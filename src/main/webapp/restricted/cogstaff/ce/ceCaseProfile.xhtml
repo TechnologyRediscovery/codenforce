@@ -745,14 +745,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 ajax="true"
                                                                 styleClass="noFill button-size-small"
                                                                 actionListener="#{ceCaseSearchProfileBB.onViolationAddInit}"
-                                                                value="Add Violation"
+                                                                value="Add Violations"
                                                                 oncomplete="PF('violation-selectelement-dialog-var').show()"
                                                                 icon="fa fa-plus"
+                                                                update="violation-selectelement-dialog
+                                                                        violation-selectelement-form"
                                                                 />
 
                                             <p:spacer height="5px" />
-
-
 
                                             <p:dataTable
                                                 id="cecase-violations-table"
@@ -3737,7 +3737,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                     <p:dialog   id="violation-add-dialog"
-                                height="600" width="1000"
+                                height="700" width="1000"
                                 widgetVar="violation-add-dialog-var"
                                 responsive="true"
                                 modal="true"
@@ -3745,11 +3745,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 closable="true"
                                 closeOnEscape="true"
                                 rendered="true"
-                                header="Record New Code Violation @ #{ceCaseSearchProfileBB.currentCase.property.address}">
+                                header="Record New Code Violations @ #{ceCaseSearchProfileBB.currentCase.property.address}">
 
                         <h:form id="violation-add-form">
 
-                            <p:growl />
+                            <p:growl id="violation-add-growl"/>
+                            
 
                             <div class="ui-g data_container_nested_restrict">
 
@@ -3759,7 +3760,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     <p:commandButton    id="violation-insert-button0"
                                                         ajax="false" 
-                                                        value="Record Violation" 
+                                                        value="Record Violations" 
                                                         action="#{ceCaseSearchProfileBB.onViolationAddCommitButtonChange}" 
                                                         icon="fa fa-warning" />
                                 </div>
@@ -3774,205 +3775,223 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         action="#{ceCaseSearchProfileBB.onViolationAddAbortButtonChange}" 
                                                         icon="fa fa-stop" />
                                 </div>
-
-                                <!--NESTED DATA FIELD -->
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                    <!--NESTED DATA LABEL INLINE -->
-                                    <div class="restrict-data-field-label-inline" >
-                                        <h:outputLabel value="Ordinance Details"/>
-                                    </div>
-                                    <!--NESTED DATA VALUE INLINE -->
-                                    <div class="restrict-data-field-value-inline" >
-                                        <h:outputText    id="violation-add-source-ot"
-                                                         value="Source: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.source.sourceName} (#{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.source.sourceYear})"/>
-
-                                        <p:spacer height="2px" />
-
-                                        <h:outputText    id="violation-add-chapter-ot"
-                                                         value="Chapter #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordchapterNo}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordchapterTitle}"/>
-
-                                        <p:spacer height="2px" />
-
-                                        <h:outputText    id="violation-add-section-ot"
-                                                         value="Section #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSecNum}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSecTitle}"/>
-
-                                        <h:outputText value=" | " />
-
-                                        <h:outputText    id="violation-add-subsection-ot"
-                                                         value="Sub-Sec #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSecNum}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSecTitle}"/>
-
-                                        <p:spacer height="2px" />
-
-                                        <h:outputText    id="violation-add-category-ot"
-                                                         value="Category: #{!(empty ceCaseSearchProfileBB.currentViolation.violatedEnfElement.guideEntry) ? ceCaseSearchProfileBB.currentViolation.violatedEnfElement.guideEntry.category :'' }"/>
-
-                                        <p:spacer height="2px" />
-
-                                        <h:outputText   id="violation-add-ord-text"
-                                                        styleClass="monospace"
-                                                        value="#{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordTechnicalText}"
-                                                        escape="false" />
-                                    </div>
-                                </div>
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                    <div class="restrict-main-contents-io-title" >
-                                        <h:outputLabel for="viol-date-dor">
-                                            <h:outputText value="Date of Record"/>
-                                        </h:outputLabel>
-                                    </div>
-
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:growl for="viol-date-dor" />
-                                        <p:calendar id="viol-date-dor"
-                                                    value="#{ceCaseSearchProfileBB.currentViolation.dateOfRecordUtilDate}" 
-                                                    mode="popup"  
-                                                    showOn="button" 
-                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                    navigator="true" 
-                                                    tabindex="2" 
-                                                    timeInput="true" 
-                                                    showHour="true" 
-                                                    showMinute="true"
-                                                    showButtonPanel="true" 
-                                                    showTodayButton="true"
-                                                    required="true"/>
-                                    </div>
-                                </div>
-
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                    <div class="restrict-main-contents-io-title" >
-                                        <h:outputLabel for="viol-date-stipcomp">
-                                            <h:outputText value="Stipulated Compliance Date"/>
-                                        </h:outputLabel>
-                                    </div>
-
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:growl for="viol-date-stipcomp"/>
-
-                                        <h:outputText value="(Default value is based on the ordinance's default days to comply of 
-                                                      #{ceCaseSearchProfileBB.currentViolation.codeViolated.normDaysToComply})"
-                                                      style="font-style: italic"/>
-                                        <p:spacer height="3px" />
-                                        <p:calendar id="viol-date-stipcomp"
-                                                    value="#{ceCaseSearchProfileBB.currentViolation.stipulatedComplianceDateUtilDate}" 
-                                                    mode="popup"  
-                                                    showOn="button" 
-                                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                    navigator="true" 
-                                                    tabindex="1"
-                                                    timeInput="true" 
-                                                    showHour="true" 
-                                                    showMinute="true"
-                                                    showButtonPanel="true" 
-                                                    showTodayButton="true"
-                                                    required="true"/>
-                                    </div>
-                                </div>
-
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                    <div class="restrict-main-contents-io-title" >
-
-                                        <p:outputLabel for="viol-penalty">
-                                            <h:outputText value="Penalty ($)"/>
-                                        </p:outputLabel>
-                                    </div>
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:growl for="viol-penalty" />
-                                        <p:inputText id="viol-penalty" 
-                                                     value="#{ceCaseSearchProfileBB.currentViolation.penalty}"
-                                                     tabindex="3" 
-                                                     required="true" 
-                                                     type="number"/>
-                                    </div>
-
-                                </div>
-
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                    <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel for="viol-descr">
-                                            <h:outputText value="Description of code violation"/>
-                                        </p:outputLabel>
-                                    </div>
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:growl for="viol-descr" />
-                                        <p:inputTextarea id="viol-descr" 
-                                                         value="#{ceCaseSearchProfileBB.currentViolation.description}"
-                                                         tabindex="5" 
-                                                         style="width: 100%"
-                                                         required="true" />
-
-                                    </div>
-
-                                </div>
-
-
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                    <div class="restrict-main-contents-io-content" >
-                                        <p:selectBooleanCheckbox id="violation-findings-makedefault-chkbx-0"
-                                                                 value="#{ceCaseSearchProfileBB.formMakeFindingsDefault}"
-                                                                 itemLabel="Make these findings the default for enforcable ordinance ID:#{ceCaseSearchProfileBB.currentViolation.codeViolated.codeSetElementID}"
-                                                                 />
-                                    </div>
-
-                                </div>
-
-                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                    <div class="restrict-main-contents-io-title" >
-                                        <p:outputLabel  for="violation-severity-som">
-                                            <h:outputText value="Violation severity" />
-                                        </p:outputLabel>
-                                    </div>
-                                    <div class="restrict-main-contents-io-content" >
-
-                                        <h:selectOneMenu id="violation-severity-som"
-                                                         value="#{ceCaseSearchProfileBB.currentViolation.severityIntensity}" style="width:175px;height:25px">
-                                            <f:converter converterId="intensityClassConverter"/>
-
-                                            <f:selectItem itemLabel="select a severity" noSelectionOption="true" />
-
-                                            <f:selectItems id="violation-severity-selitems"
-                                                           value="#{ceCaseSearchProfileBB.severityList}"
-                                                           var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
-
-                                        </h:selectOneMenu>
-
-                                    </div>
-                                </div>
-
-
-
                             </div>
+                            <p:spacer height="5px" />
+                            
+                            <p:scrollPanel style="height:600px; width:950px;">
+                                
+                                <ui:repeat value="#{ceCaseSearchProfileBB.selectedViolationList}"
+                                              var="bcv">
+                                    <div class="ui-g data_container_nested_restrict">
+                                        <!--NESTED DATA FIELD -->
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
 
-                            <p:spacer height="10px"/>
+                                            <!--NESTED DATA LABEL INLINE -->
+                                            <div class="restrict-data-field-label-inline" >
+                                                <h:outputLabel value="Ordinance Details: #{bcv.violatedEnfElement.ordSubSecNum}: #{bcv.violatedEnfElement.ordSubSecTitle} " style="font-size: 2em;"/>
+                                            </div>
+                                            <!--NESTED DATA VALUE INLINE -->
+                                            <div class="restrict-data-field-value-inline" >
+                                                <h:outputText    id="violation-add-source-ot"
+                                                                 value="Source: #{bcv.violatedEnfElement.source.sourceName} (#{bcv.violatedEnfElement.source.sourceYear})"/>
+
+                                                <p:spacer height="2px" />
+
+                                                <h:outputText    id="violation-add-chapter-ot"
+                                                                 value="Chapter #{bcv.violatedEnfElement.ordchapterNo}: #{bcv.violatedEnfElement.ordchapterTitle}"/>
+
+                                                <p:spacer height="2px" />
+
+                                                <h:outputText    id="violation-add-section-ot"
+                                                                 value="Section #{bcv.violatedEnfElement.ordSecNum}: #{bcv.violatedEnfElement.ordSecTitle}"/>
+
+                                                <h:outputText value=" | " />
+
+                                                <h:outputText    id="violation-add-subsection-ot"
+                                                                 value="Sub-Sec #{bcv.violatedEnfElement.ordSubSecNum}: #{bcv.violatedEnfElement.ordSubSecTitle}"/>
+
+                                                <p:spacer height="2px" />
+
+                                                <h:outputText    id="violation-add-category-ot"
+                                                                 value="Category: #{!(empty bcv.violatedEnfElement.guideEntry) ? bcv.violatedEnfElement.guideEntry.category :'' }"/>
+
+                                                <p:spacer height="2px" />
+
+                                                <h:outputText   id="violation-add-ord-text"
+                                                                styleClass="monospace"
+                                                                value="#{bcv.violatedEnfElement.ordTechnicalText}"
+                                                                escape="false" />
+                                            </div>
+                                        </div>
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                            <div class="restrict-main-contents-io-title" >
+                                                <h:outputLabel for="viol-date-dor">
+                                                    <h:outputText value="Date of Record"/>
+                                                </h:outputLabel>
+                                            </div>
+
+                                            <div class="restrict-main-contents-io-content" >
+                                                <p:growl for="viol-date-dor" />
+                                                <p:calendar id="viol-date-dor"
+                                                            value="#{bcv.dateOfRecordUtilDate}" 
+                                                            mode="popup"  
+                                                            showOn="button" 
+                                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                            navigator="true" 
+                                                            tabindex="2" 
+                                                            timeInput="true" 
+                                                            showHour="true" 
+                                                            showMinute="true"
+                                                            showButtonPanel="true" 
+                                                            showTodayButton="true"
+                                                            required="true"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                            <div class="restrict-main-contents-io-title" >
+                                                <h:outputLabel for="viol-date-stipcomp">
+                                                    <h:outputText value="Stipulated Compliance Date"/>
+                                                </h:outputLabel>
+                                            </div>
+
+                                            <div class="restrict-main-contents-io-content" >
+                                                <p:growl for="viol-date-stipcomp"/>
+
+                                                <h:outputText value="(Default value is based on the ordinance's default days to comply of 
+                                                              #{bcv.codeViolated.normDaysToComply})"
+                                                              style="font-style: italic"/>
+                                                <p:spacer height="3px" />
+                                                <p:calendar id="viol-date-stipcomp"
+                                                            value="#{bcv.stipulatedComplianceDateUtilDate}" 
+                                                            mode="popup"  
+                                                            showOn="button" 
+                                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                            navigator="true" 
+                                                            tabindex="1"
+                                                            timeInput="true" 
+                                                            showHour="true" 
+                                                            showMinute="true"
+                                                            showButtonPanel="true" 
+                                                            showTodayButton="true"
+                                                            required="true"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                            <div class="restrict-main-contents-io-title" >
+
+                                                <p:outputLabel for="viol-penalty">
+                                                    <h:outputText value="Penalty ($)"/>
+                                                </p:outputLabel>
+                                            </div>
+                                            <div class="restrict-main-contents-io-content" >
+                                                <p:growl for="viol-penalty" />
+                                                <p:inputText id="viol-penalty" 
+                                                             value="#{bcv.penalty}"
+                                                             tabindex="3" 
+                                                             required="true" 
+                                                             type="number"/>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                            <div class="restrict-main-contents-io-title" >
+                                                <p:outputLabel for="viol-descr">
+                                                    <h:outputText value="Description of code violation"/>
+                                                </p:outputLabel>
+                                            </div>
+                                            <div class="restrict-main-contents-io-content" >
+                                                <p:growl for="viol-descr" />
+                                                <p:inputTextarea id="viol-descr" 
+                                                                 value="#{bcv.description}"
+                                                                 tabindex="5" 
+                                                                 style="width: 100%"
+                                                                 required="true" />
+
+                                            </div>
+
+                                        </div>
 
 
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
 
-                            <div class="restrict-main-contents-io-button">
+                                            <div class="restrict-main-contents-io-content" >
+                                                <p:selectBooleanCheckbox id="violation-findings-makedefault-chkbx-0"
+                                                                         value="#{bcv.makeFindingsDefault}"
+                                                                         itemLabel="Make these findings the default for enforcable ordinance ID:#{bcv.codeViolated.codeSetElementID}"
+                                                                         />
+                                            </div>
+
+                                        </div>
+
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                                            <div class="restrict-main-contents-io-title" >
+                                                <p:outputLabel  for="violation-severity-som">
+                                                    <h:outputText value="Violation severity" />
+                                                </p:outputLabel>
+                                            </div>
+                                            <div class="restrict-main-contents-io-content" >
+
+                                                <h:selectOneMenu id="violation-severity-som"
+                                                                 value="#{bcv.severityIntensity}" style="width:175px;height:25px">
+                                                    <f:converter converterId="intensityClassConverter"/>
+
+                                                    <f:selectItem itemLabel="select a severity" noSelectionOption="true" />
+
+                                                    <f:selectItems id="violation-severity-selitems"
+                                                                   value="#{ceCaseSearchProfileBB.severityList}"
+                                                                   var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
+
+                                                </h:selectOneMenu>
+
+                                            </div>
+                                        </div>
+                                        <div class="restrict-main-contents-io-button gray_button">
+                                            
+                                            <p:commandButton    id="violation-removefrombatch"
+                                                           ajax="true" 
+                                                           value="Remove violation" 
+                                                           immediate="true" 
+                                                           action="#{ceCaseSearchProfileBB.onViolationRemoveFromBatchButtonChange(bcv)}" 
+                                                           icon="fa fa-eraser" 
+                                                           update="violation-add-form"/>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                </ui:repeat>
+                            </p:scrollPanel>
 
 
-                                <p:commandButton    id="violation-insert-button1"
-                                                    ajax="false" 
-                                                    value="Record Violation" 
-                                                    action="#{ceCaseSearchProfileBB.onViolationAddCommitButtonChange}" 
-                                                    icon="fa fa-warning" />
-                            </div>
+                            <p:spacer height="5px"/>
+                            <div class="ui-g data_container_nested_restrict">
 
-                            <div class="restrict-main-contents-io-button gray_button">
+                                <div class="restrict-main-contents-io-button">
 
-                                <p:commandButton    id="violation-insert-abort-button1"
-                                                    ajax="false" 
-                                                    value="Cancel" 
-                                                    process="@none" 
-                                                    immediate="true" 
-                                                    action="#{ceCaseSearchProfileBB.onViolationAddAbortButtonChange}" 
-                                                    icon="fa fa-stop" />
+
+                                    <p:commandButton    id="violation-insert-button1"
+                                                        ajax="false" 
+                                                        value="Record Violations" 
+                                                        action="#{ceCaseSearchProfileBB.onViolationAddCommitButtonChange}" 
+                                                        icon="fa fa-warning" />
+                                </div>
+
+                                <div class="restrict-main-contents-io-button gray_button">
+
+                                    <p:commandButton    id="violation-insert-abort-button1"
+                                                        ajax="false" 
+                                                        value="Cancel" 
+                                                        process="@none" 
+                                                        immediate="true" 
+                                                        action="#{ceCaseSearchProfileBB.onViolationAddAbortButtonChange}" 
+                                                        icon="fa fa-stop" />
+                                </div>
                             </div>
 
                         </h:form>
@@ -4409,7 +4428,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                      closable="true"
                                      responsive="true">
 
-                        >
+                        
                         <div class="ui-g data_container_nested_restrict">
                             <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
                                 <div class="restrict-data-field-label-inline" >
@@ -5334,12 +5353,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 > 
 
                         <h:form id="violation-selectelement-form">
-
+                            
+                            <p:commandButton    id="viol-selectelement-done-cb"
+                                                ajax="true"  
+                                                tabindex="27"
+                                                value="Add selected violations"
+                                                icon="fa fa-check"
+                                                actionListener="#{ceCaseSearchProfileBB.onOrdinanceSelectionCompleteButtonChange}"
+                                                oncomplete="PF('violation-add-dialog-var').show()"
+                                                update="violation-add-form"/>
+                            
+                            <p:spacer height="5px" />
+                                                
                             <p:dataTable
                                 id="enforcableCodeSetElementTable"
                                 var="cse"
                                 value="#{ceCaseSearchProfileBB.currentCodeSet.enfCodeElementList}"
                                 rowKey="#{cse.codeSetElementID}"
+                                selection="#{ceCaseSearchProfileBB.selectedElementList}"
                                 tableStyleClass="primeDataTable"
                                 scrollable="true"
                                 resizableColumns="true"
@@ -5349,6 +5380,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 expandedRow="false"
                                 widgetVar="codeSetElementListTable">
 
+                                 <p:column selectionMode="multiple" 
+                                           style="width:16px;text-align:center"/>
+                                 
                                 <p:column width="3%">
                                     <f:facet name="header">
                                         <h:outputText value="Exp"/>
@@ -5423,24 +5457,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-                                <p:column width="10%" sortBy="#{cse.guideEntry.subCategory}"
-                                          filterBy="#{cse.guideEntry.subCategory}">
-                                    <f:facet name="header">
-                                        <h:outputText value="Action" />
-                                    </f:facet>
-
-                                    <p:commandButton   id="violation-select-button"
-                                                       ajax="true"
-                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                       value="Select"  
-                                                       icon="fa fa-check-square"
-                                                       actionListener="#{ceCaseSearchProfileBB.onViolationSelectElementButtonChange(cse)}"
-                                                       oncomplete="PF('violation-add-dialog-var').show()"
-                                                       update="violation-add-form"/>
-
-
-                                </p:column>
-
+                               
 
                                 <p:rowExpansion>
                                     <div class="outlinedBox">
@@ -6016,9 +6033,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:inputText  id="event-add-descr-it" 
+                                        <p:inputTextarea  id="event-add-descr-it" 
                                                       value="#{ceCaseSearchProfileBB.currentEvent.description}" 
-                                                      style="width: 100%;" 
+                                                      style="width: 100%; height: 150px;" 
                                                       tabindex="3" 
                                                       required="false" />
                                     </div>

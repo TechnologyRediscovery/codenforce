@@ -16,15 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.BlobCoordinator;
-import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.coordinators.*;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
@@ -32,34 +24,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobLight;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
-import com.tcvcog.tcvce.entities.CaseStageEnum;
-import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.CitationStatus;
-import com.tcvcog.tcvce.entities.CodeSet;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.CourtEntity;
-import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
-import com.tcvcog.tcvce.entities.EventDomainEnum;
-import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.IntensityClass;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
-import com.tcvcog.tcvce.entities.PageModeEnum;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonDataHeavy;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyDataHeavy;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
@@ -82,14 +47,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
-import javax.faces.event.ValueChangeEvent;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -151,6 +112,8 @@ public class CECaseSearchProfileBB
     
     private String formNoteTextViolation;
     private List<EnforcableCodeElement> filteredElementList;
+    private List<EnforcableCodeElement> selectedElementList;
+    private List<CodeViolation> selectedViolationList;
     private CodeSet currentCodeSet;
 
     private boolean extendStipCompUsingDate;
@@ -1219,7 +1182,7 @@ public class CECaseSearchProfileBB
     /**
      * Listener for user requests to start nullify operation
      * @param ev
-     */
+    */
     public void onViolationNullifyInitButtonChange(ActionEvent ev){
         // nothing to do here since we got to this point 
         // having viewed the violation so currentViolation is correct
@@ -1227,41 +1190,109 @@ public class CECaseSearchProfileBB
     
     
    
-     /**
-     * Listener for user selection of a violation from the code set violation
-     * table
+    /**
+     * Internal coordinator call shell for each of the selected ECE's from list
      *
      * @param ece
-     */
-    public void onViolationSelectElementButtonChange(EnforcableCodeElement ece) {
-        System.out.println("CECaseSearchProfileBB.onViolationSelectElementButtonChange: CSEID: " + ece.getCodeSetElementID());
+    */
+    private CodeViolation injectOrdinanceIntoViolation(EnforcableCodeElement ece) throws BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
-        try {
-            currentViolation = cc.violation_injectOrdinance(currentCase, getCurrentViolation(), ece, null);
-        } catch (BObStatusException ex) {
+        CodeViolation cv = null;
+        cv = cc.violation_injectOrdinance(currentCase, cc.violation_getCodeViolationSkeleton(currentCase), ece, null);
+       
+        return cv;
+    }
+    
+    /**
+     * Listener for user indication that ordinances have been selected
+     * and we're ready to configure the violation of those ordinances
+     * Iterates over each of the selected elements and injects the ordinance
+     * and builds a violation list for configuration
+     * 
+    */
+    public void onOrdinanceSelectionCompleteButtonChange(){
+        if(!selectedElementList.isEmpty()){
+            for(EnforcableCodeElement ece: selectedElementList){
+                try{
+                    System.out.println("onOrdinanceSelectionCompleteButtonChange | visiting eceID: " + ece.getCodeSetElementID());
+                    CodeViolation cv = injectOrdinanceIntoViolation(ece);
+                    System.out.println("onOrdinanceSelectionCompleteButtonChange | Adding Code Violation to list, cseID: " + cv.getViolatedEnfElement().getCodeSetElementID());
+                    selectedViolationList.add(cv);
+                } catch (BObStatusException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    ex.getMessage(), ""));
+                }
+            }
+        } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
+                            "At least one ordinance is required!", ""));
+        }
+    }
+    
+    /**
+     * Responds to user requests to commit a new code violation to the CECase
+     *
+     * @return
+    */
+    public String onViolationAddCommitButtonChange() {
+
+        CaseCoordinator cc = getCaseCoordinator();
+        UserAuthorized ua = getSessionBean().getSessUser();
+        
+        // Iterate over all the violations and add them to our case
+        if(!selectedViolationList.isEmpty()){
+            for(CodeViolation cv: selectedViolationList){
+                try {
+                    cc.violation_attachViolationToCase(cv, currentCase, ua);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                    "Success! Violation attached to case.", ""));
+                    // Removed for batch processing
+                    //            getSessionBean().getSessionBean().setSessCodeViolation(currentViolation);
+                    System.out.println("ViolationBB.onViolationAddCommmitButtonChange | attached violation to case");
+                    if(cv.isMakeFindingsDefault()){
+                        makeViolationFindingsDefault(cv);
+                    }
+                } catch (IntegrationException | SearchException | BObStatusException | EventException | ViolationException ex) {
+                    System.out.println(ex);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    ex.getMessage(), ""));
+                }
+            }
+        }
+        
+        return "ceCaseProfile";
+
+    }
+    
+    /**
+     * Listener for user requests to remove a violation from the list
+     * of ECEs turned into violations, prior to their attachment to the case
+     * @param cv 
+     */
+    public void onViolationRemoveFromBatchButtonChange(CodeViolation cv){
+        if(cv != null && !selectedViolationList.isEmpty()){
+            selectedViolationList.remove(cv);
+            System.out.println("Removed Violation ECE ID from batch: " + cv.getViolatedEnfElement().getCodeSetElementID());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Removed Ordiance from Batch-Code Set Element ID: " + cv.getViolatedEnfElement().getCodeSetElementID(), ""));
         }
     }
     
     /**
      * Listener for user requests to start the violation add process
+     * 
      * @param ev
      */
     public void onViolationAddInit(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        System.out.println("violationBB.OnModeInsertInit");
-
-        try {
-            currentViolation = cc.violation_getCodeViolationSkeleton(currentCase);
-        } catch (BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-        }
-
+        // setup our lists
+        selectedElementList = new ArrayList<>();
+        selectedViolationList = new ArrayList<>();
+        System.out.println("OnViolationAddInit: Selected Element list Size: " + selectedElementList.size());
     }
     
       /**
@@ -1574,6 +1605,12 @@ public class CECaseSearchProfileBB
         return "ceCaseProfile";
     }
     
+    /**
+     * Manages requesting that a particular violation's description
+     * be made default for all future additions of this violation to the case
+     * 
+     * @param cv 
+     */
     private void makeViolationFindingsDefault(CodeViolation cv){
         CaseCoordinator cc = getCaseCoordinator();
         try {
@@ -1689,36 +1726,7 @@ public class CECaseSearchProfileBB
 
   
 
-    /**
-     * Responds to user requests to commit a new code violation to the CECase
-     *
-     * @return
-     */
-    public String onViolationAddCommitButtonChange() {
-
-        CaseCoordinator cc = getCaseCoordinator();
-
-        try {
-            cc.violation_attachViolationToCase(currentViolation, currentCase, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success! Violation attached to case.", ""));
-            getSessionBean().getSessionBean().setSessCodeViolation(currentViolation);
-            System.out.println("ViolationBB.onViolationAddCommmitButtonChange | completed violation process");
-        } catch (IntegrationException | SearchException | BObStatusException | EventException | ViolationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            return "";
-        }
-        
-        if(formMakeFindingsDefault){
-            makeViolationFindingsDefault(currentViolation);
-        }
-        return "ceCaseProfile";
-
-    }
+  
     
     /**
      * Listener for user requests to abort violation add process
@@ -3380,6 +3388,34 @@ public class CECaseSearchProfileBB
      */
     public void setCurrentBlob(BlobLight currentBlob) {
         this.currentBlob = currentBlob;
+    }
+
+    /**
+     * @return the selectedElementList
+     */
+    public List<EnforcableCodeElement> getSelectedElementList() {
+        return selectedElementList;
+    }
+
+    /**
+     * @param selectedElementList the selectedElementList to set
+     */
+    public void setSelectedElementList(List<EnforcableCodeElement> selectedElementList) {
+        this.selectedElementList = selectedElementList;
+    }
+
+    /**
+     * @return the selectedViolationList
+     */
+    public List<CodeViolation> getSelectedViolationList() {
+        return selectedViolationList;
+    }
+
+    /**
+     * @param selectedViolationList the selectedViolationList to set
+     */
+    public void setSelectedViolationList(List<CodeViolation> selectedViolationList) {
+        this.selectedViolationList = selectedViolationList;
     }
 
    

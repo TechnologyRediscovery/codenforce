@@ -2817,8 +2817,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if (cv.getStipulatedComplianceDate().isBefore(cv.getDateOfRecord())) {
             throw new ViolationException("Stipulated compliance date cannot be before the violation's date of record");
         }
-        
-        
     }
     
     /**
@@ -2831,7 +2829,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws BObStatusException 
      */
-    public CodeViolation violation_injectOrdinance(CECase cse, CodeViolation cv, EnforcableCodeElement ece, MunicipalityDataHeavy mdh ) throws BObStatusException{
+    public CodeViolation    violation_injectOrdinance(  CECase cse, 
+                                                        CodeViolation cv, 
+                                                        EnforcableCodeElement ece, 
+                                                        MunicipalityDataHeavy mdh ) 
+                            throws BObStatusException{
 
         if(cse != null && cv != null && ece != null){
             List<CodeViolation> vlst = new ArrayList<>();

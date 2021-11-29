@@ -45,7 +45,7 @@ public class CodeViolationDisplayable extends CodeViolation {
         this.severityIntensity = cv.severityIntensity;
         this.lastUpdatedTS = cv.lastUpdatedTS;
         this.lastUpdatedUser = cv.lastUpdatedUser;
-        
+        this.makeFindingsDefault = cv.makeFindingsDefault;
         this.nullifiedTS = cv.nullifiedTS;
         this.nullifiedUser = cv.nullifiedUser;
         

@@ -238,7 +238,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             for (IntensityClass ic : classList) {
                 if (ic.isActive()) {
                     classListFinal.add(ic);
-
                 }
             }
         }
