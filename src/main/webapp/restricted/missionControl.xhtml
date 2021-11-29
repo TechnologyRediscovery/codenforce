@@ -328,12 +328,7 @@
                                         <p:growl id="prop-search-messages" showDetail="false"/>
                                     </h:form>
                                     
-                                    <h:form id="prop-pie-form">
-                                        
-                                        <p:pieChart id="pie-property"
-                                                    model="#{missionControlBB.pieProperty}" />
-                                    </h:form>
-
+                                  
                                     <h:form id="prop-search-query-form">
 
                                         <!-- NESTED DATA CONTAINER -->
@@ -1119,7 +1114,7 @@
 
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                                     <div class="restrict-main-contents-io-link">
-
+                                        <h2>
                                         <p:commandLink  ajax="false" 
                                                         action="#{ceCaseSearchProfileBB.generateReportCECaseList}"
                                                         value="Click to generate report in new tab" 
@@ -1127,6 +1122,7 @@
                                                         styleClass="font-size:2em;"
                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                         />
+                                        </h2>
                                     </div>
                                     <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                                         <div class="ui-button gray_button">

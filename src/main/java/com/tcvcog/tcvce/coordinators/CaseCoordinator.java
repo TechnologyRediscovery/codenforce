@@ -482,7 +482,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             statusBundle.setPhase(CasePhaseEnum.Closed);
             // jump right to court-based phase assignment if we have at least 1 elegible citation
         } else if (!cecase_buildCitationListForPhaseAssignment(cse).isEmpty()){
-            statusBundle.setPhase(cecase_determineAndSetPhase_stageCITATION(cse));
+            // Use catch all for citation at any stage of the process
+            statusBundle.setPhase(CasePhaseEnum.Cited);
+            // TODO: fix complex logic on citation phase stuff
+//            statusBundle.setPhase(cecase_determineAndSetPhase_stageCITATION(cse));
         } else {
 
             // find overriding factors to have a closed 
@@ -551,7 +554,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             }
         }
         
-        
         return citList;
         
     }
@@ -561,7 +563,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * 
      * Assesses the list of events and citations on the case to determine the 
      * appropriate post-hearing related case phase
-     * 
+     * NOTE AS OF 29-NOV-2020: Let's just do: citation status, minus event processing
      * 
      *
      * @param cse

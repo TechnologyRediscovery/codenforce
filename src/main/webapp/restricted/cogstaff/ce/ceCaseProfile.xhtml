@@ -746,6 +746,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 styleClass="noFill button-size-small"
                                                                 actionListener="#{ceCaseSearchProfileBB.onViolationAddInit}"
                                                                 value="Add Violations"
+                                                                disabled="#{!empty ceCaseSearchProfileBB.currentCase.closingDate}"
                                                                 oncomplete="PF('violation-selectelement-dialog-var').show()"
                                                                 icon="fa fa-plus"
                                                                 update="violation-selectelement-dialog
@@ -841,7 +842,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         ajax="true" 
                                                                         value="edit"
                                                                         actionListener="#{ceCaseSearchProfileBB.onViolationUpdateInitButtonChange(v)}"
-                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                                         update="violation-details-dialog
                                                                         violation-details-form"
                                                                         oncomplete="PF('violation-details-dialog-var').show()"/>
@@ -4321,10 +4322,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                           ajax="true" 
                                                           actionListener="#{ceCaseSearchProfileBB.onViolationUpdateStipDateInitButtonChange}"
                                                           oncomplete="PF('violation-update-stipdate-dialog-var').show()"
-                                                          disabled="false"
+                                                          disabled="#{!(empty ceCaseSearchProfileBB.currentViolation.actualComplianceDate)}"
                                                           style="color: blue;"
                                                           styleClass="noFill"
-                                                          value="Change Compliance Date" />
+                                                          value="Change Stip. Comp. Date"
+                                                          update="violation-update-stipdate-dialog
+                                                          violation-update-stipdate-form"/>
 
 
                                     </div>
@@ -4574,7 +4577,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 ajax="false"
                                 action="#{ceCaseSearchProfileBB.onViolationExtendStipCompDateCommitButtonChange}"
                                 value="Change Stipulated Complaince Date"
-                                disabled="#{!(empty ceCaseSearchProfileBB.currentViolation.actualComplianceDate)}"
+                                disabled="false"
                                 update="form-messages-growl"
                                 />
                             <p:spacer height="5px" />

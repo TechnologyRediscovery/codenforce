@@ -66,6 +66,17 @@ public enum CasePhaseEnum {
                                     true,
                                     true,
                                     true),
+    Cited                       (   "Citation issued--Any stage of court process", 
+                                        "Case is at any stage of the court review process.",
+                                        "howto-citation",
+                                        5, 
+                                        CaseStageEnum.Citation, 
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true),
+    
     
     AwaitingHearingDate             (   "Citation issued; Awaiting Hearing Date", 
                                         "Monitor mail for court documents; create event when hearing is scheduled",
