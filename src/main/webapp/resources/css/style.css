@@ -50,6 +50,11 @@ body{
     font-family: 'Heebo';
 }
 
+release {
+    font-size: 0.3em;
+    color: lightgray;
+}
+
 /*---------------- HEADERS -------------------*/
 
 h1{
