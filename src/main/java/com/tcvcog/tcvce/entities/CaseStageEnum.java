@@ -14,6 +14,7 @@ public enum CaseStageEnum {
     Investigation("Investigation", "caseStageInvestigationIconID"),
     Enforcement("Enforcement", "caseStageEnforcementIconID"),
     Citation("Citation", "caseStageCitationIconID"),
+    Review("Final Review", "caseStageReviewIconID"),
     Closed("Closed", "caseStageClosedIconID"),
     Unknown("Unknown", "caseStageUnknownIconID");
     

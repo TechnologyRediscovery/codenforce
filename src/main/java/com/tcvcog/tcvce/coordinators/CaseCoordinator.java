@@ -137,11 +137,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
            {
 
         Credential cred = null;
-        if (ua != null && c != null) {
+        if (ua != null && c != null && c.getCaseID() != 0) {
             cred = ua.getKeyCard();
 
         } else {
-            throw new BObStatusException("Cannot construct cecaseDH with null case input");
+            throw new BObStatusException("CaseCoordinator.cecase_assembleCECaseDataHeavy: Cannot construct cecaseDH with null case input or caseID = 0");
         }
         SearchCoordinator sc = getSearchCoordinator();
         WorkflowCoordinator wc = getWorkflowCoordinator();
@@ -487,26 +487,21 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             // TODO: fix complex logic on citation phase stuff
 //            statusBundle.setPhase(cecase_determineAndSetPhase_stageCITATION(cse));
         } else {
-
             // find overriding factors to have a closed 
             if (cse.getViolationList().isEmpty()) {
                 // Open case, no violations yet: only one mapping
-
                 statusBundle.setPhase(CasePhaseEnum.PrelimInvestigationPending);
-
                 // we have at least one violation attached  
             } else {
-
                 // If we don't have a mailed notice, then we're in Notice Delivery phase
                 if (!cecase_determineIfNoticeHasBeenMailed(cse)) {
                     statusBundle.setPhase(CasePhaseEnum.IssueNotice);
-
                     // notice has been sent so we're in CaseStageEnum.Enforcement or beyond
                 } else {
                     int maxVStage = violation_determineMaxViolationStatus(cse.getViolationList());
                     switch (maxVStage) {
                         case 0:  // all violations resolved
-                            statusBundle.setPhase(CasePhaseEnum.Closed);
+                            statusBundle.setPhase(CasePhaseEnum.FinalReview);
                             break;
                         case 1: // all violations within compliance window
                             statusBundle.setPhase(CasePhaseEnum.InsideComplianceWindow);
@@ -792,7 +787,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.EventException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public int cecase_insertNewCECase(CECase freshCase, UserAuthorized ua, CEActionRequest cear) 
+    public CECaseDataHeavy cecase_insertNewCECase(CECase freshCase, UserAuthorized ua, CEActionRequest cear) 
             throws IntegrationException, 
             BObStatusException, 
             ViolationException, 
@@ -818,7 +813,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // the integrator returns to us a CECaseDataHeavy with the correct ID after it has
         // been written into the DB
         int freshID = ci.insertNewCECase(freshCase);
-        CECaseDataHeavy cedh = cecase_assembleCECaseDataHeavy(freshCase, ua);
+        CECase insertedCase = ci.getCECase(freshID);
+        // adjusted during turkey 21 updates
+        CECaseDataHeavy cedh = cecase_assembleCECaseDataHeavy(insertedCase, ua);
+        
 
         // If we were passed in an action request, connect it to the new case we just made
         if (cear != null) {
@@ -829,7 +827,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             originationEvent = ec.initEvent(cedh, originationCategory);
             StringBuilder sb = new StringBuilder();
             originationEvent.setNotes(sb.toString());
-        } else if(freshCase.isPropertyInfoCase()){
+        } else if(insertedCase.isPropertyInfoCase()){
             // This is a property info case, it originated to store info
             originationCategory = ec.initEventCategory(
                     Integer.parseInt(getResourceBundle(
@@ -850,11 +848,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         originationEvent.setUserCreator(uc.user_getUser(ua.getUserID()));
 
-        cedh.setCaseID(freshID);
-
         ec.addEvent(originationEvent, cedh, ua);
         
-        return freshID;
+        return cedh;
     }
     
     /**
@@ -3112,7 +3108,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         cv.setLastUpdatedUser(u);
 
         ci.updateCodeViolationCompliance(cv);
-        violation_checkForFullComplianceAndCloseCaseIfTriggered(cse, u);
+        // Based on user feedback, we are suspending auto-closing of case
+        // upon all violation coming into compliance
+        // as of 2-DEC-2021
+        
+//        violation_checkForFullComplianceAndCloseCaseIfTriggered(cse, u);
     }
 
     /**

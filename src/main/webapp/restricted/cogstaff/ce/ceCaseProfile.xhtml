@@ -283,7 +283,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                 oncomplete="PF('case-forceclose-dialog-var').show()"
                                                                                 disabled="false"
                                                                                 style="color:blue;"
-                                                                                value="force close" />
+                                                                                value="close case" />
 
                                                         </div>
 
@@ -947,9 +947,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:column headerText="Category"
                                                           sortBy="#{event.category.eventCategoryTitle}"
                                                           styleClass="centeredColumnContent">
-                                                    <div class="#{event.category.icon.styleClass}">
-                                                        <i class="material-icons status-display-icon-i"><h:outputText value="#{event.category.icon.materialIcon}"/></i>
-                                                    </div>
+                                                    <ui:remove>
+                                                        
+                                                        <div class="#{event.category.icon.styleClass}">
+                                                            <i class="material-icons status-display-icon-i"><h:outputText value="#{event.category.icon.materialIcon}"/></i>
+                                                        </div>
+                                                    </ui:remove>
                                                     <h:outputText value="#{event.category.eventType.label}:" />
                                                     <p:spacer height="1px" />
                                                     <h:outputText value="#{event.category.eventCategoryTitle}" />
@@ -5969,21 +5972,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <div class="restrict-main-contents-io-content" >
                                         <p:growl for="event-add-time-start-cal" />
 
-                                        <p:datePicker 
+                                        <p:calendar
                                             value="#{ceCaseSearchProfileBB.currentEvent.timeStartUtilDate}" 
                                             rendered="#{!empty ceCaseSearchProfileBB.currentEvent}"
                                             id="event-add-time-start-cal"
-                                            autocomplete="false"
-                                            monthNavigator="true"
-                                            yearNavigator="true"
-                                            showTime="true"
-                                            pattern="dd MMM, yyyy HH:mm"
-                                            tabindex="16" 
+                                             mode="popup"  
+                                            showOn="button" 
+                                            disabled="false"
+                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                            navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                            showButtonPanel="true" 
+                                            showTodayButton="true"
                                             required="true">
                                             <p:ajax update="event-add-time-end-cal" 
                                                     listener="#{ceCaseSearchProfileBB.onTimeStartChange}"
                                                     />
-                                        </p:datePicker>
+                                        </p:calendar>
                                     </div>
                                 </div>
                                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
@@ -6192,11 +6196,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </div>
 
                                     <div class="restrict-main-contents-io-content" >
-                                        <p:inputText  id="eventDesc" 
-                                                      value="#{ceCaseSearchProfileBB.currentEvent.description}" 
-                                                      style="width: 100%;" 
-                                                      tabindex="3" 
-                                                      required="false" />
+                                        <p:inputTextarea  id="eventDesc" 
+                                                            value="#{ceCaseSearchProfileBB.currentEvent.description}" 
+                                                            style="width: 100%; height:60px;" 
+                                                            tabindex="3" 
+                                                            required="false" />
                                     </div>
                                 </div>
 

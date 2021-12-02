@@ -45,42 +45,42 @@ public class CECaseDataHeavy
     public CECaseDataHeavy(CECase cse){
         if(cse != null){
             
-        this.caseID = cse.caseID;
-        this.publicControlCode = cse.publicControlCode;
-        this.paccEnabled = cse.paccEnabled;
+            this.caseID = cse.caseID;
+            this.publicControlCode = cse.publicControlCode;
+            this.paccEnabled = cse.paccEnabled;
 
-        this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
+            this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
 
-        this.propertyID = cse.propertyID;
-        this.propertyUnitID = cse.propertyUnitID;
+            this.propertyID = cse.propertyID;
+            this.propertyUnitID = cse.propertyUnitID;
 
-        this.caseManager = cse.caseManager;
-        this.caseName = cse.caseName;
+            this.caseManager = cse.caseManager;
+            this.caseName = cse.caseName;
 
-        this.originationDate = cse.originationDate;
-        this.closingDate = cse.closingDate;
-        this.creationTimestamp = cse.creationTimestamp;
+            this.originationDate = cse.originationDate;
+            this.closingDate = cse.closingDate;
+            this.creationTimestamp = cse.creationTimestamp;
 
-        this.notes = cse.notes;
+            this.notes = cse.notes;
 
-        this.source = cse.source;
+            this.source = cse.source;
 
-        this.citationList = cse.citationList;
-        this.noticeList = cse.noticeList;
-        this.violationList = cse.violationList;
-       
-        this.active = cse.active;
-        this.propertyInfoCase = cse.propertyInfoCase;
-        this.personInfoPersonID = cse.getPersonInfoPersonID();
-        
-        this.lastUpdatedBy = cse.getLastUpdatedBy();
-        this.lastUpdatedTS = cse.getLastUpdatedTS();
-        this.statusBundle = cse.getStatusBundle();
-        
-        this.eventList = cse.eventList;
-        this.statusAssignmentLog = cse.statusAssignmentLog;
-        
-        eventListMaster = new ArrayList<>();
+            this.citationList = cse.citationList;
+            this.noticeList = cse.noticeList;
+            this.violationList = cse.violationList;
+
+            this.active = cse.active;
+            this.propertyInfoCase = cse.propertyInfoCase;
+            this.personInfoPersonID = cse.getPersonInfoPersonID();
+
+            this.lastUpdatedBy = cse.getLastUpdatedBy();
+            this.lastUpdatedTS = cse.getLastUpdatedTS();
+            this.statusBundle = cse.getStatusBundle();
+
+            this.eventList = cse.eventList;
+            this.statusAssignmentLog = cse.statusAssignmentLog;
+
+            eventListMaster = new ArrayList<>();
         } else {
             System.out.println("CECaseDataHeavy.const: null input case");
         }

@@ -769,6 +769,9 @@
                                                 <div class="#{c.statusBundle.phaseIcon.styleClass}">
                                                     <i class="material-icons status-display-icon-i"><h:outputText value="#{c.statusBundle.phaseIcon.materialIcon}"/></i>
                                                 </div>
+                                                <p:spacer height="1px" />
+                                                <h:outputText value="#{c.statusBundle.phase.caseStage.label}" style="font-size:0.7em;" />
+                                                
                                             </p:column>
                                             <p:column width="8%">
                                                 <f:facet name="header">

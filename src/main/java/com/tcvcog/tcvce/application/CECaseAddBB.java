@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.Property;
 import java.io.Serializable;
@@ -76,8 +77,8 @@ public class CECaseAddBB extends BackingBeanUtils implements Serializable {
             newCase.setOriginationDate(formOriginationDate.toInstant()
                     .atZone(ZoneId.systemDefault()).toLocalDateTime());
             newCase.setNotes(formCaseNotes);
-            cc.cecase_insertNewCECase(newCase, getSessionBean().getSessUser(), cear);
-            getSessionBean().setSessCECase(cc.cecase_assembleCECaseDataHeavy(newCase, getSessionBean().getSessUser()));
+            CECaseDataHeavy insertedCECaseDH = cc.cecase_insertNewCECase(newCase, getSessionBean().getSessUser(), cear);
+            getSessionBean().setSessCECase(insertedCECaseDH);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully added case to property! Access the case from the list below.", ""));
