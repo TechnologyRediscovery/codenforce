@@ -3,12 +3,14 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns="http://www.w3.org/1999/xhtml">
-    <f:subview id="persontools-view">
+    
 
-
-        <p:growl id="persontools-growl"
-                 globalOnly="false" 
-                 />
+        <h:form id="persontools-growl-form">
+            
+            <p:growl id="persontools-growl"
+                     globalOnly="false" 
+                     />
+        </h:form>
 
         <p:dialog   id="person-profile-dialog"
                     height="700" width="600"
@@ -18,7 +20,7 @@
                     closable="true"
                     closeOnEscape="true"
                     modal="true"
-                    header="Person ID: #{personBB.currentHuman.humanID} Profile"
+                    header="Person ID: #{personBB.currentPerson.humanID} Profile"
                     rendered="true"
                     >
 
@@ -31,11 +33,11 @@
 
                     <p:commandButton id="person-profile-info-edit-button"
                                      value="#{personBB.currentPersonEditMode ? 'Save changes' : 'Edit'}"
-                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                     rendered="true"
+                                     ajax="true"
                                      icon="fa #{personBB.currentPersonEditMode ? 'fa-check' : 'fa-pencil'}"
                                      actionListener="#{personBB.toggleHumanEditMode}"
-                                     oncomplete="PF('person-profile-dialog-var').show()"
-                                     update="person-info-form"/>
+                                    />
 
 
                     <div class="restrict-main-contents-io-button gray_button">
@@ -60,17 +62,17 @@
 
                         <div class="p-col-6">
                             <h:outputText rendered="#{!personBB.currentPersonEditMode}" 
-                                          value="#{personBB.currentHuman.humanID}"/>
+                                          value="#{personBB.currentPerson.humanID}"/>
 
                         </div>
 
                         <div class="p-col-6">Name</div>
                         <div class="p-col-6">
                             <h:outputText rendered="#{!personBB.currentPersonEditMode}" 
-                                          value="#{personBB.currentHuman.name}"/>
+                                          value="#{personBB.currentPerson.name}"/>
 
                             <p:inputText rendered="#{personBB.currentPersonEditMode}"
-                                         value="#{personBB.currentHuman.name}"
+                                         value="#{personBB.currentPerson.name}"
                                          required="true"
                                          requiredMessage="All person records require at least a last name."/>
                         </div>
@@ -78,10 +80,10 @@
                         <div class="p-col-6">Job title</div>
                         <div class="p-col-6">
                             <h:outputText rendered="#{!personBB.currentPersonEditMode}" 
-                                          value="#{personBB.currentHuman.jobTitle}"/>
+                                          value="#{personBB.currentPerson.jobTitle}"/>
 
                             <p:inputText rendered="#{personBB.currentPersonEditMode}"
-                                         value="#{personBB.currentHuman.jobTitle}"
+                                         value="#{personBB.currentPerson.jobTitle}"
                                          required="false"/>
                         </div>
 
@@ -89,56 +91,56 @@
                         <div class="p-col-6">Multi-Person</div>
                         <div class="p-col-6">
                             <h:outputText   rendered="#{!personBB.currentPersonEditMode}"
-                                            value="#{empty personBB.currentHuman.multiHuman ? 'Yes' : 'No'}" />
+                                            value="#{empty personBB.currentPerson.multiHuman ? 'Yes' : 'No'}" />
 
                             <p:selectBooleanCheckbox rendered="#{personBB.currentPersonEditMode}"
-                                                     value="#{personBB.currentHuman.multiHuman}" />
+                                                     value="#{personBB.currentPerson.multiHuman}" />
                         </div>
 
                         <div class="p-col-6">Business entity</div>
                         <div class="p-col-6">
                             <h:outputText   rendered="#{!personBB.currentPersonEditMode}"
-                                            value="#{empty personBB.currentHuman.businessEntity ? 'Yes' : 'No'}" />
+                                            value="#{empty personBB.currentPerson.businessEntity ? 'Yes' : 'No'}" />
 
                             <p:selectBooleanCheckbox rendered="#{personBB.currentPersonEditMode}"
-                                                     value="#{personBB.currentHuman.businessEntity}" />
+                                                     value="#{personBB.currentPerson.businessEntity}" />
                         </div>
 
 
                         <div class="p-col-6">Creation</div>
                         <div class="p-col-6">
-                            <h:outputText value="#{personBB.getPrettyDate(personBB.currentHuman.createdTS)}" />
+                            <h:outputText value="#{personBB.getPrettyDate(personBB.currentPerson.createdTS)}" />
                             <p:spacer height="2px" />
-                            <h:outputText   rendered="#{!empty personBB.currentHuman.createdBy}"
-                                            value="by #{personBB.currentHuman.createdBy.username}" />
+                            <h:outputText   rendered="#{!empty personBB.currentPerson.createdBy}"
+                                            value="by #{personBB.currentPerson.createdBy.username}" />
                         </div>
 
                         <div class="p-col-6">Last update</div>
                         <div class="p-col-6">
-                            <h:outputText value="#{personBB.getPrettyDate(personBB.currentHuman.lastUpdatedTS)}" />
+                            <h:outputText value="#{personBB.getPrettyDate(personBB.currentPerson.lastUpdatedTS)}" />
                             <p:spacer height="2px" />
-                            <h:outputText   rendered="#{!empty personBB.currentHuman.lastUpdatedBy}"
-                                            value="by #{personBB.currentHuman.lastUpdatedBy.username}" />
+                            <h:outputText   rendered="#{!empty personBB.currentPerson.lastUpdatedBy}"
+                                            value="by #{personBB.currentPerson.lastUpdatedBy.username}" />
                         </div>
 
                         <div class="p-col-6">Record status</div>
                         <div class="p-col-6">
-                            <h:outputText value="#{empty personBB.currentHuman.deactivatedTS ? 'active' : 'deactivated on'}" />
+                            <h:outputText value="#{empty personBB.currentPerson.deactivatedTS ? 'active' : 'deactivated on'}" />
                             <p:spacer height="2px" />
-                            <h:outputText value="#{empty personBB.currentHuman.deactivatedTS ? '' : personBB.getPrettyDate(personBB.currentHuman.deactivatedTS) }" />
+                            <h:outputText value="#{empty personBB.currentPerson.deactivatedTS ? '' : personBB.getPrettyDate(personBB.currentPerson.deactivatedTS) }" />
                             <p:spacer height="2px" />
-                            <h:outputText   rendered="#{!empty personBB.currentHuman.deactivatedBy}"
-                                            value="by #{personBB.currentHuman.deactivatedBy.username}" />
+                            <h:outputText   rendered="#{!empty personBB.currentPerson.deactivatedBy}"
+                                            value="by #{personBB.currentPerson.deactivatedBy.username}" />
                         </div>
                     </div>
                     
                      <div class="p-col-6">Under 18?</div>
                     <div class="p-col-6">
                         <h:outputText   rendered="#{!personBB.currentPersonEditMode}"
-                                        value="#{empty personBB.currentHuman.under18 ? 'Yes' : 'No'}" />
+                                        value="#{empty personBB.currentPerson.under18 ? 'Yes' : 'No'}" />
 
                         <p:selectBooleanCheckbox rendered="#{personBB.currentPersonEditMode}"
-                                                 value="#{personBB.currentHuman.under18}" />
+                                                 value="#{personBB.currentPerson.under18}" />
                     </div>
 
                     <div class="p-col-6">
@@ -147,11 +149,11 @@
                     <div class="p-col-6">
 
                         <h:outputText rendered="#{!personBB.currentPersonEditMode}" 
-                                      value="#{personBB.getPrettyDateNoTime(personBB.currentHuman.dob)}"/>
+                                      value="#{personBB.getPrettyDateNoTime(personBB.currentPerson.dob)}"/>
 
                         <p:calendar id="person-dor-it"
                                     rendered="#{personBB.currentPersonEditMode}" 
-                                    value="#{personBB.currentHuman.dob}"
+                                    value="#{personBB.currentPerson.dob}"
                                     mode="popup" tabindex="3"
                                     showOn="button"
                                     pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -168,14 +170,14 @@
                     <div class="p-col-6">
 
                         <h:outputText rendered="#{!personBB.currentPersonEditMode}" 
-                                      value="#{personBB.getPrettyDateNoTime(personBB.currentHuman.deceasedDate)}"/>
+                                      value="#{personBB.getPrettyDateNoTime(personBB.currentPerson.deceasedDate)}"/>
 
-                        <h:outputText rendered="#{!empty personBB.currentPersonEditMode and !empty personBB.currentHuman.deceasedBy}" 
-                                      value="recorded by user: #{personBB.currentHuman.deceasedBy.username}"/>
+                        <h:outputText rendered="#{!empty personBB.currentPersonEditMode and !empty personBB.currentPerson.deceasedBy}" 
+                                      value="recorded by user: #{personBB.currentPerson.deceasedBy.username}"/>
 
                         <p:calendar id="person-dod-it"
                                     rendered="#{personBB.currentPersonEditMode}" 
-                                    value="#{personBB.currentHuman.deceasedDate}"
+                                    value="#{personBB.currentPerson.deceasedDate}"
                                     mode="popup" tabindex="3"
                                     showOn="button"
                                     pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -195,16 +197,13 @@
 
                 <h:form id="person-profile-addresses-form">
 
-                    <div class="restrict-main-contents-io-link">
 
-                        <p:commandLink      id="addresses-add-cb"
-                                            ajax="true"
-                                            actionListener="#{personBB.onMailingAddressAddInitButtonChange}"
-                                            oncomplete="PF('address-dialog-var').show()"
-                                            style="color:blue;"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                            value="Add address" />
-                    </div>
+                    <p:commandButton      id="addresses-add-cb"
+                                        ajax="true"
+                                        actionListener="#{addressBB.onMailingAddressAddInitButtonChange}"
+                                        oncomplete="PF('address-dialog-var').show()"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                        value="Add address" />
 
 
                     <p:spacer height="5px"/>
@@ -257,7 +256,7 @@
 
                             <p:commandLink      id="address-actions-cl"
                                                 ajax="true"
-                                                actionListener="#{personBB.onMailingAddressEditInitButtonChange(hmal)}"
+                                                actionListener="#{addressBB.onMailingAddressEditInitButtonChange(hmal)}"
                                                 style="color:blue;"
                                                 oncomplete="PF('address-dialog-var).show()"
                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
@@ -277,15 +276,14 @@
 
                 <h:form id="person-profile-phones-form">
 
-                    <div class="restrict-main-contents-io-link">
-                        <p:commandButton      id="phones-add-cb"
-                                            ajax="true"
-                                            actionListener="#{personBB.onPhoneAddInitButtonChange}"
-                                            oncomplete="PF('phone-dialog-var').show()"
-                                            style="color:blue;"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                            value="Add phone number" />
-                    </div>
+                    
+                    <p:commandButton     id="phones-add-cb"
+                                        ajax="true"
+                                        actionListener="#{personBB.onPhoneAddInitButtonChange}"
+                                        oncomplete="PF('phone-dialog-var').show()"
+                                        rendered="true"
+                                        value="Add phone number" 
+                                        update="@form:@parent:phone-info-form"/>
 
 
                     <p:spacer height="5px"/>
@@ -331,7 +329,8 @@
                                                 actionListener="#{personBB.onPhoneEditInitButtonChange(ph)}"
                                                 style="color:blue;"
                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                update="phone-dialog"
+                                                oncomplete="PF('phone-dialog-var').show()"
+                                                update="@form:@parent:phone-info-form"
                                                 value="edit" />
 
                         </p:column>
@@ -348,16 +347,13 @@
 
                 <h:form id="person-profile-emails-form">
 
-                    <div class="restrict-main-contents-io-link">
-                        <p:commandButton      id="email-add-cb"
-                                            ajax="true"
-                                            actionListener="#{personBB.onEmailAddInitButtonChange}"
-                                            oncomplete="PF('email-dialog-var').show()"
-                                            style="color:blue;"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                            update="@form:@parent:email-info-form"
-                                            value="Add email address" />
-                    </div>
+                    <p:commandButton      id="email-add-cb"
+                                        ajax="true"
+                                        actionListener="#{personBB.onEmailAddInitButtonChange}"
+                                        oncomplete="PF('email-dialog-var').show()"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                        update="@form:@parent:email-info-form"
+                                        value="Add email address" />
 
                     <p:spacer height="5px"/>
 
@@ -394,7 +390,8 @@
                                                 actionListener="#{personBB.onEmailEditInitButtonChange(ea)}"
                                                 style="color:blue;"
                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                update="email-info-form"
+                                                update="@form:@parent:email-info-form"
+                                                oncomplete="PF('email-dialog-var').show()"
                                                 value="view/edit" />
 
                         </p:column>
@@ -429,6 +426,7 @@
                                      value="#{personBB.currentContactPhoneEditMode? 'Save changes' : 'Edit'}"
                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                      icon="fa #{personBB.currentContactPhoneEditMode ? 'fa-check' : 'fa-pencil'}"
+                                     ajax="true"
                                      actionListener="#{personBB.togglePhoneEditMode}"
                                      oncomplete="PF('phone-dialog-var').show()"
                                      update="@form"/>
@@ -670,5 +668,5 @@
                 </h:form>
             </p:panel>
         </p:dialog>
-    </f:subview>
+    
 </ui:composition>

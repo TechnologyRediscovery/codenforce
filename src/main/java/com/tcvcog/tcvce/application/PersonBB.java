@@ -55,6 +55,7 @@ public class PersonBB extends BackingBeanUtils {
     
      @PostConstruct
     public void initBean(){
+         System.out.println("PersonBB.initBean()");
         currentPersonEditMode = false;
         currentContactPhoneEditMode = false;
         currentContactEmailEditMode = false;
@@ -86,41 +87,40 @@ public class PersonBB extends BackingBeanUtils {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not refresh current Person", ""));
         }
-        
-        
     }
     
     
     /**********************************************************/
     /************** HUMANS INFRASTRUCTURE *********************/
-    /**********************************************************/
+    /**********************************************************/ 
     
     /**
      * Listener for user clicks of the human edit button
+     * @param ev
      */
-    public void toggleHumanEditMode(){
+    public void toggleHumanEditMode(ActionEvent ev){
+        System.out.println("PersonBB.toggleHumanEditMode: toggle val: " + currentPersonEditMode);
         if(currentPersonEditMode){
             if(currentPerson != null && currentPerson.getHumanID() == 0){
                 // we've got a new record, so commit our add to DB
-                onHumanAddCommitButtonChange(null);
+                onHumanAddCommitButtonChange();
+                System.out.println("PersonBB.toggleHumanEditMode: new person; committed");
             } else {
                 // we've got an existing human, so commit updates
-                onHumanEditCommitButtonChange(null);
+                onHumanEditCommitButtonChange();
+                System.out.println("PersonBB.toggleHumanEditMode: person edit done");
             }
         }
         currentPersonEditMode = !currentPersonEditMode;
-        refreshCurrentPerson();
-        
-        
     }
     
     /**
      * Listener for user requests to add a human
-     * @param ev 
      */
-    public void onHumanAddInitButtonChange(ActionEvent ev){
+    public void onHumanAddInitButtonChange(){
         PersonCoordinator pc = getPersonCoordinator();
         currentPerson = pc.createPersonSkeleton(getSessionBean().getSessMuni());
+        System.out.println("PersonBB.onHumanAddInitButtonChange");
         
         
     }
@@ -129,11 +129,10 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to finalize human changes
      * @param ev 
      */
-    public void onHumanAddCommitButtonChange(ActionEvent ev){
+    public void onHumanAddCommitButtonChange(){
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.humanAdd(currentPerson, getSessionBean().getSessUser());
-            refreshCurrentPerson();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Succesfully added person to database!", ""));
@@ -143,9 +142,6 @@ public class PersonBB extends BackingBeanUtils {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "FATAL ERROR CODE P001: Could not add new Person to the database!", ""));
         }    
-        
-        
-        
     }
     
     /**
@@ -163,9 +159,8 @@ public class PersonBB extends BackingBeanUtils {
     
     /**
      * Listener for user requests to commit the human edit process
-     * @param ev 
      */
-    public void onHumanEditCommitButtonChange(ActionEvent ev){
+    public void onHumanEditCommitButtonChange(){
         
         PersonCoordinator pc = getPersonCoordinator();
         try {
@@ -189,7 +184,7 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to abort a human add or edit operation
      * @param ev 
      */
-    public void onHumanOperationAbortButtonChange(ActionEvent ev){
+    public void onHumanOperationAbortButtonChange(){
         currentPersonEditMode = false;
         getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -207,13 +202,15 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user clicks of the phone edit button
      */
     public void togglePhoneEditMode(){
-        
+        System.out.println("PersonBB.togglePhoneEditMode: toggle mode " + currentContactPhoneEditMode);
         if(currentContactPhoneEditMode){
             PersonCoordinator pc = getPersonCoordinator();
             if(currentContactPhone != null && currentContactPhone.getPhoneID() == 0){
-                onPhoneAddCommitButtonChange(null);
+                onPhoneAddCommitButtonChange();
+                System.out.println("PersonBB.togglePhoneEditMode: added new phone");
             } else {
-                onPhoneEditCommitButtonChange(null);
+                onPhoneEditCommitButtonChange();
+                System.out.println("PersonBB.togglePhoneEditMode: edited phone");
             }
         }
         currentContactPhoneEditMode = !currentContactPhoneEditMode;
@@ -224,9 +221,10 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to start adding a new phone number
      * @param ev 
      */
-    public void onPhoneAddInitButtonChange(ActionEvent ev){
+    public void onPhoneAddInitButtonChange(){
         PersonCoordinator pc = getPersonCoordinator();
         currentContactPhone = pc.createContactPhoneSkeleton();
+        System.out.println("PersonBB.onPhoneAddInitButtonChange");
         
         
     }
@@ -235,7 +233,7 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to finalize a new phone number
      * @param ev 
      */
-    public void onPhoneAddCommitButtonChange(ActionEvent ev){
+    public void onPhoneAddCommitButtonChange(){
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentContactPhone = pc.contactPhoneAdd(currentContactPhone, getSessionBean().getSessUser());
@@ -266,7 +264,7 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to finalize the phone edit operation
      * @param ev 
      */
-    public void onPhoneEditCommitButtonChange(ActionEvent ev){
+    public void onPhoneEditCommitButtonChange(){
          PersonCoordinator pc = getPersonCoordinator();
         try {
             pc.contactPhoneUpdate(currentContactPhone, getSessionBean().getSessUser());
@@ -301,13 +299,17 @@ public class PersonBB extends BackingBeanUtils {
     
     /**
      * Listener for user clicks of the edit button for emails
+     * @param p
      */
     public void toggleEmailEditMode(){
+        System.out.println("PersonBB.toggleEmailEditMode | toggle mode: " + currentContactEmailEditMode);
         if(currentContactEmailEditMode){
             if(currentContactEmail != null && currentContactEmail.getEmailID() == 0){
-                onEmailAddCommitButtonChange(null);
+                onEmailAddCommitButtonChange();
+                System.out.println("PersonBB.toggleEmailEditMode | commited new email");
             } else {
-                onEmailEditCommitButtonChange(null);
+                onEmailEditCommitButtonChange();
+                System.out.println("PersonBB.toggleEmailEditMode | edited new email");
             }
         }
         currentContactEmailEditMode = !currentContactEmailEditMode;
@@ -318,10 +320,12 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to start adding a new email 
      * @param ev 
      */
-    public void onEmailAddInitButtonChange(ActionEvent ev){
+    public void onEmailAddInitButtonChange(){
+        System.out.println("PersonPP.onEmailAddInitButtonChange");
         PersonCoordinator pc = getPersonCoordinator();
         currentContactEmail = pc.createContactEmailSkeleton();
         currentContactEmailEditMode = true;
+        
         
     }
     
@@ -329,7 +333,7 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to finalize a new email 
      * @param ev 
      */
-    public void onEmailAddCommitButtonChange(ActionEvent ev){
+    public void onEmailAddCommitButtonChange(){
           PersonCoordinator pc = getPersonCoordinator();
         try {
             currentContactEmail = pc.contactEmailAdd(currentContactEmail, getSessionBean().getSessUser());
@@ -359,7 +363,7 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to finalize the email edit operation
      * @param ev 
      */
-    public void onEmailEditCommitButtonChange(ActionEvent ev){
+    public void onEmailEditCommitButtonChange(){
           PersonCoordinator pc = getPersonCoordinator();
         try {
             pc.contactEmailUpdate(currentContactEmail, getSessionBean().getSessUser());

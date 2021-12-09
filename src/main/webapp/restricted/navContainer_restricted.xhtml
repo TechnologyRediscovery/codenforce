@@ -95,33 +95,33 @@
 
                             <!-- TOP NAVIGATION BAR -->
                             <div class="ui-g data_container_nested_restrict" style="background-color: gray; margin-bottom: 0px;">
-                                <h:form styleClass="p-grid p-p-3" id="topnavbar">
-                                    
-                                    <div class="activebob-container p-col"
-                                         id="activbob-muni">
 
-                                        <div class="ui-g data_container_nested_restrict">
+                                <div class="activebob-container p-col"
+                                     id="activbob-muni">
 
-                                            <!--NESTED DATA FIELD VERTICAL-->
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+                                    <div class="ui-g data_container_nested_restrict">
 
-                                                <div class="aob-container aob-container-iconifiedheader">
+                                        <!--NESTED DATA FIELD VERTICAL-->
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
 
-                                                    <div class="inline-icon">
+                                            <div class="aob-container aob-container-iconifiedheader">
 
-                                                        <i class="material-icons">
-                                                            <h:outputText value="location_city"/>
-                                                        </i>
-                                                    </div>
+                                                <div class="inline-icon">
 
-                                                    <h:outputText value="Municipality"/>
+                                                    <i class="material-icons">
+                                                        <h:outputText value="location_city"/>
+                                                    </i>
                                                 </div>
-                                                <div class="aob-container aob-container-objectstring">
 
-                                                    <h:outputText value="#{sessionBean.sessMuni.muniName}"/>
+                                                <h:outputText value="Municipality"/>
+                                            </div>
+                                            <div class="aob-container aob-container-objectstring">
 
-                                                </div>
-                                                <div class="aob-container aob-container-actions">
+                                                <h:outputText value="#{sessionBean.sessMuni.muniName}"/>
+
+                                            </div>
+                                            <div class="aob-container aob-container-actions">
+                                                <h:form id="topnav-muni-form">
 
                                                     <div class="restrict-main-contents-io-link link-button">
 
@@ -138,41 +138,42 @@
                                                                           action="#{missionControlBB.reauthenticate}" 
                                                                           ajax="false"/>
                                                     </div>
-                                                </div>
+                                                </h:form>
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <div class="activebob-container p-col"
-                                         id="activbob-code">
+                                </div>
 
-                                        <div class="ui-g data_container_nested_restrict">
-                                            <!--NESTED DATA FIELD VERTICAL-->
-                                            <div class="ui-g-10 ui-md-10 ui-lg-10">
+                                <div class="activebob-container p-col"
+                                     id="activbob-code">
 
-
-                                                <div class="aob-container aob-container-iconifiedheader">
-
-                                                    <div class="inline-icon">
-
-                                                        <i class="material-icons">
-                                                            <h:outputText value="gavel"/>
-                                                        </i>
-                                                    </div>
-
-                                                    <h:outputText value="Code Book"/>
-                                                </div>
-                                            </div>    
+                                    <div class="ui-g data_container_nested_restrict">
+                                        <!--NESTED DATA FIELD VERTICAL-->
+                                        <div class="ui-g-10 ui-md-10 ui-lg-10">
 
 
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
-                                                <div class="aob-container aob-container-objectstring">
-                                                    <h:outputText value="#{sessionBean.sessMuni.codeSet.codeSetName}"/>
+                                            <div class="aob-container aob-container-iconifiedheader">
 
+                                                <div class="inline-icon">
+
+                                                    <i class="material-icons">
+                                                        <h:outputText value="gavel"/>
+                                                    </i>
                                                 </div>
 
-                                                <div class="aob-container aob-container-actions">
+                                                <h:outputText value="Code Book"/>
+                                            </div>
+                                        </div>    
 
+
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+                                            <div class="aob-container aob-container-objectstring">
+                                                <h:outputText value="#{sessionBean.sessMuni.codeSet.codeSetName}"/>
+
+                                            </div>
+
+                                            <div class="aob-container aob-container-actions">
+                                                <h:form id="topnav-codebook-form">
                                                     <div class="restrict-main-contents-io-link link-button">
 
                                                         <p:commandLink    id="navcontres-button-ordinances" 
@@ -193,37 +194,40 @@
                                                             help
                                                         </a>
                                                     </div>
-                                                </div>
+                                                </h:form>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
 
-                                    <div class="activebob-container p-col"
-                                         id="aob-property">
+                                <div class="activebob-container p-col"
+                                     id="aob-property">
 
-                                        <div class="ui-g data_container_nested_restrict">
+                                    <div class="ui-g data_container_nested_restrict">
 
-                                            <!--NESTED DATA FIELD VERTICAL-->
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+                                        <!--NESTED DATA FIELD VERTICAL-->
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
 
-                                                <div class="aob-container aob-container-iconifiedheader">
+                                            <div class="aob-container aob-container-iconifiedheader">
 
-                                                    <div class="inline-icon">
+                                                <div class="inline-icon">
 
-                                                        <i class="material-icons">
-                                                            <h:outputText value="home"/>
-                                                        </i>
-                                                    </div>
-
-                                                    <h:outputText value="Property"/>
+                                                    <i class="material-icons">
+                                                        <h:outputText value="home"/>
+                                                    </i>
                                                 </div>
-                                                <div class="aob-container aob-container-objectstring">
+
+                                                <h:outputText value="Property"/>
+                                            </div>
+                                            <div class="aob-container aob-container-objectstring">
 
 
-                                                    <h:outputText value="#{sessionBean.sessProperty.address}"/>
+                                                <h:outputText value="#{sessionBean.sessProperty.address}"/>
 
-                                                </div>
+                                            </div>
+                                            <h:form id="topnav-prop-form">
+
                                                 <div class="aob-container aob-container-actions">
 
                                                     <div class="restrict-main-contents-io-link link-button">
@@ -266,36 +270,40 @@
                                                                        action="#{sessionBean.navigateToPageCorrespondingToObject(sessionBean.sessProperty)}"/>
                                                     </p:overlayPanel>
                                                 </div>
-
-                                            </div>
+                                            </h:form>
 
                                         </div>
+
                                     </div>
+                                </div>
 
 
-                                    <div class="activebob-container p-col"
-                                         id="aob-person">
+                                <div class="activebob-container p-col"
+                                     id="aob-person">
 
-                                        <div class="ui-g data_container_nested_restrict">
+                                    <div class="ui-g data_container_nested_restrict">
 
-                                            <!--NESTED DATA FIELD VERTICAL-->
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+                                        <!--NESTED DATA FIELD VERTICAL-->
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
 
-                                                <div class="aob-container aob-container-iconifiedheader">
+                                            <div class="aob-container aob-container-iconifiedheader">
 
-                                                    <div class="inline-icon">
+                                                <div class="inline-icon">
 
-                                                        <i class="material-icons">
-                                                            <h:outputText value="person"/>
-                                                        </i>
-                                                    </div>
-
-                                                    <h:outputText value="Person"/>
+                                                    <i class="material-icons">
+                                                        <h:outputText value="person"/>
+                                                    </i>
                                                 </div>
-                                                <div class="aob-container aob-container-objectstring">
 
-                                                    <h:outputText value="#{sessionBean.sessPerson.firstName} #{sessionBean.sessPerson.lastName} (ID:#{sessionBean.sessPerson.personID})"/>
-                                                </div>
+                                                <h:outputText value="Person"/>
+                                            </div>
+                                            <div class="aob-container aob-container-objectstring">
+
+                                                <h:outputText value="#{sessionBean.sessPerson.firstName} #{sessionBean.sessPerson.lastName} (ID:#{sessionBean.sessPerson.personID})"/>
+                                            </div>
+                                            <ui:include src="cogstaff/person/compositions/personTools.xhtml"/>
+                                            <h:form id="topnav-pers-form">
+
                                                 <div class="aob-container aob-container-actions">
 
                                                     <div class="restrict-main-contents-io-link link-button">
@@ -314,9 +322,8 @@
 
                                                                         oncomplete="PF('activebob-perslist-overlay-var').show();"/>
                                                     </div>
-                                                    
-                                                    <ui:include src="cogstaff/person/compositions/personTools.xhtml"/>
-                                                    
+
+
                                                     <div class="restrict-main-contents-io-link link-button">
 
                                                         <p:commandLink  id="activebob-persontools-cb"
@@ -325,11 +332,14 @@
                                                                         oncomplete="PF('person-profile-dialog-var').show();"/>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <p:overlayPanel id="activebob-perslist-overlay"
-                                                            widgetVar="activebob-perslist-overlay-var"
-                                                            appendTo="activebob-person"
-                                                            dismissable="true">
+                                            </h:form>
+                                        </div>
+                                        <p:overlayPanel id="activebob-perslist-overlay"
+                                                        widgetVar="activebob-perslist-overlay-var"
+                                                        appendTo="activebob-person"
+                                                        dismissable="true">
+                                            <h:form id="topnav-perslist-form">
+
 
                                                 <b><h:outputText value="#{sessionBean.sessPersonList.size()} persons:"/></b><br/>
 
@@ -345,35 +355,38 @@
 
 
                                                 </ui:repeat>
-                                            </p:overlayPanel>
+                                            </h:form>
+                                        </p:overlayPanel>
 
-                                        </div>
                                     </div>
+                                </div>
 
-                                    <div class="activebob-container p-col"
-                                         id="aob-cecase">
+                                <div class="activebob-container p-col"
+                                     id="aob-cecase">
 
-                                        <div class="ui-g data_container_nested_restrict">
+                                    <div class="ui-g data_container_nested_restrict">
 
-                                            <!--NESTED DATA FIELD VERTICAL-->
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+                                        <!--NESTED DATA FIELD VERTICAL-->
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
 
-                                                <div class="aob-container aob-container-iconifiedheader">
+                                            <div class="aob-container aob-container-iconifiedheader">
 
-                                                    <div class="inline-icon">
+                                                <div class="inline-icon">
 
-                                                        <i class="material-icons">
-                                                            <h:outputText value="gavel"/>
-                                                        </i>
-                                                    </div>
-
-                                                    <h:outputText value="CE Case"/>
+                                                    <i class="material-icons">
+                                                        <h:outputText value="gavel"/>
+                                                    </i>
                                                 </div>
-                                                <div class="aob-container aob-container-objectstring">
 
-                                                    <h:outputText value="#{sessionBean.sessCECase.caseName} (ID:#{sessionBean.sessCECase.caseID})"/>
+                                                <h:outputText value="CE Case"/>
+                                            </div>
+                                            <div class="aob-container aob-container-objectstring">
 
-                                                </div>
+                                                <h:outputText value="#{sessionBean.sessCECase.caseName} (ID:#{sessionBean.sessCECase.caseID})"/>
+
+                                            </div>
+                                            <h:form id="topnav-cecase-form">
+
                                                 <div class="aob-container aob-container-actions">
 
                                                     <div class="restrict-main-contents-io-link link-button">
@@ -392,12 +405,14 @@
 
 
                                                 </div>
+                                            </h:form>
 
-                                            </div>
-                                            <p:overlayPanel id="activebob-cecaselist-overlay"
-                                                            widgetVar="activebob-cecaselist-overlay-var"
-                                                            appendTo="activebob-cecase"
-                                                            dismissable="true">
+                                        </div>
+                                        <p:overlayPanel id="activebob-cecaselist-overlay"
+                                                        widgetVar="activebob-cecaselist-overlay-var"
+                                                        appendTo="activebob-cecase"
+                                                        dismissable="true">
+                                            <h:form id="topnav-caselist-form">
 
                                                 <b><h:outputText value="#{sessionBean.sessCECaseList.size()} cases:"/></b><br/>
 
@@ -414,28 +429,29 @@
 
                                                     <p:spacer height="2px"/>
                                                 </ui:repeat>
-                                            </p:overlayPanel>
-                                        </div>
+                                            </h:form>
+                                        </p:overlayPanel>
                                     </div>
+                                </div>
 
-                                    <div class="activebob-container p-col"
-                                         id="aob-occperiod">
+                                <div class="activebob-container p-col"
+                                     id="aob-occperiod">
 
-                                        <div class="ui-g data_container_nested_restrict">
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
-                                                <div class="aob-container aob-container-iconifiedheader">
-                                                    <div class="inline-icon">
-                                                        <i class="material-icons">
-                                                            <h:outputText value="date_range"/>
-                                                        </i>
-                                                    </div>
-                                                    <h:outputText value="Occupancy Period"/>
+                                    <div class="ui-g data_container_nested_restrict">
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
+                                            <div class="aob-container aob-container-iconifiedheader">
+                                                <div class="inline-icon">
+                                                    <i class="material-icons">
+                                                        <h:outputText value="date_range"/>
+                                                    </i>
                                                 </div>
+                                                <h:outputText value="Occupancy Period"/>
+                                            </div>
 
-                                                <div class="aob-container aob-container-objectstring">
-                                                    <h:outputText value="#{sessionBean.sessOccPeriod.type.title} | Unit #{sessionBean.sessOccPeriod.propUnitProp.unitNumber} (ID:#{sessionBean.sessOccPeriod.periodID})"/>
-                                                </div>
-
+                                            <div class="aob-container aob-container-objectstring">
+                                                <h:outputText value="#{sessionBean.sessOccPeriod.type.title} | Unit #{sessionBean.sessOccPeriod.propUnitProp.unitNumber} (ID:#{sessionBean.sessOccPeriod.periodID})"/>
+                                            </div>
+                                            <h:form id="topnav-occ-form">
                                                 <div class="aob-container aob-container-actions">
                                                     <div class="restrict-main-contents-io-link link-button">
                                                         <p:commandLink id="activebob-occperiod-view-cl"
@@ -450,11 +466,13 @@
                                                                         oncomplete="PF('activebob-occperiodlist-overlay-var').show();"/>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <p:overlayPanel id="activebob-occperiodlist-overlay"
-                                                            widgetVar="activebob-occperiodlist-overlay-var"
-                                                            appendTo="activebob-occperiod"
-                                                            dismissable="true">
+                                            </h:form>
+                                        </div>
+                                        <p:overlayPanel id="activebob-occperiodlist-overlay"
+                                                        widgetVar="activebob-occperiodlist-overlay-var"
+                                                        appendTo="activebob-occperiod"
+                                                        dismissable="true">
+                                            <h:form id="topnav-occperiodlist-form">
 
                                                 <b><h:outputText value="#{sessionBean.sessOccPeriodList.size()} periods:"/></b><br/>
 
@@ -470,35 +488,35 @@
 
                                                     <p:spacer height="2px"/>
                                                 </ui:repeat>
-                                            </p:overlayPanel>
-                                        </div>
+                                            </h:form>
+                                        </p:overlayPanel>
                                     </div>
-                                </h:form>
+                                </div>
                             </div>
                             <div style="float:right;">
                                 <h:form id="userform">
 
                                     <h:outputText value="#{systemServicesBB.bbSessionUser.person.firstName} #{systemServicesBB.bbSessionUser.person.lastName} ( #{systemServicesBB.bbSessionUser.username})"/>
-                                    
-                                        <div class="restrict-main-contents-io-link link-button">
-                                            <p:commandLink id="navbar-button-usersettings2"
-                                                           ajax="true"
-                                                           actionListener="#{userBB.initiateUserUpdates}"
-                                                           rendered="true"
-                                                           disabled="false"
-                                                           oncomplete="PF('navcontainer-dialog-usersettings').show()"
-                                                           value="user settings"
-                                                           update="usersettings-form"/>
-                                        </div>
+
+                                    <div class="restrict-main-contents-io-link link-button">
+                                        <p:commandLink id="navbar-button-usersettings2"
+                                                       ajax="true"
+                                                       actionListener="#{userBB.initiateUserUpdates}"
+                                                       rendered="true"
+                                                       disabled="false"
+                                                       oncomplete="PF('navcontainer-dialog-usersettings').show()"
+                                                       value="user settings"
+                                                       update="usersettings-form"/>
+                                    </div>
 
 
-                                        <div class="restrict-main-contents-io-link link-button">
+                                    <div class="restrict-main-contents-io-link link-button">
 
-                                            <p:commandLink id="navcontres-button-logout2"
-                                                           action="#{systemServicesBB.logout}"
-                                                           value="logout"
-                                                           ajax="false"/>
-                                        </div>
+                                        <p:commandLink id="navcontres-button-logout2"
+                                                       action="#{systemServicesBB.logout}"
+                                                       value="logout"
+                                                       ajax="false"/>
+                                    </div>
                                 </h:form>
                             </div>
 
@@ -894,223 +912,223 @@
                                 </ui:insert>
                             </div>
                         </div>
-                        
-                        
-                    <p:dialog   id="person-search-dialog"
-                                height="650" width="900"
-                                header="Search for Persons"
-                                widgetVar="person-search-dialog-var"
-                                closable="true" 
-                                rendered="true"
-                                >
-                        
-                                <p:panel    id="pers-search-query-panel"
-                                            toggleable="true"
-                                            widgetVar="pers-search-query-panel-var"
-                                            collapsed="false"
-                                            header="Search for persons">
 
-                                    <h:form id="pers-search-messages-form">
-                                        <h:messages id="pers-search-messages"
-                                                    globalOnly="true" showDetail="true" showSummary="true"
-                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
-                                        </h:messages>
-                                    </h:form>
 
-                                    <h:form id="search-query-form">
-                                        
-                                        <h:outputLabel styleClass="bold" value="Available queries" for="search-query-som" />
-                                        
-                                        <p:spacer height="5px" />
-                                        
-                                        <p:selectOneMenu id="search-query-som" 
-                                                         tabindex="1" 
-                                                         value="#{personSearchBB.querySelected}">
-                                            <f:converter converterId="bOBQueryConverter"/>
-                                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                            <f:selectItems id="search-query-si" value="#{personSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
-                                            <p:ajax update="pers-search-messages-form
-                                                    search-query-form
-                                                    @form"
-                                                    listener="#{personSearchBB.changeQuerySelected}"/>
-                                        </p:selectOneMenu>
+                        <p:dialog   id="person-search-dialog"
+                                    height="650" width="900"
+                                    header="Search for Persons"
+                                    widgetVar="person-search-dialog-var"
+                                    closable="true" 
+                                    rendered="true"
+                                    >
 
-                                        <p:spacer height="5px" />
+                            <p:panel    id="pers-search-query-panel"
+                                        toggleable="true"
+                                        widgetVar="pers-search-query-panel-var"
+                                        collapsed="false"
+                                        header="Search for persons">
 
-                                        <h:outputLabel styleClass="bold" value="Description " />
+                                <h:form id="pers-search-messages-form">
+                                    <h:messages id="pers-search-messages"
+                                                globalOnly="true" showDetail="true" showSummary="true"
+                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                    </h:messages>
+                                </h:form>
 
-                                        <div class='logoutput'>
-                                            <h:outputText id="search-query-desc-ot" value="#{personSearchBB.querySelected.queryName.desc}" />
-                                        </div>
+                                <h:form id="search-query-form">
 
-                                        <p:spacer height="5px" />
-                                        
-                                        <p:outputLabel for="pers-query-appendresults-chkbx">
-                                                <h:outputText value="Append results to current result list? "
-                                                              styleClass="bold"/>
-                                        </p:outputLabel>
-                                        
-                                         <p:selectBooleanCheckbox   id="pers-query-appendresults-chkbx" 
-                                                                    value="#{personSearchBB.appendResultsToList}" 
-                                                                    disabled="false" />
-                                        
-                                        <p:spacer height="5px" />
-                                        
-                                        <p:commandButton   id="pers-search-exec-cb" 
-                                                           ajax="true" 
-                                                           actionListener="#{personSearchBB.executeQuery}"
-                                                           icon="fa fa-search" 
-                                                           styleClass="button"
-                                                           value="execute selected query" 
-                                                           disabled="#{personSearchBB.querySelected.queryExecuted}"
-                                                           update="pers-search-messages-form
-                                                           @form
-                                                           log-form"/>
-                                        
-                                        <p:commandButton   id="pers-search-clearquery-cb" 
-                                                           ajax="true" 
-                                                           actionListener="#{personSearchBB.resetCurrentQuery}"
-                                                           disabled="#{!personSearchBB.querySelected.queryExecuted}"
-                                                           icon="fa fa-eraser" 
-                                                           styleClass="button"
-                                                           value="reset query" 
-                                                           update="pers-search-messages-form
-                                                           @form
-                                                           log-form"/>
-                                        
-                                        <p:spacer height="5px" />
+                                    <h:outputLabel styleClass="bold" value="Available queries" for="search-query-som" />
 
-                                          <h:panelGrid  columns="1" 
-                                                        cellpadding="10" 
-                                                        columnClasses="gridTd-solid-back"
-                                                        footerClass="gridFooter">
+                                    <p:spacer height="5px" />
 
-                                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                         columnClasses="gridTd-solid-back, gridTd-solid-back">
+                                    <p:selectOneMenu id="search-query-som" 
+                                                     tabindex="1" 
+                                                     value="#{personSearchBB.querySelected}">
+                                        <f:converter converterId="bOBQueryConverter"/>
+                                        <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                                        <f:selectItems id="search-query-si" value="#{personSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                        <p:ajax update="pers-search-messages-form
+                                                search-query-form
+                                                @form"
+                                                listener="#{personSearchBB.changeQuerySelected}"/>
+                                    </p:selectOneMenu>
 
-                                                <h:panelGroup>
-                                                      <p:outputLabel for="pers-filter-name-first-ctl">
-                                                          <h:outputText value="First name"
-                                                                        styleClass="datum-label"/>
-                                                      </p:outputLabel>
-                                                      <p:selectBooleanCheckbox id="pers-filter-name-first-ctl" 
-                                                                               value="#{personSearchBB.paramsSelected.name_first_ctl}" 
-                                                                               disabled="#{personSearchBB.querySelected.queryExecuted}">
-                                                          <p:ajax update="pers-filter-name-first-val"/>
-                                                      </p:selectBooleanCheckbox>
-                                                  </h:panelGroup>
-                                                <h:panelGroup>
-                                                    
-                                                    <p:inputText id="pers-filter-name-first-val" value="#{personSearchBB.paramsSelected.name_first_val}" 
-                                                                 style="width: 200px;" tabindex="1" required="false" styleClass="inputText"
-                                                                 disabled="#{!personSearchBB.paramsSelected.name_first_ctl or personSearchBB.querySelected.queryExecuted}">
-                                                    </p:inputText>
-                                                    <h:message for="pers-filter-name-first-val" showDetail="true" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                </h:panelGroup>
+                                    <p:spacer height="5px" />
 
-                                            </h:panelGrid>
+                                    <h:outputLabel styleClass="bold" value="Description " />
 
-                                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                         columnClasses="gridTd-solid-back, gridTd-solid-back">
+                                    <div class='logoutput'>
+                                        <h:outputText id="search-query-desc-ot" value="#{personSearchBB.querySelected.queryName.desc}" />
+                                    </div>
 
-                                                <h:panelGroup>
-                                                      <p:outputLabel for="pers-filter-name-last-ctl">
-                                                          <h:outputText value="Last name"
-                                                                        styleClass="datum-label"/>
-                                                      </p:outputLabel>
-                                                      <p:selectBooleanCheckbox id="pers-filter-name-last-ctl" 
-                                                                               value="#{personSearchBB.paramsSelected.name_last_ctl}" 
-                                                                               disabled="#{personSearchBB.querySelected.queryExecuted}">
-                                                          <p:ajax update="pers-filter-name-last-val"/>
-                                                      </p:selectBooleanCheckbox>
-                                                  </h:panelGroup>
-                                                <h:panelGroup>
-                                                    
-                                                    <p:inputText id="pers-filter-name-last-val" value="#{personSearchBB.paramsSelected.name_last_val}" 
-                                                                 style="width: 200px;" tabindex="1" required="false" styleClass="inputText"
-                                                                 disabled="#{!personSearchBB.paramsSelected.name_last_ctl or personSearchBB.querySelected.queryExecuted}">
-                                                    </p:inputText>
-                                                    <h:message for="pers-filter-name-last-val" showDetail="true" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                </h:panelGroup>
+                                    <p:spacer height="5px" />
 
-                                            </h:panelGrid>
+                                    <p:outputLabel for="pers-query-appendresults-chkbx">
+                                        <h:outputText value="Append results to current result list? "
+                                                      styleClass="bold"/>
+                                    </p:outputLabel>
 
-                                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                         columnClasses="gridTd-solid-back, gridTd-solid-back">
-                                              
-                                                <h:panelGroup>
-                                                    <p:outputLabel for="filter-bobid-val" value="Filter by person ID?"/>
-                                                    <p:spacer height="5px"/>
-                                                    <p:selectBooleanCheckbox id="filter-bobid-ctl" value="#{personSearchBB.paramsSelected.bobID_ctl}" >
-                                                        <p:ajax update="filter-bobid-val"/>
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
+                                    <p:selectBooleanCheckbox   id="pers-query-appendresults-chkbx" 
+                                                               value="#{personSearchBB.appendResultsToList}" 
+                                                               disabled="false" />
 
-                                                <h:panelGroup>
-                                                    <p:outputLabel for="filter-bobid-val">
-                                                        <h:outputText value="Person ID number"/>
-                                                    </p:outputLabel>
-                                                    <p:inputText id="filter-bobid-val" value="#{personSearchBB.paramsSelected.bobID_val}" 
-                                                                 style="width: 25%;" tabindex="3" required="false" styleClass="inputText"
-                                                                 disabled="#{!personSearchBB.paramsSelected.bobID_ctl}"/>
-                                                    <h:message for="filter-bobid-val" showDetail="false" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    <p:spacer height="5px" />
 
-                                                </h:panelGroup>
-                                            </h:panelGrid>
-                                              
-                                              <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
-                                                         columnClasses="topbottom-lines-left, topbottom-lines-right">
-                                                <h:panelGroup>
-                                                    <p:outputLabel id="pers-filter-muni-ol" for="seev-filter-muni-chkbx" value="Filter by municipality? "/>
-                                                    <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" 
-                                                                             value="#{personSearchBB.paramsSelected.muni_ctl}" 
-                                                                             disabled="#{personSearchBB.querySelected.queryExecuted}">
-                                                        <p:ajax update="pers-search-muni-som"/>
-                                                    </p:selectBooleanCheckbox>
-                                                </h:panelGroup>
-                                                <h:panelGroup>
-                                                    <p:selectOneMenu id="pers-search-muni-som" tabindex="1" value="#{personSearchBB.paramsSelected.muni_val}"
-                                                                     disabled="#{!personSearchBB.paramsSelected.muni_ctl or personSearchBB.querySelected.queryExecuted}">
-                                                        <f:converter converterId="muniConverter"/>
-                                                        <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
-                                                        <f:selectItems id="muniNameList" value="#{systemServicesBB.municipalityListForSearch}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
-                                                    </p:selectOneMenu>
-                                                    <h:message for="pers-search-muni-som" showDetail="true" showSummary="true" 
-                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                                </h:panelGroup>
-                                              </h:panelGrid>
+                                    <p:commandButton   id="pers-search-exec-cb" 
+                                                       ajax="true" 
+                                                       actionListener="#{personSearchBB.executeQuery}"
+                                                       icon="fa fa-search" 
+                                                       styleClass="button"
+                                                       value="execute selected query" 
+                                                       disabled="#{personSearchBB.querySelected.queryExecuted}"
+                                                       update="pers-search-messages-form
+                                                       @form
+                                                       log-form"/>
 
-                                              
-                                              
+                                    <p:commandButton   id="pers-search-clearquery-cb" 
+                                                       ajax="true" 
+                                                       actionListener="#{personSearchBB.resetCurrentQuery}"
+                                                       disabled="#{!personSearchBB.querySelected.queryExecuted}"
+                                                       icon="fa fa-eraser" 
+                                                       styleClass="button"
+                                                       value="reset query" 
+                                                       update="pers-search-messages-form
+                                                       @form
+                                                       log-form"/>
+
+                                    <p:spacer height="5px" />
+
+                                    <h:panelGrid  columns="1" 
+                                                  cellpadding="10" 
+                                                  columnClasses="gridTd-solid-back"
+                                                  footerClass="gridFooter">
+
+                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd-solid-back, gridTd-solid-back">
+
+                                            <h:panelGroup>
+                                                <p:outputLabel for="pers-filter-name-first-ctl">
+                                                    <h:outputText value="First name"
+                                                                  styleClass="datum-label"/>
+                                                </p:outputLabel>
+                                                <p:selectBooleanCheckbox id="pers-filter-name-first-ctl" 
+                                                                         value="#{personSearchBB.paramsSelected.name_first_ctl}" 
+                                                                         disabled="#{personSearchBB.querySelected.queryExecuted}">
+                                                    <p:ajax update="pers-filter-name-first-val"/>
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+
+                                                <p:inputText id="pers-filter-name-first-val" value="#{personSearchBB.paramsSelected.name_first_val}" 
+                                                             style="width: 200px;" tabindex="1" required="false" styleClass="inputText"
+                                                             disabled="#{!personSearchBB.paramsSelected.name_first_ctl or personSearchBB.querySelected.queryExecuted}">
+                                                </p:inputText>
+                                                <h:message for="pers-filter-name-first-val" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+
                                         </h:panelGrid>
-                                    </h:form>
-                                </p:panel>
-                                <p:panel    id="pers-search-results-log-panel"
-                                            toggleable="true"
-                                            widgetVar="pers-search-results-log-var"
-                                            collapsed="false"
-                                            header="Query result log">
-                                    <h:form id="log-form">
-                                        
 
-                                            <h:outputLabel styleClass="bold" value="Log" />
-                                              <div class='logoutput'>
+                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd-solid-back, gridTd-solid-back">
 
-                                                  <h:outputText id="search-results-querylog" 
-                                                                value="#{personSearchBB.querySelected.queryLog}" 
-                                                                escape="false"/>
-                                              </div>
+                                            <h:panelGroup>
+                                                <p:outputLabel for="pers-filter-name-last-ctl">
+                                                    <h:outputText value="Last name"
+                                                                  styleClass="datum-label"/>
+                                                </p:outputLabel>
+                                                <p:selectBooleanCheckbox id="pers-filter-name-last-ctl" 
+                                                                         value="#{personSearchBB.paramsSelected.name_last_ctl}" 
+                                                                         disabled="#{personSearchBB.querySelected.queryExecuted}">
+                                                    <p:ajax update="pers-filter-name-last-val"/>
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
 
-                                    </h:form>
-                                </p:panel>
-                        
-                            </p:dialog>
+                                                <p:inputText id="pers-filter-name-last-val" value="#{personSearchBB.paramsSelected.name_last_val}" 
+                                                             style="width: 200px;" tabindex="1" required="false" styleClass="inputText"
+                                                             disabled="#{!personSearchBB.paramsSelected.name_last_ctl or personSearchBB.querySelected.queryExecuted}">
+                                                </p:inputText>
+                                                <h:message for="pers-filter-name-last-val" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
 
-                        
-                        
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="gridTd-solid-back, gridTd-solid-back">
+
+                                            <h:panelGroup>
+                                                <p:outputLabel for="filter-bobid-val" value="Filter by person ID?"/>
+                                                <p:spacer height="5px"/>
+                                                <p:selectBooleanCheckbox id="filter-bobid-ctl" value="#{personSearchBB.paramsSelected.bobID_ctl}" >
+                                                    <p:ajax update="filter-bobid-val"/>
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <p:outputLabel for="filter-bobid-val">
+                                                    <h:outputText value="Person ID number"/>
+                                                </p:outputLabel>
+                                                <p:inputText id="filter-bobid-val" value="#{personSearchBB.paramsSelected.bobID_val}" 
+                                                             style="width: 25%;" tabindex="3" required="false" styleClass="inputText"
+                                                             disabled="#{!personSearchBB.paramsSelected.bobID_ctl}"/>
+                                                <h:message for="filter-bobid-val" showDetail="false" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                                     columnClasses="topbottom-lines-left, topbottom-lines-right">
+                                            <h:panelGroup>
+                                                <p:outputLabel id="pers-filter-muni-ol" for="seev-filter-muni-chkbx" value="Filter by municipality? "/>
+                                                <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" 
+                                                                         value="#{personSearchBB.paramsSelected.muni_ctl}" 
+                                                                         disabled="#{personSearchBB.querySelected.queryExecuted}">
+                                                    <p:ajax update="pers-search-muni-som"/>
+                                                </p:selectBooleanCheckbox>
+                                            </h:panelGroup>
+                                            <h:panelGroup>
+                                                <p:selectOneMenu id="pers-search-muni-som" tabindex="1" value="#{personSearchBB.paramsSelected.muni_val}"
+                                                                 disabled="#{!personSearchBB.paramsSelected.muni_ctl or personSearchBB.querySelected.queryExecuted}">
+                                                    <f:converter converterId="muniConverter"/>
+                                                    <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
+                                                    <f:selectItems id="muniNameList" value="#{systemServicesBB.municipalityListForSearch}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                                </p:selectOneMenu>
+                                                <h:message for="pers-search-muni-som" showDetail="true" showSummary="true" 
+                                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+
+
+
+                                    </h:panelGrid>
+                                </h:form>
+                            </p:panel>
+                            <p:panel    id="pers-search-results-log-panel"
+                                        toggleable="true"
+                                        widgetVar="pers-search-results-log-var"
+                                        collapsed="false"
+                                        header="Query result log">
+                                <h:form id="log-form">
+
+
+                                    <h:outputLabel styleClass="bold" value="Log" />
+                                    <div class='logoutput'>
+
+                                        <h:outputText id="search-results-querylog" 
+                                                      value="#{personSearchBB.querySelected.queryLog}" 
+                                                      escape="false"/>
+                                    </div>
+
+                                </h:form>
+                            </p:panel>
+
+                        </p:dialog>
+
+
+
                     </f:view>
                 </div>
             </div>

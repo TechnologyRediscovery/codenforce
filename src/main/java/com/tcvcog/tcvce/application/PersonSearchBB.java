@@ -336,8 +336,8 @@ public class PersonSearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
     
         try {
-            int freshID = pc.humanAdd(currentPerson, getSessionBean().getSessUser());
-            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(pc.getPerson(pc.getHuman(freshID)),getSessionBean().getSessUser().getKeyCard()));
+            Person p = pc.humanAdd(currentPerson, getSessionBean().getSessUser());
+            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p,getSessionBean().getSessUser().getKeyCard()));
                if(isConnectToActiveProperty()){
                    
                    Property property = getSessionBean().getSessProperty();

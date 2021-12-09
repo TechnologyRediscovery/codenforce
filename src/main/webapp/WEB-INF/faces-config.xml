@@ -115,14 +115,7 @@
         <managed-bean-class>com.tcvcog.tcvce.application.Initializer</managed-bean-class>
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
-    
-    
-    <managed-bean>
-        <managed-bean-name>systemCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.SystemCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
-    
+   
    
     
     <managed-bean>
@@ -1386,12 +1379,7 @@
         <managed-bean-class>com.tcvcog.tcvce.application.CheckRequestStatusBean</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>actionRequestManageBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CEActionRequestsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+   
     
     <managed-bean>
         <managed-bean-name>cECasesActionRequestsBB</managed-bean-name>
@@ -2082,11 +2070,7 @@
         
     </navigation-rule>
     
-    <managed-bean>
-        <managed-bean-name>navMenuBean</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.NavMenuBean</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-    </managed-bean>
+   
     
     <managed-bean>
         <managed-bean-name>actionRequestManageBB</managed-bean-name>
@@ -2094,18 +2078,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>publicInfoBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PublicInfoBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    
-    <managed-bean>
-        <managed-bean-name>municipalityManageBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.MunicipalityManageBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     <managed-bean>
         <managed-bean-name>cECaseListExport</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseListExport</managed-bean-class>
