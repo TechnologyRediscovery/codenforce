@@ -295,14 +295,10 @@
                                                 <div class="aob-container aob-container-objectstring">
 
                                                     <h:outputText value="#{sessionBean.sessPerson.firstName} #{sessionBean.sessPerson.lastName} (ID:#{sessionBean.sessPerson.personID})"/>
-
-
                                                 </div>
                                                 <div class="aob-container aob-container-actions">
 
                                                     <div class="restrict-main-contents-io-link link-button">
-
-
                                                         <p:commandLink id="activebob-person-view-cl"
                                                                        ajax="false"
                                                                        value="view"
@@ -318,7 +314,9 @@
 
                                                                         oncomplete="PF('activebob-perslist-overlay-var').show();"/>
                                                     </div>
+                                                    
                                                     <ui:include src="cogstaff/person/compositions/personTools.xhtml"/>
+                                                    
                                                     <div class="restrict-main-contents-io-link link-button">
 
                                                         <p:commandLink  id="activebob-persontools-cb"
@@ -327,8 +325,6 @@
                                                                         oncomplete="PF('person-profile-dialog-var').show();"/>
                                                     </div>
                                                 </div>
-                                                
-
                                             </div>
                                             <p:overlayPanel id="activebob-perslist-overlay"
                                                             widgetVar="activebob-perslist-overlay-var"

@@ -296,8 +296,7 @@
                                         oncomplete="PF('phone-dialog-var').show()"
                                         style="color:blue;"
                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                        update="phone-info-form"
-                                        value="Connect person" />
+                                        value="Add phone number" />
                 </div>
 
 
@@ -344,7 +343,7 @@
                                             actionListener="#{personBB.onPhoneEditInitButtonChange(ph)}"
                                             style="color:blue;"
                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                            update="phone-info-form"
+                                            update="phone-dialog"
                                             value="edit" />
 
                     </p:column>
@@ -368,14 +367,11 @@
                                         oncomplete="PF('email-dialog-var').show()"
                                         style="color:blue;"
                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                        update="email-dialog
-                                        email-info-form"
+                                        update=":email-info-form"
                                         value="Add email address" />
                 </div>
 
-
                 <p:spacer height="5px"/>
-
 
                 <p:dataTable    id="person-emails-table"
                                 value="#{personBB.currentPerson.emailList}"

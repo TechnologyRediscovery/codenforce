@@ -3101,6 +3101,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if(cse != null && cv != null && ece != null){
             List<CodeViolation> vlst = new ArrayList<>();
             vlst.addAll(cse.getViolationList());
+            
             if(!vlst.isEmpty()){
                 // check to make sure that particular ordinance isn't already on the case
                 for (CodeViolation tempCv : vlst) {
