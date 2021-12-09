@@ -320,7 +320,7 @@ public class PersonSearchBB extends BackingBeanUtils{
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.assemblePersonDataHeavy(
-                    pc.personInit(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni()),
+                    pc.createPersonSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni()),
                     getSessionBean().getSessUser().getKeyCard());
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);

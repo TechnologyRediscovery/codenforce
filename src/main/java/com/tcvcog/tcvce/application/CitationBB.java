@@ -403,7 +403,6 @@ public class CitationBB extends BackingBeanUtils {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Fatal error! Unable to insert new log entry.", ""));
         } 
-        citationStatusEditMode = false;
        
    }
    
@@ -435,7 +434,6 @@ public class CitationBB extends BackingBeanUtils {
                             ex.getMessage(), ""));
             
         }
-        onCitationStatusLogEditModeToggle();
     }
     
     /**

@@ -2143,7 +2143,7 @@ public class CECaseSearchProfileBB
     public void queueSelectedPerson(ActionEvent ev) {
         PersonCoordinator pc = getPersonCoordinator();
         if (eventHumanSelected != null) {
-            getCurrentEvent().getPersonList().add(pc.getHumanLinkSkeleton(eventHumanSelected));
+            getCurrentEvent().getPersonList().add(pc.createHumanLinkSkeleton(eventHumanSelected));
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -2219,7 +2219,7 @@ public class CECaseSearchProfileBB
      */
     public void personCreateInit(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-        workingPerson = pc.personInit(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
+        workingPerson = pc.createPersonSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
     }
 
     /**

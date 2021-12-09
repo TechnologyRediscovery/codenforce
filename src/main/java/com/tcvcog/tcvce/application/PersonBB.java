@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.ContactEmail;
 import com.tcvcog.tcvce.entities.ContactPhone;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
 /**
@@ -29,7 +31,7 @@ public class PersonBB extends BackingBeanUtils {
     
     private IFace_humanListHolder currentHumanListHolder;
 
-    private Human currentHuman;
+    
     private Person currentPerson;
     private boolean currentPersonEditMode;
     
@@ -53,6 +55,10 @@ public class PersonBB extends BackingBeanUtils {
     
      @PostConstruct
     public void initBean(){
+        currentPersonEditMode = false;
+        currentContactPhoneEditMode = false;
+        currentContactEmailEditMode = false;
+        
         PersonCoordinator pc = getPersonCoordinator();
         try {
             phoneTypeList = pc.getContactPhoneTypeList();
@@ -60,6 +66,26 @@ public class PersonBB extends BackingBeanUtils {
             System.out.println(ex);
         }
         
+    }
+    
+    /**********************************************************/
+    /************** REFRESHING  *******************************/
+    /**********************************************************/
+    
+    /**
+     * Refreshes the current person
+     */
+    private void refreshCurrentPerson(){
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            currentPerson = pc.getPerson(currentPerson);
+            
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not refresh current Person", ""));
+        }
         
         
     }
@@ -73,6 +99,17 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user clicks of the human edit button
      */
     public void toggleHumanEditMode(){
+        if(currentPersonEditMode){
+            if(currentPerson != null && currentPerson.getHumanID() == 0){
+                // we've got a new record, so commit our add to DB
+                onHumanAddCommitButtonChange(null);
+            } else {
+                // we've got an existing human, so commit updates
+                onHumanEditCommitButtonChange(null);
+            }
+        }
+        currentPersonEditMode = !currentPersonEditMode;
+        refreshCurrentPerson();
         
         
     }
@@ -82,6 +119,8 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onHumanAddInitButtonChange(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        currentPerson = pc.createPersonSkeleton(getSessionBean().getSessMuni());
         
         
     }
@@ -91,6 +130,19 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onHumanAddCommitButtonChange(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            currentPerson = pc.humanAdd(currentPerson, getSessionBean().getSessUser());
+            refreshCurrentPerson();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Succesfully added person to database!", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "FATAL ERROR CODE P001: Could not add new Person to the database!", ""));
+        }    
         
         
         
@@ -101,8 +153,12 @@ public class PersonBB extends BackingBeanUtils {
      * @param h
       */
     public void onHumanEditInitButtonChange(Human h){
-        
-        
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            currentPerson = pc.getPerson(h);
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        }
     }
     
     /**
@@ -110,6 +166,21 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onHumanEditCommitButtonChange(ActionEvent ev){
+        
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            pc.humanEdit(currentPerson, getSessionBean().getSessUser());
+            refreshCurrentPerson();
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Succesfully updated " + currentPerson.getName() + ", id " + currentPerson.getHumanID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "ERROR updating " + currentPerson.getName() + ", id " + currentPerson.getHumanID(), ""));
+            
+        }
         
         
     }
@@ -119,67 +190,14 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onHumanOperationAbortButtonChange(ActionEvent ev){
-        
-        
+        currentPersonEditMode = false;
+        getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_INFO,
+                         "Abort successful; no changes made", ""));
     }
     
     
-    /**********************************************************/
-    /************** Mailing address INFRASTRUCTURE *********************/
-    /**********************************************************/
-    
-    /**
-     * Listener for user clicks of the mailing address edit mode
-     */
-    public void toggleMailingAddressEditMode(){
-        
-        
-    }
-    
-    
-    /**
-     * Listener for user requests to start the process of adding a mailing address
-     * @param ev 
-     */
-    public void onMailingAddressAddInitButtonChange(ActionEvent ev){
-        
-        
-    }
-    
-    /**
-     * Listener for user requests to finalize the process of adding a mailing address
-     * @param ev 
-     */
-    public void onMailingAddressAddCommitButtonChange(ActionEvent ev){
-        
-    }
-    
-    /**
-     * Listener for user requests to start the process of editing a mailing address
-     * @param ma
-     */
-    public void onMailingAddressEditInitButtonChange(MailingAddress ma){
-        
-        
-    }
-    
-    /**
-     * Listener for user requests to finalize mailing address edits
-     * @param ev 
-     */
-    public void onMailingAddressEditCommitButtonChange(ActionEvent ev){
-        
-        
-    }
-    
-    /**
-     * Listener for user requests to abort any mailing address operation
-     * @param ev 
-     */
-    public void onMailingAddressAbortOperationButtonChange(ActionEvent ev){
-        
-    }
-    
+   
     
     /***********************************************************/
     /************** Phone number INFRASTRUCTURE ****************/
@@ -190,6 +208,15 @@ public class PersonBB extends BackingBeanUtils {
      */
     public void togglePhoneEditMode(){
         
+        if(currentContactPhoneEditMode){
+            PersonCoordinator pc = getPersonCoordinator();
+            if(currentContactPhone != null && currentContactPhone.getPhoneID() == 0){
+                onPhoneAddCommitButtonChange(null);
+            } else {
+                onPhoneEditCommitButtonChange(null);
+            }
+        }
+        currentContactPhoneEditMode = !currentContactPhoneEditMode;
         
     }
     
@@ -198,6 +225,8 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onPhoneAddInitButtonChange(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        currentContactPhone = pc.createContactPhoneSkeleton();
         
         
     }
@@ -207,8 +236,18 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onPhoneAddCommitButtonChange(ActionEvent ev){
-        
-        
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            currentContactPhone = pc.contactPhoneAdd(currentContactPhone, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Succesfully inserted new phone number with ID " + currentContactPhone.getPhoneID(), ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Unable to insert new ContactPhone, sorry. This problem must be fixed by an dev.", ""));
+        }
     }
     
     
@@ -217,8 +256,10 @@ public class PersonBB extends BackingBeanUtils {
      * @param ph
      */
     public void onPhoneEditInitButtonChange(ContactPhone ph){
-        
-        
+        if(ph != null){
+            currentContactPhone = ph;
+        }
+        currentContactEmailEditMode = true;
     }
     
     /**
@@ -226,8 +267,19 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onPhoneEditCommitButtonChange(ActionEvent ev){
-        
-        
+         PersonCoordinator pc = getPersonCoordinator();
+        try {
+            pc.contactPhoneUpdate(currentContactPhone, getSessionBean().getSessUser());
+            currentContactPhone = pc.getContactPhone(currentContactPhone);
+            getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Succesfully Updated new phone number with ID " + currentContactPhone.getPhoneID(), ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Unable to Update phone number, sorry. This problem must be fixed by an dev.", ""));
+        }
     }
     
     /**
@@ -235,7 +287,10 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onPhoneOperationAbortButtonChange(ActionEvent ev){
-        
+        currentContactPhoneEditMode = false;
+        getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Aborted; no changes made!", ""));
         
     }
     
@@ -248,17 +303,25 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user clicks of the edit button for emails
      */
     public void toggleEmailEditMode(){
-        
-        
-        
+        if(currentContactEmailEditMode){
+            if(currentContactEmail != null && currentContactEmail.getEmailID() == 0){
+                onEmailAddCommitButtonChange(null);
+            } else {
+                onEmailEditCommitButtonChange(null);
+            }
+        }
+        currentContactEmailEditMode = !currentContactEmailEditMode;
     }
+    
     
      /**
      * Listener for user requests to start adding a new email 
      * @param ev 
      */
     public void onEmailAddInitButtonChange(ActionEvent ev){
-        
+        PersonCoordinator pc = getPersonCoordinator();
+        currentContactEmail = pc.createContactEmailSkeleton();
+        currentContactEmailEditMode = true;
         
     }
     
@@ -267,8 +330,18 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onEmailAddCommitButtonChange(ActionEvent ev){
-        
-        
+          PersonCoordinator pc = getPersonCoordinator();
+        try {
+            currentContactEmail = pc.contactEmailAdd(currentContactEmail, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Succesfully updated " + currentContactEmail.getEmailaddress()+ ", id " + currentPerson.getHumanID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "ERROR updating email address with id " + currentContactEmail.getEmailID(), ""));
+        }
     }
     
     
@@ -277,7 +350,8 @@ public class PersonBB extends BackingBeanUtils {
      * @param ce 
      */
     public void onEmailEditInitButtonChange(ContactEmail ce){
-        
+        currentContactEmail = ce;
+        currentContactEmailEditMode = true;
         
     }
     
@@ -286,7 +360,20 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onEmailEditCommitButtonChange(ActionEvent ev){
-        
+          PersonCoordinator pc = getPersonCoordinator();
+        try {
+            pc.contactEmailUpdate(currentContactEmail, getSessionBean().getSessUser());
+            currentContactEmail = pc.getContactEmail(currentContactEmail);
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Succesfully updated " + currentPerson.getName() + ", id " + currentPerson.getHumanID(), ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "ERROR updating " + currentPerson.getName() + ", id " + currentPerson.getHumanID(), ""));
+            
+        }
         
     }
     
@@ -295,7 +382,10 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onEmailOperationAbortButtonChange(ActionEvent ev){
-        
+          getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Aborted; No changes made!", ""));
+          currentContactEmailEditMode = false;
         
     }
     
@@ -305,12 +395,7 @@ public class PersonBB extends BackingBeanUtils {
     /**********************************************************/
     
 
-    /**
-     * @return the currentHuman
-     */
-    public Human getCurrentHuman() {
-        return currentHuman;
-    }
+   
 
     /**
      * @return the currentPersonEditMode
@@ -361,12 +446,7 @@ public class PersonBB extends BackingBeanUtils {
         return currentContactEmailEditMode;
     }
 
-    /**
-     * @param currentHuman the currentHuman to set
-     */
-    public void setCurrentHuman(Human currentHuman) {
-        this.currentHuman = currentHuman;
-    }
+  
 
     /**
      * @param currentPersonEditMode the currentPersonEditMode to set

@@ -125,6 +125,70 @@ public  class   AddressBB
         
     }
     
+     /**********************************************************/
+    /************** Mailing address INFRASTRUCTURE *********************/
+    /**********************************************************/
+    
+    /**
+     * Listener for user clicks of the mailing address edit mode
+     */
+    public void toggleMailingAddressEditMode(){
+        
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to start the process of adding a mailing address
+     * @param ev 
+     */
+    public void onMailingAddressAddInitButtonChange(ActionEvent ev){
+        
+        
+    }
+    
+    /**
+     * Listener for user requests to finalize the process of adding a mailing address
+     * @param ev 
+     */
+    public void onMailingAddressAddCommitButtonChange(ActionEvent ev){
+        
+    }
+    
+    /**
+     * Listener for user requests to start the process of editing a mailing address
+     * @param ma
+     */
+    public void onMailingAddressEditInitButtonChange(MailingAddress ma){
+        
+        
+    }
+    
+    /**
+     * Listener for user requests to finalize mailing address edits
+     * @param ev 
+     */
+    public void onMailingAddressEditCommitButtonChange(ActionEvent ev){
+        
+        
+    }
+    
+    /**
+     * Listener for user requests to abort any mailing address operation
+     * @param ev 
+     */
+    public void onMailingAddressAbortOperationButtonChange(ActionEvent ev){
+        
+    }
+    
+    
+    
+    /************************************************************/
+    /************** GETTERS AND SETTERS    **********************/
+    /************************************************************/
+    
+    
+    
     /**
      * @return the currentAddress
      */

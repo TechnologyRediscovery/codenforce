@@ -121,7 +121,7 @@ public class PersonInfoBB extends BackingBeanUtils{
     
     public void personCreateInit(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-//        workingPerson = pc.personInit(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
+//        workingPerson = pc.createPersonSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
     }
     
     /**

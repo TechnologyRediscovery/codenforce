@@ -21,6 +21,8 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.ContactEmail;
+import com.tcvcog.tcvce.entities.ContactPhone;
 import com.tcvcog.tcvce.entities.ContactPhoneType;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Human;
@@ -87,7 +89,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param hu to turn into a HumanLink
      * @return the given Human wrapped in a Link. Null if input is null.
      */
-    public HumanLink getHumanLinkSkeleton(Human hu){
+    public HumanLink createHumanLinkSkeleton(Human hu){
         if(hu != null){
             return new HumanLink(hu);
             
@@ -172,6 +174,20 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     private Human configureHuman(Human hum){
         // config logic for Human's go heres
         return hum;
+    }
+    
+    /**
+     * Access point for getting a person 
+     * Convenience method for calling getPerson that takes 
+     * a human object
+     * @param humanID
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public Person getPerson(int humanID) throws IntegrationException, BObStatusException{
+        return getPerson(getHuman(humanID));
+        
     }
     
     /**
@@ -277,7 +293,6 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
                }
             }
         }
-        
         return pdh;
     }
     
@@ -313,6 +328,10 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         pi.updateHuman(h);
     }
     
+    /**
+     * Factory method for Human objects not in the DB
+     * @return an empty Skeleton of a Human
+     */
     public Human humanInit(){
         Human h = new Human();
         return h;
@@ -325,7 +344,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param m
      * @return 
      */
-    public Person personInit(Municipality m){
+    public Person createPersonSkeleton(Municipality m){
         Person newP = new Person(humanInit()); 
         newP.setBusinessEntity(false);
         return newP;
@@ -338,15 +357,17 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param ua
      * @return
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public int humanAdd(Human h, UserAuthorized ua) throws IntegrationException{
+    public Person humanAdd(Human h, UserAuthorized ua) throws IntegrationException, BObStatusException{
         SystemIntegrator si = getSystemIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
        
+        h.setLastUpdatedBy(ua);
         h.setCreatedBy(ua);
         h.setSource( si.getBOBSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                 .getString("bobsourcePersonInternal"))));
-        return pi.insertHuman(h);
+        return getPerson(pi.insertHuman(h));
         
     }
     
@@ -381,6 +402,172 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         }
         
     }
+    
+    // *******************************************************
+    // *********  CONTACT PHONE AND EMAIL STUFF **************
+    // *******************************************************
+    
+    /**
+     * Factory method for ContactPhone objects
+     * @return 
+     */
+    public ContactPhone createContactPhoneSkeleton(){
+        return new ContactPhone();
+    }
+    
+    public List<ContactPhone> getContactPhoneList(List<Integer> phidl) throws IntegrationException{
+        List<ContactPhone> phoneList = new ArrayList<>();
+        if(phidl != null && !phidl.isEmpty()){
+            for(Integer i: phidl){
+                phoneList.add(getContactPhone(i));
+            }
+        }
+       return phoneList;
+    }
+
+    /**
+     * Type safe getter
+     * @param ph
+     * @return 
+     */
+    public ContactPhone getContactPhone(ContactPhone ph) throws IntegrationException{
+        if(ph != null){
+            return getContactPhone(ph.getPhoneID());
+        } else {
+            return null;
+        }
+    }
+    
+    public ContactPhone getContactPhone(int phid) throws IntegrationException{
+        if(phid != 0){
+            PersonIntegrator pi = getPersonIntegrator();
+            return configureContactPhone(pi.getContactPhone(phid));
+        } else {
+            throw new IntegrationException("cannot fetch phone with ID of 0");
+            
+        }
+        
+    }
+    
+    /**
+     * Logic configuration intermediary for ContactPhone objects
+     * @param ph
+     * @return the passed in object that has been configured
+     */
+    private ContactPhone configureContactPhone(ContactPhone ph){
+        // nothing to do here yet
+        return ph;
+    }
+    
+    /**
+     * Logic intermediary for updating phone numbers
+     * @param phone
+     * @param ua 
+     */
+    public void contactPhoneUpdate(ContactPhone phone, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        PersonIntegrator pi = getPersonIntegrator();
+        pi.updateContactPhone(phone);
+    }
+    
+    
+    /**
+     * Logic intermediary for adding a new phone number to the DB
+     * @param phone
+     * @param ua
+     * @return 
+     */
+    public ContactPhone contactPhoneAdd(ContactPhone phone, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        PersonIntegrator pi = getPersonIntegrator();
+        return getContactPhone(pi.insertContactPhone(phone));
+        
+    }
+    
+    /** EMAILS ****/
+    
+    /**
+     * Factory method for ContactEmail objects
+     * @return 
+     */
+    public ContactEmail createContactEmailSkeleton(){
+        return new ContactEmail();
+        
+    }
+    
+    /**
+     * Convenience method for extracting an entire list of emails
+     * from the database, all configured and ready for injection into a Person!
+     * @param emids
+     * @return 
+     */
+    public List<ContactEmail> getContactEmailList(List<Integer> emids) throws IntegrationException{
+        List<ContactEmail> emailList = new ArrayList<>();
+        if(emids != null && !emids.isEmpty()){
+            for(Integer i: emids){
+                emailList.add(getContactEmail(i));
+            }
+        }
+        return emailList;
+    }
+    
+    /**
+     * Type safe email getter
+     * @param ce
+     * @return
+     * @throws IntegrationException 
+     */
+    public ContactEmail getContactEmail(ContactEmail ce) throws IntegrationException{
+        if(ce != null){
+            return getContactEmail(ce.getEmailID());
+        } else {
+            return null;
+        }
+    }
+    
+    
+    /**
+     * Retrieves a single ContactEmail from the DB
+     * @param emid
+     * @return 
+     */
+    public ContactEmail getContactEmail(int emid) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        return configureContactEmail(pi.getContactEmail(emid));
+    }
+    
+    /**
+     * Internal logic method for configuring the ContactEmail objects
+     * @param ce
+     * @return 
+     */
+    private ContactEmail configureContactEmail(ContactEmail ce){
+        // Nothing to do here yet
+        return ce;
+    }
+    
+    
+    /**
+     * Logic intermediary for updating email records 
+     * @param em
+     * @param ua 
+     */
+    public void contactEmailUpdate(ContactEmail em, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        PersonIntegrator pi = getPersonIntegrator();
+        pi.updateContactEmail(em);
+        
+    }
+    
+    /**
+     * Logic intermediary for adding new emaiil addresses to the DB
+     * @param em
+     * @param ua 
+     * @return the new ContactEmail with a DB key
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public ContactEmail contactEmailAdd(ContactEmail em, UserAuthorized ua) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        return getContactEmail(pi.insertContactEmail(em));
+    }
+    
     
    
     
