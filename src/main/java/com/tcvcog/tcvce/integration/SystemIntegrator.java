@@ -120,9 +120,11 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * deactivated_userid
      * @param ti
      * @param rs
+     * @param userIDOnly To avoid recursion, set to True to only inject UserIDs on 
+     * creation, update, and deactivation 
      * @throws SQLException 
      */
-    protected void populateTrackedFields(TrackedEntity ti, ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
+    protected void populateTrackedFields(TrackedEntity ti, ResultSet rs, boolean userIDOnly) throws SQLException, IntegrationException, BObStatusException{
         UserIntegrator ui = getUserIntegrator();
         
         if(rs != null){
@@ -131,21 +133,33 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 ti.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
             }
             if(rs.getInt("createdby_userid") != 0){
-                ti.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+                if(userIDOnly){
+                    ti.setCreatedByUserID(rs.getInt("createdby_userid"));
+                } else {
+                    ti.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+                }
             }
             
             if(rs.getTimestamp("lastupdatedts") != null){
                 ti.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
             }
             if(rs.getInt("lastupdatedby_userid") != 0){
-                ti.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+                if(userIDOnly){
+                    ti.setLastUpdatedByUserID((rs.getInt("lastupdatedby_userid")));
+                } else {
+                    ti.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+                }
             }
             
             if(rs.getTimestamp("deactivatedts") != null){
                 ti.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
             }
             if(rs.getInt("deactivatedby_userid") != 0){
-                ti.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+                if(userIDOnly){
+                    ti.setDeactivatedByUserID(rs.getInt("deactivatedby_userid"));
+                } else {
+                    ti.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+                }
             }
         }
     }
@@ -173,21 +187,21 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 te.setLinkCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
             }
             if(rs.getInt("createdby_userid") != 0){
-                te.setLinkCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+                te.setLinkCreatedByUserID(rs.getInt("createdby_userid"));
             }
             
             if(rs.getTimestamp("lastupdatedts") != null){
                 te.setLinkLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
             }
             if(rs.getInt("lastupdatedby_userid") != 0){
-                te.setLinkLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+                te.setLinkLastUpdatedByUserID(rs.getInt("lastupdatedby_userid"));
             }
             
             if(rs.getTimestamp("deactivatedts") != null){
                 te.setLinkDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
             }
             if(rs.getInt("deactivatedby_userid") != 0){
-                te.setLinkDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+                te.setLinkDeactivatedByUserID(rs.getInt("deactivatedby_userid"));
             }
             if(rs.getInt("source_sourceid") != 0){
                 te.setLinkSource(getBOBSource(rs.getInt("source_sourceid")));
@@ -304,7 +318,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 }
             } catch (SQLException ex) {
                 System.out.println(ex.toString());
-                throw new IntegrationException("unable to linked object role", ex);
+                throw new IntegrationException("unable to get linked object role", ex);
             } finally {
                 if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
                 if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -323,11 +337,10 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public LinkedObjectRole generateLinkedObjectRole(ResultSet rs) throws SQLException, IntegrationException{
-        MunicipalityCoordinator mc = getMuniCoordinator();
         LinkedObjectRole lor = new LinkedObjectRole();
          if(rs != null){
             
-            lor.setRoleID(rs.getInt("roleid"));
+            lor.setRoleID(rs.getInt("lorid"));
             
             lor.setTitle((rs.getString("title")));
             
@@ -336,10 +349,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             }
             lor.setDescription(rs.getString("description"));
             
-            if(rs.getInt("muni_municode") != 0){
-                lor.setMuni(mc.getMuni(rs.getInt("muni_municode")));
-            }
-            
+          
             if(rs.getTimestamp("deactivatedts") != null){
                 lor.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
             }
@@ -814,8 +824,9 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         bs.setSourceid(rs.getInt("sourceid"));
         bs.setTitle(rs.getString("title"));;
         bs.setDescription(rs.getString("description"));
+        // beware of inifinte loops
         bs.setCreatorUserID(rs.getInt("creator"));
-        bs.setMuni(mi.getMuni(rs.getInt("muni_municode")));;
+        bs.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         bs.setActive(rs.getBoolean("active"));;
         bs.setNotes(rs.getString("notes"));
         return bs;

@@ -53,6 +53,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -195,7 +197,12 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      * @return 
      */
     public String requestActionAsFacesUser() {
-        currentRequest.setRequestor(getSessionBean().getSessUser().getPerson());
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            currentRequest.setRequestor(pc.getPerson(getSessionBean().getSessUser().getPerson()));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
         getSessionBean().setSessCEAR(currentRequest);
         return "reviewAndSubmit";
     }
@@ -574,7 +581,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             //insert it into the database.
             personID = insertActionRequestorNewPerson(currentRequest.getRequestor());
                 //We want to get the entry we just inserted into the database
-//                currentRequest.setRequestor(pi.getPerson(personID));
+//                currentRequest.setRequestor(pi.getPersonByHumanID(personID));
         } else {
 
             // do nothing, since we already have the person in the system

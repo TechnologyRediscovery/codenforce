@@ -68,7 +68,7 @@ public class PersonEditPublicBB extends BackingBeanUtils implements Serializable
         // THIS IS HARDCODED, DEFAULT, PUBLIC USER SHOULD BE PARAMETER
         u.setUserID(102);
         int cloneId = pi.createClone(person, u);
-//        person = pi.getPerson(cloneId);
+//        person = pi.getPersonByHumanID(cloneId);
         PersonCoordinator pc = getPersonCoordinator();
         person = pc.anonymizePersonData(person);
         clonePerson = person;

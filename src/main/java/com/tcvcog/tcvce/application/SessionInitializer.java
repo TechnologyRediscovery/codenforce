@@ -554,9 +554,9 @@ public  class       SessionInitializer
         try {
             sb.setSessPersonList(persc.getPersonListFromHumanLinkList(getSessionBean().getSessProperty().getHumanLinkList()));
             if(sb.getSessPersonList().isEmpty()){
-                sb.setSessPersonQueued(persc.selectDefaultPerson(cred));
+                sb.setSessPerson(persc.selectDefaultPerson(cred));
             } else {
-                sb.setSessPersonQueued(sb.getSessPersonList().get(0));
+                sb.setSessPerson(sb.getSessPersonList().get(0));
             }
             sb.setQueryPersonList(sc.buildQueryPersonList(cred));
             if(!sb.getQueryPersonList().isEmpty()){

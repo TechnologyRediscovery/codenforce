@@ -1972,7 +1972,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         if (nov.getLockedAndqueuedTS() == null) {
 //            int ghostID = pc.createChostPerson(nov.getRecipient(), ua);
-//            nov.setRecipient(pi.getPerson(ghostID));
+//            nov.setRecipient(pi.getPersonByHumanID(ghostID));
             nov.setLockedAndqueuedTS(LocalDateTime.now());
             nov.setLockedAndQueuedBy(ua);
             
@@ -2504,7 +2504,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         for(CodeViolation cv: c.getViolationList()){
             CitationCodeViolationLink ccvl = new CitationCodeViolationLink(cv);
             ccvl.setCreatedBy(creator);
-            ccvl.setLinkCreatedBy(creator);
+            ccvl.setLinkCreatedByUserID(creator.getUserID());
             ccvl.setCitVStatus(getDefaultCitationViolationStatusEnumVal());
             ccvl.setLinkSource(sc.getBObSource(Integer.parseInt(
                     getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("bobsource_internalhuman"))));

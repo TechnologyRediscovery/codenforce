@@ -33,10 +33,13 @@ public abstract class   TrackedEntity
     /** Humanization Object standard fields **/
     protected LocalDateTime createdTS;
     protected User createdBy;
+    protected int createdByUserID;
     protected LocalDateTime lastUpdatedTS;
     protected User lastUpdatedBy;
+    protected int lastUpdatedByUserID;
     protected LocalDateTime deactivatedTS;
     protected User deactivatedBy;
+    protected int deactivatedByUserID;
     
     
     public static String getPrettyDate(LocalDateTime ldtDate){
@@ -138,6 +141,48 @@ public abstract class   TrackedEntity
     
     public boolean isActive(){
         return deactivatedTS == null;
+    }
+
+    /**
+     * @return the createdByUserID
+     */
+    public int getCreatedByUserID() {
+        return createdByUserID;
+    }
+
+    /**
+     * @return the lastUpdatedByUserID
+     */
+    public int getLastUpdatedByUserID() {
+        return lastUpdatedByUserID;
+    }
+
+    /**
+     * @return the deactivatedByUserID
+     */
+    public int getDeactivatedByUserID() {
+        return deactivatedByUserID;
+    }
+
+    /**
+     * @param createdByUserID the createdByUserID to set
+     */
+    public void setCreatedByUserID(int createdByUserID) {
+        this.createdByUserID = createdByUserID;
+    }
+
+    /**
+     * @param lastUpdatedByUserID the lastUpdatedByUserID to set
+     */
+    public void setLastUpdatedByUserID(int lastUpdatedByUserID) {
+        this.lastUpdatedByUserID = lastUpdatedByUserID;
+    }
+
+    /**
+     * @param deactivatedByUserID the deactivatedByUserID to set
+     */
+    public void setDeactivatedByUserID(int deactivatedByUserID) {
+        this.deactivatedByUserID = deactivatedByUserID;
     }
 
   

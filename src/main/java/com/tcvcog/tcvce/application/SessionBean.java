@@ -157,7 +157,7 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     
-    private PersonDataHeavy sessPerson;
+    private Person sessPerson;
     private ActivatableRouteEnum sessPersonRoute;
     
     private Person sessPersonQueued;
@@ -1554,14 +1554,14 @@ public class    SessionBean
     /**
      * @return the sessPerson
      */
-    public PersonDataHeavy getSessPerson() {
+    public Person getSessPerson() {
         return sessPerson;
     }
 
     /**
      * @param sessPerson the sessPerson to set
      */
-    public void setSessPerson(PersonDataHeavy sessPerson) {
+    public void setSessPerson(Person sessPerson) {
         this.sessPerson = sessPerson;
     }
 

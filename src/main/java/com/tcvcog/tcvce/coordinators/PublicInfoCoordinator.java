@@ -1245,7 +1245,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         Person unbundled = input.getBundledPerson();
 
 /// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                            
-//        Person exportable = pc.getPerson(unbundled.getHumanID());
+//        Person exportable = pc.getPersonByHumanID(unbundled.getHumanID());
 
 //        if (exportable == null) {
 //

@@ -79,7 +79,9 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         if(humanID == 0){
             return null;
         }
-        return configureHuman(pi.getHuman(humanID));
+        Human h = pi.getHuman(humanID);
+        h = configureHuman(h);
+         return h;
     }
     
     /**
@@ -138,7 +140,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         hum.setCreatedBy(ua);
-        hum.setLinkLastUpdatedBy(ua);
+        hum.setLinkLastUpdatedByUserID(ua.getUserID());
         
         return pi.insertHumanLink(hlh, hum);
     }
@@ -178,15 +180,17 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Access point for getting a person 
-     * Convenience method for calling getPerson that takes 
-     * a human object
+ Convenience method for calling getPersonByHumanID that takes 
+ a human object
      * @param humanID
      * @return
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-    public Person getPerson(int humanID) throws IntegrationException, BObStatusException{
-        return getPerson(getHuman(humanID));
+    public Person getPersonByHumanID(int humanID) throws IntegrationException, BObStatusException{
+        Human h = getHuman(humanID);
+        Person p = getPerson(h);
+        return p;
         
     }
     
@@ -195,16 +199,15 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param hum
      * @return the fully-baked human (i.e. a person)
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public Person getPerson(Human hum) throws IntegrationException, BObStatusException{
-        PersonIntegrator pi = getPersonIntegrator();
-        
-        if(hum != null){
+        if(hum == null){
             return null;
         }
         Person p = new Person(hum);
-        
-        return configurePerson(p);
+        p = configurePerson(p);
+        return p;
     }
     
     /**
@@ -367,7 +370,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         h.setCreatedBy(ua);
         h.setSource( si.getBOBSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                 .getString("bobsourcePersonInternal"))));
-        return getPerson(pi.insertHuman(h));
+        return getPersonByHumanID(pi.insertHuman(h));
         
     }
     
@@ -612,15 +615,19 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Logic container for choosing a default person if the SessionInitializer
-     * does not have a session List to work from
+     * does not have a session List to work from. Currently it just grabs
+     * the UserAuthorized's Person
      * @param cred
      * @return the selected person proposed for becoming the sessionPerson
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public Person selectDefaultPerson(Credential cred) throws IntegrationException{
         UserCoordinator uc = getUserCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
         try {
-            return uc.user_getUser(cred.getGoverningAuthPeriod().getUserID()).getPerson();
+            User u = uc.user_getUser(cred.getGoverningAuthPeriod().getUserID());
+            System.out.println("PersonCoordinator.selectDefaultPerson: " + u);
+            return pc.getPerson(u.getPerson());
         } catch (BObStatusException ex) {
             throw new IntegrationException(ex.getMessage());
         }
@@ -645,7 +652,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         if(cred != null){
             idList = pi.getPersonHistory(cred.getGoverningAuthPeriod().getUserID());
             while(!idList.isEmpty() && pl.size() <= Constants.MAX_BOB_HISTORY_SIZE){
-//                pl.add(pi.getPerson(idList.remove(0)));
+//                pl.add(pi.getPersonByHumanID(idList.remove(0)));
             }
         }
         return pl;
@@ -985,7 +992,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     public PersonWithChanges getPersonWithChanges(int personID) throws IntegrationException{
         
-//        PersonWithChanges skeleton = new PersonWithChanges(getPerson(personID));
+//        PersonWithChanges skeleton = new PersonWithChanges(getPersonByHumanID(personID));
         
         PersonIntegrator pi = getPersonIntegrator();
         

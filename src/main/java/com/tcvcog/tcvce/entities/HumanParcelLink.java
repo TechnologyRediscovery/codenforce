@@ -37,13 +37,13 @@ public class HumanParcelLink
     protected BOBSource linkSource;
     
     protected LocalDateTime linkCreatedTS;
-    protected User linkCreatedBy;
+    protected int linkCreatedBy;
     
     protected LocalDateTime linkLastUpdatedTS;
-    protected User linkLastUpdatedBy;
+    protected int linkLastUpdatedBy;
     
     protected LocalDateTime linkDeactivatedTS;
-    protected User linkDeactivatedBy;
+    protected int linkDeactivatedBy;
     
     protected String linkNotes;
 
@@ -97,7 +97,7 @@ public class HumanParcelLink
      * @return the linkCreatedBy
      */
     @Override
-    public User getLinkCreatedBy() {
+    public int getLinkCreatedByUserID() {
         return linkCreatedBy;
     }
 
@@ -113,7 +113,7 @@ public class HumanParcelLink
      * @return the linkLastUpdatedBy
      */
     @Override
-    public User getLinkLastUpdatedBy() {
+    public int getLinkLastUpdatedByUserID() {
         return linkLastUpdatedBy;
     }
 
@@ -129,7 +129,7 @@ public class HumanParcelLink
      * @return the linkDeactivatedBy
      */
     @Override
-    public User getLinkDeactivatedBy() {
+    public int getLinkDeactivatedByUserID() {
         return linkDeactivatedBy;
     }
 
@@ -145,7 +145,7 @@ public class HumanParcelLink
      * @param linkCreatedBy the linkCreatedBy to set
      */
     @Override
-    public void setLinkCreatedBy(User linkCreatedBy) {
+    public void setLinkCreatedByUserID(int linkCreatedBy) {
         this.linkCreatedBy = linkCreatedBy;
     }
 
@@ -153,7 +153,7 @@ public class HumanParcelLink
      * @param linkLastUpdatedBy the linkLastUpdatedBy to set
      */
     @Override
-    public void setLinkLastUpdatedBy(User linkLastUpdatedBy) {
+    public void setLinkLastUpdatedByUserID(int linkLastUpdatedBy) {
         this.linkLastUpdatedBy = linkLastUpdatedBy;
     }
 
@@ -161,7 +161,7 @@ public class HumanParcelLink
      * @param linkDeactivatedBy the linkDeactivatedBy to set
      */
     @Override
-    public void setLinkDeactivatedBy(User linkDeactivatedBy) {
+    public void setLinkDeactivatedByUserID(int linkDeactivatedBy) {
         this.linkDeactivatedBy = linkDeactivatedBy;
     }
 

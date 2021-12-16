@@ -79,13 +79,12 @@ public abstract class PublicInfoBundle implements Serializable {
      * @param manager 
      */
     public void setCaseManager(User manager){
+        
         if (manager != null && manager.getPerson() != null) {
             StringBuilder sb = new StringBuilder();
-            sb.append(manager.getPerson().getFirstName());
-            sb.append(" ");
-            sb.append(manager.getPerson().getLastName());
+            sb.append(manager.getPerson().getName());
             setCaseManagerName(sb.toString());
-            setCaseManagerContact(manager.getPerson().getPrimaryPhone().phoneNumber);
+        
         }
     }
     

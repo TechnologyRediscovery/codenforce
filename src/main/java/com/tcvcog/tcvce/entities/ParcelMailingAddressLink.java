@@ -33,13 +33,13 @@ public class ParcelMailingAddressLink
     protected BOBSource linkSource;
     
     protected LocalDateTime linkCreatedTS;
-    protected User linkCreatedBy;
+    protected int linkCreatedBy;
     
     protected LocalDateTime linkLastUpdatedTS;
-    protected User linkLastUpdatedBy;
+    protected int linkLastUpdatedBy;
     
     protected LocalDateTime linkDeactivatedTS;
-    protected User linkDeactivatedBy;
+    protected int linkDeactivatedBy;
     
     protected String linkNotes;
     
@@ -89,7 +89,7 @@ public class ParcelMailingAddressLink
      * @return the linkCreatedBy
      */
     @Override
-    public User getLinkCreatedBy() {
+    public int getLinkCreatedByUserID() {
         return linkCreatedBy;
     }
 
@@ -105,7 +105,7 @@ public class ParcelMailingAddressLink
      * @return the linkLastUpdatedBy
      */
     @Override
-    public User getLinkLastUpdatedBy() {
+    public int getLinkLastUpdatedByUserID() {
         return linkLastUpdatedBy;
     }
 
@@ -121,7 +121,7 @@ public class ParcelMailingAddressLink
      * @return the linkDeactivatedBy
      */
     @Override
-    public User getLinkDeactivatedBy() {
+    public int getLinkDeactivatedByUserID() {
         return linkDeactivatedBy;
     }
 
@@ -138,7 +138,7 @@ public class ParcelMailingAddressLink
      * @param linkCreatedBy the linkCreatedBy to set
      */
     @Override
-    public void setLinkCreatedBy(User linkCreatedBy) {
+    public void setLinkCreatedByUserID(int linkCreatedBy) {
         this.linkCreatedBy = linkCreatedBy;
     }
 
@@ -147,7 +147,7 @@ public class ParcelMailingAddressLink
      * @param linkLastUpdatedBy the linkLastUpdatedBy to set
      */
     @Override
-    public void setLinkLastUpdatedBy(User linkLastUpdatedBy) {
+    public void setLinkLastUpdatedByUserID(int linkLastUpdatedBy) {
         this.linkLastUpdatedBy = linkLastUpdatedBy;
     }
 
@@ -156,7 +156,7 @@ public class ParcelMailingAddressLink
      * @param linkDeactivatedBy the linkDeactivatedBy to set
      */
     @Override
-    public void setLinkDeactivatedBy(User linkDeactivatedBy) {
+    public void setLinkDeactivatedByUserID(int linkDeactivatedBy) {
         this.linkDeactivatedBy = linkDeactivatedBy;
     }
 

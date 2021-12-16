@@ -2282,11 +2282,11 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                viol = new CodeViolationDisplayable(getCodeViolation(rs.getInt("codeviolation_violationid")));
+                  viol = new CodeViolationDisplayable(getCodeViolation(rs.getInt("codeviolation_violationid")));
                 viol.setIncludeOrdinanceText(rs.getBoolean("includeordtext"));
                 viol.setIncludeHumanFriendlyText(rs.getBoolean("includehumanfriendlyordtext"));
-                viol.setIncludeViolationPhotos(rs.getBoolean("includeviolationphoto"));
-                codeViolationList.add(viol);
+                 viol.setIncludeViolationPhotos(rs.getBoolean("includeviolationphoto"));
+                 codeViolationList.add(viol);
             }
 
         } catch (SQLException ex) {

@@ -793,32 +793,10 @@
     </managed-bean>
     
     <managed-bean>
-        <managed-bean-name>personEventsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonEventsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    
-    <managed-bean>
-        <managed-bean-name>personInfoBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonInfoBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
         <managed-bean-name>personChangesBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PersonChangesBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>personOccPeriodsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonOccPeriodsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
-    
-    
     
     <managed-bean>
         <managed-bean-name>personSearchBB</managed-bean-name>

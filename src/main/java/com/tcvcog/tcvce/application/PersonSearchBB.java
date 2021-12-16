@@ -106,7 +106,7 @@ public class PersonSearchBB extends BackingBeanUtils{
                  currentPerson = pc.assemblePersonDataHeavy(personList.get(0),
                             cred);
             } else {
-                currentPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessUser().getPerson(),
+                currentPerson = pc.assemblePersonDataHeavy(pc.getPerson(getSessionBean().getSessUser().getPerson()),
                             cred);
             }
        } catch (IntegrationException | BObStatusException ex){

@@ -674,7 +674,12 @@ public class UserConfigBB extends BackingBeanUtils{
      * @return 
      */
     public String onEditUserPersonRecordButtonChange(Person p){
-        getSessionBean().setSessPersonQueued(userAuthorizedInConfig.getPerson());
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            getSessionBean().setSessPersonQueued(pc.getPerson(userAuthorizedInConfig.getPerson()));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
         return "persons";
     }
 

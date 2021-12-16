@@ -21,7 +21,9 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- *
+ * Our base class for a system User. Note a User doesn't have 
+ * any credentials to do anything only to hold information. 
+ * See UserAuthorized for the credentialed subclass.
  * @author cedba
  */
 public class User implements Serializable{
@@ -30,7 +32,7 @@ public class User implements Serializable{
     protected RoleType roleType;
     protected String username;
     
-    protected Person person;
+    protected Human person;
     protected int personID;
 
     protected String notes;
@@ -133,14 +135,15 @@ public class User implements Serializable{
     /**
      * @return the person
      */
-    public Person getPerson() {
+    public Human getPerson() {
         return person;
     }
 
     /**
-     * @param person the person to set
+     * @param person the person to set - It's actually a Human, not an 
+     * Instance of Person class
      */
-    public void setPerson(Person person) {
+    public void setPerson(Human person) {
         this.person = person;
     }
 
@@ -180,7 +183,7 @@ public class User implements Serializable{
         if(person != null){
             personID = person.getHumanID();
         }
-        return personID;
+        return getPersonID();
     }
 
     /**
@@ -199,7 +202,7 @@ public class User implements Serializable{
         hash = 43 * hash + Objects.hashCode(this.roleType);
         hash = 43 * hash + Objects.hashCode(this.username);
         hash = 43 * hash + Objects.hashCode(this.person);
-        hash = 43 * hash + this.personID;
+        hash = 43 * hash + this.getPersonID();
         hash = 43 * hash + Objects.hashCode(this.notes);
         hash = 43 * hash + Objects.hashCode(this.badgeNumber);
         hash = 43 * hash + Objects.hashCode(this.oriNumber);
@@ -340,6 +343,13 @@ public class User implements Serializable{
      */
     public void setHomeMuniID(int homeMuniID) {
         this.homeMuniID = homeMuniID;
+    }
+
+    /**
+     * @return the personID
+     */
+    public int getPersonID() {
+        return personID;
     }
     /**
      * @return the accessRecord

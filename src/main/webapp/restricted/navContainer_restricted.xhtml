@@ -299,7 +299,7 @@
                                             </div>
                                             <div class="aob-container aob-container-objectstring">
 
-                                                <h:outputText value="#{sessionBean.sessPerson.firstName} #{sessionBean.sessPerson.lastName} (ID:#{sessionBean.sessPerson.personID})"/>
+                                                <h:outputText value="#{sessionBean.sessPerson.name} (ID:#{sessionBean.sessPerson.personID})"/>
                                             </div>
                                             <ui:include src="cogstaff/person/compositions/personTools.xhtml"/>
                                             <h:form id="topnav-pers-form">
@@ -537,12 +537,10 @@
                                     <h:outputText value="#{userBB.currentUser.userID}"/>
                                     <h:outputText value=")"/>
                                     <h:outputText value=" "/>
-                                    <h:outputText value="#{userBB.currentUser.person.firstName}"/>
+                                    <h:outputText value="#{userBB.currentUser.person.name}"/>
                                     <h:outputText value=" "/>
-                                    <h:outputText value="#{userBB.currentUser.person.lastName}"/>
-                                    <h:outputText value=" "/>
-                                    <h:outputText value="(ID: "/>
-                                    <h:outputText value="#{userBB.currentUser.person.personID}"/>
+                                    <h:outputText value="(HID: "/>
+                                    <h:outputText value="#{userBB.currentUser.person.humanID}"/>
                                     <h:outputText value=")"/>
                                 </h2>
 
@@ -618,10 +616,8 @@
 
                                             <h:outputText value="Your user is currently mapped to: "/>
                                             <p:spacer height="5px"/>
-                                            <h:outputText value="#{userBB.currentUser.person.firstName}"/>
-                                            <h:outputText value=" "/>
-                                            <h:outputText value="#{userBB.currentUser.person.lastName}"/>
-                                            <h:outputText value=" (ID: #{userBB.currentUser.person.personID})"/>
+                                            <h:outputText value="#{userBB.currentUser.person.name}"/>
+                                            <h:outputText value=" (ID: #{userBB.currentUser.person.humanID})"/>
                                             <h:outputText value=" "/>
 
 
@@ -634,7 +630,7 @@
                                                              value="#{userBB.formSelectedUserPerson}">
                                                 <f:selectItem itemLabel="select a person..." noSelectionOption="true"/>
                                                 <f:selectItems value="#{userBB.userPersonList}"  var="p" itemValue="#{p}" 
-                                                               itemLabel="#{p.firstName} #{p.lastName} (id:#{p.personID})"/>
+                                                               itemLabel="#{p.name} (id:#{p.humanID})"/>
                                                 <f:converter converterId="personConverter"/>
                                             </p:selectOneMenu>
                                             <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 

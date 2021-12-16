@@ -51,21 +51,20 @@ public class PersonCECasesBB extends BackingBeanUtils{
     @PostConstruct
     public void initBean(){
        PersonCoordinator pc = getPersonCoordinator();
-       CaseCoordinator cc = getCaseCoordinator();
        
-       if(getSessionBean().getSessPersonQueued() != null){
-           try {
-               currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(),
-                       getSessionBean().getSessUser().getKeyCard());
-           } catch (IntegrationException | BObStatusException ex) {
-               System.out.println(ex);
-           }
-             getSessionBean().setSessPerson(currPerson);
-            getSessionBean().setSessPersonQueued(null);
-       } else {
-            currPerson = (getSessionBean().getSessPerson());
-       }
-        caseList = currPerson.getCaseList();
+        try {
+            if(getSessionBean().getSessPersonQueued() != null){
+                currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(),
+                                    getSessionBean().getSessUser().getKeyCard());
+                getSessionBean().setSessPerson(currPerson);
+                getSessionBean().setSessPersonQueued(null);
+            } else {
+                 currPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPerson(), getSessionBean().getSessUser().getMyCredential());
+            }
+             caseList = currPerson.getCaseList();
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        }
         
     }
     

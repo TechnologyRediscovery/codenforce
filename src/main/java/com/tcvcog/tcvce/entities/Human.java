@@ -84,6 +84,22 @@ public  class   Human
     public int getHumanID() {
         return humanID;
     }
+    
+    /**
+     * Added for reverse compat with Persons who used to have First and Last
+     * @return empty string
+     */
+    public String getFirstName(){
+        return "";
+    }
+    
+    /**
+     * Added for reverse compat with Persons who used to have First and Last
+     * @return the name
+     */
+    public String getLastName(){
+        return name;
+    }
 
     /**
      * @return the name

@@ -99,9 +99,7 @@ public class PropertyUnitChangesBB
     public String approvedByWho(PropertyUnitChangeOrder change) {
 
         if (change.getApprovedBy() != null) {
-            return "Approved by: " + change.getApprovedBy().getPerson().getFirstName()
-                    + " "
-                    + change.getApprovedBy().getPerson().getLastName()
+            return "Approved by: " + change.getApprovedBy().getPerson().getName()
                     + " (ID# "
                     + change.getApprovedBy().getPerson().getHumanID()
                     + ")";

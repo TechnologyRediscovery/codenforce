@@ -156,7 +156,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 h = generateHuman(rs);
             }
 
-        } catch (SQLException ex) {
+        } catch (SQLException | BObStatusException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("PersonIntegrator.getHuman | Unable to retrieve human", ex);
         } finally {
@@ -174,7 +174,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException
      * @throws IntegrationException 
      */
-    private Human generateHuman(ResultSet rs) throws SQLException, IntegrationException{
+    private Human generateHuman(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         SystemIntegrator si = getSystemIntegrator();
         
         Human h = new Human();
@@ -194,7 +194,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         }
         
         // Ship to our SystemIntegrator for standard fields
-//        si.populateTrackedFields(h, rs);
+        // TODO: Fix infinite recursion! Humans are made by users who have humans in them.
+        si.populateTrackedFields(h, rs, true);
         return h;
     }
     
@@ -270,7 +271,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             }
             
             if(hl.getLastUpdatedBy()!= null){
-                stmt.setInt(4, hl.getLinkLastUpdatedBy().getUserID() );
+                stmt.setInt(4, hl.getLinkLastUpdatedByUserID());
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
@@ -348,7 +349,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             }
             
             if(hl.getLastUpdatedBy()!= null){
-                stmt.setInt(2, hl.getLinkLastUpdatedBy().getUserID() );
+                stmt.setInt(2, hl.getLinkLastUpdatedByUserID() );
             } else {
                 stmt.setNull(2, java.sql.Types.NULL);
             }
@@ -404,13 +405,13 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             
             if(hl.getLastUpdatedBy()!= null){
-                stmt.setInt(1, hl.getLinkLastUpdatedBy().getUserID() );
+                stmt.setInt(1, hl.getLinkLastUpdatedByUserID());
             } else {
                 stmt.setNull(1, java.sql.Types.NULL);
             }
             
             if(hl.getDeceasedBy() != null){
-                stmt.setInt(2, hl.getLinkDeactivatedBy().getUserID() );
+                stmt.setInt(2, hl.getLinkDeactivatedByUserID());
             } else {
                 stmt.setNull(2, java.sql.Types.NULL);
             }
@@ -702,7 +703,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             
-            String s =  "SELECT emailid FROM contactemail WHERE human_humanid=? ";
+            String s =  "SELECT emailid FROM contactemail WHERE human_humanid=?; ";
             
             stmt = con.prepareStatement(s);
             stmt.setInt(1, humanID);
@@ -748,7 +749,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 em.setBounceTS(rs.getTimestamp("bouncets").toLocalDateTime());
             }
             
-            si.populateTrackedFields(em, rs);
+            si.populateTrackedFields(em, rs, true);
             
             return em;
         } catch (BObStatusException ex) {
@@ -966,7 +967,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             }
             phone.setDisconnectRecordedBy(uc.user_getUser(rs.getInt("disconnect_userid")));
             
-            si.populateTrackedFields(phone, rs);
+            si.populateTrackedFields(phone, rs, true);
             phone.setNotes(rs.getString("notes"));
             
             return phone;
@@ -1148,7 +1149,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             
             String s = "SELECT phonetypeid, title, createdts, deactivatedts\n" +
-                        "  FROM public.contactphonetype;";
+                        "  FROM public.contactphonetype WHERE phonetypeid=?;";
             
             stmt = con.prepareStatement(s);
             stmt.setInt(1, phoneTypeID);
@@ -1222,8 +1223,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         
         cpt.setPhoneTypeID(rs.getInt("phonetypeid"));
         cpt.setTitle(rs.getString("title"));
-        cpt.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
-        cpt.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+        if(rs.getTimestamp("createdts") != null){
+            cpt.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+        }
+        if(rs.getTimestamp("deactivatedts") != null){
+            cpt.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+        }
         return cpt;
         
     }

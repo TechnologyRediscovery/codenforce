@@ -354,21 +354,21 @@
                         <h:outputText value="#{csle.logEntryID}" />
                     </p:column>
 
-                    <p:column width="10%">
+                    <p:column width="30%" sortBy="#{csle.dateOfRecord}">
                         <f:facet name="header">
                             <h:outputText value="Date"/>
                         </f:facet>
                         <h:outputText value="#{citationBB.getPrettyDateNoTime(csle.dateOfRecord)}" />
                     </p:column>
 
-                    <p:column width="50%">
+                    <p:column width="45%">
                         <f:facet name="header">
                             <h:outputText value="Status"/>
                         </f:facet>
                         <h:outputText value="#{csle.status.statusTitle}" />
                     </p:column>
 
-                    <p:column width="50%">
+                    <p:column width="10%">
                         <f:facet name="header">
                             <h:outputText value="Actions"/>
                         </f:facet>
@@ -378,8 +378,7 @@
                                             oncomplete="PF('citation-status-log-entry-dialog-var').show()"
                                             style="color:blue;"
                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                            update="citation-update-status-dialog
-                                            citation-update-status-form"
+                                            update="@form:@parent:citation-status-log-entry-form"
                                             value="edit" />
 
 

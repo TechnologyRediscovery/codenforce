@@ -591,7 +591,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
                 cdr.setCitationID(rs.getInt("citation_citationid"));
                 cdr.setNotes(rs.getString("notes"));
                 
-                si.populateTrackedFields(cdr, rs);
+                si.populateTrackedFields(cdr, rs, false);
             } catch (BObStatusException ex) {
                 throw new IntegrationException(ex.getMessage());
             }
@@ -1021,7 +1021,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             cit.setFilingType(getCitationFilingType(rs.getInt("filingtype_typeid")));
             cit.setNotes(rs.getString("notes"));
             cit.setOfficialText(rs.getString("officialtext"));
-            si.populateTrackedFields(cit, rs);
+            si.populateTrackedFields(cit, rs, false);
             
         } catch (SQLException | IntegrationException ex) {
             System.out.println(ex);
@@ -1283,7 +1283,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             
             csle.setCourtEntity(getCourtEntity(rs.getInt("ccs_ceid")));
             
-            si.populateTrackedFields(csle, rs);
+            si.populateTrackedFields(csle, rs, false);
             
             return csle;
         } catch (BObStatusException ex) {

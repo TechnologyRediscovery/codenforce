@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserMuniAuthPeriodLogEntry;
@@ -81,7 +82,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, userID);
             rs = stmt.executeQuery();
-            while(rs.next()){
+             while(rs.next()){
                 newUser = generateUser(rs);
             }
             
@@ -136,7 +137,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    
      /**
      * Note that the client method is responsible for moving the cursor on the 
      * result set object before passing it into this method     * 
@@ -153,8 +153,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setUsername(rs.getString("username"));
             user.setNotes(rs.getString("notes"));
             user.setPersonID(rs.getInt("personlink"));
-            if(rs.getInt("personlink") != 0){
-                user.setPerson(pc.getPerson(pc.getHuman(rs.getInt("personlink"))));
+            if(user.getPersonID() != 0){
+                user.setPerson(pc.getHuman(user.getPersonID()));
             }
             // line 2 of SELECT
             user.setCreatedByUserId(rs.getInt("createdby"));
@@ -164,7 +164,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setNoLoginVirtualUser(rs.getBoolean("nologinvirtualonly"));
             
             // line 3 of SELECT
-            if(rs.getTimestamp("deactivatedts") != null){
+             if(rs.getTimestamp("deactivatedts") != null){
                 user.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());   
             }
             user.setDeactivatedBy(rs.getInt("deactivated_userid"));
@@ -172,18 +172,11 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 user.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
             }
             
-            if(rs.getInt("homemuni") != 0){
+             if(rs.getInt("homemuni") != 0){
                 user.setHomeMuniID(rs.getInt("homemuni"));
             }
-            
-            
-        
-        return user;
+         return user;
     }
-    
-  
- 
-    
     
     /**
      *
@@ -248,14 +241,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             if(rs.getTimestamp("createdts") != null){
                 ua.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
             }
-            
-            
-        
         return ua;
-        
     }
-    
-   
     
     /**
      * Provides a complete list of records by User in the table loginmuniauthperiod.
@@ -291,9 +278,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                  if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             } // close finally
         }
-        
         return perList;
-        
     }
     
     /**
@@ -366,8 +351,6 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
         
         return per;
-        
-        
     }
     
     

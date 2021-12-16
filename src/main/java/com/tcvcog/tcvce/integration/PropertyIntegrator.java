@@ -141,7 +141,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 parcel.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
             }
             parcel.setLotAndBlock(rs.getString("lotandblock"));
-            si.populateTrackedFields(parcel, rs);
+            si.populateTrackedFields(parcel, rs, false);
             return parcel;
         } catch (BObStatusException ex) {
             throw new IntegrationException(ex.getMessage());
@@ -319,7 +319,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 pi.setUseType(getPropertyUseType(rs.getInt("usetype_typeid")));
             }
             
-            si.populateTrackedFields(pi, rs);
+            si.populateTrackedFields(pi, rs, false);
            
             
         } catch (SQLException ex) {
@@ -633,7 +633,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
          ms.setName(rs.getString("name"));
          ms.setCityStateZip(getMailingCityStateZip(rs.getInt("citystatezip_cszipid")));
          ms.setNotes(rs.getString("notes"));
-         si.populateTrackedFields(ms, rs);
+         si.populateTrackedFields(ms, rs, true);
          return ms;
      }
     
@@ -708,7 +708,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         }
         
         ma.setNotes(rs.getString("notes"));
-        si.populateTrackedFields(ma, rs);
+        si.populateTrackedFields(ma, rs, true);
         
         return ma;
         
@@ -806,7 +806,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             String s =  "SELECT humanmailing_humanid, humanmailing_addressid, source_sourceid, \n" +
                         "       createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
-                        "       deactivatedts, deactivatedby_userid, notes\n" +
+                        "       deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid" +
                         "  FROM public.humanmailingaddress WHERE humanmailing_humanid=?";
             
             stmt = con.prepareStatement(s);
@@ -840,14 +840,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     private HumanMailingAddressLink generateHumanMailingAddressLink(ResultSet rs) 
             throws SQLException, IntegrationException, BObStatusException{
         SystemIntegrator si = getSystemIntegrator();
-        
-        MailingAddress ma = getMailingAddress(rs.getInt("mailingparcel_mailingid"));
+       
+        MailingAddress ma = getMailingAddress(rs.getInt("humanmailing_addressid"));
         HumanMailingAddressLink hmal = new HumanMailingAddressLink(ma);
+        hmal.setLinkID(rs.getInt("linkid"));
         
-        hmal.setLinkRole(si.getLinkedObjectRole(rs.getInt("roleid_roleid")));
+        hmal.setLinkRole(si.getLinkedObjectRole(rs.getInt("linkedobjectrole_lorid")));
         
         // populate nonstandard fields:
-        if(rs.getInt("source_soruceid") != 0){
+        if(rs.getInt("source_sourceid") != 0){
             hmal.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
         }
         // populate standard fields with common method in SI

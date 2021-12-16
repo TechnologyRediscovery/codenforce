@@ -185,9 +185,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         if (mbp.getUser() != null) {
 
             if (mbp.getUser().getPerson() != null) {
-                sb.append(mbp.getUser().getPerson().getFirstName());
-                sb.append(Constants.FMT_SPACE_LITERAL);
-                sb.append(mbp.getUser().getPerson().getLastName());
+                sb.append(mbp.getUser().getPerson().getName());
                 sb.append(Constants.FMT_SPACE_LITERAL);
             }
             sb.append(Constants.FMT_HTML_BREAK);
