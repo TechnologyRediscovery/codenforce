@@ -436,7 +436,7 @@
                                                 widgetVar="event-profile-panel-var"
                                                 collapsed="false"
                                                 rendered="#{eventsBB.activeViewMode}"
-                                                header="Event Info (ID:#{eventsBB.currentEvent.eventID}) | Created by #{!(empty eventsBB.currentEvent.userCreator) ? eventsBB.currentEvent.userCreator.person.lastName : ''} | last updated on #{eventsBB.getPrettyDate(eventsBB.currentEvent.lastUpdatedTS)} by #{!(empty eventsBB.currentEvent.lastUpdatedBy) ? eventsBB.currentEvent.lastUpdatedBy.person.lastName: ''}">
+                                                header="Event Info (ID:#{eventsBB.currentEvent.eventID}) | Created by #{!(empty eventsBB.currentEvent.userCreator) ? eventsBB.currentEvent.userCreator.human.lastName : ''} | last updated on #{eventsBB.getPrettyDate(eventsBB.currentEvent.lastUpdatedTS)} by #{!(empty eventsBB.currentEvent.lastUpdatedBy) ? eventsBB.currentEvent.lastUpdatedBy.phumanlastName: ''}">
 
                                         <h:form id="event-profile-form">
                                             <div class="ui-g data_container_nested_restrict">
@@ -855,7 +855,7 @@
                                     <p:panel id="event-update-panel"
                                              toggleable="true"
                                              collapsed="false"
-                                             header="Update event (ID:#{eventsBB.currentEvent.eventID}) | Created by #{!(empty eventsBB.currentEvent.userCreator) ? eventsBB.currentEvent.userCreator.person.lastName : ''} | last updated on #{eventsBB.getPrettyDate(eventsBB.currentEvent.lastUpdatedTS)} by #{!(empty eventsBB.currentEvent.lastUpdatedBy) ? eventsBB.currentEvent.lastUpdatedBy.person.lastName: ''}"
+                                             header="Update event (ID:#{eventsBB.currentEvent.eventID}) | Created by #{!(empty eventsBB.currentEvent.userCreator) ? eventsBB.currentEvent.userCreator.phumanlastName : ''} | last updated on #{eventsBB.getPrettyDate(eventsBB.currentEvent.lastUpdatedTS)} by #{!(empty eventsBB.currentEvent.lastUpdatedBy) ? eventsBB.currentEvent.lastUpdatedBy.perhumanstName: ''}"
                                              rendered="#{eventsBB.activeUpdateMode}"
                                              >
 
@@ -1640,7 +1640,7 @@
                                                          disabled="#{!eventsBB.searchParamsSelected.user_ctl}">
                                             <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
                                             <f:selectItems value="#{systemServicesBB.userListForSearch}"  var="u" itemValue="#{u}" 
-                                                           itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
+                                                           itemLabel="#{u.pehumanirstName} #{u.persohumanName} (id:#{u.username})"/>
                                             <f:converter converterId="userConverter"/>
                                         </p:selectOneMenu>
 

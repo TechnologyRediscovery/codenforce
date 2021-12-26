@@ -496,7 +496,7 @@
                             <div style="float:right;">
                                 <h:form id="userform">
 
-                                    <h:outputText value="#{systemServicesBB.bbSessionUser.person.firstName} #{systemServicesBB.bbSessionUser.person.lastName} ( #{systemServicesBB.bbSessionUser.username})"/>
+                                    <h:outputText value="#{systemServicesBB.bbSessionUser.human.firstName} #{systemServicesBB.bbSessionUser.human.lastName} ( #{systemServicesBB.bbSessionUser.username})"/>
 
                                     <div class="restrict-main-contents-io-link link-button">
                                         <p:commandLink id="navbar-button-usersettings2"
@@ -537,10 +537,10 @@
                                     <h:outputText value="#{userBB.currentUser.userID}"/>
                                     <h:outputText value=")"/>
                                     <h:outputText value=" "/>
-                                    <h:outputText value="#{userBB.currentUser.person.name}"/>
+                                    <h:outputText value="#{userBB.currentUser.human.name}"/>
                                     <h:outputText value=" "/>
                                     <h:outputText value="(HID: "/>
-                                    <h:outputText value="#{userBB.currentUser.person.humanID}"/>
+                                    <h:outputText value="#{userBB.currentUser.human.humanID}"/>
                                     <h:outputText value=")"/>
                                 </h2>
 
@@ -616,8 +616,8 @@
 
                                             <h:outputText value="Your user is currently mapped to: "/>
                                             <p:spacer height="5px"/>
-                                            <h:outputText value="#{userBB.currentUser.person.name}"/>
-                                            <h:outputText value=" (ID: #{userBB.currentUser.person.humanID})"/>
+                                            <h:outputText value="#{userBB.currentUser.human.name}"/>
+                                            <h:outputText value=" (ID: #{userBB.currentUser.human.humanID})"/>
                                             <h:outputText value=" "/>
 
 
@@ -631,7 +631,7 @@
                                                 <f:selectItem itemLabel="select a person..." noSelectionOption="true"/>
                                                 <f:selectItems value="#{userBB.userPersonList}"  var="p" itemValue="#{p}" 
                                                                itemLabel="#{p.name} (id:#{p.humanID})"/>
-                                                <f:converter converterId="personConverter"/>
+                                                <f:converter converterId="humanConverter"/>
                                             </p:selectOneMenu>
                                             <h:message for="usersettings-som-userpersons" showDetail="false" showSummary="true" 
                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>

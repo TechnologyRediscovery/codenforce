@@ -194,7 +194,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         }
         
         // Ship to our SystemIntegrator for standard fields
-        // TODO: Fix infinite recursion! Humans are made by users who have humans in them.
         si.populateTrackedFields(h, rs, true);
         return h;
     }
@@ -496,6 +495,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             }
             
             stmt.setString(12, h.getNotes());
+            
+            stmt.setInt(13, h.getHumanID());
+            
             
             stmt.executeUpdate();
 

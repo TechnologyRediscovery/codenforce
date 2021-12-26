@@ -163,7 +163,7 @@
                                                                 icon="fa fa-gear"/>
                                     </div>
                                     <div class="nav_button">
-                                        <h:outputText value="Hi, #{systemServicesBB.bbSessionUser.person.firstName}" />
+                                        <h:outputText value="Hi, #{systemServicesBB.bbSessionUser.human.firstName}" />
                                     </div>
                                 </div>
                             </h:form>
@@ -185,12 +185,12 @@
                                     <h:outputText value="#{userBB.currentUser.userID}" />
                                     <h:outputText value=")" />
                                     <h:outputText value=" " />
-                                    <h:outputText value="#{userBB.currentUser.person.firstName}" />
+                                    <h:outputText value="#{userBB.currentUser.human.firstName}" />
                                     <h:outputText value=" " />
-                                    <h:outputText value="#{userBB.currentUser.person.lastName}" />
+                                    <h:outputText value="#{userBB.currentUser.pehumanastName}" />
                                     <h:outputText value=" " />
                                     <h:outputText value="(ID: "/>
-                                    <h:outputText value="#{userBB.currentUser.person.personID}" />
+                                    <h:outputText value="#{userBB.currentUser.phumanpersonID}" />
                                     <h:outputText value=")" />
                                 </h2>
 
@@ -283,10 +283,10 @@
 
                                                         <h:outputText value="Your user is currently mapped to: " />
                                                         <p:spacer height="5px" />
-                                                        <h:outputText value="#{userBB.currentUser.person.firstName}" />
+                                                        <h:outputText value="#{userBB.currentUser.phumanfirstName}" />
                                                         <h:outputText value=" " />
-                                                        <h:outputText value="#{userBB.currentUser.person.lastName}" />
-                                                        <h:outputText value=" (ID: #{userBB.currentUser.person.personID})" />
+                                                        <h:outputText value="#{userBB.currentUser.persohumanName}" />
+                                                        <h:outputText value=" (ID: #{userBB.currentUser.perhumanrsonID})" />
                                                         <h:outputText value=" " />
 
 

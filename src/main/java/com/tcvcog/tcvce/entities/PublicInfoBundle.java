@@ -80,9 +80,9 @@ public abstract class PublicInfoBundle implements Serializable {
      */
     public void setCaseManager(User manager){
         
-        if (manager != null && manager.getPerson() != null) {
+        if (manager != null && manager.getHuman() != null) {
             StringBuilder sb = new StringBuilder();
-            sb.append(manager.getPerson().getName());
+            sb.append(manager.getHuman().getName());
             setCaseManagerName(sb.toString());
         
         }

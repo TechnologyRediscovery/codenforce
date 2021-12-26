@@ -32,7 +32,7 @@ public class User implements Serializable{
     protected RoleType roleType;
     protected String username;
     
-    protected Human person;
+    protected Human userHuman;
     protected int personID;
 
     protected String notes;
@@ -133,18 +133,18 @@ public class User implements Serializable{
     }
 
     /**
-     * @return the person
+     * @return the userHuman
      */
-    public Human getPerson() {
-        return person;
+    public Human getHuman() {
+        return userHuman;
     }
 
     /**
-     * @param person the person to set - It's actually a Human, not an 
-     * Instance of Person class
+     * @param person the userHuman to set - It's actually a Human, not an 
+ Instance of Person class
      */
-    public void setPerson(Human person) {
-        this.person = person;
+    public void setHuman(Human person) {
+        this.userHuman = person;
     }
 
 
@@ -180,8 +180,8 @@ public class User implements Serializable{
      * @return the personID
      */
     public int getHumanID() {
-        if(person != null){
-            personID = person.getHumanID();
+        if(userHuman != null){
+            personID = userHuman.getHumanID();
         }
         return getPersonID();
     }
@@ -201,7 +201,7 @@ public class User implements Serializable{
         hash = 43 * hash + this.userID;
         hash = 43 * hash + Objects.hashCode(this.roleType);
         hash = 43 * hash + Objects.hashCode(this.username);
-        hash = 43 * hash + Objects.hashCode(this.person);
+        hash = 43 * hash + Objects.hashCode(this.userHuman);
         hash = 43 * hash + this.getPersonID();
         hash = 43 * hash + Objects.hashCode(this.notes);
         hash = 43 * hash + Objects.hashCode(this.badgeNumber);

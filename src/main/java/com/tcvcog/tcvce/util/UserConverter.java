@@ -48,8 +48,8 @@ public class UserConverter extends EntityConverter implements Converter {
 
         User u = (User) o;
         String userID = null;
-        if(u.getPerson() != null && u.getPerson().getName() != null){
-            userID = u.getPerson().getName();
+        if(u.getHuman() != null && u.getHuman().getName() != null){
+            userID = u.getHuman().getName();
         } else {
             userID = u.getUsername();
         }

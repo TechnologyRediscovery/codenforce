@@ -328,7 +328,7 @@
                                                                          disabled="#{!occPeriodSearchBB.searchParamsSelected.user_ctl}">
                                                             <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
                                                             <f:selectItems value="#{systemServicesBB.userListForSearch}"  var="u" itemValue="#{u}" 
-                                                                           itemLabel="#{u.person.firstName} #{u.person.lastName} (id:#{u.username})"/>
+                                                                           itemLabel="#{u.human.firstName} #{u.human.lastName} (id:#{u.username})"/>
                                                             <f:converter converterId="userConverter"/>
                                                         </p:selectOneMenu>
                                                     </h:panelGroup>

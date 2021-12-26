@@ -199,7 +199,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public String requestActionAsFacesUser() {
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            currentRequest.setRequestor(pc.getPerson(getSessionBean().getSessUser().getPerson()));
+            currentRequest.setRequestor(pc.getPerson(getSessionBean().getSessUser().getHuman()));
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         } 

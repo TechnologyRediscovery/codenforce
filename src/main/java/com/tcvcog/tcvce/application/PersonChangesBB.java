@@ -165,8 +165,8 @@ public class PersonChangesBB
     public String approvedByWho(PersonChangeOrder change) {
 
         if (change.getApprovedBy() != null) {
-            return "Approved by: " + change.getApprovedBy().getPerson().getName()
-                    + change.getApprovedBy().getPerson().getHumanID()
+            return "Approved by: " + change.getApprovedBy().getHuman().getName()
+                    + change.getApprovedBy().getHuman().getHumanID()
                     + ")";
         } else if (change.isActive()) {
             return "No action taken yet";

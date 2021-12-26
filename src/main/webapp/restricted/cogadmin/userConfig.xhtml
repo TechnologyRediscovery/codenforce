@@ -109,14 +109,14 @@
                                                         </f:facet>
                                                         <h:outputText value="#{user.username}"/>
                                                     </p:column>
-                                                    <p:column sortBy="#{user.person.lastName}">
+                                                    <p:column sortBy="#{user.human.lastName}">
                                                         <f:facet name="header">
                                                             <h:outputText value="Person" />
                                                         </f:facet>
-                                                        <h:outputText value="#{user.person.firstName}"/>
+                                                        <h:outputText value="#{user.phumanfirstName}"/>
                                                         <h:outputText value=" "/>
-                                                        <h:outputText value="#{user.person.lastName}"/>
-                                                        <h:outputText value=", PersID: #{user.person.personID} "/>
+                                                        <h:outputText value="#{user.phumanlastName}"/>
+                                                        <h:outputText value=", PersID: #{user.human.personID} "/>
                                                     </p:column>
                                                     <p:column sortBy="#{user.createdTS}">
                                                         <f:facet name="header">
@@ -224,13 +224,13 @@
                                                         <div class="data_field_value" >
                                                             <h:outputText id="userinfo-personlink"
                                                                           styleClass="data_field_value" 
-                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? userConfigBB.userAuthorizedInConfig.person.lastName: ''}" />
+                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.pershumanuserConfigBB.userAuthorizedInConfig.pershumantName: ''}" />
                                                             <h:outputText id="userinfo-personlink2"
-                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? '(ID:': ''}" />
+                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.personhumanID:': ''}" />
                                                             <h:outputText id="userinfo-personlink3"
-                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? userConfigBB.userAuthorizedInConfig.person.personID: ''}" />
+                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.personhumanerConfigBB.userAuthorizedInConfig.personhumannID: ''}" />
                                                             <h:outputText id="userinfo-personlink4"
-                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.person) ? ')': ''}" />
+                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.human) ? ')': ''}" />
                                                         </div>
                                                     </div>
 
@@ -399,9 +399,9 @@
                                                             style="clear:both;">
 
                                                         <h:outputText   rendered="#{!(empty userConfigBB.userAuthorizedInConfig.person)}"
-                                                                        value="This user is currently mapped to: #{userConfigBB.userAuthorizedInConfig.person.firstName} #{userConfigBB.userAuthorizedInConfig.person.lastName} (ID: #{userConfigBB.userAuthorizedInConfig.person.personID})" />
+human                                                                  value="This user is currently mapped to: #{userConfigBB.userAuthorizedInConfig.pehumanirstName} #{userConfigBB.userAuthorizedInConfig.personhumaname} (ID: #{userConfigBB.userAuthorizedInConfig.human.personID})" />
 
-                                                        <h:outputText   rendered="#{empty userConfigBB.userAuthorizedInConfig.person}"
+                                                        <h:outputText   rendered="#{empty userConfigBB.userAuthorizedInConfig.pehuman
                                                                         value="Map the User to a Person:" />
                                                     </div>
 
@@ -437,7 +437,7 @@
                                                         <p:selectOneMenu id="userconfig-som-userpersons" 
                                                                          required="false" 
                                                                          disabled="#{userConfigBB.personLinkUseID}"
-                                                                         value="#{userConfigBB.userAuthorizedInConfig.person}"
+                                                                         value="#{userConfigBB.userAuthorizedInConfig.human}"
                                                                          styleClass="data_field_value">
                                                             <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
                                                             <f:selectItems value="#{userConfigBB.userPersonList}"  var="p" itemValue="#{p}" 

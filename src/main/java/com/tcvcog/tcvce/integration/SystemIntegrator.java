@@ -118,47 +118,47 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * lastupdatedby_userid
      * deactivatedts
      * deactivated_userid
-     * @param ti
+     * @param te
      * @param rs
      * @param userIDOnly To avoid recursion, set to True to only inject UserIDs on 
      * creation, update, and deactivation 
      * @throws SQLException 
      */
-    protected void populateTrackedFields(TrackedEntity ti, ResultSet rs, boolean userIDOnly) throws SQLException, IntegrationException, BObStatusException{
+    protected void populateTrackedFields(TrackedEntity te, ResultSet rs, boolean userIDOnly) throws SQLException, IntegrationException, BObStatusException{
         UserIntegrator ui = getUserIntegrator();
         
         if(rs != null){
             
             if(rs.getTimestamp("createdts") != null){
-                ti.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
+                te.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
             }
             if(rs.getInt("createdby_userid") != 0){
                 if(userIDOnly){
-                    ti.setCreatedByUserID(rs.getInt("createdby_userid"));
+                    te.setCreatedByUserID(rs.getInt("createdby_userid"));
                 } else {
-                    ti.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+                    te.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
                 }
             }
             
             if(rs.getTimestamp("lastupdatedts") != null){
-                ti.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+                te.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
             }
             if(rs.getInt("lastupdatedby_userid") != 0){
                 if(userIDOnly){
-                    ti.setLastUpdatedByUserID((rs.getInt("lastupdatedby_userid")));
+                    te.setLastUpdatedByUserID((rs.getInt("lastupdatedby_userid")));
                 } else {
-                    ti.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+                    te.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
                 }
             }
             
             if(rs.getTimestamp("deactivatedts") != null){
-                ti.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+                te.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
             }
             if(rs.getInt("deactivatedby_userid") != 0){
                 if(userIDOnly){
-                    ti.setDeactivatedByUserID(rs.getInt("deactivatedby_userid"));
+                    te.setDeactivatedByUserID(rs.getInt("deactivatedby_userid"));
                 } else {
-                    ti.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+                    te.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
                 }
             }
         }

@@ -211,8 +211,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="restrict-data-field-value-inline" >
 
                                                         <h:outputText id="case-manager-ot" 
-                                                                      value="#{ceCaseSearchProfileBB.currentCase.caseManager.person.firstName} 
-                                                                      #{ceCaseSearchProfileBB.currentCase.caseManager.person.lastName} "/>  
+                                                                      value="#{ceCaseSearchProfileBB.currentCase.caseManager.human.firstName} 
+                                                                      #{ceCaseSearchProfileBB.currentCase.caseManager.human.lastName} "/>  
                                                         <br/>
                                                         <h:outputText id="case-manager-username"
                                                                       value="(#{ceCaseSearchProfileBB.currentCase.caseManager.username})"/>
@@ -1057,11 +1057,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <h:outputText styleClass="ui-label-inline"
                                                                       value="Intended for: "  />
                                                         <h:outputText styleClass="data-text"
-                                                                      value="#{proposal.responderIntended.person.firstName}" />
+                                                                      value="#{proposal.responderIntended.human.firstName}" />
                                                         <h:outputText styleClass="data-text"
                                                                       value=" " />
                                                         <h:outputText styleClass="data-text"
-                                                                      value="#{proposal.responderIntended.person.lastName}" />
+                                                                      value="#{proposal.responderIntended.human.lastName}" />
                                                     </div>
 
                                                     <p:dataScroller id="proposals-choicescroller"
@@ -1367,7 +1367,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                           itemDisabled="true"/>
                                             <f:selectItems id="cecase-search-user-field-val-items"
                                                            value="#{systemServicesBB.userListForSearch}"
-                                                           var="usr" itemValue="#{usr}" itemLabel="#{usr.person.firstName} #{usr.person.lastName}; username #{usr.username}" />
+                                                           var="usr" itemValue="#{usr}" itemLabel="#{usr.human.firstName} #{usr.human.lastName}; username #{usr.username}" />
                                             <f:converter converterId="userConverter" />
                                         </p:selectOneMenu>
 
@@ -1672,11 +1672,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText   id="nov-creator-ot0"
                                                         value="#{!(empty noticeOfViolationBB.currentNotice.creationBy) ? 'By ' : ''}"/>
                                         <h:outputText   id="nov-creator-ot1"
-                                                        value="#{!(empty noticeOfViolationBB.currentNotice.creationBy) ? noticeOfViolationBB.currentNotice.creationBy.person.firstName : ''}"/>
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.creationBy) ? noticeOfViolationBB.currentNotice.creationBy.human.firstName : ''}"/>
                                         <h:outputText   id="nov-creator-ot2"
                                                         value=" "/>
                                         <h:outputText   id="nov-creator-ot3"
-                                                        value="#{!(empty noticeOfViolationBB.currentNotice.creationBy) ? noticeOfViolationBB.currentNotice.creationBy.person.lastName : ''}"/>
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.creationBy) ? noticeOfViolationBB.currentNotice.creationBy.human.lastName : ''}"/>
                                     </div>
                                     <div class="restrict-data-field-value-vertical" >
                                         <h:outputText id="nov-dor-placeholder-ot"
@@ -1701,11 +1701,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText   id="nov-queuedby-ot0"
                                                         value="#{!(empty noticeOfViolationBB.currentNotice.lockedAndQueuedBy) ? 'By ' : ''}"/>
                                         <h:outputText   id="nov-queuedby-ot1"
-                                                        value="#{!(empty noticeOfViolationBB.currentNotice.lockedAndQueuedBy) ? noticeOfViolationBB.currentNotice.lockedAndQueuedBy.person.firstName : ''}"/>
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.lockedAndQueuedBy) ? noticeOfViolationBB.currentNotice.lockedAndQueuedBy.human.firstName : ''}"/>
                                         <h:outputText   id="nov-queuedby-ot2"
                                                         value=" "/>
                                         <h:outputText   id="nov-queuedby-ot3"
-                                                        value="#{!(empty noticeOfViolationBB.currentNotice.lockedAndQueuedBy) ? noticeOfViolationBB.currentNotice.lockedAndQueuedBy.person.lastName : ''}"/>
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.lockedAndQueuedBy) ? noticeOfViolationBB.currentNotice.lockedAndQueuedBy.human.lastName : ''}"/>
                                     </div>
                                     <div class="restrict-data-field-value-vertical" >
 
@@ -1731,11 +1731,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText   id="nov-sentby-ot0"
                                                         value="#{!(empty noticeOfViolationBB.currentNotice.sentBy) ? 'By ' : ''}"/>
                                         <h:outputText   id="nov-sentby-ot1"
-                                                        value="#{!(empty noticeOfViolationBB.currentNotice.sentBy) ? noticeOfViolationBB.currentNotice.sentBy.person.firstName : ''}"/>
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.sentBy) ? noticeOfViolationBB.currentNotice.sentBy.human.firstName : ''}"/>
                                         <h:outputText   id="nov-sentby-ot2"
                                                         value=" "/>
                                         <h:outputText   id="nov-sentby-ot3"
-                                                        value="#{!(empty noticeOfViolationBB.currentNotice.sentBy) ? noticeOfViolationBB.currentNotice.sentBy.person.lastName : ''}"/>
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.sentBy) ? noticeOfViolationBB.currentNotice.sentBy.human.lastName : ''}"/>
                                     </div>
                                     <div class="restrict-data-field-value-vertical" >
 
@@ -1760,11 +1760,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText   id="nov-returnedby-ot0"
                                                         value="#{!(empty noticeOfViolationBB.currentNotice.returnedBy) ? 'By ' : ''}"/>
                                         <h:outputText   id="nov-returnedby-ot1"
-                                                        value="#{!(empty noticeOfViolationBB.currentNotice.returnedBy) ? noticeOfViolationBB.currentNotice.returnedBy.person.firstName : ''}"/>
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.returnedBy) ? noticeOfViolationBB.currentNotice.returnedBy.human.firstName : ''}"/>
                                         <h:outputText   id="nov-returnedby-ot2"
                                                         value=" "/>
                                         <h:outputText   id="nov-returnedby-ot3"
-                                                        value="#{!(empty noticeOfViolationBB.currentNotice.returnedBy) ? noticeOfViolationBB.currentNotice.returnedBy.person.lastName : ''}"/>
+                                                        value="#{!(empty noticeOfViolationBB.currentNotice.returnedBy) ? noticeOfViolationBB.currentNotice.returnedBy.human.lastName : ''}"/>
                                     </div>
 
                                     <div class="restrict-data-field-value-vertical" >
@@ -2248,10 +2248,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <div class="signature">
                                             <h:outputText 
                                                 id="notifyingofficer-person-ot"
-                                                value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.person.firstName} 
-                                                          #{noticeOfViolationBB.currentNotice.notifyingOfficer.person.lastName}
-                                                          #{noticeOfViolationBB.currentNotice.notifyingOfficer.person.jobTitle}
-                                                          #{noticeOfViolationBB.currentNotice.notifyingOfficer.person.phoneWork}" />
+                                                value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.human.firstName} 
+                                                          #{noticeOfViolationBB.currentNotice.notifyingOfficer.human.lastName}
+                                                          #{noticeOfViolationBB.currentNotice.notifyingOfficer.human.jobTitle}
+                                                          #{noticeOfViolationBB.currentNotice.notifyingOfficer.human.phoneWork}" />
                                         </div>
                                     
 
@@ -2271,7 +2271,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                           itemDisabled="true"/>
                                             <f:selectItems id="nov-notifyingsender-selitems" 
                                                            value="#{noticeOfViolationBB.notifyingOfficerCandidateList}" 
-                                                           var="usr" itemValue="#{usr}" itemLabel="#{usr.username}: #{usr.person.firstName} #{usr.person.lastName}; " />
+                                                           var="usr" itemValue="#{usr}" itemLabel="#{usr.username}: #{usr.human.firstName} #{usr.human.lastName}; " />
                                             <f:converter converterId="userConverter" />
                                         </p:selectOneMenu>
 
@@ -2504,15 +2504,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             <h2>signature</h2>
 
                                 <p>
-                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.firstName}" />
+                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.human.firstName}" />
                                     <h:outputText value=" " />
-                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.lastName}" />
+                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.human.lastName}" />
                                     <p:spacer height="3px" />
-                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.jobTitle}" />
+                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.human.jobTitle}" />
                                     <p:spacer height="3px" />
-                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.phoneWork}" />
+                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.human.phoneWork}" />
                                     <h:outputText value=" | " />
-                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.person.email}" />
+                                    <h:outputText value="#{noticeOfViolationBB.currentNotice.creationBy.human.email}" />
                                 </p>
                             </ui:remove>
 
@@ -3683,11 +3683,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText   id="violation-creator-ot0"
                                                         value="#{!(empty ceCaseSearchProfileBB.currentViolation.createdBy) ? 'Declared by ' : ''}"/>
                                         <h:outputText   id="violation-creator-ot1"
-                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.createdBy) ? ceCaseSearchProfileBB.currentViolation.createdBy.person.firstName : ''}"/>
+                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.createdBy) ? ceCaseSearchProfileBB.currentViolation.createdBy.human.firstName : ''}"/>
                                         <h:outputText   id="violation-creator-ot2"
                                                         value=" "/>
                                         <h:outputText   id="violation-creator-ot3"
-                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.complianceUser) ? ceCaseSearchProfileBB.currentViolation.createdBy.person.lastName : ''}"/>
+                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.complianceUser) ? ceCaseSearchProfileBB.currentViolation.createdBy.human.lastName : ''}"/>
                                         <h:outputText value="&nbsp;" />
                                     </div>
                                     <div class="restrict-main-contents-io-link">
@@ -3758,11 +3758,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText   id="violation-compby-ot0"
                                                         value="#{!(empty ceCaseSearchProfileBB.currentViolation.complianceUser) ? 'Certified by user ' : ''}"/>
                                         <h:outputText   id="violation-compby-ot1"
-                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.complianceUser) ? ceCaseSearchProfileBB.currentViolation.complianceUser.person.firstName : ''}"/>
+                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.complianceUser) ? ceCaseSearchProfileBB.currentViolation.complianceUser.human.firstName : ''}"/>
                                         <h:outputText   id="violation-compby-ot2"
                                                         value=" "/>
                                         <h:outputText   id="violation-compby-ot3"
-                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.complianceUser) ? ceCaseSearchProfileBB.currentViolation.complianceUser.person.lastName : ''}"/>
+                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.complianceUser) ? ceCaseSearchProfileBB.currentViolation.complianceUser.human.lastName : ''}"/>
                                         <p:spacer height="3px" />
                                         <h:outputText   id="violation-comp-notes-ot0"
                                                         value="#{!(empty ceCaseSearchProfileBB.currentViolation.complianceNote) ? 'Note: ' : ''}"/>
@@ -3804,11 +3804,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <h:outputText   id="violation-nullifiedby-ot0"
                                                         value="#{!(empty ceCaseSearchProfileBB.currentViolation.nullifiedUser) ? 'Nullified by user ' : ''}"/>
                                         <h:outputText   id="violation-nullifiedby-ot1"
-                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.nullifiedUser) ? ceCaseSearchProfileBB.currentViolation.nullifiedUser.person.firstName : ''}"/>
+                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.nullifiedUser) ? ceCaseSearchProfileBB.currentViolation.nullifiedUser.human.firstName : ''}"/>
                                         <h:outputText   id="violation-nullifiedby-ot2"
                                                         value=" "/>
                                         <h:outputText   id="violation-nullifiedby-ot3"
-                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.nullifiedUser) ? ceCaseSearchProfileBB.currentViolation.nullifiedUser.person.lastName : ''}"/>
+                                                        value="#{!(empty ceCaseSearchProfileBB.currentViolation.nullifiedUser) ? ceCaseSearchProfileBB.currentViolation.nullifiedUser.human.lastName : ''}"/>
                                         <h:outputText value="&nbsp;" />
 
                                     </div>

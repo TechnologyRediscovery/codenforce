@@ -225,7 +225,7 @@
                                          value="#{citationBB.currentCitation.filingOfficer}">
                             <f:converter converterId="userConverter"/>
                             <f:selectItems value="#{citationBB.filingOfficerCandidateList}"
-                                           var="iouser" itemValue="#{iouser}" itemLabel="#{iouser.person.name}"/>
+                                           var="iouser" itemValue="#{iouser}" itemLabel="#{iouser.human.name}"/>
                         </p:selectOneMenu>
                     </div>
                 </div>
@@ -662,7 +662,7 @@
                                      value="#{citationBB.currentCitation.filingOfficer}">
                         <f:converter converterId="userConverter"/>
                         <f:selectItems value="#{citationBB.filingOfficerCandidateList}"
-                                       var="iouser" itemValue="#{iouser}" itemLabel="#{iouser.person.name}"/>
+                                       var="iouser" itemValue="#{iouser}" itemLabel="#{iouser.phumanname}"/>
                     </p:selectOneMenu>
                 </div>
             </div>

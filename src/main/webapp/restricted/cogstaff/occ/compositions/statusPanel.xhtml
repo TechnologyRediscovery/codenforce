@@ -62,8 +62,8 @@
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to unlock the start date? It was originally locked by
-                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy.person.firstName}
-                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy.person.lastName}
+                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy.human.firstName}
+                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy.human.lastName}
                                                          on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
@@ -111,8 +111,8 @@
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to deauthorize the occupancy period? It was originally authorized by
-                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.person.firstName}
-                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.person.lastName}
+                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.phumanfirstName}
+                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.pehumanastName}
                                                          on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
@@ -142,8 +142,8 @@
                     <div class="restrict-data-field-value-inline">
 
                         <h:outputText id="occperiod-manager-ot"
-                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.person.firstName}
-                                                              #{occPeriodSearchWorkflowBB.currentOccPeriod.manager.person.lastName}"/>
+                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.pehumanirstName}
+                                                              #{occPeriodSearchWorkflowBB.currentOccPeriod.manager.human.lastName}"/>
                         <br/>
                         <h:outputText id="occperiod-manager-username"
                                       value="(#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.username})"/>
@@ -160,8 +160,8 @@
                         </p:outputLabel>
                     </div>
                     <div class="restrict-data-field-value-inline">
-                        <h:outputText value="#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.person.firstName}
-                                                  #{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.person.lastName}
+                        <h:outputText value="#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.personhumanName}
+                                                  #{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.personhumaname}
                                                   (#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.username})"/>
                         <br/>
                         <h:outputText value="at #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.createdTS)}"/>
@@ -232,8 +232,8 @@
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to unlock the start date? It was originally locked by
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy.person.firstName}
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy.person.lastName}
+                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy.phumanfirstName}
+                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy.person.lahuman}
                                                      on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
@@ -290,8 +290,8 @@
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to unlock the end date? It was originally locked by
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.person.firstName}
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.person.lastName}
+                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.person.fihumane}
+                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.phumanlastName}
                                                      on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
@@ -435,7 +435,7 @@
                                           itemDisabled="true"/>
                             <f:selectItems id="occperiod-search-user-field-val-items"
                                            value="#{systemServicesBB.userListForSearch}"
-                                           var="usr" itemValue="#{usr}" itemLabel="#{usr.person.firstName} #{usr.person.lastName}; username #{usr.username}"/>
+                                           var="usr" itemValue="#{usr}" itemLabel="#{usr.personhumanName} #{usr.perhumanstName}; username #{usr.username}"/>
                             <f:converter converterId="userConverter"/>
                         </p:selectOneMenu>
 

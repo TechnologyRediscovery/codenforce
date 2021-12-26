@@ -45,7 +45,7 @@ public  class   Human
         protected LocalDate deceasedDate;
         protected User deceasedBy;
         
-        protected Integer cloneOfHumanID;
+        protected int cloneOfHumanID;
         protected String notes;
         
         
@@ -243,14 +243,14 @@ public  class   Human
     /**
      * @return the cloneOfHumanID
      */
-    public Integer getCloneOfHumanID() {
+    public int getCloneOfHumanID() {
         return cloneOfHumanID;
     }
 
     /**
      * @param cloneOfHumanID the cloneOfHumanID to set
      */
-    public void setCloneOfHumanID(Integer cloneOfHumanID) {
+    public void setCloneOfHumanID(int cloneOfHumanID) {
         this.cloneOfHumanID = cloneOfHumanID;
     }
 

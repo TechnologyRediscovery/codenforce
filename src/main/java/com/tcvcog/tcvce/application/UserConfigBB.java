@@ -354,7 +354,7 @@ public class UserConfigBB extends BackingBeanUtils{
             
              try {
                  Person p = pc.getPerson(pc.getHuman(personIDToLink));
-                 userAuthorizedInConfig.setPerson(p);
+                 userAuthorizedInConfig.setHuman(p);
              } catch (IntegrationException | BObStatusException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -363,7 +363,7 @@ public class UserConfigBB extends BackingBeanUtils{
                                 ""));
              }
         }
-        if(userAuthorizedInConfig.getPerson() != null){
+        if(userAuthorizedInConfig.getHuman() != null){
             try {
                 freshUserID = uc.user_insertNewUser(userAuthorizedInConfig);
                 if(freshUserID != 0){
@@ -676,7 +676,7 @@ public class UserConfigBB extends BackingBeanUtils{
     public String onEditUserPersonRecordButtonChange(Person p){
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            getSessionBean().setSessPersonQueued(pc.getPerson(userAuthorizedInConfig.getPerson()));
+            getSessionBean().setSessPersonQueued(pc.getPerson(userAuthorizedInConfig.getHuman()));
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         } 

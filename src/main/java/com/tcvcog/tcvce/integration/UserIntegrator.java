@@ -154,7 +154,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setNotes(rs.getString("notes"));
             user.setPersonID(rs.getInt("personlink"));
             if(user.getPersonID() != 0){
-                user.setPerson(pc.getHuman(user.getPersonID()));
+                user.setHuman(pc.getHuman(user.getPersonID()));
             }
             // line 2 of SELECT
             user.setCreatedByUserId(rs.getInt("createdby"));
@@ -675,10 +675,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(1, userToInsert.getUsername());
             stmt.setString(2, userToInsert.getNotes());
             
-            if(userToInsert.getPerson() == null){
+            if(userToInsert.getHuman() == null){
                 stmt.setInt(3, userToInsert.getHumanID());
             } else {
-                stmt.setInt(3, userToInsert.getPerson().getHumanID());
+                stmt.setInt(3, userToInsert.getHuman().getHumanID());
             }
             
             if(userToInsert.getCreatedByUserId() != 0){
@@ -896,15 +896,15 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
             // check both the object and ID person link fields
             // without a Person object, use the raw ID
-            if(usr.getPerson() == null){
+            if(usr.getHuman() == null){
                 if(usr.getHumanID() != 0){
                     stmt.setInt(2, usr.getHumanID());
                 } else {
                     stmt.setNull(2, java.sql.Types.NULL);
                 }
             } else { // we've got a person object
-                if(usr.getPerson().getHumanID() != 0){ // make sure it's not a new Person
-                    stmt.setInt(2, usr.getPerson().getHumanID());
+                if(usr.getHuman().getHumanID() != 0){ // make sure it's not a new Person
+                    stmt.setInt(2, usr.getHuman().getHumanID());
                 } else {
                     stmt.setNull(2, java.sql.Types.NULL);
                 }

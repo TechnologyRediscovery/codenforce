@@ -868,7 +868,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public void user_updateUser(User u) throws IntegrationException, AuthorizationException{
         UserIntegrator ui = getUserIntegrator();
         StringBuilder sb = new StringBuilder();
-        if(u != null && (u.getPerson() != null || u.getPerson().getHumanID() != 0)){
+        if(u != null && (u.getHuman() != null || u.getHuman().getHumanID() != 0)){
                 ui.updateUser(u);
         }
     }
@@ -890,7 +890,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public void user_updateUserPersonLink(User u, Person freshPerson) throws IntegrationException, AuthorizationException{
         
         UserIntegrator ui = getUserIntegrator();
-        if(u != null && u.getPerson().getHumanID() != 0){
+        if(u != null && u.getHuman().getHumanID() != 0){
     
             // TODO: complete note on user udpates
             MessageBuilderParams mb = new MessageBuilderParams();

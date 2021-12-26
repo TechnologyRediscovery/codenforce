@@ -83,7 +83,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         currentUser = getSessionBean().getSessUser();
         userPersonList = new ArrayList<>();
         if(currentUser != null){
-            userPersonList.add(currentUser.getPerson());
+            userPersonList.add(currentUser.getHuman());
         }
         formSelectedUserPerson = null;
     }
@@ -117,7 +117,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     public String editUserPersonRecord(){
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            getSessionBean().setSessPersonQueued(pc.getPerson(currentUser.getPerson()));
+            getSessionBean().setSessPersonQueued(pc.getPerson(currentUser.getHuman()));
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         } 

@@ -131,7 +131,7 @@
 
                                         <p:commandButton    id="navcontres-button-logout"
                                                             action="#{systemServicesBB.logout}" 
-                                                            value="Logout #{systemServicesBB.bbSessionUser.person.firstName} "
+                                                            value="Logout #{systemServicesBB.bbSessionUser.human.firstName} "
                                                             ajax="false"/>
 
                                         <p:commandButton        id="navbar-button-usersettings"
@@ -192,12 +192,12 @@
                                 <h:outputText value="User settings:" />
                                 
                                 <h:outputText value=" " />
-                                <h:outputText value="#{userBB.currentUser.person.firstName}" />
+                                <h:outputText value="#{userBB.currentUser.human.firstName}" />
                                 <h:outputText value=" " />
-                                <h:outputText value="#{userBB.currentUser.person.lastName}" />
+                                <h:outputText value="#{userBB.currentUser.human.lastName}" />
                                 <h:outputText value=" " />
                                 <h:outputText value="("/>
-                                <h:outputText value="#{userBB.currentUser.person.personID}" />
+                                <h:outputText value="#{userBB.currentUser.pehumanersonID}" />
                                 <h:outputText value=")" />
                                 <h:outputText value=" " />
                                 <h:outputText value="+" />
@@ -292,10 +292,10 @@
 
                                                         <h:outputText value="Your user is currently mapped to: " />
                                                         <p:spacer height="5px" />
-                                                        <h:outputText value="#{userBB.currentUser.person.firstName}" />
+                                                        <h:outputText value="#{userBB.currentUser.pehumanirstName}" />
                                                         <h:outputText value=" " />
-                                                        <h:outputText value="#{userBB.currentUser.person.lastName}" />
-                                                        <h:outputText value=" (ID: #{userBB.currentUser.person.personID})" />
+                                                        <h:outputText value="#{userBB.currentUser.phumanlastName}" />
+                                                        <h:outputText value=" (ID: #{userBB.currentUser.persohumanonID})" />
                                                         <h:outputText value=" " />
 
 

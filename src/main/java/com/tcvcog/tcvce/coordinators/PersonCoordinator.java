@@ -627,7 +627,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         try {
             User u = uc.user_getUser(cred.getGoverningAuthPeriod().getUserID());
             System.out.println("PersonCoordinator.selectDefaultPerson: " + u);
-            return pc.getPerson(u.getPerson());
+            return pc.getPerson(u.getHuman());
         } catch (BObStatusException ex) {
             throw new IntegrationException(ex.getMessage());
         }

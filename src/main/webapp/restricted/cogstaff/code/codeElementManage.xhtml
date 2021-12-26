@@ -401,7 +401,7 @@
                                                                    <h:outputText id="ord-created" 
                                                                                  value="#{codeElementBB.getPrettyDateNoTime(ord.createdTS)}"/>
                                                                    <h:outputText value="#{!(empty ord.createdBy) ? ' by ' : ''}"/>
-                                                                   <h:outputText value="#{!(empty ord.createdBy) ? ord.createdBy.person.lastName : ''}"/>
+                                                                   <h:outputText value="#{!(empty ord.createdBy) ? ord.createdBy.human.lastName : ''}"/>
                                                                 </div>
                                                             </div>
                                                             <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
@@ -414,7 +414,7 @@
                                                                    <h:outputText id="ord-updated" 
                                                                                  value="#{codeElementBB.getPrettyDateNoTime(ord.lastUpdatedTS)}"/>
                                                                    <h:outputText value="#{!(empty ord.lastupdatedBy) ? ' by ' : ''}"/>
-                                                                   <h:outputText value="#{!(empty ord.lastupdatedBy) ? ord.lastupdatedBy.person.lastName : ''}"/>
+                                                                   <h:outputText value="#{!(empty ord.lastupdatedBy) ? ord.lastupdatedBy.phumanlastName : ''}"/>
                                                                 </div>
                                                             </div>
                                                            

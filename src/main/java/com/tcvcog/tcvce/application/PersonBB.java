@@ -6,8 +6,10 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.ContactEmail;
 import com.tcvcog.tcvce.entities.ContactPhone;
 import com.tcvcog.tcvce.entities.ContactPhoneType;
@@ -16,8 +18,6 @@ import com.tcvcog.tcvce.entities.IFace_humanListHolder;
 import com.tcvcog.tcvce.entities.MailingAddress;
 import com.tcvcog.tcvce.entities.Person;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -33,7 +33,7 @@ public class PersonBB extends BackingBeanUtils {
 
     
     private Person currentPerson;
-    private boolean currentPersonEditMode;
+    private boolean currentPersonHumanFieldsEditMode;
     
     private MailingAddress currentMailingAddress;
     private boolean currentMailingAddressEditMode;
@@ -46,6 +46,7 @@ public class PersonBB extends BackingBeanUtils {
     private ContactEmail currentContactEmail;
     private boolean currentContactEmailEditMode;
     
+    private List<BOBSource> sourceList;
     
     /**
      * Creates a new instance of PersonBB
@@ -55,17 +56,22 @@ public class PersonBB extends BackingBeanUtils {
     
      @PostConstruct
     public void initBean(){
-         System.out.println("PersonBB.initBean()");
-        currentPersonEditMode = false;
+        SystemCoordinator sc = getSystemCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
+        
+        currentPerson = getSessionBean().getSessPerson();
+        System.out.println("PersonBB.initBean()");
+        currentPersonHumanFieldsEditMode = false;
         currentContactPhoneEditMode = false;
         currentContactEmailEditMode = false;
         
-        PersonCoordinator pc = getPersonCoordinator();
         try {
             phoneTypeList = pc.getContactPhoneTypeList();
+            sourceList = sc.getBobSourceListComplete();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
+        
         
     }
     
@@ -99,25 +105,29 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev
      */
     public void toggleHumanEditMode(ActionEvent ev){
-        System.out.println("PersonBB.toggleHumanEditMode: toggle val: " + currentPersonEditMode);
-        if(currentPersonEditMode){
+        System.out.println("PersonBB.toggleHumanEditMode: toggle val: " + currentPersonHumanFieldsEditMode);
+        if(currentPersonHumanFieldsEditMode){
             if(currentPerson != null && currentPerson.getHumanID() == 0){
                 // we've got a new record, so commit our add to DB
-                onHumanAddCommitButtonChange();
+                onHumanAddCommitButtonChange(null);
                 System.out.println("PersonBB.toggleHumanEditMode: new person; committed");
+                   getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Editing person record: " + currentPerson.getHumanID(), ""));
             } else {
                 // we've got an existing human, so commit updates
-                onHumanEditCommitButtonChange();
+                onHumanEditCommitButtonChange(null);
                 System.out.println("PersonBB.toggleHumanEditMode: person edit done");
             }
         }
-        currentPersonEditMode = !currentPersonEditMode;
+        currentPersonHumanFieldsEditMode = !currentPersonHumanFieldsEditMode;
     }
     
     /**
      * Listener for user requests to add a human
+     * @param ev
      */
-    public void onHumanAddInitButtonChange(){
+    public void onHumanAddInitButtonChange(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
         currentPerson = pc.createPersonSkeleton(getSessionBean().getSessMuni());
         System.out.println("PersonBB.onHumanAddInitButtonChange");
@@ -129,7 +139,7 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to finalize human changes
      * @param ev 
      */
-    public void onHumanAddCommitButtonChange(){
+    public void onHumanAddCommitButtonChange(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.humanAdd(currentPerson, getSessionBean().getSessUser());
@@ -159,8 +169,9 @@ public class PersonBB extends BackingBeanUtils {
     
     /**
      * Listener for user requests to commit the human edit process
+     * @param ev
      */
-    public void onHumanEditCommitButtonChange(){
+    public void onHumanEditCommitButtonChange(ActionEvent ev){
         
         PersonCoordinator pc = getPersonCoordinator();
         try {
@@ -184,8 +195,9 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to abort a human add or edit operation
      * @param ev 
      */
-    public void onHumanOperationAbortButtonChange(){
-        currentPersonEditMode = false;
+    public void onHumanOperationAbortButtonChange(ActionEvent ev){
+        System.out.println("PersonBB.onHumanOperationAbortButtonChange");
+        currentPersonHumanFieldsEditMode = false;
         getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO,
                          "Abort successful; no changes made", ""));
@@ -402,10 +414,10 @@ public class PersonBB extends BackingBeanUtils {
    
 
     /**
-     * @return the currentPersonEditMode
+     * @return the currentPersonHumanFieldsEditMode
      */
-    public boolean isCurrentPersonEditMode() {
-        return currentPersonEditMode;
+    public boolean isCurrentPersonHumanFieldsEditMode() {
+        return currentPersonHumanFieldsEditMode;
     }
 
     /**
@@ -453,10 +465,10 @@ public class PersonBB extends BackingBeanUtils {
   
 
     /**
-     * @param currentPersonEditMode the currentPersonEditMode to set
+     * @param currentPersonHumanFieldsEditMode the currentPersonHumanFieldsEditMode to set
      */
-    public void setCurrentPersonEditMode(boolean currentPersonEditMode) {
-        this.currentPersonEditMode = currentPersonEditMode;
+    public void setCurrentPersonHumanFieldsEditMode(boolean currentPersonHumanFieldsEditMode) {
+        this.currentPersonHumanFieldsEditMode = currentPersonHumanFieldsEditMode;
     }
 
     /**
@@ -555,6 +567,20 @@ public class PersonBB extends BackingBeanUtils {
      */
     public void setCurrentContactPhoneDisconnected(boolean currentContactPhoneDisconnected) {
         this.currentContactPhoneDisconnected = currentContactPhoneDisconnected;
+    }
+
+    /**
+     * @return the sourceList
+     */
+    public List<BOBSource> getSourceList() {
+        return sourceList;
+    }
+
+    /**
+     * @param sourceList the sourceList to set
+     */
+    public void setSourceList(List<BOBSource> sourceList) {
+        this.sourceList = sourceList;
     }
     
      

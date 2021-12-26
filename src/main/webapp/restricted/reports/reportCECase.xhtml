@@ -56,8 +56,8 @@
                                     <p:spacer height="5px"/>
                                     <h:outputLabel styleClass="bold" value="Case Manager: "/>
                                     <h:outputText id="selcase-manager-it" 
-                                                  value="#{ceCaseSearchProfileBB.currentCase.caseManager.person.firstName} 
-                                                  #{ceCaseSearchProfileBB.currentCase.caseManager.person.lastName} 
+                                                  value="#{ceCaseSearchProfileBB.currentCase.caseManager.human.firstName} 
+                                                  #{ceCaseSearchProfileBB.currentCase.caseManager.human.lastName} 
                                                   (#{ceCaseSearchProfileBB.currentCase.caseManager.username})"/>  
                                 </h:panelGroup>      
 
@@ -124,8 +124,8 @@
                                      <h3>report generation notes:</h3>
                                      <p>
                                         <h:outputLabel id="report-creator-ol" for="report-creator-ot" styleClass="bold" value="creator name: " />
-                                        <h:outputText id="report-creator-ot"  value="#{reportingBB.currentReport.creator.person.firstName} 
-                                                      #{reportingBB.currentReport.creator.person.firstName} 
+                                        <h:outputText id="report-creator-ot"  value="#{reportingBB.currentReport.creator.human.firstName} 
+                                                      #{reportingBB.currentReport.creator.phumanfirstName} 
                                                       (user: #{reportingBB.currentReport.creator.username})"/>
                                         <br />
                                         <h:outputLabel id="report-creator-cred-ol" for="report-creator-cred-ot" styleClass="bold" value="creator credentials: " />
@@ -185,7 +185,7 @@
                                     <h:panelGroup>
                                         <p>
                                             <h:outputText value="Owner: " styleClass="bold" />
-                                            <h:outputText value="#{e.userCreator.person.firstName} #{e.userCreator.person.lastName} (user: #{e.userCreator.username}, ID: #{e.userCreator.userID})"/>
+                                            <h:outputText value="#{e.userCreator.pehumanirstName} #{e.userCreator.perhumanstName} (user: #{e.userCreator.username}, ID: #{e.userCreator.userID})"/>
                                             <br />
                                             <h:outputText styleClass="bold" value="Date of record: "/>
                                         <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(e.timeStart)}"/>

@@ -103,7 +103,7 @@
                         <i class="p-ml-1 pi pi-info-circle"/>
                     </h:panelGroup>
                     <p:tooltip for="inspections-table-inspecterinfoicon"
-                               value="#{inspection.inspector.person.firstName} #{inspection.inspector.person.lastName}" position="right"/>
+                               value="#{inspection.inspector.human.firstName} #{inspection.inspector.human.lastName}" position="right"/>
                 </p:column>
                 <p:column headerText="Spaces">
                     <h:outputText value="#{inspection.inspectedSpaceListSize} space(s)"/>
@@ -232,7 +232,7 @@
                                 converter="userConverter">
                 <p:ajax update="inspections-selectinspector-continuebutton"/>
                 <f:selectItems value="#{occInspectionsBB.userList}" var="user"
-                               itemLabel="#{user.person.firstName} #{user.person.lastName} #{user.username}"
+                               itemLabel="#{user.human.firstName} #{user.human.lastName} #{user.username}"
                                itemValue="#{user}"/>
                 <p:column>
                     <h:outputText value="#{u.person.firstName} #{u.person.lastName} (#{u.username})"/>
@@ -424,8 +424,8 @@
                     </div>
                     <div class="p-col-6">Inspector</div>
                     <div class="p-col-6">
-                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.inspector.person.firstName}
-                        #{occInspectionsBB.selectedInspection.inspector.person.lastName}
+                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.inspector.human.firstName}
+                        #{occInspectionsBB.selectedInspection.inspector.human.lastName}
                         (#{occInspectionsBB.selectedInspection.inspector.username})"/>
                         <p:selectOneMenu rendered="#{occInspectionsBB.editMode}"
                                          value="#{occInspectionsBB.selectedInspection.inspector}"
@@ -433,24 +433,24 @@
                                          filterMatchMode="contains"
                                          converter="userConverter">
                             <f:selectItems value="#{occInspectionsBB.userList}" var="user"
-                                           itemLabel="#{user.person.firstName} #{user.person.lastName} #{user.username}"
+                                           itemLabel="#{user.human.firstName} #{user.human.lastName} #{user.username}"
                                            itemValue="#{user}"/>
                         </p:selectOneMenu>
                     </div>
                     <p:divider/>
                     <div class="p-col-6">Created by</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.createdBy.person.firstName}
-                        #{occInspectionsBB.selectedInspection.createdBy.person.lastName}
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.createdBy.human.firstName}
+                        #{occInspectionsBB.selectedInspection.createdBy.human.lastName}
                         (#{occInspectionsBB.selectedInspection.createdBy.username}) at
                         #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.creationTS)}</div>
                     <div class="p-col-6">Last updated by</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.lastUpdatedBy.person.firstName}
-                        #{occInspectionsBB.selectedInspection.lastUpdatedBy.person.lastName}
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.lastUpdatedBy.human.firstName}
+                        #{occInspectionsBB.selectedInspection.lastUpdatedBy.human.lastName}
                         (#{occInspectionsBB.selectedInspection.lastUpdatedBy.username}) at
                         #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.lastUpdatedTS)}</div>
                     <div class="p-col-6">Deactivated by</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.deactivatedBy.person.firstName}
-                        #{occInspectionsBB.selectedInspection.deactivatedBy.person.lastName}
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.deactivatedBy.human.firstName}
+                        #{occInspectionsBB.selectedInspection.deactivatedBy.human.lastName}
                         (#{occInspectionsBB.selectedInspection.deactivatedBy.username}) at
                         #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.deactivatedTS)}</div>
                 </div>
@@ -493,8 +493,8 @@
                         #{occInspectionsBB.selectedInspection.thirdPartyInspector.person.lastName}
                         (#{occInspectionsBB.selectedInspection.thirdPartyInspector.username})</div>
                     <div class="p-col-6">Third party inspector approval</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.person.firstName}
-                        #{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.person.lastName}
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.human.firstName}
+                        #{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.human.lastName}
                         (#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.username}) at
                         #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.thirdPartyInspectorApprovalTS)}</div>
                 </div>
