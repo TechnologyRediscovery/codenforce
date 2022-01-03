@@ -132,7 +132,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @param inspection    The current inspection
      * @param user          The current user--not necessarily the official inspector of the
      *                      OccInspection.
-     * @param type          The space type which will have a list of SpaceElements inside it
+     * @param tpe          The space type which will have a list of SpaceElements inside it
      * @param initialStatus The initial status of the created OccInspectedSpace
      * @param locDesc       A populated location descriptor for the new OccInspectedSpace. Can be an
      *                      existing location or a new one.
@@ -144,7 +144,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      */
     public OccInspection createInspectedSpace(OccInspection inspection,
                                               User user,
-                                              OccSpaceType type,
+                                              OccSpaceTypeChecklistified tpe,
                                               final OccInspectionStatusEnum initialStatus,
                                               OccLocationDescriptor locDesc) throws IntegrationException {
 
@@ -167,7 +167,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 
         // Wrap each CodeElement in an InspectedCodeElement blanket to keep it warm :)
         List<OccInspectedSpaceElement> inspectedElements;
-        inspectedElements = type.getCodeElementList().stream().map(element -> {
+        inspectedElements = tpe.getCodeElementList().stream().map(element -> {
             OccInspectedSpaceElement inspectedElement = new OccInspectedSpaceElement(element);
 
             switch (initialStatus) {
@@ -489,27 +489,28 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         }
         return null;
     }
-    
-    private OccChecklistTemplate configureOccChecklistTemplate(OccChecklistTemplate oct){
-        
-        OccChecklistIntegrator oci = getOccChecklistIntegrator();
-        oct.getOccSpaceTypeList()
-        
-
-        return oct;
-    }
-    
+ 
       /**
      * Call me when the backing bean loads to get a list of possible
      * inspections to carry out such as "Commercial building" or
      * "residential"
      *
      * @param muni
-     * @return
+     * @return a list, possibly containing checklist template objects
      * @throws IntegrationException
      */
     public List<OccChecklistTemplate> getOccChecklistTemplateList(Municipality muni) throws IntegrationException {
-        return getOccChecklistIntegrator().getOccChecklistTemplateList(muni);
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        List<OccChecklistTemplate> templateList = new ArrayList<>();
+        if(muni != null){
+            List<Integer> idl = oci.getOccChecklistTemplateList(muni);
+            if(idl != null && !idl.isEmpty()){
+                for(Integer i: idl){
+                    templateList.add(getChecklistTemplate(i));
+                }
+            }
+        }
+        return templateList;
     }
 
     /**
@@ -540,27 +541,17 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                 ostcl.add(oci.getOccSpaceTypeChecklistified(ostcid));
             }
         }
-        
         return ostcl;
-        
     }
-    
-    
     
     /**
      * Fields requests for a non checklistified SpaceType by ID
      * @param tpeID
      * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
     public OccSpaceType getOccSpaceType(int tpeID) throws IntegrationException{
         OccChecklistIntegrator oci = getOccChecklistIntegrator();
         return oci.getOccSpaceType(tpeID);
-        
-        
-        
     }
-    
-  
-
-  
 }

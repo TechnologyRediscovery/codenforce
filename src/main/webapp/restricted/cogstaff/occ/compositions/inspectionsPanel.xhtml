@@ -277,21 +277,21 @@
 
             <p:dataTable id="inspections-selecttype-dt"
                          scrollHeight="600"
-                         var="type" value="#{occInspectionsBB.selectedInspection.checklistTemplate.occSpaceTypeList}"
-                         rowKey="#{type.spaceTypeID}"
+                         var="ost" value="#{occInspectionsBB.selectedInspection.checklistTemplate.occSpaceTypeList}"
+                         rowKey="#{ost.checklistSpaceTypeID}"
                          selection="#{occInspectionsBB.selectedSpaceType}"
                          stripedRows="true">
                 <p:ajax event="rowSelect"
                         update=":inspections-selecttype-form:inspections-selecttype-continuebutton"/>
                 <p:column selectionMode="single" style="width:16px;text-align:center"/>
                 <p:column headerText="Name">
-                    <h:outputText value="#{type.spaceTypeTitle}"/>
+                    <h:outputText value="#{ost.spaceTypeTitle}"/>
                 </p:column>
                 <p:column headerText="Description">
-                    <h:outputText value="#{type.spaceTypeDescription}"/>
+                    <h:outputText value="#{ost.spaceTypeDescription}"/>
                 </p:column>
                 <p:column headerText="Required">
-                    <i class="#{space.required ? 'pi pi-star' : ''}"/>
+                    <i class="#{ost.required ? 'pi pi-star' : ''}"/>
                 </p:column>
             </p:dataTable>
 

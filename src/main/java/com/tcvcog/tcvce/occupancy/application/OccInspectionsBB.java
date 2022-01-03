@@ -35,7 +35,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     private OccLocationDescriptor skeletonLocationDescriptor;
 
     private OccInspection selectedInspection;
-    private OccSpaceType selectedSpaceType;
+    private OccSpaceTypeChecklistified selectedSpaceType;
 
     private OccInspectedSpace selectedInspectedSpace;
     
@@ -279,14 +279,14 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the selectedSpaceType
      */
-    public OccSpaceType getSelectedSpaceType() {
+    public OccSpaceTypeChecklistified getSelectedSpaceType() {
         return selectedSpaceType;
     }
 
     /**
      * @param selectedSpaceType the selectedSpaceType to set
      */
-    public void setSelectedSpaceType(OccSpaceType selectedSpaceType) {
+    public void setSelectedSpaceType(OccSpaceTypeChecklistified selectedSpaceType) {
         this.selectedSpaceType = selectedSpaceType;
     }
 }

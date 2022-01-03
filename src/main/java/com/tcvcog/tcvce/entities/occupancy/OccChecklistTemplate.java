@@ -58,7 +58,7 @@ public class OccChecklistTemplate  {
      * item to our coorodinator's inspectionAction_commenceSpaceInspection method
      * 
      */
-    protected List<OccSpaceType> occSpaceTypeList;
+    protected List<OccSpaceTypeChecklistified> occSpaceTypeList;
 
     /**
      * @return the muni
@@ -194,14 +194,14 @@ public class OccChecklistTemplate  {
     /**
      * @return the occSpaceTypeList
      */
-    public List<OccSpaceType> getOccSpaceTypeList() {
+    public List<OccSpaceTypeChecklistified> getOccSpaceTypeList() {
         return occSpaceTypeList;
     }
 
     /**
      * @param occSpaceTypeList the occSpaceTypeList to set
      */
-    public void setOccSpaceTypeList(List<OccSpaceType> occSpaceTypeList) {
+    public void setOccSpaceTypeList(List<OccSpaceTypeChecklistified> occSpaceTypeList) {
         this.occSpaceTypeList = occSpaceTypeList;
     }
 
