@@ -45,6 +45,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
 /**
+ * Backer for the OccPeriod
  * @author Ellen Bascomb, JURPLEL
  */
 public class OccPeriodSearchWorkflowBB
@@ -90,6 +91,9 @@ public class OccPeriodSearchWorkflowBB
     public OccPeriodSearchWorkflowBB() {
     }
 
+    /**
+     * Assume a zen-like state and initialize this bean
+     */
     @PostConstruct
     public void initBean() {
         System.out.printf("OccPeriodSearchWorkflowBB constructed");
@@ -98,14 +102,14 @@ public class OccPeriodSearchWorkflowBB
 
         currentOccPeriod = sb.getSessOccPeriod();
         
-        lastSavedOccPeriod = new OccPeriod(currentOccPeriod);
+        setLastSavedOccPeriod(new OccPeriod(currentOccPeriod));
         PropertyIntegrator pi = getPropertyIntegrator();
 
-        occPeriodTypeList = sb.getSessMuni().getProfile().getOccPeriodTypeList();
+        setOccPeriodTypeList(sb.getSessMuni().getProfile().getOccPeriodTypeList());
 
         try {
             currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
-            propertyUnitCandidateList = sb.getSessProperty().getUnitList();
+            setPropertyUnitCandidateList(sb.getSessProperty().getUnitList());
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
@@ -128,6 +132,9 @@ public class OccPeriodSearchWorkflowBB
         configureParameters();
     }
 
+    /**
+     * Sets up search fields
+     */
     private void configureParameters() {
         if (occPeriodQuerySelected != null
                 &&
@@ -142,6 +149,9 @@ public class OccPeriodSearchWorkflowBB
     }
 
 
+    /**
+     * Gets an updated instance of the current OccPeriod
+     */
     public void reloadCurrentOccPeriodDataHeavy() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
@@ -170,6 +180,9 @@ public class OccPeriodSearchWorkflowBB
     }
 
 
+    /**
+     * Listener for user requests to certify a field on the OccPeriod
+     */
     public void certifyOccPeriodField() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         FacesContext context = getFacesContext();
@@ -218,6 +231,9 @@ public class OccPeriodSearchWorkflowBB
     }
 
 
+    /**
+     * Listener for the requests to authorize or unauthorize the OccPeriod
+     */
     public void toggleOccPeriodAuthorization() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
@@ -262,7 +278,7 @@ public class OccPeriodSearchWorkflowBB
             System.out.println("OccPeriodSearchWorkflowBB.saveOccPeriodChanges successful");
 
             // Set backup copy in case of failure if saving to database succeeds
-            lastSavedOccPeriod = new OccPeriod(currentOccPeriod);
+            setLastSavedOccPeriod(new OccPeriod(currentOccPeriod));
         } catch (IntegrationException | BObStatusException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     ex.getMessage(), ""));
@@ -280,9 +296,13 @@ public class OccPeriodSearchWorkflowBB
     public void discardOccPeriodChanges() {
         System.out.println("OccPeriodSearchWorkflowBB.discardOccPeriodChanges");
 
-        currentOccPeriod = new OccPeriodDataHeavy(lastSavedOccPeriod);
+        currentOccPeriod = new OccPeriodDataHeavy(getLastSavedOccPeriod());
     }
 
+    /**
+     * Listener for user request to map the current occ period to a a new property
+     * unit
+     */
     public void updatePeriodPropUnit() {
 //        OccupancyCoordinator oc = getOccupancyCoordinator();
 //        try {
@@ -363,6 +383,9 @@ public class OccPeriodSearchWorkflowBB
         }
     }
 
+    /**
+     * Asks the Coordinator for the OccPeriod viewing history
+     */
     public void loadOccPeriodHistory() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
@@ -405,6 +428,9 @@ public class OccPeriodSearchWorkflowBB
         }
     }
 
+    /**
+     * Listener for user requests to start a new query
+     */
     public void changeQuerySelected() {
 
         configureParameters();
@@ -413,6 +439,9 @@ public class OccPeriodSearchWorkflowBB
                         "New query loaded!", ""));
     }
 
+    /**
+     * Listener for user requests to clear out and restart the current Query
+     */
     public void resetQuery() {
         SearchCoordinator sc = getSearchCoordinator();
         occPeriodQueryList = sc.buildQueryOccPeriodList(getSessionBean().getSessUser().getMyCredential());
@@ -569,6 +598,104 @@ public class OccPeriodSearchWorkflowBB
      */
     public void setSearch_personList(List<Person> search_personList) {
         this.search_personList = search_personList;
+    }
+
+    /**
+     * @return the lastSavedOccPeriod
+     */
+    public OccPeriod getLastSavedOccPeriod() {
+        return lastSavedOccPeriod;
+    }
+
+    /**
+     * @return the occPeriodTypeList
+     */
+    public List<OccPeriodType> getOccPeriodTypeList() {
+        return occPeriodTypeList;
+    }
+
+    /**
+     * @return the selectedPropertyUnit
+     */
+    public PropertyUnit getSelectedPropertyUnit() {
+        return selectedPropertyUnit;
+    }
+
+    /**
+     * @return the managerInspectorCandidateList
+     */
+    public List<User> getManagerInspectorCandidateList() {
+        return managerInspectorCandidateList;
+    }
+
+    /**
+     * @return the selectedManager
+     */
+    public User getSelectedManager() {
+        return selectedManager;
+    }
+
+    /**
+     * @param lastSavedOccPeriod the lastSavedOccPeriod to set
+     */
+    public void setLastSavedOccPeriod(OccPeriod lastSavedOccPeriod) {
+        this.lastSavedOccPeriod = lastSavedOccPeriod;
+    }
+
+    /**
+     * @param occPeriodTypeList the occPeriodTypeList to set
+     */
+    public void setOccPeriodTypeList(List<OccPeriodType> occPeriodTypeList) {
+        this.occPeriodTypeList = occPeriodTypeList;
+    }
+
+    /**
+     * @param selectedPropertyUnit the selectedPropertyUnit to set
+     */
+    public void setSelectedPropertyUnit(PropertyUnit selectedPropertyUnit) {
+        this.selectedPropertyUnit = selectedPropertyUnit;
+    }
+
+    /**
+     * @param managerInspectorCandidateList the managerInspectorCandidateList to set
+     */
+    public void setManagerInspectorCandidateList(List<User> managerInspectorCandidateList) {
+        this.managerInspectorCandidateList = managerInspectorCandidateList;
+    }
+
+    /**
+     * @param selectedManager the selectedManager to set
+     */
+    public void setSelectedManager(User selectedManager) {
+        this.selectedManager = selectedManager;
+    }
+
+    /**
+     * @return the selectedOccPeriodType
+     */
+    public OccPeriodType getSelectedOccPeriodType() {
+        return selectedOccPeriodType;
+    }
+
+    /**
+     * @return the propertyUnitCandidateList
+     */
+    public List<PropertyUnit> getPropertyUnitCandidateList() {
+        return propertyUnitCandidateList;
+    }
+
+    /**
+     * @param selectedOccPeriodType the selectedOccPeriodType to set
+     */
+    public void setSelectedOccPeriodType(OccPeriodType selectedOccPeriodType) {
+        this.selectedOccPeriodType = selectedOccPeriodType;
+    }
+
+    /**
+     * @param propertyUnitCandidateList the propertyUnitCandidateList to set
+     */
+    public void setPropertyUnitCandidateList(List<PropertyUnit> propertyUnitCandidateList) {
+        this.propertyUnitCandidateList = propertyUnitCandidateList;
     }
 
 }

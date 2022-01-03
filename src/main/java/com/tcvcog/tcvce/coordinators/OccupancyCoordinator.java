@@ -24,37 +24,27 @@ import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
-
 import com.tcvcog.tcvce.entities.*;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectableStatus;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionStatusEnum;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
-import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
-import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.integration.*;
-import com.tcvcog.tcvce.occupancy.integration.OccChecklistIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
-import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
-import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -67,8 +57,6 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
-
-import java.util.Iterator;
 
 /**
  * King of all business logic implementation for the entire Occupancy object
@@ -448,9 +436,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return freshLocID;
     }
 
-    public OccInspection getOccInspectionSkeleton() {
-        return new OccInspection();
-    }
 
     /**
      * Updates DB to mark the passed in OccInspection the governing one in the
@@ -907,49 +892,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 //        }
     }
 
-    public void inspectionAction_removeSpaceFromChecklist(OccInspectedSpace spc, User u, OccInspection oi) throws IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        oii.deleteInspectedSpace(spc);
-    }
-
-    public void inspectionAction_recordComplianceWithInspectedElement(OccInspectedSpaceElement oise,
-                                                                      User u,
-                                                                      OccInspection oi) throws IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
-        oise.setComplianceGrantedBy(u);
-        oise.setComplianceGrantedTS(LocalDateTime.now());
-        oise.setLastInspectedTS(LocalDateTime.now());
-        oise.setLastInspectedBy(u);
-
-        oii.updateInspectedSpaceElement(oise);
-    }
-
-    public void clearInspectionOfElement(OccInspectedSpaceElement oise,
-                                         User u,
-                                         OccInspection oi) throws IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
-        oise.setComplianceGrantedBy(null);
-        oise.setComplianceGrantedTS(null);
-        oise.setLastInspectedTS(null);
-        oise.setLastInspectedBy(null);
-
-        oii.updateInspectedSpaceElement(oise);
-    }
-
-    public void inspectionAction_inspectWithoutCompliance(OccInspectedSpaceElement oise,
-                                                          User u,
-                                                          OccInspection oi) throws IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
-        oise.setComplianceGrantedBy(null);
-        oise.setComplianceGrantedTS(null);
-        oise.setLastInspectedTS(LocalDateTime.now());
-        oise.setLastInspectedBy(u);
-
-        oii.updateInspectedSpaceElement(oise);
-    }
+  
 
     /**
      * For inter-coordinator processing only! I get called by the EvCoor during
@@ -970,59 +913,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }
 
 
-    /**
-     * Call me when the backing bean loads to get a list of possible
-     * inspections to carry out such as "Commercial building" or
-     * "residential"
-     *
-     * @return
-     * @throws IntegrationException
-     */
-    public List<OccChecklistTemplate> getOccChecklistTemplateList(Municipality muni) throws IntegrationException {
-        return getOccChecklistIntegrator().getOccChecklistTemplateList(muni);
-    }
-
-    public OccSpaceElement getOccSpaceElementSkeleton() {
-        return new OccSpaceElement();
-
-    }
-
-    public OccChecklistTemplate getChecklistTemplate(int checklistID) throws IntegrationException {
-        OccChecklistTemplate oct = null;
-        OccChecklistIntegrator oci = getOccChecklistIntegrator();
-        if(checklistID != 0){
-            
-            oct = oci.getChecklistTemplate(checklistID);
-            if(oct != null && oct.getInspectionChecklistID() != 0){
-                oct.setOccSpaceTypeList(getOccSpaceTypeList(oct));
-            }
-            return oct;
-        }
-        return null;
-    }
-    
-    public List<OccSpaceType> getOccSpaceTypeList(OccChecklistTemplate oct) throws IntegrationException{
-        OccChecklistIntegrator oci = getOccChecklistIntegrator();
-        List<OccSpaceType> ostl = oci.getOccInspecTemplateSpaceTypeList(oct.getInspectionChecklistID());
-        for (OccSpaceType ost: ostl) {
-            configureOccSpaceType(ost);
-        }
-        
-        return ostl;
-        
-    }
-    
-    private OccSpaceType configureOccSpaceType(OccSpaceType ost) throws IntegrationException{
-        
-        if(ost != null){
-            OccChecklistIntegrator oci = getOccChecklistIntegrator();
-            ost.setCodeElementList(oci.getOccSpaceElementsByOccSpaceType(ost));
-        }
-        
-        return ost;
-        
-        
-    }
+  
             
 
 } // close class

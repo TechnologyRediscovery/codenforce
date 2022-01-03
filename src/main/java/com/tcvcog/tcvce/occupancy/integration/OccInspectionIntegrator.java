@@ -35,8 +35,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * The master Inspection integrator for methods 
@@ -830,10 +828,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             ins.setNumBedrooms(rs.getInt("numbedrooms"));
             ins.setNumBathrooms(rs.getInt("numbathrooms"));
             
+            ins.setChecklistTemplateID(rs.getInt("occchecklist_checklistlistid"));
             
-            // now set the big lists
-            ins.setChecklistTemplate(getOccChecklistIntegrator().getChecklistTemplate(rs.getInt("occchecklist_checklistlistid")));
-            ins.setInspectedSpaceList(getInspectedSpaceList(ins.getInspectionID()));
             
             if (rs.getTimestamp("effectivedate") != null) {
                 ins.setEffectiveDateOfRecord(rs.getTimestamp("effectivedate").toLocalDateTime());

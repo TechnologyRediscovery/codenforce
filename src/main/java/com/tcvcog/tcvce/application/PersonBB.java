@@ -86,7 +86,6 @@ public class PersonBB extends BackingBeanUtils {
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.getPerson(currentPerson);
-            
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
@@ -131,8 +130,6 @@ public class PersonBB extends BackingBeanUtils {
         PersonCoordinator pc = getPersonCoordinator();
         currentPerson = pc.createPersonSkeleton(getSessionBean().getSessMuni());
         System.out.println("PersonBB.onHumanAddInitButtonChange");
-        
-        
     }
     
     /**

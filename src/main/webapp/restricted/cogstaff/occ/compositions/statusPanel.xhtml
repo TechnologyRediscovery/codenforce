@@ -111,8 +111,8 @@
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to deauthorize the occupancy period? It was originally authorized by
-                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.phumanfirstName}
-                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.pehumanastName}
+                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.human.name}
+                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.human.name}
                                                          on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
@@ -142,8 +142,8 @@
                     <div class="restrict-data-field-value-inline">
 
                         <h:outputText id="occperiod-manager-ot"
-                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.pehumanirstName}
-                                                              #{occPeriodSearchWorkflowBB.currentOccPeriod.manager.human.lastName}"/>
+                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.human.name}
+                                                              #{occPeriodSearchWorkflowBB.currentOccPeriod.manager.human.name}"/>
                         <br/>
                         <h:outputText id="occperiod-manager-username"
                                       value="(#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.username})"/>
@@ -160,8 +160,8 @@
                         </p:outputLabel>
                     </div>
                     <div class="restrict-data-field-value-inline">
-                        <h:outputText value="#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.personhumanName}
-                                                  #{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.personhumaname}
+                        <h:outputText value="#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.human.name}
+                                                  #{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.human.name}
                                                   (#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.username})"/>
                         <br/>
                         <h:outputText value="at #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.createdTS)}"/>
@@ -232,8 +232,8 @@
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to unlock the start date? It was originally locked by
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy.phumanfirstName}
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy.person.lahuman}
+                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy.human.name}
+                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy.username}
                                                      on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
@@ -290,8 +290,8 @@
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to unlock the end date? It was originally locked by
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.person.fihumane}
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.phumanlastName}
+                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.human.name}
+                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.human.name}
                                                      on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
@@ -314,7 +314,7 @@
                                          icon="fa fa-home"
                                          action="#{occPeriodSearchWorkflowBB.exploreProperty}"
                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                         value="view property: #{occPeriodSearchWorkflowBB.currentPropertyUnit.property.address}"/>
+                                         value="view property parcel ID: #{occPeriodSearchWorkflowBB.currentPropertyUnit.parcelKey}"/>
 
 
                     </div>
@@ -435,7 +435,7 @@
                                           itemDisabled="true"/>
                             <f:selectItems id="occperiod-search-user-field-val-items"
                                            value="#{systemServicesBB.userListForSearch}"
-                                           var="usr" itemValue="#{usr}" itemLabel="#{usr.personhumanName} #{usr.perhumanstName}; username #{usr.username}"/>
+                                           var="usr" itemValue="#{usr}" itemLabel="#{usr.human.name}; username #{usr.username}"/>
                             <f:converter converterId="userConverter"/>
                         </p:selectOneMenu>
 

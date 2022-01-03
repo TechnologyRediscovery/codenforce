@@ -111,7 +111,7 @@
                 <p:column headerText="Actions">
                     <p:commandLink ajax="true"
                                    style="color:blue;"
-                                   actionListener="#{occInspectionsBB.clearSelections}"
+                                   actionListener="#{occInspectionsBB.onAddSpaceLinkClick(inspection)}"
                                    oncomplete="PF('inspections-selecttype-var').show()"
                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                    update="inspections-selecttype-form"
@@ -211,6 +211,8 @@
                                  value="Continue"
                                  disabled="#{occInspectionsBB.selectedChecklistTemplate.inspectionChecklistID == 0}"
                                  icon="pi pi-arrow-right"
+                                 actionListener="#{occInspectionsBB.onChecklistSelectionCompleteButtonActuation}"
+                                 update="@form:@parent:inspections-selectinspector-form"
                                  oncomplete="PF('inspections-selectchecklist-var').hide(); PF('inspections-selectinspector-var').show()"/>
             </f:facet>
         </p:dialog>
@@ -218,42 +220,47 @@
 
 
     <!-- Inspector selection dialog used in inspection creation flow -->
-    <h:form id="inspections-selectinspector-form">
         <p:dialog id="inspections-selectinspector"
-                  width="600"
+                  width="600" height="800"
                   widgetVar="inspections-selectinspector-var"
                   header="Select Inspector"
                   modal="true"
+                  closeOnEscape="true"
+                  closable="true"
                   resizable="true">
-            <p:selectOneListbox id="inspections-selectinspector-listbox"
-                                scrollHeight="600"
-                                value="#{occInspectionsBB.selectedInspector}"
-                                var="u" filter="true" filterMatchMode="contains"
-                                converter="userConverter">
-                <p:ajax update="inspections-selectinspector-continuebutton"/>
-                <f:selectItems value="#{occInspectionsBB.userList}" var="user"
-                               itemLabel="#{user.human.firstName} #{user.human.lastName} #{user.username}"
-                               itemValue="#{user}"/>
-                <p:column>
-                    <h:outputText value="#{u.person.firstName} #{u.person.lastName} (#{u.username})"/>
-                </p:column>
-            </p:selectOneListbox>
+            
+            <h:form id="inspections-selectinspector-form">
+                <h2>Current inspector</h2>
 
-            <f:facet name="footer">
-                <p:commandButton value="Back"
-                                 icon="pi pi-arrow-left"
-                                 class="ui-button-outlined p-mr-1"
-                                 oncomplete="PF('inspections-selectinspector-var').hide(); PF('inspections-selectchecklist-var').show();"/>
-                <p:commandButton id="inspections-selectinspector-continuebutton"
-                                 value="Create"
-                                 disabled="#{occInspectionsBB.selectedInspector.userID == 0}"
-                                 icon="pi pi-plus"
-                                 actionListener="#{occInspectionsBB.createInspection}"
-                                 update="inspections-form:inspections-table"
-                                 oncomplete="PF('inspections-selectinspector-var').hide()"/>
-            </f:facet>
+                <h:outputText value="#{occInspectionsBB.selectedInspector.human.name}" />
+                
+                 <p:spacer height="5px" />
+                    <p:commandButton value="Back"
+                                     icon="pi pi-arrow-left"
+                                     class="ui-button-outlined p-mr-1"
+                                     oncomplete="PF('inspections-selectinspector-var').hide(); PF('inspections-selectchecklist-var').show();"/>
+                    <p:commandButton id="inspections-selectinspector-continuebutton"
+                                     value="Create"
+                                     disabled="#{occInspectionsBB.selectedInspector.userID == 0}"
+                                     icon="pi pi-plus"
+                                     actionListener="#{occInspectionsBB.createInspection}"
+                                     update="inspections-form:inspections-table"
+                                     oncomplete="PF('inspections-selectinspector-var').hide()"/>
+                
+                <h2>Change inspector</h2>
+                <p:selectOneListbox id="inspections-selectinspector-listbox"
+                                    scrollHeight="300"
+                                    value="#{occInspectionsBB.selectedInspector}"
+                                    var="u" filter="true" filterMatchMode="contains"
+                                    converter="userConverter">
+                    <p:ajax update="inspections-selectinspector-continuebutton"/>
+                    <f:selectItems value="#{occInspectionsBB.userList}" var="user"
+                                   itemLabel="#{user.human.name} (#{user.username})"
+                                   itemValue="#{user}"/>
+                </p:selectOneListbox>
+               
+            </h:form>
         </p:dialog>
-    </h:form>
 
 
     <!-- Space add flow -->
@@ -272,7 +279,7 @@
                          scrollHeight="600"
                          var="type" value="#{occInspectionsBB.selectedInspection.checklistTemplate.occSpaceTypeList}"
                          rowKey="#{type.spaceTypeID}"
-                         selection="!{occInspectionsBB.selectedType}"
+                         selection="#{occInspectionsBB.selectedSpaceType}"
                          stripedRows="true">
                 <p:ajax event="rowSelect"
                         update=":inspections-selecttype-form:inspections-selecttype-continuebutton"/>
@@ -489,9 +496,9 @@
                     </div>
                     <p:divider/>
                     <div class="p-col-6">Third party inspector</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyInspector.person.firstName}
-                        #{occInspectionsBB.selectedInspection.thirdPartyInspector.person.lastName}
-                        (#{occInspectionsBB.selectedInspection.thirdPartyInspector.username})</div>
+                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyInspector.name}
+                        #{occInspectionsBB.selectedInspection.thirdPartyInspector.name}
+                        (#{occInspectionsBB.selectedInspection.thirdPartyInspector.name})</div>
                     <div class="p-col-6">Third party inspector approval</div>
                     <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.human.firstName}
                         #{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.human.lastName}
@@ -628,7 +635,7 @@
                   modal="true"
                   resizable="true">
             <div class="p-d-flex p-jc-between">
-                <h1><h:outputText value="#{occInspectionsBB.selectedInspectedSpace.name}"/></h1>
+                <h1><h:outputText value="#{occInspectionsBB.selectedInspectedSpace.location.locationDescription}"/></h1>
                 <div>
                     <p:commandButton value="Pass All"/>
                 </div>

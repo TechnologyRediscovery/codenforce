@@ -20,25 +20,36 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.*;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccChecklistIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.util.Constants;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * Business logic reservoir for field inspections, formerly called Occupancy Inspections
+ * but since field inspections are used for both silos, that distinction is now moot
+ * @author Ellen Bascomb of apt 31Y
+ */
 public class OccInspectionCoordinator extends BackingBeanUtils implements Serializable {
 
     public OccInspectionCoordinator() {
+    }
+    
+    /**
+     * Factory of occupnacy inspections
+     * @return 
+     */
+    public OccInspection getOccInspectionSkeleton() {
+        return new OccInspection();
     }
 
     /**
@@ -67,7 +78,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     public OccInspection inspectionAction_commenceOccupancyInspection(OccInspection in,
                                                                       OccChecklistTemplate tem,
                                                                       OccPeriod period,
-                                                                      User user) throws InspectionException, IntegrationException {
+                                                                      User user) 
+            throws InspectionException, IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         OccChecklistIntegrator oci = getOccChecklistIntegrator();
         OccInspection inspec = null;
@@ -99,6 +111,12 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         return inspec;
     }
 
+    
+    /**
+     * Logic container for updating space element data on all elements in an inspection
+     * @param inspection
+     * @throws IntegrationException 
+     */
     public void inspectionAction_updateSpaceElementData(OccInspection inspection) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
 
@@ -156,6 +174,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                 case FAIL:
                     inspectedElement.setLastInspectedBy(user);
                     inspectedElement.setLastInspectedTS(LocalDateTime.now());
+                    inspectedElement.setComplianceGrantedBy(null);// fail means this is null
+                    inspectedElement.setComplianceGrantedTS(null);// fail means this is null
                     break;
                 case PASS:
                     inspectedElement.setLastInspectedBy(user);
@@ -170,7 +190,23 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             return inspectedElement;
         }).collect(Collectors.toList());
 
-        // ...also make it the OccInspectedSpace's list of InspectedCodeElements
+        // ...al if (selectedInspection == null) {
+//            System.out.println("Can't initialize add space to inspection: selected inspection object is null");
+//            return;
+//        }
+//        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+//        try {
+////             Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
+//            selectedInspection = oic.inspectionAction_commenceSpaceInspection(
+//                                                selectedInspection, 
+//                                                selectedInspection.getInspector(), 
+//                                                , 
+//                                                null, 
+//                                                null);
+//
+//        } catch (IntegrationException ex) {
+//            System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
+//        }so make it the OccInspectedSpace's list of InspectedCodeElements
         inspectedSpace.setInspectedElementList(inspectedElements);
 
         // With a fully built inspected space, we can record our start of inspection in the DB
@@ -187,12 +223,30 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         return inspection;
     }
 
+    /**
+     * Logic containe for retrieving and configuring an OccInspection
+     * @param inspectionID
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
     public OccInspection getOccInspection(int inspectionID) throws IntegrationException, BObStatusException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        OccInspection oi = oii.getOccInspection(inspectionID);
+        oi.setChecklistTemplate(getChecklistTemplate(oi.getChecklistTemplateID()));
+        oi.setInspectedSpaceList(oii.getInspectedSpaceList(oi.getInspectionID()));
 
-        return configureOccInspection(oii.getOccInspection(inspectionID));
+        oi = configureOccInspection(oi);
+        return oi;
     }
 
+    /**
+     * Assembles a list of all OccInspections for a given period
+     * @param period
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
     public List<OccInspection> getOccInspectionsFromOccPeriod(OccPeriodDataHeavy period) throws IntegrationException, BObStatusException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
 
@@ -206,7 +260,14 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         return inspectionList;
     }
 
-    public OccInspection configureOccInspection(OccInspection inspection) throws BObStatusException {
+    /**
+     * Logic for setting members on the Occupancy Inspection objects
+     * 
+     * @param inspection
+     * @return
+     * @throws BObStatusException 
+     */
+    private OccInspection configureOccInspection(OccInspection inspection) throws BObStatusException {
         boolean allSpacesPassed = true;
         if (inspection != null) {
             for (OccInspectedSpace inSpace : inspection.getInspectedSpaceList()) {
@@ -224,7 +285,13 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         return inspection;
     }
 
-    public OccInspectedSpace configureOccInspectedSpace(OccInspectedSpace inSpace) throws BObStatusException {
+    /**
+     * Logic for setting members on OccInspectedSpace
+     * @param inSpace
+     * @return
+     * @throws BObStatusException 
+     */
+    private OccInspectedSpace configureOccInspectedSpace(OccInspectedSpace inSpace) throws BObStatusException {
         SystemIntegrator si = getSystemIntegrator();
         boolean atLeastOneElementInspected = false;
         boolean allElementsPass = true;
@@ -273,7 +340,13 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 
     }
 
-    public OccInspectedSpaceElement configureOccInspectedSpaceElement(OccInspectedSpaceElement inSpaceEle) throws BObStatusException {
+    /**
+     * Implements business logic to set the status of each space element
+     * @param inSpaceEle
+     * @return
+     * @throws BObStatusException 
+     */
+    private OccInspectedSpaceElement configureOccInspectedSpaceElement(OccInspectedSpaceElement inSpaceEle) throws BObStatusException {
         SystemIntegrator si = getSystemIntegrator();
 
         int iconID = 0;
@@ -313,4 +386,181 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         }
         return inSpaceEle;
     }
+    
+    /**
+     * Coordinates removing a space from being part of a checklist, 
+     * @param spc
+     * @param u
+     * @param oi
+     * @throws IntegrationException 
+     */
+    public void inspectionAction_removeSpaceFromInspection(OccInspectedSpace spc, User u, OccInspection oi) throws IntegrationException {
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        oii.deleteInspectedSpace(spc);
+    }
+
+    /**
+     * Sets members on an OccInspectedSpaceElement and writes to DB
+     * @param oise
+     * @param u
+     * @param oi
+     * @throws IntegrationException 
+     */
+    public void inspectionAction_recordComplianceWithInspectedElement(OccInspectedSpaceElement oise,
+                                                                      User u,
+                                                                      OccInspection oi) throws IntegrationException {
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+
+        oise.setComplianceGrantedBy(u);
+        oise.setComplianceGrantedTS(LocalDateTime.now());
+        oise.setLastInspectedTS(LocalDateTime.now());
+        oise.setLastInspectedBy(u);
+
+        oii.updateInspectedSpaceElement(oise);
+    }
+
+    /**
+     * Removes status of space inspection in DB
+     * @param oise
+     * @param u
+     * @param oi
+     * @throws IntegrationException 
+     */
+    public void clearInspectionOfElement(OccInspectedSpaceElement oise,
+                                         User u,
+                                         OccInspection oi) throws IntegrationException {
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+
+        oise.setComplianceGrantedBy(null);
+        oise.setComplianceGrantedTS(null);
+        oise.setLastInspectedTS(null);
+        oise.setLastInspectedBy(null);
+
+        oii.updateInspectedSpaceElement(oise);
+    }
+
+    /**
+     * Implements business rules for marking an element as inspected but not 
+     * with compliance. From a database and Java logic perspective, 
+     * there's no field that corresponds to "failure" but rather the failure
+     * of an element during an inspection is derived from a timestamp of having 
+     * been inspected but not being flagged as in compliance.
+     * 
+     * @param oise the element that has been inspected but is not in compliance
+     * @param u
+     * @param oi
+     * @throws IntegrationException 
+     */
+    public void inspectionAction_inspectWithoutCompliance(OccInspectedSpaceElement oise,
+                                                          User u,
+                                                          OccInspection oi) throws IntegrationException {
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+
+        oise.setComplianceGrantedBy(null);
+        oise.setComplianceGrantedTS(null);
+        oise.setLastInspectedTS(LocalDateTime.now());
+        oise.setLastInspectedBy(u);
+
+        oii.updateInspectedSpaceElement(oise);
+    }
+    
+    /** 
+     * ************************************************************
+     * ********************* CHECKLIST TEMPLATES ******************
+     * ************************************************************
+     */
+    
+     /**
+     * Logic container for retrieving a ChecklistTemplate, which is used 
+     * to create an actual OccupancyInspection
+     * @param checklistID
+     * @return fully baked checklist template; null if ID == 0
+     * @throws IntegrationException 
+     */
+    public OccChecklistTemplate getChecklistTemplate(int checklistID) throws IntegrationException {
+        OccChecklistTemplate oct = null;
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        if(checklistID != 0){
+            oct = oci.getChecklistTemplate(checklistID);
+            if(oct != null && oct.getInspectionChecklistID() != 0){
+                oct.setOccSpaceTypeList(getOccSpaceTypeChecklistifiedList(oct));
+            }
+            return oct;
+        }
+        return null;
+    }
+    
+    private OccChecklistTemplate configureOccChecklistTemplate(OccChecklistTemplate oct){
+        
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        oct.getOccSpaceTypeList()
+        
+
+        return oct;
+    }
+    
+      /**
+     * Call me when the backing bean loads to get a list of possible
+     * inspections to carry out such as "Commercial building" or
+     * "residential"
+     *
+     * @param muni
+     * @return
+     * @throws IntegrationException
+     */
+    public List<OccChecklistTemplate> getOccChecklistTemplateList(Municipality muni) throws IntegrationException {
+        return getOccChecklistIntegrator().getOccChecklistTemplateList(muni);
+    }
+
+    /**
+     * Factory method for creating OccSpaceElement
+     * @return the Fresh Object
+     */
+    public OccSpaceElement getOccSpaceElementSkeleton() {
+        return new OccSpaceElement();
+
+    }
+
+   
+    
+    /**
+     * Extracts all occ space types for injection into the Template.
+     * Used during the construction of an OccChecklistTemplate
+     * @param oct
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<OccSpaceTypeChecklistified> getOccSpaceTypeChecklistifiedList(OccChecklistTemplate oct) throws IntegrationException{
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        List<OccSpaceTypeChecklistified> ostcl = null;
+        if(oct != null){
+            ostcl = new ArrayList<>();
+            List<Integer> ostcidl = oci.getOccSpaceTypeChecklistifiedIDListByChecklist(oct.getInspectionChecklistID());
+            for (Integer ostcid: ostcidl) {
+                ostcl.add(oci.getOccSpaceTypeChecklistified(ostcid));
+            }
+        }
+        
+        return ostcl;
+        
+    }
+    
+    
+    
+    /**
+     * Fields requests for a non checklistified SpaceType by ID
+     * @param tpeID
+     * @return 
+     */
+    public OccSpaceType getOccSpaceType(int tpeID) throws IntegrationException{
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        return oci.getOccSpaceType(tpeID);
+        
+        
+        
+    }
+    
+  
+
+  
 }

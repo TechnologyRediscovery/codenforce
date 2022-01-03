@@ -10,25 +10,23 @@ import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.*;
-
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.faces.event.ActionEvent;
 
 /**
  * The premier backing bean for occupancy inspections workflow.
  *
- * @author jurplel
+ * @author jurplel & ellen bascomb starting Jan 2022
  */
 public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     private List<OccChecklistTemplate> checklistTemplateList;
     private List<User> userList;
 
-    // Form items--these need organized
+    // Form items--these need to be organized
     private OccChecklistTemplate selectedChecklistTemplate;
     private User selectedInspector;
 
@@ -37,16 +35,21 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     private OccLocationDescriptor skeletonLocationDescriptor;
 
     private OccInspection selectedInspection;
+    private OccSpaceType selectedSpaceType;
 
     private OccInspectedSpace selectedInspectedSpace;
+    
 
     private boolean editMode;
 
     @PostConstruct
     public void initBean() {
+        
+        
         // Initialize list of checklist templates
-        initChecklistTemplates();
+       initChecklistTemplates();
         initUserList();
+        
     }
 
     /**
@@ -55,7 +58,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      */
     public void initChecklistTemplates() {
         SessionBean sb = getSessionBean();
-        OccupancyCoordinator oc = getOccupancyCoordinator();
+        OccInspectionCoordinator oc = getOccInspectionCoordinator();
         try {
             checklistTemplateList = oc.getOccChecklistTemplateList(sb.getSessMuni());
         } catch (IntegrationException ex) {
@@ -72,6 +75,11 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         try {
             // TODO: probably shouldn't pass null here...
             userList = uc.user_assembleUserListForSearch(null);
+            if(userList != null){
+                System.out.println("OccInspectionsBB.initUserList: size = " + userList.size());
+            } else{
+                System.out.println("OccInspectionsBB.initUserList: null");
+            }
         } catch (BObStatusException ex) {
             System.out.println(ex);
         }
@@ -93,7 +101,11 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
-            OccInspection newInspection = oic.inspectionAction_commenceOccupancyInspection(null, selectedChecklistTemplate, occPeriod, selectedInspector);
+            OccInspection newInspection = oic.inspectionAction_commenceOccupancyInspection(
+                    null, // inspection
+                    selectedChecklistTemplate, 
+                    occPeriod, 
+                    selectedInspector);
 
             if (occPeriod.getInspectionList() == null) {
                 occPeriod.setInspectionList(new ArrayList());
@@ -105,11 +117,17 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         }
     }
 
+    /**
+     * Asks coordinator for LocationDescriptor object
+     */
     public void initSkeletonLocDescriptor() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         skeletonLocationDescriptor = oc.getOccLocationDescriptorSkeleton();
     }
 
+    /**
+     * 
+     */
     public void createLocDescriptor() {
         if (skeletonLocationDescriptor == null) {
             System.out.println("Can't create new loc descriptor: skeleton location descriptor object is null");
@@ -123,22 +141,45 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
             System.out.println("Failed to add skeleton location descriptor: " + ex);
         }
     }
+    
+    /**
+     * Listener for the user to be finished selecting a checklist
+     * Sets the selected inspector to the current occ period's manager
+     * @param ev 
+     */
+    public void onChecklistSelectionCompleteButtonActuation(ActionEvent ev){
+        selectedInspector = getSessionBean().getSessOccPeriod().getManager();
+        
+    }
 
+    /**
+     * Listener for user requests to add a chosen OccSpace to the current inspection
+     * 
+     */
     public void addSelectedSpaceToSelectedInspection() {
 //        if (selectedInspection == null) {
 //            System.out.println("Can't initialize add space to inspection: selected inspection object is null");
 //            return;
 //        }
-//        OccupancyCoordinator oc = getOccupancyCoordinator();
+//        OccInspectionCoordinator oic = getOccInspectionCoordinator();
 //        try {
-            // Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
-//            selectedInspection = oc.inspectionAction_commenceSpaceInspection(selectedInspection, selectedInspection.getInspector(), selectedSpace, null, null);
-
+////             Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
+//            selectedInspection = oic.inspectionAction_commenceSpaceInspection(
+//                                                selectedInspection, 
+//                                                selectedInspection.getInspector(), 
+//                                                , 
+//                                                null, 
+//                                                null);
+//
 //        } catch (IntegrationException ex) {
 //            System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
 //        }
     }
 
+    /**
+     * Extracts all values of th enum OccINspectionStatusEnum
+     * @return 
+     */
     public OccInspectionStatusEnum[] getStatuses() {
         return OccInspectionStatusEnum.values();
     }
@@ -152,6 +193,21 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         setSelectedInspector(new User());
 
         setSelectedLocDescriptor(new OccLocationDescriptor());
+    }
+    
+    /**
+     * Listener for user requests to bring up the space type selection
+     * dialog
+     * @param oi
+     * @param ev 
+     */
+    public void onAddSpaceLinkClick(OccInspection oi){
+        clearSelections();
+        selectedInspection = oi;
+        
+        
+        
+        
     }
 
     // getters & setters below you know the drill
@@ -218,5 +274,19 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     public void toggleEditMode() {
         editMode = !editMode;
+    }
+
+    /**
+     * @return the selectedSpaceType
+     */
+    public OccSpaceType getSelectedSpaceType() {
+        return selectedSpaceType;
+    }
+
+    /**
+     * @param selectedSpaceType the selectedSpaceType to set
+     */
+    public void setSelectedSpaceType(OccSpaceType selectedSpaceType) {
+        this.selectedSpaceType = selectedSpaceType;
     }
 }

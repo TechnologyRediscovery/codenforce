@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- * Rougly maps to a parcelunit record in the DB
+ * Roughly maps to a parcelunit record in the DB
  * @author ellen bascomb of apt 31y
  */
 public class    PropertyUnit 

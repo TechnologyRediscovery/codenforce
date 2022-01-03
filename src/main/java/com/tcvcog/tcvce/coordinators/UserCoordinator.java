@@ -244,9 +244,10 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * 
      * @param usr
      * @return An assembled list of users for authorization
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public List<User> user_assembleUserListForSearch(User usr) throws BObStatusException{
-        // we do nothing with muniList
+        // we do nothing with user
         UserIntegrator ui = getUserIntegrator();
         
         List<User> ulst = new ArrayList<>();

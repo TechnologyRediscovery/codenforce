@@ -63,6 +63,7 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     
     // This template object provides us the raw lists of uninspected
     // space types, from which we extract a list of Spaces and their CodeElements
+    private int checklistTemplateID;
     private OccChecklistTemplate checklistTemplate;
     
     private List<OccInspectedSpace> inspectedSpaceList;
@@ -584,5 +585,19 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
 
     public void setTimeEnd(LocalDateTime timeEnd) {
         this.timeEnd = timeEnd;
+    }
+
+    /**
+     * @return the checklistTemplateID
+     */
+    public int getChecklistTemplateID() {
+        return checklistTemplateID;
+    }
+
+    /**
+     * @param checklistTemplateID the checklistTemplateID to set
+     */
+    public void setChecklistTemplateID(int checklistTemplateID) {
+        this.checklistTemplateID = checklistTemplateID;
     }
 }
