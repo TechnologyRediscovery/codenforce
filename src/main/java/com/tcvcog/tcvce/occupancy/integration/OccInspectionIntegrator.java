@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -97,6 +98,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return inspSpaceList;
     }
 
+    /**
+     * Extracts an inspected space from DB and injects elements
+     * @param inspectedspaceID
+     * @return
+     * @throws IntegrationException 
+     */
     public OccInspectedSpace getInspectedSpace(int inspectedspaceID) throws IntegrationException {
         OccInspectedSpace inspectedSpace = null;
         if (inspectedspaceID == 0) {
@@ -152,17 +159,25 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return inspectedSpace;
     }
 
+    /**
+     * GEnerator for OccInspectedSpace
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
     private OccInspectedSpace generateOccInspectedSpace(ResultSet rs) throws SQLException, IntegrationException {
+        UserIntegrator ui = getUserIntegrator();
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
         OccInspectedSpace inSpace = null;
         try {
-            UserIntegrator ui = getUserIntegrator();
-            OccChecklistIntegrator oci = getOccChecklistIntegrator();
             
             inSpace = new OccInspectedSpace();
             inSpace.setInspectedSpaceID(rs.getInt("inspectedspaceid"));
             inSpace.setLocation(getLocationDescriptor(rs.getInt("occlocationdescription_descid")));
             
-            inSpace.setType(oci.getOccSpaceType(rs.getInt("occchecklistspacetype_chklstspctypid")));
+            inSpace.setType(oci.getOccSpaceTypeChecklistified(rs.getInt("occchecklistspacetype_chklstspctypid")));
             
             inSpace.setAddedToChecklistBy(ui.getUser(rs.getInt("addedtochecklistby_userid")));
             inSpace.setInspectionID(rs.getInt("occinspection_inspectionid"));
@@ -178,6 +193,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     }
 
+    /**
+     * Extracts an inspected element and all its meta data from the DB
+     * @param eleID
+     * @return
+     * @throws IntegrationException 
+     */
     public OccInspectedSpaceElement getInspectedSpaceElement(int eleID) throws IntegrationException {
         String query_spaceIDs = "SELECT inspectedspaceelementid, notes, locationdescription_id, lastinspectedby_userid, \n"
                 + "lastinspectedts, compliancegrantedby_userid, compliancegrantedts, \n"
@@ -220,6 +241,13 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     }
 
+    /**
+     * GEnerator for inspected space elements
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
     private OccInspectedSpaceElement generateInspectedSpaceElement(ResultSet rs) throws SQLException, IntegrationException {
             CodeIntegrator ci = getCodeIntegrator();
             UserIntegrator ui = getUserIntegrator();
@@ -264,6 +292,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             return inspectedEle;
     }
 
+    /**
+     * Creates a new record in the occlocationdescriptor table
+     * @param locDesc
+     * @return
+     * @throws IntegrationException 
+     */
     public int insertLocationDescriptor(OccLocationDescriptor locDesc) throws IntegrationException {
         String sql = "INSERT INTO public.occlocationdescriptor(\n"
                 + "            locationdescriptionid, description, buildingfloorno)\n"
@@ -300,12 +334,23 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return insertedLocDescID;
     }
 
+    /**
+     * TODO: Finish me
+     * @param inspection
+     * @return 
+     */
     public List<OccLocationDescriptor> getLocationDescriptorsByInspection(OccInspection inspection) {
         //
 
         return new ArrayList();
     }
 
+    /**
+     * Extracts a location descriptor from the DB
+     * @param descriptorID
+     * @return
+     * @throws IntegrationException 
+     */
     public OccLocationDescriptor getLocationDescriptor(int descriptorID) throws IntegrationException {
         String query_spaceIDs = "SELECT locationdescriptionid, description, buildingfloorno\n"
                 + "  FROM public.occlocationdescriptor WHERE locationdescriptionid = ?;";
@@ -343,6 +388,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return loc;
     }
 
+    /**
+     * Updates a record in the occlocationdescriptor table
+     * @param locDesc
+     * @throws IntegrationException 
+     */
     public void updateLocationDescriptor(OccLocationDescriptor locDesc) throws IntegrationException {
         String sql = "UPDATE public.occlocationdescriptor\n"
                 + "   SET description=?, buildingfloorno=?\n"
@@ -370,14 +420,22 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         } // close finally
     }
 
+    /**
+     * Creates a record in the occinspectedspace table which connects a space type 
+     * with an inspeection and records who added it and when
+     * @param spc
+     * @param inspection
+     * @return
+     * @throws IntegrationException 
+     */
     public OccInspectedSpace recordCommencementOfSpaceInspection(OccInspectedSpace spc, OccInspection inspection)
             throws IntegrationException {
 
-        String sql = "INSERT INTO public.occinspectedspace(\n"
-                + "            inspectedspaceid, occspace_spaceid, occinspection_inspectionid, \n"
-                + "            occlocationdescription_descid, addedtochecklistby_userid, addedtochecklistts)\n"
-                + "    VALUES (DEFAULT, ?, ?, \n"
-                + "            ?, ?, now());";
+        String sql =    "INSERT INTO public.occinspectedspace(\n" +
+                        "            inspectedspaceid, occinspection_inspectionid, occlocationdescription_descid, \n" +
+                        "            addedtochecklistby_userid, addedtochecklistts, occchecklistspacetype_chklstspctypid)\n" +
+                        "    VALUES (DEFAULT, ?, ?, \n" +
+                        "            ?, now(), ?);";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -385,20 +443,25 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         int insertedInspSpaceID = 0;
         try {
             stmt = con.prepareStatement(sql);
-            stmt.setInt(1, spc.getInspectedSpaceID());
-            stmt.setInt(2, inspection.getInspectionID());
+            
+            stmt.setInt(1, inspection.getInspectionID());
+            
             if (spc.getLocation() != null) {
-                stmt.setInt(3, spc.getLocation().getLocationID());
+                stmt.setInt(2, spc.getLocation().getLocationID());
             } else {
-                stmt.setInt(3, Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                stmt.setInt(2, Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("locationdescriptor_implyfromspacename")));
             }
-            if (spc.getAddedToChecklistBy() != null) {
-                stmt.setInt(4, spc.getAddedToChecklistBy().getUserID());
+            
+            if(spc.getAddedToChecklistBy() != null){
+                stmt.setInt(3, spc.getAddedToChecklistBy().getUserID());
             } else {
-                stmt.setNull(4, java.sql.Types.NULL);
+                stmt.setNull(3, java.sql.Types.NULL);
             }
-
+            
+            stmt.setInt(4, spc.getType().getChecklistSpaceTypeID());
+            
+            
             stmt.execute();
 
             String retrievalQuery = "SELECT currval('occinspectedspace_pk_seq');";
@@ -414,9 +477,9 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             throw new IntegrationException("Unable to insert newly inspected space, sorry!", ex);
 
         } finally {
-              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         spc.setInspectedSpaceID(insertedInspSpaceID);
 
@@ -430,10 +493,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      * its composed elements do not have an ID number generated from the DB yet,
      * and these will come from the DB sequences ;
      *
-     * Remember: The db doesn't have a concept of an "inspected space", only an
-     * inspectedSpaceElement so this method will iterate over the inspected
-     * elements in the OccInspectedSpace, executing an insert statement for
-     * each.
      *
      * @param inspection the current OccInspection
      * @param inspSpace an OccInspectedSpace that was NOT retrieved from the DB
@@ -457,7 +516,14 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return spaceInserts;
     }
     
-    private void insertInspectedSpaceElement(OccInspectedSpaceElement inspElement, OccInspectedSpace inSpace) throws IntegrationException{
+    /**
+     * Massive creator of records in the all-important occinspectedspaceelement
+     * table 
+     * @param inspElement
+     * @param inSpace
+     * @throws IntegrationException 
+     */
+    private int insertInspectedSpaceElement(OccInspectedSpaceElement inspElement, OccInspectedSpace inSpace) throws IntegrationException{
         
         String sql =     "INSERT INTO public.occinspectedspaceelement(\n" +
                                 "            inspectedspaceelementid, notes, locationdescription_id, lastinspectedby_userid, \n" +
@@ -550,8 +616,14 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
+        return newlyInspectedSpaceElement;
     }
 
+    /**
+     * Updates a single record in the occinspectedspaceelement table
+     * @param inspElement with members ready for extraction and insertion into DB
+     * @throws IntegrationException 
+     */
     public void updateInspectedSpaceElement(OccInspectedSpaceElement inspElement) throws IntegrationException {
         String sql = "UPDATE public.occinspectedspaceelement\n"
                 + "   SET notes=?, lastinspectedby_userid=?, lastinspectedts=?, compliancegrantedby_userid=?, \n"
@@ -632,6 +704,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt.setInt(1, inspSpace.getInspectedSpaceID());
             stmt.setInt(2, inspection.getInspectionID());
             stmt.setInt(3, inspSpace.getLocation().getLocationID());
+            stmt.setInt(4, inspSpace.getInspectedSpaceID());
 
             stmt.executeUpdate();
 
@@ -646,6 +719,13 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         } // close finally
     }
 
+    
+    /**
+     * Removes records from both the occinspectedspaceelement (first)
+     * and then the parent occinspectedspace table
+     * @param is
+     * @throws IntegrationException 
+     */
     public void deleteInspectedSpace(OccInspectedSpace is) throws IntegrationException {
         String sqlDeleteInsSpaceElement = "DELETE FROM occinspectedspaceelement WHERE inspectedspace_inspectedspaceid=?;";
         String sqlDeleteInsSpace = "DELETE FROM occinspectedspace WHERE inspectedspaceid=?;";
@@ -671,6 +751,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         } // close finally
     }
 
+    /**
+     * Deletes a single record in the occinspectedspaceelement table
+     * @param ele
+     * @throws IntegrationException 
+     */
     public void deleteInspectedSpaceElement(OccInspectedSpaceElement ele) throws IntegrationException {
         String sqlDeleteInsSpaceElement = "DELETE FROM occinspectedspaceelement WHERE inspectedspaceelementid =?;";
         Connection con = getPostgresCon();
@@ -690,6 +775,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         } // close finally
     }
 
+    /**
+     * Builds an ID list of all inspections by OccPeriod
+     * @param op
+     * @return
+     * @throws IntegrationException 
+     */
     public List<Integer> getOccInspectionList(OccPeriod op) throws IntegrationException {
 
         List<Integer> inspecIDList = new ArrayList<>();
@@ -725,9 +816,15 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     }
 
-    public List<OccInspection> getOccInspectionListByPACC(int pacc) throws IntegrationException {
+    /**
+     * Extracts IDs of inspections by pacc
+     * @param pacc
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> getOccInspectionListByPACC(int pacc) throws IntegrationException {
 
-        List<OccInspection> inspecList = new ArrayList<>();
+        List<Integer> inspecList = new ArrayList<>();
 
         String query = "SELECT inspectionid FROM occinspection WHERE publicaccesscc=? ";
         Connection con = getPostgresCon();
@@ -741,7 +838,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                inspecList.add(getOccInspection(rs.getInt("inspectionid")));
+                inspecList.add(rs.getInt("inspectionid"));
             }
 
         } catch (SQLException ex) {
@@ -758,6 +855,14 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     }
     
+    /**
+     * Extracts a single occ inspection from the DB; Note the Coordinator injects it with
+     * all sorts of lists, most notably the occinspectedspace list which contains the elements
+     * and their inspection status
+     * @param inspectionID
+     * @return
+     * @throws IntegrationException 
+     */
     public OccInspection getOccInspection(int inspectionID) throws IntegrationException {
         OccupancyCoordinator oc = getOccupancyCoordinator();
 
@@ -799,6 +904,13 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return inspection;
     }
 
+    /**
+     * Generator of OccInspection objects
+     * @param rs
+     * @return
+     * @throws IntegrationException
+     * @throws SQLException 
+     */
     private OccInspection generateOccInspection(ResultSet rs) throws IntegrationException, SQLException {
             OccInspection ins = new OccInspection();
             
@@ -884,6 +996,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return ins;
     }
 
+    /**
+     * Updates a single record in the occinspection table
+     * @param occInsp
+     * @throws IntegrationException 
+     */
     public void updateOccInspection(OccInspection occInsp) throws IntegrationException {
         String sql = "UPDATE public.occinspection\n"
                 + "   SET inspector_userid=?, publicaccesscc=?, \n"
@@ -1003,24 +1120,30 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         }
     }
 
-    public void activateOccInspection(OccInspection ins) throws IntegrationException {
+    /**
+     * Sets the deactivation fields on the given OccInspection
+     * @param ins
+     * @throws IntegrationException 
+     */
+    public void deactivateOccInspection(OccInspection ins) throws IntegrationException {
 
-        String query = "UPDATE occinspection SET active=false WHERE occperiod_periodid=?;";
+        String query = "UPDATE occinspection SET deactivatedts=now() AND deactivatedby_userid=? WHERE inspectionid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, ins.getOccPeriodID());
+            if(ins.getDeactivatedBy() != null){
+                stmt.setInt(1, ins.getDeactivatedBy().getUserID());
+            } else {
+                throw new IntegrationException("Cannot deactivate occ inspection with null deac by User");
+            }
+            stmt.setInt(2, ins.getInspectionID());
+                    
             stmt.executeUpdate();
 
-            // now turn the given inspection active
-            query = "UPDATE occinspection SET active=true WHERE inspectionid=?;";
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, ins.getInspectionID());
-            stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot mark inspection as activate, sorries!", ex);
+            throw new IntegrationException("Cannot mark inspection as deactivated, sorries!", ex);
         } finally {
               if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -1029,24 +1152,13 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         } // close finally
     }
 
-    public void deleteOccupancyInspection(OccInspection occInspection) throws IntegrationException {
-        String query = "DELETE FROM public.occupancyinspection\n" + " WHERE inspectionid=?;";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, occInspection.getInspectionID());
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot delete occupancy inspeciton--probably because another" + "part of the database has a reference item.", ex);
-        } finally {
-              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-
-        } // close finally
-    }
-
+   
+    /**
+     * Creates a new record in the occinspection table
+     * @param occInsp
+     * @return
+     * @throws IntegrationException 
+     */
     public OccInspection insertOccInspection(OccInspection occInsp) throws IntegrationException {
         String query = "INSERT INTO public.occinspection(\n"
                 + "            inspectionid, occperiod_periodid, inspector_userid, publicaccesscc, \n"
@@ -1195,27 +1307,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return occInsp;
     }
 
-    public void detachSpacefromSpaceType(OccSpaceType ost) throws IntegrationException {
-
-        String query = "DELETE FROM public.occspace\n"
-                + " WHERE spacetype_id=?;";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, ost.getSpaceTypeID());
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot detach space from spacetype--probably because another" + "part of the database has a reference item.", ex);
-        } finally {
-              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             
-
-        } // close finally
-    }
-
+  /**Extracts and builds an OccInspectionDetermination object from the DB
+   * 
+   * @param determinationID
+   * @return
+   * @throws IntegrationException 
+   */
     public OccInspectionDetermination getDetermination(int determinationID) throws IntegrationException {
         OccInspectionDetermination determination = null;
 
@@ -1248,6 +1345,13 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return determination;
     }
 
+    /**
+     * Generator for OccInspectionDetermination objects
+     * @param rs
+     * @return
+     * @throws IntegrationException
+     * @throws SQLException 
+     */
     private OccInspectionDetermination generateDetermination(ResultSet rs) throws IntegrationException, SQLException {
         EventIntegrator ei = new EventIntegrator();
 
@@ -1269,6 +1373,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return det;
     }
 
+    /**
+     * Updates a record in the occinspectiondetermination table
+     * @param det
+     * @throws IntegrationException 
+     */
     public void updateDetermination(OccInspectionDetermination det) throws IntegrationException {
         String sql = "UPDATE public.occinspectiondetermination\n"
                 + "   SET title=?, description=?, notes=?, eventcat_catid=?, active=? \n"
@@ -1302,6 +1411,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         }
     }
 
+    /**
+     * Removes a record in the occinspectiondetermination table
+     * @param det
+     * @throws IntegrationException 
+     */
     public void deleteDetermination(OccInspectionDetermination det) throws IntegrationException {
         String query = "DELETE FROM public.occinspectiondetermination\n" + " WHERE determinationid=?;";
         Connection con = getPostgresCon();
@@ -1320,6 +1434,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         } // close finally
     }
 
+    /**
+     * Creates a new record in the occinspectiondetermination table
+     * @param det
+     * @return
+     * @throws IntegrationException 
+     */
     public OccInspectionDetermination insertDetermination(OccInspectionDetermination det) throws IntegrationException {
         String query = "INSERT INTO public.occinspectiondetermination(\n"
                 + "            determinationid, title, description, notes, eventcat_catid, active)\n"
@@ -1365,6 +1485,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return det;
     }
 
+    /**
+     * Extracts and builds an OccInspectionCause object from the DB
+     * @param causeID
+     * @return
+     * @throws IntegrationException 
+     */
     public OccInspectionCause getCause(int causeID) throws IntegrationException {
         OccInspectionCause cause = null;
 
@@ -1397,6 +1523,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return cause;
     }
 
+    /**
+     * Generator of OccInspectionCause objects
+     * @param rs
+     * @return
+     * @throws SQLException 
+     */
     private OccInspectionCause generateCause(ResultSet rs) throws SQLException {
         OccInspectionCause cause = new OccInspectionCause();
 
@@ -1412,6 +1544,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return cause;
     }
 
+    /**
+     * Updates a record in the occinspectioncause table
+     * @param cause
+     * @throws IntegrationException 
+     */
     public void updateCause(OccInspectionCause cause) throws IntegrationException {
         String sql = "UPDATE public.occinspectioncause\n"
                 + "   SET title=?, description=?, notes=?, active=? \n"
@@ -1439,6 +1576,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         }
     }
 
+    /**
+     * Removes a record from the occinspectioncause table
+     * @param cause
+     * @throws IntegrationException 
+     */
     public void deleteCause(OccInspectionCause cause) throws IntegrationException {
         String query = "DELETE FROM public.occinspectioncause\n" + " WHERE causeid=?;";
         Connection con = getPostgresCon();
@@ -1457,6 +1599,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         } // close finally
     }
 
+    /**
+     * Creates a new record in the occinspectioncause table
+     * @param cause
+     * @return
+     * @throws IntegrationException 
+     */
     public OccInspectionCause insertCause(OccInspectionCause cause) throws IntegrationException {
         String query = "INSERT INTO public.occinspectioncause(\n"
                 + "            causeid, title, description, notes, active)\n"

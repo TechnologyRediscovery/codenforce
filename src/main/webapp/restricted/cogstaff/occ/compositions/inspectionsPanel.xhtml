@@ -3,6 +3,11 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns="http://www.w3.org/1999/xhtml">
+    
+    <h:form id="inspections-growl-form">
+        <p:growl id="inspection-growl" />
+    </h:form>
+    
     <p:panel id="inspections-panel"
              toggleable="true"
              widgetVar="inspections-panel-var"
@@ -168,55 +173,55 @@
     <!-- Inspection Creation Flow -->
 
     <!-- Checklist selection dialog used in inspection creation flow -->
-    <h:form id="inspections-selectchecklist-form">
         <p:dialog id="inspections-selectchecklist"
                   width="1000"
                   widgetVar="inspections-selectchecklist-var"
                   header="Choose Checklist"
                   modal="true"
                   resizable="true">
-            <p:dataTable id="inspections-selectchecklist-dt"
-                         scrollHeight="600"
-                         var="checklist" value="#{occInspectionsBB.checklistTemplateList}"
-                         rowKey="#{checklist.inspectionChecklistID}"
-                         selection="#{occInspectionsBB.selectedChecklistTemplate}"
-                         stripedRows="true">
-                <p:ajax event="rowSelect"
-                        update=":inspections-selectchecklist-form:inspections-selectchecklist-continuebutton"/>
-                <p:column selectionMode="single" style="width:16px;text-align:center"/>
-                <p:column headerText="Title">
-                    <h:outputText value="#{checklist.title}"/>
-                </p:column>
+            <h:form id="inspections-selectchecklist-form">
+                <p:dataTable id="inspections-selectchecklist-dt"
+                             scrollHeight="600"
+                             var="checklist" value="#{occInspectionsBB.checklistTemplateList}"
+                             rowKey="#{checklist.inspectionChecklistID}"
+                             selection="#{occInspectionsBB.selectedChecklistTemplate}"
+                             stripedRows="true">
+                    <p:ajax event="rowSelect"
+                            update=":inspections-selectchecklist-form:inspections-selectchecklist-continuebutton"/>
+                    <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                    <p:column headerText="Title">
+                        <h:outputText value="#{checklist.title}"/>
+                    </p:column>
 
-                <p:column headerText="Description">
-                    <h:outputText value="#{checklist.description}"/>
-                </p:column>
+                    <p:column headerText="Description">
+                        <h:outputText value="#{checklist.description}"/>
+                    </p:column>
 
-                <p:column headerText="Municipality">
-                    <h:outputText value="#{checklist.muni.muniName}"/>
-                </p:column>
+                    <p:column headerText="Municipality">
+                        <h:outputText value="#{checklist.muni.muniName}"/>
+                    </p:column>
 
-                <p:column headerText="Code Source">
-                    <h:outputText
-                            value="#{checklist.governingCodeSource.sourceName} (#{checklist.governingCodeSource.sourceYear})"/>
-                </p:column>
-            </p:dataTable>
+                    <p:column headerText="Code Source">
+                        <h:outputText
+                                value="#{checklist.governingCodeSource.sourceName} (#{checklist.governingCodeSource.sourceYear})"/>
+                    </p:column>
+                </p:dataTable>
 
-            <f:facet name="footer">
-                <p:commandButton value="Cancel"
-                                 icon="pi pi-times"
-                                 class="ui-button-outlined p-mr-1"
-                                 oncomplete="PF('inspections-selectchecklist-var').hide()"/>
-                <p:commandButton id="inspections-selectchecklist-continuebutton"
-                                 value="Continue"
-                                 disabled="#{occInspectionsBB.selectedChecklistTemplate.inspectionChecklistID == 0}"
-                                 icon="pi pi-arrow-right"
-                                 actionListener="#{occInspectionsBB.onChecklistSelectionCompleteButtonActuation}"
-                                 update="@form:@parent:inspections-selectinspector-form"
-                                 oncomplete="PF('inspections-selectchecklist-var').hide(); PF('inspections-selectinspector-var').show()"/>
-            </f:facet>
+                <f:facet name="footer">
+                    <p:commandButton value="Cancel"
+                                     icon="pi pi-times"
+                                     class="ui-button-outlined p-mr-1"
+                                     oncomplete="PF('inspections-selectchecklist-var').hide()"/>
+                    <p:commandButton id="inspections-selectchecklist-continuebutton"
+                                     value="Continue"
+                                     disabled="#{occInspectionsBB.selectedChecklistTemplate.inspectionChecklistID == 0}"
+                                     icon="pi pi-arrow-right"
+                                     actionListener="#{occInspectionsBB.onChecklistSelectionCompleteButtonActuation}"
+                                     update="@form:@parent:inspections-selectinspector-form"
+                                     oncomplete="PF('inspections-selectchecklist-var').hide(); PF('inspections-selectinspector-var').show()"/>
+                </f:facet>
+            </h:form>
         </p:dialog>
-    </h:form>
 
 
     <!-- Inspector selection dialog used in inspection creation flow -->
@@ -267,137 +272,141 @@
     <!-- (Currently a bit defunct) -->
 
     <!-- Type selection used in space add flow -->
-    <h:form id="inspections-selecttype-form">
         <p:dialog id="inspections-selecttype"
                   width="800"
+                  closeOnEscape="true"
                   widgetVar="inspections-selecttype-var"
-                  header="Select Type"
+                  header="Select Space Type"
                   modal="true"
                   resizable="true">
+            <h:form id="inspections-selecttype-form">
 
-            <p:dataTable id="inspections-selecttype-dt"
-                         scrollHeight="600"
-                         var="ost" value="#{occInspectionsBB.selectedInspection.checklistTemplate.occSpaceTypeList}"
-                         rowKey="#{ost.checklistSpaceTypeID}"
-                         selection="#{occInspectionsBB.selectedSpaceType}"
-                         stripedRows="true">
-                <p:ajax event="rowSelect"
-                        update=":inspections-selecttype-form:inspections-selecttype-continuebutton"/>
-                <p:column selectionMode="single" style="width:16px;text-align:center"/>
-                <p:column headerText="Name">
-                    <h:outputText value="#{ost.spaceTypeTitle}"/>
-                </p:column>
-                <p:column headerText="Description">
-                    <h:outputText value="#{ost.spaceTypeDescription}"/>
-                </p:column>
-                <p:column headerText="Required">
-                    <i class="#{ost.required ? 'pi pi-star' : ''}"/>
-                </p:column>
-            </p:dataTable>
+                <p:dataTable id="inspections-selecttype-dt"
+                             scrollHeight="600"
+                             var="ost" value="#{occInspectionsBB.selectedInspection.checklistTemplate.occSpaceTypeList}"
+                             rowKey="#{ost.checklistSpaceTypeID}"
+                             selection="#{occInspectionsBB.selectedSpaceType}"
+                             stripedRows="true"
+                             rowExpandMode="multiple">
+                    <p:ajax event="rowSelect"
+                            update=":inspections-selecttype-form:inspections-selecttype-continuebutton"/>
+                    <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                    <p:column style="width:2rem">
+                        <p:rowToggler/>
+                    </p:column>
+                    <p:column headerText="CSTID">
+                        <h:outputText value="#{ost.checklistSpaceTypeID}"/>
+                    </p:column>
+                    <p:column headerText="Type ID">
+                        <h:outputText value="#{ost.spaceTypeID}"/>
+                    </p:column>
+                    <p:column headerText="Chklst ID">
+                        <h:outputText value="#{ost.checklistParentID}"/>
+                    </p:column>
+                    <p:column headerText="Name">
+                        <h:outputText value="#{ost.spaceTypeTitle}"/>
+                    </p:column>
+                    <p:column headerText="Description">
+                        <h:outputText value="#{ost.spaceTypeDescription}"/>
+                    </p:column>
+                    <p:column headerText="Required">
+                        <i class="#{ost.required ? 'pi pi-star' : ''}"/>
+                    </p:column>
+                    <p:rowExpansion>
+                        <p:dataTable id="ordbytype-table"
+                                     var="ord"
+                                     value="#{ost.codeElementList}"
+                                     rowKey="#{ord.elementID}"
+                                     stripedRows="true">
 
-            <f:facet name="footer">
-                <p:commandButton value="Cancel"
-                                 icon="pi pi-times"
-                                 class="ui-button-outlined p-mr-1"
-                                 oncomplete="PF('inspections-selecttype-var').hide()"/>
-                <p:commandButton id="inspections-selecttype-continuebutton"
-                                 value="Continue"
-                                 disabled="!{occInspectionsBB.selectedType.spaceTypeID == 0}"
-                                 icon="pi pi-arrow-right"
-                                 update="inspections-selectspace-form"
-                                 oncomplete="PF('inspections-selecttype-var').hide(); PF('inspections-selectspace-var').show()"/>
-            </f:facet>
+                            <p:column headerText="EleID">
+                                <h:outputText value="#{ord.elementID}"/>
+                            </p:column>
+                            <p:column headerText="subsec">
+                                <h:outputText value="#{ord.ordSubSecTitle}"/>
+                            </p:column>
+
+                        </p:dataTable>
+
+                    </p:rowExpansion>
+
+
+                </p:dataTable>
+                <p:spacer height="3px" />
+
+                    <p:commandButton value="Cancel"
+                                     icon="pi pi-times"
+                                     class="ui-button-outlined p-mr-1"
+                                     oncomplete="PF('inspections-selecttype-var').hide()"/>
+                    <p:commandButton id="inspections-selecttype-continuebutton"
+                                     value="Continue"
+                                     disabled="!{occInspectionsBB.selectedType.spaceTypeID == 0}"
+                                     icon="pi pi-arrow-right"
+                                     update="inspections-selectspace-form"
+                                     oncomplete="PF('inspections-selecttype-var').hide(); PF('inspections-selectspace-var').show()"/>
+            </h:form>
         </p:dialog>
-    </h:form>
 
     <!-- Actual space(?) selection used in space add flow -->
-    <h:form id="inspections-selectspace-form">
         <p:dialog id="inspections-selectspace"
                   width="800"
                   widgetVar="inspections-selectspace-var"
-                  header="Select Space"
+                  header="Identify location"
                   modal="true"
                   resizable="true">
+            <h:form id="inspections-selectspace-form">
+                <p:spacer height="5px"/>
+                    <div class="p-col-12 p-md-6">
+                        <p:commandButton value="New location descriptor"
+                                         actionListener="#{occInspectionsBB.initSkeletonLocDescriptor}"
+                                         update="inspections-addlocdesc-form"
+                                         oncomplete="PF('inspections-addlocdesc-var').show()"
+                                         icon="pi pi-plus"/>
+                    </div>
+                <p:outputLabel styleClass="p-d-block">OR Choose a Location descriptor:</p:outputLabel>
+                <div class="p-grid">
+                    <div class="p-col-12 p-md-6">
+                        <p:selectOneMenu value="#{occInspectionsBB.selectedLocDescriptor}"
+                                         converter="occLocationDescriptorConverter"
+                                         var="ld" filter="true" filterMatchMode="contains">
+                            <p:ajax update="inspections-selectspace-continuebutton
+                                            @form"/>
+                            <f:selectItems value="#{occInspectionsBB.selectedInspection.allUniqueLocationDescriptors}" var="locdep"
+                                           itemLabel="#{locdep.locationDescription}" itemValue="#{locdep}"/>
+                            <p:column>
+                                <h:outputText value="#{ld.locationDescription}"/>
+                            </p:column>
+                        </p:selectOneMenu>
+                    </div>
 
-<!--            value="!{occInspectionsBB.selectedType.spaceList}"-->
-<!--            <p:dataTable id="inspections-selectspace-dt"-->
-<!--                         scrollHeight="600"-->
-<!--                         var="space"-->
-<!--                         rowKey="#{space.spaceID}"-->
-<!--                         selection="!{occInspectionsBB.selectedSpace}"-->
-<!--                         stripedRows="true">-->
-<!--                <p:ajax event="rowSelect"-->
-<!--                        update=":inspections-selectspace-form:inspections-selectspace-continuebutton"/>-->
-<!--                <p:column selectionMode="single" style="width:16px;text-align:center"/>-->
-<!--                <p:column headerText="Name">-->
-<!--                    <h:outputText value="#{space.name}"/>-->
-<!--                </p:column>-->
-<!--                <p:column headerText="Description">-->
-<!--                    <h:outputText value="#{space.description}"/>-->
-<!--                </p:column>-->
-<!--                <p:column headerText="Required">-->
-<!--                    <i class="#{space.required ? 'pi pi-star' : ''}"/>-->
-<!--                </p:column>-->
-<!--                <p:column headerText="Required">-->
-<!--                    <p:commandLink style="color:blue;"-->
-<!--                                   actionListener="!{occInspectionsBB.setSelectedSpace(space)}"-->
-<!--                                   oncomplete="PF('inspections-editspace-var').show()"-->
-<!--                                   update="inspections-editspace-form"-->
-<!--                                   value="Edit"/>-->
-<!--                </p:column>-->
-<!--            </p:dataTable>-->
-
-            <p:spacer height="5px"/>
-
-            <p:commandButton value="New space"
-                             icon="pi pi-plus"/>
-
-            <p:spacer height="5px"/>
-
-            <p:outputLabel styleClass="p-d-block">Location descriptor:</p:outputLabel>
-            <div class="p-grid">
-                <div class="p-col-12 p-md-6">
-                    <p:selectOneMenu value="#{occInspectionsBB.selectedLocDescriptor}"
-                                     converter="occLocationDescriptorConverter"
-                                     var="ld" filter="true" filterMatchMode="contains">
-                        <p:ajax update="inspections-selectspace-continuebutton"/>
-                        <f:selectItems value="#{occInspectionsBB.selectedInspection.allUniqueLocationDescriptors}" var="locdep"
-                                       itemLabel="#{locdep.locationDescription}" itemValue="#{locdep}"/>
-                        <p:column>
-                            <h:outputText value="#{ld.locationDescription}"/>
-                        </p:column>
-                    </p:selectOneMenu>
                 </div>
-                <div class="p-col-12 p-md-6">
-                    <p:commandButton value="New location descriptor"
-                                     actionListener="#{occInspectionsBB.initSkeletonLocDescriptor}"
-                                     update="inspections-addlocdesc-form"
-                                     oncomplete="PF('inspections-addlocdesc-var').show()"
-                                     icon="pi pi-plus"/>
-                </div>
-            </div>
+                
+                <h3>Selected location</h3>
+                
+                <h:outputText value="#{occInspectionsBB.selectedLocDescriptor.locationDescription}"/>
+                <p:spacer height="3px" />
+                <h:outputText value="Floor: #{occInspectionsBB.selectedLocDescriptor.buildingFloorNo}"/>
+                <p:spacer height="3px" />
+                <h:outputText value="#{occInspectionsBB.selectedLocDescriptor.locationID}"/>
+                <p:spacer height="5px" />
+                    <p:commandButton value="Back"
+                                     icon="pi pi-arrow-left"
+                                     class="ui-button-outlined p-mr-1"
+                                     oncomplete="PF('inspections-selectspace-var').hide(); PF('inspections-selecttype-var').show()"/>
 
-            <f:facet name="footer">
-                <p:commandButton value="Back"
-                                 icon="pi pi-arrow-left"
-                                 class="ui-button-outlined p-mr-1"
-                                 oncomplete="PF('inspections-selectspace-var').hide(); PF('inspections-selecttype-var').show()"/>
-
-<!--                             disabled="!{occInspectionsBB.selectedSpace.spaceID == 0 or occInspectionsBB.selectedLocDescriptor.locationID == 0}"-->
-                <p:commandButton id="inspections-selectspace-continuebutton"
-                                 value="Add to inspection"
-                                 icon="pi pi-plus"
-                                 actionListener="#{occInspectionsBB.addSelectedSpaceToSelectedInspection}"
-                                 update="inspections-form:inspections-table"
-                                 oncomplete="PF('inspections-selectspace-var').hide()"/>
-            </f:facet>
+                    <p:commandButton id="inspections-selectspace-continuebutton"
+                                     value="Add to inspection"
+                                     icon="pi pi-plus"
+                                     actionListener="#{occInspectionsBB.addSelectedSpaceToSelectedInspection}"
+                                     update="inspections-form:inspections-table
+                                            inspections-growl-form"
+                                     oncomplete="PF('inspections-selectspace-var').hide()"/>
+            </h:form>
         </p:dialog>
-    </h:form>
 
     <!-- Independent dialogs that are not necessarily used in a flow -->
 
     <!-- Dialog to view details of an OccInspection -->
-    <h:form id="inspections-inspectiondetails-form">
         <p:dialog id="inspections-inspectiondetails"
                   width="800"
                   height="600"
@@ -405,278 +414,281 @@
                   header="Inspection Details"
                   modal="true"
                   resizable="true">
-            <p:commandButton id="inspections-inspectiondetails-editbutton"
-                             value="#{occInspectionsBB.editMode ? 'Done' : 'Edit'}"
-                             disabled="#{!empty occInspectionsBB.selectedInspection.deactivatedBy}"
-                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                             icon="fa #{occInspectionsBB.editMode ? 'fa-check' : 'fa-pencil'}"
-                             actionListener="#{occInspectionsBB.toggleEditMode}"
-                             oncomplete="PF('inspections-inspectiondetails-var').show()"
-                             update="inspections-inspectiondetails-form"/>
+            <h:form id="inspections-inspectiondetails-form">
+                <p:commandButton id="inspections-inspectiondetails-editbutton"
+                                 value="#{occInspectionsBB.editMode ? 'Done' : 'Edit'}"
+                                 disabled="#{!empty occInspectionsBB.selectedInspection.deactivatedBy}"
+                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                 icon="fa #{occInspectionsBB.editMode ? 'fa-check' : 'fa-pencil'}"
+                                 actionListener="#{occInspectionsBB.toggleEditMode}"
+                                 oncomplete="PF('inspections-inspectiondetails-var').show()"
+                                 update="inspections-inspectiondetails-form"/>
 
-            <p:spacer height="5px"/>
+                <p:spacer height="5px"/>
 
-            <p:panel id="inspections-inspectiondetails-generalpanel"
-                     toggleable="true"
-                     collapsed="false"
-                     header="General">
+                <p:panel id="inspections-inspectiondetails-generalpanel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="General">
 
-                <div class="p-grid">
-                    <div class="p-col-6">ID</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.inspectionID}</div>
-                    <div class="p-col-6">Follow up to inspection ID</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.followUpToInspectionID}"/>
-                        <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.followUpToInspectionID}"/>
+                    <div class="p-grid">
+                        <div class="p-col-6">ID</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.inspectionID}</div>
+                        <div class="p-col-6">Follow up to inspection ID</div>
+                        <div class="p-col-6">
+                            <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.followUpToInspectionID}"/>
+                            <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.followUpToInspectionID}"/>
+                        </div>
+                        <div class="p-col-6">Inspector</div>
+                        <div class="p-col-6">
+                            <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.inspector.human.firstName}
+                            #{occInspectionsBB.selectedInspection.inspector.human.lastName}
+                            (#{occInspectionsBB.selectedInspection.inspector.username})"/>
+                            <p:selectOneMenu rendered="#{occInspectionsBB.editMode}"
+                                             value="#{occInspectionsBB.selectedInspection.inspector}"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             converter="userConverter">
+                                <f:selectItems value="#{occInspectionsBB.userList}" var="user"
+                                               itemLabel="#{user.human.firstName} #{user.human.lastName} #{user.username}"
+                                               itemValue="#{user}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <p:divider/>
+                        <div class="p-col-6">Created by</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.createdBy.human.firstName}
+                            #{occInspectionsBB.selectedInspection.createdBy.human.lastName}
+                            (#{occInspectionsBB.selectedInspection.createdBy.username}) at
+                            #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.creationTS)}</div>
+                        <div class="p-col-6">Last updated by</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.lastUpdatedBy.human.firstName}
+                            #{occInspectionsBB.selectedInspection.lastUpdatedBy.human.lastName}
+                            (#{occInspectionsBB.selectedInspection.lastUpdatedBy.username}) at
+                            #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.lastUpdatedTS)}</div>
+                        <div class="p-col-6">Deactivated by</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.deactivatedBy.human.firstName}
+                            #{occInspectionsBB.selectedInspection.deactivatedBy.human.lastName}
+                            (#{occInspectionsBB.selectedInspection.deactivatedBy.username}) at
+                            #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.deactivatedTS)}</div>
                     </div>
-                    <div class="p-col-6">Inspector</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.inspector.human.firstName}
-                        #{occInspectionsBB.selectedInspection.inspector.human.lastName}
-                        (#{occInspectionsBB.selectedInspection.inspector.username})"/>
-                        <p:selectOneMenu rendered="#{occInspectionsBB.editMode}"
-                                         value="#{occInspectionsBB.selectedInspection.inspector}"
-                                         filter="true"
-                                         filterMatchMode="contains"
-                                         converter="userConverter">
-                            <f:selectItems value="#{occInspectionsBB.userList}" var="user"
-                                           itemLabel="#{user.human.firstName} #{user.human.lastName} #{user.username}"
-                                           itemValue="#{user}"/>
-                        </p:selectOneMenu>
+                </p:panel>
+
+                <p:panel id="inspections-inspectiondetails-inspectionpanel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Inspection">
+                    <div class="p-grid">
+                        <div class="p-col-6">Start time</div>
+                        <div class="p-col-6">
+                            <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.timeStart)}"/>
+                            <p:calendar rendered="#{occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.timeStart}" pattern="MM/dd/yyyy HH:mm" mask="true"/>
+                        </div>
+                        <div class="p-col-6">End time</div>
+                        <div class="p-col-6">
+                            <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.timeEnd)}"/>
+                            <p:calendar rendered="#{occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.timeEnd}" pattern="MM/dd/yyyy HH:mm" mask="true"/>
+                        </div>
+                        <p:divider/>
+                        <div class="p-col-6">Max occupants allowed</div>
+                        <div class="p-col-6">
+                            <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.maxOccupantsAllowed}"/>
+                            <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.maxOccupantsAllowed}"/>
+                        </div>
+                        <div class="p-col-6">Number of bedrooms</div>
+                        <div class="p-col-6">
+                            <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.numBedrooms}"/>
+                            <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.numBedrooms}"/>
+                        </div>
+                        <div class="p-col-6">Number of bathrooms</div>
+                        <div class="p-col-6">
+                            <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.numBathrooms}"/>
+                            <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.numBathrooms}"/>
+                        </div>
+                        <p:divider/>
+                        <div class="p-col-6">Third party inspector</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyInspector.name}
+                            #{occInspectionsBB.selectedInspection.thirdPartyInspector.name}
+                            (#{occInspectionsBB.selectedInspection.thirdPartyInspector.name})</div>
+                        <div class="p-col-6">Third party inspector approval</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.human.firstName}
+                            #{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.human.lastName}
+                            (#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.username}) at
+                            #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.thirdPartyInspectorApprovalTS)}</div>
                     </div>
-                    <p:divider/>
-                    <div class="p-col-6">Created by</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.createdBy.human.firstName}
-                        #{occInspectionsBB.selectedInspection.createdBy.human.lastName}
-                        (#{occInspectionsBB.selectedInspection.createdBy.username}) at
-                        #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.creationTS)}</div>
-                    <div class="p-col-6">Last updated by</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.lastUpdatedBy.human.firstName}
-                        #{occInspectionsBB.selectedInspection.lastUpdatedBy.human.lastName}
-                        (#{occInspectionsBB.selectedInspection.lastUpdatedBy.username}) at
-                        #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.lastUpdatedTS)}</div>
-                    <div class="p-col-6">Deactivated by</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.deactivatedBy.human.firstName}
-                        #{occInspectionsBB.selectedInspection.deactivatedBy.human.lastName}
-                        (#{occInspectionsBB.selectedInspection.deactivatedBy.username}) at
-                        #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.deactivatedTS)}</div>
-                </div>
-            </p:panel>
-            
-            <p:panel id="inspections-inspectiondetails-inspectionpanel"
-                     toggleable="true"
-                     collapsed="false"
-                     header="Inspection">
-                <div class="p-grid">
-                    <div class="p-col-6">Start time</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.timeStart)}"/>
-                        <p:calendar rendered="#{occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.timeStart}" pattern="MM/dd/yyyy HH:mm" mask="true"/>
+                </p:panel>
+                <p:panel id="inspections-inspectiondetails-causepanel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Cause">
+                    <div class="p-grid">
+                        <div class="p-col-6">Cause ID</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.causeID}</div>
+                        <div class="p-col-6">Title</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.title}</div>
+                        <div class="p-col-6">Description</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.description}</div>
+                        <div class="p-col-6">Notes</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.notes}</div>
+                        <div class="p-col-6">Active</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.active ? "Yes" : "No"}</div>
                     </div>
-                    <div class="p-col-6">End time</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.timeEnd)}"/>
-                        <p:calendar rendered="#{occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.timeEnd}" pattern="MM/dd/yyyy HH:mm" mask="true"/>
+                </p:panel>
+
+                <p:panel id="inspections-inspectiondetails-determinationpanel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Determination">
+                    <div class="p-grid">
+                        <div class="p-col-6">Determination ID</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.determinationID}</div>
+                        <div class="p-col-6">Title</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.title}</div>
+                        <div class="p-col-6">Description</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.description}</div>
+                        <div class="p-col-6">Notes</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.notes}</div>
+                        <div class="p-col-6">Event Category</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.eventCategory.eventCategoryTitle}<br/>
+                                             #{occInspectionsBB.selectedInspection.determination.eventCategory.eventCategoryDesc}</div>
+                        <div class="p-col-6">Active</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.active ? "Yes" : "No"}</div>
                     </div>
-                    <p:divider/>
-                    <div class="p-col-6">Max occupants allowed</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.maxOccupantsAllowed}"/>
-                        <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.maxOccupantsAllowed}"/>
+                </p:panel>
+                <p:panel id="inspections-inspectiondetails-notespanel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Notes">
+                    <div class="p-grid">
+                        <div class="p-col-6">Pre-inspection notes</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.notesPreInspection}</div>
+                        <div class="p-col-6">Remarks</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.remarks}</div>
+                        <div class="p-col-6">General Comments</div>
+                        <div class="p-col-6">#{occInspectionsBB.selectedInspection.generalComments}</div>
                     </div>
-                    <div class="p-col-6">Number of bedrooms</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.numBedrooms}"/>
-                        <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.numBedrooms}"/>
-                    </div>
-                    <div class="p-col-6">Number of bathrooms</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!occInspectionsBB.editMode}" value="#{occInspectionsBB.selectedInspection.numBathrooms}"/>
-                        <p:inputText rendered="#{occInspectionsBB.editMode}"  value="#{occInspectionsBB.selectedInspection.numBathrooms}"/>
-                    </div>
-                    <p:divider/>
-                    <div class="p-col-6">Third party inspector</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyInspector.name}
-                        #{occInspectionsBB.selectedInspection.thirdPartyInspector.name}
-                        (#{occInspectionsBB.selectedInspection.thirdPartyInspector.name})</div>
-                    <div class="p-col-6">Third party inspector approval</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.human.firstName}
-                        #{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.human.lastName}
-                        (#{occInspectionsBB.selectedInspection.thirdPartyApprovalBy.username}) at
-                        #{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.thirdPartyInspectorApprovalTS)}</div>
-                </div>
-            </p:panel>
-            <p:panel id="inspections-inspectiondetails-causepanel"
-                     toggleable="true"
-                     collapsed="false"
-                     header="Cause">
-                <div class="p-grid">
-                    <div class="p-col-6">Cause ID</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.causeID}</div>
-                    <div class="p-col-6">Title</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.title}</div>
-                    <div class="p-col-6">Description</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.description}</div>
-                    <div class="p-col-6">Notes</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.notes}</div>
-                    <div class="p-col-6">Active</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.cause.active ? "Yes" : "No"}</div>
-                </div>
-            </p:panel>
-            
-            <p:panel id="inspections-inspectiondetails-determinationpanel"
-                     toggleable="true"
-                     collapsed="false"
-                     header="Determination">
-                <div class="p-grid">
-                    <div class="p-col-6">Determination ID</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.determinationID}</div>
-                    <div class="p-col-6">Title</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.title}</div>
-                    <div class="p-col-6">Description</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.description}</div>
-                    <div class="p-col-6">Notes</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.notes}</div>
-                    <div class="p-col-6">Event Category</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.eventCategory.eventCategoryTitle}<br/>
-                                         #{occInspectionsBB.selectedInspection.determination.eventCategory.eventCategoryDesc}</div>
-                    <div class="p-col-6">Active</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.determination.active ? "Yes" : "No"}</div>
-                </div>
-            </p:panel>
-            <p:panel id="inspections-inspectiondetails-notespanel"
-                     toggleable="true"
-                     collapsed="false"
-                     header="Notes">
-                <div class="p-grid">
-                    <div class="p-col-6">Pre-inspection notes</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.notesPreInspection}</div>
-                    <div class="p-col-6">Remarks</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.remarks}</div>
-                    <div class="p-col-6">General Comments</div>
-                    <div class="p-col-6">#{occInspectionsBB.selectedInspection.generalComments}</div>
-                </div>
-            </p:panel>
-            <f:facet name="footer">
-                <p:commandButton value="Cancel"
-                                 icon="pi pi-times"
-                                 oncomplete="PF('inspections-inspectiondetails-var').hide()"/>
-                <p:commandButton id="inspections-inspectiondetails-savebutton"
-                                 value="Save"
-                                 icon="pi pi-save"
-                                 oncomplete="PF('inspections-inspectiondetails-var').hide()"/>
-            </f:facet>
+                </p:panel>
+                <f:facet name="footer">
+                    <p:commandButton value="Cancel"
+                                     icon="pi pi-times"
+                                     oncomplete="PF('inspections-inspectiondetails-var').hide()"/>
+                    <p:commandButton id="inspections-inspectiondetails-savebutton"
+                                     value="Save"
+                                     icon="pi pi-save"
+                                     oncomplete="PF('inspections-inspectiondetails-var').hide()"/>
+                </f:facet>
+            </h:form>
         </p:dialog>
-    </h:form>
 
     <!-- Currently not working and not realized dialog for editing of an OccInspectedSpace's basic info -->
-    <h:form id="inspections-editspace-form">
         <p:dialog id="inspections-editspace"
                   widgetVar="inspections-editspace-var"
                   header="Edit Space"
                   modal="true"
                   closable="false"
                   resizable="true">
-            <p:outputLabel styleClass="p-d-block">Space name:</p:outputLabel>
-<!--            <p:inputText styleClass="p-d-block" value="!{occInspectionsBB.selectedSpace.name}"/>-->
+            <h:form id="inspections-editspace-form">
+                <p:outputLabel styleClass="p-d-block">Space name:</p:outputLabel>
+    <!--            <p:inputText styleClass="p-d-block" value="!{occInspectionsBB.selectedSpace.name}"/>-->
 
-            <p:outputLabel styleClass="p-d-block">Space description:</p:outputLabel>
-<!--            <p:inputTextarea rows="6" cols="33" value="!{occInspectionsBB.selectedSpace.description}"/>-->
+                <p:outputLabel styleClass="p-d-block">Space description:</p:outputLabel>
+    <!--            <p:inputTextarea rows="6" cols="33" value="!{occInspectionsBB.selectedSpace.description}"/>-->
 
-            <!--                                 update="inspections-selectspace-form:inspections-selectspace-dt
-                                         inspections-selectspace-form:inspections-selectspace-continuebutton" -->
-            <f:facet name="footer">
-                <p:commandButton id="inspections-editspace-continuebutton"
-                                 value="Ok"
-                                 icon="pi pi-check"
-                                 oncomplete="PF('inspections-editspace-var').hide()"/>
-            </f:facet>
+                <!--                                 update="inspections-selectspace-form:inspections-selectspace-dt
+                                             inspections-selectspace-form:inspections-selectspace-continuebutton" -->
+                <f:facet name="footer">
+                    <p:commandButton id="inspections-editspace-continuebutton"
+                                     value="Ok"
+                                     icon="pi pi-check"
+                                     oncomplete="PF('inspections-editspace-var').hide()"/>
+                </f:facet>
+            </h:form>
         </p:dialog>
-    </h:form>
 
     <!-- Dialog used for adding new location descriptors. Yep, it's pretty defunct. -->
-    <h:form id="inspections-addlocdesc-form">
         <p:dialog id="inspections-addlocdesc"
                   widgetVar="inspections-addlocdesc-var"
                   header="Add Location Descriptor"
                   modal="true"
+                  closable="true"
+                  closeOnEscape="true"
                   resizable="true">
+            <h:form id="inspections-addlocdesc-form">
 
-            <p:outputLabel for="inspections-locdesc-input" styleClass="p-d-block">Location description:</p:outputLabel>
-            <p:inputTextarea id="inspections-locdesc-input"
-                    rows="6" cols="33" value="#{occInspectionsBB.skeletonLocationDescriptor.locationDescription}">
-                <p:ajax update="inspections-addlocdesc-continuebutton"/>
-            </p:inputTextarea>
+                <p:outputLabel for="inspections-locdesc-input" styleClass="p-d-block">Location description:</p:outputLabel>
+                <p:inputTextarea id="inspections-locdesc-input"
+                        rows="6" cols="33" value="#{occInspectionsBB.skeletonLocationDescriptor.locationDescription}">
+                    <p:ajax update="inspections-addlocdesc-continuebutton"/>
+                </p:inputTextarea>
 
-            <p:outputLabel for="inspections-floornumber-input" styleClass="p-d-block">Building floor number:</p:outputLabel>
-            <p:inputNumber id="inspections-floornumber-input"
-                           value="#{occInspectionsBB.skeletonLocationDescriptor.buildingFloorNo}"/>
+                <p:outputLabel for="inspections-floornumber-input" styleClass="p-d-block">Building floor number:</p:outputLabel>
+                <p:inputNumber id="inspections-floornumber-input"
+                               value="#{occInspectionsBB.skeletonLocationDescriptor.buildingFloorNo}"/>
 
-            <f:facet name="footer">
-                <p:commandButton value="Cancel"
-                                 icon="pi pi-times"
-                                 oncomplete="PF('inspections-addlocdesc-var').hide()"/>
-                <p:commandButton id="inspections-addlocdesc-continuebutton"
-                                 value="Add"
-                                 disabled="#{empty occInspectionsBB.skeletonLocationDescriptor.locationDescription}"
-                                 icon="pi pi-plus"
-                                 actionListener="#{occInspectionsBB.createLocDescriptor}"
-                                 oncomplete="PF('inspections-addlocdesc-var').hide()"/>
-            </f:facet>
+                <p:spacer height="3px" />
+                    <p:commandButton value="Cancel"
+                                     icon="pi pi-times"
+                                     oncomplete="PF('inspections-addlocdesc-var').hide()"/>
+                    <p:commandButton id="inspections-addlocdesc-continuebutton"
+                                     value="Add"
+                                     disabled="#{empty occInspectionsBB.skeletonLocationDescriptor.locationDescription}"
+                                     icon="pi pi-plus"
+                                     update="@form:@parent:inspections-selectspace-form"
+                                     actionListener="#{occInspectionsBB.createLocDescriptor}"
+                                     oncomplete="PF('inspections-addlocdesc-var').hide()"/>
+            </h:form>
         </p:dialog>
-    </h:form>
 
     <!-- Barely realized form that should show stats for one OccInspectedSpace(?) and all of its ordinances -->
-    <h:form id="inspections-entryscreen-form">
         <p:dialog id="inspections-entryscreen"
                   height="600" width="1000"
                   widgetVar="inspections-entryscreen-var"
                   header="Placeholder Dialog Title"
                   modal="true"
                   resizable="true">
-            <div class="p-d-flex p-jc-between">
-                <h1><h:outputText value="#{occInspectionsBB.selectedInspectedSpace.location.locationDescription}"/></h1>
-                <div>
-                    <p:commandButton value="Pass All"/>
-                </div>
-                <div>
-                    <p:commandButton value="Edit Space" class="p-mr-1"/>
-                    <p:commandButton value="Remove Space"/>
-                </div>
-            </div>
-            <p:repeat value="#{occInspectionsBB.selectedInspectedSpace.inspectedElementListVisible}" var="spaceElement">
-                <div class="p-grid">
-                    <div class="p-col-12 p-md-4">
-                        <h3><h:outputText value="§#{spaceElement.ordSecNum}:#{spaceElement.ordSecTitle}; §§#{spaceElement.ordSubSecNum} #{spaceElement.ordSubSecTitle}"/></h3>
-                        <ul>
-                            <li><h:outputText value="#{spaceElement.ordTechnicalText}"/></li>
-                        </ul>
+            <h:form id="inspections-entryscreen-form">
+                <div class="p-d-flex p-jc-between">
+                    <h1><h:outputText value="#{occInspectionsBB.selectedInspectedSpace.location.locationDescription}"/></h1>
+                    <div>
+                        <p:commandButton value="Pass All"/>
                     </div>
-                    <div class="p-col-12 p-md-4 p-mt-5">
-                        <p:selectOneButton id="inspections-entryscreen-statussel" value="#{spaceElement.statusEnum}" unselectable="false">
-                            <!-- Strangely this element needs to update itself to call the setter -->
-                            <p:ajax update="inspections-entryscreen-statussel"/>
-                            <f:selectItems value="#{occInspectionsBB.statuses}" var="status" itemLabel="#{status.label}"/>
-                        </p:selectOneButton>
-                        <div class="p-d-flex p-mt-2 p-jc-end">
-                            <p:selectBooleanCheckbox itemLabel="Exclude from NOV"/>
+                    <div>
+                        <p:commandButton value="Edit Space" class="p-mr-1"/>
+                        <p:commandButton value="Remove Space"/>
+                    </div>
+                </div>
+                <p:repeat value="#{occInspectionsBB.selectedInspectedSpace.inspectedElementListVisible}" var="spaceElement">
+                    <div class="p-grid">
+                        <div class="p-col-12 p-md-4">
+                            <h3><h:outputText value="§#{spaceElement.ordSecNum}:#{spaceElement.ordSecTitle}; §§#{spaceElement.ordSubSecNum} #{spaceElement.ordSubSecTitle}"/></h3>
+                            <ul>
+                                <li><h:outputText value="#{spaceElement.ordTechnicalText}"/></li>
+                            </ul>
                         </div>
-                    </div>
-                    <div class="p-col-12 p-md-4">
-                        <div class="p-d-flex">
-                            <div>
-                                <p class="p-mb-0">Comments:</p>
-                                <p:inputTextarea rows="6" cols="33"/>
-                            </div>
-                            <div class="p-mx-3 p-mt-5">
-                                <p:button icon="pi pi-plus" styleClass="rounded-button"/>
-                                <p>Add Photo</p>
+                        <div class="p-col-12 p-md-4 p-mt-5">
+                            <p:selectOneButton id="inspections-entryscreen-statussel" value="#{spaceElement.statusEnum}" unselectable="false">
+                                <!-- Strangely this element needs to update itself to call the setter -->
+                                <p:ajax update="inspections-entryscreen-statussel"/>
+                                <f:selectItems value="#{occInspectionsBB.statuses}" var="status" itemLabel="#{status.label}"/>
+                            </p:selectOneButton>
+                            <div class="p-d-flex p-mt-2 p-jc-end">
+                                <p:selectBooleanCheckbox itemLabel="Exclude from NOV"/>
                             </div>
                         </div>
+                        <div class="p-col-12 p-md-4">
+                            <div class="p-d-flex">
+                                <div>
+                                    <p class="p-mb-0">Comments:</p>
+                                    <p:inputTextarea rows="6" cols="33"/>
+                                </div>
+                                <div class="p-mx-3 p-mt-5">
+                                    <p:button icon="pi pi-plus" styleClass="rounded-button"/>
+                                    <p>Add Photo</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </p:repeat>
-            <p:commandButton value="Add Ordinance" icon="pi pi-plus"/>
+                </p:repeat>
+                <p:commandButton value="Add Ordinance" icon="pi pi-plus"/>
+            </h:form>
         </p:dialog>
-    </h:form>
 </ui:composition>

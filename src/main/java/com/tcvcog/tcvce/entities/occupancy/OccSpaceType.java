@@ -28,7 +28,15 @@ public class OccSpaceType extends EntityUtils{
     protected String spaceTypeTitle;
     protected String spaceTypeDescription;
     
- 
+    public OccSpaceType(OccSpaceType ost){
+        this.spaceTypeID = ost.spaceTypeID;
+        this.spaceTypeTitle = ost.spaceTypeTitle;
+        this.spaceTypeDescription = ost.spaceTypeDescription;
+    }
+    
+    public OccSpaceType(){
+        
+    }
 
     /**
      * @return the spaceTypeID

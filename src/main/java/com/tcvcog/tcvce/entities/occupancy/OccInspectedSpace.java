@@ -37,7 +37,7 @@ public class OccInspectedSpace
 
     private int inspectedSpaceID;
     
-    protected OccSpaceType type;
+    protected OccSpaceTypeChecklistified type;
     
     private List<OccInspectedSpaceElement> inspectedElementList;
     private List<OccInspectedSpaceElement> inspectedElementListVisible;
@@ -72,7 +72,7 @@ public class OccInspectedSpace
 
         this.status = space.getStatus();
 
-        this.inspectionID = getInspectionID();
+        this.inspectionID = space.getInspectionID();
     }
 
     public void configureVisibleElementList() {
@@ -160,7 +160,7 @@ public class OccInspectedSpace
     /**
      * @return the spaceType
      */
-    public OccSpaceType getType() {
+    public OccSpaceTypeChecklistified getType() {
         return type;
     }
 
@@ -169,7 +169,7 @@ public class OccInspectedSpace
     /**
      * @param type the spaceType to set
      */
-    public void setType(OccSpaceType type) {
+    public void setType(OccSpaceTypeChecklistified type) {
         this.type = type;
     }
 

@@ -14,12 +14,13 @@ import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
 /**
  * The premier backing bean for occupancy inspections workflow.
  *
- * @author jurplel & ellen bascomb starting Jan 2022
+ * @author jurplel (& ellen bascomb starting Jan 2022)
  */
 public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
@@ -126,7 +127,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * 
+     * Listener to user confirmation that the they want to add 
+     * their new location descriptor
      */
     public void createLocDescriptor() {
         if (skeletonLocationDescriptor == null) {
@@ -136,7 +138,9 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.addNewLocationDescriptor(skeletonLocationDescriptor);
+            // store and retrieve this location descriptors
+            selectedLocDescriptor= oc.getOccLocationDescriptor(oc.addNewLocationDescriptor(skeletonLocationDescriptor));
+            System.out.println("OccInspectionBB.createLocationDescriptor | ID: " + selectedLocDescriptor.getLocationID());
         } catch (IntegrationException ex) {
             System.out.println("Failed to add skeleton location descriptor: " + ex);
         }
@@ -157,23 +161,29 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      * 
      */
     public void addSelectedSpaceToSelectedInspection() {
-//        if (selectedInspection == null) {
-//            System.out.println("Can't initialize add space to inspection: selected inspection object is null");
-//            return;
-//        }
-//        OccInspectionCoordinator oic = getOccInspectionCoordinator();
-//        try {
-////             Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
-//            selectedInspection = oic.inspectionAction_commenceSpaceInspection(
-//                                                selectedInspection, 
-//                                                selectedInspection.getInspector(), 
-//                                                , 
-//                                                null, 
-//                                                null);
-//
-//        } catch (IntegrationException ex) {
-//            System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
-//        }
+        if (selectedInspection == null) {
+            System.out.println("Can't initialize add space to inspection: selected inspection object is null");
+            return;
+        }
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        try {
+//             Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
+            selectedInspection = oic.inspectSpace(
+                                                selectedInspection, 
+                                                selectedInspection.getInspector(), 
+                                                selectedSpaceType, 
+                                                OccInspectionStatusEnum.NOTINSPECTED, 
+                                                selectedLocDescriptor);
+            getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_INFO,
+                         "Added space to inspection", ""));
+
+        } catch (IntegrationException ex) {
+            System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Cannot add space to inspection.", ""));
+        }
     }
 
     /**

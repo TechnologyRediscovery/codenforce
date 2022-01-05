@@ -416,6 +416,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return rpt;
     }
 
+    /**
+     * Factory for OccPermits
+     * @param usr
+     * @return 
+     */
     public OccPermit getOccPermitSkeleton(User usr) {
         OccPermit permit = new OccPermit();
         permit.setDateIssued(LocalDateTime.now());
@@ -424,10 +429,33 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     }
 
+    /**
+     * Logic intermediary for Location Descriptors
+     * @param locid
+     * @return
+     * @throws IntegrationException 
+     */
+    public OccLocationDescriptor getOccLocationDescriptor(int locid) throws IntegrationException{
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        return oii.getLocationDescriptor(locid);
+        
+        
+    }
+    
+    /**
+     * Factory for OccLocationDescriptors
+     * @return 
+     */
     public OccLocationDescriptor getOccLocationDescriptorSkeleton() {
         return new OccLocationDescriptor();
     }
 
+    /**
+     * Logic intermediary for creating new occ location descriptors
+     * @param old
+     * @return
+     * @throws IntegrationException 
+     */
     public int addNewLocationDescriptor(OccLocationDescriptor old) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         int freshLocID = 0;
@@ -617,7 +645,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     public void activateOccInspection(OccInspection is) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        oii.activateOccInspection(is);
+        oii.deactivateOccInspection(is);
 
     }
 

@@ -20,6 +20,16 @@ public class OccSpaceTypeChecklistified
     private String notes;
     private List<OccSpaceElement> codeElementList;
 
+    public OccSpaceTypeChecklistified(OccSpaceType ost){
+        super(ost);
+        
+    }
+    
+    public OccSpaceTypeChecklistified(){
+        
+    }
+    
+    
     /**
      * @return the codeElementList
      */

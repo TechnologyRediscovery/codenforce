@@ -190,13 +190,13 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
 
-        List<OccInspection> inspectionList = oii.getOccInspectionListByPACC(pacc);
+//        List<OccInspection> inspectionList = oii.getOccInspectionListByPACC(pacc);
 
-        for (OccInspection ins : inspectionList) {
+//        for (OccInspection ins : inspectionList) {
             // TODO upgrade for parcelization
 //            infoBundleList.add(extractPublicInfo(ins));
 
-        }
+//        }
 
         return infoBundleList;
     }

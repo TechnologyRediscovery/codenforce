@@ -142,11 +142,12 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      *
      * @throws IntegrationException
      */
-    public OccInspection createInspectedSpace(OccInspection inspection,
+    public OccInspection        inspectSpace  (OccInspection inspection,
                                               User user,
                                               OccSpaceTypeChecklistified tpe,
-                                              final OccInspectionStatusEnum initialStatus,
-                                              OccLocationDescriptor locDesc) throws IntegrationException {
+                                              OccInspectionStatusEnum initialStatus,
+                                              OccLocationDescriptor locDesc) 
+            throws IntegrationException {
 
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
 
@@ -163,7 +164,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         inspectedSpace.setLocation(locDesc);
 
         inspectedSpace.setAddedToChecklistBy(user);
-        inspectedSpace.setAddedToChecklistTS(LocalDateTime.now());
+        // actually this is stamped by now() in db
+//        inspectedSpace.setAddedToChecklistTS(LocalDateTime.now());
 
         // Wrap each CodeElement in an InspectedCodeElement blanket to keep it warm :)
         List<OccInspectedSpaceElement> inspectedElements;
@@ -190,23 +192,6 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             return inspectedElement;
         }).collect(Collectors.toList());
 
-        // ...al if (selectedInspection == null) {
-//            System.out.println("Can't initialize add space to inspection: selected inspection object is null");
-//            return;
-//        }
-//        OccInspectionCoordinator oic = getOccInspectionCoordinator();
-//        try {
-////             Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
-//            selectedInspection = oic.inspectionAction_commenceSpaceInspection(
-//                                                selectedInspection, 
-//                                                selectedInspection.getInspector(), 
-//                                                , 
-//                                                null, 
-//                                                null);
-//
-//        } catch (IntegrationException ex) {
-//            System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
-//        }so make it the OccInspectedSpace's list of InspectedCodeElements
         inspectedSpace.setInspectedElementList(inspectedElements);
 
         // With a fully built inspected space, we can record our start of inspection in the DB
@@ -216,8 +201,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         // now use our convenience method to record Inspection of the space's individual elements
         oii.recordInspectionOfSpaceElements(inspectedSpace, inspection);
 
-            // check sequence by retrieving new inspected space and displaying info
-            inspectedSpace = oii.getInspectedSpace(inspectedSpace.getInspectedSpaceID());
+        // check sequence by retrieving new inspected space and displaying info
+        inspectedSpace = oii.getInspectedSpace(inspectedSpace.getInspectedSpaceID());
         System.out.println("OccupancyCoordinator.inspectionAction_commenceSpaceInspection | retrievedInspectedSpaceID= " + inspectedSpace);
 
         return inspection;
