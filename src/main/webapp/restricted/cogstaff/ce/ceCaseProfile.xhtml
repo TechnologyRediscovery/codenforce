@@ -508,7 +508,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 <p:commandButton   id="nov-managetemplates-init-button"
                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                   value="Manage templates"  
+                                                                   value="Manage NOV templates"  
                                                                    icon="fa fa-paragraph"
                                                                    ajax="true"
                                                                    actionListener="#{noticeOfViolationBB.onTemplateManageInitButtonChange}"
@@ -2694,6 +2694,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                      ajax="true"
                                                      actionListener="#{noticeOfViolationBB.onTemplateViewButtonChange(template)}"
                                                      update="@form:@parent:nov-template-view-form
+                                                            nov-template-view-form
                                                             nov-template-view-dialog"
                                                      oncomplete="PF('nov-template-view-dialog-var').show()"/>
 
@@ -2702,7 +2703,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                      icon="fa fa-edit"
                                                      ajax="true"
                                                      actionListener="#{noticeOfViolationBB.onTemplateEditButtonChange(template)}"
-                                                     update="@form:@parent:nov-template-form"
+                                                     update="@form:@parent:nov-template-form
+                                                     nov-template-form"
                                                      oncomplete="PF('nov-templatemanage-dialog-var').show()"/>
                                 </p:column>
 
@@ -3429,9 +3431,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                          rowExpandMode="multiple"
                                          expandedRow="false"
                                          widgetVar="textBlockTableWidgetVar"
+                                         selection="#{noticeOfViolationBB.currentTemplateBlock}"
+                                         selectionMode="single"
                                          >
 
-
+                               
                                 <p:column width="20%">
                                     <f:facet name="header">
                                         <h:outputText value="ID#" />
@@ -3457,7 +3461,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                      icon="fa fa-search"
                                                      ajax="true" 
                                                      actionListener="#{noticeOfViolationBB.onTemplateBlockViewChange(template)}"
-                                                     update="@form:@parent:nov-template-form"/>
+                                                     update="nov-template-form"
+                                                     oncomplete="PF('nov-templatemanage-dialog-var').show()"/>
 
 
                                     <p:commandButton id="removetemplate-cb"
@@ -3468,12 +3473,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                      nov-templateblocks-table
                                                      "
                                                      actionListener="#{noticeOfViolationBB.onTemplateDeleteButtonChange(template)}"/>
+                                                     
                                 </p:column>
 
                             </p:dataTable>
 
 
-
+                            <p:spacer height="5px"/>
+                                        
+                            <p:commandButton id="viewselectedtemplate-cb"
+                                                     value="Edit Selected Template"
+                                                     icon="fa fa-search"
+                                                     ajax="true" 
+                                                     style="margin-right: 5px;"
+                                                     actionListener="#{noticeOfViolationBB.onTemplateViewSelectedButtonChange}"
+                                                     update="nov-template-form
+                                                                nov-templatemanage-dialog"
+                                                     oncomplete="PF('nov-templatemanage-dialog-var').show()"/>
 
 
                             <p:commandButton 
@@ -3488,10 +3504,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 "
                                 actionListener="#{noticeOfViolationBB.onTemplateCreateButton}"/>
                         </h:form>
+                        
+                        <hr />
 
                         <h:form id="nov-template-form">
 
-
+                            <h2>NOV Template Editor</h2>
                             <p:spacer height="5px" />
                             <p:outputLabel id="tempblockID-ol">
                                 <h:outputText value="You are editing template id: #{noticeOfViolationBB.currentTemplateBlock.blockID}"/>
@@ -3501,12 +3519,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 <h:outputText value="Template Name"/>
                             </p:outputLabel>
                             <p:inputText id="tempblockNameIT" value="#{noticeOfViolationBB.currentTemplateBlock.textBlockName}" 
-                                         style="width: 20%;" tabindex="4" required="true" styleClass="inputText"/>
+                                         style="width: 80%;" tabindex="4" required="true" styleClass="inputText"/>
                             <h:message for="tempblockNameIT" showDetail="false" showSummary="true" 
                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
                             <p>
-                                Include the following where you want the violations: ***VIOLATIONS*** 
+                                Include the following text where you want the violations: ***VIOLATIONS*** 
                             </p>
 
                             <p:textEditor  id="nov-template-editor"  

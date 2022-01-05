@@ -730,6 +730,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         currentTemplateBlock = tb;
         
     }
+    
+    /**
+     * Listener for user requests to edit a selected template in a table
+     * @param ev 
+     */
+    public void onTemplateViewSelectedButtonChange(ActionEvent ev){
+        System.out.println("NOVBB.onTemplateViewSelectedButtonChange | currentTemplateBlock " + currentTemplateBlock.getBlockID());
+    }
     /**
      * Listener for user requests to build NOV with template
      * @param temp 
@@ -758,7 +766,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      * @param temp 
      */
     public void onTemplateViewButtonChange(TextBlock temp){
+    
         currentTemplateBlock = temp;
+        System.out.println("NoticeOfViolationBB.onTemplateViewButtonChange | block ID: " + currentTemplateBlock.getBlockID());
         
     }
 
@@ -993,7 +1003,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      * @param tb
      */
     public void onTemplateBlockViewChange(TextBlock tb){
-        System.out.println("NoticeOfViolationBB.onTemplateBlockViewChange");
+        System.out.println("NoticeOfViolationBB.onTemplateBlockViewChange | id:" +tb.getBlockID());
         currentTemplateBlock = tb;
         
     }

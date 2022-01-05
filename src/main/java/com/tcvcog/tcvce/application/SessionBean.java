@@ -484,7 +484,8 @@ public class    SessionBean
                 sessProperty = pc.assemblePropertyDataHeavy(pc.getProperty(cse.getPropertyID()), ua);
                 sessPropertyList = pc.assemblePropertyHistoryList(ua.getKeyCard());
                 
-                sessCECaseList = sessProperty.getCeCaseList();
+                // Turned off to avoid the case list getting set to zero 
+//                sessCECaseList = sessProperty.getCeCaseList();
                 
                 sessPersonList = sessProperty.getPersonList();
                 if(sessPersonList != null && !sessPersonList.isEmpty()){
