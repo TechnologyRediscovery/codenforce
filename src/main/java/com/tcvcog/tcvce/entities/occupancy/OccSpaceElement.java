@@ -35,7 +35,7 @@ import com.tcvcog.tcvce.entities.CodeElement;
  */
 public class OccSpaceElement extends CodeElement {
     
-    protected int spaceElementID;
+    protected int occChecklistSpaceTypeElementID;
     protected boolean requiredForInspection;
 
     public OccSpaceElement() {}
@@ -46,23 +46,23 @@ public class OccSpaceElement extends CodeElement {
 
     public OccSpaceElement(OccSpaceElement occSpaceElement) {
         super(occSpaceElement);
-        this.spaceElementID = occSpaceElement.getSpaceElementID();
+        this.occChecklistSpaceTypeElementID = occSpaceElement.getOccChecklistSpaceTypeElementID();
         this.requiredForInspection = occSpaceElement.isRequiredForInspection();
     }
 
 
     /**
-     * @return the spaceElementID
+     * @return the occChecklistSpaceTypeElementID
      */
-    public int getSpaceElementID() {
-        return spaceElementID;
+    public int getOccChecklistSpaceTypeElementID() {
+        return occChecklistSpaceTypeElementID;
     }
 
     /**
-     * @param spaceElementID the spaceElementID to set
+     * @param occChecklistSpaceTypeElementID the occChecklistSpaceTypeElementID to set
      */
-    public void setSpaceElementID(int spaceElementID) {
-        this.spaceElementID = spaceElementID;
+    public void setOccChecklistSpaceTypeElementID(int occChecklistSpaceTypeElementID) {
+        this.occChecklistSpaceTypeElementID = occChecklistSpaceTypeElementID;
     }
 
     /**

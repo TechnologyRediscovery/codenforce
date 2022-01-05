@@ -580,7 +580,7 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
                 // complexity of object creation, we'll try this for testing
                 OccSpaceElement ele = new OccSpaceElement(getCodeCoordinator().getCodeElement(rs.getInt("codeelement_id")));
                 ele.setRequiredForInspection(rs.getBoolean("ocsterequired"));
-                ele.setSpaceElementID(rs.getInt("spaceelementid"));
+                ele.setOccChecklistSpaceTypeElementID(rs.getInt("spaceelementid"));
                 ele.setNotes(rs.getString("ocstenotes"));
                 eleList.add(new OccSpaceElement(ele));
             }

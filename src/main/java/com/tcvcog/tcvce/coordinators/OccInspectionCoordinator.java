@@ -193,7 +193,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         }).collect(Collectors.toList());
 
         inspectedSpace.setInspectedElementList(inspectedElements);
-
+        inspectedSpace.setType(tpe);
         // With a fully built inspected space, we can record our start of inspection in the DB
         inspectedSpace = oii.recordCommencementOfSpaceInspection(inspectedSpace, inspection);
         System.out.println("OccupancyCoordinator.inspectionAction_commenceSpaceInspection | commenced inspecting of space");
