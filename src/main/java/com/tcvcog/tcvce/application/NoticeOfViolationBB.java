@@ -94,7 +94,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     private List<TextBlock> injectableBlockList;
     private TextBlock currentTemplateBlock;
-    private String formTemplateBlockText;
+    
     
     private Map<String, Integer> blockCatIDMap;
     private String selectedBlockTemplate;
@@ -170,7 +170,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
         try {
             injectableBlockList = ci.getTextBlockTemplates(m);
-            formTemplateBlockText = "";
+            
             if(currentTemplateBlock == null){
                 if(injectableBlockList != null && !injectableBlockList.isEmpty()){
                     currentTemplateBlock = injectableBlockList.get(0);
@@ -728,7 +728,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void onTemplateEditButtonChange(TextBlock tb){
         currentTemplateBlock = tb;
-        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
+        
     }
     /**
      * Listener for user requests to build NOV with template
@@ -995,7 +995,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void onTemplateBlockViewChange(TextBlock tb){
         System.out.println("NoticeOfViolationBB.onTemplateBlockViewChange");
         currentTemplateBlock = tb;
-        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
+        
     }
     
     /**
@@ -1030,7 +1030,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         CaseCoordinator cc = getCaseCoordinator();
         // only load the a block automatically if not selected
         
-        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
+        
     }
     
     /**
@@ -1041,7 +1041,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         currentTemplateBlock = cc.nov_getTemplateBlockSekeleton(getSessionBean().getSessMuni());
-        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
+        
       
         getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -1059,7 +1059,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         CaseIntegrator ci = getCaseIntegrator();
         try {
             if(currentTemplateBlock != null){
-                currentTemplateBlock.setTextBlockText(formTemplateBlockText);
+                
                 ci.insertTextBlock(currentTemplateBlock);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -1069,7 +1069,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "No block to insert!", ""));
             }
-            formTemplateBlockText = currentTemplateBlock.getTextBlockText();
+            
             injectableBlockList = ci.getTextBlockTemplates(getSessionBean().getSessMuni());
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -1088,7 +1088,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void onTemplateUpdateButtonChange(ActionEvent ev){
         CaseIntegrator ci = getCaseIntegrator();
         try {
-            currentTemplateBlock.setTextBlockText(formTemplateBlockText);
+            
             ci.updateTextBlock(currentTemplateBlock);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -1645,19 +1645,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         this.formBlockOrder = formBlockOrder;
     }
 
-    /**
-     * @return the formTemplateBlockText
-     */
-    public String getFormTemplateBlockText() {
-        return formTemplateBlockText;
-    }
-
-    /**
-     * @param formTemplateBlockText the formTemplateBlockText to set
-     */
-    public void setFormTemplateBlockText(String formTemplateBlockText) {
-        this.formTemplateBlockText = formTemplateBlockText;
-    }
+   
 
     /**
      * @return the draftNoticeLoaded

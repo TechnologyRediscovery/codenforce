@@ -512,7 +512,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                    icon="fa fa-paragraph"
                                                                    ajax="true"
                                                                    actionListener="#{noticeOfViolationBB.onTemplateManageInitButtonChange}"
-                                                                   update="nov-template-form"
+                                                                   update="@form:@parent:nov-template-form"
                                                                    oncomplete="PF('nov-templatemanage-dialog-var').show()"
                                                                    />
                                             </div>
@@ -2693,7 +2693,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                      icon="fa fa-search"
                                                      ajax="true"
                                                      actionListener="#{noticeOfViolationBB.onTemplateViewButtonChange(template)}"
-                                                     update="nov-template-view-dialog"
+                                                     update="@form:@parent:nov-template-view-form
+                                                            nov-template-view-dialog"
                                                      oncomplete="PF('nov-template-view-dialog-var').show()"/>
 
                                     <p:commandButton id="template-edit-cb"
@@ -2701,7 +2702,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                      icon="fa fa-edit"
                                                      ajax="true"
                                                      actionListener="#{noticeOfViolationBB.onTemplateEditButtonChange(template)}"
-                                                     update="nov-template-form"
+                                                     update="@form:@parent:nov-template-form"
                                                      oncomplete="PF('nov-templatemanage-dialog-var').show()"/>
                                 </p:column>
 
@@ -3456,7 +3457,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                      icon="fa fa-search"
                                                      ajax="true" 
                                                      actionListener="#{noticeOfViolationBB.onTemplateBlockViewChange(template)}"
-                                                     update="nov-template-form"/>
+                                                     update="@form:@parent:nov-template-form"/>
 
 
                                     <p:commandButton id="removetemplate-cb"
@@ -3482,7 +3483,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 icon="fa fa-plus"
                                 styleClass="buttonOwnLine" 
                                 tabindex="6"
-                                update="nov-template-form
+                                update="@form:@parent:nov-template-form
                                 messages-global-form
                                 "
                                 actionListener="#{noticeOfViolationBB.onTemplateCreateButton}"/>
@@ -3509,7 +3510,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                             </p>
 
                             <p:textEditor  id="nov-template-editor"  
-                                           value="#{noticeOfViolationBB.formTemplateBlockText}" 
+                                           value="#{noticeOfViolationBB.currentTemplateBlock.textBlockText}" 
                                            secure="false"
                                            height="700"/>
 
