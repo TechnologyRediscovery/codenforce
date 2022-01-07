@@ -378,7 +378,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
        SystemIntegrator si = getSystemIntegrator();
        return si.getPutList();
    }
-    
 
     /**
      * Adapter method for taking in simple note info, not in Object format and
@@ -670,6 +669,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     private final NavigationSubItem users = getNavSubItem("Users", "/restricted/cogadmin/userConfig.xhtml", "fa fa-user-o", false);
     private final NavigationSubItem icons = getNavSubItem("Icons", "/restricted/cogadmin/iconManage.xhtml", "fa fa-rebel", false);
     private final NavigationSubItem puts = getNavSubItem("PUTs", "/restricted/cogadmin/propertyUseTypeManage.xhtml", "fa fa-flag", false);
+    private final NavigationSubItem oid = getNavSubItem("Occ Det's", "/restricted/cogadmin/occInspectionDeterminationManage.xhtml", "fa fa-pencil-square-o", false);
     private final NavigationSubItem blobs = getNavSubItem("Files", "/restricted/cogadmin/manageBlob.xhtml", "fa fa-folder", false);
 
     //Store SubNav Items into List: Reports
@@ -679,6 +679,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList.add(users);
         navList.add(icons);
         navList.add(puts);
+        navList.add(oid);
         navList.add(blobs);
         return navList;
     }

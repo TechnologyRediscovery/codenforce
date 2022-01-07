@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tcvcog.tcvce.application;
+package com.tcvcog.tcvce.occupancy.application;
 
+import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.Icon;
-import com.tcvcog.tcvce.entities.PropertyUseType;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionRequirement;
 import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
@@ -21,130 +22,128 @@ import javax.faces.event.ActionEvent;
  *
  * @author sylvia
  */
-public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
+public class OccInspectionRequirementBB extends BackingBeanUtils implements Serializable{
 
-    private List<PropertyUseType> putList;
-    private PropertyUseType currentPut;
+    private List<OccInspectionRequirement> reqList;
+    private OccInspectionRequirement currentRequirement;
     
     /**
      * Creates a new 
      * instance of PropertyUseTypeBB
      */
-    public PropertyUseTypeBB() {
+    public OccInspectionRequirementBB() {
         
         
     }
     
     @PostConstruct
     public void initBean(){
-        refreshPutList();
+        refreshRequirementList();
     }
     
-    public void refreshPutList(){
-        SystemCoordinator sc = getSystemCoordinator();
+    public void refreshRequirementList(){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
-            putList = sc.getPutList();
+            reqList = oic.getRequirementList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
     }
     
-    public void editPut(PropertyUseType p){
-        currentPut = p;
+    public void editRequirement(OccInspectionRequirement r){
+        currentRequirement = r;
     }
     
     public void commitUpdates(ActionEvent ev){
-        SystemCoordinator sc = getSystemCoordinator();
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
-            sc.updatePut(currentPut);
+            oic.updateRequirement(currentRequirement);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated PropertyUseType", ""));
+                            "Successfully updated Requirement", ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not update PropertyUseType, sorry", ""));
+                            "Could not update Requirement, sorry", ""));
         }
-        refreshPutList();
+        refreshRequirementList();
     }
     
     public void commitInsert(ActionEvent ev){
-        SystemCoordinator sc = getSystemCoordinator();
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
-            sc.insertPut(currentPut);
+            oic.insertRequirement(currentRequirement);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success! PropertyUseType inserted", ""));
+                            "Success! Requirement inserted", ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not insert PropertyUseType, sorry", ""));
+                            "Could not insert Requirement, sorry", ""));
         }
-        refreshPutList();
+        refreshRequirementList();
     }
     
-    //method for deleting existing puts
     public void commitRemove(ActionEvent ev) {
-        SystemCoordinator sc = getSystemCoordinator();
-        if(currentPut.getTypeID() > 0){             
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        if(currentRequirement.getRequirementID() > 0){             
             try {
-                int uses = sc.putCheckForUse(currentPut);
+                int uses = oic.requirementCheckForUse(currentRequirement);
                 if(uses == 0){
-                    sc.deactivatePut(currentPut);
+                    oic.deactivateRequirement(currentRequirement);
                     getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Success! PropertyUseType removed", ""));
+                                "Success! Requirement removed", ""));
                 } else {
                     getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "PropertyUseType is in use " + uses + " times. Could not remove", ""));
+                                "Requirement is in use " + uses + " times. Could not remove", ""));
                 }
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Could not remove PropertyUseType, sorry", ""));
+                                "Could not remove Requirement, sorry", ""));
             }
-            refreshPutList();
+            refreshRequirementList();
         } else {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Invalid PropertyUseTypeID: " + currentPut.getTypeID(), ""));
+                                "Invalid Requirement: " + currentRequirement.getRequirementID(), ""));
         }
     }
     
-    public void createNewPut(){
-        PropertyUseType p = new PropertyUseType();
-        p.setIcon(new Icon());
-        currentPut = p;
+    public void createNewRequirement(){
+        OccInspectionRequirement p = new OccInspectionRequirement();
+        currentRequirement = p;
     }
     
 
     /**
-     * @return the putList
+     * @return the reqList
      */
-    public List<PropertyUseType> getPutList() {
-        return putList;
+    public List<OccInspectionRequirement> getReqList() {
+        return reqList;
     }
 
     /**
-     * @param putList the putList to set
+     * @param reqList the reqList to set
      */
-    public void setPutList(List<PropertyUseType> putList) {
-        this.putList = putList;
+    public void setReqList(List<OccInspectionRequirement> reqList) {
+        this.reqList = reqList;
     }
 
     /**
-     * @return the currentPut
+     * @return the currentRequirement
      */
-    public PropertyUseType getCurrentPut() {
-        return currentPut;
+    public OccInspectionRequirement getCurrentRequirement() {
+        return currentRequirement;
     }
 
     /**
-     * @param currentPut the currentPut to set
+     * @param currentRequirement the currentRequirement to set
      */
-    public void setCurrentPut(PropertyUseType currentPut) {
-        this.currentPut = currentPut;
+    public void setCurrentRequirement(OccInspectionRequirement currentRequirement) {
+        this.currentRequirement = currentRequirement;
     }
     
 }

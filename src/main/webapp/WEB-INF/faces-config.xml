@@ -244,6 +244,12 @@
         <managed-bean-class>com.tcvcog.tcvce.application.PropertyUseTypeBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>occInspectionDeterminationBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccInspectionDeterminationBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
       
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules display and nav ~~~~~~~~~~~~~~~~~~~ --> 
 
@@ -267,6 +273,14 @@
         </navigation-case>
     </navigation-rule>
 
+     <navigation-rule>
+        <from-view-id>*</from-view-id>
+        <navigation-case>
+            <from-outcome>occInspectionDeterminationManage</from-outcome>
+            <to-view-id>/restricted/cogadmin/occInspectionDeterminationManage.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
 
    
 

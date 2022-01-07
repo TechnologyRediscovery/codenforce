@@ -1219,154 +1219,384 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
         } // close finally
     }
-
+        
+    public int determinationCheckForUse(OccInspectionDetermination d) throws IntegrationException {
+        SystemIntegrator si = getSystemIntegrator();
+        int uses = 0;
+        List<String> useTables = si.findForeignUseTables("determination");
+        for(int x = 0; x < useTables.size(); x++){
+            uses =+ si.checkForUse("public." + useTables.get(x), "determination_detid", d.getDeterminationID());
+            System.out.println("Checked public." + useTables.get(x) + " for  determination_detid" + d.getDeterminationID());
+        };
+        return uses;
+    }
+    
     public OccInspectionDetermination getDetermination(int determinationID) throws IntegrationException {
-        OccInspectionDetermination determination = null;
-
-        String query = " SELECT determinationid, title, description, notespreinspection, eventcat_catid, active \n"
-                + "  FROM public.occinspectiondetermination WHERE determinationid=?;";
+        EventIntegrator ei = new EventIntegrator();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT determinationid, title, description, notes, eventcat_catid, active ");
+        sb.append("FROM public.occinspectiondetermination WHERE determinationid=?;");
+        OccInspectionDetermination d = null;
 
         try {
-
-            stmt = con.prepareStatement(query);
+            stmt = con.prepareStatement(sb.toString());
             stmt.setInt(1, determinationID);
             rs = stmt.executeQuery();
-
             while (rs.next()) {
-                determination = generateDetermination(rs);
+                d = new OccInspectionDetermination();
+                d.setDeterminationID(rs.getInt("determinationid"));
+                d.setTitle(rs.getString("title"));
+                d.setDescription(rs.getString("description"));
+                d.setNotes(rs.getString("notes"));
+                if (rs.getInt("eventcat_catid") != 0) {
+                    d.setEventCategory(ei.getEventCategory(rs.getInt("eventcat_catid")));
+                }
+                d.setActive(rs.getBoolean("active"));
             }
-
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot get OccInspectionDetermination", ex);
-
+            throw new IntegrationException("unable to generate determination", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-
-        return determination;
+        return d;
     }
 
-    private OccInspectionDetermination generateDetermination(ResultSet rs) throws IntegrationException, SQLException {
-        EventIntegrator ei = new EventIntegrator();
-
-        OccInspectionDetermination det = new OccInspectionDetermination();
-
-        det.setDeterminationID(rs.getInt("determinationid"));
-
-        det.setTitle(rs.getString("title"));
-        det.setDescription(rs.getString("description"));
-
-        det.setNotes(rs.getString("notes"));
-
-        if (rs.getInt("eventcat_catid") != 0) {
-            det.setEventCategory(ei.getEventCategory(rs.getInt("eventcat_catid")));
-        }
-
-        det.setActive(rs.getBoolean("active"));
-
-        return det;
-    }
-
-    public void updateDetermination(OccInspectionDetermination det) throws IntegrationException {
-        String sql = "UPDATE public.occinspectiondetermination\n"
-                + "   SET title=?, description=?, notes=?, eventcat_catid=?, active=? \n"
-                + " WHERE determinationid=?;";
+    public void deactivateDetermination(OccInspectionDetermination d) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(sql);
-            stmt.setString(1, det.getTitle());
-            stmt.setString(2, det.getDescription());
-
-            stmt.setString(3, det.getNotes());
-
-            if (det.getEventCategory() != null) {
-                stmt.setInt(4, det.getEventCategory().getCategoryID());
-            } else {
-                stmt.setNull(4, java.sql.Types.NULL);
-            }
-
-            stmt.setBoolean(5, det.isActive());
-
-            stmt.setInt(6, det.getDeterminationID());
-
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.occinspectiondetermination SET active=false ");
+        sb.append("WHERE determinationid=?");
+        
+        try{
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, d.getDeterminationID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to update occinspectiondetermination record", ex);
+            throw new IntegrationException("unable to deactivate determination", ex);
         } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        }
-    }
-
-    public void deleteDetermination(OccInspectionDetermination det) throws IntegrationException {
-        String query = "DELETE FROM public.occinspectiondetermination\n" + " WHERE determinationid=?;";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, det.getDeterminationID());
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot delete occ inspection determination--probably because another" + "part of the database has a reference item.", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
 
-    public OccInspectionDetermination insertDetermination(OccInspectionDetermination det) throws IntegrationException {
-        String query = "INSERT INTO public.occinspectiondetermination(\n"
-                + "            determinationid, title, description, notes, eventcat_catid, active)\n"
-                + "    VALUES (DEFAULT, ?, ?, ?, ?, ?);";
+    public void updateDetermination(OccInspectionDetermination d) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.occinspectiondetermination SET title=?, description=?, notes=?, eventcat_catid=?, active=? ");
+        sb.append("WHERE determinationid = ?;");
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setString(1, d.getTitle());
+            stmt.setString(2, d.getDescription());
+            stmt.setString(3, d.getNotes());
+            stmt.setInt(4, d.getEventCategory().getCategoryID());
+            stmt.setBoolean(5, d.isActive());
+            stmt.setInt(6, d.getDeterminationID());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to update determination", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        } // close finally
+    }
+
+    public void insertDetermination(OccInspectionDetermination d) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO public.occinspectiondetermination(");
+        sb.append("determinationid, title, description, notes, eventcat_catid, active) ");
+        sb.append("VALUES (DEFAULT, ?, ?, ?, ?, ?);");
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setString(1, d.getTitle());
+            stmt.setString(2, d.getDescription());
+            stmt.setString(3, d.getNotes());
+            stmt.setInt(4, d.getEventCategory().getCategoryID());
+            stmt.setBoolean(5, true);
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to insert determination", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        } // close finally
+    }
+   
+    public List<OccInspectionDetermination> getDeterminationList() throws IntegrationException {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        int newDeterminationID = 0;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT determinationid FROM public.occinspectiondetermination WHERE active=true;");
+        List<OccInspectionDetermination> detList = new ArrayList<>();
         try {
-            stmt = con.prepareStatement(query);
-
-            stmt.setString(1, det.getTitle());
-            stmt.setString(2, det.getDescription());
-
-            stmt.setString(3, det.getNotes());
-
-            if (det.getEventCategory() != null) {
-                stmt.setInt(4, det.getEventCategory().getCategoryID());
-            } else {
-                stmt.setNull(4, java.sql.Types.NULL);
-            }
-
-            stmt.setBoolean(5, det.isActive());
-
-            stmt.execute();
-                String retrievalQuery = "SELECT currval('occinspection_determination_seq');";
-            stmt = con.prepareStatement(retrievalQuery);
+            stmt = con.prepareStatement(sb.toString());
             rs = stmt.executeQuery();
-
             while (rs.next()) {
-                newDeterminationID = rs.getInt(1);
+                detList.add(getDetermination(rs.getInt("determinationid")));
             }
-
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot insert OccInspectionDetermination", ex);
+            throw new IntegrationException("Unable to generate OccInspectionDetermination(List)", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return detList;
+    }
+        
+    public int requirementCheckForUse(OccInspectionRequirement r) throws IntegrationException {
+        SystemIntegrator si = getSystemIntegrator();
+        int uses = 0;
+        List<String> useTables = si.findForeignUseTables("requirementid");
+        for(int x = 0; x < useTables.size(); x++){
+            uses =+ si.checkForUse("public." + useTables.get(x), "requirement_requirementid", r.getRequirementID());
+            System.out.println("Checked public." + useTables.get(x) + " for  requirement_requirementid" + r.getRequirementID());
+        };
+        return uses;
+    }
+    
+    public OccInspectionRequirement getRequirement(int requirementID) throws IntegrationException {
+        EventIntegrator ei = new EventIntegrator();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT requirementid, title, description, active ");
+        sb.append("FROM public.occinspectionrequirement WHERE requirementid=?;");
+        OccInspectionRequirement r = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, requirementID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                r = new OccInspectionRequirement();
+                r.setRequirementID(rs.getInt("requirementid"));
+                r.setTitle(rs.getString("title"));
+                r.setDescription(rs.getString("description"));
+                r.setActive(rs.getBoolean("active"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to generate requirement", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return r;
+    }
+
+    public void deactivateRequirement(OccInspectionRequirement r) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.occinspectionrequirement SET active=false ");
+        sb.append("WHERE requirementid=?");
+        
+        try{
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, r.getRequirementID());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to deactivate requirement", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+
+    public void updateRequirement(OccInspectionRequirement r) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.occinspectionrequirement SET title=?, description=?, active=? ");
+        sb.append("WHERE requirementid = ?;");
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setString(1, r.getTitle());
+            stmt.setString(2, r.getDescription());
+            stmt.setBoolean(3, r.isActive());
+            stmt.setInt(4, r.getRequirementID());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to update requirement", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        } // close finally
+    }
+
+    public void insertRequirement(OccInspectionRequirement r) throws IntegrationException {
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO public.occinspectionrequirement(");
+        sb.append("requirementid, title, description, active) ");
+        sb.append("VALUES (DEFAULT, ?, ?, ?);");
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setString(1, r.getTitle());
+            stmt.setString(2, r.getDescription());
+            stmt.setBoolean(3, true);
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to insert requirement", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        } // close finally
+    }
+   
+    public List<OccInspectionRequirement> getRequirementList() throws IntegrationException {
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT requirementid FROM public.occinspectionrequirement WHERE active=true;");
+        List<OccInspectionRequirement> reqList = new ArrayList<>();
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                reqList.add(getRequirement(rs.getInt("requirementid")));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to generate OccInspectionRequirement(List)", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return reqList;
+    }
+    
+    public List<OccInspectionRequirementAssigned> getOccRequirementAssignedList(OccInspection inspection){
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT occrequirement_requirementid FROM public.occinspectionrequirementassigned ");
+        sb.append("WHERE occinspection_inspectionid = ?;");
+        List<OccInspectionRequirementAssigned> assignedList = new ArrayList<>();
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, inspection.getInspectionID());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                assignedList.add(getOccRequirementAssigned(inspection.getInspectionID(), rs.getInt("occrequirement_requirementid")));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        } // close finally
+        //query the assigned table by inspection number
+        //
+        
+        
+        
+        
+        
+        
+        
+        return assignedList;
+    }
+    
+    public OccInspectionRequirementAssigned getOccRequirementAssigned(int inspectionID, int requirementID){
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT * FROM public.occinspectionrequirementassigned ");
+        sb.append("WHERE occinspection_inspectionid = ? ");
+        sb.append("AND occrequirement_requirementid = ?;");
+        OccInspectionRequirementAssigned reqAssigned = null;
+        
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, inspectionID);
+            rs = stmt.executeQuery();
+            reqAssigned = generateOccRequirementAssigned(rs);
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+        } catch (BObStatusException ex) {
+            Logger.getLogger(OccInspectionIntegrator.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        } // close finally
+        
+        
+        
+        
+        
+        
+        
+        return reqAssigned;
+    }
+    
+    private OccInspectionRequirementAssigned generateOccRequirementAssigned(ResultSet rs) throws BObStatusException{
+        OccInspectionRequirementAssigned reqAssigned = null;
+        if(rs == null){
+            return reqAssigned;
         }
-        det.setDeterminationID(newDeterminationID);
-        return det;
+        UserIntegrator ui = getUserIntegrator();
+        try {            
+            //check for null rs
+            //if not null make a new instance of OccInspectionRequirementAssigned
+            //in constructor call get requirement and pass in requirementid
+            reqAssigned = new OccInspectionRequirementAssigned(getRequirement(rs.getInt("occrequirement_requirementid")));
+            reqAssigned.setInspectionID(rs.getInt("occinspection_inspectionid"));
+            
+            reqAssigned.setAssignedBy(ui.getUser(rs.getInt("assignedby")));
+            reqAssigned.setAssignedDate(rs.getTimestamp("assigneddate").toLocalDateTime());
+            reqAssigned.setAssignedNotes(rs.getString("assignednotes"));
+            
+            if(rs.getTimestamp("fulfilleddate") != null){
+                reqAssigned.setFulfilledBy(ui.getUser(rs.getInt("fulfilledby")));
+                reqAssigned.setFulfilledDate(rs.getTimestamp("fulfilleddate").toLocalDateTime());
+                reqAssigned.setFulfilledNotes(rs.getString("fulfillednotes"));
+            }
+            
+            reqAssigned.setNotes(rs.getString("notes"));
+            
+        } catch (SQLException | IntegrationException ex) {
+            Logger.getLogger(OccInspectionIntegrator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        return reqAssigned;
     }
 
     public OccInspectionCause getCause(int causeID) throws IntegrationException {

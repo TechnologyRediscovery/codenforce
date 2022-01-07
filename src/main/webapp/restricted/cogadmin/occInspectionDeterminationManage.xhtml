@@ -8,80 +8,80 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Icon Manager</title>
+        <title>Occupation Inspection Determination Manager</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
                 <div class="mainContainer">
-                    <h:form id="iconmanage-messages-form">
+                    <h:form id="oidmanage-messages-form">
                         <p:growl id="growl" showDetail="true"/>
                     </h:form>
                             
-                    <h1>Icon Manager</h1>
+                    <h1>Determination Manager</h1>
                     <f:view>
-                        <h:form id="icon-manage-form">
+                        <h:form id="oid-manage-form">
                             
-                            <p:commandButton ajax="true" value="Add New Icon" icon="fa fa-plus" 
-                                             actionListener="#{iconBB.createNewIcon}"
-                                             oncomplete="PF('icon-addupdate-dialog').show()"
+                            <p:commandButton ajax="true" value="Add New Determination" icon="fa fa-plus" 
+                                             actionListener="#{occInspectionDeterminationBB.createNewDetermination}"
+                                             oncomplete="PF('oid-addupdate-dialog').show()"
                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
-                                             update="icon-add-update-form"/>
+                                             update="oid-add-update-form"/>
                             
                             <p:spacer height="15px"/>
                             
                              <p:dataTable
-                                id="icon-table"
-                                var="icon"
-                                value="#{iconBB.iconList}"
-                                rowKey="#{icon.iconID}"
+                                id="oid-table"
+                                var="occInspectionDetermination"
+                                value="#{occInspectionDeterminationBB.detList}"
+                                rowKey="#{occInspectionDetermination.determinationID}"
                                 tableStyleClass="primeDataTable">
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="ID" />
                                     </f:facet>
-                                    <h:outputText value="#{icon.iconID}"/>
-                                </p:column>
-                                 
-                                 <p:column width="8%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Icon" />
-                                    </f:facet>
-                                    <i class="material-icons"><h:outputText value="#{icon.materialIcon}"/></i>
+                                    <h:outputText value="#{occInspectionDetermination.determinationID}"/>
                                 </p:column>
                                  
                                  <p:column width="8%">
                                     <p:commandButton ajax="true"
-                                                     id="update-icon-cb" value="edit" icon="#{icon.fontAwesome}"
+                                                     id="update-oid-cb" value="edit" 
                                         styleClass="multiButtonLineButton" 
-                                        actionListener="#{iconBB.editIcon(icon)}"
-                                        oncomplete="PF('icon-addupdate-dialog').show()"
-                                        update="icon-add-update-form" />
+                                        actionListener="#{occInspectionDeterminationBB.editDetermination(occInspectionDetermination)}"
+                                        oncomplete="PF('oid-addupdate-dialog').show()"
+                                        update="oid-add-update-form" />
+                                </p:column>
+                                 
+                                 <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Title" />
+                                    </f:facet>
+                                    <h:outputText value="#{occInspectionDetermination.title}"/>
                                 </p:column>
                                  
                                 <p:column>
                                     <f:facet name="header">
-                                        <h:outputText value="Name" />
+                                        <h:outputText value="Description" />
                                     </f:facet>
-                                    <h:outputText value="#{icon.name}"/>
+                                    <h:outputText value="#{occInspectionDetermination.description}"/>
                                 </p:column>
                                 <p:column>
                                     <f:facet name="header">
-                                        <h:outputText value="Style class" />
+                                        <h:outputText value="Notes" />
                                     </f:facet>
-                                    <h:outputText value="#{icon.styleClass}"/>
+                                    <h:outputText value="#{occInspectionDetermination.notes}"/>
                                 </p:column>
                                 <p:column>
                                     <f:facet name="header">
-                                        <h:outputText value="Font Awesome" />
+                                        <h:outputText value="Event Category" />
                                     </f:facet>
-                                    <h:outputText value="#{icon.fontAwesome}"/>
+                                    <h:outputText value="#{occInspectionDetermination.eventCategory.eventCategoryTitle}"/>
                                 </p:column>
                                 <p:column>
                                     <f:facet name="header">
-                                        <h:outputText value="Material Icon" />
+                                        <h:outputText value="Category ID" />
                                     </f:facet>
-                                    <h:outputText value="#{icon.materialIcon}"/>
+                                    <h:outputText value="#{occInspectionDetermination.eventCategory.categoryID}"/>
                                 </p:column>
                             
                             </p:dataTable>
@@ -104,56 +104,56 @@
                         
                         
                     <p:dialog   height="750" width="1000"
-                                widgetVar="icon-addupdate-dialog"
+                                widgetVar="oid-addupdate-dialog"
                                 closable="true" 
                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}">
-                        <h:form id="icon-add-update-form">
+                        <h:form id="oid-add-update-form">
                             
-                            <h2>Add/update icon</h2>
-                            <p><h:outputText id="icon-id-ot" value="Icon ID: #{iconBB.currentIcon.iconID}"/></p>
+                            <h2>Add/update Determination</h2>
+                            <p><h:outputText id="oid-id-ot" value="Icon ID: #{occInspectionDeterminationBB.currentDetermination.determinationID}"/></p>
                             
                             <h:panelGrid columns="2" border="0" 
                                          cellpadding="5" columnClasses="gridTd, gridTd"
                                          footerClass="gridFooter">
                                 
                                 <h:panelGroup>
-                                    <h:outputLabel  id="icon-name-ol"
+                                    <h:outputLabel  id="oid-title-ol"
                                                     value="Name" 
-                                                    for="icon-name-it"/>
-                                    <p:inputText id="icon-name-it" 
-                                                 value="#{iconBB.currentIcon.name}" 
+                                                    for="oid-title-it"/>
+                                    <p:inputText id="oid-title-it" 
+                                                 value="#{occInspectionDeterminationBB.currentDetermination.title}" 
                                                  style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    <h:message for="icon-name-it" showDetail="false" showSummary="true" 
+                                    <h:message for="oid-title-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <h:outputLabel  id="icon-style-ol"
-                                                    value="CSS Style" 
-                                                    for="icon-style-it"/>
-                                    <p:inputText id="icon-style-it" 
-                                                 value="#{iconBB.currentIcon.styleClass}" 
+                                    <h:outputLabel  id="oid-describe-ol"
+                                                    value="Description" 
+                                                    for="oid-describe-it"/>
+                                    <p:inputText id="oid-describe-it" 
+                                                 value="#{occInspectionDeterminationBB.currentDetermination.description}" 
                                                  style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    <h:message for="icon-style-it" showDetail="false" showSummary="true" 
+                                    <h:message for="oid-describe-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <h:outputLabel  id="icon-fa-ol" 
-                                                    value="Font-awesome icon id" 
-                                                    for="icon-fa-it"/>
-                                    <p:inputText id="icon-fa-it" 
-                                                 value="#{iconBB.currentIcon.fontAwesome}" 
+                                    <h:outputLabel  id="oid-note-ol" 
+                                                    value="Notes" 
+                                                    for="oid-note-it"/>
+                                    <p:inputText id="oid-note-it" 
+                                                 value="#{occInspectionDeterminationBB.currentDetermination.notes}" 
                                                  style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    <h:message for="icon-fa-it" showDetail="false" showSummary="true" 
+                                    <h:message for="oid-note-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <h:outputLabel  id="icon-material-ol"
-                                                    value="Material icon ID" 
-                                                    for="icon-material-it"/>
-                                    <p:inputText id="icon-material-it" 
-                                                 value="#{iconBB.currentIcon.materialIcon}" 
+                                    <h:outputLabel  id="oid-eventid-ol"
+                                                    value="Event Category ID" 
+                                                    for="oid-eventid-it"/>
+                                    <p:inputText id="oid-eventid-it" 
+                                                 value="#{occInspectionDeterminationBB.currentDetermination.eventCategory.categoryID}" 
                                                  style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    <h:message for="icon-material-it" showDetail="false" showSummary="true" 
+                                    <h:message for="oid-eventid-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
                             </h:panelGrid>
@@ -161,34 +161,34 @@
                             <p:spacer height="15px"/>
                              <p:commandButton ajax="true" tabindex="2"
                                                  value="Cancel" icon="fa fa-stop" 
-                                                 onclick="PF('icon-addupdate-dialog').hide()"/>
+                                                 onclick="PF('oid-addupdate-dialog').hide()"/>
                              
-                             <p:commandButton    id="icon-commitupdates-cb"
-                                                ajax="true" value="Update icon data" icon="fa fa-plus" 
+                             <p:commandButton    id="oid-commitupdates-cb"
+                                                ajax="true" value="Update Determination data" icon="fa fa-plus" 
                                              tabindex="11" 
-                                             actionListener="#{iconBB.commitUpdates}"
-                                             disabled="#{!(iconBB.currentIcon.iconID!= 0)}"
-                                             oncomplete="PF('icon-addupdate-dialog').hide()"
-                                             update="icon-manage-form:icon-table
-                                             iconmanage-messages-form"
+                                             actionListener="#{occInspectionDeterminationBB.commitUpdates}"
+                                             disabled="#{!(occInspectionDeterminationBB.currentDetermination.determinationID!= 0)}"
+                                             oncomplete="PF('oid-addupdate-dialog').hide()"
+                                             update="oid-manage-form:oid-table
+                                             oidmanage-messages-form"
                                              />
                             
-                             <p:commandButton    id="icon-commitinsert-cb"
-                                                ajax="true" value="Add new icon" icon="fa fa-plus" 
-                                                tabindex="11" actionListener="#{iconBB.commitInsert}"
-                                                disabled="#{!(iconBB.currentIcon.iconID == 0)}"
-                                             oncomplete="PF('icon-addupdate-dialog').hide()"
-                                             update="icon-manage-form:icon-table
-                                             iconmanage-messages-form"
+                             <p:commandButton    id="oid-commitinsert-cb"
+                                                ajax="true" value="Add new Determination" icon="fa fa-plus" 
+                                                tabindex="11" actionListener="#{occInspectionDeterminationBB.commitInsert}"
+                                                disabled="#{!(occInspectionDeterminationBB.currentDetermination.determinationID == 0)}"
+                                             oncomplete="PF('oid-addupdate-dialog').hide()"
+                                             update="oid-manage-form:oid-table
+                                             oidmanage-messages-form"
                                              />
                              
-                             <p:commandButton    id="icon-commitremove-cb"
-                                                ajax="true" value="Remove icon" icon="fa fa-trash" 
-                                                tabindex="11" actionListener="#{iconBB.commitRemove}"
-                                                disabled="#{!(iconBB.currentIcon.iconID != 0)}"
-                                             oncomplete="PF('icon-addupdate-dialog').hide()"
-                                             update="icon-manage-form:icon-table
-                                             iconmanage-messages-form"
+                             <p:commandButton    id="oid-commitremove-cb"
+                                                ajax="true" value="Remove Determination" icon="fa fa-trash" 
+                                                tabindex="11" actionListener="#{occInspectionDeterminationBB.commitRemove}"
+                                                disabled="#{!(occInspectionDeterminationBB.currentDetermination.determinationID != 0)}"
+                                             oncomplete="PF('oid-addupdate-dialog').hide()"
+                                             update="oid-manage-form:oid-table
+                                             oidmanage-messages-form"
                                              />
                                              
 

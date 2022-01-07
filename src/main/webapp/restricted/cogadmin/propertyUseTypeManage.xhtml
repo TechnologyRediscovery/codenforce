@@ -18,7 +18,7 @@
                         <p:growl id="growl" showDetail="true"/>
                     </h:form>
                             
-                    <h1>PUT Manager</h1>
+                    <h1>Property Use Type Manager</h1>
                     <f:view>
                         <h:form id="put-manage-form">
                             
@@ -110,11 +110,9 @@
                             <h2>Add/update Property Use Type</h2>
                             <p><h:outputText id="put-id-ot" value="userid: #{propertyUseTypeBB.currentPut.typeID}"/></p>
                             
-                            <h:panelGrid columns="2" border="0" 
-                                         cellpadding="5" columnClasses="gridTd, gridTd"
-                                         footerClass="gridFooter">
-                                
-                                <h:panelGroup>
+                            
+                            <div class="p-grid">
+                                <div class="p-col-6">
                                     <h:outputLabel  id="put-name-ol"
                                                     value="Name" 
                                                     for="put-name-it"/>
@@ -123,8 +121,8 @@
                                                  style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
                                     <h:message for="put-name-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                <h:panelGroup>
+                                </div>
+                                <div class="p-col-6">
                                     <h:outputLabel  id="put-describe-ol"
                                                     value="Description" 
                                                     for="put-describe-it"/>
@@ -133,20 +131,34 @@
                                                  style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
                                     <h:message for="put-describe-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <h:outputLabel  id="put-iconid-ol" 
-                                                    value="Icon ID" 
-                                                    for="put-iconid-it"/>
-                                    <p:inputText id="put-iconid-it" 
-                                                 value="#{propertyUseTypeBB.currentPut.icon.iconID}" 
-                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    
-                                    
-                                    <h:message for="put-iconid-it" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                                <h:panelGroup>
+                                </div>
+                                <div class="p-col-6">
+                                    <p:outputLabel for="@next" value="Icon"/>
+                                    <p:selectOneMenu id="advanced" value="#{propertyUseTypeBB.currentPut.icon}"
+                                                     panelStyle="width:180px" var="i" converter="iconConverter"
+                                                    filter="true" filterMatchMode="startsWith">
+
+                                        <f:selectItems value="#{propertyUseTypeBB.iconList}" var="icon"
+                                                    itemLabel="#{icon.name}" itemValue="#{icon}"/>
+
+                                        <p:column style="width:10%">
+                                            <i class="material-icons"><h:outputText value="#{i.materialIcon}"/></i>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Name"/>
+                                            </f:facet>
+                                            <h:outputText value="#{i.name}"/>
+                                        </p:column>
+
+                                        <f:facet name="footer">
+                                            <h:outputText value="#{propertyUseTypeBB.iconList.size()} icons" 
+                                                       style="font-weight:bold;" styleClass="p-py-1 p-d-block"/>
+                                         </f:facet>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-col-6">
                                     <h:outputLabel  id="put-zoneclass-ol"
                                                     value="Zone Class" 
                                                     for="put-zoneclass-it"/>
@@ -155,8 +167,8 @@
                                                  style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
                                     <h:message for="put-zoneclass-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
-                            </h:panelGrid>
+                                </div>
+                            </div>
 
                             <p:spacer height="15px"/>
                              <p:commandButton ajax="true" tabindex="2"

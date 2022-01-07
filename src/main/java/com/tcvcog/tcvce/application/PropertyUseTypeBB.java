@@ -26,6 +26,8 @@ public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
     private List<PropertyUseType> putList;
     private PropertyUseType currentPut;
     
+    private List<Icon> iconList;
+    
     /**
      * Creates a new 
      * instance of PropertyUseTypeBB
@@ -38,12 +40,14 @@ public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
     @PostConstruct
     public void initBean(){
         refreshPutList();
+        createNewPut();
     }
     
     public void refreshPutList(){
         SystemCoordinator sc = getSystemCoordinator();
         try {
             putList = sc.getPutList();
+            setIconList(sc.getIconList());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -145,6 +149,20 @@ public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
      */
     public void setCurrentPut(PropertyUseType currentPut) {
         this.currentPut = currentPut;
+    }
+
+    /**
+     * @return the iconList
+     */
+    public List<Icon> getIconList() {
+        return iconList;
+    }
+
+    /**
+     * @param iconList the iconList to set
+     */
+    public void setIconList(List<Icon> iconList) {
+        this.iconList = iconList;
     }
     
 }

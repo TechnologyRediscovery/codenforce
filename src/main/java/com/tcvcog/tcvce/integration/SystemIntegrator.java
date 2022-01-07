@@ -362,7 +362,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return style;
 
     }
-
+    
     private PrintStyle generatePrintStyle(ResultSet rs) throws SQLException {
         PrintStyle style = new PrintStyle();
 
@@ -380,7 +380,15 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return style;
     }
     
-    private int checkForUse(String tableName, String target, int targetID) throws IntegrationException{
+    /**
+     * 
+     * @param tableName Name of the target table to search
+     * @param target    Name of the target column
+     * @param targetID  Identifier of the target
+     * @return int number of uses of targetID found in tableName on column target
+     * @throws IntegrationException 
+     */
+    public int checkForUse(String tableName, String target, int targetID) throws IntegrationException{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -411,10 +419,15 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return uses;
-        
     }
     
-    private List<String> findForeignUseTables(String search) throws IntegrationException {
+    /**
+     * 
+     * @param search String to search for foreign keys
+     * @return List<String> of tables with foreign keys to search
+     * @throws IntegrationException 
+     */
+    public List<String> findForeignUseTables(String search) throws IntegrationException {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -628,7 +641,6 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         return p;
-
     }
     
     public void deactivatePut(PropertyUseType p) throws IntegrationException {
@@ -727,7 +739,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
         return putList;
     }
-
+    
     public void insertImprovementSuggestion(ImprovementSuggestion is) throws IntegrationException {
 
         Connection con = getPostgresCon();

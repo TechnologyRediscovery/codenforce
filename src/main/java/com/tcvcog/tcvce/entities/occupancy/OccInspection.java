@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionRequirementAssigned;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 
 import java.time.LocalDateTime;
@@ -96,6 +97,8 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     private String generalComments;
 
     private OccInspectionCause cause;
+    
+    private List<OccInspectionRequirementAssigned> requirementList;
     
     public OccInspection() {
         inspectedSpaceList = new ArrayList<>();
