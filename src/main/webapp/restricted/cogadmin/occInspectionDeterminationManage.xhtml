@@ -1,0 +1,207 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Icon Manager</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:form id="iconmanage-messages-form">
+                        <p:growl id="growl" showDetail="true"/>
+                    </h:form>
+                            
+                    <h1>Icon Manager</h1>
+                    <f:view>
+                        <h:form id="icon-manage-form">
+                            
+                            <p:commandButton ajax="true" value="Add New Icon" icon="fa fa-plus" 
+                                             actionListener="#{iconBB.createNewIcon}"
+                                             oncomplete="PF('icon-addupdate-dialog').show()"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                             update="icon-add-update-form"/>
+                            
+                            <p:spacer height="15px"/>
+                            
+                             <p:dataTable
+                                id="icon-table"
+                                var="icon"
+                                value="#{iconBB.iconList}"
+                                rowKey="#{icon.iconID}"
+                                tableStyleClass="primeDataTable">
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{icon.iconID}"/>
+                                </p:column>
+                                 
+                                 <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Icon" />
+                                    </f:facet>
+                                    <i class="material-icons"><h:outputText value="#{icon.materialIcon}"/></i>
+                                </p:column>
+                                 
+                                 <p:column width="8%">
+                                    <p:commandButton ajax="true"
+                                                     id="update-icon-cb" value="edit" icon="#{icon.fontAwesome}"
+                                        styleClass="multiButtonLineButton" 
+                                        actionListener="#{iconBB.editIcon(icon)}"
+                                        oncomplete="PF('icon-addupdate-dialog').show()"
+                                        update="icon-add-update-form" />
+                                </p:column>
+                                 
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Name" />
+                                    </f:facet>
+                                    <h:outputText value="#{icon.name}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Style class" />
+                                    </f:facet>
+                                    <h:outputText value="#{icon.styleClass}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Font Awesome" />
+                                    </f:facet>
+                                    <h:outputText value="#{icon.fontAwesome}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Material Icon" />
+                                    </f:facet>
+                                    <h:outputText value="#{icon.materialIcon}"/>
+                                </p:column>
+                            
+                            </p:dataTable>
+                            
+                        <p:spacer height="15px"/>
+                        <hr/>
+                        <p:spacer height="15px"/>
+                        
+
+                        </h:form>
+                        
+                    <p:dialog      height="650" width="800"
+                                   widgetVar="user-info-dialog"
+                                   closable="true" 
+                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
+                        
+
+                    </p:dialog>
+                        
+                        
+                        
+                    <p:dialog   height="750" width="1000"
+                                widgetVar="icon-addupdate-dialog"
+                                closable="true" 
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}">
+                        <h:form id="icon-add-update-form">
+                            
+                            <h2>Add/update icon</h2>
+                            <p><h:outputText id="icon-id-ot" value="Icon ID: #{iconBB.currentIcon.iconID}"/></p>
+                            
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+                                
+                                <h:panelGroup>
+                                    <h:outputLabel  id="icon-name-ol"
+                                                    value="Name" 
+                                                    for="icon-name-it"/>
+                                    <p:inputText id="icon-name-it" 
+                                                 value="#{iconBB.currentIcon.name}" 
+                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                    <h:message for="icon-name-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel  id="icon-style-ol"
+                                                    value="CSS Style" 
+                                                    for="icon-style-it"/>
+                                    <p:inputText id="icon-style-it" 
+                                                 value="#{iconBB.currentIcon.styleClass}" 
+                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                    <h:message for="icon-style-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel  id="icon-fa-ol" 
+                                                    value="Font-awesome icon id" 
+                                                    for="icon-fa-it"/>
+                                    <p:inputText id="icon-fa-it" 
+                                                 value="#{iconBB.currentIcon.fontAwesome}" 
+                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                    <h:message for="icon-fa-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel  id="icon-material-ol"
+                                                    value="Material icon ID" 
+                                                    for="icon-material-it"/>
+                                    <p:inputText id="icon-material-it" 
+                                                 value="#{iconBB.currentIcon.materialIcon}" 
+                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                    <h:message for="icon-material-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                            </h:panelGrid>
+
+                            <p:spacer height="15px"/>
+                             <p:commandButton ajax="true" tabindex="2"
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('icon-addupdate-dialog').hide()"/>
+                             
+                             <p:commandButton    id="icon-commitupdates-cb"
+                                                ajax="true" value="Update icon data" icon="fa fa-plus" 
+                                             tabindex="11" 
+                                             actionListener="#{iconBB.commitUpdates}"
+                                             disabled="#{!(iconBB.currentIcon.iconID!= 0)}"
+                                             oncomplete="PF('icon-addupdate-dialog').hide()"
+                                             update="icon-manage-form:icon-table
+                                             iconmanage-messages-form"
+                                             />
+                            
+                             <p:commandButton    id="icon-commitinsert-cb"
+                                                ajax="true" value="Add new icon" icon="fa fa-plus" 
+                                                tabindex="11" actionListener="#{iconBB.commitInsert}"
+                                                disabled="#{!(iconBB.currentIcon.iconID == 0)}"
+                                             oncomplete="PF('icon-addupdate-dialog').hide()"
+                                             update="icon-manage-form:icon-table
+                                             iconmanage-messages-form"
+                                             />
+                             
+                             <p:commandButton    id="icon-commitremove-cb"
+                                                ajax="true" value="Remove icon" icon="fa fa-trash" 
+                                                tabindex="11" actionListener="#{iconBB.commitRemove}"
+                                                disabled="#{!(iconBB.currentIcon.iconID != 0)}"
+                                             oncomplete="PF('icon-addupdate-dialog').hide()"
+                                             update="icon-manage-form:icon-table
+                                             iconmanage-messages-form"
+                                             />
+                                             
+
+                        </h:form>
+
+                    </p:dialog>
+                        
+                        
+                        
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
