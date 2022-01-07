@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Represents an ordinance that has been inspected (or is in queue
+ * to be inspected) during an occupancy inspection
  * @author ellen bascomb of apt 31y
  */
 public class OccInspectedSpaceElement

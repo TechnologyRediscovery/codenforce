@@ -125,7 +125,6 @@
                     </p:commandLink>
                     <p:commandLink ajax="true"
                                    style="color:blue;"
-                                   actionListener="#{occInspectionsBB.clearSelections}"
                                    oncomplete="PF('inspections-inspectiondetails-var').show()"
                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                    update="inspections-inspectiondetails-form"
@@ -153,12 +152,11 @@
                         <p:column headerText="Actions">
                             <p:commandLink ajax="true"
                                            style="color:blue;"
-                                           actionListener="#{occInspectionsBB.clearSelections}"
                                            oncomplete="PF('inspections-entryscreen-var').show()"
                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                            update="inspections-entryscreen-form"
                                            value="Edit">
-                                <f:actionListener binding="#{occInspectionsBB.setSelectedInspectedSpace(inspectedSpace)}"/>
+                                <f:actionListener binding="#{occInspectionsBB.onViewInspectedSpaceLinkClick(inspectedSpace, inspection)}"/>
                             </p:commandLink>
                         </p:column>
                     </p:dataTable>
@@ -207,7 +205,6 @@
                     </p:column>
                 </p:dataTable>
 
-                <f:facet name="footer">
                     <p:commandButton value="Cancel"
                                      icon="pi pi-times"
                                      class="ui-button-outlined p-mr-1"
@@ -219,7 +216,6 @@
                                      actionListener="#{occInspectionsBB.onChecklistSelectionCompleteButtonActuation}"
                                      update="@form:@parent:inspections-selectinspector-form"
                                      oncomplete="PF('inspections-selectchecklist-var').hide(); PF('inspections-selectinspector-var').show()"/>
-                </f:facet>
             </h:form>
         </p:dialog>
 
@@ -639,56 +635,113 @@
         </p:dialog>
 
     <!-- Barely realized form that should show stats for one OccInspectedSpace(?) and all of its ordinances -->
+    
         <p:dialog id="inspections-entryscreen"
                   height="600" width="1000"
                   widgetVar="inspections-entryscreen-var"
-                  header="Placeholder Dialog Title"
+                  header="Inspect code elements in space type"
                   modal="true"
                   resizable="true">
-            <h:form id="inspections-entryscreen-form">
+                <h1><h:outputText value="#{occInspectionsBB.selectedInspectedSpace.location.locationDescription}"/></h1>
                 <div class="p-d-flex p-jc-between">
-                    <h1><h:outputText value="#{occInspectionsBB.selectedInspectedSpace.location.locationDescription}"/></h1>
-                    <div>
-                        <p:commandButton value="Pass All"/>
-                    </div>
-                    <div>
-                        <p:commandButton value="Edit Space" class="p-mr-1"/>
-                        <p:commandButton value="Remove Space"/>
-                    </div>
-                </div>
-                <p:repeat value="#{occInspectionsBB.selectedInspectedSpace.inspectedElementListVisible}" var="spaceElement">
-                    <div class="p-grid">
-                        <div class="p-col-12 p-md-4">
-                            <h3><h:outputText value="§#{spaceElement.ordSecNum}:#{spaceElement.ordSecTitle}; §§#{spaceElement.ordSubSecNum} #{spaceElement.ordSubSecTitle}"/></h3>
-                            <ul>
-                                <li><h:outputText value="#{spaceElement.ordTechnicalText}"/></li>
-                            </ul>
+
+                        <div>
+                            <h:form id="inspections-entryscreen-controls-form">
+                                <p:selectOneMenu    id="inspections-entryscreen-statussel" 
+                                                    value="#{occInspectionsBB.selectedElementStatusForBatch}" 
+                                                    >
+                                                <!-- Strangely this element needs to update itself to call the setter -->
+                                                <f:selectItem noSelectionOption="true"
+                                                              itemDisabled="true"
+                                                              itemLabel="choose a batch status" />
+                                                <f:selectItems value="#{occInspectionsBB.statuses}" 
+                                                               var="status" 
+                                                               itemLabel="#{status.label}"/>
+                                </p:selectOneMenu>
+                                
+                                <p:commandLink     id="applybatch-cl"
+                                                    ajax="true"
+                                                    style="color:blue;"
+                                                    update="@form:@parent:inspections-entryscreen-form:element-accordion
+                                                            @form:@parent:inspections-growl-form"
+                                                    value="Batch apply to all ords"
+                                                    actionListener="#{occInspectionsBB.onBatchProcessElementLinkClick}" />
+                                    
+                                    
+                                
+                                
+                            <p:commandButton value="Edit Space" 
+                                             class="p-mr-1"/>
+
+                            <p:commandButton value="Remove Space"/>
+                            </h:form>
                         </div>
-                        <div class="p-col-12 p-md-4 p-mt-5">
-                            <p:selectOneButton id="inspections-entryscreen-statussel" value="#{spaceElement.statusEnum}" unselectable="false">
-                                <!-- Strangely this element needs to update itself to call the setter -->
-                                <p:ajax update="inspections-entryscreen-statussel"/>
-                                <f:selectItems value="#{occInspectionsBB.statuses}" var="status" itemLabel="#{status.label}"/>
-                            </p:selectOneButton>
-                            <div class="p-d-flex p-mt-2 p-jc-end">
-                                <p:selectBooleanCheckbox itemLabel="Exclude from NOV"/>
-                            </div>
+                        <div>
                         </div>
-                        <div class="p-col-12 p-md-4">
-                            <div class="p-d-flex">
-                                <div>
-                                    <p class="p-mb-0">Comments:</p>
-                                    <p:inputTextarea rows="6" cols="33"/>
+                    </div>
+              
+                <p:separator />
+                
+            <h:form id="inspections-entryscreen-form">
+                <p:accordionPanel id="element-accordion"
+                                  value="#{occInspectionsBB.selectedInspectedSpace.inspectedElementGroupList}" 
+                                    var="elegrp"
+                                    >
+                    <p:tab title="#{elegrp.groupTitle}">
+                        <p:repeat value="#{elegrp.elementList}" 
+                          var="spaceElement">
+                            <div class="p-grid">
+                                <div class="p-col-12 p-md-4">
+                                    <h3><h:outputText value="§#{spaceElement.ordSecNum}:#{spaceElement.ordSecTitle}; §§#{spaceElement.ordSubSecNum} #{spaceElement.ordSubSecTitle}"/></h3>
+                                    
+                                    <ul>
+                                        <li><h:outputText value="#{spaceElement.ordTechnicalText}"/></li>
+                                    </ul>
                                 </div>
-                                <div class="p-mx-3 p-mt-5">
-                                    <p:button icon="pi pi-plus" styleClass="rounded-button"/>
-                                    <p>Add Photo</p>
+                                <div class="p-col-12 p-md-4 p-mt-5">
+                                    <p:selectOneButton id="inspections-entryscreen-statussel" 
+                                                       value="#{spaceElement.statusEnum}" 
+                                                       unselectable="false">
+                                        <!-- Strangely this element needs to update itself to call the setter -->
+                                        <p:ajax update="inspections-entryscreen-statussel"/>
+                                        <p:ajax update="@form:element-accordion"/>
+                                        <p:ajax update="@form:@parent:inspections-growl-form"/>
+                                        <p:ajax listener="#{occInspectionsBB.onElementInspectionStatusButtonChange(spaceElement)}" />
+                                        <f:selectItems value="#{occInspectionsBB.statuses}" 
+                                                       var="status" 
+                                                       itemLabel="#{status.label}"/>
+                                    </p:selectOneButton>
+                                    <div class="p-d-flex p-mt-2 p-jc-end">
+                                        <p:selectBooleanCheckbox    id="insp-ele-excludefromnov-cb"
+                                                                    itemLabel="Include fail in Code Enf Case"
+                                                                    rendered="#{(!empty spaceElement.lastInspectedTS) and (empty spaceElement.complianceGrantedTS)}"
+                                                                    value="#{spaceElement.migrateToCaseOnFail}"/>
+                                    </div>
+                                </div>
+                                <div class="p-col-12 p-md-4">
+                                    <div class="p-d-flex">
+                                        <div>
+                                            <p class="p-mb-0">Findings:</p>
+                                            <p:inputTextarea rows="6" cols="33"/>
+                                        </div>
+                                        <div class="p-mx-3 p-mt-5">
+                                            <p:button icon="pi pi-plus" 
+                                                      styleClass="rounded-button"/>
+                                            <p>Add Photo</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </p:repeat>
+                        </p:repeat>
+                    </p:tab>
+                </p:accordionPanel>
+
+                <p:separator />
+                
+              
+                
                 <p:commandButton value="Add Ordinance" icon="pi pi-plus"/>
+                
             </h:form>
         </p:dialog>
 </ui:composition>

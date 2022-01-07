@@ -268,7 +268,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             
             inspectedEle = new OccInspectedSpaceElement(ci.getCodeElement(rs.getInt("codeelement_id")));
             
-            inspectedEle.setInspectedSpaceElementID(rs.getInt("occchecklistspacetypeelement_elementid"));
+            inspectedEle.setInspectedSpaceElementID(rs.getInt("inspectedspaceelementid"));
+            inspectedEle.setOccChecklistSpaceTypeElementID(rs.getInt("occchecklistspacetypeelement_elementid"));
             
             inspectedEle.setInspectionNotes(rs.getString("oisenotes"));
             inspectedEle.setLocation(getLocationDescriptor(rs.getInt("locationdescription_id")));
@@ -552,6 +553,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         
         // single row formatting of query_icse
         // SELECT DISTINCT space_id FROM checklistspaceelement INNER JOIN spaceelement ON (spaceelement_id = spaceelementid) WHERE checklist_id = 1;
+        
+        if(inspElement == null || inspElement.getInspectedSpaceElementID() == 0){
+            throw new IntegrationException("Cannot insert inspected element with an ID of 0 or null");
+        }
+        
         int newlyInspectedSpaceElement = 0;
         Connection con = getPostgresCon();
         ResultSet rs = null;

@@ -5,6 +5,7 @@ import com.tcvcog.tcvce.application.SessionBean;
 import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -14,6 +15,8 @@ import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
@@ -39,6 +42,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     private OccSpaceTypeChecklistified selectedSpaceType;
 
     private OccInspectedSpace selectedInspectedSpace;
+    
+    private OccInspectionStatusEnum selectedElementStatusForBatch;
     
 
     private boolean editMode;
@@ -155,6 +160,19 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         selectedInspector = getSessionBean().getSessOccPeriod().getManager();
         
     }
+    
+    /**
+     * Listener for user requests to view a space for inspection.
+     * @param ois 
+     * @param oi the inspection
+     */
+    public void onViewInspectedSpaceLinkClick(OccInspectedSpace ois, OccInspection oi){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        selectedInspectedSpace = oic.configureElementDisplay(ois);
+        selectedInspection = oi;
+        System.out.println("OccInspectionsBB.onViewInspectedSpaceLinkClick | ois: " + ois.getInspectedSpaceID());
+        
+    }
 
     /**
      * Listener for user requests to add a chosen OccSpace to the current inspection
@@ -168,7 +186,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
 //             Maybe its important that i'm not passing a user or OccInspectionStatusEnum but i think its fine.
-            selectedInspection = oic.inspectSpace(
+            selectedInspection = oic.inspectionAction_commenceInspectionOfSpaceTypeChecklistified(
                                                 selectedInspection, 
                                                 selectedInspection.getInspector(), 
                                                 selectedSpaceType, 
@@ -197,6 +215,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     /**
      * Clears all parameters that might be selected during an inspection flow
      * so that one may start completely fresh. May be called, for example, by a button to start a flow.
+     * ECD: We shouldn;t be making objects here!!!!
      */
     public void clearSelections() {
         setSelectedChecklistTemplate(new OccChecklistTemplate());
@@ -212,13 +231,80 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      * @param ev 
      */
     public void onAddSpaceLinkClick(OccInspection oi){
-        clearSelections();
+//        clearSelections();
         selectedInspection = oi;
+    }
+    
+    /**
+     * Listener for user clicks of the not inspected/pass/fail button
+     * 
+     * @param oise the element in the inspection accordion
+     */
+    public void onElementInspectionStatusButtonChange(OccInspectedSpaceElement oise){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        System.out.println("OccInspectionBB.onElementInspectionStatusButtonChange | oise: " + oise.getInspectedSpaceElementID() + " status: " + oise.getStatusEnum().getLabel());
+        try {
+            oic.inspectionAction_recordElementInspectionByStatusEnum(oise, getSessionBean().getSessUser(), selectedInspection);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Recorded status of element ID: " + oise.getInspectedSpaceElementID(), ""));
+        } catch (AuthorizationException | BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.toString(), ""));
+          
+        } 
         
-        
+    }
+    
+    /**
+     * Listener for user requests to apply a status to all elements in the current
+     * spacetype
+     * @param ev 
+     */
+    public void onBatchProcessElementLinkClick(ActionEvent ev){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        if(selectedElementStatusForBatch != null){
+            try {
+                oic.inspectionAction_batchConfigureInspectedSpace(  selectedInspectedSpace, 
+                                                                    selectedElementStatusForBatch, 
+                                                                    getSessionBean().getSessUser(), 
+                                                                    selectedInspection);
+                refreshCurrentInspectionAndRestoreSelectedSpace();
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Success! Applied status " 
+                                       + selectedElementStatusForBatch.getLabel() 
+                                       + " To all ordinances in this space!", ""));
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               ex.toString(), ""));
+            } 
+        }
         
         
     }
+    
+    /**
+     * Asks coordinator for new inspection and finds the current space type in the
+     * returned freshly updated inspection object and makes its version of the
+     * current space the current one
+     */
+    private void refreshCurrentInspectionAndRestoreSelectedSpace() throws IntegrationException, BObStatusException{
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        selectedInspection = oic.getOccInspection(selectedInspection.getInspectionID());
+        for(OccInspectedSpace ois: selectedInspection.getInspectedSpaceList()){
+            if(ois.getInspectedSpaceID() == selectedInspectedSpace.getInspectedSpaceID()){
+                selectedInspectedSpace = oic.configureElementDisplay(ois);
+                System.out.println("OccInspectionsBB.refreshCurrentInspectionAndRestoreSelectedSpace | oisid " + ois.getInspectedSpaceID());
+                break;
+            }
+        }
+    }
+    
 
     // getters & setters below you know the drill
 
@@ -298,5 +384,19 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedSpaceType(OccSpaceTypeChecklistified selectedSpaceType) {
         this.selectedSpaceType = selectedSpaceType;
+    }
+
+    /**
+     * @return the selectedElementStatusForBatch
+     */
+    public OccInspectionStatusEnum getSelectedElementStatusForBatch() {
+        return selectedElementStatusForBatch;
+    }
+
+    /**
+     * @param selectedElementStatusForBatch the selectedElementStatusForBatch to set
+     */
+    public void setSelectedElementStatusForBatch(OccInspectionStatusEnum selectedElementStatusForBatch) {
+        this.selectedElementStatusForBatch = selectedElementStatusForBatch;
     }
 }

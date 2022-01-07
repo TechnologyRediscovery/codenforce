@@ -575,14 +575,19 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
                     ostc.setNotes(rs.getString("ocstnotes"));
                     containerBuilt = true;
                 }
-                                    
-                // this call to the code coordinator is basically an antipattern--but for this level of 
-                // complexity of object creation, we'll try this for testing
-                OccSpaceElement ele = new OccSpaceElement(getCodeCoordinator().getCodeElement(rs.getInt("codeelement_id")));
-                ele.setRequiredForInspection(rs.getBoolean("ocsterequired"));
-                ele.setOccChecklistSpaceTypeElementID(rs.getInt("spaceelementid"));
-                ele.setNotes(rs.getString("ocstenotes"));
-                eleList.add(new OccSpaceElement(ele));
+                
+                // Because of this yucky left outer join, we can get back a row to correspond
+                // to a type but a type that has no elements to inspect. So this was yielding
+                // an occspacelement without any guts and erroring out the insert.
+                if(rs.getInt("spaceelementid") != 0){
+                    // this call to the code coordinator is basically an antipattern--but for this level of 
+                    // complexity of object creation, we'll try this for testing
+                    OccSpaceElement ele = new OccSpaceElement(getCodeCoordinator().getCodeElement(rs.getInt("codeelement_id")));
+                    ele.setRequiredForInspection(rs.getBoolean("ocsterequired"));
+                    ele.setOccChecklistSpaceTypeElementID(rs.getInt("spaceelementid"));
+                    ele.setNotes(rs.getString("ocstenotes"));
+                    eleList.add(new OccSpaceElement(ele));
+                }
             }
             //inject our list of elements
             if(ostc !=null){

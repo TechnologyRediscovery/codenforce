@@ -43,6 +43,8 @@ public class OccInspectedSpace
     private List<OccInspectedSpaceElement> inspectedElementListVisible;
     private ViewOptionsOccChecklistItemsEnum viewSetting;
     
+    private List<OccInsElementGroup> inspectedElementGroupList;
+    
     private OccLocationDescriptor location;
 
     private User addedToChecklistBy;
@@ -314,6 +316,20 @@ public class OccInspectedSpace
 
     public void setInspectionID(int inspectionID) {
         this.inspectionID = inspectionID;
+    }
+
+    /**
+     * @return the inspectedElementGroupList
+     */
+    public List<OccInsElementGroup> getInspectedElementGroupList() {
+        return inspectedElementGroupList;
+    }
+
+    /**
+     * @param inspectedElementGroupList the inspectedElementGroupList to set
+     */
+    public void setInspectedElementGroupList(List<OccInsElementGroup> inspectedElementGroupList) {
+        this.inspectedElementGroupList = inspectedElementGroupList;
     }
     
 }

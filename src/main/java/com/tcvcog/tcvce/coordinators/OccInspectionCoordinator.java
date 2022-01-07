@@ -17,11 +17,13 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.*;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccChecklistIntegrator;
@@ -31,7 +33,10 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +46,9 @@ import java.util.stream.Collectors;
  */
 public class OccInspectionCoordinator extends BackingBeanUtils implements Serializable {
 
+    final static String NO_ELEMENT_CATEGORY_TITLE = "Uncategorized";
+    
+    
     public OccInspectionCoordinator() {
     }
     
@@ -142,12 +150,12 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      *
      * @throws IntegrationException
      */
-    public OccInspection        inspectSpace  (OccInspection inspection,
-                                              User user,
-                                              OccSpaceTypeChecklistified tpe,
-                                              OccInspectionStatusEnum initialStatus,
-                                              OccLocationDescriptor locDesc) 
-            throws IntegrationException {
+    public OccInspection inspectionAction_commenceInspectionOfSpaceTypeChecklistified  (OccInspection inspection,
+                                                                                        User user,
+                                                                                        OccSpaceTypeChecklistified tpe,
+                                                                                        OccInspectionStatusEnum initialStatus,
+                                                                                        OccLocationDescriptor locDesc) 
+                                                                                throws IntegrationException {
 
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
 
@@ -170,24 +178,17 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         // Wrap each CodeElement in an InspectedCodeElement blanket to keep it warm :)
         List<OccInspectedSpaceElement> inspectedElements;
         inspectedElements = tpe.getCodeElementList().stream().map(element -> {
-            OccInspectedSpaceElement inspectedElement = new OccInspectedSpaceElement(element);
+        OccInspectedSpaceElement inspectedElement = new OccInspectedSpaceElement(element);
 
             switch (initialStatus) {
                 case FAIL:
-                    inspectedElement.setLastInspectedBy(user);
-                    inspectedElement.setLastInspectedTS(LocalDateTime.now());
-                    inspectedElement.setComplianceGrantedBy(null);// fail means this is null
-                    inspectedElement.setComplianceGrantedTS(null);// fail means this is null
+                    inspectionAction_configureElementForInspectionNoCompliance(inspectedElement, user, inspection);
                     break;
                 case PASS:
-                    inspectedElement.setLastInspectedBy(user);
-                    inspectedElement.setLastInspectedTS(LocalDateTime.now());
-                    inspectedElement.setComplianceGrantedBy(user);
-                    inspectedElement.setComplianceGrantedTS(LocalDateTime.now());
+                    inspectionAction_configureElementForCompliance(inspectedElement, user, inspection);
                     break;
                 default:
-                    inspectedElement.setLastInspectedBy(null);
-                    inspectedElement.setLastInspectedTS(null);
+                    inspectionAction_configureElementForNotInspected(inspectedElement, user, inspection);
             }
             return inspectedElement;
         }).collect(Collectors.toList());
@@ -225,6 +226,9 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         return oi;
     }
 
+    
+    
+    
     /**
      * Assembles a list of all OccInspections for a given period
      * @param period
@@ -271,7 +275,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     }
 
     /**
-     * Logic for setting members on OccInspectedSpace
+     * Logic for setting members on OccInspectedSpace on extraction from DB
      * @param inSpace
      * @return
      * @throws BObStatusException 
@@ -323,6 +327,49 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         Collections.sort(inSpace.getInspectedElementList());
         return inSpace;
 
+    }
+    
+    /**
+     * Builds a single generation tree of elements for display in an accordion
+     * panel whose "folds" each has a list of logically grouped elements
+     * 
+     * @param ois containing all the CodeElements in its belly
+     * @return the same ois but with a nice List of OccInsElementGroup objects!
+     */
+    public OccInspectedSpace configureElementDisplay(OccInspectedSpace ois){
+        if(ois != null){
+            // build a map first, keyed to code guide category name
+            Map<String, List<OccInspectedSpaceElement>> oismap = new HashMap<>();
+            
+            if(!ois.getInspectedElementList().isEmpty()){
+                for(OccInspectedSpaceElement oise: ois.getInspectedElementList()){
+                    String cat = null;
+                    if(oise.getGuideEntry() != null){
+                         cat = oise.getGuideEntry().getCategory();
+                    }
+                    if(cat == null){
+                        cat = NO_ELEMENT_CATEGORY_TITLE;
+                    }
+                    if(oismap.containsKey(cat)){
+                        oismap.get(cat).add(oise);
+                    } else {
+                        List<OccInspectedSpaceElement> oisel = new ArrayList<>();
+                        oisel.add(oise);                        
+                        oismap.put(cat, oisel);
+                    }
+                }
+            }
+            // now unpack the map and build our groupings for display
+            
+            Set<String> catSet = oismap.keySet();
+            List<OccInsElementGroup> groupList = new ArrayList<>();
+            for(String c: catSet){
+                OccInsElementGroup grp = new OccInsElementGroup(c, oismap.get(c));
+                groupList.add(grp);
+            }
+            ois.setInspectedElementGroupList(groupList);
+        } // end if for non null input param
+        return ois;
     }
 
     /**
@@ -383,25 +430,93 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         oii.deleteInspectedSpace(spc);
     }
+    
+    /**
+     * Routing method for code elements as they are inspected. This method 
+     * 
+     * calls the respective methods inside this coordinator based on the value of the
+     * OccInspectedSpaceElements statusEnum
+     * 
+     * @param oise the element being inspected with a statusEnum set to the desired state
+     * @param ua the user doing the inspecting; must have CEO or better permissions
+     * @param oi the inspection in which the element lives
+     * @throws AuthorizationException
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void inspectionAction_recordElementInspectionByStatusEnum(OccInspectedSpaceElement oise,
+                                                                     UserAuthorized ua,
+                                                                     OccInspection oi) throws AuthorizationException, BObStatusException, IntegrationException{
+        if(oise == null || ua == null || oi == null){
+            throw new BObStatusException("Cannot update code element status with null element, user, or inspection");
+        }
+        if(!ua.getMyCredential().isHasEnfOfficialPermissions()){
+            throw new AuthorizationException("User " + ua.getUsername() + " is not authorized to change code element status");
+        }
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        switch(oise.getStatusEnum()){
+            case NOTINSPECTED:
+                inspectionAction_configureElementForNotInspected(oise, ua, oi);
+                break;
+            case FAIL:
+                inspectionAction_configureElementForInspectionNoCompliance(oise, ua, oi);
+                break;
+            case PASS:
+                inspectionAction_configureElementForCompliance(oise, ua, oi);
+                break;
+        }
+        // write changes to db
+        oii.updateInspectedSpaceElement(oise);
+
+    }
+    
+    
+    public OccInspectedSpace inspectionAction_batchConfigureInspectedSpace(OccInspectedSpace ois,
+                                                                            OccInspectionStatusEnum oise,
+                                                                            UserAuthorized ua,
+                                                                            OccInspection oi) throws BObStatusException, IntegrationException{
+        if(ois == null || oise == null || ua == null || oi == null){
+            throw new BObStatusException("Cannot batch update with null ois, user, or inspection");
+        }
+        
+        List<OccInspectedSpaceElement> oisel = ois.getInspectedElementList();
+        if(oisel != null && !oisel.isEmpty()){
+            OccInspectionIntegrator oii = getOccInspectionIntegrator();
+            for(OccInspectedSpaceElement ele: oisel){
+                switch(oise){
+                    case NOTINSPECTED:
+                        inspectionAction_configureElementForNotInspected(ele, ua, oi);
+                        break;
+                    case FAIL:
+                        inspectionAction_configureElementForInspectionNoCompliance(ele, ua, oi);
+                        break;
+                    case PASS:
+                        inspectionAction_configureElementForCompliance(ele, ua, oi);
+                        break;
+                } // close switch
+                oii.updateInspectedSpaceElement(ele);
+            } // close for over elements
+        } // close not null
+        return ois;
+    }
+    
 
     /**
      * Sets members on an OccInspectedSpaceElement and writes to DB
      * @param oise
      * @param u
      * @param oi
-     * @throws IntegrationException 
+     * @return with members properly set, ready for writing to db
      */
-    public void inspectionAction_recordComplianceWithInspectedElement(OccInspectedSpaceElement oise,
+    public OccInspectedSpaceElement inspectionAction_configureElementForCompliance(OccInspectedSpaceElement oise,
                                                                       User u,
-                                                                      OccInspection oi) throws IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+                                                                      OccInspection oi)  {
 
         oise.setComplianceGrantedBy(u);
         oise.setComplianceGrantedTS(LocalDateTime.now());
         oise.setLastInspectedTS(LocalDateTime.now());
         oise.setLastInspectedBy(u);
-
-        oii.updateInspectedSpaceElement(oise);
+        return oise;
     }
 
     /**
@@ -409,19 +524,18 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @param oise
      * @param u
      * @param oi
-     * @throws IntegrationException 
+     * @return with members set
      */
-    public void clearInspectionOfElement(OccInspectedSpaceElement oise,
+    public OccInspectedSpaceElement inspectionAction_configureElementForNotInspected(OccInspectedSpaceElement oise,
                                          User u,
-                                         OccInspection oi) throws IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+                                         OccInspection oi)  {
 
         oise.setComplianceGrantedBy(null);
         oise.setComplianceGrantedTS(null);
         oise.setLastInspectedTS(null);
         oise.setLastInspectedBy(null);
 
-        oii.updateInspectedSpaceElement(oise);
+        return oise;
     }
 
     /**
@@ -434,19 +548,18 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @param oise the element that has been inspected but is not in compliance
      * @param u
      * @param oi
-     * @throws IntegrationException 
+     * @return with members set, ready for sending to DB
      */
-    public void inspectionAction_inspectWithoutCompliance(OccInspectedSpaceElement oise,
+    public OccInspectedSpaceElement inspectionAction_configureElementForInspectionNoCompliance(OccInspectedSpaceElement oise,
                                                           User u,
-                                                          OccInspection oi) throws IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+                                                          OccInspection oi)  {
 
         oise.setComplianceGrantedBy(null);
         oise.setComplianceGrantedTS(null);
         oise.setLastInspectedTS(LocalDateTime.now());
         oise.setLastInspectedBy(u);
 
-        oii.updateInspectedSpaceElement(oise);
+        return oise;
     }
     
     /** 
