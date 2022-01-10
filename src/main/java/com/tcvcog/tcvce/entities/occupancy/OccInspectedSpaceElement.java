@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
@@ -66,8 +67,8 @@ public class OccInspectedSpaceElement
 
     public OccInspectedSpaceElement() { }
 
-    public OccInspectedSpaceElement(CodeElement codeElement) {
-        super(codeElement);
+    public OccInspectedSpaceElement(EnforcableCodeElement ece) {
+        super(ece);
     }
 
     public OccInspectedSpaceElement(OccSpaceElement occSpaceElement) {
@@ -76,19 +77,26 @@ public class OccInspectedSpaceElement
 
     public OccInspectedSpaceElement(OccInspectedSpaceElement occInspectedSpaceElement) {
         super(occInspectedSpaceElement);
-        this.inspectedSpaceElementID = occInspectedSpaceElement.getInspectedSpaceElementID();
-        this.lastInspectedTS = occInspectedSpaceElement.getLastInspectedTS();
-        this.lastInspectedBy = occInspectedSpaceElement.getLastInspectedBy();
-        this.complianceGrantedTS = occInspectedSpaceElement.getComplianceGrantedTS();
-        this.complianceGrantedBy = occInspectedSpaceElement.getComplianceGrantedBy();
-        this.required = occInspectedSpaceElement.isRequired();
-        this.overrideRequiredFlag_thisElementNotInspectedBy = occInspectedSpaceElement.getOverrideRequiredFlag_thisElementNotInspectedBy();
-        this.inspectionNotes = occInspectedSpaceElement.getInspectionNotes();
-        this.blobList = occInspectedSpaceElement.getBlobList();
-        this.location = occInspectedSpaceElement.getLocation();
-        this.failureIntensityClassID = occInspectedSpaceElement.getFailureIntensityClassID();
-        this.status = occInspectedSpaceElement.getStatus();
-        this.inspectedSpaceID = occInspectedSpaceElement.getInspectedSpaceID();
+        if(occInspectedSpaceElement != null){
+            
+            this.inspectedSpaceElementID = occInspectedSpaceElement.getInspectedSpaceElementID();
+            this.lastInspectedTS = occInspectedSpaceElement.getLastInspectedTS();
+            this.lastInspectedBy = occInspectedSpaceElement.getLastInspectedBy();
+            
+            this.complianceGrantedTS = occInspectedSpaceElement.getComplianceGrantedTS();
+            this.complianceGrantedBy = occInspectedSpaceElement.getComplianceGrantedBy();
+            this.required = occInspectedSpaceElement.isRequired();
+            
+            this.overrideRequiredFlag_thisElementNotInspectedBy = occInspectedSpaceElement.getOverrideRequiredFlag_thisElementNotInspectedBy();
+            this.inspectionNotes = occInspectedSpaceElement.getInspectionNotes();
+            this.blobList = occInspectedSpaceElement.getBlobList();
+            
+            this.location = occInspectedSpaceElement.getLocation();
+            this.failureIntensityClassID = occInspectedSpaceElement.getFailureIntensityClassID();
+            this.status = occInspectedSpaceElement.getStatus();
+            
+            this.inspectedSpaceID = occInspectedSpaceElement.getInspectedSpaceID();
+        }
     }
 
     /**
@@ -368,6 +376,7 @@ public class OccInspectedSpaceElement
     /**
      * Not boring! These are getters and setter wrappers for the status parameter that take and give raw enums
      *
+     * @return 
      **/
     public OccInspectionStatusEnum getStatusEnum() {
         return getStatus().getStatusEnum();

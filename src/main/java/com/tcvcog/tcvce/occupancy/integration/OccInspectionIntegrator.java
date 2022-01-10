@@ -212,7 +212,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 + "occchecklistspacetypeelement_elementid, "
                 + "failureseverity_intensityclassid, "
                 + "migratetocecaseonfail, "
-                + "occchecklistspacetypeelement.codeelement_id \n"
+                + "occchecklistspacetypeelement.codesetelement_seteleid \n"
                 + "FROM public.occinspectedspaceelement "
                 + "INNER JOIN public.occchecklistspacetypeelement ON (occchecklistspacetypeelement_elementid = spaceelementid) \n"
                 + "WHERE inspectedspaceelementid=?;";
@@ -266,7 +266,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             OccInspectedSpaceElement inspectedEle = null;
         try {
             
-            inspectedEle = new OccInspectedSpaceElement(ci.getCodeElement(rs.getInt("codeelement_id")));
+            inspectedEle = new OccInspectedSpaceElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_seteleid")));
             
             inspectedEle.setInspectedSpaceElementID(rs.getInt("inspectedspaceelementid"));
             inspectedEle.setOccChecklistSpaceTypeElementID(rs.getInt("occchecklistspacetypeelement_elementid"));

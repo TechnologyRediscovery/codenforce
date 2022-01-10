@@ -639,10 +639,10 @@
         <p:dialog id="inspections-entryscreen"
                   height="600" width="1000"
                   widgetVar="inspections-entryscreen-var"
-                  header="Inspect code elements in space type"
+                  header="Inspect ordiances in #{occInspectionsBB.selectedInspectedSpace.type.spaceTypeTitle} (ID: #{occInspectionsBB.selectedInspectedSpace.inspectedSpaceID})"
                   modal="true"
                   resizable="true">
-                <h1><h:outputText value="#{occInspectionsBB.selectedInspectedSpace.location.locationDescription}"/></h1>
+                
                 <div class="p-d-flex p-jc-between">
 
                         <div>
@@ -666,47 +666,122 @@
                                                             @form:@parent:inspections-growl-form"
                                                     value="Batch apply to all ords"
                                                     actionListener="#{occInspectionsBB.onBatchProcessElementLinkClick}" />
-                                    
-                                    
-                                
-                                
-                            <p:commandButton value="Edit Space" 
-                                             class="p-mr-1"/>
-
-                            <p:commandButton value="Remove Space"/>
                             </h:form>
                         </div>
                         <div>
+                            <h:form id="stinspection-tools-form">
+                                
+                                <p:selectBooleanCheckbox id="stinspection-usedefaultfindings-cb"
+                                                         value="#{occInspectionsBB.useDefaultFindingsOnCurrentOISE}"
+                                                         label="use default findings"
+                                                         title="when an element fails, populate findings with default findings on the ordinance"/>
+                                
+                                <h:outputText value=" | " />
+                                
+                                <p:commandLink     id="stinspection-editspace"
+                                                    ajax="true"
+                                                    style="color:blue;"
+                                                    update=""
+                                                    value="edit space"
+                                                    actionListener="#{occInspectionsBB.onSpaceTypeEditLinkClick}" />
+                                
+                                <h:outputText value=" | " />
+                                
+                                <p:commandLink     id="stinspection-removespace"
+                                                    ajax="true"
+                                                    style="color:blue;"
+                                                    update=""
+                                                    value="remove space from inspection"
+                                                    actionListener="#{occInspectionsBB.onSpaceTypeRemoveLinkClick}" >
+                                      <p:confirm header="Confirmation" message="Do you want to delete this inspected space?" icon="pi pi-info-circle"/>
+                                </p:commandLink>
+                           
+                            </h:form>
+                            
+                            
                         </div>
                     </div>
               
                 <p:separator />
                 
             <h:form id="inspections-entryscreen-form">
+                
+                  <p:commandButton id="inspections-newbutton"
+                             value="Save space data and close"
+                             disabled="false"
+                             rendered="true"
+                             icon="fa fa-save"
+                             actionListener="#{occInspectionsBB.onSavCurrentSpaceChanges}"
+                             oncomplete="PF('inspections-entryscreen-var').hide()"
+                             update="@form:@parent:inspections-form
+                                    @form:@parent:inspections-growl-form"/>
+
+                  <p:spacer height="5px" />
                 <p:accordionPanel id="element-accordion"
                                   value="#{occInspectionsBB.selectedInspectedSpace.inspectedElementGroupList}" 
                                     var="elegrp"
                                     >
+                    <p:ajax/>
                     <p:tab title="#{elegrp.groupTitle}">
-                        <p:repeat value="#{elegrp.elementList}" 
-                          var="spaceElement">
+                        <p:repeat   value="#{elegrp.elementList}" 
+                                    var="spaceElement">
                             <div class="p-grid">
                                 <div class="p-col-12 p-md-4">
-                                    <h3><h:outputText value="§#{spaceElement.ordSecNum}:#{spaceElement.ordSecTitle}; §§#{spaceElement.ordSubSecNum} #{spaceElement.ordSubSecTitle}"/></h3>
+                                    <h2>
+                                        <h:outputText value="ch. #{spaceElement.ordchapterNo}: #{spaceElement.ordchapterTitle}" />
+                                    </h2>
+                                    <h3>
+                                        <h:outputText value="§#{spaceElement.ordSecNum}:#{spaceElement.ordSecTitle}" />
+                                    </h3>
+                                    <h3>
+                                        <h:outputText value="§§#{spaceElement.ordSubSecNum} #{spaceElement.ordSubSecTitle}" 
+                                                      rendered="#{!empty spaceElement.ordSubSecNum}"/>
                                     
-                                    <ul>
-                                        <li><h:outputText value="#{spaceElement.ordTechnicalText}"/></li>
-                                    </ul>
+                                        <h:outputText value=" | " />
+
+                                        <h:outputText value="§§#{spaceElement.ordSubSubSecNum} #{spaceElement.ordSubSubSecTitle}" 
+                                                      rendered="#{!empty spaceElement.ordSubSubSecNum}"/>
+                                    </h3> 
+                                    <p:spacer height="5px" />
+                                    <p>
+                                        <h:outputText id="oiseinfo"
+                                                      value="OISEleID: #{spaceElement.inspectedSpaceElementID} | OCSTEleID #{spaceElement.occChecklistSpaceTypeElementID}" />
+                                    </p>
+                                    
+                                    
+                                <p:commandLink     id="spaceelement-vieword-cl"
+                                                    ajax="true"
+                                                    type="button"
+                                                    style="color:blue;"
+                                                    actionListener="#{occInspectionsBB.onSpaceElementViewLinkClick(spaceElement)}"
+                                                    update="codeelement-fulltext-dialog"
+                                                    oncomplete="PF('codeelement-fulltext-dialog-var').show();"
+                                                    value="ordinance text"/>
+                                
+                                <h:outputText value=" | " />
+                                    
+                                <p:commandLink     id="spaceelement-viewmeta"
+                                                    ajax="true"
+                                                    type="button"
+                                                    style="color:blue;"
+                                                    actionListener="#{occInspectionsBB.onSpaceElementViewLinkClick(spaceElement)}"
+                                                    update="codeelement-metadata-dialog"
+                                                    oncomplete="PF('codeelement-metadata-dialog-var').show();"
+                                                    value="element info"/>
+                                
+                                
+                                
                                 </div>
                                 <div class="p-col-12 p-md-4 p-mt-5">
                                     <p:selectOneButton id="inspections-entryscreen-statussel" 
                                                        value="#{spaceElement.statusEnum}" 
                                                        unselectable="false">
                                         <!-- Strangely this element needs to update itself to call the setter -->
-                                        <p:ajax update="inspections-entryscreen-statussel"/>
-                                        <p:ajax update="@form:element-accordion"/>
-                                        <p:ajax update="@form:@parent:inspections-growl-form"/>
                                         <p:ajax listener="#{occInspectionsBB.onElementInspectionStatusButtonChange(spaceElement)}" />
+                                        <p:ajax update="inspections-entryscreen-statussel"/>
+                                        <!--<p:ajax update="@form:element-accordion"/>-->
+                                        <p:ajax update="@form:@parent:inspections-growl-form"/>
+                                        <p:ajax update="@form"/>
                                         <f:selectItems value="#{occInspectionsBB.statuses}" 
                                                        var="status" 
                                                        itemLabel="#{status.label}"/>
@@ -716,13 +791,40 @@
                                                                     itemLabel="Include fail in Code Enf Case"
                                                                     rendered="#{(!empty spaceElement.lastInspectedTS) and (empty spaceElement.complianceGrantedTS)}"
                                                                     value="#{spaceElement.migrateToCaseOnFail}"/>
+                                        <p:spacer height="5px" />
+                                        
+                                        <p>
+                                            <h:outputText id="inspectedby-user"
+                                                          value="Inspected by: #{spaceElement.lastInspectedBy.human.name}" 
+                                                          rendered="#{!empty spaceElement.lastInspectedBy}"/>
+                                            <p:spacer height="2px" />
+                                            <h:outputText id="inspectedby-ts"
+                                                          value="on #{occInspectionsBB.getPrettyDate(spaceElement.lastInspectedTS)}" 
+                                                          rendered="#{!empty spaceElement.lastInspectedTS}"/>
+                                            <p:spacer height="2px" />
+                                            <h:outputText id="inspectedby-failed"
+                                                          value="Failed! (no compliance)" 
+                                                          rendered="#{!empty spaceElement.lastInspectedTS and empty spaceElement.complianceGrantedTS}"/>
+                                            <p:spacer height="2px" />
+                                            <h:outputText id="inspectedby-comp-user"
+                                                          value="Compliance granted by: #{spaceElement.complianceGrantedBy.human.name}" 
+                                                          rendered="#{!empty spaceElement.complianceGrantedBy}"/>
+                                            <p:spacer height="2px" />
+                                            <h:outputText id="inspectedby-comp-ts"
+                                                          value="on #{occInspectionsBB.getPrettyDate(spaceElement.complianceGrantedTS)}" 
+                                                          rendered="#{!empty spaceElement.complianceGrantedTS}"/>
+                                            
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="p-col-12 p-md-4">
                                     <div class="p-d-flex">
                                         <div>
                                             <p class="p-mb-0">Findings:</p>
-                                            <p:inputTextarea rows="6" cols="33"/>
+                                            <p:inputTextarea    id="element-findings"
+                                                                value="#{spaceElement.inspectionNotes}"
+                                                                rows="6" cols="33"/>
+                                            
                                         </div>
                                         <div class="p-mx-3 p-mt-5">
                                             <p:button icon="pi pi-plus" 
@@ -738,10 +840,100 @@
 
                 <p:separator />
                 
-              
-                
                 <p:commandButton value="Add Ordinance" icon="pi pi-plus"/>
                 
             </h:form>
         </p:dialog>
+    
+    <p:dialog id="codeelement-fulltext-dialog"
+              widgetVar="codeelement-fulltext-dialog-var"
+              header="Full ordinance text"
+              closable="true"
+              closeOnEscape="true"
+              modal="true"
+              height="400"
+              width="500"
+              resizable="true"
+              responsive="true">
+        
+        <h:form id="codeelement-fulltext-form">
+
+            <h2>
+                <h:outputText value="ch. #{occInspectionsBB.selectedSpaceElement.ordchapterNo}: #{occInspectionsBB.selectedSpaceElement.ordchapterTitle}" />
+            </h2>
+            <h3>
+                <h:outputText value="§#{occInspectionsBB.selectedSpaceElement.ordSecNum}:#{occInspectionsBB.selectedSpaceElement.ordSecTitle}" />
+            </h3>
+            <h3>
+                <h:outputText value="§§#{occInspectionsBB.selectedSpaceElement.ordSubSecNum} #{occInspectionsBB.selectedSpaceElement.ordSubSecTitle}" 
+                              rendered="#{!empty occInspectionsBB.selectedSpaceElement.ordSubSecNum}"/>
+
+                <h:outputText value=" | " />
+                <h:outputText value="§§#{occInspectionsBB.selectedSpaceElement.ordSubSubSecNum} #{occInspectionsBB.selectedSpaceElement.ordSubSubSecNum}" 
+                              rendered="#{!empty occInspectionsBB.selectedSpaceElement.ordSubSubSecNum}"/>
+            </h3> 
+
+
+            <h:outputText id="codeelement-fulltext-ot"
+                          value="#{occInspectionsBB.selectedSpaceElement.ordTechnicalText}" 
+                          escape="false"/>
+
+            <h3>Inspection tips</h3>
+            <h:outputText id="codeelement-inspectiontips-ot"
+                          value="#{occInspectionsBB.selectedSpaceElement.guideEntry.inspectionGuidelines}" 
+                          escape="false"/>
+
+        </h:form>
+        
+        
+        
+        
+    </p:dialog>
+    
+     <p:dialog id="codeelement-metadata-dialog"
+               header="Occ Inspected Space Element Metadata"
+              widgetVar="codeelement-metadata-dialog-var"
+              closable="true"
+              closeOnEscape="true"
+              modal="true"
+              height="400"
+              width="500"
+              resizable="true"
+              responsive="true">
+         
+           <h2>
+                <h:outputText value="ch. #{occInspectionsBB.selectedSpaceElement.ordchapterNo}: #{occInspectionsBB.selectedSpaceElement.ordchapterTitle}" />
+            </h2>
+            <h3>
+                <h:outputText value="§#{occInspectionsBB.selectedSpaceElement.ordSecNum}:#{occInspectionsBB.selectedSpaceElement.ordSecTitle}" />
+            </h3>
+            <h3>
+                <h:outputText value="§§#{occInspectionsBB.selectedSpaceElement.ordSubSecNum} #{occInspectionsBB.selectedSpaceElement.ordSubSecTitle}" 
+                              rendered="#{!empty occInspectionsBB.selectedSpaceElement.ordSubSecNum}"/>
+
+                <h:outputText value=" | " />
+                <h:outputText value="§§#{occInspectionsBB.selectedSpaceElement.ordSubSubSecNum} #{occInspectionsBB.selectedSpaceElement.ordSubSubSecNum}" 
+                              rendered="#{!empty occInspectionsBB.selectedSpaceElement.ordSubSubSecNum}"/>
+            </h3> 
+
+         
+         <h:outputText value="Inspected space element ID: #{occInspectionsBB.selectedSpaceElement.inspectedSpaceElementID}" />
+         <p:spacer height="3px" />
+         
+         <h:outputText value="Inspected space ID: #{occInspectionsBB.selectedSpaceElement.inspectedSpaceID}" />
+         <p:spacer height="3px" />
+         
+         <h:outputText value="occChecklist Space Type Element ID: #{occInspectionsBB.selectedSpaceElement.occChecklistSpaceTypeElementID}" />
+         <p:spacer height="3px" />
+        
+         <h:outputText value="Code set element ID: #{occInspectionsBB.selectedSpaceElement.codeSetElementID}" />
+         <p:spacer height="3px" />
+         
+         <h:outputText value="Code Element ID: #{occInspectionsBB.selectedSpaceElement.elementID}" />
+         <p:spacer height="3px" />
+         
+         
+         
+     </p:dialog>
+    
 </ui:composition>

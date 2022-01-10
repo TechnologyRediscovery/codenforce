@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.occupancy.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
@@ -90,26 +91,26 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
      * Note that the 
      *
      * @param tpe
-     * @param elementsToAttach a list of CodeElements that should be inspected
+     * @param ecel a list of CodeElements that should be inspected
      * in this space
      * @throws IntegrationException
      */
-    public void attachCodeElementsToSpaceTypeInChecklist(OccSpaceTypeChecklistified tpe, List<CodeElement> elementsToAttach) throws IntegrationException {
+    public void attachCodeElementsToSpaceTypeInChecklist(OccSpaceTypeChecklistified tpe, List<EnforcableCodeElement> ecel) throws IntegrationException {
         String sql =    "INSERT INTO public.occchecklistspacetypeelement(\n" +
-                        "            spaceelementid, codeelement_id, required, checklistspacetype_typeid, notes)\n" +
+                        "            spaceelementid, codesetelement_seteleid, required, checklistspacetype_typeid, notes)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, ?);";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ListIterator li = elementsToAttach.listIterator();
-        CodeElement ce;
+        ListIterator li = ecel.listIterator();
+        EnforcableCodeElement ece;
         try {
             // for each CodeElement in the list passed into the method, make an entry in the spaceelement table
             while (li.hasNext()) {
-                ce = (CodeElement) li.next();
+                ece = (EnforcableCodeElement) li.next();
                 stmt = con.prepareStatement(sql);
                 
-                stmt.setInt(1, ce.getElementID());
+                stmt.setInt(1, ece.getCodeSetElementID());
                 stmt.setBoolean(2, tpe.isRequired());
                 stmt.setInt(3, tpe.getSpaceTypeID());
                 stmt.setString(4, tpe.getNotes());
@@ -544,7 +545,7 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
     public OccSpaceTypeChecklistified getOccSpaceTypeChecklistified(int ocstid) throws IntegrationException {
         
          String query = "SELECT 	occchecklistspacetypeelement.spaceelementid, \n" + //inc
-                        "	occchecklistspacetypeelement.codeelement_id, \n" + //inc
+                        "	occchecklistspacetypeelement.codesetelement_seteleid, \n" + //inc
                         "	occchecklistspacetypeelement.required AS ocsterequired, \n" + //inc
                         "	occchecklistspacetypeelement.checklistspacetype_typeid, \n" + // join field
                         "	occchecklistspacetypeelement.notes AS ocstenotes,\n" + //inc
@@ -582,7 +583,8 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
                 if(rs.getInt("spaceelementid") != 0){
                     // this call to the code coordinator is basically an antipattern--but for this level of 
                     // complexity of object creation, we'll try this for testing
-                    OccSpaceElement ele = new OccSpaceElement(getCodeCoordinator().getCodeElement(rs.getInt("codeelement_id")));
+                    int seteleid = rs.getInt("codesetelement_seteleid");
+                    OccSpaceElement ele = new OccSpaceElement(getCodeCoordinator().getEnforcableCodeElement(seteleid));
                     ele.setRequiredForInspection(rs.getBoolean("ocsterequired"));
                     ele.setOccChecklistSpaceTypeElementID(rs.getInt("spaceelementid"));
                     ele.setNotes(rs.getString("ocstenotes"));

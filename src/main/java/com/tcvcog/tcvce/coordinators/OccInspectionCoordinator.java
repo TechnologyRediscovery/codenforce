@@ -47,6 +47,9 @@ import java.util.stream.Collectors;
 public class OccInspectionCoordinator extends BackingBeanUtils implements Serializable {
 
     final static String NO_ELEMENT_CATEGORY_TITLE = "Uncategorized";
+    final static String SPACE = " ";
+    final static boolean COMMENCE_SPACE_WITH_DEF_FAIL_FINDINGS = false;
+    
     
     
     public OccInspectionCoordinator() {
@@ -122,12 +125,18 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     
     /**
      * Logic container for updating space element data on all elements in an inspection
-     * @param inspection
+     * EXCEPT for inspection status which must be routed through the appropriate other methods on
+     * this Coordinator
+     * @param osi
      * @throws IntegrationException 
      */
-    public void inspectionAction_updateSpaceElementData(OccInspection inspection) throws IntegrationException {
+    public void inspectionAction_updateSpaceElementData(OccInspectedSpace osi) throws IntegrationException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-
+        if(osi != null && osi.getInspectedElementList() != null && !osi.getInspectedElementList().isEmpty()){
+            for(OccInspectedSpaceElement oise: osi.getInspectedElementList()){
+                oii.updateInspectedSpaceElement(oise);
+            }
+        }
     }
 
     /**
@@ -182,7 +191,11 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 
             switch (initialStatus) {
                 case FAIL:
-                    inspectionAction_configureElementForInspectionNoCompliance(inspectedElement, user, inspection);
+                    inspectionAction_configureElementForInspectionNoCompliance( 
+                                        inspectedElement, 
+                                        user, 
+                                        inspection, 
+                                        COMMENCE_SPACE_WITH_DEF_FAIL_FINDINGS);
                     break;
                 case PASS:
                     inspectionAction_configureElementForCompliance(inspectedElement, user, inspection);
@@ -440,13 +453,15 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @param oise the element being inspected with a statusEnum set to the desired state
      * @param ua the user doing the inspecting; must have CEO or better permissions
      * @param oi the inspection in which the element lives
+     * @param useDefFindOnFail if true is passed in, the default findings will be appended to any findings
      * @throws AuthorizationException
      * @throws BObStatusException
      * @throws IntegrationException 
      */
     public void inspectionAction_recordElementInspectionByStatusEnum(OccInspectedSpaceElement oise,
                                                                      UserAuthorized ua,
-                                                                     OccInspection oi) throws AuthorizationException, BObStatusException, IntegrationException{
+                                                                     OccInspection oi,
+                                                                     boolean useDefFindOnFail) throws AuthorizationException, BObStatusException, IntegrationException{
         if(oise == null || ua == null || oi == null){
             throw new BObStatusException("Cannot update code element status with null element, user, or inspection");
         }
@@ -459,7 +474,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                 inspectionAction_configureElementForNotInspected(oise, ua, oi);
                 break;
             case FAIL:
-                inspectionAction_configureElementForInspectionNoCompliance(oise, ua, oi);
+                inspectionAction_configureElementForInspectionNoCompliance(oise, ua, oi, useDefFindOnFail);
                 break;
             case PASS:
                 inspectionAction_configureElementForCompliance(oise, ua, oi);
@@ -470,11 +485,22 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 
     }
     
-    
+    /**
+     * Undertakes a batch operation for all inspected space elements in the inspected space
+     * @param ois
+     * @param oise
+     * @param ua
+     * @param oi
+     * @param useDefFindOnFail when true the default findings are appended to existing findings
+     * @return
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
     public OccInspectedSpace inspectionAction_batchConfigureInspectedSpace(OccInspectedSpace ois,
                                                                             OccInspectionStatusEnum oise,
                                                                             UserAuthorized ua,
-                                                                            OccInspection oi) throws BObStatusException, IntegrationException{
+                                                                            OccInspection oi,
+                                                                            boolean useDefFindOnFail) throws BObStatusException, IntegrationException{
         if(ois == null || oise == null || ua == null || oi == null){
             throw new BObStatusException("Cannot batch update with null ois, user, or inspection");
         }
@@ -488,7 +514,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                         inspectionAction_configureElementForNotInspected(ele, ua, oi);
                         break;
                     case FAIL:
-                        inspectionAction_configureElementForInspectionNoCompliance(ele, ua, oi);
+                        inspectionAction_configureElementForInspectionNoCompliance(ele, ua, oi, useDefFindOnFail);
                         break;
                     case PASS:
                         inspectionAction_configureElementForCompliance(ele, ua, oi);
@@ -548,16 +574,30 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @param oise the element that has been inspected but is not in compliance
      * @param u
      * @param oi
+     * @param useDefFindOnFail appends default findings to findings if true
      * @return with members set, ready for sending to DB
      */
     public OccInspectedSpaceElement inspectionAction_configureElementForInspectionNoCompliance(OccInspectedSpaceElement oise,
                                                           User u,
-                                                          OccInspection oi)  {
+                                                          OccInspection oi,
+                                                          boolean useDefFindOnFail)  {
 
         oise.setComplianceGrantedBy(null);
         oise.setComplianceGrantedTS(null);
         oise.setLastInspectedTS(LocalDateTime.now());
         oise.setLastInspectedBy(u);
+        
+        if(useDefFindOnFail){
+            StringBuilder sb = new StringBuilder();
+            if(oise.getInspectionNotes() != null){
+                sb.append(oise.getInspectionNotes());
+                sb.append(SPACE);
+            }
+            if(oise.getDefaultViolationDescription() != null){
+                sb.append(oise.getDefaultViolationDescription());
+            }
+            oise.setInspectionNotes(sb.toString());
+        }
 
         return oise;
     }

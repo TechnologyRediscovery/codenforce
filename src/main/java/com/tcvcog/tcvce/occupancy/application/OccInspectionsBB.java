@@ -42,9 +42,10 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     private OccSpaceTypeChecklistified selectedSpaceType;
 
     private OccInspectedSpace selectedInspectedSpace;
+    private OccInspectedSpaceElement selectedSpaceElement;
     
     private OccInspectionStatusEnum selectedElementStatusForBatch;
-    
+    private boolean useDefaultFindingsOnCurrentOISE;
 
     private boolean editMode;
 
@@ -244,7 +245,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         System.out.println("OccInspectionBB.onElementInspectionStatusButtonChange | oise: " + oise.getInspectedSpaceElementID() + " status: " + oise.getStatusEnum().getLabel());
         try {
-            oic.inspectionAction_recordElementInspectionByStatusEnum(oise, getSessionBean().getSessUser(), selectedInspection);
+            oic.inspectionAction_recordElementInspectionByStatusEnum(oise, getSessionBean().getSessUser(), selectedInspection, useDefaultFindingsOnCurrentOISE);
+            refreshCurrentInspectionAndRestoreSelectedSpace();
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Recorded status of element ID: " + oise.getInspectedSpaceElementID(), ""));
@@ -270,7 +272,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                 oic.inspectionAction_batchConfigureInspectedSpace(  selectedInspectedSpace, 
                                                                     selectedElementStatusForBatch, 
                                                                     getSessionBean().getSessUser(), 
-                                                                    selectedInspection);
+                                                                    selectedInspection, 
+                                                                    useDefaultFindingsOnCurrentOISE);
                 refreshCurrentInspectionAndRestoreSelectedSpace();
                 getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -286,6 +289,26 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         }
         
         
+    }
+    
+    /**
+     * Listener for user requests to save updates to their current space
+     * @param ev
+     */
+    public void onSavCurrentSpaceChanges(ActionEvent ev){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        try {
+            oic.inspectionAction_updateSpaceElementData(selectedInspectedSpace);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Saved changes to space: " + selectedInspectedSpace.getType().getSpaceTypeTitle() + " id " + selectedInspectedSpace.getInspectedSpaceID(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                           ex.getMessage(), ""));
+            
+        }
     }
     
     /**
@@ -305,6 +328,44 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         }
     }
     
+    /**
+     * Listener for user requests to edit a space (from the inspection dialog)
+     * @param ev 
+     */
+    public void onSpaceTypeEditLinkClick(ActionEvent ev){
+        System.out.println("OccInspectionBB.onSpaceTypeEditLinkClick");
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to view a specific space element in a dialog
+     * @param oise 
+     */
+    public void onSpaceElementViewLinkClick(OccInspectedSpaceElement oise){
+        selectedSpaceElement = oise;
+    }
+    
+    /**
+     * Listener for user requests to delete a space
+     * @param ev 
+     */
+    public void onSpaceTypeRemoveLinkClick(ActionEvent ev){
+        System.out.println("OccInspectionBB.onSpaceTypeRemoveLinkClick");
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        try {
+            oic.inspectionAction_removeSpaceFromInspection(selectedInspectedSpace, getSessionBean().getSessUser(), selectedInspection);
+              getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Success: The selected space has been removed from this inspection.", ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Failure: Could not remove this inspected space from the inspection, sorry.i", ""));
+        }
+        
+    }
 
     // getters & setters below you know the drill
 
@@ -398,5 +459,33 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedElementStatusForBatch(OccInspectionStatusEnum selectedElementStatusForBatch) {
         this.selectedElementStatusForBatch = selectedElementStatusForBatch;
+    }
+
+    /**
+     * @return the selectedSpaceElement
+     */
+    public OccInspectedSpaceElement getSelectedSpaceElement() {
+        return selectedSpaceElement;
+    }
+
+    /**
+     * @param selectedSpaceElement the selectedSpaceElement to set
+     */
+    public void setSelectedSpaceElement(OccInspectedSpaceElement selectedSpaceElement) {
+        this.selectedSpaceElement = selectedSpaceElement;
+    }
+
+    /**
+     * @return the useDefaultFindingsOnCurrentOISE
+     */
+    public boolean isUseDefaultFindingsOnCurrentOISE() {
+        return useDefaultFindingsOnCurrentOISE;
+    }
+
+    /**
+     * @param useDefaultFindingsOnCurrentOISE the useDefaultFindingsOnCurrentOISE to set
+     */
+    public void setUseDefaultFindingsOnCurrentOISE(boolean useDefaultFindingsOnCurrentOISE) {
+        this.useDefaultFindingsOnCurrentOISE = useDefaultFindingsOnCurrentOISE;
     }
 }

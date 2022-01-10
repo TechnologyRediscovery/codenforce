@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 
 /**
  * Represents a specific ordinance that MIGHT be inspected
@@ -33,15 +34,15 @@ import com.tcvcog.tcvce.entities.CodeElement;
  * 
  * @author sylvia
  */
-public class OccSpaceElement extends CodeElement {
+public class OccSpaceElement extends EnforcableCodeElement {
     
     protected int occChecklistSpaceTypeElementID;
     protected boolean requiredForInspection;
 
     public OccSpaceElement() {}
 
-    public OccSpaceElement(CodeElement codeElement) {
-        super(codeElement);
+    public OccSpaceElement(EnforcableCodeElement ece) {
+        super(ece);
     }
 
     public OccSpaceElement(OccSpaceElement occSpaceElement) {
