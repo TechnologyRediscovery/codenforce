@@ -16,40 +16,52 @@
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.occupancy.OccInspectionDetermination;
+import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionCause;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
-@FacesConverter(value="occInspectionDeterminationConverter")
-public class OccInspectionDeterminationConverter extends EntityConverter implements Converter {
+@FacesConverter(value="occInspectionConverter")
+public class OccInspectionConverter extends EntityConverter implements Converter {
 
     @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
         if(titleS.isEmpty()) {
             return null;
         }
-        OccInspectionDetermination o = (OccInspectionDetermination) this.getViewMap(fc).get(titleS);
+        OccInspection o = (OccInspection) this.getViewMap(fc).get(titleS);
         return o;
     }
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object o) {
 
-        if (o == null){
+        if (o == null) {
             return "";
         }
 
-        OccInspectionDetermination oid = (OccInspectionDetermination) o;
-        String title = oid.getTitle();
+        OccInspection opt = (OccInspection) o;
+        StringBuilder sb = new StringBuilder();
+        sb.append("ID: ");
+        sb.append(opt.getInspectionID());
+        if(opt.getEffectiveDateOfRecord() != null){
+            sb.append(" | ");
+            sb.append(opt.getEffectiveDateOfRecord().toString());
+        }
+        
+        String title = sb.toString();
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;
 
         } else {
-            return "OccInspectionDeterminationConverter error";
+            return "OccInspectionConverter error";
         }
+
+
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

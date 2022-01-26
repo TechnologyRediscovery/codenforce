@@ -419,7 +419,7 @@ public class    SessionBean
                 setSessOccPeriodListLight(pdh.getCompletePeriodList());
 
                 if (sessOccPeriodList != null && !sessOccPeriodList.isEmpty()) {
-                    setSessOccPeriod(sessOccPeriodList.get(0));
+                    setSessOccPeriodFromPeriodBase(sessOccPeriodList.get(0));
                     sessOccPeriodRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                     sessOccPeriodListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                 } else {
@@ -502,7 +502,7 @@ public class    SessionBean
 
                 setSessOccPeriodListLight(sessProperty.getCompletePeriodList());
                 if (sessOccPeriodList != null && !sessOccPeriodList.isEmpty()) {
-                    setSessOccPeriod(sessOccPeriodList.get(0));
+                    setSessOccPeriodFromPeriodBase(sessOccPeriodList.get(0));
                 }
 
                 setSessEventsPageEventDomainRequest(DomainEnum.CODE_ENFORCEMENT);
@@ -516,7 +516,7 @@ public class    SessionBean
 
 
                 // Set sessOccPeriod
-                setSessOccPeriod(period);
+                setSessOccPeriodFromPeriodBase(period);
 
 
                 // Set current property to match the sessOccPeriod's propertyUnit
@@ -588,7 +588,7 @@ public class    SessionBean
      * Creates a new instance of getSessionBean()
      */
     public SessionBean() {
-        System.out.println("SessionBean.SessionBean");
+        System.out.println("SessionBean.SessionBean constructor");
     }
     
     
@@ -862,6 +862,11 @@ public class    SessionBean
         
     }
     
+    /**
+     * Setter for session CE Case objects
+     * @param cse which will be fetched from the DB again and then assembled
+     * into a DataHeavy version
+     */
     public void setSessCECase(CECase cse){
         CaseCoordinator cc = getCaseCoordinator();
         try {
@@ -1129,7 +1134,7 @@ public class    SessionBean
     public void setSessOccPeriodListLight(List<OccPeriod> lightOccPeriodList) {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            setSessOccPeriodList(oc.getOccPeriodPropertyUnitHeavy(lightOccPeriodList));
+            setSessOccPeriodList(oc.getOccPeriodPropertyUnitHeavyList(lightOccPeriodList));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -1405,26 +1410,31 @@ public class    SessionBean
     }
 
     /**
-     * @param sessOccPeriod the sessOccPeriod to set
+     * @param sop the sessOccPeriod to set; if null is passed in
+     * the current occ period is reloaded and kept as the session object
      */
-    public void setSessOccPeriod(OccPeriodDataHeavy sessOccPeriod) {
-
+    public void setSessOccPeriod(OccPeriodDataHeavy sop) {
+        
         // Set PropertyUnitWithProp because we have property integrator object here and not in the class
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            sessOccPeriod.setPropUnitProp(pi.getPropertyUnitWithProp(sessOccPeriod.getPeriodID()));
-        } catch (IntegrationException | BObStatusException ex) {
+            if(sop != null){
+                sop.setPropUnitProp(pi.getPropertyUnitWithProp(sop.getPropertyUnitID()));
+                this.sessOccPeriod = sop;
+            } else {
+                OccupancyCoordinator oc = getOccupancyCoordinator();
+                this.sessOccPeriod = oc.assembleOccPeriodDataHeavy(sessOccPeriod, sessUser.getKeyCard());
+            }
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
         }
-
-        this.sessOccPeriod = sessOccPeriod;
     }
 
     /**
      * Sets the current session occupancy period to the heavy value of opBase
      * @param occPeriodBase
      */
-    public void setSessOccPeriod(OccPeriod occPeriodBase) {
+    public void setSessOccPeriodFromPeriodBase(OccPeriod occPeriodBase) {
         OccupancyCoordinator oc = getOccupancyCoordinator();
 
         // Convert occPeriodBase to a heavy data class (because it can be modified, presumably)
@@ -1436,6 +1446,7 @@ public class    SessionBean
         }
 
         // Set the current session occ period to this converted "heavy" occ period
+        // but go through the setter so we load the prop unit heavy version
         setSessOccPeriod(occPeriodHeavy);
     }
 

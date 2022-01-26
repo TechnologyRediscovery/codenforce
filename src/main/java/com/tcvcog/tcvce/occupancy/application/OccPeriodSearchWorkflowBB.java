@@ -389,7 +389,7 @@ public class OccPeriodSearchWorkflowBB
     public void loadOccPeriodHistory() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            occPeriodList.addAll(oc.getOccPeriodPropertyUnitHeavy(oc.assembleOccPeriodHistoryList(getSessionBean().getSessUser().getMyCredential())));
+            occPeriodList.addAll(oc.getOccPeriodPropertyUnitHeavyList(oc.assembleOccPeriodHistoryList(getSessionBean().getSessUser().getMyCredential())));
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,

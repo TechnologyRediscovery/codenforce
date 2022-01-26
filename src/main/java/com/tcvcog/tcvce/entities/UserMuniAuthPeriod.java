@@ -67,6 +67,9 @@ public class UserMuniAuthPeriod extends BOb implements Serializable, Comparable<
 
     private int assignmentRelativeOrder;
     
+    private LocalDateTime oathTS;
+    private CourtEntity oathCourtEntity;
+    
     /**
      * Half-baked attempt at some security on BOBs
      * @return 
@@ -418,6 +421,34 @@ public class UserMuniAuthPeriod extends BOb implements Serializable, Comparable<
      */
     public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
         startDate = DateTimeUtil.convertUtilDate(startDateUtilDate);
+    }
+
+    /**
+     * @return the oathCourtEntity
+     */
+    public CourtEntity getOathCourtEntity() {
+        return oathCourtEntity;
+    }
+
+    /**
+     * @param oathCourtEntity the oathCourtEntity to set
+     */
+    public void setOathCourtEntity(CourtEntity oathCourtEntity) {
+        this.oathCourtEntity = oathCourtEntity;
+    }
+
+    /**
+     * @return the oathTS
+     */
+    public LocalDateTime getOathTS() {
+        return oathTS;
+    }
+
+    /**
+     * @param oathTS the oathTS to set
+     */
+    public void setOathTS(LocalDateTime oathTS) {
+        this.oathTS = oathTS;
     }
     
 }

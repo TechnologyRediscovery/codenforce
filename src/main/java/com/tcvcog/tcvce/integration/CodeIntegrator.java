@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -443,6 +444,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      */
     public List<CodeElement> getCodeElements(int sourceID) throws IntegrationException, BObStatusException{
         String query = "SELECT elementid from codeelement where codesource_sourceID = ? AND deactivatedts IS NULL;";
+        CodeCoordinator cc = getCodeCoordinator();
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -456,7 +458,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                elementList.add(getCodeElement(rs.getInt("elementid")));
+                elementList.add(cc.getCodeElement(rs.getInt("elementid")));
             }
              
         } catch (SQLException ex) { 
@@ -985,7 +987,8 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         
         PaymentIntegrator pi = getPaymentIntegrator();
         UserIntegrator ui = getUserIntegrator();
-        CodeElement ele = getCodeElement(rs.getInt("codelement_elementid"));
+        CodeCoordinator cc = getCodeCoordinator();
+        CodeElement ele = cc.getCodeElement(rs.getInt("codelement_elementid"));
         
         EnforcableCodeElement newEce = new EnforcableCodeElement(ele);
         

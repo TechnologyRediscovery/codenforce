@@ -233,7 +233,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
                 break;
             case OCCUPANCY:
                 OccPeriod occPeriod = (OccPeriod) currentEventHolder;
-                sb.setSessOccPeriod(occPeriod);
+                sb.setSessOccPeriodFromPeriodBase(occPeriod);
                 break;
             case UNIVERSAL:
                 System.out.println("EventsBB reached universal case in createNewEvent()--do something about this maybe?");

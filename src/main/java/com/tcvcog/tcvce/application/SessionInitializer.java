@@ -47,6 +47,8 @@ import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
@@ -622,7 +624,11 @@ public  class       SessionInitializer
         OccPeriod op = null;
         try {
             // Session object init
-            sb.setSessOccPeriodListLight(occCord.assembleOccPeriodHistoryList(cred));
+            
+            QueryOccPeriod qop = sc.runQuery(sc.initQuery(QueryOccPeriodEnum.ALL_PERIODS_IN_MUNI, cred));
+            
+            sb.setSessOccPeriodList(qop.getBOBResultList());
+            
             if(sb.getSessOccPeriodList().isEmpty()){
                 op = occCord.getOccPeriod(sb.getSessMuni().getDefaultOccPeriodID());
             } else {
@@ -630,17 +636,17 @@ public  class       SessionInitializer
                 op = sb.getSessOccPeriodList().get(0);
             }
             
-            sb.setSessOccPeriod(occCord.assembleOccPeriodDataHeavy(op, cred));
             if(op == null){
                 throw new SessionException("Unable to set a session occ period");
             }
+            sb.setSessOccPeriodFromPeriodBase(op);
             
             // Query set init
             sb.setQueryOccPeriodList(sc.buildQueryOccPeriodList(cred));
             if(!sb.getQueryOccPeriodList().isEmpty()){
                 sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
             }
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+        } catch (IntegrationException | SearchException ex) {
             System.out.println(ex);
             throw new SessionException( "Occ period list or query assembly failure", 
                                         ex, 

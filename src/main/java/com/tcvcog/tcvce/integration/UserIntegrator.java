@@ -283,7 +283,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     
     /**
      * For use by system administrators to manage user data. Raw means that even 
-     * expired or invalidated periods are STILL included
+     * expired or invalidated periods are STILL included. Clients can 
+     * use methods on the UserCoordinator to clean periods.
      * @param m
      * @return
      * @throws IntegrationException 
@@ -328,7 +329,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         // broken query
         String query = "SELECT muniauthperiodid, muni_municode, authuser_userid, accessgranteddatestart, \n" +
                         "       accessgranteddatestop, recorddeactivatedts, authorizedrole, createdts, \n" +
-                        "       createdby_userid, notes, supportassignedby, assignmentrank\n" +
+                        "       createdby_userid, notes, supportassignedby, assignmentrank, oathts, oathcourtentity_entityid  \n" +
                         "  FROM public.loginmuniauthperiod WHERE muniauthperiodid=?;";
         
         PreparedStatement stmt = null;
@@ -357,6 +358,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
     private UserMuniAuthPeriod generateUserMuniAuthPeriod(ResultSet rs) throws SQLException, IntegrationException{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         UserMuniAuthPeriod per = new UserMuniAuthPeriod(mi.getMuni(rs.getInt("muni_municode")));
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
         
         per.setUserMuniAuthPeriodID(rs.getInt("muniauthperiodid"));
         
@@ -383,6 +385,13 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         per.setNotes(rs.getString("notes"));
         // do support stuff later
         per.setAssignmentRelativeOrder(rs.getInt("assignmentrank"));
+        
+        if(rs.getTimestamp("oathts") != null){
+            per.setOathTS(rs.getTimestamp("oathts").toLocalDateTime());
+        }
+        if(rs.getInt("oathcourtentity_entityid") != 0){
+            per.setOathCourtEntity(cei.getCourtEntity(rs.getInt("oathcourtentity_entityid")));
+        }
         
         return per;
     }
@@ -610,10 +619,10 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query = "INSERT INTO public.loginmuniauthperiod(\n" +
                         "            muniauthperiodid, muni_municode, authuser_userid, accessgranteddatestart, \n" +
                         "            accessgranteddatestop, recorddeactivatedts, authorizedrole, createdts, \n" +
-                        "            createdby_userid, notes, supportassignedby, assignmentrank)\n" +
+                        "            createdby_userid, notes, supportassignedby, assignmentrank, oathts, oathcourtentity_entityid)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
                         "            ?, NULL, CAST (? AS role), now(), \n" +
-                        "            ?, ?, ?, ?);";
+                        "            ?, ?, ?, ?, ?, ?);";
         
         PreparedStatement stmt = null;
         
@@ -633,6 +642,17 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             // set support assigned to null until functionality implemented
             stmt.setNull(8, java.sql.Types.NULL);
             stmt.setInt(9, uap.getAssignmentRelativeOrder());
+            if(uap.getOathTS() != null){
+                stmt.setTimestamp(10, java.sql.Timestamp.valueOf(uap.getOathTS()));
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
+            }
+            
+            if(uap.getOathCourtEntity() != null){
+                stmt.setInt(11, uap.getOathCourtEntity().getCourtEntityID());
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
             
             stmt.execute();
             

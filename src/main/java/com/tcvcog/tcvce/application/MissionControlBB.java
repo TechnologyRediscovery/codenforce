@@ -348,7 +348,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     
     public String onViewOccPeriodButtonChange(OccPeriod per){
         if(per != null){
-            getSessionBean().setSessOccPeriod(per);
+            getSessionBean().setSessOccPeriodFromPeriodBase(per);
         }
         
         return "occPeriodWorkflow";

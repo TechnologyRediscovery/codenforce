@@ -1,0 +1,215 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="occperiod-messages-form">
+        <p:growl id="occperiod-growl" />
+    </h:form>
+
+
+    <p:panel  id="occperiod-list-panel"
+              toggleable="true"
+              widgetVar="occperiod-list-panel-var"
+              collapsed="false"
+              style="width:100%;"
+              header="Occupancy Periods">
+        
+        <h:form id="occperiod-query-form">
+            
+
+
+        <h:outputLabel styleClass="bold" 
+                       value="Select an occupancy period query:" 
+                       for="occperiod-query-desc-ot" />
+
+        <p:selectOneMenu id="occperiod-query-som" 
+                         tabindex="1" 
+                         value="#{occPeriodSearchWorkflowBB.occPeriodQuerySelected}"
+                         disabled="#{occPeriodSearchWorkflowBB.occPeriodQuerySelected.queryExecuted}">
+            <f:converter converterId="bOBQueryConverter"/>
+            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+            <f:selectItems id="querylist-si" 
+                           value="#{occPeriodSearchWorkflowBB.occPeriodQueryList}" 
+                           var="ql" 
+                           itemValue="#{ql}" 
+                           itemLabel="#{ql.queryTitle}" />
+            <p:ajax listener="#{occPeriodSearchWorkflowBB.changeQuerySelected}"
+                    update="@form
+                    occperiod-messages-form" />
+        </p:selectOneMenu>
+
+        <p:spacer height="5px" />
+
+        <h:outputLabel styleClass="bold" 
+                       value="Description: " 
+                       for="occperiod-query-desc-ot" />
+        <h:outputText id="occperiod-query-desc-ot" 
+                      value="#{occPeriodSearchWorkflowBB.occPeriodQuerySelected.queryName.desc}" />
+
+        <p:spacer height="5px" />
+
+        <p:commandButton   id="occperiod-executequery-cb" 
+                           ajax="true" 
+                           actionListener="#{occPeriodSearchWorkflowBB.executeQuery}"
+                           disabled="#{occPeriodSearchWorkflowBB.occPeriodQuerySelected.queryExecuted}"
+                           icon="fa fa-flash" 
+                           styleClass="button"
+                           value="run query" 
+                           update="@form
+                           occperiod-search-results-form
+                           occperiod-search-log-form"/>
+
+        <p:commandButton   id="occperiod-search-clear-cb" 
+                           ajax="true" 
+                           actionListener="#{occPeriodSearchWorkflowBB.resetQuery}"
+                           icon="fa fa-eraser" 
+                           styleClass="button inline-button"
+                           value="clear query" 
+                           disabled="#{!occPeriodSearchWorkflowBB.occPeriodQuerySelected.queryExecuted}"
+                           update=" occperiod-search-log-form
+                           @form"/>
+
+
+        <p:selectBooleanButton  id="occperiod-search-appendresults-chkbox" 
+                                onLabel="Add Results to Existing Period List"
+                                onIcon="fa fa-indent"
+                                offLabel="Build Fresh Period List On Search"
+                                offIcon="fa fa-eraser"
+                                value="#{occPeriodSearchWorkflowBB.appendResultsToList}" 
+                                disabled="false" />
+
+        </h:form>
+
+        <h:form id="occperiod-search-results-form" >
+
+            <p:commandButton   id="occperiod-search-results-clear-button" 
+                               ajax="true" 
+                               actionListener="#{occPeriodSearchWorkflowBB.clearOccPeriodList}"
+                               icon="fa fa-eraser" 
+                               styleClass="button"
+                               value="clear results list" 
+                               update=" occperiod-messages-form
+                                        occperiod-search-results-form"/>
+
+            <p:commandButton   id="occperiod-search-loadhistory-button" 
+                               ajax="true" 
+                               rendered="false"
+                               actionListener="#{occPeriodSearchWorkflowBB.loadOccPeriodHistory}"
+                               icon="fa fa-clock-o" 
+                               styleClass="button"
+                               value="load period history" 
+                               update=" occperiod-messages-form
+                                        @form"/>
+            <p:spacer height="5px" />
+
+            <h:outputText value="listing #{occPeriodSearchWorkflowBB.occPeriodList.size()} periods" 
+                          styleClass="italic"/>
+            <p:spacer height="5px" />
+
+            <p:dataTable
+                id="occperiods-table"
+                var="period"
+                rowKey="#{period.periodID}"
+                value="#{occPeriodSearchWorkflowBB.occPeriodList}"
+                tableStyleClass="primeDataTable"
+                resizableColumns="true"
+                widgetVar="occperiods-table-var"
+                >
+                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                <p:column width="20%" 
+                          sortable="true"
+                          sortBy="#{period.propUnitProp.property.primaryAddressLink.street.name}">
+                          
+                    <f:facet name="header">
+                        <h:outputText value="Street" />
+                    </f:facet>
+                    <h:outputText value="#{period.propUnitProp.property.primaryAddressLink.street.name}" />
+                </p:column>
+
+                <p:column width="8%"
+                          sortable="true"
+                          sortBy="#{period.propUnitProp.property.primaryAddressLink.buildingNo}">
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{period.propUnitProp.property.primaryAddressLink.buildingNo}" />
+                </p:column>
+
+                <p:column width="10%" >
+                    <f:facet name="header">
+                        <h:outputText value="Unit" />
+                    </f:facet>
+                    <h:outputText value="#{period.propUnitProp.unitNumber}" />
+                </p:column>
+
+                <p:column width="15%" 
+                          sortable="true"
+                          sortBy="#{period.type.title}">
+                    <f:facet name="header">
+                        <h:outputText value="Type" />
+                    </f:facet>
+                    <h:outputText value="#{period.type.title}" />
+                    <p:spacer height="1px" />
+                    <h:outputText value="(Per ID: #{period.periodID})" />
+                </p:column>
+
+                <p:column width="20%"
+                          sortable="true"
+                          sortBy="#{period.startDate}">
+                    <f:facet name="header">
+                        <h:outputText value="Start Date" />
+                    </f:facet>
+                    <h:outputText value="#{occPeriodSearchWorkflowBB.getPrettyDateNoTime(period.startDate)}" />
+                </p:column>
+
+                <p:column width="10%">
+                    <f:facet name="header">
+                        <h:outputText value="Status" />
+                    </f:facet>
+                    <h:outputText value="#{empty period.authorizedTS ? 'In-Process' : 'Authorized'}" />
+                </p:column>
+
+                <p:column width="10%">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+
+                    <div class="restrict-main-contents-io-link">
+
+                        <p:commandLink id="violation-ord-details-cl" 
+                                       ajax="false"
+                                       action="#{missionControlBB.onViewOccPeriodButtonChange(period)}"
+                                       value="view" 
+                                       style="color:blue;"
+                                       type="button" />
+                    </div>
+
+
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+
+    </p:panel>
+    
+
+    <p:panel  id="occperiod-search-log-panel"
+              toggleable="true"
+              widgetVar="occperiod-search-log-panel-var"
+              collapsed="true"
+              style="width:100%;"
+              header="CECase Query log">
+
+        <h:form id="occperiod-search-log-form">
+            <div class="search-query-desc">
+                <h:outputText id="occperiod-search-log-ot" 
+                              value="#{occPeriodSearchWorkflowBB.occPeriodQuerySelected.queryLog}"
+                              escape="false"/>
+            </div>
+        </h:form>
+    </p:panel>
+
+</ui:composition>

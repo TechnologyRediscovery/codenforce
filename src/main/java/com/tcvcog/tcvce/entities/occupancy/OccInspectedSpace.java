@@ -44,6 +44,7 @@ public class OccInspectedSpace
     private ViewOptionsOccChecklistItemsEnum viewSetting;
     
     private List<OccInsElementGroup> inspectedElementGroupList;
+    private Map<OccInspectionStatusEnum, List<OccInspectedSpaceElement>> elementStatusMap;
     
     private OccLocationDescriptor location;
 
@@ -102,13 +103,34 @@ public class OccInspectedSpace
             }
         }
     }
+    
+    public List<OccInspectedSpaceElement> getElementListPass(){
+        if(elementStatusMap != null){
+            return elementStatusMap.get(OccInspectionStatusEnum.PASS);
+        }
+        return new ArrayList<>();
+    }
+    
+    public List<OccInspectedSpaceElement> getElementListFail(){
+        if(elementStatusMap != null){
+            return elementStatusMap.get(OccInspectionStatusEnum.FAIL);
+        }
+        return new ArrayList<>();
+        
+    }
+    public List<OccInspectedSpaceElement> getElementListNotIns(){
+        if(elementStatusMap != null){
+            return elementStatusMap.get(OccInspectionStatusEnum.NOTINSPECTED);
+        }
+        return new ArrayList<>();
+        
+    }
 
 
     public List<OccLocationDescriptor> getAllUniqueLocationDescriptors() {
         Set<OccLocationDescriptor> locationDescriptors = new HashSet();
 
         for (OccInspectedSpaceElement inspectedSpaceElement : inspectedElementList) {
-            System.out.println("A:" + inspectedSpaceElement.getInspectedSpaceID());
             locationDescriptors.add(inspectedSpaceElement.getLocation());
         }
 
@@ -330,6 +352,20 @@ public class OccInspectedSpace
      */
     public void setInspectedElementGroupList(List<OccInsElementGroup> inspectedElementGroupList) {
         this.inspectedElementGroupList = inspectedElementGroupList;
+    }
+
+    /**
+     * @return the elementStatusMap
+     */
+    public Map<OccInspectionStatusEnum, List<OccInspectedSpaceElement>> getElementStatusMap() {
+        return elementStatusMap;
+    }
+
+    /**
+     * @param elementStatusMap the elementStatusMap to set
+     */
+    public void setElementStatusMap(Map<OccInspectionStatusEnum, List<OccInspectedSpaceElement>> elementStatusMap) {
+        this.elementStatusMap = elementStatusMap;
     }
     
 }

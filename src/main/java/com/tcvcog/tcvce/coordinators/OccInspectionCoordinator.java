@@ -85,12 +85,13 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * configured Template inside
      * @throws InspectionException
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public OccInspection inspectionAction_commenceOccupancyInspection(OccInspection in,
                                                                       OccChecklistTemplate tem,
                                                                       OccPeriod period,
                                                                       User user) 
-            throws InspectionException, IntegrationException {
+            throws InspectionException, IntegrationException, BObStatusException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         OccChecklistIntegrator oci = getOccChecklistIntegrator();
         OccInspection inspec = null;
@@ -110,12 +111,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             }
             inspec.setInspector(user);
             inspec.setPacc(generateControlCodeFromTime(user.getHomeMuniID()));
-//            if (muni.isEnablePublicOccInspectionTODOs()) {
-//                inspec.setEnablePacc(true);
-//            } else {
-//                inspec.setEnablePacc(false);
-//            }
-            inspec = oii.insertOccInspection(inspec);
+
+            inspec = getOccInspection(oii.insertOccInspection(inspec));
         } else {
             throw new InspectionException("Occ period either inactive or uninspectable");
         }
@@ -154,12 +151,12 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @param locDesc       A populated location descriptor for the new OccInspectedSpace. Can be an
      *                      existing location or a new one.
      *
-     * @return Containing a List of InspectedCodeElement objects ready to be
-     * evaluated
+     * @return The sapce type passed in turned into an inspected space 
+     * with a DB ID
      *
      * @throws IntegrationException
      */
-    public OccInspection inspectionAction_commenceInspectionOfSpaceTypeChecklistified  (OccInspection inspection,
+    public OccInspectedSpace inspectionAction_commenceInspectionOfSpaceTypeChecklistified  (OccInspection inspection,
                                                                                         User user,
                                                                                         OccSpaceTypeChecklistified tpe,
                                                                                         OccInspectionStatusEnum initialStatus,
@@ -212,14 +209,43 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         inspectedSpace = oii.recordCommencementOfSpaceInspection(inspectedSpace, inspection);
         System.out.println("OccupancyCoordinator.inspectionAction_commenceSpaceInspection | commenced inspecting of space");
 
-        // now use our convenience method to record Inspection of the space's individual elements
+        // now use our convenience method to initiate Inspection of the space's individual elements
         oii.recordInspectionOfSpaceElements(inspectedSpace, inspection);
 
         // check sequence by retrieving new inspected space and displaying info
-        inspectedSpace = oii.getInspectedSpace(inspectedSpace.getInspectedSpaceID());
+//        inspectedSpace = oii.getInspectedSpace(inspectedSpace.getInspectedSpaceID());
         System.out.println("OccupancyCoordinator.inspectionAction_commenceSpaceInspection | retrievedInspectedSpaceID= " + inspectedSpace);
 
-        return inspection;
+        return inspectedSpace;
+    }
+    
+    /**
+     * Sets the certified fields on an inspection and injects a determination;
+     * Implements logic to ensure proper privileges and throws exceptions
+     * with useful messages inside
+     * 
+     * @param oi to certify
+     * @param det to certify; must be relevant for context (i.e. occperiod)
+     * @param ua doing the certification (must be OP manager or sys admin or better)
+     * @param op The host occ period--which cannot be authorized
+     */
+    public void inspectionAction_certifyInspection( OccInspection oi,
+                                                    UserAuthorized ua,
+                                                    OccPeriod op) throws IntegrationException, BObStatusException, AuthorizationException{
+        
+        if(oi == null || oi.getDetermination() == null || ua == null || op == null || op.getManager() == null){
+            throw new BObStatusException("Cannot certify with null inspection, determination, user, period, or manager!");
+        }
+        
+        if(ua.getUserID() != op.getManager().getUserID() || !ua.getKeyCard().isHasSysAdminPermissions()){
+            throw new AuthorizationException("Given user cannot certify this inspection because user is not period manager or does not have sys admin or better permissions");
+        }
+      
+        oi.setDeterminationBy(ua);
+        oi.setDeterminationTS(LocalDateTime.now());
+        
+        updateOccInspection(oi, ua);
+              
     }
 
     /**
@@ -237,6 +263,92 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 
         oi = configureOccInspection(oi);
         return oi;
+    }
+    
+    
+    /**
+     * Configures members and updates an existing record in the 
+     * occinspection table. The beast!
+     * 
+     * @param oi with changed fields. This method injects lastupdatedby stuff
+     * @param ua the user doing the updates
+     */
+    public void updateOccInspection(OccInspection oi, UserAuthorized ua) throws IntegrationException, BObStatusException{
+      OccInspectionIntegrator oii = getOccInspectionIntegrator();
+      if(oi == null || oi.getInspectionID() == 0 || ua == null){
+          throw new BObStatusException("Cannot update an inspection with null inspection or ID of 0 or null use");
+      }
+      oi.setLastUpdatedBy(ua);
+      // database stamps update TS with now()
+      oii.updateOccInspection(oi);
+    }
+    
+    /**
+     * Logic container for ensuring that deactivation is allowed
+     * @param ua doing the deactivating; must be either the inspector or OP manager
+     * @param oi to be deactivated
+     * @param op parent occ period of the inspection to be deactivated
+     * @throws com.tcvcog.tcvce.domain.BObStatusException for null of any input param
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException inputted ua must be the manager or inspector or have sys admin or better permissions
+     */
+    public void deactivateOccInspection(UserAuthorized ua, OccInspection oi, OccPeriod op) 
+            throws BObStatusException, IntegrationException, AuthorizationException{
+        if(ua == null || oi == null || op == null || oi.getInspector() == null || op.getManager() == null){
+            throw new BObStatusException("Cannot deactivate an inspection with null user, inspec, or period, or their manager/inspector!");
+            
+        }
+        if(op.getPeriodID() != oi.getOccPeriodID()){
+            throw new BObStatusException("Cannot deactivate inspection because the given inspection is not contained by the given occ period. This is a fatal error.");
+        }
+        if(verifyUserAuthorizationForInspectionActions(ua, oi, op)) {
+            OccInspectionIntegrator oii = getOccInspectionIntegrator();
+            oi.setDeactivatedBy(ua);
+            oi.setDeactivatedTS(LocalDateTime.now());
+            oii.updateOccInspection(oi);
+        } else {
+            throw new AuthorizationException("Cannot deactivate an occ inspection unless user is the manager of period, the inspector, or a sys admin or better");
+        }
+    }
+    
+    
+    /**
+     * Removes the values for the given OccInspection's determination, detTS, and DetUser
+     * @param ua
+     * @param oi
+     * @param op 
+     */
+    public void removeOccInspectionFinalization(UserAuthorized ua, OccInspection oi, OccPeriod op) throws IntegrationException, BObStatusException{
+        if(verifyUserAuthorizationForInspectionActions(ua, oi, op)){
+            oi.setDetermination(null);
+            oi.setDeterminationBy(null);
+            oi.setDeterminationTS(null);
+            updateOccInspection(oi, ua);
+        }
+        
+        
+    }
+    
+    
+    /**
+     * Logic container for checking that an inspection
+     * can be modified by a given user on our particular occ period
+     * 
+     * @return true if the user has authorization; false if the user should be prohibited
+     * from undertaking action
+     */
+    private boolean verifyUserAuthorizationForInspectionActions(UserAuthorized ua,
+                                                                OccInspection oi, 
+                                                                OccPeriod op){
+        
+        boolean auth = false;
+        if(ua != null && oi != null && op != null && op.getManager() != null){
+            if(ua.getUserID() == oi.getInspector().getUserID() || ua.getUserID() == op.getManager().getUserID() || ua.getKeyCard().isHasSysAdminPermissions()){
+                auth = true;
+            }
+        }
+        
+        return auth;
     }
 
     
@@ -297,15 +409,31 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         SystemIntegrator si = getSystemIntegrator();
         boolean atLeastOneElementInspected = false;
         boolean allElementsPass = true;
-
+        
+        Map<OccInspectionStatusEnum, List<OccInspectedSpaceElement>> elbsm = new HashMap<>();
+        elbsm.put(OccInspectionStatusEnum.PASS, new ArrayList<>());
+        elbsm.put(OccInspectionStatusEnum.FAIL, new ArrayList<>());
+        elbsm.put(OccInspectionStatusEnum.NOTINSPECTED, new ArrayList<>());
+              
         for (OccInspectedSpaceElement inSpaceEle : inSpace.getInspectedElementList()) {
             configureOccInspectedSpaceElement(inSpaceEle);
-            if (inSpaceEle.getStatus().getStatusEnum() == OccInspectionStatusEnum.FAIL) {
-                allElementsPass = false;
-            } else if (inSpaceEle.getLastInspectedTS() != null) {
-                atLeastOneElementInspected = true;
+            switch(inSpaceEle.getStatusEnum()){
+                case FAIL:
+                    allElementsPass = false;
+                    elbsm.get(OccInspectionStatusEnum.FAIL).add(inSpaceEle);
+                    atLeastOneElementInspected = true;
+                    break;
+                case NOTINSPECTED:
+                    elbsm.get(OccInspectionStatusEnum.NOTINSPECTED).add(inSpaceEle);
+                    break;
+                case PASS:
+                    elbsm.get(OccInspectionStatusEnum.PASS).add(inSpaceEle);
+                    atLeastOneElementInspected = true;
+                    break;
             }
         }
+        
+        inSpace.setElementStatusMap(elbsm);
 
         int iconID = 0;
         try {
@@ -450,6 +578,9 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * calls the respective methods inside this coordinator based on the value of the
      * OccInspectedSpaceElements statusEnum
      * 
+     * TODO: make sure add to code enf on fail gets recorded as 
+     * as true by default
+     * 
      * @param oise the element being inspected with a statusEnum set to the desired state
      * @param ua the user doing the inspecting; must have CEO or better permissions
      * @param oi the inspection in which the element lives
@@ -469,6 +600,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             throw new AuthorizationException("User " + ua.getUsername() + " is not authorized to change code element status");
         }
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        
         switch(oise.getStatusEnum()){
             case NOTINSPECTED:
                 inspectionAction_configureElementForNotInspected(oise, ua, oi);
@@ -691,5 +823,38 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     public OccSpaceType getOccSpaceType(int tpeID) throws IntegrationException{
         OccChecklistIntegrator oci = getOccChecklistIntegrator();
         return oci.getOccSpaceType(tpeID);
+    }
+    
+    /**
+     * Retrieves all active causes for use in selection boxes
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<OccInspectionCause> getOccInspectionCauseList() throws IntegrationException{
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        List<Integer> cidl = oii.getCauseListActiveOnly();
+        List<OccInspectionCause> causeList = new ArrayList<>();
+        if(cidl != null && !cidl.isEmpty()){
+            for(Integer i: cidl){
+                causeList.add(oii.getCause(i));
+            }
+        }
+        return causeList;
+    }
+    /**
+     * Retrieves all active determinations for use in selection boxes
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<OccInspectionDetermination> getOccDeterminationList() throws IntegrationException{
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        List<Integer> didl = oii.getDeterminationListActiveOnly();
+        List<OccInspectionDetermination> detList = new ArrayList<>();
+        if(didl != null && !didl.isEmpty()){
+            for(Integer i: didl){
+                detList.add(oii.getDetermination(i));
+            }
+        }
+        return detList;
     }
 }

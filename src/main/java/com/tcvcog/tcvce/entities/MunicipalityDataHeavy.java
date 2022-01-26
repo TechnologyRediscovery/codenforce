@@ -68,6 +68,7 @@ public  class       MunicipalityDataHeavy
     private List<User> userList;
     private List<CourtEntity> courtEntities;
     private List<Integer> photoDocList;
+    private List<User> swornOfficerList;
     
     
     protected List<HumanLink> humanLinkList;
@@ -706,6 +707,20 @@ public  class       MunicipalityDataHeavy
     @Override
     public int getHostPK() {
         return muniCode;
+    }
+
+    /**
+     * @return the swornOfficerList
+     */
+    public List<User> getSwornOfficerList() {
+        return swornOfficerList;
+    }
+
+    /**
+     * @param swornOfficerList the swornOfficerList to set
+     */
+    public void setSwornOfficerList(List<User> swornOfficerList) {
+        this.swornOfficerList = swornOfficerList;
     }
   
     

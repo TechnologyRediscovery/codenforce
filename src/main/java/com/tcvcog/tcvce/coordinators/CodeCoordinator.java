@@ -50,6 +50,16 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     final String ECE_DEFAULT_PENALTY_NOTES = "Default values";
     final int ECE_DEFAULT_DAYS_TO_COMPLY = 30;
     final String ECE_DEFAULT_DAYSTOCOMPLY_NOTES = "Default values";
+    
+    final static String FMT_SECTION_ENTITY = "&#167;";
+    final static String FMT_SPACE = " ";
+    final static String FMT_PAREN_L = "(";
+    final static String FMT_PAREN_R = ")";
+    final static String FMT_DASH = "-";
+    final static String FMT_COLON = ":";
+    
+    
+    
     /**
      * Creates a new instance of CodeCoordinator
      */
@@ -169,10 +179,84 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     public CodeElement getCodeElement(int eleid) throws IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
         try {
-            return ci.getCodeElement(eleid);
+            return configureCodeElement(ci.getCodeElement(eleid));
         } catch (BObStatusException ex) {
             throw new IntegrationException(ex.getMessage());
         }
+    }
+
+    /**
+     * Logic bundle for code elements; 
+     * @param ce
+     * @return 
+     */
+    private CodeElement configureCodeElement(CodeElement ce){
+       ce.setHeaderString(buildOrdTitle(ce));
+        
+        return ce;
+    }
+    
+    /**
+     * Implements logic to create a title for a code element; Designed to be injected
+     * into the code elements ordiance
+     * 
+     * TODO: Finish my guts
+     * @param ce
+     * @return 
+     */
+    private String buildOrdTitle(CodeElement ce){
+        StringBuilder sb = new StringBuilder();
+         if(ce != null){
+            
+            if(ce.getSource() != null){
+                sb.append(ce.getSource().getSourceName());
+                if(ce.getSource().getSourceYear() != 0){
+                    sb.append(FMT_PAREN_L);
+                    sb.append(ce.getSource().getSourceYear());
+                    sb.append(FMT_PAREN_R);
+                }
+                sb.append(FMT_SPACE);
+            }
+
+            sb.append(FMT_SECTION_ENTITY);
+            sb.append(FMT_SPACE);
+            
+            // If we have a standard IPMC listing, the chapter and section
+            // numbers are actually in the sub-section number, so just use that number
+            // such as 302.1.1: Chapter 3, section 2, subsec 1, subsubsec 1
+            if(ce.getOrdchapterNo() != 0 
+                    && ce.getOrdSecNum().contains(String.valueOf(ce.getOrdchapterNo()))){
+                
+            }
+            if(ce.getOrdSecNum() != null 
+                        && ce.getOrdSubSecNum() != null 
+                        && ce.getOrdSubSecNum().contains(ce.getOrdSecNum())){
+                if(ce.getOrdSubSubSecNum() != null 
+                        && ce.getOrdSubSubSecNum().contains(ce.getOrdSubSecNum())){
+                    // eg 302.1.1
+                    sb.append(ce.getOrdSubSubSecNum());
+                } else { // we don't have a recursive sub-sub sec number, so use sub-sec number
+                    sb.append(FMT_SPACE);
+                    sb.append(ce.getOrdSubSecNum());
+                    sb.append(FMT_COLON);
+                    sb.append(FMT_SPACE);
+                }
+                
+                
+                if(ce.getOrdSecTitle() != null){
+                    sb.append(ce.getOrdSecTitle());
+                    sb.append(FMT_SPACE);
+                    sb.append(FMT_DASH);
+                    sb.append(FMT_SPACE);
+                }
+                if(ce.getOrdSubSecTitle() != null){
+                    sb.append(ce.getOrdSubSecTitle());
+                }
+            } else { // Section number is not inside sub-section number, so use the section number
+                // TODO: Finsish
+            } 
+        }
+         return sb.toString();
     }
     
     

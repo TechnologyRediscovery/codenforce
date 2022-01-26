@@ -117,7 +117,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return oppu;
     }
 
-    public List<OccPeriodPropertyUnitHeavy> getOccPeriodPropertyUnitHeavy(List<OccPeriod> perList) throws IntegrationException {
+    public List<OccPeriodPropertyUnitHeavy> getOccPeriodPropertyUnitHeavyList(List<OccPeriod> perList) throws IntegrationException {
         List<OccPeriodPropertyUnitHeavy> oppuList = new ArrayList<>();
         for (OccPeriod op : perList) {
             oppuList.add(OccupancyCoordinator.this.getOccPeriodPropertyUnitHeavy(op.getPeriodID()));
@@ -147,6 +147,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         SearchCoordinator sc = getSearchCoordinator();
         EventCoordinator ec = getEventCoordinator();
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
 
         OccPeriodDataHeavy opdh = new OccPeriodDataHeavy(per);
 
@@ -155,6 +156,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         // in our integrators for each BOB
         try {
             per = oi.getOccPeriod(per.getPeriodID());
+            opdh.setPropUnitProp(pc.getPropertyUnitWithProp(opdh.getPropertyUnitID()));
             // APPLICATION LIST
             opdh.setApplicationList(oi.getOccPermitApplicationList(opdh));
 
@@ -176,8 +178,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 qe.getParamsList().get(0).setEventDomainPK_val(per.getPeriodID());
             }
             // Model after CECase
-            EventCoordinator evc = getEventCoordinator();
-            evc.getEventList(opdh);
+//            EventCoordinator evc = getEventCoordinator();
+            // Looks like this is useless 
+//            evc.getEventList(opdh);
 
             opdh.setEventList(ec.downcastEventCnFPropertyUnitHeavy(qe.getBOBResultList()));
 
@@ -203,7 +206,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             // BLOB LIST
             opdh.setBlobIDList(bi.photosAttachedToOccPeriod(opdh.getPeriodID()));
 
-            opdh.setGoverningInspection(designateGoverningInspection(opdh));
+            // Commented out 26-JAN-2022 here since we  aren't implementing rigid logic
+            // on occ period permit generation based on inspection output data
+            // TODO: Reconsider governing inspection idea            //
+//            opdh.setGoverningInspection(designateGoverningInspection(opdh));
 
         } catch (BObStatusException  | EventException | AuthorizationException | IntegrationException | ViolationException ex) {
             System.out.println(ex);
@@ -211,6 +217,28 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         return opdh;
 
+    }
+    
+    /**
+     * Connects a given inspection to the new period specified by the target. 
+     
+     * @param ins to Xfer to a new period
+     * @param periodIDTarget ID of the period to which the given inspection should
+     * be attached
+     */
+    public void transferInspectionOccPeriod(OccInspection ins, int periodIDTarget) throws BObStatusException, IntegrationException{
+        if(ins == null || periodIDTarget == 0){
+            throw new BObStatusException("Cannot xcer an inspection to a new period with null Inspection or target ID of 0");
+        }
+        OccPeriod per = getOccPeriod(periodIDTarget);
+        if(per == null){
+            throw new BObStatusException("Invalid target occupancy period ID");
+        }
+        
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        ins.setOccPeriodID(periodIDTarget);
+        oii.updateOccInspection(ins);
+        
     }
 
     public List<OccPeriodType> getOccPeriodTypesFromProfileID(int profileID) {
@@ -637,15 +665,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         oi.updateOccPeriod(period);
     }
 
-    public void updateOccInspection(OccInspection is, User u) throws IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        oii.updateOccInspection(is);
-
-    }
+ 
 
     public void activateOccInspection(OccInspection is) throws IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        oii.deactivateOccInspection(is);
+        // Nothing to do here yet
+        
+        
 
     }
 

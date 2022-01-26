@@ -96,6 +96,16 @@ public class CodeElement
         }
     }
 
+    
+     /**
+     * @return the headerString
+     */
+    public String getHeaderString() {
+       
+        
+        return headerString;
+    }
+
 
     /**
      * @return the createdTS
@@ -388,23 +398,7 @@ public class CodeElement
         this.guideEntryID = guideEntryID;
     }
 
-    /**
-     * @return the headerString
-     */
-    public String getHeaderString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(ordchapterTitle);
-        sb.append(":");
-        sb.append(ordSecTitle);
-        sb.append("-");
-        sb.append(ordSubSecNum);
-        sb.append(":");
-        sb.append(ordSubSecTitle);
-        headerString = sb.toString();
-        
-        return headerString;
-    }
-
+   
     /**
      * @param headerString the headerString to set
      */
