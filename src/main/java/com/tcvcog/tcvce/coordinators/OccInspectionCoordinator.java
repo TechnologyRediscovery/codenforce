@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -37,6 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -86,12 +89,13 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @throws InspectionException
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
     public OccInspection inspectionAction_commenceOccupancyInspection(OccInspection in,
                                                                       OccChecklistTemplate tem,
                                                                       OccPeriod period,
                                                                       User user) 
-            throws InspectionException, IntegrationException, BObStatusException {
+            throws InspectionException, IntegrationException, BObStatusException, BlobException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         OccChecklistIntegrator oci = getOccChecklistIntegrator();
         OccInspection inspec = null;
@@ -255,12 +259,18 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-    public OccInspection getOccInspection(int inspectionID) throws IntegrationException, BObStatusException {
+    public OccInspection getOccInspection(int inspectionID) throws IntegrationException, BObStatusException, BlobException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
+        
+        
+        // get the base object with non-list members
         OccInspection oi = oii.getOccInspection(inspectionID);
+        
+        // setup our lists
         oi.setChecklistTemplate(getChecklistTemplate(oi.getChecklistTemplateID()));
         oi.setInspectedSpaceList(oii.getInspectedSpaceList(oi.getInspectionID()));
-
+        oi.setBlobList(bc.getBlobLightList(oi));
         oi = configureOccInspection(oi);
         return oi;
     }
@@ -361,7 +371,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-    public List<OccInspection> getOccInspectionsFromOccPeriod(OccPeriodDataHeavy period) throws IntegrationException, BObStatusException {
+    public List<OccInspection> getOccInspectionsFromOccPeriod(OccPeriodDataHeavy period) throws IntegrationException, BObStatusException, BlobException {
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
 
         List<Integer> inspectionIDList = oii.getOccInspectionList(period);
@@ -383,10 +393,12 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      */
     private OccInspection configureOccInspection(OccInspection inspection) throws BObStatusException {
         boolean allSpacesPassed = true;
+        BlobCoordinator bc = getBlobCoordinator();
         if (inspection != null) {
             for (OccInspectedSpace inSpace : inspection.getInspectedSpaceList()) {
-                if (configureOccInspectedSpace(inSpace).getStatus().getStatusEnum() == OccInspectionStatusEnum.FAIL
-                        || configureOccInspectedSpace(inSpace).getStatus().getStatusEnum() == OccInspectionStatusEnum.NOTINSPECTED) {
+                configureOccInspectedSpace(inSpace);
+                if (inSpace.getStatus().getStatusEnum() == OccInspectionStatusEnum.FAIL
+                        || inSpace.getStatus().getStatusEnum() == OccInspectionStatusEnum.NOTINSPECTED) {
                     allSpacesPassed = false;
                 }
             }
@@ -521,6 +533,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      */
     private OccInspectedSpaceElement configureOccInspectedSpaceElement(OccInspectedSpaceElement inSpaceEle) throws BObStatusException {
         SystemIntegrator si = getSystemIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
+        
 
         int iconID = 0;
 
@@ -528,7 +542,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             if (inSpaceEle == null) {
                 throw new BObStatusException("Cannot configure a null OccInspectedSpaceElement...");
             }
-
+            inSpaceEle.setBlobList(bc.getBlobLightList(inSpaceEle));
             if (inSpaceEle.getLastInspectedBy() != null && inSpaceEle.getComplianceGrantedTS() == null) {
 
                 inSpaceEle.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.FAIL));
@@ -554,9 +568,9 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 //                System.out.println("OccupancyCoordinator.configureOccInspectedSpaceEleement | NOT INSPECTED inspectedSpaceElementID: " + inSpaceEle.getInspectedSpaceID());
 
             }
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException | BlobException  ex) {
             System.out.println(ex);
-        }
+        } 
         return inSpaceEle;
     }
     

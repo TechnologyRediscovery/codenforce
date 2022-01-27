@@ -40,9 +40,11 @@ public  class       OccPeriodDataHeavy
         implements  IFace_EventRuleGoverned, 
                     IFace_CredentialSigned,
                     IFace_PaymentHolder,
-                    IFace_humanListHolder{
+                    IFace_humanListHolder,
+                    IFace_BlobHolder{
     
     final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.OCCPERIODHUMAN;
+    final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.OCC_PERIOD;
     
     protected OccPeriodStatusEnum status;
 
@@ -60,6 +62,8 @@ public  class       OccPeriodDataHeavy
     
     private List<FeeAssigned> feeList;
     private List<Payment> paymentList;
+    
+    private List<BlobLight> blobList;
 
     private LocalDateTime configuredTS;
     private String credentialSignature;
@@ -430,6 +434,26 @@ public  class       OccPeriodDataHeavy
    
     @Override
     public int getHostPK() {
+        return periodID;
+    }
+
+    @Override
+    public void setBlobList(List<BlobLight> bl) {
+        this.blobList = bl;
+    }
+
+    @Override
+    public List<BlobLight> getBlobList() {
+        return blobList;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return BLOB_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
         return periodID;
     }
 

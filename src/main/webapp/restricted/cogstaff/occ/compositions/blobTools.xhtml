@@ -1,0 +1,167 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <p:dialog   id="blob-upload-dialog"
+                height="600" width="800"
+                widgetVar="blob-upload-dialog-var"
+                responsive="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                header="Photos and Documents on Case: #{ceCaseSearchProfileBB.currentCase.caseName}"
+                rendered="true"
+                > 
+
+        <h:form id="case-blobs-start-form" enctype="multipart/form-data">
+            <h2>Photos/Docs (10 max)</h2>
+            <p>Allowed file types: pdf, jpeg, png, gif</p>
+
+            <p:fileUpload 
+                mode="advanced" 
+                update="cecase-blobs-form:cecase-blobs-table"
+                listener="#{ceCaseSearchProfileBB.onBlobUploadCommitButtonChange}"
+                multiple="true"
+                fileLimit="10"
+                sizeLimit="99999999999" 
+                allowTypes="/(\.|\/)(jpe?g|JPG|JPE?G|png|PNG|pdf|PDF)$/"
+                rendered="true"
+                oncomplete="PF('case-blobs-dialog-var').hide()"/>    
+        </h:form>
+
+
+    </p:dialog>
+
+
+    <p:dialog   id="blob-edit-dialog"
+                height="600" width="800"
+                widgetVar="blob-edit-dialog-var"
+                responsive="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                header="Edit photo/document #{ceCaseSearchProfileBB.currentCase.caseName}"
+                rendered="true"
+                > 
+
+        <h:form id="blob-edit-form" >
+
+
+            <div class="ui-g data_container_nested_restrict">
+
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <div class="restrict-main-contents-io-title" >
+                        <h:outputLabel for="blob-edit-title-it">
+                            <h:outputText value="Title"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content" >
+                        <p:inputText  id="blob-edit-title-it" 
+                                      value="#{ceCaseSearchProfileBB.currentBlob.title}" 
+                                      tabindex="1" 
+                                      required="false" />
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <div class="restrict-main-contents-io-title" >
+                        <h:outputLabel for="blob-edit-descr-it">
+                            <h:outputText value="Description"/>
+                        </h:outputLabel>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content" >
+                        <p:inputText  id="blob-edit-descr-it" 
+                                      value="#{ceCaseSearchProfileBB.currentBlob.description}" 
+                                      tabindex="2" 
+                                      required="false" />
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+                    <p:commandButton    id="blob-edit-commit-cb"
+                                        ajax="true" 
+                                        actionListener="#{ceCaseSearchProfileBB.onBlobUpdateMetadata}"
+                                        oncomplete="PF('blob-edit-dialog-var').hide()"
+                                        value="Save changes"  
+                                        tabindex="3"
+                                        styleClass="inline-button"
+                                        icon="fa fa-floppy-o"
+                                        update="cecase-blobs-form:cecase-blobs-table
+                                        messages-global-form"/>
+
+                </div>
+
+            </div>
+
+
+        </h:form>
+
+
+    </p:dialog>
+
+
+
+
+    <p:dialog   id="blob-remove-dialog"
+                height="400" width="600"
+                widgetVar="blob-remove-dialog-var"
+                responsive="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                header="Remove photo or document"
+                > 
+
+        <h:form id="blob-remove-form">
+
+            <div class="ui-g data_container_nested_restrict">
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+                    <div class="restrict-data-field-label-inline" >
+
+                        <h:outputLabel  for="blob-remove-button">
+                            <h:outputText value="This operation removes the link between this blob and this case; the file remains in the DB" />
+                        </h:outputLabel>
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
+
+                    <div class="restrict-main-contents-io-button red_button">
+                        <p:commandButton 
+                            id="blob-remove-button"
+                            icon="fa fa-trash"
+                            ajax="true"
+                            actionListener="#{ceCaseSearchProfileBB.onBlobRemoveCommitButtonChange}"
+                            value="Remove Photo/Doc ID:#{ceCaseSearchProfileBB.currentBlob.photoDocID}"
+                            update="cecase-blobs-form:cecase-blobs-table
+                            messages-global-form"
+                            oncomplete="PF('blob-remove-dialog-var).hide();"
+                            />
+                    </div>
+                    <div class="restrict-main-contents-io-button gray_button">
+                        <p:commandButton    id="blob-remove-cancel-button"
+                                            ajax="true"  
+                                            tabindex="27"
+                                            value="Cancel"
+                                            icon="fa fa-stop"
+                                            immediate="true"
+                                            process="@none"
+                                            onclick="PF('blob-remove-dialog-var').hide()"
+                                            />
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+
+
+
+
+</ui:composition>

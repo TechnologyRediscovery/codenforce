@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -211,7 +212,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             // TODO: Reconsider governing inspection idea            //
 //            opdh.setGoverningInspection(designateGoverningInspection(opdh));
 
-        } catch (BObStatusException  | EventException | AuthorizationException | IntegrationException | ViolationException ex) {
+        } catch (BObStatusException  | EventException | AuthorizationException | IntegrationException | ViolationException | BlobException  ex) {
             System.out.println(ex);
         }
 

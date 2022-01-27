@@ -59,7 +59,7 @@ import javax.faces.context.FacesContext;
  * 
  * @author noah, Ellen, and NADGIT
  */
-public class manageBlobBB extends BackingBeanUtils implements Serializable{
+public class ManageBlobBB extends BackingBeanUtils implements Serializable{
     
     private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
     
@@ -112,7 +112,7 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 //                    blobList.add(bc.getBlobLight(idnum));
 //                }
 //        } catch (IntegrationException | BlobException ex) {
-//            System.out.println("manageBlobBB.initBean | ERROR: " + ex);
+//            System.out.println("ManageBlobBB.initBean | ERROR: " + ex);
 //        }
     }
     
@@ -401,14 +401,14 @@ public class manageBlobBB extends BackingBeanUtils implements Serializable{
 //        } catch(IOException | IntegrationException | BlobException  ex){
 //            //Rollback the filename
 //            selectedBlob.setFilename(originalName);
-//            System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
+//            System.out.println("ManageBlobBB.updateBlobFilename() | ERROR: " + ex);
 //            getFacesContext().addMessage(null,
 //                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
 //                            "An error occurred while trying to update the filename!", ""));
 //        } catch(BlobTypeException ex){
 //            //Rollback the filename
 //            selectedBlob.setFilename(originalName);
-//            System.out.println("manageBlobBB.updateBlobFilename() | ERROR: " + ex);
+//            System.out.println("ManageBlobBB.updateBlobFilename() | ERROR: " + ex);
 //            getFacesContext().addMessage(null,
 //                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
 //                            "Please end the file name with the file extension [" +

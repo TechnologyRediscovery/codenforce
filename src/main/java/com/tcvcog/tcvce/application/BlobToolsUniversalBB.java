@@ -6,29 +6,38 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobTypeEnum;
+import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.event.FileUploadEvent;
 
 /**
- *
- * @author noah
+ * Backing bean for the code resuse blob UI tools
+ * that all work with our objects that implement
+ * IFace_BlobHolder
+ * 
+ * @author noah and Ellen Bascomb as of Jan 2022
  */
-public class UploadBlobBB extends BackingBeanUtils implements Serializable {
+public class BlobToolsUniversalBB 
+        extends BackingBeanUtils 
+        implements Serializable {
 
     /**
      * Creates a new instance of uploadBlobBB
      */
-    public UploadBlobBB() {
+    public BlobToolsUniversalBB() {
 
     }
 
@@ -73,6 +82,40 @@ public class UploadBlobBB extends BackingBeanUtils implements Serializable {
 
     public String navToLinkBlob() {
         return "linkBlob";
+    }
+    
+    
+    /**
+     * Listener for user requests to upload a file and attach to case
+     * I ask the coordinator for the current Blob_Holder and interrogate it
+     * for information about where to store its blobs in the DB
+     *
+     * @param ev
+     */
+    public void onBlobUploadCommitButtonChange(FileUploadEvent ev) {
+        IFace_BlobHolder bh = getSessionBean().getSessBlobHolder();
+        System.out.println("BlobToolsUniversalBB.onBlobUploadCommitButtonChange | Beginning storage cycle!");
+        if (bh != null && bh.getBlobLinkEnum() != null && ev != null && ev.getFile() != null) {
+
+            try {
+                BlobCoordinator blobc = getBlobCoordinator();
+
+                Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
+                blob.setBytes(ev.getFile().getContent());
+                blob.setFilename(ev.getFile().getFileName());
+                blob.setMuni(getSessionBean().getSessMuni());
+
+                Blob freshBlob = blobc.insertBlobAndInsertMetadataAndLinkToParent(blob, bh);
+                // ship to coordinator for storage
+                if (freshBlob != null) {
+                    System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getPhotoDocID());
+                }
+
+            } catch (IntegrationException | IOException | BlobException | BlobTypeException | BObStatusException ex) {
+                System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | upload failed! " + ex);
+                System.out.println(ex);
+            }
+        }
     }
 
 }

@@ -1166,7 +1166,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
 
                 // Write to DB
-//                blob.setBlobID(blobc.storeBlob(blob));
+//                blob.setBlobID(blobc.insertPhotoDoc(blob));
             cc.nov_updateStyleHeaderImage(currentNotice.getStyle(), blob);
 
         } catch ( IntegrationException | BObStatusException ex) {

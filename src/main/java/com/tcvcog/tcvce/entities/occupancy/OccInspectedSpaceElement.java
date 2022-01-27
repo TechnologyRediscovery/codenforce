@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BlobLight;
+import com.tcvcog.tcvce.entities.BlobLinkEnum;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
@@ -36,6 +37,8 @@ public class OccInspectedSpaceElement
         extends OccSpaceElement
         implements Serializable, Comparable<OccInspectedSpaceElement>, IFace_BlobHolder {
 
+    private final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.INSPECTED_ELEMENT;
+    
     private int inspectedSpaceElementID;
 
     // Here lies the remains of composition replaced by inheritance! 2-AUG-19 on occbeta
@@ -384,5 +387,15 @@ public class OccInspectedSpaceElement
 
     public void setStatusEnum(OccInspectionStatusEnum statusEnum) {
         setStatus(new OccInspectableStatus(statusEnum));
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return BLOB_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return inspectedSpaceElementID;
     }
 }

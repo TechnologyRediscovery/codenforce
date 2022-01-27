@@ -7,6 +7,7 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.User;
@@ -136,7 +137,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                          "Created new inspection!: " + selectedInspection.getInspectionID(), ""));
 
             refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
-        } catch (InspectionException | IntegrationException | BObStatusException ex) {
+        } catch (InspectionException | IntegrationException | BObStatusException | BlobException ex) {
             System.out.println("Failed to create new OccInspection: " + ex);
         }
     }
@@ -212,7 +213,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                      new FacesMessage(FacesMessage.SEVERITY_INFO,
                              "Updated inspection ID: " + selectedInspection.getInspectionID(), ""));
                 refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
-            } catch (IntegrationException | BObStatusException ex) {
+            } catch (IntegrationException | BObStatusException | BlobException ex) {
                 System.out.println(ex);
                  getFacesContext().addMessage(null,
                      new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -262,7 +263,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Inspection determination has been certified and inspection is now locked!",  ""));
             refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
-        } catch (IntegrationException | AuthorizationException | BObStatusException ex) {
+        } catch (IntegrationException | AuthorizationException | BObStatusException | BlobException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -283,7 +284,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Inspection has been decertified and determination removed!",  ""));
                 refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
-            } catch (IntegrationException | BObStatusException ex) {
+            } catch (IntegrationException | BObStatusException | BlobException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -318,7 +319,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                          "Added space to inspection", ""));
             refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
 
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | BlobException ex) {
             System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -369,7 +370,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Recorded status of element ID: " + oise.getInspectedSpaceElementID(), ""));
-        } catch (AuthorizationException | BObStatusException | IntegrationException ex) {
+        } catch (AuthorizationException | BObStatusException | IntegrationException | BlobException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -399,7 +400,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                                "Success! Applied status " 
                                        + selectedElementStatusForBatch.getLabel() 
                                        + " To all ordinances in this space!", ""));
-            } catch (BObStatusException | IntegrationException ex) {
+            } catch (BObStatusException | IntegrationException | BlobException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -439,7 +440,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      * the UI just has to say to udpate any linked UI elements to see
      * updates
      */
-    private void refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod() throws IntegrationException, BObStatusException{
+    private void refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod() throws IntegrationException, BObStatusException, BlobException{
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         selectedInspection = oic.getOccInspection(selectedInspection.getInspectionID());
         if(selectedInspectedSpace != null){

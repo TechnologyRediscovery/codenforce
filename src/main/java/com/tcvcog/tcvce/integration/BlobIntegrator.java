@@ -30,9 +30,11 @@ import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -52,8 +54,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author noah
+ * The massive Integrator of Java objects and the database tables
+ * that relate to binary objects, such as documents and photos
+ * @author noah and Ellen Bascomb of Apartment 31Y
  */
 public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     
@@ -520,19 +523,63 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Takes in one of our BlobHolders and its corresponding BlobLight
+     * and writes a record to the appropriate linking table
+     * @param bh 
+     * @param blight 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void linkBlobHolderToBlobMetadata(IFace_BlobHolder bh, BlobLight blight) throws BObStatusException, IntegrationException{
+        if(bh == null || blight == null || bh.getBlobLinkEnum() == null){
+            throw new BObStatusException("Cannot link blob holder to byte metadata with null object inputs");
+        }
+          
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO ");
+        sb.append(bh.getBlobLinkEnum().getBlobLinkTableName());
+        sb.append(" (");
+        sb.append(bh.getBlobLinkEnum().getBlobLinkTableParentIDFieldName());
+        sb.append(",");
+        sb.append(bh.getBlobLinkEnum().getBlobLinkTablePhotodocIDFieldName());
+        sb.append(") VALUES (?,?);");
+        
+        try {
+            
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, bh.getParentObjectID());
+            stmt.setInt(2, blight.getPhotoDocID());
+            
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("BlobIntegrator.linkBlobHolderToBlobMetadata | Error linking metadata to parent ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
      * stores this photodoc in the db
+     * As of JAN 2022--this is the primary storage method for binary data
      * 
-     * @param blob the meta to be stored
-     * @return the blobID of the newly stored meta
+     * 
+     * @param bl the meta to be stored
+     * @return the id of the newly stored meta
      * @throws com.tcvcog.tcvce.domain.BlobTypeException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public Blob storeBlob(Blob blob) throws IntegrationException, BlobTypeException{
+    public int insertPhotoDoc(BlobLight bl) throws IntegrationException, BlobTypeException{
         
-        if(blob == null){
-            throw new IntegrationException("cannot store null blob!");
+        if(bl == null || bl.getBytesID() == 0){
+            throw new IntegrationException("cannot store null BlobLight or cannot link to a byte ID of 0!");
         }
-        
+        int lastID = 0;
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.photodoc(\n" +
                         "            photodocid, photodocdescription, blobbytes_bytesid, \n" +
@@ -548,39 +595,37 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
             stmt = con.prepareStatement(query);
             
-            stmt.setString(1, blob.getDescription());
+            stmt.setString(1, bl.getDescription());
             
-            int bytesID = storeBlobBytes(blob);
+            stmt.setInt(2, bl.getBytesID());
             
-            stmt.setInt(2, bytesID);
-            
-            if(blob.getMuni() != null){
-                stmt.setInt(3, blob.getMuni().getMuniCode());
+            if(bl.getMuni() != null){
+                stmt.setInt(3, bl.getMuni().getMuniCode());
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
             
-            if(blob.getType() != null){
-                stmt.setInt(4, blob.getType().getTypeEnum().getTypeID());
+            if(bl.getType() != null){
+                stmt.setInt(4, bl.getType().getTypeEnum().getTypeID());
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
             
-            if(blob.getBlobMetadata() != null){
+            if(bl.getBlobMetadata() != null){
                 // TODO: Finish metadata
                 stmt.setNull(5, java.sql.Types.NULL);
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
             
-            if(blob.getTitle() != null){
-                stmt.setString(6, blob.getTitle());
+            if(bl.getTitle() != null){
+                stmt.setString(6, bl.getTitle());
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
             
-            if(blob.getCreatedBy() != null){
-                stmt.setInt(7, blob.getCreatedBy().getUserID());
+            if(bl.getCreatedBy() != null){
+                stmt.setInt(7, bl.getCreatedBy().getUserID());
                 
             }else {
                 stmt.setNull(7, java.sql.Types.NULL);
@@ -594,20 +639,20 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             ResultSet rs;
             rs = s.executeQuery(idNumQuery);
             rs.next();
-            int lastID = rs.getInt(1);
+           lastID = rs.getInt(1);
             
             //set the IDs so after we throw the blob back they can access the blob and bytes
-            blob.setPhotoDocID(lastID);
-            blob.setBytesID(bytesID);
+           
             
-        } catch (SQLException | IOException ex) {
+            
+        } catch (SQLException  ex) {
             System.out.println(ex);
             throw new IntegrationException("Error inserting blob. ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-        return blob;
+        return lastID;
     }
     
     /**
@@ -670,7 +715,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt = con.prepareStatement(query);
             stmt.setString(1, blob.getDescription());
             
-            int bytesID = storeBlobBytes(blob);
+            int bytesID = insertBlobBytes(blob);
             
             stmt.setInt(2, bytesID);
             
@@ -711,7 +756,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws java.io.IOException
      */
-    private int storeBlobBytes(Blob blob) throws BlobTypeException, IntegrationException, IOException{
+    public int insertBlobBytes(Blob blob) throws BlobTypeException, IntegrationException, IOException{
         
         if(blob.getType() == null){
             throw new BlobTypeException("Attempted to store a blob with null type. ");
@@ -2236,6 +2281,39 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
+    /**
+     * NOTE: As of Jan 2022 we haven't activated the phot doc requirement, so that is null always
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void linkBlobToInspection(BlobLight bl,  OccInspection oi) throws IntegrationException, BObStatusException {
+        if(bl == null || oi == null){
+            throw new BObStatusException("Cannot link blob to inspection with null blob or null inspection");
+        }
+        
+        Connection con = getPostgresCon();
+        String query =  " INSERT INTO public.occinspectionphotodoc(\n" +
+"            photodoc_photodocid, inspection_inspectionid, photorequirement_requirementid)\n" +
+"    VALUES (?, ?, NULL);";
+        
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setInt(1, bl.getPhotoDocID());
+            stmt.setInt(2, oi.getInspectionID());
+            
+            System.out.println("BlobIntegrator.linkBlobToInspection| Statement: " + stmt.toString());
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("Error inserting blob-occInspection link. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
     
     /**
      * @param blobID the ID of the blob to be linked
@@ -2498,6 +2576,63 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         return idList;
         
     }
+    
+    /**
+     * Asks the inputted BlobHolder for its enum and uses that info
+     * to query the correct table in the DB
+     * 
+     * @param bh not null object and not null Info Enum
+     * @return the IDs of the blob light to be fetched
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<Integer> getBlobLightIDList(IFace_BlobHolder bh) throws BObStatusException, IntegrationException{
+        if(bh == null || bh.getBlobLinkEnum() == null){
+            throw new BObStatusException("Cannot retrieve BlobLight list with null holder or info enum");            
+        }
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT ");
+        sb.append(bh.getBlobLinkEnum().getBlobLinkTablePhotodocIDFieldName());
+        sb.append(" FROM ");
+        sb.append(bh.getBlobLinkEnum().getBlobLinkTableName());
+        sb.append(" WHERE ");
+        sb.append(bh.getBlobLinkEnum().getBlobLinkTableParentIDFieldName());
+        sb.append(" = ?;");
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, bh.getParentObjectID());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt(bh.getBlobLinkEnum().getBlobLinkTablePhotodocIDFieldName()));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("BlobIntegrator.getBlobLightIDList: Could not get blob ID list. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idList;
+        
+    }
+    
+    
+        
+        
+    
+    
     
     /**
      * Get the IDs of photos attached to a given property

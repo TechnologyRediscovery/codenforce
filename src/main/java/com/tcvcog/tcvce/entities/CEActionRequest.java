@@ -612,4 +612,14 @@ public class CEActionRequest extends BOb implements Serializable, IFace_BlobHold
         this.active = active;
     }
 
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getParentObjectID() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

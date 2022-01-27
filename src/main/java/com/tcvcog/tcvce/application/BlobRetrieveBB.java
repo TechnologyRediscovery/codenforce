@@ -30,8 +30,10 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
 /**
- * Attempt at a bean that gets image and pdf blobs: not working 
- * as of 26 May 2021
+ * Attempt at a bean that gets image and pdf blobs:  Perhaps some is
+ * not working, but ECD checked on 26JAN22 and the working
+ * system is using retrieveBlob method!!
+ * 
  * 
  * @author Ellen Bascomb
  */

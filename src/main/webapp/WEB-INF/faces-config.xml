@@ -1688,8 +1688,8 @@
     
          
     <managed-bean>
-        <managed-bean-name>uploadBlobBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.UploadBlobBB</managed-bean-class>
+        <managed-bean-name>blobToolsUniversalBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.BlobToolsUniversal</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
@@ -1720,10 +1720,9 @@
     
     <managed-bean>
         <managed-bean-name>manageBlobBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.manageBlobBB</managed-bean-class>
+        <managed-bean-class>com.tcvcog.tcvce.application.ManageBlobBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-    
+    </managed-bean>    
     <managed-bean>
         <managed-bean-name>cECaseBlobsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseBlobsBB</managed-bean-class>
@@ -1788,9 +1787,9 @@
     
     <managed-bean>
         <managed-bean-name>cECasePublicBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECasePublicBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.application.BlobToolsUniversalBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
         
     <managed-bean>
@@ -1929,9 +1928,9 @@
     
     <managed-bean>
         <managed-bean-name>workflowCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.WorkflowCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.application.ManageBlobBB</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>workflowIntegrator</managed-bean-name>

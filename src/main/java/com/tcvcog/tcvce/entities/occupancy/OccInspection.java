@@ -17,6 +17,9 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BOb;
+import com.tcvcog.tcvce.entities.BlobLight;
+import com.tcvcog.tcvce.entities.BlobLinkEnum;
+import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
@@ -37,7 +40,12 @@ import java.util.*;
  *
  * @author Adam Gutonski and Sylvia
  */
-public class OccInspection extends BOb implements Comparable<OccInspection> {
+public  class       OccInspection 
+        extends     BOb 
+        implements  Comparable<OccInspection>,
+                    IFace_BlobHolder{
+    
+    private final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.FIELD_INSPECTION;
     
     private int inspectionID;
 
@@ -70,6 +78,8 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
     private List<OccInspectedSpace> inspectedSpaceListVisible;
     private ViewOptionsOccChecklistItemsEnum viewSetting;
     private boolean includeEmptySpaces;
+    
+    private List<BlobLight> blobList;
     
     private int pacc;
     private boolean enablePacc;
@@ -599,5 +609,25 @@ public class OccInspection extends BOb implements Comparable<OccInspection> {
      */
     public void setChecklistTemplateID(int checklistTemplateID) {
         this.checklistTemplateID = checklistTemplateID;
+    }
+
+    @Override
+    public void setBlobList(List<BlobLight> bl) {
+        this.blobList = bl;
+    }
+
+    @Override
+    public List<BlobLight> getBlobList() {
+        return blobList;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return BLOB_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return inspectionID;
     }
 }

@@ -317,6 +317,8 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     private Blob sessBlob;
+    private BlobLight sessBlobLight;
+    private IFace_BlobHolder sessBlobHolder;
     private List<Blob> blobList;
     private PageModeEnum blobPageModeRequest;
     
@@ -1902,6 +1904,34 @@ public class    SessionBean
      */
     public void setSessMailingCityStateZip(MailingCityStateZip sessMailingCityStateZip) {
         this.sessMailingCityStateZip = sessMailingCityStateZip;
+    }
+
+    /**
+     * @return the sessBlobLight
+     */
+    public BlobLight getSessBlobLight() {
+        return sessBlobLight;
+    }
+
+    /**
+     * @return the sessBlobHolder
+     */
+    public IFace_BlobHolder getSessBlobHolder() {
+        return sessBlobHolder;
+    }
+
+    /**
+     * @param sessBlobLight the sessBlobLight to set
+     */
+    public void setSessBlobLight(BlobLight sessBlobLight) {
+        this.sessBlobLight = sessBlobLight;
+    }
+
+    /**
+     * @param sessBlobHolder the sessBlobHolder to set
+     */
+    public void setSessBlobHolder(IFace_BlobHolder sessBlobHolder) {
+        this.sessBlobHolder = sessBlobHolder;
     }
 
     
