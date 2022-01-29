@@ -28,6 +28,7 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
+import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
@@ -88,6 +89,39 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
     }
 
+    
+    /**
+     * Retrieval point for a BlobType
+     * @param typeid
+     * @return the BlobType all ready to roll; null if id = 0;
+     */
+    public BlobType getBlobType(int typeid) throws IntegrationException{
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        if(typeid == 0){
+            return null;
+        }
+        return bi.getBlobType(typeid);
+        
+        
+    }
+    
+    /**
+     * Extracts all BlobTypes from the DB
+     * @return 
+     */
+    public List<BlobType> getBlobTypeList() throws IntegrationException{
+        BlobIntegrator bi = getBlobIntegrator();
+        List<Integer> idl = bi.getBlobTypeList();
+        List<BlobType> typeList = new ArrayList<>();
+        if(idl != null && !idl.isEmpty()){
+            for(Integer i: idl){
+                typeList.add(getBlobType(i));
+            }
+        }
+        
+        return typeList;
+    }
     
     /**
      * Factory method for Blobs--byteless blobs!!! 

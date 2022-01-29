@@ -12,12 +12,17 @@ import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
+import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
 
 /**
@@ -34,6 +39,8 @@ public class    BlobUtilitiesBB
     private BlobLight currentBlobLight;
     private boolean editModeBlobMetadata;
     
+    private List<BlobType> blobTypeList;
+    
     
     /**
      * Creates a new instance of BlobUtilitiesBB
@@ -45,9 +52,18 @@ public class    BlobUtilitiesBB
 
     @PostConstruct
     public void initBean() {
+        BlobCoordinator bc = getBlobCoordinator();
+        
         getSessionBean().setBlobList(new ArrayList<Blob>());
         currentBlobHolder = getSessionBean().getSessBlobHolder();
         editModeBlobMetadata = false;
+        
+        try {
+            blobTypeList = bc.getBlobTypeList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
     }
 
     
@@ -189,6 +205,18 @@ public class    BlobUtilitiesBB
         
     }
     
+    /**
+     * Listener for user requests to cancel blob meta data edit
+     * operation; toggles edit mode to false
+     * 
+     * @param ev 
+     */
+    public void onBlobEditMetadataAbortButtonClick(ActionEvent ev){
+        editModeBlobMetadata = false;
+
+        
+    }
+    
     
     
     
@@ -242,6 +270,20 @@ public class    BlobUtilitiesBB
      */
     public void setEditModeBlobMetadata(boolean editModeBlobMetadata) {
         this.editModeBlobMetadata = editModeBlobMetadata;
+    }
+
+    /**
+     * @return the blobTypeList
+     */
+    public List<BlobType> getBlobTypeList() {
+        return blobTypeList;
+    }
+
+    /**
+     * @param blobTypeList the blobTypeList to set
+     */
+    public void setBlobTypeList(List<BlobType> blobTypeList) {
+        this.blobTypeList = blobTypeList;
     }
 
     

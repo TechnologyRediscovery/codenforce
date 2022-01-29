@@ -28,7 +28,6 @@ import com.tcvcog.tcvce.domain.MetadataException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
-import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import com.tcvcog.tcvce.entities.Metadata;
@@ -48,6 +47,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -387,6 +387,15 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
+    
+    /**
+     * Extracts record from the blobtype table by ID and 
+     * builds an object
+     * 
+     * @param typeid
+     * @return the fully baked BlobType
+     * @throws IntegrationException 
+     */
     public BlobType getBlobType(int typeid) throws IntegrationException{
         
         if(typeid == 0){
@@ -396,7 +405,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
           Connection con = getPostgresCon();
         ResultSet rs = null;
-        String query = "SELECT typeid, typetitle, icon_iconid\n" +
+        String query = "SELECT typeid, typetitle, icon_iconid, contenttypestring, browserviewable, \n" +
+                        "       notes, fileextensionsarr\n" +
                         "  FROM public.blobtype WHERE typeid=?";
         
         PreparedStatement stmt = null;
@@ -440,11 +450,51 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         SystemIntegrator si = getSystemIntegrator();
         
         BlobType bt = new BlobType();
+        bt.setTypeID(rs.getInt("typeid"));
         bt.setTitle(rs.getString("typetitle"));
         bt.setIcon(si.getIcon(rs.getInt("icon_iconid")));
-        bt.setTypeEnum(BlobTypeEnum.blobTypeFromInt(rs.getInt("typeid")));
+        bt.setContentTypeString(rs.getString("contenttypestring"));
+        bt.setBrowserViewable(rs.getBoolean("browserviewable"));
+        bt.setNotes(rs.getString("notes"));
+        bt.setFileExtensionsPermitted(Arrays.asList((String[]) rs.getArray("fileextensionsarr").getArray()));
         
         return bt;
+    }
+    
+    /**
+     * Extracts all blob types from the database and returns their IDs for fetching from 
+     * getBobType(int id)
+     * @return 
+     */
+    public List<Integer> getBlobTypeList() throws IntegrationException{
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "SELECT typeid FROM public.blobtype;";
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idl = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                idl.add(rs.getInt("typeid"));
+                
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error retrieving blob type. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        return idl;
     }
     
     /**
@@ -456,7 +506,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
     private Metadata generateBlobMetadata(ResultSet rs) throws SQLException, MetadataException{
         Metadata meta = new Metadata();
         meta.setBytesID(rs.getInt("blobbytes_bytesid"));
-        meta.setType(BlobTypeEnum.blobTypeFromInt(rs.getInt("blobtype_typeid")));
+//        meta.setType(BlobTypeEnum.blobTypeFromInt(rs.getInt("blobtype_typeid")));
         
         // We must now convert the byte array to an object
         

@@ -16,35 +16,29 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.util.List;
+
 /**
  * Represents a type of binary large object, BLOB
  * 
  * @author Ellen Bascomb
  */
 public class BlobType {
-   private BlobTypeEnum typeEnum;
+   
+   private int typeID;
    private String title;
    private Icon icon;
-
-    /**
-     * @return the typeEnum
-     */
-    public BlobTypeEnum getTypeEnum() {
-        return typeEnum;
-    }
-
-    /**
-     * @param typeEnum the typeEnum to set
-     */
-    public void setTypeEnum(BlobTypeEnum typeEnum) {
-        this.typeEnum = typeEnum;
-    }
-
+   private String contentTypeString;
+   private boolean browserViewable;
+   private String notes;
+   private List<String> fileExtensionsPermitted;
+   
     /**
      * @return the title
      */
     public String getTitle() {
         return title;
+        
     }
 
     /**
@@ -66,6 +60,76 @@ public class BlobType {
      */
     public void setIcon(Icon icon) {
         this.icon = icon;
+    }
+
+    /**
+     * @return the typeID
+     */
+    public int getTypeID() {
+        return typeID;
+    }
+
+    /**
+     * @return the contentTypeString
+     */
+    public String getContentTypeString() {
+        return contentTypeString;
+    }
+
+    /**
+     * @return the browserViewable
+     */
+    public boolean isBrowserViewable() {
+        return browserViewable;
+    }
+
+    /**
+     * @return the fileExtensionsPermitted
+     */
+    public List<String> getFileExtensionsPermitted() {
+        return fileExtensionsPermitted;
+    }
+
+    /**
+     * @param typeID the typeID to set
+     */
+    public void setTypeID(int typeID) {
+        this.typeID = typeID;
+    }
+
+    /**
+     * @param contentTypeString the contentTypeString to set
+     */
+    public void setContentTypeString(String contentTypeString) {
+        this.contentTypeString = contentTypeString;
+    }
+
+    /**
+     * @param browserViewable the browserViewable to set
+     */
+    public void setBrowserViewable(boolean browserViewable) {
+        this.browserViewable = browserViewable;
+    }
+
+    /**
+     * @param fileExtensionsPermitted the fileExtensionsPermitted to set
+     */
+    public void setFileExtensionsPermitted(List<String> fileExtensionsPermitted) {
+        this.fileExtensionsPermitted = fileExtensionsPermitted;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
     
     

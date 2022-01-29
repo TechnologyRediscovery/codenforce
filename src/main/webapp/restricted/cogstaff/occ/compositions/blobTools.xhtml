@@ -145,151 +145,109 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
-                header="Viewing Photo/Doc: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
+                header="View or edit Photo/Doc: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
                 rendered="true"
                 > 
         <h:form id="blob-veweditmetadata-form">
-    <h:form id="inspections-inspectiondetails-form">
-                <p:commandButton id="inspections-inspectiondetails-editbutton"
-                                 value="#{occInspectionsBB.editModeInspectionMetadata ? 'Save Changes' : 'Edit'}"
-                                 disabled="#{!empty occInspectionsBB.selectedInspection.deactivatedBy}"
+            
+                <p:commandButton id="blob-editmetadata-button"
+                                 value="#{blobUtilitiesBB.editModeBlobMetadata ? 'Save Changes' : 'Edit'}"
+                                 disabled="false"
                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                 icon="fa #{occInspectionsBB.editModeInspectionMetadata ? 'fa-check' : 'fa-pencil'}"
-                                 actionListener="#{occInspectionsBB.onToggleEditModeInspectionMetadata}"
-                                 oncomplete="PF('inspections-inspectiondetails-var').show()"
+                                 icon="fa #{blobUtilitiesBB.editModeBlobMetadata ? 'fa-check' : 'fa-pencil'}"
+                                 actionListener="#{blobUtilitiesBB.toggleEditModeBlobMetadata}"
+                                 oncomplete="PF('blobs-vieweditmetadata-dialog-var').show();"
                                  update="@form
-                                        @form:@parent:inspections-growl-form
-                                        @form:@parent:inspections-form"/>
+                                        @form:@parent:blobs-growl-form
+                                        @form:@parent:gallery-form"/>
                 
                 <div class="gray_button">
                     
                     <p:commandButton id="inspections-inspectiondetails-abort"
                                      value="Cancel"
                                      styleClass="gray-button"
-                                     rendered="#{occInspectionsBB.editModeInspectionMetadata}"
+                                     rendered="#{blobUtilitiesBB.onBlobEditMetadataAbortButtonClick}"
                                      icon="fa fa-stop"
                                      actionListener="#{occInspectionsBB.abortEditsOccInspectionMetadata}"
-                                     oncomplete="PF('inspections-inspectiondetails-var').show()"
-                                     update="@form
-                                     @form:@parent:inspections-growl-form"/>
+                                     oncomplete="PF('blobs-vieweditmetadata-dialog-var').hide();"
+                                     />
                 </div>
                 
                 
 
                 <p:spacer height="5px"/>
 
-                <p:panel id="inspections-inspectiondetails-generalpanel"
+                <p:panel id="blob-metadata-panel"
                          toggleable="true"
                          collapsed="false"
-                         header="General">
+                         header="Photo/Doc Details">
 
                     <div class="p-grid">
-                        <div class="p-col-6">ID</div>
+                        
+                        <div class="p-col-6">MetaData ID</div>
                         <div class="p-col-6">
-                            <h:outputText value="#{occInspectionsBB.selectedInspection.inspectionID}" />
-                        </div>
-                        <div class="p-col-6">
-                            Re-inspection?
-                        </div>
-                        <div class="p-col-6">
-                            
-                            <h:outputText rendered="#{occInspectionsBB.selectedInspection.followUpToInspectionID eq 0 and !occInspectionsBB.editModeInspectionMetadata}" 
-                                          value="No; first inspection"/>
-                            
-                            <h:outputText rendered="#{occInspectionsBB.selectedInspection.followUpToInspectionID ne 0 and !occInspectionsBB.editModeInspectionMetadata}" 
-                                          value="Yes: To inspection ID: #{occInspectionsBB.selectedInspection.followUpToInspectionID}"/>
-                            
-                              <p:selectOneMenu rendered="#{occInspectionsBB.editModeInspectionMetadata}"
-                                               value="#{occInspectionsBB.formFollowUpInspection}"
-                                             filter="false"
-                                             required="false"
-                                             converter="occInspectionConverter">
-                                  <f:selectItems value="#{occPeriodSearchWorkflowBB.currentOccPeriod.inspectionList}" 
-                                               var="ins"
-                                               itemLabel="#{ins.inspectionID} (#{occInspectionsBB.getPrettyDate(ins.effectiveDateOfRecord)})"
-                                               itemValue="#{ins}"/>
-                            </p:selectOneMenu>
-                            <p:spacer rendered="#{occInspectionsBB.editModeInspectionMetadata}"
-                                      height="3px" />
-                            <h:outputText rendered="#{occInspectionsBB.editModeInspectionMetadata}"
-                                          value="Showing all inspections on the current occupancy period" />
-                                            
-                        </div>
-                        <div class="p-col-6">
-                            Inspector
-                        </div>
-                        <div class="p-col-6">
-                            <h:outputText rendered="#{!occInspectionsBB.editModeInspectionMetadata}" 
-                                          value="#{occInspectionsBB.selectedInspection.inspector.human.name}" />
-                            <h:outputText rendered="#{!occInspectionsBB.editModeInspectionMetadata}" 
-                                          value=" (#{occInspectionsBB.selectedInspection.inspector.username})" />
-                                          
-                            <p:selectOneMenu rendered="#{occInspectionsBB.editModeInspectionMetadata}"
-                                             value="#{occInspectionsBB.selectedInspection.inspector}"
-                                             filter="true"
-                                             filterMatchMode="contains"
-                                             converter="userConverter">
-                                <f:selectItems value="#{systemServicesBB.bbSessionMuni.swornOfficerList}" 
-                                               var="user"
-                                               itemLabel="#{user.human.name} (#{user.username})"
-                                               itemValue="#{user}"/>
-                            </p:selectOneMenu>
+                            <h:outputText value="#{blobUtilitiesBB.currentBlobLight.photoDocID}" />
                         </div>
                         
-                        <p:divider/>
-                        
+                        <div class="p-col-6">File Bytes ID</div>
                         <div class="p-col-6">
-                            Created
+                            <h:outputText value="#{blobUtilitiesBB.currentBlobLight.bytesID}" />
                         </div>
                         
+                        <div class="p-col-6">Original Filename</div>
                         <div class="p-col-6">
-                            <h:outputText value="#{occInspectionsBB.selectedInspection.createdBy.human.name} 
-                                          (#{occInspectionsBB.selectedInspection.createdBy.username})" 
-                                          rendered="#{!empty occInspectionsBB.selectedInspection.createdBy}"/>
+                            <h:outputText value="#{blobUtilitiesBB.currentBlobLight.filename}" />
+                        </div>
+                       
+                        <div class="p-col-6">Uploader</div>
+                        <div class="p-col-6">
+                            <h:outputText value="#{blobUtilitiesBB.currentBlobLight.createdBy.human.name} 
+                                          (#{blobUtilitiesBB.currentBlobLight.createdBy.username})" 
+                                          rendered="#{!empty blobUtilitiesBB.currentBlobLight.createdBy}"/>
                             <p:spacer height="3px" />
                             
                             <h:outputText value="at "
-                                          rendered="#{!empty occInspectionsBB.selectedInspection.creationTS}" />
+                                          rendered="#{!empty blobUtilitiesBB.currentBlobLight.createdTS}" />
                         
-                            <h:outputText value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.creationTS)}" 
-                                          rendered="#{!empty occInspectionsBB.selectedInspection.creationTS}"/>
-                        </div>
-                        
-                        <div class="p-col-6">
-                            Last updated
-                        </div>
-                        
-                        <div class="p-col-6">
-                            <h:outputText value="#{occInspectionsBB.selectedInspection.lastUpdatedBy.human.name} 
-                                          (#{occInspectionsBB.selectedInspection.lastUpdatedBy.username})" 
-                                          rendered="#{!empty occInspectionsBB.selectedInspection.lastUpdatedBy}"/>
+                            <h:outputText value="#{blobUtilitiesBB.getPrettyDate(blobUtilitiesBB.currentBlobLight.createdTS)}" 
+                                          rendered="#{!empty blobUtilitiesBB.currentBlobLight.createdTS}"/>
                             
-                            <p:spacer height="3px" />
-                            <h:outputText value="at "
-                                          rendered="#{!empty occInspectionsBB.selectedInspection.lastUpdatedTS}" />
-                        
-                            <h:outputText value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.lastUpdatedTS)}" 
-                                          rendered="#{!empty occInspectionsBB.selectedInspection.lastUpdatedTS}"/>
                         </div>
+                       
+                        <div class="p-col-6">File type</div>
                         <div class="p-col-6">
-                            Deactivated
+                            <h:outputText value="#{blobUtilitiesBB.currentBlobLight.type.title}"
+                                          rendered="#{!blobUtilitiesBB.editModeBlobMetadata}"/>
                         </div>
+                       
+                        <div class="p-col-6">Title</div>
                         <div class="p-col-6">
+                            <h:outputText value="#{blobUtilitiesBB.currentBlobLight.title}" 
+                                          rendered="#{!blobUtilitiesBB.editModeBlobMetadata}"/>
                             
-                             <h:outputText value="Active Record" 
-                                          rendered="#{empty occInspectionsBB.selectedInspection.deactivatedBy}"/>
-                             
-                             <h:outputText value="#{occInspectionsBB.selectedInspection.deactivatedBy.human.name} 
-                                          (#{occInspectionsBB.selectedInspection.deactivatedBy.username})" 
-                                          rendered="#{!empty occInspectionsBB.selectedInspection.deactivatedBy}"/>
-                            <p:spacer height="3px" />
-                            
-                            <h:outputText value="at "
-                                          rendered="#{!empty occInspectionsBB.selectedInspection.deactivatedTS}" />
-                        
-                            <h:outputText value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.deactivatedTS)}" 
-                                          rendered="#{!empty occInspectionsBB.selectedInspection.deactivatedBy}"/>
+                            <p:inputText value="#{blobUtilitiesBB.currentBlobLight.title}"
+                                         rendered="#{blobUtilitiesBB.editModeBlobMetadata}" />
                         </div>
+                       
+                        <div class="p-col-6">Description</div>
+                        <div class="p-col-6">
+                            <h:outputText value="#{blobUtilitiesBB.currentBlobLight.description}" 
+                                          rendered="#{!blobUtilitiesBB.editModeBlobMetadata}"/>
+                            
+                            <p:inputTextarea     value="#{blobUtilitiesBB.currentBlobLight.description}"
+                                                rendered="#{blobUtilitiesBB.editModeBlobMetadata}" 
+                                                cols="25"
+                                                rows="4"/>
+                        </div>
+                        
+                        <div class="p-col-6">Hosting Municipality</div>
+                        <div class="p-col-6">
+                            <h:outputText value="#{blobUtilitiesBB.currentBlobLight.muni.muniName}" 
+                                          rendered="#{!blobUtilitiesBB.editModeBlobMetadata}"/>
+                            
+                            
+                        </div>
+                       
                     </div>
             
 
