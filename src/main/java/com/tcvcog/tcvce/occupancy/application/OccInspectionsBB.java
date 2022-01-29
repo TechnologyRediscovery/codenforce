@@ -238,6 +238,39 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         
     }
     
+    /**
+     * Listener for user requests to start the image upload process to
+     * an occ inspection
+     * I take the current inspection and make it the session's 
+     * BlobHolder so the reuasable code modules can take over
+     * @param oi
+     */
+    public void onUploadImagesToInspectionInitButtonClick(OccInspection oi){
+        System.out.println("OccInspectionsBB.onUploadImagesToInspectionInitButtonClick");
+        if(oi != null){
+            selectedInspection = oi;
+            getSessionBean().setSessBlobHolder(selectedInspection);
+        } else {
+            System.out.println("OccInspectionsBB.onUploadImagesToInspectionInitButtonClick | cannot set BlobHolder");
+        }
+    }
+    
+    /**
+     * Listener for user requests to see the photos on an inspection
+     * Sets the inspection as the blobholder for the blob UI to take over
+     * @param oi 
+     */
+    public void onViewPhotoPoolLinkClick(OccInspection oi){
+        
+        System.out.println("OccInspectionsBB.onViewPhotoPoolLinkClick");
+        if(oi != null){
+            selectedInspection = oi;
+            getSessionBean().setSessBlobHolder(selectedInspection);
+        } else {
+        }
+        
+    }
+    
     
     /**
      * Listener for user requests to start the certification process

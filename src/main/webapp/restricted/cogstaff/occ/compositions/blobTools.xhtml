@@ -3,6 +3,12 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns="http://www.w3.org/1999/xhtml">
+    
+    <h:form id="blobs-growl-form">
+        <p:growl id="blobs-growl"
+                 keepAlive="true"
+                 life="4000"/>
+    </h:form>
 
     <p:dialog   id="blob-upload-dialog"
                 height="600" width="800"
@@ -12,156 +18,283 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
-                header="Photos and Documents on Case: #{ceCaseSearchProfileBB.currentCase.caseName}"
+                header="Upload Photos and Documents on #{blobUtilitiesBB.currentBlobHolder.blobLinkEnum.objectParentTitle} (ID:#{blobUtilitiesBB.currentBlobHolder.parentObjectID})"
                 rendered="true"
                 > 
 
-        <h:form id="case-blobs-start-form" enctype="multipart/form-data">
-            <h2>Photos/Docs (10 max)</h2>
-            <p>Allowed file types: pdf, jpeg, png, gif</p>
+        <h:form id="blob-upload-form" 
+                enctype="multipart/form-data">
+            <h2>
+                <h:outputText  value="Upload Photos/Docs to #{blobUtilitiesBB.currentBlobHolder.blobLinkEnum.objectParentTitle} (ID:#{blobUtilitiesBB.currentBlobHolder.parentObjectID})" />
+            </h2>
+            <p>Allowed file types: pdf, jpeg, png, gif (Limit: 50 files)</p>
 
             <p:fileUpload 
                 mode="advanced" 
-                update="cecase-blobs-form:cecase-blobs-table"
-                listener="#{ceCaseSearchProfileBB.onBlobUploadCommitButtonChange}"
+                listener="#{blobUtilitiesBB.onBlobUploadCommitButtonChange}"
                 multiple="true"
-                fileLimit="10"
+                fileLimit="50"
                 sizeLimit="99999999999" 
                 allowTypes="/(\.|\/)(jpe?g|JPG|JPE?G|png|PNG|pdf|PDF)$/"
                 rendered="true"
-                oncomplete="PF('case-blobs-dialog-var').hide()"/>    
+                update="blobs-growl-form"
+                oncomplete="PF('blob-upload-dialog-var').hide()"/>    
         </h:form>
-
-
+       
     </p:dialog>
 
-
-    <p:dialog   id="blob-edit-dialog"
-                height="600" width="800"
-                widgetVar="blob-edit-dialog-var"
+    <p:dialog   id="blobs-gallery-dialog"
+                height="600" width="1000"
+                widgetVar="blobs-gallery-dialog-var"
                 responsive="true"
                 modal="true"
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
-                header="Edit photo/document #{ceCaseSearchProfileBB.currentCase.caseName}"
+                header="Photos and Documents on #{blobUtilitiesBB.currentBlobHolder.blobLinkEnum.objectParentTitle} (ID:#{blobUtilitiesBB.currentBlobHolder.parentObjectID})"
                 rendered="true"
                 > 
+        <h:form id="gallery-form">
+            
+            <p:dataTable id="blob-table"
+                         value="#{blobUtilitiesBB.currentBlobHolder.blobList}"
+                         var="blob"
+                         rowKey="#{blob.photoDocID}">
+            
+                 <p:column headerText="PhotoDoc ID"
+                                  style="width:10%;">
+                            <h:outputText value="#{blob.photoDocID}" />
+                </p:column>
+                 <p:column headerText="Blob ID"
+                                  style="width:10%;">
+                            <h:outputText value="#{blob.bytesID}" />
+                </p:column>
+                 
+                 <p:column headerText="Type"
+                                  style="width:20%;">
+                            <h:outputText value="#{blob.type.title}" />
+                </p:column>
+                 <p:column headerText="Timestamp"
+                                  style="width:20%;">
+                            <h:outputText value="#{blob.createdTS}" />
+                </p:column>
+                 <p:column headerText="Title / Descr"
+                                  style="width:30%;">
+                            <h:outputText value="#{blob.title}" />
+                            <p:spacer height="5px" />
+                            <h:outputText value="#{blob.description}" />
+                </p:column>
+                 <p:column headerText="Actions"
+                                  style="width:20%;">
+                     <p:commandLink id="blob-viewblob-cl"
+                                    actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob)}"
+                                    value="view"
+                                    update="blobs-viewblob-dialog
+                                            blob-viewblob-form"
+                                    oncomplete="PF('blobs-viewblob-dialog-var').show();" />
+                 
+                </p:column>
+            
+            </p:dataTable>
+            
+            <p:spacer height="5px" />
 
-        <h:form id="blob-edit-form" >
-
-
-            <div class="ui-g data_container_nested_restrict">
-
-
-                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                    <div class="restrict-main-contents-io-title" >
-                        <h:outputLabel for="blob-edit-title-it">
-                            <h:outputText value="Title"/>
-                        </h:outputLabel>
-                    </div>
-
-                    <div class="restrict-main-contents-io-content" >
-                        <p:inputText  id="blob-edit-title-it" 
-                                      value="#{ceCaseSearchProfileBB.currentBlob.title}" 
-                                      tabindex="1" 
-                                      required="false" />
-                    </div>
-                </div>
-                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                    <div class="restrict-main-contents-io-title" >
-                        <h:outputLabel for="blob-edit-descr-it">
-                            <h:outputText value="Description"/>
-                        </h:outputLabel>
-                    </div>
-
-                    <div class="restrict-main-contents-io-content" >
-                        <p:inputText  id="blob-edit-descr-it" 
-                                      value="#{ceCaseSearchProfileBB.currentBlob.description}" 
-                                      tabindex="2" 
-                                      required="false" />
-                    </div>
-                </div>
-
-                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                    <p:commandButton    id="blob-edit-commit-cb"
-                                        ajax="true" 
-                                        actionListener="#{ceCaseSearchProfileBB.onBlobUpdateMetadata}"
-                                        oncomplete="PF('blob-edit-dialog-var').hide()"
-                                        value="Save changes"  
-                                        tabindex="3"
-                                        styleClass="inline-button"
-                                        icon="fa fa-floppy-o"
-                                        update="cecase-blobs-form:cecase-blobs-table
-                                        messages-global-form"/>
-
-                </div>
-
-            </div>
-
-
+            <p:galleria value="#{blobUtilitiesBB.currentBlobHolder.blobList}" 
+                        var="blob" 
+                        style="max-width: 640px">
+                
+                <p:graphicImage value="#{blobRetrieveBB.retrieveBlob(blob)}"
+                                alt="canot display" 
+                                style="width: 100%" />
+                
+                <f:facet    name="thumbnail">
+                    <p:graphicImage value="#{blobRetrieveBB.retrieveBlob(blob)}"
+                                    alt="cannot display photo" />
+                </f:facet>
+            </p:galleria>
         </h:form>
-
-
     </p:dialog>
-
-
-
-
-    <p:dialog   id="blob-remove-dialog"
-                height="400" width="600"
-                widgetVar="blob-remove-dialog-var"
+    
+    
+    
+    <p:dialog   id="blobs-viewblob-dialog"
+                height="800" width="800"
+                widgetVar="blobs-viewblob-dialog-var"
                 responsive="true"
                 modal="true"
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
-                header="Remove photo or document"
+                header="Viewing Photo/Doc: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
+                rendered="true"
                 > 
-
-        <h:form id="blob-remove-form">
-
-            <div class="ui-g data_container_nested_restrict">
-                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-                    <div class="restrict-data-field-label-inline" >
-
-                        <h:outputLabel  for="blob-remove-button">
-                            <h:outputText value="This operation removes the link between this blob and this case; the file remains in the DB" />
-                        </h:outputLabel>
-                    </div>
-                </div>
-                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
-
-                    <div class="restrict-main-contents-io-button red_button">
-                        <p:commandButton 
-                            id="blob-remove-button"
-                            icon="fa fa-trash"
-                            ajax="true"
-                            actionListener="#{ceCaseSearchProfileBB.onBlobRemoveCommitButtonChange}"
-                            value="Remove Photo/Doc ID:#{ceCaseSearchProfileBB.currentBlob.photoDocID}"
-                            update="cecase-blobs-form:cecase-blobs-table
-                            messages-global-form"
-                            oncomplete="PF('blob-remove-dialog-var).hide();"
-                            />
-                    </div>
-                    <div class="restrict-main-contents-io-button gray_button">
-                        <p:commandButton    id="blob-remove-cancel-button"
-                                            ajax="true"  
-                                            tabindex="27"
-                                            value="Cancel"
-                                            icon="fa fa-stop"
-                                            immediate="true"
-                                            process="@none"
-                                            onclick="PF('blob-remove-dialog-var').hide()"
-                                            />
-                    </div>
-                </div>
-            </div>
+        <h:form id="blob-viewblob-form">
+            
+           <p:graphicImage value="#{blobRetrieveBB.retrieveBlob(blobUtilitiesBB.currentBlobLight)}"
+                                alt="canot display" 
+                                style="width: 100%" />
         </h:form>
+        
     </p:dialog>
+    
+    <p:dialog   id="blobs-vieweditmetadata-dialog"
+                height="800" width="800"
+                widgetVar="blobs-vieweditmetadata-dialog-var"
+                responsive="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                header="Viewing Photo/Doc: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
+                rendered="true"
+                > 
+        <h:form id="blob-veweditmetadata-form">
+    <h:form id="inspections-inspectiondetails-form">
+                <p:commandButton id="inspections-inspectiondetails-editbutton"
+                                 value="#{occInspectionsBB.editModeInspectionMetadata ? 'Save Changes' : 'Edit'}"
+                                 disabled="#{!empty occInspectionsBB.selectedInspection.deactivatedBy}"
+                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                 icon="fa #{occInspectionsBB.editModeInspectionMetadata ? 'fa-check' : 'fa-pencil'}"
+                                 actionListener="#{occInspectionsBB.onToggleEditModeInspectionMetadata}"
+                                 oncomplete="PF('inspections-inspectiondetails-var').show()"
+                                 update="@form
+                                        @form:@parent:inspections-growl-form
+                                        @form:@parent:inspections-form"/>
+                
+                <div class="gray_button">
+                    
+                    <p:commandButton id="inspections-inspectiondetails-abort"
+                                     value="Cancel"
+                                     styleClass="gray-button"
+                                     rendered="#{occInspectionsBB.editModeInspectionMetadata}"
+                                     icon="fa fa-stop"
+                                     actionListener="#{occInspectionsBB.abortEditsOccInspectionMetadata}"
+                                     oncomplete="PF('inspections-inspectiondetails-var').show()"
+                                     update="@form
+                                     @form:@parent:inspections-growl-form"/>
+                </div>
+                
+                
 
+                <p:spacer height="5px"/>
 
+                <p:panel id="inspections-inspectiondetails-generalpanel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="General">
 
+                    <div class="p-grid">
+                        <div class="p-col-6">ID</div>
+                        <div class="p-col-6">
+                            <h:outputText value="#{occInspectionsBB.selectedInspection.inspectionID}" />
+                        </div>
+                        <div class="p-col-6">
+                            Re-inspection?
+                        </div>
+                        <div class="p-col-6">
+                            
+                            <h:outputText rendered="#{occInspectionsBB.selectedInspection.followUpToInspectionID eq 0 and !occInspectionsBB.editModeInspectionMetadata}" 
+                                          value="No; first inspection"/>
+                            
+                            <h:outputText rendered="#{occInspectionsBB.selectedInspection.followUpToInspectionID ne 0 and !occInspectionsBB.editModeInspectionMetadata}" 
+                                          value="Yes: To inspection ID: #{occInspectionsBB.selectedInspection.followUpToInspectionID}"/>
+                            
+                              <p:selectOneMenu rendered="#{occInspectionsBB.editModeInspectionMetadata}"
+                                               value="#{occInspectionsBB.formFollowUpInspection}"
+                                             filter="false"
+                                             required="false"
+                                             converter="occInspectionConverter">
+                                  <f:selectItems value="#{occPeriodSearchWorkflowBB.currentOccPeriod.inspectionList}" 
+                                               var="ins"
+                                               itemLabel="#{ins.inspectionID} (#{occInspectionsBB.getPrettyDate(ins.effectiveDateOfRecord)})"
+                                               itemValue="#{ins}"/>
+                            </p:selectOneMenu>
+                            <p:spacer rendered="#{occInspectionsBB.editModeInspectionMetadata}"
+                                      height="3px" />
+                            <h:outputText rendered="#{occInspectionsBB.editModeInspectionMetadata}"
+                                          value="Showing all inspections on the current occupancy period" />
+                                            
+                        </div>
+                        <div class="p-col-6">
+                            Inspector
+                        </div>
+                        <div class="p-col-6">
+                            <h:outputText rendered="#{!occInspectionsBB.editModeInspectionMetadata}" 
+                                          value="#{occInspectionsBB.selectedInspection.inspector.human.name}" />
+                            <h:outputText rendered="#{!occInspectionsBB.editModeInspectionMetadata}" 
+                                          value=" (#{occInspectionsBB.selectedInspection.inspector.username})" />
+                                          
+                            <p:selectOneMenu rendered="#{occInspectionsBB.editModeInspectionMetadata}"
+                                             value="#{occInspectionsBB.selectedInspection.inspector}"
+                                             filter="true"
+                                             filterMatchMode="contains"
+                                             converter="userConverter">
+                                <f:selectItems value="#{systemServicesBB.bbSessionMuni.swornOfficerList}" 
+                                               var="user"
+                                               itemLabel="#{user.human.name} (#{user.username})"
+                                               itemValue="#{user}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        
+                        <p:divider/>
+                        
+                        <div class="p-col-6">
+                            Created
+                        </div>
+                        
+                        <div class="p-col-6">
+                            <h:outputText value="#{occInspectionsBB.selectedInspection.createdBy.human.name} 
+                                          (#{occInspectionsBB.selectedInspection.createdBy.username})" 
+                                          rendered="#{!empty occInspectionsBB.selectedInspection.createdBy}"/>
+                            <p:spacer height="3px" />
+                            
+                            <h:outputText value="at "
+                                          rendered="#{!empty occInspectionsBB.selectedInspection.creationTS}" />
+                        
+                            <h:outputText value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.creationTS)}" 
+                                          rendered="#{!empty occInspectionsBB.selectedInspection.creationTS}"/>
+                        </div>
+                        
+                        <div class="p-col-6">
+                            Last updated
+                        </div>
+                        
+                        <div class="p-col-6">
+                            <h:outputText value="#{occInspectionsBB.selectedInspection.lastUpdatedBy.human.name} 
+                                          (#{occInspectionsBB.selectedInspection.lastUpdatedBy.username})" 
+                                          rendered="#{!empty occInspectionsBB.selectedInspection.lastUpdatedBy}"/>
+                            
+                            <p:spacer height="3px" />
+                            <h:outputText value="at "
+                                          rendered="#{!empty occInspectionsBB.selectedInspection.lastUpdatedTS}" />
+                        
+                            <h:outputText value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.lastUpdatedTS)}" 
+                                          rendered="#{!empty occInspectionsBB.selectedInspection.lastUpdatedTS}"/>
+                        </div>
+                        <div class="p-col-6">
+                            Deactivated
+                        </div>
+                        <div class="p-col-6">
+                            
+                             <h:outputText value="Active Record" 
+                                          rendered="#{empty occInspectionsBB.selectedInspection.deactivatedBy}"/>
+                             
+                             <h:outputText value="#{occInspectionsBB.selectedInspection.deactivatedBy.human.name} 
+                                          (#{occInspectionsBB.selectedInspection.deactivatedBy.username})" 
+                                          rendered="#{!empty occInspectionsBB.selectedInspection.deactivatedBy}"/>
+                            <p:spacer height="3px" />
+                            
+                            <h:outputText value="at "
+                                          rendered="#{!empty occInspectionsBB.selectedInspection.deactivatedTS}" />
+                        
+                            <h:outputText value="#{occInspectionsBB.getPrettyDate(occInspectionsBB.selectedInspection.deactivatedTS)}" 
+                                          rendered="#{!empty occInspectionsBB.selectedInspection.deactivatedBy}"/>
+                        </div>
+                    </div>
+            
+
+        </h:form>
+        
+    </p:dialog>
 
 </ui:composition>

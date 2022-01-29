@@ -210,15 +210,16 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * 
      * @param blob with bytes and ZERO for bytesID and photodocID
      * @param bh the container of the blob with not null LinkInfoEnum
+     * @param ua
      * 
-     * @return the passed in blob with the BytesID and metadata ID set
+     * @return the passed in blob 
      * @throws BObStatusException
      * @throws BlobTypeException
      * @throws IntegrationException
      * @throws IOException 
      * @throws com.tcvcog.tcvce.domain.BlobException 
      */
-    public Blob insertBlobAndInsertMetadataAndLinkToParent(Blob blob, IFace_BlobHolder bh) 
+    public Blob insertBlobAndInsertMetadataAndLinkToParent(Blob blob, IFace_BlobHolder bh, UserAuthorized ua) 
             throws  BObStatusException, 
                     BlobTypeException, 
                     IntegrationException, 
@@ -229,7 +230,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         BlobIntegrator bi = getBlobIntegrator();
-        
+        blob.setBlobUploadedBy(ua);
         blob.setBytesID(bi.insertBlobBytes(auditAndPrepareBlobForStorage(blob)));
         blob.setPhotoDocID(bi.insertPhotoDoc(blob));
         bi.linkBlobHolderToBlobMetadata(bh, blob);

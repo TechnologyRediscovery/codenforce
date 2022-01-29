@@ -36,7 +36,9 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
@@ -321,6 +323,46 @@ public class    SessionBean
     private IFace_BlobHolder sessBlobHolder;
     private List<Blob> blobList;
     private PageModeEnum blobPageModeRequest;
+    
+    /**
+     * If there's a session blob holder, I figure out what type it is
+     * and then I get a new one and point our session blob holder to it
+     * @return 
+     */
+    public IFace_BlobHolder refreshSessionBlobHolder(){
+        System.out.println("SessionBean.refreshSessionBlobHolder " );
+        if(sessBlobHolder != null){
+            if(sessBlobHolder instanceof OccInspection){
+                OccInspectionCoordinator oic = getOccInspectionCoordinator();
+                OccInspection oi = (OccInspection) sessBlobHolder;
+                try {
+                    sessBlobHolder = oic.getOccInspection(oi.getInspectionID());
+                    System.out.println("SessionBean.refreshSessionBlobHolder | new BlobHolder Type: " + sessBlobHolder.getClass());
+                    System.out.println("SessionBean.refreshSessionBlobHolder | new BlobHolder list size: " + sessBlobHolder.getBlobList().size());
+                } catch (IntegrationException | BObStatusException | BlobException ex) {
+                    System.out.println("SessionBean.refreshSessionBlobHolder | could not get a new occ inspection");
+                } 
+                
+                return sessBlobHolder;
+                
+            } else if (sessBlobHolder instanceof OccInspectedSpaceElement){
+                // i think we'll want to delegate this to other parts of session bean to reuse the 
+                // refresh process once its standardized
+            } else if (sessBlobHolder instanceof OccPeriodDataHeavy){
+                
+                
+            } else {
+                System.out.println("SessionBean.refreshSessionBlobHolder | no matching type for session blob holder--very strange!");
+            }
+            
+            
+            
+        }
+        return null;
+        
+    }
+    
+    
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                  XIII PublicInfoBundle                          <<< */

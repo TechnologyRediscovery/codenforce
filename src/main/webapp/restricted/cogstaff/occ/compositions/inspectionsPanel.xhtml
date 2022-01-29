@@ -8,6 +8,8 @@
         <p:growl id="inspection-growl" />
     </h:form>
     
+    <ui:include src="blobTools.xhtml"/>
+    
     <p:panel id="inspections-panel"
              toggleable="true"
              widgetVar="inspections-panel-var"
@@ -47,15 +49,46 @@
                                    value="Add space"> |
                         <f:actionListener binding="#{occInspectionsBB.setSelectedInspection(ins)}"/>
                     </p:commandLink>
-                    <p:commandLink ajax="true"
-                                   style="color:blue;"
-                                   oncomplete="PF('inspections-inspectiondetails-var').show()"
-                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                   update="inspections-inspectiondetails-form
-                                            inspection-deactivation-form
-                                            inspection-occperiodxfer-form"
-                                   value="Details">
+                    
+                <h:outputText value=" | " />
+                
+                <p:commandLink  id="inspection-details-cl"
+                                    ajax="true"
+                                    style="color:blue;"
+                                    oncomplete="PF('inspections-inspectiondetails-var').show()"
+                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                    update="inspections-inspectiondetails-form
+                                             inspection-deactivation-form
+                                             inspection-occperiodxfer-form"
+                                    value="Details">
                         <f:actionListener binding="#{occInspectionsBB.setSelectedInspection(ins)}"/>
+                    </p:commandLink>
+                
+                <h:outputText value=" | " />
+                
+                <p:commandLink  id="inspection-uploadphotos-cl"
+                                    ajax="true"
+                                   style="color:blue;"
+                                   oncomplete="PF('blob-upload-dialog-var').show()"
+                                   rendered="true"
+                                   update="blob-upload-dialog
+                                            blob-upload-form"
+                                   value="Add Photos"
+                                   actionListener="#{occInspectionsBB.onUploadImagesToInspectionInitButtonClick(ins)}">
+                        
+                    </p:commandLink>
+                <h:outputText value=" | " />
+                
+                <p:commandLink  id="inspection-viewphotos-cl"
+                                    ajax="true"
+                                   style="color:blue;"
+                                   oncomplete="PF('blobs-gallery-dialog-var').show()"
+                                   rendered="true"
+                                   update="blobs-gallery-dialog
+                                            gallery-form"
+                                   value="View photo pool"
+                                   actionListener="#{occInspectionsBB.onViewPhotoPoolLinkClick(ins)}">
+                        
                     </p:commandLink>
                 
                 <p:dataTable var="inspectedSpace"

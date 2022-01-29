@@ -1687,11 +1687,7 @@
     </managed-bean>
     
          
-    <managed-bean>
-        <managed-bean-name>blobToolsUniversalBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.BlobToolsUniversal</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+  
     
     <managed-bean>
         <managed-bean-name>blobCoordinator</managed-bean-name>
@@ -1729,7 +1725,11 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    
+ <managed-bean>
+        <managed-bean-name>blobUtilitiesBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.BlobUtilitiesBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>    
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: blobs ~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     
@@ -1785,11 +1785,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>cECasePublicBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.BlobToolsUniversalBB</managed-bean-class>
-    
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
         
     <managed-bean>
@@ -2099,4 +2094,5 @@
         <managed-bean-class>com.tcvcog.tcvce.application.AddressBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+   
 </faces-config>
