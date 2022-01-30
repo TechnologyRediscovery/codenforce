@@ -14,20 +14,58 @@ package com.tcvcog.tcvce.entities;
  */
 public enum BlobLinkEnum {
     
+     MUNICIPALITY   (   "Municipality",
+                            "municipality",
+                            "muniphotodoc",
+                            "muni_municode",
+                            "photodoc_photodocid"),
+    
+    PROPERTY   (   "Property",
+                            "parcel",
+                            "parcelphotodoc",
+                            "parcel_parcelkey",
+                            "photodoc_photodocid"),
+     
     OCC_PERIOD          (   "Occupancy Period",
                             "occperiod",
                             "occperiodphotodoc",
                             "occperiod_periodid",
                             "photodoc_photodocid"),
+    
     FIELD_INSPECTION    (   "Field Inspection",
                             "occinspection",
                             "occinspectionphotodoc",
                             "inspection_inspectionid",
                             "photodoc_photodocid"),
+    
     INSPECTED_ELEMENT   (   "Inspected Ordinance",
                             "occinspectedspaceelement",
                             "occinspectedspaceelementphotodoc",
                             "inspectedspaceelement_elementid",
+                            "photodoc_photodocid"),
+    
+    CEACTION_REQUEST   (   "Code enforcement action request",
+                            "ceactionrequest",
+                            "ceactionrequestphotodoc",
+                            "ceactionrequest_requestid",
+                            "photodoc_photodocid"),
+    
+    CE_CASE   (         "Code Enforcement Case",
+                            "cecase",
+                            "cecasephotodoc",
+                            "cecase_caseid",
+                            "photodoc_photodocid"),
+    
+    CODE_VIOLATION  (    "Code Violation",
+                            "codeviolation",
+                            "codeviolationphotodoc",
+                            "codeviolation_violationid",
+                            "photodoc_photodocid"),
+    
+    CITATION   (   "Citation",
+                            "citation",
+                            "citationphotodoc",
+                            "citation_citationid",
                             "photodoc_photodocid");
     
     private final String objectParentTitle;

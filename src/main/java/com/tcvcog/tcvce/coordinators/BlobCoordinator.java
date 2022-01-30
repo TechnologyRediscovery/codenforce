@@ -28,6 +28,8 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
+import com.tcvcog.tcvce.entities.BlobLinkEnum;
+import com.tcvcog.tcvce.entities.BlobPool;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
@@ -509,10 +511,13 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * IN PROCESS, probably to stay deprecated
+     * 
      * A method for grabbing PDFBlobLights that's safe:
      * if it encounters an entry that does not yet have a properly
      * populated metadata column, it strips the metadata and saves it
      * before returning the blob.
+     * @deprecated 
      * @param blobID
      * @return
      * @throws IntegrationException
@@ -574,6 +579,29 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             blobList.add(getBlobLight(id));
         }
         return blobList;
+    }
+    
+    /**
+     * Fancy overload that will create a blob pool on the session bean
+     * by building a sneaky instance of IFace_BlobHolder that only contains
+     * Blobs that are in the ancestry of the given BlobHolder
+     * @param bh from which to extract pool info
+     * @return the pool with a BlobLight list for the taking.
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BlobException 
+     */
+    public BlobPool getBlobPool( IFace_BlobHolder bh) throws BObStatusException, IntegrationException, BlobException{
+        BlobIntegrator bi = getBlobIntegrator();
+        BlobPool pool = null;
+        if(bh.getBlobUpstreamPoolEnumPoolFeederID() != 0 && bh.getBlobUpstreamPoolEnum() != null){
+             pool = new BlobPool(bh.getBlobUpstreamPoolEnumPoolFeederID(), bh.getBlobUpstreamPoolEnum());
+             pool.setBlobList(getBlobLightList(bi.getBlobLightIDList(bh)));
+        } else {
+            throw new BObStatusException("The blobholder passed in does not have a blob pool!! No pool for you.");
+        }
+        return pool;
+        
     }
     
     /**

@@ -322,14 +322,42 @@ public class    SessionBean
     private Blob sessBlob;
     private BlobLight sessBlobLight;
     private IFace_BlobHolder sessBlobHolder;
+    private BlobPool sessBlobHolderPool;
     private List<Blob> blobList;
     private PageModeEnum blobPageModeRequest;
     private List<BlobType> blobTypeList;
     
     /**
+     * Accepts BlobHolders to become the session's one and only
+     * SessionBlobHolder. The registration process will
+     * ask the registered BlobHolder for its upstream pool and get that 
+     * ready, too
+     * @param bh for registration on the session
+     */
+    public void registerSessionBlobHolder(IFace_BlobHolder bh){
+        if(bh != null){
+            sessBlobHolder = bh;
+            refreshSessionBlobHolder();
+            BlobLinkEnum upstreamPool = bh.getBlobUpstreamPoolEnum();
+            if(upstreamPool != null){
+                BlobCoordinator bc = getBlobCoordinator();
+                try {
+                    sessBlobHolderPool = bc.getBlobPool(bh);
+                } catch (BObStatusException | BlobException | IntegrationException ex) {
+                    System.out.println(ex);
+                }
+                
+            }
+        }
+        
+        
+    }
+    
+    
+    /**
      * If there's a session blob holder, I figure out what type it is
      * and then I get a new one and point our session blob holder to it
-     * @return 
+     * @return the session's BlobHolder
      */
     public IFace_BlobHolder refreshSessionBlobHolder(){
         System.out.println("SessionBean.refreshSessionBlobHolder " );
@@ -362,6 +390,24 @@ public class    SessionBean
         }
         return null;
         
+    }
+    
+    /**
+     * I ask the blobcoordinator for the updated bloblight list
+     * before calling setSessBlobHolder.
+     * I think i'm redundant!! Oh no!
+     * @param bh 
+     */
+    public void updateAndSetSessBlobHolder(IFace_BlobHolder bh){
+         BlobCoordinator bc = getBlobCoordinator();
+        if (bh != null){
+            try {
+                bh.setBlobList(bc.getBlobLightList(bh));
+                registerSessionBlobHolder(bh);
+            } catch (BObStatusException | BlobException | IntegrationException ex) {
+                System.out.println(ex);
+            } 
+        }
     }
     
     
@@ -1972,22 +2018,7 @@ public class    SessionBean
     }
     
     
-    /**
-     * I ask the blobcoordinator for the updated bloblight list
-     * before calling setSessBlobHolder
-     * @param bh 
-     */
-    public void updateAndSetSessBlobHolder(IFace_BlobHolder bh){
-         BlobCoordinator bc = getBlobCoordinator();
-        if (bh != null){
-            try {
-                bh.setBlobList(bc.getBlobLightList(bh));
-                sessBlobHolder = bh;
-            } catch (BObStatusException | BlobException | IntegrationException ex) {
-                System.out.println(ex);
-            } 
-        }
-    }
+
 
     /**
      * I'm a normal setter
@@ -2011,6 +2042,21 @@ public class    SessionBean
      */
     public void setBlobTypeList(List<BlobType> blobTypeList) {
         this.blobTypeList = blobTypeList;
+    }
+
+    
+    /**
+     * @return the sessBlobHolderPool
+     */
+    public BlobPool getSessBlobHolderPool() {
+        return sessBlobHolderPool;
+    }
+
+    /**
+     * @param sessBlobHolderPool the sessBlobHolderPool to set
+     */
+    public void setSessBlobHolderPool(BlobPool sessBlobHolderPool) {
+        this.sessBlobHolderPool = sessBlobHolderPool;
     }
 
     

@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobLinkEnum;
+
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
@@ -38,6 +39,7 @@ public class OccInspectedSpaceElement
         implements Serializable, Comparable<OccInspectedSpaceElement>, IFace_BlobHolder {
 
     private final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.INSPECTED_ELEMENT;
+    private final static BlobLinkEnum BLOP_UPSPTREAM_POOL = BlobLinkEnum.FIELD_INSPECTION;
     
     private int inspectedSpaceElementID;
 
@@ -67,6 +69,7 @@ public class OccInspectedSpaceElement
      * inspectedspace table
      */
     private int inspectedSpaceID;
+    private int occInspectionID;
 
     public OccInspectedSpaceElement() { }
 
@@ -397,5 +400,29 @@ public class OccInspectedSpaceElement
     @Override
     public int getParentObjectID() {
         return inspectedSpaceElementID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return BLOP_UPSPTREAM_POOL;
+    }
+
+    /**
+     * @return the occInspectionID
+     */
+    public int getOccInspectionID() {
+        return occInspectionID;
+    }
+
+    /**
+     * @param occInspectionID the occInspectionID to set
+     */
+    public void setOccInspectionID(int occInspectionID) {
+        this.occInspectionID = occInspectionID;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return occInspectionID;
     }
 }

@@ -40,6 +40,8 @@ public  class       OccPeriod
                     IFace_ActivatableBOB,
                     IFace_NoteHolder {
     
+
+    
     protected int periodID;
     protected int propertyUnitID;
     

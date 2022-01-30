@@ -45,6 +45,7 @@ public  class       OccPeriodDataHeavy
     
     final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.OCCPERIODHUMAN;
     final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.OCC_PERIOD;
+    final static BlobLinkEnum BLOB_UPSTREAMPOOL_ENUM = BlobLinkEnum.PROPERTY;
     
     protected OccPeriodStatusEnum status;
 
@@ -455,6 +456,21 @@ public  class       OccPeriodDataHeavy
     @Override
     public int getParentObjectID() {
         return periodID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return BLOB_UPSTREAMPOOL_ENUM;
+    }
+
+    /**
+     * I send back the parcel key of the containing property
+     * so I can use its poool of Blobs, if I want
+     * @return 
+     */
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return this.getPropUnitProp().getParcelKey();
     }
 
    

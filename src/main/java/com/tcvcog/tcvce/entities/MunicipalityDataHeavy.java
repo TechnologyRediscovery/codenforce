@@ -27,9 +27,15 @@ import java.util.Objects;
 public  class       MunicipalityDataHeavy 
         extends     Municipality
         implements  IFace_CredentialSigned,
-                    IFace_humanListHolder{
+                    IFace_humanListHolder,
+                    IFace_BlobHolder{
     
     final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.MUNIHUMAN;
+    
+    private final static BlobLinkEnum BLOP_LINK_INFO = BlobLinkEnum.MUNICIPALITY;
+    private final static BlobLinkEnum BLOP_UPSPTREAM_POOL = null;
+    private final static String TABLE_NAME = "municipality";
+    
     
     private String address_street;
     private String address_city;
@@ -69,6 +75,7 @@ public  class       MunicipalityDataHeavy
     private List<CourtEntity> courtEntities;
     private List<Integer> photoDocList;
     private List<User> swornOfficerList;
+    private List<BlobLight> blobList;
     
     
     protected List<HumanLink> humanLinkList;
@@ -721,6 +728,36 @@ public  class       MunicipalityDataHeavy
      */
     public void setSwornOfficerList(List<User> swornOfficerList) {
         this.swornOfficerList = swornOfficerList;
+    }
+
+    @Override
+    public void setBlobList(List<BlobLight> bl) {
+        this.blobList = bl;
+    }
+
+    @Override
+    public List<BlobLight> getBlobList() {
+        return blobList;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return BLOP_LINK_INFO;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return muniCode;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return BLOP_UPSPTREAM_POOL;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return 0;
     }
   
     

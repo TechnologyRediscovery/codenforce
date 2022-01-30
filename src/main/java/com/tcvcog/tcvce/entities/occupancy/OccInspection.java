@@ -46,7 +46,7 @@ public  class       OccInspection
                     IFace_BlobHolder{
     
     private final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.FIELD_INSPECTION;
-    private final static BlobPoolEnum BLOP_UPSPTREAM_POOL
+    private final static BlobLinkEnum BLOP_UPSPTREAM_POOL = BlobLinkEnum.OCC_PERIOD;
     
     private int inspectionID;
 
@@ -630,5 +630,15 @@ public  class       OccInspection
     @Override
     public int getParentObjectID() {
         return inspectionID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return BLOP_UPSPTREAM_POOL;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return occPeriodID;
     }
 }
