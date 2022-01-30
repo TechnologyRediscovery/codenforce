@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
@@ -61,6 +62,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -810,6 +813,16 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_XII_Blob(Credential cred, SubSysEnum ss) throws SessionException{
+        BlobCoordinator bc = getBlobCoordinator();
+        try {
+            sb.setBlobTypeList(bc.getBlobTypeListComplete());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            throw new SessionException("XII_BLOB FATAL: could not build session blob type list");
+            
+        }
+        
+        
         
     }
 

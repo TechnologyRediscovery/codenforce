@@ -31,7 +31,6 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
@@ -1111,72 +1110,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
     
     
-    /**
-     * Attempts to upload new photo for header on NOVs
-     * @param ev 
-     */
-    public void onHeaderUploadRequest(FileUploadEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        if (ev == null) {
-            System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | event: null");
-            return;
-        }
-
-        System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | File: " + ev.getFile().getFileName() + " Type: " + ev.getFile().getContentType());
-
-        BlobCoordinator blobc = getBlobCoordinator();
-        BlobIntegrator blobi = getBlobIntegrator();
-        try {
-            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
-            
-//            blob.setBytes(ev.getFile().getContents());  // set bytes  
-            
-            blob.setFilename(ev.getFile().getFileName());
-            blob.setMuni(getSessionBean().getSessMuni());
-            blob.setDescription("Header image for Notices of Violation in " + getSessionBean().getSessMuni().getMuniName() + " as of " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            // Write to DB
-            blob = blobc.storeBlob(blob);
-            PrintStyle newStyle = cc.nov_updateStyleHeaderImage(currentNotice.getStyle(), blob);
-            //newStyle should have the header image ID on it.
-            currentNotice.setStyle(newStyle);
-
-        } catch (IntegrationException
-                | BObStatusException
-                | IOException
-                | NoSuchElementException ex) {
-            System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
-            System.out.println(ex);
-        } catch (BlobException | BlobTypeException ex) {
-            System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Incompatible file type. ",
-                            "Please upload image files only (jpg, gif, or png)."));
-    
-        }
-
-        Blob blob = null;
-        try {
-            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
-            // TODO Upgrade on PF https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
-//                blob.setBytes(ev.getFile().getContents());  // set bytes  
-            blob.setType(blobi.getBlobType(BlobTypeEnum.PHOTO.getTypeID()));
-            blob.setFilename(ev.getFile().getFileName());
-
-
-
-                // Write to DB
-//                blob.setBlobID(blobc.insertPhotoDoc(blob));
-            cc.nov_updateStyleHeaderImage(currentNotice.getStyle(), blob);
-
-        } catch ( IntegrationException | BObStatusException ex) {
-            System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
-            System.out.println(ex);
-        }
-
-//            blobList.add(blob);
-
-    }
+  
     
     /**
      * Listener for user requests to bring up the choose person dialog

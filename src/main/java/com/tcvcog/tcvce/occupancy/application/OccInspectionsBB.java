@@ -2,6 +2,7 @@ package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.SessionBean;
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
@@ -257,7 +258,8 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     
     /**
      * Listener for user requests to see the photos on an inspection
-     * Sets the inspection as the blobholder for the blob UI to take over
+     * Sets the inspection as the blobholder for the blob UI to take over.
+     * And asks our blob coordinator for my most recent blob list
      * @param oi 
      */
     public void onViewPhotoPoolLinkClick(OccInspection oi){
@@ -265,8 +267,9 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         System.out.println("OccInspectionsBB.onViewPhotoPoolLinkClick");
         if(oi != null){
             selectedInspection = oi;
-            getSessionBean().setSessBlobHolder(selectedInspection);
+            getSessionBean().updateAndSetSessBlobHolder(selectedInspection);
         } else {
+            // do nothing
         }
         
     }

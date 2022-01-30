@@ -659,11 +659,6 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>    
     
-    <managed-bean>
-        <managed-bean-name>propertyFilesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PropertyFilesBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>    
     
     <managed-bean>
         <managed-bean-name>propertyOccPeriodsBB</managed-bean-name>

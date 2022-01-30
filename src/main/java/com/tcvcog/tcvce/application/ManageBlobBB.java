@@ -28,7 +28,6 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
-import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.CEActionRequest;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.MetadataKey;
@@ -247,83 +246,18 @@ public class ManageBlobBB extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * TODO: Fix blob manager
+     * @param blight 
+     */
     public void downloadBlob(BlobLight blight){
         selectedBlob = blight;
-        downloadSelectedBlob();
+        
+//        downloadSelectedBlob();
         
     }
     
-    public void downloadSelectedBlob(){
-
-        // Prepare.
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        ExternalContext externalContext = facesContext.getExternalContext();
-
-        BufferedInputStream input = null;
-        BufferedOutputStream output = null;
-
-        BlobCoordinator bc = getBlobCoordinator();
-
-        Blob blob = null;
-
-        try {
-
-            // Init servlet response.
-            externalContext.responseReset();
-
-            switch (selectedBlob.getType().getTypeEnum()) {
-                case PDF:
-                    externalContext.setResponseContentType("application/pdf");
-                    blob = bc.getPDFBlob(selectedBlob.getPhotoDocID());
-                    break;
-
-                case PHOTO:
-//                    externalContext.setResponseContentType("image/" + BlobCoordinator.getFileExtension(selectedBlob.getFilename()));
-                    blob = bc.getPhotoBlob(selectedBlob.getPhotoDocID());
-                    break;
-
-                default:
-                    //do nothing
-                    break;
-            }
-
-            if (blob != null) {
-                // Open file and prepare the response
-                input = new BufferedInputStream(new ByteArrayInputStream(blob.getBytes()));
-
-                externalContext.setResponseContentLength(blob.getBytes().length);
-
-                externalContext.setResponseHeader("Content-Disposition", "attachment; filename=\"" + blob.getFilename() + "\"");
-
-                output = new BufferedOutputStream(externalContext.getResponseOutputStream(), DEFAULT_BUFFER_SIZE);
-
-                // Write file contents to response.
-                byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-                int length;
-                while ((length = input.read(buffer)) > 0) {
-                    output.write(buffer, 0, length);
-                }
-
-                // Finalize task.
-                output.flush();
-                System.out.println("manageBlobBB.downloadSelectedBlob: output.flush() done");
-            } else {
-                throw new BlobException("BlobType not yet supported for download or blob failed to load.");
-            }
-        } catch (IOException | IntegrationException | BlobException ex) {
-            System.out.println("manageBlobBB.downloadSelectedBlob | " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to prepare your download!", ""));
-        } finally {
-            // close streams.
-            if (output != null){  try { output.close(); } catch (IOException ex) { /* Ignore */ } }
-            if (input != null){  try { input.close(); } catch (IOException ex) { /* Ignore */ } }
-        }
-
-        // Inform JSF that we are done using the response.
-        facesContext.responseComplete();
-    }
+   
 
     public void executeQuery(){
         BlobCoordinator bc = getBlobCoordinator();
@@ -348,11 +282,15 @@ public class ManageBlobBB extends BackingBeanUtils implements Serializable{
         BlobCoordinator bc = getBlobCoordinator();
             try {
 
-                if (selectedBlob.getType().getTypeEnum()== BlobTypeEnum.PHOTO) {
+                // TODO: Figureo out how to do custom stuff by type!! Do I need an enum 
+                // after all???
+                if (selectedBlob.getType().getTypeID() == 222222222) {
                     bc.deletePhotoBlob(selectedBlob);
-                } else if (selectedBlob.getType().getTypeEnum() == BlobTypeEnum.PDF) {
+                } else if (selectedBlob.getType().getTypeID() == 3433333) {
                     bc.deletePDFBlob(selectedBlob);
                 }
+                
+                
 
                 //Setting blobID to 0 tells the reloadBlobs() method
                 //not to search for the blob after reloading.
@@ -616,20 +554,22 @@ public class ManageBlobBB extends BackingBeanUtils implements Serializable{
     /**
      * Primefaces can't compare enums in EL. So, this translates the type to
      * an integer value so it can make sure to render the correct elements.
+     * // TODO: Update for blobs22
      * @return 
      */
     public int getSelectedBlobType(){
-        switch(selectedBlob.getType().getTypeEnum()){
-            case PHOTO:
-                return 0;  
-            
-            case PDF:
-                return 1;
-            
-            default:
-                //Invalid type
-                return -1;
-        }
+//        switch(selectedBlob.getType().getTypeEnum()){
+//            case PHOTO:
+//                return 0;  
+//            
+//            case PDF:
+//                return 1;
+//            
+//            default:
+//                //Invalid type
+//                return -1;
+//        }
+        return 0;
         
     }
     

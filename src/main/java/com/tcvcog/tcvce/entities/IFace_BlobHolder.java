@@ -27,4 +27,5 @@ public interface IFace_BlobHolder {
     public List<BlobLight> getBlobList();
     public BlobLinkEnum getBlobLinkEnum();
     public int getParentObjectID();
+    public BlobPoolEnum getBlobUpstreamPoolEnum();
 }

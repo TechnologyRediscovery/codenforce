@@ -29,11 +29,11 @@ import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobType;
-import com.tcvcog.tcvce.entities.BlobTypeEnum;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -85,9 +86,24 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     private final DefaultStreamedContent defaultStream = new DefaultStreamedContent();
     private final int GIGABYTE = 1000000000;
 
+    private List<BlobType> blobTypeListMaster;
+    
     public BlobCoordinator() {
 
     }
+    
+    
+     @PostConstruct
+    public void initBean() {
+         System.out.println("BlobCoordinator.initBean(); assembling application tools");
+        try {
+            blobTypeListMaster = getBlobTypeListComplete();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
+    
+    
 
     
     /**
@@ -109,8 +125,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * Extracts all BlobTypes from the DB
      * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public List<BlobType> getBlobTypeList() throws IntegrationException{
+    public List<BlobType> getBlobTypeListComplete() throws IntegrationException{
         BlobIntegrator bi = getBlobIntegrator();
         List<Integer> idl = bi.getBlobTypeList();
         List<BlobType> typeList = new ArrayList<>();
@@ -149,58 +166,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         return blob;
     }
 
-    /**
-     * The BlobCoordinator attempts to retrieve an image with a given Blob ID supplied by a JSF parameter. 
-     * If something were to go wrong, automatically retrieve the defaultStream for the interface.
-     *
-     * @param bl
-     * @param ctx
-     * @param fctx
-     * @return
-     * @throws BlobTypeException
-     * @throws com.tcvcog.tcvce.domain.BlobException
-     */
-    public StreamedContent getBlobStream(BlobLight bl, ExternalContext ctx, FacesContext fctx) throws BlobTypeException, BlobException{
-        // should use EL to verify blob type,  but this will check it anyway
-        DefaultStreamedContent sc = null;
-
-        if (fctx.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-            sc = defaultStream;
-        } else {
-            
-            //Get the blob ID from the Faces context
-            int blobID = Integer.parseInt(ctx.getRequestParameterMap().get("blobID"));
-            System.out.println("BlobCoordinator.getImage: image ID " + blobID);
-            try {
-                Blob blob = getPhotoBlob(blobID);
-                if (null == blob.getType()) {
-                    throw new BlobTypeException("BlobType is null.");
-                } else {
-                    switch (blob.getType().getTypeEnum()) {
-                        case PHOTO:
-                            // TODO: Update to new UI:
-                            // https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
-//                            sc = new DefaultStreamedContent.builder().new ByteArrayInputStream(bi.getBlob(blob.getBytesID()));
-                            break;
-                        case PDF:
-//                            sc = new DefaultStreamedContent(new FileInputStream(new File("/home/noah/Documents/COG Project/codeconnect/src/main/webapp/images/pdf-icon.png")));
-                            break;
-                        default:
-                            throw new BlobTypeException("Attempted to display incompatible BLOB type. ");
-                    }
-                }
-            } catch (IntegrationException ex) {
-                System.out.println("BlobCoordinator.getImage | " + ex);
-            } 
-//            catch (FileNotFoundException ex) {
-//                System.out.println(ex);
-//                System.out.println("BlobCoordinator.getBlobStream | ERROR: could not find pdf-icon.png ");
-//            }
-            
-        }
-        
-        return sc;
-    }
+   
 
     /**
      * The BlobCoordinator attempts to retrieve a PDF with a given Blob ID supplied by a JSF parameter. 
@@ -245,6 +211,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @param blob with bytes and ZERO for bytesID and photodocID
      * @param bh the container of the blob with not null LinkInfoEnum
      * @param ua
+     * @param muni
      * 
      * @return the passed in blob 
      * @throws BObStatusException
@@ -253,7 +220,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IOException 
      * @throws com.tcvcog.tcvce.domain.BlobException 
      */
-    public Blob insertBlobAndInsertMetadataAndLinkToParent(Blob blob, IFace_BlobHolder bh, UserAuthorized ua) 
+    public Blob insertBlobAndInsertMetadataAndLinkToParent( Blob blob, 
+                                                            IFace_BlobHolder bh, 
+                                                            UserAuthorized ua,
+                                                            Municipality muni) 
             throws  BObStatusException, 
                     BlobTypeException, 
                     IntegrationException, 
@@ -265,8 +235,12 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         BlobIntegrator bi = getBlobIntegrator();
         blob.setBlobUploadedBy(ua);
+        blob.setMuni(muni);
+        // ******** AUDIT BLOB AND INSERT *************
         blob.setBytesID(bi.insertBlobBytes(auditAndPrepareBlobForStorage(blob)));
+        // we have bytes ID set, so the photodoc table can point to it
         blob.setPhotoDocID(bi.insertPhotoDoc(blob));
+        // then connect the metadata record to the parent business object
         bi.linkBlobHolderToBlobMetadata(bh, blob);
                       
         return blob;
@@ -301,9 +275,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             throw new BlobException("You cannot upload a file without a filename.");
         }
         
-        BlobIntegrator bi = getBlobIntegrator();
-        
         //First, let's find out what type of file this is.
+        // note in codeNforce file extension does NOT include the trailing .
         String fileExtension = getFileExtension(blob.getFilename());
 
         //if the file extension is uppercase, we need to change it to lowercase.
@@ -311,119 +284,27 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         String lowerCaseExt = fileExtension.toLowerCase();
         
-        if(!fileExtension.equals(lowerCaseExt)) {
-            
-            blob.setFilename(filename.replace("." + fileExtension, "." + lowerCaseExt));
-
-            fileExtension = lowerCaseExt;
+        // This seems heavy and clunky, but this is a relatively rare operation
+        // that is only done once on the blob's first INSERTs
+        if(blobTypeListMaster == null){
+            blobTypeListMaster = getBlobTypeListComplete();
         }
         
-        switch (fileExtension) {
-            case "jpg":
-                return configureImageBlob(blob);
-            case "jpeg":
-                return configureImageBlob(blob);
-            case "gif":
-                return configureImageBlob(blob);
-            case "png":
-                return configureImageBlob(blob);
-            case "pdf":
-
-                blob.setType(bi.getBlobType(BlobTypeEnum.PDF.getTypeID()));
-
-                stripPDFMetadata(blob);
-                // YIKES:: BREAKING CHANGE
-                //return getBlobIntegrator().insertPhotoDoc(blob);
-                return null;
-
-            default:
-                //Incorrect file type
+        if(lowerCaseExt != null && blobTypeListMaster != null && !blobTypeListMaster.isEmpty()){
+            for(BlobType bt: blobTypeListMaster){
+                if(bt.getFileExtensionsPermitted().contains(lowerCaseExt)){
+                    System.out.println("BlobCoordinator.auditAndPrepareBlobForStorage | Assigning type " + bt.getTypeID() + " to filename " + blob.getFilename());
+                    blob.setType(bt);
+                    break;
+                }
+            }
+            // if we make it here, we haven't assigned 
+            if(blob.getType()== null){
                 throw new BlobException("Incompatible file type, please upload a JPG, JPEG, GIF, PNG, or PDF.");
+            }
         }
+        return blob;
     }
-    
-    
-    /**
-     * Validates blobs and prepares them for storage, whether they are photos
-     * or documents.
-     *   
-     * I interrogate the filename to determine type and make sure the blob type 
-     * gets set correctly. NOTE: A file with an incorrect file extension
-     * will pass through unnoticed, resulting in garbage in the DB and bad data.
-     * 
-     * TODO: make this method throw exception if blob is corrupted
-     * @deprecated  replaced by internal private method and IFace_BlobHolder
-     * @param blob
-     * @return
-     * @throws BlobException if blob is too large or of an incorrect file type
-     * @throws IntegrationException
-     * @throws IOException 
-     * @throws com.tcvcog.tcvce.domain.BlobTypeException
-     */
-    public Blob storeBlob(Blob blob) 
-            throws  BlobException, 
-                    IOException, 
-                    IntegrationException, 
-                    BlobTypeException {
-        if (blob.getBytes()== null || blob.getBytes().length == 0) {
-            throw new BlobException("You cannot upload a file without binary data");
-        }
-        
-        //Test to see if the byte array is larger than a GIGABYTE
-        if (blob.getBytes().length > GIGABYTE) {
-            throw new BlobException("You cannot upload a file larger than 1 gigabyte.");
-        }
-
-        String filename = blob.getFilename();
-        
-        if(filename == null || filename.isEmpty()){
-            throw new BlobException("You cannot upload a file without a filename.");
-        }
-        
-        BlobIntegrator bi = getBlobIntegrator();
-        
-        //First, let's find out what type of file this is.
-        String fileExtension = getFileExtension(blob.getFilename());
-
-        //if the file extension is uppercase, we need to change it to lowercase.
-        //This keeps the database standardized.
-        
-        String lowerCaseExt = fileExtension.toLowerCase();
-        
-        if(!fileExtension.equals(lowerCaseExt)) {
-            
-            blob.setFilename(filename.replace("." + fileExtension, "." + lowerCaseExt));
-
-            fileExtension = lowerCaseExt;
-        }
-        
-        switch (fileExtension) {
-            case "jpg":
-                return configureImageBlob(blob);
-            case "jpeg":
-                return configureImageBlob(blob);
-            case "gif":
-                return configureImageBlob(blob);
-            case "png":
-                return configureImageBlob(blob);
-            case "pdf":
-
-                blob.setType(bi.getBlobType(BlobTypeEnum.PDF.getTypeID()));
-
-                blob = stripPDFMetadata(blob);
-                // YIKES:: BREAKING CHANGE since we're not writing in the bytes
-                // during auditing!
-                //return getBlobIntegrator().insertPhotoDoc(blob);
-                return blob;
-
-            default:
-                //Incorrect file type
-                throw new BlobException("Incompatible file type, please upload a JPG, JPEG, GIF, PNG, or PDF.");
-        }
-
-    }
-    
-    
     
     /**
      * Logic container for linking blobs to properties
@@ -441,23 +322,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         return bl;
     }
     
-    /**
-     * Configures BLOBs to correspond to image blobs
-     * @param blob
-     * @return 
-     */
-    private Blob configureImageBlob(Blob blob) 
-            throws IntegrationException {
-        BlobIntegrator bi = getBlobIntegrator();
-
-        blob.setType(bi.getBlobType(BlobTypeEnum.PHOTO.getTypeID()));
-
-        // TODO: Fix me with new pathway of IFace_BlobHolder
-//        blob = stripPDFMetadata(blob);
-//        return getBlobIntegrator().insertPhotoDoc(blob);
-        return blob;
-        
-    }
+   
     
     
     /**
@@ -470,10 +335,27 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         BlobIntegrator bi = getBlobIntegrator();
         
         if(bl != null && ua != null){
-            bi.updatePhotoDocMetadata(bl);
+            bl.setLastUpdatedBy(ua);
+            bi.updateBlobLight(bl);
+        }
+    }
+    
+    /**
+     * Sets the deactivated by and deactivatedts fields on the given blob light
+     * @param bl
+     * @param ua doing the deactivating
+     */
+    public void deactivateBlobLight(BlobLight bl, UserAuthorized ua) throws IntegrationException{
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        if(bl != null && ua != null){
+            bl.setLastUpdatedBy(ua);
+            bl.setDeactivatedBy(ua);
+            bl.setDeactivatedTS(LocalDateTime.now());
+            bi.updateBlobLight(bl);
         }
         
-    
+        
     }
     
     
@@ -1134,7 +1016,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
         int blobID = blob.getPhotoDocID();
         
-        if (blob.getType().getTypeEnum() == BlobTypeEnum.PHOTO) {
+        // TODO: Fix me post blob interfacification
+//        if (blob.getType().getTypeEnum() == BlobTypeEnum.PHOTO) {
+        if (true) {
 
             CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
             
@@ -1176,11 +1060,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
                 
             }
             
-        } else if (blob.getType().getTypeEnum() == BlobTypeEnum.PDF){
-            
-            //No PDF Connections yet
-            
-        }
+        } 
 
         return objectList;
         

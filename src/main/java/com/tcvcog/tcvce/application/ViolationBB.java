@@ -640,43 +640,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    /**
-     * Listener
-     *
-     * @param ev
-     */
-    public void handlePhotoUpload(FileUploadEvent ev) {
-        if (ev == null) {
-            System.out.println("ViolationAddBB.handlePhotoUpload | event: null");
-            return;
-        }
-        
-        try {
-            BlobCoordinator blobc = getBlobCoordinator();
-            BlobIntegrator bi = getBlobIntegrator();
-            
-            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
-            // TODO: PF upgrade: https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
-            
-            //blob.setBytes(ev.getFile().getContents());
-            
-            blob.setFilename(ev.getFile().getFileName());
-            blob.setMuni(getSessionBean().getSessMuni());
-            
-            currentViolation.getBlobList().add(blobc.storeBlob(blob));
-            
-            bi.linkBlobToViolation(blob.getPhotoDocID(), currentViolation.getViolationID());
-            
-        } catch (IntegrationException | IOException | BlobTypeException ex) {
-            System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
-        } catch (BlobException ex) {
-            System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-        }
-    }
-
+    
     /**
      * Responds to user requests to commit a new code violation to the CECase
      *
@@ -774,7 +738,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     public void onPhotoUpdateDescription(Blob blob){
         BlobIntegrator bi = getBlobIntegrator();
         try {
-            bi.updatePhotoDocMetadata(blob);
+            bi.updateBlobLight(blob);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully updated photo description", ""));

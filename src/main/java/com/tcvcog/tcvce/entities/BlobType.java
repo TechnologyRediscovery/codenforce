@@ -16,14 +16,16 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a type of binary large object, BLOB
  * 
  * @author Ellen Bascomb
  */
-public class BlobType {
+public class BlobType implements Serializable, Comparable<BlobType> {
    
    private int typeID;
    private String title;
@@ -130,6 +132,42 @@ public class BlobType {
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    @Override
+    public int compareTo(BlobType o) {
+        return this.title.compareTo(o.title);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + this.typeID;
+        hash = 97 * hash + Objects.hashCode(this.title);
+        hash = 97 * hash + Objects.hashCode(this.icon);
+        hash = 97 * hash + Objects.hashCode(this.contentTypeString);
+        hash = 97 * hash + (this.browserViewable ? 1 : 0);
+        hash = 97 * hash + Objects.hashCode(this.notes);
+        hash = 97 * hash + Objects.hashCode(this.fileExtensionsPermitted);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BlobType other = (BlobType) obj;
+        if (this.typeID != other.typeID) {
+            return false;
+        }
+        return true;
     }
     
     

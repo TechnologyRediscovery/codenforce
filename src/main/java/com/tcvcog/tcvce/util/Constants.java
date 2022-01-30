@@ -45,7 +45,11 @@ public class Constants implements Serializable {
     // NOV keys
     public final static String NOV_VIOLATIONS_INJECTION_POINT = "***VIOLATIONS***";
     
-    
+    // BLOB TYPES
+    public final static String BLOBTYPE_PDF_KEY = "blobtypeid_pdf";
+    public final static String BLOBTYPE_JPG_KEY = "blobtypeid_jpg";
+    public final static String BLOBTYPE_PNG_KEY = "blobtypeid_png";
+    public final static String BLOBTYPE_DOC_KEY = "blobtypeid_doc";
     
     // Object management configuration parameters
     public final static int MAX_BOB_HISTORY_SIZE = 30;

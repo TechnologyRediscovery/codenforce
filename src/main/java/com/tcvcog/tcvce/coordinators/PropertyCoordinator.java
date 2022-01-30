@@ -411,9 +411,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         }
         
         blob.setCreatedBy(ua);
-        Blob freshBlob = bc.storeBlob(blob);
-        bc.linkBlobToProperty(freshBlob, prop);
-        return freshBlob;
+        throw new BlobException("Fatal error: Cannot attach blob to prop: must update code for IFace_BlobHolder");
+        
+//        Blob freshBlob = bc.storeBlob(blob);
+//        bc.linkBlobToProperty(freshBlob, prop);
+//        return freshBlob;
         
     }
     

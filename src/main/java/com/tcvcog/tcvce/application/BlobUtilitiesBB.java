@@ -59,52 +59,14 @@ public class    BlobUtilitiesBB
         editModeBlobMetadata = false;
         
         try {
-            blobTypeList = bc.getBlobTypeList();
+            blobTypeList = bc.getBlobTypeListComplete();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
         
     }
 
-    
-    /**
-     * Old version not oriented at code reuse
-     * @deprecated 
-     * @param ev 
-     */
-    public void handleBlobUpload(FileUploadEvent ev) {
-        if (ev == null) {
-            System.out.println("BlobUtilitiesBB.handlePhotoUpload | event: null");
-            return;
-        }
-
-        System.out.println("BlobUtilitiesBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + ev.getFile().getContentType());
-
-        BlobCoordinator blobc = getBlobCoordinator();
-        Blob blob = null;
-
-        try {
-            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
-            
-            blob.setBytes(ev.getFile().getContent());  // set bytes 
-
-            // set filename
-            blob.setFilename(ev.getFile().getFileName());
-
-            blob.setMuni(getSessionBean().getSessMuni());
-            
-            blob = blobc.storeBlob(blob);
-        } catch (IntegrationException | IOException | NoSuchElementException ex) {
-            System.out.println("BlobUploadBB.handleBlobUpload | " + ex);
-        } catch (BlobException | BlobTypeException ex){
-            System.out.println("BlobUploadBB.handleBlobUpload | " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-        }
-
-        getSessionBean().getBlobList().add(blob);
-    }
+  
 
     public String navToLinkBlob() {
         return "linkBlob";
@@ -135,7 +97,12 @@ public class    BlobUtilitiesBB
                 blob.setBytes(ev.getFile().getContent());
                 blob.setFilename(ev.getFile().getFileName());
                 blob.setMuni(getSessionBean().getSessMuni());
-                Blob freshBlob = blobc.insertBlobAndInsertMetadataAndLinkToParent(blob, currentBlobHolder, getSessionBean().getSessUser());
+                   
+                Blob freshBlob = blobc.insertBlobAndInsertMetadataAndLinkToParent(
+                                                blob, 
+                                                currentBlobHolder, 
+                                                getSessionBean().getSessUser(), 
+                                                getSessionBean().getSessMuni());
                 // ship to coordinator for storage
                 if (freshBlob != null) {
                     System.out.println("BlobUtilitiesBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getPhotoDocID());
@@ -167,6 +134,14 @@ public class    BlobUtilitiesBB
         }
     }
     
+    private void refreshCurrentBlobLight() throws IntegrationException, BlobException{
+        BlobCoordinator bc = getBlobCoordinator();
+        if(currentBlobLight != null){
+            currentBlobLight = bc.getBlobLight(currentBlobLight.getPhotoDocID());
+            
+        }
+    }
+    
     /**
      * Listener for user requests to view a bloblight
      * BlobLights don't have the bytes in them--they just
@@ -185,14 +160,36 @@ public class    BlobUtilitiesBB
      * view and edit mode for blob metadata
      */
     public void toggleEditModeBlobMetadata(){
+        System.out.println("BlobUtilitiesBB.toggleEditBlobMetadata : start of method " + editModeBlobMetadata);
         if(editModeBlobMetadata){
-            
+            editBlobMetadata();
         } else {
             // nothing to do -- we were in view mode
         }
         // flip our switch
         editModeBlobMetadata = !editModeBlobMetadata;
         
+    }
+    
+    /**
+     * Passes the bean's currentBlobLight to the BlobCoordintor
+     * for metadata updates
+     */
+    private void editBlobMetadata(){
+        BlobCoordinator bc = getBlobCoordinator();
+        try {
+            bc.updateBlobMetatdata(currentBlobLight, getSessionBean().getSessUser());
+            refreshCurrentBlobLight();
+            refreshCurrentBlobHolder();
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Successfully updated metadata on photo/doc ID: " + currentBlobLight.getPhotoDocID(), ""));
+        } catch (IntegrationException | BlobException ex) {
+             getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Could not update metata data of your photodoc ID: " + currentBlobLight.getPhotoDocID(), ""));
+             System.out.println(ex);
+        }
     }
     
     /**
@@ -222,6 +219,8 @@ public class    BlobUtilitiesBB
     
 
     /**
+     * UNUSUALLY--I GO AND GET MY SESSION BLOB HOLDER ON EACH CALL
+     * since I work with lots of object families
      * @return the currentBlobHolder
      */
     public IFace_BlobHolder getCurrentBlobHolder() {

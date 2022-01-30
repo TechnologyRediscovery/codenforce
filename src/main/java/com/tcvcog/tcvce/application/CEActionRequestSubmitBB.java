@@ -421,7 +421,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
             //save the description to the database.
             try {
-                bi.updatePhotoDocMetadata(b);
+                bi.updateBlobLight(b);
             } catch (IntegrationException ex) {
                 System.out.println("CEActionRequestSubmitBB.savePhotosAndContinue() | ERROR: " + ex);
             }
@@ -505,6 +505,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         getSessionBean().setSessCEAR(currentRequest);
     }
 
+    
+    /**
+     * TODO: must be updated for IFace_BlobHolder
+     * @param ev 
+     */
     public void handlePhotoUpload(FileUploadEvent ev) {
         if (ev == null) {
             System.out.println("CEActionRequestBB.handlePhotoUpload | event: null");
@@ -515,27 +520,27 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         BlobCoordinator blobc = getBlobCoordinator();
         Blob blob = null;
-        try {
-            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
+//        try {
+//            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
             // TODO: PF migration https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
 //            blob.setBytes(ev.getFile().getContents());  // set bytes
-            blob.setFilename(ev.getFile().getFileName());
-            blob.setMuni(currentRequest.getMuni());
-
-            blob = blobc.storeBlob(blob);
-        } catch (IntegrationException | IOException | BlobTypeException ex) {
-            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Something went wrong while trying to upload your photo, please try again.",
-                            "If this problem persists, please call your municipal office."));
-        } catch (BlobException ex) {
-            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(),
-                            ""));
-        }
+//            blob.setFilename(ev.getFile().getFileName());
+//            blob.setMuni(currentRequest.getMuni());
+//
+//            blob = blobc.storeBlob(blob);
+//        } catch (IntegrationException | IOException | BlobTypeException ex) {
+//            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            "Something went wrong while trying to upload your photo, please try again.",
+//                            "If this problem persists, please call your municipal office."));
+//        } catch (BlobException ex) {
+//            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            ex.getMessage(),
+//                            ""));
+//        }
 
         currentRequest.getBlobList().add(blob);
     }

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
@@ -323,6 +324,7 @@ public class    SessionBean
     private IFace_BlobHolder sessBlobHolder;
     private List<Blob> blobList;
     private PageModeEnum blobPageModeRequest;
+    private List<BlobType> blobTypeList;
     
     /**
      * If there's a session blob holder, I figure out what type it is
@@ -1968,12 +1970,47 @@ public class    SessionBean
     public void setSessBlobLight(BlobLight sessBlobLight) {
         this.sessBlobLight = sessBlobLight;
     }
+    
+    
+    /**
+     * I ask the blobcoordinator for the updated bloblight list
+     * before calling setSessBlobHolder
+     * @param bh 
+     */
+    public void updateAndSetSessBlobHolder(IFace_BlobHolder bh){
+         BlobCoordinator bc = getBlobCoordinator();
+        if (bh != null){
+            try {
+                bh.setBlobList(bc.getBlobLightList(bh));
+                sessBlobHolder = bh;
+            } catch (BObStatusException | BlobException | IntegrationException ex) {
+                System.out.println(ex);
+            } 
+        }
+    }
 
     /**
+     * I'm a normal setter
+     * 
      * @param sessBlobHolder the sessBlobHolder to set
      */
     public void setSessBlobHolder(IFace_BlobHolder sessBlobHolder) {
+       
         this.sessBlobHolder = sessBlobHolder;
+    }
+
+    /**
+     * @return the blobTypeList
+     */
+    public List<BlobType> getBlobTypeList() {
+        return blobTypeList;
+    }
+
+    /**
+     * @param blobTypeList the blobTypeList to set
+     */
+    public void setBlobTypeList(List<BlobType> blobTypeList) {
+        this.blobTypeList = blobTypeList;
     }
 
     

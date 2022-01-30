@@ -46,6 +46,7 @@ public  class       OccInspection
                     IFace_BlobHolder{
     
     private final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.FIELD_INSPECTION;
+    private final static BlobPoolEnum BLOP_UPSPTREAM_POOL
     
     private int inspectionID;
 

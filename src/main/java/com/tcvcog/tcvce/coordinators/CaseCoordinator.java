@@ -2303,9 +2303,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         BlobCoordinator bc = getBlobCoordinator();
         BlobIntegrator bi = getBlobIntegrator();
         
-        Blob freshBlob = bc.storeBlob(blob);
-        bi.linkBlobToCECase(blob, cse);
-        return freshBlob;
+        throw new BlobException("Failed to atttach blob to case; code must be updated for IFafce_BlobHolder");
+        // TODO: update for new code reuse methods!!!
+        
+//        Blob freshBlob = bc.storeBlob(blob);
+//        bi.linkBlobToCECase(blob, cse);
+//        return null;
         
     }
     
