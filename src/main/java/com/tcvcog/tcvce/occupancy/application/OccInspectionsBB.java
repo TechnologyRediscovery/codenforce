@@ -267,7 +267,11 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         System.out.println("OccInspectionsBB.onViewPhotoPoolLinkClick");
         if(oi != null){
             selectedInspection = oi;
-            getSessionBean().updateAndSetSessBlobHolder(selectedInspection);
+            try {
+                getSessionBean().setAndRefreshSessionBlobHolderAndBuildUpstreamPool(selectedInspection);
+            } catch (BObStatusException | BlobException | IntegrationException ex) {
+                
+            }
         } else {
             // do nothing
         }
@@ -577,6 +581,19 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         }
         return "missionControl";
         
+        
+    }
+    
+    /**
+     * Listener for user requests to add to or view blobs on the oise
+     * @param oise 
+     */
+    public void onManageBlobsOnInspectedElement(OccInspectedSpaceElement oise){
+        try {
+            getSessionBean().setAndRefreshSessionBlobHolderAndBuildUpstreamPool(oise);
+        } catch (BObStatusException | BlobException | IntegrationException ex) {
+            System.out.println(ex);
+        } 
         
     }
 

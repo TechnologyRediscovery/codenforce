@@ -328,6 +328,35 @@
                                          value="reload period"/>
                     </div>
                 </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
+                    <p:commandLink  id="period-uploadphotos-cl"
+                                    ajax="true"
+                                   style="color:blue;"
+                                   oncomplete="PF('blob-upload-dialog-var').show()"
+                                   rendered="true"
+                                   update="@form:@parent:@parent:blob-upload-dialog"
+                                   value="Upload or connect photos/docs"
+                                   actionListener="#{occPeriodSearchWorkflowBB.manageBlobsOnOccPeriod}">
+                        
+                    </p:commandLink>
+                    
+                </div>
+                
+                <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
+                    
+                <p:commandLink  id="period-viewphotos-cl"
+                                    ajax="true"
+                                   style="color:blue;"
+                                   oncomplete="PF('blobs-gallery-dialog-var').show()"
+                                   rendered="true"
+                                   update="@form:@parent:@parent:blobs-gallery-dialog"
+                                   value="View photos/docs"
+                                   actionListener="#{occPeriodSearchWorkflowBB.manageBlobsOnOccPeriod}">
+                        
+                    </p:commandLink>
+                
+                </div>
+                
             </div>
         </h:form>
     </p:panel>

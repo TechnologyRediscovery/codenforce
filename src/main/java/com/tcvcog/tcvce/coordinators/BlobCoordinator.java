@@ -308,6 +308,27 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         return blob;
     }
     
+    
+    /**
+     * Connects a blob holder to existing blobs selected from a pool of blobs
+     * 
+     * @param bh
+     * @param blobList
+     * @throws BObStatusException 
+     */
+    public void linkBlobHolderToBlobList(IFace_BlobHolder bh, List<BlobLight> blobList) throws BObStatusException, IntegrationException{
+        if(bh == null || blobList == null || blobList.isEmpty()){
+            throw new BObStatusException("Cannot link blobholder to list if null holder, list, or empty list");
+        }
+        
+        BlobIntegrator bi = getBlobIntegrator();
+        
+        for(BlobLight bl: blobList){
+            bi.linkBlobHolderToBlobMetadata(bh, bl);
+        }
+        
+    }
+    
     /**
      * Logic container for linking blobs to properties
      * 
@@ -436,6 +457,22 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     public Blob getBlob(BlobLight bl){
         BlobIntegrator bi = getBlobIntegrator();
         return bi.getBlob(bl);
+        
+        
+        
+    }
+    
+    /**
+     * Extracts a Blob from the DB given a bloblightID
+     * The BlobLight knows where to find its own bytes
+     * @param blobLightID
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.MetadataException 
+     */
+    public Blob getBlob(int blobLightID) throws IntegrationException, MetadataException{
+        BlobIntegrator bi  = getBlobIntegrator();
+        return bi.getBlob(bi.getBlobLight(blobLightID));
         
         
         

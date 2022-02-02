@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -40,9 +41,12 @@ import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 
 /**
  * Backer for the OccPeriod
@@ -450,6 +454,20 @@ public class OccPeriodSearchWorkflowBB
         }
         configureParameters();
 
+    }
+    
+    /**
+     * Listener for user requests to view or add blobs to this period
+     * @param ev
+     */
+    public void manageBlobsOnOccPeriod(ActionEvent ev){
+        try {
+            getSessionBean().setAndRefreshSessionBlobHolderAndBuildUpstreamPool(currentOccPeriod);
+        } catch (BObStatusException | BlobException | IntegrationException ex) {
+            System.out.println(ex);
+            
+        } 
+        
     }
 
 

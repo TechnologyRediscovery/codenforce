@@ -81,7 +81,7 @@ public class BlobRetrieveBB extends BackingBeanUtils {
                      System.out.println("BobRetrieveBB.retrieveBlob: extracted blob bytes ID " + blob.getBytesID() + " | bytea size: " + blob.getBytes().length);
 
                  blobStream = DefaultStreamedContent.builder()
-                         .contentType("image/jpeg")
+                         .contentType(b.getType().getContentTypeString())
                          .name(blob.getFilename())
                          .stream(() -> new ByteArrayInputStream(blob.getBytes()))
                          .build();
@@ -89,7 +89,7 @@ public class BlobRetrieveBB extends BackingBeanUtils {
                      System.out.println("BobRetrieveBB.retrieveBlob: extracted null blob from BlobLight ID " + b.getPhotoDocID() );
 
                  }
-//             fc.responseComplete(); 
+             fc.responseComplete(); 
         }
     
         return blobStream;

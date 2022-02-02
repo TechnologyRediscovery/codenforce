@@ -40,7 +40,7 @@ public class    BlobUtilitiesBB
     private boolean editModeBlobMetadata;
     
     private List<BlobType> blobTypeList;
-    
+    private List<BlobLight> selectedBlobList;
     
     /**
      * Creates a new instance of BlobUtilitiesBB
@@ -63,6 +63,10 @@ public class    BlobUtilitiesBB
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
+        
+        selectedBlobList = new ArrayList<>();
+        
+        
         
     }
 
@@ -129,7 +133,14 @@ public class    BlobUtilitiesBB
      */
     public void refreshCurrentBlobHolder(){
         if(currentBlobHolder != null){
-            currentBlobHolder = getSessionBean().refreshSessionBlobHolder();
+            try {
+                currentBlobHolder = getSessionBean().setAndRefreshSessionBlobHolderAndBuildUpstreamPool(currentBlobHolder);
+            } catch (BObStatusException | BlobException | IntegrationException ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not refresh current blob holder, sorry! This is a fatal error." , ""));
+            } 
             
         }
     }
@@ -214,6 +225,27 @@ public class    BlobUtilitiesBB
         
     }
     
+    /**
+     * Listener for user requests to link the selected blobs 
+     * in the pool to the current blob holder
+     * @param ev 
+     */
+    public void linkCurrentBlobHolderToPooledBlobs(ActionEvent ev){
+        System.out.println("BlobUtilitiesBB.linkCurrentBlobHolderToPooledBlobs | selectedBlobList: " + selectedBlobList.size());        
+        BlobCoordinator bc = getBlobCoordinator();
+        try {
+            bc.linkBlobHolderToBlobList(currentBlobHolder, selectedBlobList);
+            refreshCurrentBlobHolder();
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Successfully linked current object to selected photos/documents: " , ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Fatal error linking photo/docs from pool to current photo/doc holder. There's nothing you can do about this, sorry! Complain to Eric" , ""));
+        }
+    }
     
     
     
@@ -283,6 +315,20 @@ public class    BlobUtilitiesBB
      */
     public void setBlobTypeList(List<BlobType> blobTypeList) {
         this.blobTypeList = blobTypeList;
+    }
+
+    /**
+     * @return the selectedBlobList
+     */
+    public List<BlobLight> getSelectedBlobList() {
+        return selectedBlobList;
+    }
+
+    /**
+     * @param selectedBlobList the selectedBlobList to set
+     */
+    public void setSelectedBlobList(List<BlobLight> selectedBlobList) {
+        this.selectedBlobList = selectedBlobList;
     }
 
     

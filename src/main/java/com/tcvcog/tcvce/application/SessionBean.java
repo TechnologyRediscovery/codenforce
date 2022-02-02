@@ -327,88 +327,38 @@ public class    SessionBean
     private PageModeEnum blobPageModeRequest;
     private List<BlobType> blobTypeList;
     
-    /**
-     * Accepts BlobHolders to become the session's one and only
-     * SessionBlobHolder. The registration process will
-     * ask the registered BlobHolder for its upstream pool and get that 
-     * ready, too
-     * @param bh for registration on the session
-     */
-    public void registerSessionBlobHolder(IFace_BlobHolder bh){
-        if(bh != null){
-            sessBlobHolder = bh;
-            refreshSessionBlobHolder();
-            BlobLinkEnum upstreamPool = bh.getBlobUpstreamPoolEnum();
-            if(upstreamPool != null){
-                BlobCoordinator bc = getBlobCoordinator();
-                try {
-                    sessBlobHolderPool = bc.getBlobPool(bh);
-                } catch (BObStatusException | BlobException | IntegrationException ex) {
-                    System.out.println(ex);
-                }
-                
-            }
-        }
-        
-        
-    }
-    
+   
     
     /**
      * If there's a session blob holder, I figure out what type it is
      * and then I get a new one and point our session blob holder to it
+     * @param bh
      * @return the session's BlobHolder
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public IFace_BlobHolder refreshSessionBlobHolder(){
+    public IFace_BlobHolder setAndRefreshSessionBlobHolderAndBuildUpstreamPool(IFace_BlobHolder bh) 
+            throws BObStatusException, IntegrationException, BlobException{
+        BlobCoordinator bc = getBlobCoordinator();
         System.out.println("SessionBean.refreshSessionBlobHolder " );
-        if(sessBlobHolder != null){
-            if(sessBlobHolder instanceof OccInspection){
-                OccInspectionCoordinator oic = getOccInspectionCoordinator();
-                OccInspection oi = (OccInspection) sessBlobHolder;
-                try {
-                    sessBlobHolder = oic.getOccInspection(oi.getInspectionID());
-                    System.out.println("SessionBean.refreshSessionBlobHolder | new BlobHolder Type: " + sessBlobHolder.getClass());
-                    System.out.println("SessionBean.refreshSessionBlobHolder | new BlobHolder list size: " + sessBlobHolder.getBlobList().size());
-                } catch (IntegrationException | BObStatusException | BlobException ex) {
-                    System.out.println("SessionBean.refreshSessionBlobHolder | could not get a new occ inspection");
-                } 
-                
-                return sessBlobHolder;
-                
-            } else if (sessBlobHolder instanceof OccInspectedSpaceElement){
-                // i think we'll want to delegate this to other parts of session bean to reuse the 
-                // refresh process once its standardized
-            } else if (sessBlobHolder instanceof OccPeriodDataHeavy){
-                
-                
-            } else {
-                System.out.println("SessionBean.refreshSessionBlobHolder | no matching type for session blob holder--very strange!");
-            }
+        if(bh != null){
+            sessBlobHolder = bh;
             
-            
-            
-        }
-        return null;
+            sessBlobHolder.setBlobList(bc.getBlobLightList(sessBlobHolder));
         
+            // update upstream pool
+            BlobLinkEnum upstreamPool = bh.getBlobUpstreamPoolEnum();
+            if(upstreamPool != null){
+
+                sessBlobHolderPool = bc.getBlobPool(bh);
+            }
+        }
+        
+        return sessBlobHolder;
     }
     
-    /**
-     * I ask the blobcoordinator for the updated bloblight list
-     * before calling setSessBlobHolder.
-     * I think i'm redundant!! Oh no!
-     * @param bh 
-     */
-    public void updateAndSetSessBlobHolder(IFace_BlobHolder bh){
-         BlobCoordinator bc = getBlobCoordinator();
-        if (bh != null){
-            try {
-                bh.setBlobList(bc.getBlobLightList(bh));
-                registerSessionBlobHolder(bh);
-            } catch (BObStatusException | BlobException | IntegrationException ex) {
-                System.out.println(ex);
-            } 
-        }
-    }
+   
     
     
     

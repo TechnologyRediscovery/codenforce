@@ -22,31 +22,116 @@
                 rendered="true"
                 > 
 
-        <h:form id="blob-upload-form" 
-                enctype="multipart/form-data">
-            <h2>
-                <h:outputText  value="Upload Photos/Docs to #{blobUtilitiesBB.currentBlobHolder.blobLinkEnum.objectParentTitle} (ID:#{blobUtilitiesBB.currentBlobHolder.parentObjectID})" />
-            </h2>
-            <p>Allowed file types: pdf, jpeg, png, gif (Limit: 50 files)</p>
+        <p:tabView id="blob-uploadconnect-tabview">
+            <p:tab title="Upload files">
 
-            <p:fileUpload 
-                mode="advanced" 
-                listener="#{blobUtilitiesBB.onBlobUploadCommitButtonChange}"
-                multiple="true"
-                fileLimit="50"
-                sizeLimit="99999999999" 
-                allowTypes="/(\.|\/)(jpe?g|JPG|JPE?G|png|PNG|pdf|PDF)$/"
-                rendered="true"
-                update="blobs-growl-form
+
+                <h:form id="blob-upload-form" 
+                        enctype="multipart/form-data">
+                    <h2>
+                        <h:outputText  value="Upload Photos/Docs to #{blobUtilitiesBB.currentBlobHolder.blobLinkEnum.objectParentTitle} (ID:#{blobUtilitiesBB.currentBlobHolder.parentObjectID})" />
+                    </h2>
+                    <p>Allowed file types: pdf, jpeg, png, gif (Limit: 50 files)</p>
+
+                    <p:fileUpload 
+                        mode="advanced" 
+                        listener="#{blobUtilitiesBB.onBlobUploadCommitButtonChange}"
+                        multiple="true"
+                        fileLimit="50"
+                        sizeLimit="99999999999" 
+                        allowTypes="/(\.|\/)(jpe?g|JPG|JPE?G|png|PNG|pdf|PDF)$/"
+                        rendered="true"
+                        update="blobs-growl-form
                         blobs-gallery-dialog
                         gallery-form"
-                oncomplete="PF('blob-upload-dialog-var').hide(); PF('blobs-gallery-dialog-var').show();"/>    
-        </h:form>
+                        oncomplete="PF('blob-upload-dialog-var').hide(); PF('blobs-gallery-dialog-var').show();"/>    
+                </h:form>
+
+            </p:tab>
+
+            <p:tab title="Choose from upstream photo/doc pool" 
+                   rendered="#{!empty blobUtilitiesBB.currentBlobHolder.blobUpstreamPoolEnum}">
+
+                <h:form id="blobs-choosefrompool-form">
+                    
+                    <h2>
+                        <h:outputText value="Choose a photo/doc from the upstream pool of #{sessionBean.sessBlobHolderPool.poolLinkEnum.objectParentTitle} (ID:#{sessionBean.sessBlobHolderPool.blobParentID})" />
+                    </h2>
+
+                    <p:commandButton id="blob-linkfromblobpool-button"
+                                     value="Link selected photos/documents"
+                                     disabled="false"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                     icon="fa fa-link"
+                                     actionListener="#{blobUtilitiesBB.linkCurrentBlobHolderToPooledBlobs}"
+                                     oncomplete="PF('blob-upload-dialog-var').hide(); PF('blobs-gallery-dialog-var').show();"
+                                     update="   blobs-growl-form
+                                                blobs-gallery-dialog
+                                                gallery-form"/>
+
+                    <p:spacer height="5px" />
+
+                    <p:dataTable id="blob-upstreampool-table"
+                                 value="#{sessionBean.sessBlobHolderPool.blobList}"
+                                 var="blob"
+                                 selection="#{blobUtilitiesBB.selectedBlobList}"
+                                 rowKey="#{blob.photoDocID}">
+
+                        <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+                        
+                        <p:column headerText="PhotoDoc ID"
+                                  style="width:10%;">
+                            <h:outputText value="#{blob.photoDocID}" />
+                        </p:column>
+                        <p:column headerText="Blob ID"
+                                  style="width:10%;">
+                            <h:outputText value="#{blob.bytesID}" />
+                        </p:column>
+
+                        <p:column headerText="Type"
+                                  style="width:20%;">
+                            <h:outputText value="#{blob.type.title}" />
+                        </p:column>
+                        <p:column headerText="Timestamp"
+                                  style="width:20%;">
+                            <h:outputText value="#{blob.createdTS}" />
+                        </p:column>
+                        <p:column headerText="Title / Descr"
+                                  style="width:30%;">
+                            <h:outputText value="#{blob.title}" />
+                            <p:spacer height="5px" />
+                            <h:outputText value="#{blob.description}" />
+                        </p:column>
+                        <p:column headerText="Actions"
+                                  style="width:20%;">
+                            <p:commandLink id="blob-viewblob-cl"
+                                           actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob)}"
+                                           value="view"
+                                           style="color:blue;"
+                                           update="blobs-viewblob-dialog
+                                           blob-viewblob-form"
+                                           oncomplete="PF('blobs-viewblob-dialog-var').show();" />
+
+                            <h:outputText value=" | "/>
+
+                            <p:commandLink id="blob-editblob-cl"
+                                           actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob)}"
+                                           value="edit"
+                                           style="color:blue;"
+                                           update="blob-veweditmetadata-form
+                                           blob-vieweditmetadata-dialog"
+                                           oncomplete="PF('blobs-vieweditmetadata-dialog-var').show();" />
+
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </p:tab>
+        </p:tabView>
 
     </p:dialog>
 
     <p:dialog   id="blobs-gallery-dialog"
-                height="600" width="1000"
+                height="800" width="1000"
                 widgetVar="blobs-gallery-dialog-var"
                 responsive="true"
                 modal="true"
@@ -64,38 +149,48 @@
                          rowKey="#{blob.photoDocID}">
 
                 <p:column headerText="PhotoDoc ID"
-                          style="width:10%;">
+                          style="width:5%;">
                     <h:outputText value="#{blob.photoDocID}" />
                 </p:column>
                 <p:column headerText="Blob ID"
-                          style="width:10%;">
+                          style="width:5%;">
                     <h:outputText value="#{blob.bytesID}" />
                 </p:column>
 
                 <p:column headerText="Type"
-                          style="width:20%;">
+                          style="width:10%;">
                     <h:outputText value="#{blob.type.title}" />
                 </p:column>
                 <p:column headerText="Timestamp"
-                          style="width:20%;">
+                          style="width:15%;">
                     <h:outputText value="#{blob.createdTS}" />
                 </p:column>
                 <p:column headerText="Title / Descr"
-                          style="width:30%;">
+                          style="width:20%;">
                     <h:outputText value="#{blob.title}" />
                     <p:spacer height="5px" />
                     <h:outputText value="#{blob.description}" />
                 </p:column>
+                <p:column headerText="Preview"
+                          style="width:30%;">
+                     <p:graphicImage value="#{blobsterBB.image}"
+                            alt="no preview available" 
+                            style="width: 150px" 
+                            rendered="#{blobUtilitiesBB.currentBlobLight.type.browserViewable}">
+                         <f:param name="blobid" value="#{blob.photoDocID}"/>
+                    </p:graphicImage>
+                </p:column>
                 <p:column headerText="Actions"
-                          style="width:20%;">
+                          style="width:15%;">
                     <p:commandLink id="blob-viewblob-cl"
                                    actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob)}"
                                    value="view"
                                    style="color:blue;"
+                                   rendered="#{blob.type.browserViewable}"
                                    update="blobs-viewblob-dialog
                                    blob-viewblob-form"
                                    oncomplete="PF('blobs-viewblob-dialog-var').show();" />
-                    
+
                     <h:outputText value=" | "/>
 
                     <p:commandLink id="blob-editblob-cl"
@@ -105,6 +200,15 @@
                                    update="blob-veweditmetadata-form
                                    blob-vieweditmetadata-dialog"
                                    oncomplete="PF('blobs-vieweditmetadata-dialog-var').show();" />
+
+                    <h:outputText value=" | "/>
+
+                    <p:commandLink id="blob-download-cl"
+                                   value="download"
+                                   ajax="false"
+                                   style="color:blue;">
+                           <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}" />
+                    </p:commandLink>
                     
                 </p:column>
 
@@ -112,19 +216,6 @@
 
             <p:spacer height="5px" />
 
-            <p:galleria value="#{blobUtilitiesBB.currentBlobHolder.blobList}" 
-                        var="blob" 
-                        style="max-width: 640px">
-
-                <p:graphicImage value="#{blobRetrieveBB.retrieveBlob(blob)}"
-                                alt="canot display" 
-                                style="width: 100%" />
-
-                <f:facet    name="thumbnail">
-                    <p:graphicImage value="#{blobRetrieveBB.retrieveBlob(blob)}"
-                                    alt="cannot display photo" />
-                </f:facet>
-            </p:galleria>
         </h:form>
     </p:dialog>
 
@@ -142,10 +233,22 @@
                 rendered="true"
                 > 
         <h:form id="blob-viewblob-form">
+              <p:commandLink id="blob-view-download-cl"
+                                   value="download"
+                                   ajax="false"
+                                   style="color:blue;">
+                           <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blobUtilitiesBB.currentBlobLight)}" />
+                    </p:commandLink>
+            
+            <p:spacer height="5px" />
 
-            <p:graphicImage value="#{blobRetrieveBB.retrieveBlob(blobUtilitiesBB.currentBlobLight)}"
+            <p:graphicImage value="#{blobsterBB.image}"
                             alt="canot display" 
-                            style="width: 100%" />
+                            style="width: 100%" 
+                            rendered="#{blobUtilitiesBB.currentBlobLight.type.browserViewable}">
+                <f:param name="blobid" value="#{blobUtilitiesBB.currentBlobLight.photoDocID}"/>
+            </p:graphicImage>
+    
         </h:form>
 
     </p:dialog>

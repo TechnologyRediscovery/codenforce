@@ -401,6 +401,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                         || inSpace.getStatus().getStatusEnum() == OccInspectionStatusEnum.NOTINSPECTED) {
                     allSpacesPassed = false;
                 }
+                
+                
             }
             inspection.setReadyForPassedCertification(allSpacesPassed);
             if (!inspection.getInspectedSpaceList().isEmpty()) {
@@ -542,7 +544,9 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             if (inSpaceEle == null) {
                 throw new BObStatusException("Cannot configure a null OccInspectedSpaceElement...");
             }
+            // Inject blobs
             inSpaceEle.setBlobList(bc.getBlobLightList(inSpaceEle));
+            
             if (inSpaceEle.getLastInspectedBy() != null && inSpaceEle.getComplianceGrantedTS() == null) {
 
                 inSpaceEle.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.FAIL));
