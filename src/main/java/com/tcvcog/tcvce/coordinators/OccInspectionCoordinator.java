@@ -899,6 +899,16 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     
       /**
      * Fields requests for a non checklistified SpaceType by ID
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public OccSpaceType getOccSpaceTypeSkeleton() {
+        
+        return new OccSpaceType();
+    }
+    
+      /**
+     * Fields requests for a non checklistified SpaceType by ID
      * @param tpeID
      * @return 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
@@ -989,14 +999,29 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         oci.updateSpaceTypeChecklistified(ostc);
     }
     
+    /**
+     * Does the switcheroo and passes it to the integrator for writing out 
+     * @param ose 
+     */
+    public void toggleRequiredAndUpdateOccSpaceElement(OccSpaceElement ose) throws IntegrationException{
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        if(ose != null){
+            // do the flip
+            ose.setRequiredForInspection(!ose.isRequiredForInspection());
+            oci.updateOccSpaceElement(ose);
+        }
+        
+    }
+    
     
     /**
      * Connects a list of OccSpaceTypes wrapped in their checklist wrapper
      * to the given occChecklistTemplate
      * 
      * @param plate
-     * @param ostl
      * @param required
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public void insertAndLinkSpaceTypeChecklistifiedListToTemplate(OccChecklistTemplate plate, OccSpaceType ost, boolean required) 
             throws BObStatusException, IntegrationException{

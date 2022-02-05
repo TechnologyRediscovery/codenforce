@@ -1075,6 +1075,12 @@
             <to-view-id>/public/services/occPermitAppConf.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+  
+        <navigation-case>
+            <from-outcome>checklistTools</from-outcome>
+            <to-view-id>/restricted/cogstaff/occ/inspectionChecklistTools.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
         
     </navigation-rule>
          

@@ -10,9 +10,11 @@ import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
+import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeChecklistified;
 import java.util.ArrayList;
@@ -44,6 +46,10 @@ public class checklistsBB extends BackingBeanUtils {
 
     private OccSpaceTypeChecklistified currentOccSpaceTypeChecklistified;
     private boolean editModeCurrentOccSpaceTypeChecklistified;
+    
+    private CodeSet currentCodeSet;
+    
+    
 
     private List<EnforcableCodeElement> codeElementListFiltered;
     private List<EnforcableCodeElement> codeElementListSelected;
@@ -65,6 +71,7 @@ public class checklistsBB extends BackingBeanUtils {
             refreshCurrentChecklistTemplateAndList();
             codeSourceList = cc.getCodeSourceList();
             initSpaceTypeLists();
+            currentCodeSet = getSessionBean().getSessCodeSet();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -199,10 +206,99 @@ public class checklistsBB extends BackingBeanUtils {
     }
     
     /**
+     * Listener for user requests to start the process 
+     * to create a new space type
+     * @param ev 
+     */
+    public void onCreateNewSpaceTypeInitButtonPush(ActionEvent ev){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        currentOccSpaceType = oic.getOccSpaceTypeSkeleton();
+    }
+    
+    
+    
+      /**
+     * Listener for user clicks of the "edit" button which starts the update
+     * process and its re-click as the "save edits" button which either writes
+     * the new template in or updates the existing one.
+     */
+    public void toggleEditModeOccSpaceType() {
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        try {
+            if (editModeCurrentOccSpaceType) {
+                if (currentOccSpaceType == null) {
+                    throw new BObStatusException("Cannot edit a null currentOccSpaceType");
+                }
+                if(currentOccSpaceType.getSpaceTypeID() == 0){
+                    oic.insertSpaceType(currentOccSpaceType);
+                } else {
+                    oic.updateSpaceType(currentOccSpaceType);
+                }
+
+            } else {
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                               "You are now editing space type ID " + currentOccSpaceType.getSpaceTypeID(), ""));
+
+            }
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
+
+        // do the toggle
+        editModeCurrentOccSpaceType = !editModeCurrentOccSpaceType;
+
+    }
+    
+    /**
+     * The actual listener that delegated to the toggle method
+     * @param ev 
+     */
+    public void onEditModeOccSpaceTypeToggleButtonPush(ActionEvent ev){
+        toggleEditModeOccSpaceType();
+        
+        
+    }
+    
+    /**
+     * Listener for user requests to abort the edit of a checklist
+     * @param ev 
+     */
+    public void onEditModeOccSpaceTypeAbort(ActionEvent ev){
+        // turn off edit mode; don't talk to DB about anything!
+        
+        editModeCurrentOccSpaceType = !editModeCurrentOccSpaceType;
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to add a space type to a checklist
+     * @param ev 
+     */
+    public void onSpaceTypeLinkInitButtonChange(ActionEvent ev){
+        // Take out the space types already linked
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        List<OccSpaceType> tempTypeList = new ArrayList<>();
+        if(spaceTypeList != null && currentChecklistTemplate != null && !currentChecklistTemplate.getOccSpaceTypeList().isEmpty()){
+            List<OccSpaceType> typesInChecklist = oic.downcastOccSpaceTypeChecklistified(currentChecklistTemplate.getOccSpaceTypeList());
+            // Don't display space types that are already in the template
+            for(OccSpaceType ost: spaceTypeList){
+                if(!typesInChecklist.contains(ost)){
+                    tempTypeList.add(ost);
+                }
+            }
+        }
+        spaceTypeList = tempTypeList;
+        
+    }
+    /**
      * Listener for user requests to attach all their
      * selected spaces to the current checklist
      */
-    public void onAddSelectedSpaceTypesToChecklist(){
+    public void onLinkSelectedSpaceTypesToChecklist(){
         
         if(currentChecklistTemplate != null && spaceTypeListSelected != null && !spaceTypeListSelected.isEmpty() ){
             OccInspectionCoordinator oic = getOccInspectionCoordinator();
@@ -219,17 +315,53 @@ public class checklistsBB extends BackingBeanUtils {
             }
         }
     }
+
+    /**
+     * Makes sure members ares setup for easy processing of the dialog's selections
+     * of ordinances
+     * @param ostchk 
+     */
+    public void onChooseOrdinancesToLinkToSpaceTypeLinkCLick(OccSpaceTypeChecklistified ostchk){
+        currentOccSpaceTypeChecklistified = ostchk;
+        
+    }
     
+   
     
     /**
-     * Listener for user requests to add a space type to a checklist
-     * @param ev 
+     * Boolean swap tool for making required objects optional and optional ones required
+     * @param oschk 
      */
-    public void onSpaceTypeAddInitButtonChange(ActionEvent ev){
-        // nothing to do here yet
+    public void onToggleRequiredOccSpaceTypeChecklistified(OccSpaceTypeChecklistified oschk){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        try {
+            // flip!
+            oschk.setRequired(!oschk.isRequired());
+            oic.updateSpaceTypeChecklistified(oschk);
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+        } 
+    }
+    
+    /**
+     * Boolean swap tool for making required objects optional and optional ones required
+     * @param ose
+     */
+    public void onToggleRequiredOccSpaceElement(OccSpaceElement ose){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        try {
+            oic.toggleRequiredAndUpdateOccSpaceElement(ose);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO, "Toggled Required on OccSpaceElement ID " + ose.getOccChecklistSpaceTypeElementID() + " to " + ose.isRequiredForInspection(), ""));
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
         
         
     }
+    
     
     /**
      * listener for user requests to edit the space type checklistified
@@ -426,6 +558,20 @@ public class checklistsBB extends BackingBeanUtils {
      */
     public void setSpaceTypeBatchRequired(boolean spaceTypeBatchRequired) {
         this.spaceTypeBatchRequired = spaceTypeBatchRequired;
+    }
+
+    /**
+     * @return the currentCodeSet
+     */
+    public CodeSet getCurrentCodeSet() {
+        return currentCodeSet;
+    }
+
+    /**
+     * @param currentCodeSet the currentCodeSet to set
+     */
+    public void setCurrentCodeSet(CodeSet currentCodeSet) {
+        this.currentCodeSet = currentCodeSet;
     }
 
 }

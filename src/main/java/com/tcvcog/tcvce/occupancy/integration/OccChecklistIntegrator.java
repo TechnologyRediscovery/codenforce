@@ -377,6 +377,9 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
     }
 
     
+    
+        
+    
     /**
      * Updates a record in the occchecklistspacetype by ID
      * @param ostc
@@ -401,6 +404,35 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Unable to update space type", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        }
+    }
+    
+    /**
+     * Updates a record in the occchecklistspacetype by ID
+     * @param ose
+     * @throws IntegrationException 
+     */
+    public void updateOccSpaceElement(OccSpaceElement ose) throws IntegrationException {
+        if(ose == null){
+            throw new IntegrationException("Cannot update null OccSpaceElement");
+        }
+        String query = "UPDATE public.occchecklistspacetypeelement\n" +
+                        "   SET required=? WHERE spaceelementid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setBoolean(1, ose.isRequiredForInspection());
+            stmt.setInt(2, ose.getOccChecklistSpaceTypeElementID());
+            
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to OccSpaceElement", ex);
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

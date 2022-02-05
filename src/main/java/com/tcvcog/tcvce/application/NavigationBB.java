@@ -305,6 +305,11 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         return "codeSetManage";
         
     }
+    
+    public String onChecklistsLinkClick(){
+        return "checklistTools";
+        
+    }
 
     /**
      * @return the noActiveCase
