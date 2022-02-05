@@ -77,6 +77,7 @@
                                 actionListener="#{occInspectionsBB.onUploadImagesToInspectionInitButtonClick(ins)}">
 
                 </p:commandLink>
+
                 <h:outputText value=" | " />
 
                 <p:commandLink  id="inspection-viewphotos-cl"
@@ -88,6 +89,20 @@
                                 "
                                 value="View photo pool"
                                 actionListener="#{occInspectionsBB.onViewPhotoPoolLinkClick(ins)}">
+
+                </p:commandLink>
+
+                <h:outputText value=" | " />
+
+                <p:commandLink  id="inspection-generatereport-cl"
+                                ajax="true"
+                                style="color:blue;"
+                                oncomplete="PF('inspection-reportconfig-dialog-var').show()"
+                                rendered="true"
+                                update="inspection-reportconfig-dialog
+                                inspection-reportconfig-form"
+                                value="Generate inspection report"
+                                actionListener="#{occInspectionsBB.onFieldInspectionReportInitLinkClick(ins)}">
 
                 </p:commandLink>
 
@@ -1045,7 +1060,7 @@
 
                                     </div>
                                     <div class="p-mx-3 p-mt-5">
-                                        
+
                                         <p:commandLink  id="oise-uploadphotos-cl"
                                                         ajax="true"
                                                         style="color:blue;"
@@ -1057,7 +1072,7 @@
                                                         actionListener="#{occInspectionsBB.onManageBlobsOnInspectedElement(spaceElement)}">
 
                                         </p:commandLink>
-                                        
+
                                         <p:spacer height="5px" />
 
                                         <p:commandLink  id="oise-viewphotos-cl"
@@ -1067,7 +1082,7 @@
                                                         rendered="true"
                                                         update="@form:@parent:@parent:blobs-gallery-dialog
                                                         "
-                                                        value="View photos"
+                                                        value="View photos (#{spaceElement.blobList.size()})"
                                                         actionListener="#{occInspectionsBB.onManageBlobsOnInspectedElement(spaceElement)}">
 
                                         </p:commandLink>
@@ -1226,6 +1241,116 @@
                              immediate="true"
                              class="ui-button-outlined p-mr-1"
                              oncomplete="PF('inspection-finalize-dialog-var').hide();"/>
+
+        </h:form>
+
+    </p:dialog>
+
+
+
+    <p:dialog id="inspection-reportconfig-dialog"
+              widgetVar="inspection-reportconfig-dialog-var"
+              header="Configure report of field inspection ID: #{occInspectionsBB.selectedInspection.inspectionID}"
+              closable="true"
+              closeOnEscape="true"
+              modal="true"
+              height="600"
+              width="600"
+              resizable="true"
+              responsive="true">
+
+        <h:form id="inspection-reportconfig-form">
+        
+            
+        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                <div class="restrict-main-contents-io-link">
+
+                    <p:commandLink  ajax="false" 
+                                    action="#{occInspectionsBB.onFieldInspectionReportCommitLinkClick}"
+                                    value="Click to generate inspection report in new tab" 
+                                    target="_blank"
+                                    style="font-size:5em;"
+                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                    />
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                    <div class="ui-button gray_button">
+
+                        <p:commandButton ajax="true" 
+                                         value="Cancel" icon="fa fa-stop" immediate="true"
+                                         onclick="PF('inspection-reportconfig-dialog-var').hide()"/>
+
+                    </div>
+                </div>
+            </div>
+            
+            
+            
+            <h2>Report Settings: Include...</h2>
+             <div class="p-grid">
+
+                    <div class="p-col-6">
+                        Parent Object info (Occ Period or CECase)
+                    </div>
+                    <div class="p-col-6">
+                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeOccPeriodInfoHeader}" />
+                    </div>
+                    <div class="p-col-6">
+                        Photos on passed items
+                    </div>
+                    <div class="p-col-6">
+                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includePhotos_pass}" />
+                    </div>
+                    <div class="p-col-6">
+                        Photos on failed items
+                    </div>
+                    <div class="p-col-6">
+                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includePhotos_fail}" />
+                    </div>
+                    <div class="p-col-6">
+                        Full ordinance text
+                    </div>
+                    <div class="p-col-6">
+                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeFullOrdText}" />
+                    </div>
+                    <div class="p-col-6">
+                        Item notes 
+                    </div>
+                    <div class="p-col-6">
+                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeElementNotes}" />
+                    </div>
+                    <div class="p-col-6">
+                        Inspection timestamp by item
+                    </div>
+                    <div class="p-col-6">
+                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeElementLastInspectedInfo}" />
+                    </div>
+                    <div class="p-col-6">
+                        Compliance granted timestamp by item
+                    </div>
+                    <div class="p-col-6">
+                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeElementComplianceInfo}" />
+                    </div>
+                    <div class="p-col-6">
+                        Inspector signature
+                    </div>
+                    <div class="p-col-6">
+                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeSignature}" 
+                                                 disabled="true"/>
+                    </div>
+                    <div class="p-col-6">
+                        Remedy info
+                    </div>
+                    <div class="p-col-6">
+                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeRemedyInfo}" 
+                                                 disabled="true"/>
+                    </div>
+             </div>
+            
+            
+
+            <p:spacer height="5px" />
+
 
         </h:form>
 

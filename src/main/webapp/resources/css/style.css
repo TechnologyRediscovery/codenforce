@@ -115,7 +115,6 @@ h4{
 
 .logoBox{
     float:left;
-    clear:none;
     display: inline-block;
     margin-left: 10px;
     margin-top: 10px;
@@ -636,6 +635,13 @@ div.printer-friendly-report .ui-widget-content{
 .reportconfig-header{
     text-align: left;
 
+}
+
+
+
+.report-inspection-itemstatus{
+    font-weight: bold;
+    font-size: 1.3em;
 }
 /* *********** end Printing and reports******** */
 

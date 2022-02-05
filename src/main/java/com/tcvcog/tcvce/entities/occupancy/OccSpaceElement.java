@@ -38,6 +38,8 @@ public class OccSpaceElement extends EnforcableCodeElement {
     
     protected int occChecklistSpaceTypeElementID;
     protected boolean requiredForInspection;
+    private int parentSpaceTypeID;
+    
 
     public OccSpaceElement() {}
 
@@ -49,6 +51,7 @@ public class OccSpaceElement extends EnforcableCodeElement {
         super(occSpaceElement);
         this.occChecklistSpaceTypeElementID = occSpaceElement.getOccChecklistSpaceTypeElementID();
         this.requiredForInspection = occSpaceElement.isRequiredForInspection();
+        this.parentSpaceTypeID = occSpaceElement.getParentSpaceTypeID();
     }
 
 
@@ -78,6 +81,20 @@ public class OccSpaceElement extends EnforcableCodeElement {
      */
     public void setRequiredForInspection(boolean requiredForInspection) {
         this.requiredForInspection = requiredForInspection;
+    }
+
+    /**
+     * @return the parentSpaceTypeID
+     */
+    public int getParentSpaceTypeID() {
+        return parentSpaceTypeID;
+    }
+
+    /**
+     * @param parentSpaceTypeID the parentSpaceTypeID to set
+     */
+    public void setParentSpaceTypeID(int parentSpaceTypeID) {
+        this.parentSpaceTypeID = parentSpaceTypeID;
     }
 
    

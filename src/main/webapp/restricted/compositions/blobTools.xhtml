@@ -53,7 +53,7 @@
                    rendered="#{!empty blobUtilitiesBB.currentBlobHolder.blobUpstreamPoolEnum}">
 
                 <h:form id="blobs-choosefrompool-form">
-                    
+
                     <h2>
                         <h:outputText value="Choose a photo/doc from the upstream pool of #{sessionBean.sessBlobHolderPool.poolLinkEnum.objectParentTitle} (ID:#{sessionBean.sessBlobHolderPool.blobParentID})" />
                     </h2>
@@ -66,8 +66,8 @@
                                      actionListener="#{blobUtilitiesBB.linkCurrentBlobHolderToPooledBlobs}"
                                      oncomplete="PF('blob-upload-dialog-var').hide(); PF('blobs-gallery-dialog-var').show();"
                                      update="   blobs-growl-form
-                                                blobs-gallery-dialog
-                                                gallery-form"/>
+                                     blobs-gallery-dialog
+                                     gallery-form"/>
 
                     <p:spacer height="5px" />
 
@@ -78,32 +78,46 @@
                                  rowKey="#{blob.photoDocID}">
 
                         <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
-                        
+
                         <p:column headerText="PhotoDoc ID"
-                                  style="width:10%;">
+                                  style="width:5%;">
                             <h:outputText value="#{blob.photoDocID}" />
                         </p:column>
                         <p:column headerText="Blob ID"
-                                  style="width:10%;">
+                                  style="width:5%;">
                             <h:outputText value="#{blob.bytesID}" />
                         </p:column>
 
                         <p:column headerText="Type"
-                                  style="width:20%;">
+                                  style="width:10%;">
                             <h:outputText value="#{blob.type.title}" />
                         </p:column>
                         <p:column headerText="Timestamp"
-                                  style="width:20%;">
+                                  style="width:15%;">
                             <h:outputText value="#{blob.createdTS}" />
                         </p:column>
                         <p:column headerText="Title / Descr"
-                                  style="width:30%;">
+                                  style="width:20%;">
                             <h:outputText value="#{blob.title}" />
                             <p:spacer height="5px" />
                             <h:outputText value="#{blob.description}" />
                         </p:column>
+
+                        <p:column headerText="Preview"
+                                  style="width:25%;">
+                            <p:graphicImage value="#{blobsterBB.image}"
+                                            alt="no preview available" 
+                                            style="width: 150px" 
+                                            cache="false"
+                                            rendered="#{blob.type.browserViewable}">
+                                <f:param name="blobid" value="#{blob.photoDocID}"/>
+                            </p:graphicImage>
+
+                            <h:outputText value="no preview available; download to view"
+                                          rendered="#{!blob.type.browserViewable}" />
+                        </p:column>
                         <p:column headerText="Actions"
-                                  style="width:20%;">
+                                  style="width:10%;">
                             <p:commandLink id="blob-viewblob-cl"
                                            actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob)}"
                                            value="view"
@@ -173,12 +187,16 @@
                 </p:column>
                 <p:column headerText="Preview"
                           style="width:30%;">
-                     <p:graphicImage value="#{blobsterBB.image}"
-                            alt="no preview available" 
-                            style="width: 150px" 
-                            rendered="#{blobUtilitiesBB.currentBlobLight.type.browserViewable}">
-                         <f:param name="blobid" value="#{blob.photoDocID}"/>
+                    <p:graphicImage value="#{blobsterBB.image}"
+                                    alt="no preview available" 
+                                    style="width: 150px" 
+                                    cache="false"
+                                    rendered="#{blob.type.browserViewable}">
+                        <f:param name="blobid" value="#{blob.photoDocID}"/>
                     </p:graphicImage>
+
+                    <h:outputText value="no preview available; download to view"
+                                  rendered="#{!blob.type.browserViewable}" />
                 </p:column>
                 <p:column headerText="Actions"
                           style="width:15%;">
@@ -195,7 +213,7 @@
 
                     <p:commandLink id="blob-editblob-cl"
                                    actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob)}"
-                                   value="edit"
+                                   value="details"
                                    style="color:blue;"
                                    update="blob-veweditmetadata-form
                                    blob-vieweditmetadata-dialog"
@@ -207,9 +225,9 @@
                                    value="download"
                                    ajax="false"
                                    style="color:blue;">
-                           <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}" />
+                        <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}" />
                     </p:commandLink>
-                    
+
                 </p:column>
 
             </p:dataTable>
@@ -233,13 +251,23 @@
                 rendered="true"
                 > 
         <h:form id="blob-viewblob-form">
-              <p:commandLink id="blob-view-download-cl"
-                                   value="download"
-                                   ajax="false"
-                                   style="color:blue;">
-                           <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blobUtilitiesBB.currentBlobLight)}" />
-                    </p:commandLink>
             
+            <h2>
+                <h:outputText value="#{blobUtilitiesBB.currentBlobLight.title}" />
+                <h:outputText value=" | " />
+                <h:outputText value="#{blobUtilitiesBB.currentBlobLight.type.title}" />
+                
+            </h2>
+            
+            <h:outputText value="Description: #{blobUtilitiesBB.currentBlobLight.description}" />
+            <p:spacer height="5px" />
+            <p:commandLink id="blob-view-download-cl"
+                           value="download"
+                           ajax="false"
+                           style="color:blue;">
+                <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blobUtilitiesBB.currentBlobLight)}" />
+            </p:commandLink>
+
             <p:spacer height="5px" />
 
             <p:graphicImage value="#{blobsterBB.image}"
@@ -248,7 +276,7 @@
                             rendered="#{blobUtilitiesBB.currentBlobLight.type.browserViewable}">
                 <f:param name="blobid" value="#{blobUtilitiesBB.currentBlobLight.photoDocID}"/>
             </p:graphicImage>
-    
+
         </h:form>
 
     </p:dialog>

@@ -13,6 +13,7 @@ import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.*;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -57,6 +58,9 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
     private boolean editModeInspectionMetadata;
     
     private int occPeriodIDFortransferFormField;
+    
+    private ReportConfigOccInspection inspectionReportConfig;
+    
 
     @PostConstruct
     public void initBean() {
@@ -81,9 +85,9 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      */
     public void initChecklistTemplates() {
         SessionBean sb = getSessionBean();
-        OccInspectionCoordinator oc = getOccInspectionCoordinator();
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
-            checklistTemplateList = oc.getOccChecklistTemplateList(sb.getSessMuni());
+            checklistTemplateList = oic.getOccChecklistTemplateList(sb.getSessMuni());
         } catch (IntegrationException ex) {
             System.out.println("Failed to acquire list of checklist templates:" + ex);
         }
@@ -596,6 +600,38 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         } 
         
     }
+    
+    
+    /**
+     * Listener for user requests to start the report building process
+     * @param oi 
+     */
+    public void onFieldInspectionReportInitLinkClick(OccInspection oi){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        try {
+            inspectionReportConfig = oic.getOccInspectionReportConfigDefault(
+                    oi, 
+                    getSessionBean().getSessOccPeriod(), 
+                    getSessionBean().getSessUser());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               ex.getMessage(), ""));
+            
+        }
+        
+    }
+    
+    /**
+     * Listener for user requests to start the report building process
+     * @return 
+     */
+    public String onFieldInspectionReportCommitLinkClick(){
+        getSessionBean().setReportConfigFieldInspection(inspectionReportConfig);
+        
+        return "inspectionReport";
+    }
 
     // getters & setters below you know the drill
 
@@ -785,5 +821,19 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      */
     public void setSelectedDetermination(OccInspectionDetermination selectedDetermination) {
         this.selectedDetermination = selectedDetermination;
+    }
+
+    /**
+     * @return the inspectionReportConfig
+     */
+    public ReportConfigOccInspection getInspectionReportConfig() {
+        return inspectionReportConfig;
+    }
+
+    /**
+     * @param inspectionReportConfig the inspectionReportConfig to set
+     */
+    public void setInspectionReportConfig(ReportConfigOccInspection inspectionReportConfig) {
+        this.inspectionReportConfig = inspectionReportConfig;
     }
 }

@@ -7,8 +7,10 @@ package com.tcvcog.tcvce.entities.reports;
 
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
+import com.tcvcog.tcvce.entities.occupancy.OccInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionViewOptions;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import java.io.Serializable;
 
@@ -20,8 +22,10 @@ public class ReportConfigOccInspection
         extends Report 
         implements Serializable{
     
-    private OccPeriod occPeriod;
-    private PropertyUnitWithProp propUnitWithProp;
+    private OccPeriodPropertyUnitHeavy occPeriod;
+    
+    private OccInspection inspection;
+    
     
     private Icon defaultItemIcon;
         
@@ -44,7 +48,7 @@ public class ReportConfigOccInspection
     /**
      * @return the occPeriod
      */
-    public OccPeriod getOccPeriod() {
+    public OccPeriodPropertyUnitHeavy getOccPeriod() {
         return occPeriod;
     }
 
@@ -118,7 +122,7 @@ public class ReportConfigOccInspection
     /**
      * @param occPeriod the occPeriod to set
      */
-    public void setOccPeriod(OccPeriod occPeriod) {
+    public void setOccPeriod(OccPeriodPropertyUnitHeavy occPeriod) {
         this.occPeriod = occPeriod;
     }
 
@@ -215,16 +219,17 @@ public class ReportConfigOccInspection
     }
 
     /**
-     * @return the propUnitWithProp
+     * @return the inspection
      */
-    public PropertyUnitWithProp getPropUnitWithProp() {
-        return propUnitWithProp;
+    public OccInspection getInspection() {
+        return inspection;
     }
 
     /**
-     * @param propUnitWithProp the propUnitWithProp to set
+     * @param inspection the inspection to set
      */
-    public void setPropUnitWithProp(PropertyUnitWithProp propUnitWithProp) {
-        this.propUnitWithProp = propUnitWithProp;
+    public void setInspection(OccInspection inspection) {
+        this.inspection = inspection;
     }
+
 }

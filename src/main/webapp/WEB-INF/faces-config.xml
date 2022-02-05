@@ -2094,4 +2094,9 @@
         <managed-bean-class>com.tcvcog.tcvce.application.BlobsterBB</managed-bean-class>
         <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <managed-bean-name>checklistsBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.checklistsBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 </faces-config>

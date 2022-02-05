@@ -95,6 +95,9 @@ public class    SessionBean
     private EnforcableCodeElement selectedEnfCodeElement;
     private CodeElement activeCodeElement;
     
+    private OccChecklistTemplate sessChecklistTemplate;
+    private OccSpaceType sessOccSpaceType;
+    
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                   III Property                                 <<< */
@@ -312,7 +315,7 @@ public class    SessionBean
     
     private ReportConfigCEEventList reportConfigCEEventList;
     
-    private ReportConfigOccInspection reportConfigInspection;
+    private ReportConfigOccInspection reportConfigFieldInspection;
     private ReportConfigOccPermit reportConfigOccPermit;
     
     /* >>> -------------------------------------------------------------- <<< */
@@ -1317,17 +1320,17 @@ public class    SessionBean
     }
 
     /**
-     * @return the reportConfigInspection
+     * @return the reportConfigFieldInspection
      */
-    public ReportConfigOccInspection getReportConfigInspection() {
-        return reportConfigInspection;
+    public ReportConfigOccInspection getReportConfigFieldInspection() {
+        return reportConfigFieldInspection;
     }
 
     /**
-     * @param reportConfigInspection the reportConfigInspection to set
+     * @param reportConfigFieldInspection the reportConfigFieldInspection to set
      */
-    public void setReportConfigInspection(ReportConfigOccInspection reportConfigInspection) {
-        this.reportConfigInspection = reportConfigInspection;
+    public void setReportConfigFieldInspection(ReportConfigOccInspection reportConfigFieldInspection) {
+        this.reportConfigFieldInspection = reportConfigFieldInspection;
     }
 
     /**
@@ -2007,6 +2010,34 @@ public class    SessionBean
      */
     public void setSessBlobHolderPool(BlobPool sessBlobHolderPool) {
         this.sessBlobHolderPool = sessBlobHolderPool;
+    }
+
+    /**
+     * @return the sessChecklistTemplate
+     */
+    public OccChecklistTemplate getSessChecklistTemplate() {
+        return sessChecklistTemplate;
+    }
+
+    /**
+     * @param sessChecklistTemplate the sessChecklistTemplate to set
+     */
+    public void setSessChecklistTemplate(OccChecklistTemplate sessChecklistTemplate) {
+        this.sessChecklistTemplate = sessChecklistTemplate;
+    }
+
+    /**
+     * @return the sessOccSpaceType
+     */
+    public OccSpaceType getSessOccSpaceType() {
+        return sessOccSpaceType;
+    }
+
+    /**
+     * @param sessOccSpaceType the sessOccSpaceType to set
+     */
+    public void setSessOccSpaceType(OccSpaceType sessOccSpaceType) {
+        this.sessOccSpaceType = sessOccSpaceType;
     }
 
     

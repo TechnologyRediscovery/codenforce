@@ -22,14 +22,17 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.*;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccChecklistIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -758,6 +761,36 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * ************************************************************
      */
     
+    
+    /**
+     * Factory method of OccChecklistTemplate objects
+     * NO Database write here--ID is zero
+     * @param muni injected into the new template.
+     * @return skeleton--ID=0
+     */
+    public OccChecklistTemplate getOccChecklistTemplateSkeleton(Municipality muni){
+        OccChecklistTemplate oct = new OccChecklistTemplate();
+        oct.setMuni(muni);
+        return oct;
+        
+        
+    }
+    
+    /**
+     * Deactivates the given template
+     * @param ua doing the deactivation
+     * @param oct to be deactivated
+     */
+    public void deactivateChecklistTemplate(UserAuthorized ua, OccChecklistTemplate oct) throws IntegrationException{
+        if(oct != null && ua != null){
+            OccChecklistIntegrator oci = getOccChecklistIntegrator();
+            oct.setActive(false);
+            oci.updateChecklistTemplateMetadata(oct);
+            
+            
+        }
+    }
+    
      /**
      * Logic container for retrieving a ChecklistTemplate, which is used 
      * to create an actual OccupancyInspection
@@ -831,8 +864,40 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         }
         return ostcl;
     }
+
+    /**
+     * Logic intermedi Oary for creating a new checklist template in a given muni
+     * @param plate
+     * @return the database PK of the new record in occhecklisttemplate
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public int insertChecklistTemplateMetadata(OccChecklistTemplate plate) throws IntegrationException, BObStatusException{
+        if(plate == null){
+            throw new BObStatusException("Cannot insert a null template");
+        }
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        return oci.insertChecklistTemplateMetadata(plate);
+        
+    }
+    
     
     /**
+     * Undertakes an update operation on a ChecklistTemplate, including
+     * deactivation
+     * @param plate 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void updateChecklistTemplateMetadata(OccChecklistTemplate plate) throws IntegrationException, BObStatusException{
+        if(plate == null){
+            throw new BObStatusException("Cannot update a null checklist template");
+        }
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        oci.updateChecklistTemplateMetadata(plate);
+    }
+    
+      /**
      * Fields requests for a non checklistified SpaceType by ID
      * @param tpeID
      * @return 
@@ -842,6 +907,193 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         OccChecklistIntegrator oci = getOccChecklistIntegrator();
         return oci.getOccSpaceType(tpeID);
     }
+    
+    /**
+     * Extracts all space types from the database--muni agnostic
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public List<OccSpaceType> getOccSpaceTypeList() throws IntegrationException{
+        List<Integer> stidl = getOccChecklistIntegrator().getOccSpaceTypeIDListComplete();
+        List<OccSpaceType> spaceTypeList = new ArrayList<>();
+        if(stidl != null && !stidl.isEmpty()){
+            for(Integer i: stidl){
+                spaceTypeList.add(getOccSpaceType(i));
+                
+            }
+        }
+        
+        return spaceTypeList;
+    }
+    
+    
+    /**
+     * Logic intermediary for creating a new space type; these are
+     * general across all munis, so they are just a classification scheme:
+     * Kitchen, rear exterior, etc.
+     * @param ost
+     * @return of the freshly inserted record into occspacetype
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public int insertSpaceType(OccSpaceType ost) throws IntegrationException, BObStatusException{
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        if(ost == null){
+            throw new BObStatusException("Cannot insert null space type");
+        }
+        return oci.insertSpaceType(ost);
+        
+        
+        
+    }
+    
+    /**
+     * Undertakes an update operation on a space type
+     * @param ost 
+     */
+    public void updateSpaceType(OccSpaceType ost) throws BObStatusException, IntegrationException{
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        if(ost == null){
+            throw new BObStatusException("Cannot update null space type");
+        }
+        oci.updateSpaceType(ost);
+    }
+
+
+    /**
+     * If not linked to something, removes an OccSpaceType from the DB
+     * @param ost 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void removeOccSpaceType(OccSpaceType ost) throws BObStatusException, IntegrationException{
+        if(ost == null){
+            throw new BObStatusException("Cannot remove occ space type with null input");
+        }
+        getOccChecklistIntegrator().deleteSpaceType(ost);
+        
+    }
+    
+    
+    /**
+     * Updates a single SpaceType's connection to a Checklist
+     * @param ostc 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateSpaceTypeChecklistified(OccSpaceTypeChecklistified ostc) throws BObStatusException, IntegrationException{
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        if(ostc == null){
+            throw new BObStatusException("Cannot update null space type");
+        }
+        oci.updateSpaceTypeChecklistified(ostc);
+    }
+    
+    
+    /**
+     * Connects a list of OccSpaceTypes wrapped in their checklist wrapper
+     * to the given occChecklistTemplate
+     * 
+     * @param plate
+     * @param ostl
+     * @param required
+     */
+    public void insertAndLinkSpaceTypeChecklistifiedListToTemplate(OccChecklistTemplate plate, OccSpaceType ost, boolean required) 
+            throws BObStatusException, IntegrationException{
+    
+        if(plate == null || ost == null ){
+            throw new BObStatusException("cannot insertAndLinkSpaceTypeChecklistifiedListToTemplate with null template or ostc list");
+        }
+        
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+            
+            OccSpaceTypeChecklistified ostchk = new OccSpaceTypeChecklistified(ost);
+            ostchk.setRequired(required);
+            oci.verifyUniqueChecklistSpaceTypeLink(ostchk);
+            oci.insertOccChecklistSpaceTypeChecklistified(ostchk);
+        
+    }
+    
+    /**
+     * Utility method for downcasting
+     * @param ostchkl
+     * @return 
+     */
+    public List<OccSpaceType> downcastOccSpaceTypeChecklistified(List<OccSpaceTypeChecklistified> ostchkl){
+        List<OccSpaceType> ostl = new ArrayList<>();
+        if(ostchkl != null && !ostchkl.isEmpty()){
+            for(OccSpaceTypeChecklistified ostchk: ostchkl){
+                ostl.add((OccSpaceType) ostchk);
+            }
+        }
+        return ostl;
+    }
+    
+    /**
+     * Removes a link between a SpaceType and its parent checklist. When this call
+     * is done, pulling this OSTC's parent checklist will no longer include
+     * this SpaceType or any of that space type's elements
+     * @param ostc 
+     */
+    public void detachOccSpaceTypeChecklistifiedFromTemplate(OccSpaceTypeChecklistified ostc) throws BObStatusException, IntegrationException{
+        if(ostc == null){
+            throw new BObStatusException("Cannot detach space type checklistified with null input");
+        }
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        // first get rid of the element to occspacetype links
+        if(ostc.getCodeElementList() != null && !ostc.getCodeElementList().isEmpty()){
+            for(OccSpaceElement ose: ostc.getCodeElementList()){
+                oci.detachOccSpaceElementFromOccSpaceTypeChecklistified(ose);
+            }
+        }
+        
+        // then nuke the space type
+        oci.deleteOccSpaceTypeChecklistified(ostc);
+    }
+    
+    /**
+     * Connects a given list of OccSpaceElements to the provided SpaceType that
+     * has been connected to a given checklist
+     * @param ostc
+     * @param ecel
+     */
+    public void insertAndLinkCodeElementsToSpaceType(OccSpaceTypeChecklistified ostc, List<EnforcableCodeElement> ecel) throws BObStatusException, IntegrationException{
+        if(ostc == null || ecel == null || ecel.isEmpty()){
+            throw new BObStatusException("cannot insert and link elements to space types with null inputs or empty element list");
+            
+        }
+        OccChecklistIntegrator oci = getOccChecklistIntegrator();
+        oci.attachCodeElementsToSpaceTypeInChecklist(ostc, ecel);
+        
+    }
+    
+    
+    /**Removes a link between a code element and an occ space type
+     * 
+     * @param ose 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void detachCodeElementFromSpaceType(OccSpaceElement ose) throws BObStatusException, IntegrationException{
+        if(ose == null){
+            throw new BObStatusException("Cannot detach code element from space with null code element");
+            
+        }
+        
+        getOccChecklistIntegrator().detachOccSpaceElementFromOccSpaceTypeChecklistified(ose);
+    }
+    
+    
+    
+    
+    
+  /** 
+     * ************************************************************
+     * ********************* MISC   ******************
+     * ************************************************************
+     */
+    
+  
     
     /**
      * Retrieves all active causes for use in selection boxes
@@ -875,4 +1127,48 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         }
         return detList;
     }
+    
+    /**
+     * Generates a skeleton field inspection report
+     * @param insp
+     * @param period
+     * @param usr
+     * @return
+     * @throws IntegrationException 
+     */
+     public ReportConfigOccInspection getOccInspectionReportConfigDefault(OccInspection insp,
+                                                                         OccPeriodPropertyUnitHeavy period,
+                                                                         User usr) throws IntegrationException {
+        SystemIntegrator si = getSystemIntegrator();
+
+        ReportConfigOccInspection rpt = new ReportConfigOccInspection();
+        rpt.setGenerationTimestamp(LocalDateTime.now());
+        rpt.setOccPeriod(period);
+        rpt.setInspection(insp);
+
+        rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occinspection_default_title"));
+        rpt.setCreator(usr);
+        rpt.setMuni(getSessionBean().getSessMuni());
+
+        rpt.setDefaultItemIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()))));
+
+        rpt.setIncludeOccPeriodInfoHeader(true);
+
+        rpt.setIncludePhotos_pass(true);
+        rpt.setIncludePhotos_fail(true);
+
+        rpt.setIncludeFullOrdText(true);
+        rpt.setIncludeElementNotes(true);
+
+        rpt.setIncludeElementLastInspectedInfo(true);
+        rpt.setIncludeElementComplianceInfo(true);
+
+        rpt.setIncludeRemedyInfo(false);
+        rpt.setIncludeSignature(true);
+
+        rpt.setViewSetting(ViewOptionsOccChecklistItemsEnum.FAILED_ITEMS_ONLY);
+        return rpt;
+    }
+
 }

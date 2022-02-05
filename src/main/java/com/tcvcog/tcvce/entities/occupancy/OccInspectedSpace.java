@@ -79,27 +79,29 @@ public class OccInspectedSpace
     }
 
     public void configureVisibleElementList() {
-        inspectedElementListVisible.clear();
-        for(Iterator<OccInspectedSpaceElement> itEle = inspectedElementList.iterator(); itEle.hasNext(); ){
-            OccInspectedSpaceElement oise = itEle.next();
-            switch(viewSetting){
-                case ALL_ITEMS:
-                    inspectedElementListVisible.add(oise);
-                    break;
-                case FAILED_ITEMS_ONLY:
-                    // look for failed items
-                    if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() != null){
+        if(inspectedElementListVisible != null){
+            inspectedElementListVisible.clear();
+            for(Iterator<OccInspectedSpaceElement> itEle = inspectedElementList.iterator(); itEle.hasNext(); ){
+                OccInspectedSpaceElement oise = itEle.next();
+                switch(viewSetting){
+                    case ALL_ITEMS:
                         inspectedElementListVisible.add(oise);
-                    } 
-                    break;
-                case UNISPECTED_ITEMS_ONLY:
-                    // look for failed items
-                    if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() == null){
+                        break;
+                    case FAILED_ITEMS_ONLY:
+                        // look for failed items
+                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() != null){
+                            inspectedElementListVisible.add(oise);
+                        } 
+                        break;
+                    case UNISPECTED_ITEMS_ONLY:
+                        // look for failed items
+                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() == null){
+                            inspectedElementListVisible.add(oise);
+                        } 
+                        break;
+                    default:
                         inspectedElementListVisible.add(oise);
-                    } 
-                    break;
-                default:
-                    inspectedElementListVisible.add(oise);
+                }
             }
         }
     }

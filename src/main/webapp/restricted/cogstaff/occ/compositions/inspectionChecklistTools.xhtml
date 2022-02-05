@@ -1,0 +1,739 @@
+
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Code book Management</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <f:view>
+
+                    <div class="mainContainer">
+
+                        <div class="title-container">
+
+                            <h1>Inspection Checklists</h1>
+
+
+                            <h:form id="cecase-help-form">
+                                <div class="restrict-main-contents-help-link">
+                                    <a href="https://technologyrediscovery.github.io/codenforce/code/codebooks"
+                                       target="_blank">
+                                        help
+                                    </a>
+                                </div>
+                            </h:form>
+
+                        </div>
+
+                        <h:form id="form-messages-global">
+                            <p:growl id="sets-messages-growl"
+                                     life="3000"
+                                     keepAlive="true"
+                                     globalOnly="false"/>
+                        </h:form>
+
+                        <div class ="two-column-page-flex-container">
+
+                            <div class="list-column">
+
+                                <p:panel id="checklists-panel"
+                                         toggleable="true"
+                                         widgetVar="checklists-panel-var"
+                                         collapsed="false"
+                                         header="Inspection Checklists">
+                                    <h:form id="checklists-form">
+
+
+                                        <p:commandButton id="checklist-create-init-button"
+                                                         value="New checklist"
+                                                         icon="fa fa-plus"
+                                                         oncomplete="PF('checklist-infoedit-dialog-var').show()"
+                                                         actionListener="#{checklistsBB.onChecklistCreateInitButtonClick}"
+                                                         update="checklist-infoedit-dialog"/>
+
+                                        <p:spacer height="5px"/>
+
+                                        <p:dataTable    id="checklists-table"
+                                                        var="chklst"
+                                                        value="#{checklistsBB.checklistTemplateList}"
+                                                        rowKey="#{chklst.inspectionChecklistID}"
+                                                        reflow="true">
+                                            <p:column style="width:2rem">
+                                                <p:rowToggler/>
+                                            </p:column>
+                                            <p:column headerText="ID">
+
+                                            </p:column>
+                                            <p:column headerText="Title"
+                                                      style="width:10%;">
+                                                <h:outputText value="#{chklst.title}" />
+                                            </p:column>
+                                            <p:column headerText="Active"
+                                                      style="width:10%;">
+                                                <h:outputText value="#{chklst.active ? 'Active':'Deactivated'}" />
+                                            </p:column>
+                                            <p:column headerText="Code Source"
+                                                      style="width:10%;">
+                                                <h:outputText value="#{chklst.governingCodeSource.sourceName} (#{chklst.governingCodeSource.sourceYear})" />
+                                            </p:column>
+
+                                            <p:column headerText="Actions">
+                                                <p:commandLink ajax="true"
+                                                               style="color:blue;"
+                                                               oncomplete="PF('checklist-infoedit-dialog').show()"
+                                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                               update="checklist-infoedit-dialog"
+                                                               value="view/edit"
+                                                               actionListener="#{checklistsBB.onChecklistViewEditLinkClick(chklst)}">
+                                                </p:commandLink>
+                                            </p:column>
+                                            <p:rowExpansion>
+
+
+                                            </p:rowExpansion>
+                                        </p:dataTable>
+
+
+                                    </h:form>
+                                </p:panel>
+
+                            </div>
+
+                            <div class ="object-column">
+
+                                <h:form id="spacetype-list-form">
+
+                                    <h2>
+                                        <h:outputText value="Configure space types in #{chklst.title}"/> 
+                                    </h2>
+
+                                    <p:commandButton id="checklist-create-init-button"
+                                                     value="Add space type"
+                                                     icon="fa fa-plus"
+                                                     oncomplete="PF('spacetypes-dialog-var').show()"
+                                                     actionListener="#{checklistsBB.onSpaceTypeAddInitButtonChange}"
+                                                     update="checklist-infoedit-dialog"/>
+
+
+                                    <p:dataTable id="checklist-spacetypes-dt"
+                                                 value="#{chklst.occSpaceTypeList}"
+                                                 var="ost" 
+                                                 rowKey="#{ost.checklistSpaceTypeID}"
+                                                 stripedRows="true"
+                                                 rowExpandMode="multiple">
+
+
+                                        <p:column style="width:2rem">
+                                            <p:rowToggler/>
+                                        </p:column>
+                                        <p:column headerText="CSTID">
+                                            <h:outputText value="#{ost.checklistSpaceTypeID}"/>
+                                        </p:column>
+                                        <p:column headerText="Type ID">
+                                            <h:outputText value="#{ost.spaceTypeID}"/>
+                                        </p:column>
+                                        <p:column headerText="Chklst ID">
+                                            <h:outputText value="#{ost.checklistParentID}"/>
+                                        </p:column>
+                                        <p:column headerText="Name">
+                                            <h:outputText value="#{ost.spaceTypeTitle}"/>
+                                        </p:column>
+                                        <p:column headerText="Description">
+                                            <h:outputText value="#{ost.spaceTypeDescription}"/>
+                                        </p:column>
+                                        <p:column headerText="Required">
+                                            <i class="#{ost.required ? 'pi pi-star' : ''}"/>
+                                        </p:column>
+                                        <p:column headerText="Actions">
+
+                                            <p:commandLink  id="occspacetype-viewedit-clink"
+                                                            ajax="true"
+                                                            style="color:blue;"
+                                                            oncomplete="PF('').show()"
+                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                            update=""
+                                                            value="view/edit"
+                                                            actionListener="#{checklistsBB.onChecklistViewEditLinkClick(chklst)}">
+                                            </p:commandLink>
+
+                                        </p:column>
+                                        <p:rowExpansion>
+                                            <p:dataTable id="ordbytype-table"
+                                                         var="ord"
+                                                         value="#{ost.codeElementList}"
+                                                         rowKey="#{ord.elementID}"
+                                                         stripedRows="true">
+
+                                                <p:column headerText="EleID">
+                                                    <h:outputText value="#{ord.occChecklistSpaceTypeElementID}"/>
+                                                </p:column>
+                                                <p:column headerText="subsec">
+                                                    <h:outputText value="#{ord.headerString}"/>
+                                                </p:column>
+                                                <p:column headerText="Required">
+                                                    <i class="#{ord.requiredForInspection ? 'pi pi-star' : ''}"/>
+                                                </p:column>
+
+                                            </p:dataTable>
+                                        </p:rowExpansion>
+                                    </p:dataTable>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p:dialog id="checklist-infoedit-dialog"
+                              width="1000"
+                              widgetVar="checklist-infoedit-dialog-var"
+                              header="Inspection Checklist #{checklistsBB.currentChecklistTemplate.inspectionChecklistID}"
+                              modal="true"
+                              closeOnEscape="true"
+                              closable="true"
+                              resizable="true">
+                        <h:form id="checklist-infoedit-form">
+
+                            <p:commandButton id="checklist-edit-button"
+                                             value="#{checklistsBB.editModeCurrentChecklistTemplate ? 'Save Changes' : 'Edit'}"
+                                             disabled="#{!checklistsBB.currentChecklistTemplate.active}"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                             icon="fa #{occInspectionsBB.editModeInspectionMetadata ? 'fa-check' : 'fa-pencil'}"
+                                             actionListener="#{checklistsBB.onToggleEditModeChecklistTemplateButtonClick}"
+                                             oncomplete="PF('checklist-infoedit-dialog-var').show()"
+                                             update="@form
+                                             @form:@parent:checklists-growl-form"/>
+
+                            <div class="gray_button">
+
+                                <p:commandButton id="inspections-inspectiondetails-abort"
+                                                 value="Cancel"
+                                                 styleClass="gray-button"
+                                                 rendered="#{checklistsBB.editModeCurrentChecklistTemplate}"
+                                                 icon="fa fa-stop"
+                                                 process="@none"
+                                                 immediate="true"
+                                                 actionListener="#{checklistsBB.onEditModeChecklistTemplateAbort}"
+                                                 oncomplete="PF('checklist-infoedit-dialog-var').show()"
+                                                 update="@form
+                                                 @form:@parent:checklists-growl-form"/>
+                            </div>
+
+
+
+                            <div class="p-grid">
+                                <div class="p-col-6">
+                                    ID
+                                </div>
+                                <div class="p-col-6">
+                                    <h:outputText value="#{checklistsBB.currentChecklistTemplate.inspectionChecklistID eq 0 ? '(New template)' :checklistsBB.currentChecklistTemplate.inspectionChecklistID}" />
+                                </div>
+
+                                <div class="p-col-6">
+                                    Municipality
+                                </div>
+                                <div class="p-col-6">
+                                    <h:outputText value="#{checklistsBB.currentChecklistTemplate.muni.muniName}" 
+                                                  />
+
+                                    <p:selectOneMenu 
+                                        id="munilist-som" 
+                                        tabindex="1"
+                                        value="#{checklistsBB.currentChecklistTemplate.muni}"
+                                        rendered="#{checklistsBB.editModeCurrentChecklistTemplate}"
+                                        required="true">
+                                        <f:selectItem itemLabel="select a municipality..." 
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
+                                        <f:selectItems value="#{systemServicesBB.municipalityListForSearch}" 
+                                                       var="muni" 
+                                                       itemLabel="#{muni.muniName}"/>
+                                        <f:converter converterId="muniConverter" />
+                                    </p:selectOneMenu>
+
+
+
+                                </div>
+                                <div class="p-col-6">
+                                    Title
+                                </div>
+                                <div class="p-col-6">
+                                    <h:outputText value="#{checklistsBB.currentChecklistTemplate.title}" 
+                                                  rendered="#{!checklistsBB.editModeCurrentChecklistTemplate}"/>
+
+                                    <p:inputText value="#{checklistsBB.currentChecklistTemplate.title}" 
+                                                 rendered="#{checklistsBB.editModeCurrentChecklistTemplate}"/>
+                                </div>
+                                <div class="p-col-6">
+                                    Description
+                                </div>
+                                <div class="p-col-6">
+                                    <h:outputText value="#{checklistsBB.currentChecklistTemplate.description}" 
+                                                  rendered="#{!checklistsBB.editModeCurrentChecklistTemplate}"/>
+                                    <p:inputText value="#{checklistsBB.currentChecklistTemplate.description}" 
+                                                 rendered="#{checklistsBB.editModeCurrentChecklistTemplate}"/>
+                                </div>
+                                <div class="p-col-6">
+                                    Governing Code
+                                </div>
+                                <div class="p-col-6">
+                                    <h:outputText value="#{checklistsBB.currentChecklistTemplate.governingCodeSource.sourceName} (#{checklistsBB.currentChecklistTemplate.governingCodeSource.sourceYear})" 
+                                                  rendered="#{!checklistsBB.editModeCurrentChecklistTemplate}"/>
+
+
+                                    <p:selectOneMenu 
+                                        id="codesourcelist-som" 
+                                        tabindex="5"
+                                        value="#{checklistsBB.currentChecklistTemplate.governingCodeSource}"
+                                        rendered="#{checklistsBB.editModeCurrentChecklistTemplate}"
+                                        required="true">
+                                        <f:selectItem itemLabel="select a code source..." 
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
+                                        <f:selectItems value="#{checklistsBB.codeSourceList}" 
+                                                       var="source" 
+                                                       itemLabel="#{source.sourceName} (#{source.sourceYear})"/>
+                                        <f:converter converterId="codeSourceConverter" />
+                                    </p:selectOneMenu>
+
+                                </div>
+
+                                <div class="p-col-6">
+                                    Created
+                                </div>
+                                <div class="p-col-6">
+                                    <h:outputText value="#{checklistsBB.getPrettyDate(checklistsBB.currentChecklistTemplate.createdTS)}" />
+
+                                </div>
+                                <div class="p-col-6">
+                                    Active
+                                </div>
+                                <div class="p-col-6">
+                                    <h:outputText value="#{checklistsBB.currentChecklistTemplate.active ? 'Active' : 'Deactivated'}" />
+
+
+                                    <p:commandLink  id="checkist-deactivate-clink"
+                                                    ajax="true"
+                                                    style="color:blue;"
+                                                    oncomplete="PF('checklist-infoedit-dialog-var').show()"
+                                                    rendered="#{!checklistsBB.editModeCurrentChecklistTemplate}"
+                                                    update="checklists-form
+                                                    checklists-growl-form"
+                                                    value="Deactivate checklist ID #{checklistsBB.currentChecklistTemplate.inspectionChecklistID}"
+                                                    actionListener="#{checklistsBB.onDeactivateChecklistLinkClick}">
+
+                                    </p:commandLink>
+
+
+                                </div>
+                            </div>
+
+                        </h:form>
+                    </p:dialog>
+
+
+                    <p:dialog id="select-ece-dialog"
+                              widgetVar="select-ece-dialog-var"
+                              header="Select code elements to inspect in #{checklistsBB.currentOccSpaceTypeChecklistified.spaceTypeTitle}"
+                              modal="true"
+                              closeOnEscape="true"
+                              closable="true"
+                              resizable="true">
+
+                        <h:form id="sets-ece-list-form">
+
+
+                            <p:commandButton id="sets-add-ord-cb" 
+                                             ajax="true" 
+                                             icon="fa fa-plus"
+                                             value="#{(empty codeSetBB.currentCodeSet) ? 'Select a code book' : 'Add ordinance to code book'}" 
+                                             style="width: 275px"
+                                             disabled="#{empty codeSetBB.currentCodeSet}"
+                                             oncomplete="PF('sets-addelements-dialog-var').show();"
+                                             update="
+                                             form-messages-global
+                                             sets-addelements-dialog
+                                             sets-addelements-form
+                                             "
+                                             actionListener="#{codeSetBB.onAddCodeElementsToCodeSetInitButtonChange}" />
+
+                            <p:spacer height="5px" />
+
+
+                            <h:outputText id="sets-ece-list-size-ot"
+                                          value="#{!(empty codeSetBB.currentCodeSet.enfCodeElementList) ? codeSetBB.currentCodeSet.enfCodeElementList.size() : ''}"
+                                          styleClass="italic" />
+
+                            <h:outputText id="sets-ece-list-size-label-ot"
+                                          value="#{!(empty codeSetBB.currentCodeSet.enfCodeElementList) ? ' ordiances contained in this code book' : 'empty code book'}"
+                                          styleClass="italic" />
+
+                            <p:dataTable
+                                id="sets-ece-list-table"
+                                var="cse"
+                                value="#{codeSetBB.currentCodeSet.enfCodeElementList}"
+
+                                rowKey="#{cse.codeSetElementID}"
+                                tableStyleClass="primeDataTable"
+                                resizableColumns="true"
+                                rowExpandMode="single"
+                                expandedRow="false"
+                                filteredValue="#{codeSetBB.enforcableCodeElementListFiltered}"
+                                widgetVar="codeSetElementListTable"
+                                tabindex="1">
+
+
+
+                                <p:column width="3%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Exp"/>
+                                    </f:facet>
+                                    <p:rowToggler/>
+                                </p:column>
+
+                                <p:column width="5%" 
+                                          sortBy="#{cse.codeSetElementID}">
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.codeSetElementID}"/>
+                                </p:column>
+
+                                <p:column width="10%" sortBy="#{cse.source.sourceName}"
+                                          filterBy="#{cse.source.sourceName}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Source" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.source.sourceName}(#{cse.source.sourceYear})"/>
+                                </p:column>
+
+                                <p:column width="10%" sortBy="#{cse.guideEntry.category}"
+                                          filterBy="#{cse.guideEntry.category}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.guideEntry.category}"/>
+                                </p:column>
+
+                                <p:column width="10%" sortBy="#{cse.guideEntry.subCategory}"
+                                          filterBy="#{cse.guideEntry.subCategory}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sub Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.guideEntry.subCategory}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{cse.ordchapterNo}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Cha#"/>
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordchapterNo}"/>
+                                </p:column>
+
+                                <p:column width="15%" sortBy="#{cse.ordchapterTitle}"
+                                          filterBy="#{cse.ordchapterTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Chapter"/>
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordchapterTitle}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{cse.ordSecNum}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sec#" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordSecNum}"/>
+                                </p:column>
+
+                                <p:column width="15%" sortBy="#{cse.ordSecTitle}"
+                                          filterBy="#{cse.ordSecTitle}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Section" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordSecTitle}"/>
+                                </p:column>
+
+                                <p:column width="5%" sortBy="#{cse.ordSubSecNum}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Sub#" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordSubSecNum}"/>
+                                </p:column>
+
+                                <p:column sortBy="#{cse.ordSubSecTitle}" 
+                                          filterBy="#{cse.ordSubSecTitle}"
+                                          width="15%">
+                                    <f:facet name="header">
+                                        <h:outputText value="SubSec. Title" />
+                                    </f:facet>
+                                    <h:outputText value="#{cse.ordSubSecTitle}"/>
+                                </p:column>
+
+                                <p:column   width="15%"
+                                            headerText="Actions"
+                                            styleClass="centeredColumnContent"
+                                            >
+
+
+                                    <p:commandButton   id="ece-update-init-cb"
+                                                       ajax="true"
+                                                       rendered="true"
+                                                       title="Update enforcability info"
+                                                       disabled="false"
+                                                       icon="fa fa-edit"
+                                                       actionListener="#{codeSetBB.onSetElementUpdateInitButtonChange(cse)}"
+                                                       oncomplete="PF('sets-ece-update-dialog-var').show()"
+                                                       update="sets-ece-update-dialog
+                                                       :sets-ece-update-form"/>
+
+
+
+                                    <p:commandButton   id="ece-nuke-init-cb"
+                                                       ajax="true"
+                                                       rendered="true"
+                                                       icon="fa fa-trash"
+                                                       disabled="false"
+                                                       title="Nuke enforcable ordinance"
+                                                       actionListener="#{codeSetBB.onNukeCodeSetElementInit(cse)}"
+                                                       oncomplete="PF('sets-ece-nuke-dialog-var').show()"
+                                                       update="sets-ece-nuke-dialog
+                                                       sets-ece-nuke-form"/>
+
+                                </p:column>
+
+                                <p:rowExpansion>
+
+                                    <div class="outlinedBox"
+                                         style="text-align:left;">
+
+                                        <h2>Record metadata</h2>
+                                        <div class="ui-g data_container_nested_restrict">
+                                            <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel  for="ece-createdby">
+                                                        <h:outputText value="Creation" />
+                                                    </h:outputLabel>
+                                                </div>
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="ece-createdby" 
+                                                                  value="#{!(empty cse.eceCreatedBy) ? cse.createdBy.human.lastName: ''}"/>
+                                                    <h:outputText id="ece-creationts" 
+                                                                  value="#{codeSetBB.getPrettyDate(cse.eceCreatedTS)}"/>
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field" >
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel  for="ece-lastupdatedby">
+                                                        <h:outputText value="Last updates" />
+                                                    </h:outputLabel>
+                                                </div>
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="ece-lastupdatedby" 
+                                                                  value="#{!(empty cse.lastupdatedBy) ? cse.lastupdatedBy.phumanlastName: ''}"/>
+                                                    <h:outputText id="ece-lastupdatedts" 
+                                                                  value="#{codeSetBB.getPrettyDate(cse.lastUpdatedTS)}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <h2>Enforceability Info</h2>
+
+                                        <h:panelGrid columns="4" 
+                                                     cellpadding="10" 
+                                                     footerClass="gridFooter"
+                                                     columnClasses="gridTd, gridTd"
+                                                     >
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Munimum Penalty"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="$#{cse.minPenalty}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Norm Penalty"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="$#{cse.normPenalty}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Maximum Penalty"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="$#{cse.maxPenalty}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Penalty Notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.penaltyNotes}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Default days to comply"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.normDaysToComply}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup>
+                                                <h:outputLabel styleClass="bold" value="Compliance timeframe Notes"/>
+                                                <p:spacer height="15px"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.daysToComplyNotes}"/>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <f:facet name="footer">
+                                                <h:outputLabel styleClass="bold" value="Default violation findings" style="text-align:left;"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{cse.defaultViolationDescription}"/>
+                                                </div>
+                                                <p:spacer height="15px"/>
+
+                                                <h:outputLabel styleClass="bold" value="Municipality specific notes" style="text-align:left;"/>
+                                                <div class="rowExpansion">
+                                                    <h:outputText escape="false" value="#{cse.muniSpecificNotes}"/>
+                                                </div>
+                                            </f:facet>
+
+                                        </h:panelGrid>
+                                    </div>
+
+                                    <div class="outlinedBox">
+                                        <h2>Code Element Content</h2>
+
+                                        <h:outputLabel styleClass="bold" value="Technical Text"/>
+                                        <p:spacer height="15px"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" 
+                                                          value="#{cse.ordTechnicalText}"
+                                                          styleClass="monospace"/>
+                                        </div>
+
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Human friendly text"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.ordHumanFriendlyText}"/>
+                                        </div>
+                                        <p:spacer height="15px"/>
+                                        <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.guideEntry.enforcementGuidelines}"/>
+                                        </div>
+
+                                        <p:spacer height="15px"/>
+
+                                        <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                                        <div class="rowExpansion">
+                                            <h:outputText escape="false" value="#{cse.guideEntry.inspectionGuidelines}"/>
+                                        </div>
+                                    </div>
+                                </p:rowExpansion>
+                            </p:dataTable>
+
+                            <p:spacer height="15px"/>
+
+
+
+                        </h:form>
+                    </p:dialog>
+
+
+
+                    <p:dialog id="addspacetype-dialog"
+                              widgetVar="addspacetype-dialog-var"
+                              header="Add space types to checklist: #{checklistsBB.currentChecklistTemplate.title} (ID: #{checklistsBB.currentChecklistTemplate.inspectionChecklistID})"
+                              closable="true"
+                              closeOnEscape="true"
+                              modal="true"
+                              height="400"
+                              width="500"
+                              resizable="true"
+                              responsive="true">
+
+                        <h:form id="addspacetype-form">
+
+
+
+
+                            <div class="ui-button gray_button">
+
+                                <p:commandButton ajax="true" 
+                                                 value="Cancel" 
+                                                 icon="fa fa-stop" 
+                                                 immediate="true"
+                                                 process="@none"
+                                                 onclick="PF('checklist-addspacetype-dialog-var').hide()"/>
+                            </div>
+                            
+                            <div class="p-grid">
+                                <div class="p-col-6">
+                                    Choose the space types:
+                                     <p:dataTable id="ordbytype-table"
+                                                         var="tpe"
+                                                         value="#{checklistsBB.spaceTypeList}"
+                                                         rowKey="#{tpe.spaceTypeID}"
+                                                         stripedRows="true"
+                                                         selection="#{checklistsBB.spaceTypeListSelected}">
+
+                                                <p:column selectionMode="multiple" 
+                                                          style="width:16px;text-align:center"/>
+                                                
+                                                <p:column headerText="Type ID">
+                                                    <h:outputText value="#{tpe.spaceTypeID}"/>
+                                                </p:column>
+                                                
+                                                <p:column headerText="Title">
+                                                    <h:outputText value="#{tpe.spaceTypeTitle}"/>
+                                                </p:column>
+                                                
+                                                <p:column headerText="Description">
+                                                    <h:outputText value="#{tpe.spaceTypeDescription}"/>
+                                                </p:column>
+
+                                            </p:dataTable>
+                                    
+                                    
+                                </div>
+                                <div class="p-col-6">
+                                    
+                                    <p:selectBooleanCheckbox value="#{checklistsBB.spaceTypeBatchRequired}" 
+                                                             label="Require space type in inspection"/>
+                                    
+                                    
+                                    
+                                </div>
+                            </div>
+                                <p:spacer height="5px" />
+                                
+                                   <p:commandButton id="addspacetype-addcommit-button"
+                                                     value="Add selected spaces to checklist"
+                                                     icon="fa fa-plus"
+                                                     oncomplete="PF('').show()"
+                                                     actionListener="#{checklistsBB.}"
+                                                     update="checklist-infoedit-dialog"/>
+                                
+                        </h:form>
+                    </p:dialog>
+                </f:view>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+
+

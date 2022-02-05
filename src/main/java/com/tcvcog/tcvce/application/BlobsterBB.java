@@ -18,7 +18,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
 /**
- * Test bean for loading images
+ * Bean for loading images
  * @author sylvia
  */
 public class BlobsterBB extends BackingBeanUtils{

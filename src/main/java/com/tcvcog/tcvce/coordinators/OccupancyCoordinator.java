@@ -390,40 +390,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
     }
 
-    public ReportConfigOccInspection getOccInspectionReportConfigDefault(OccInspection insp,
-                                                                         OccPeriod period,
-                                                                         User usr) throws IntegrationException {
-        SystemIntegrator si = getSystemIntegrator();
-
-        ReportConfigOccInspection rpt = new ReportConfigOccInspection();
-        rpt.setGenerationTimestamp(LocalDateTime.now());
-        rpt.setOccPeriod(period);
-
-        rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occinspection_default_title"));
-        rpt.setCreator(usr);
-        rpt.setMuni(getSessionBean().getSessMuni());
-
-        rpt.setDefaultItemIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()))));
-
-        rpt.setIncludeOccPeriodInfoHeader(true);
-
-        rpt.setIncludePhotos_pass(false);
-        rpt.setIncludePhotos_fail(true);
-
-        rpt.setIncludeFullOrdText(false);
-        rpt.setIncludeElementNotes(true);
-
-        rpt.setIncludeElementLastInspectedInfo(false);
-        rpt.setIncludeElementComplianceInfo(false);
-
-        rpt.setIncludeRemedyInfo(false);
-        rpt.setIncludeSignature(false);
-
-        rpt.setViewSetting(ViewOptionsOccChecklistItemsEnum.FAILED_ITEMS_ONLY);
-        return rpt;
-    }
-
+   
     public ReportConfigOccPermit getOccPermitReportConfigDefault(OccPermit permit,
 
                                                                  OccPeriod period,
