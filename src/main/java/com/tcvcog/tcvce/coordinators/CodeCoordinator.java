@@ -38,7 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * The controller class for all things code element (i.e. ordinances)
  * @author ellen bascomb of apt 31y
  */
 public class CodeCoordinator extends BackingBeanUtils implements Serializable {
@@ -52,6 +52,8 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     final String ECE_DEFAULT_DAYSTOCOMPLY_NOTES = "Default values";
     
     final static String FMT_SECTION_ENTITY = "&#167;";
+    
+    final static String FMT_CH = "ch.";
     final static String FMT_SPACE = " ";
     final static String FMT_PAREN_L = "(";
     final static String FMT_PAREN_R = ")";
@@ -191,7 +193,7 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
      * @return 
      */
     private CodeElement configureCodeElement(CodeElement ce){
-       ce.setHeaderString(buildOrdTitle(ce));
+       ce.setHeaderString(buildOrdinanceHeaderString(ce));
         
         return ce;
     }
@@ -204,10 +206,10 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
      * @param ce
      * @return 
      */
-    private String buildOrdTitle(CodeElement ce){
+    private String buildOrdinanceHeaderString(CodeElement ce){
         StringBuilder sb = new StringBuilder();
          if(ce != null){
-            
+            // Prefix with source and year
             if(ce.getSource() != null){
                 sb.append(ce.getSource().getSourceName());
                 if(ce.getSource().getSourceYear() != 0){
@@ -217,31 +219,29 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
                 }
                 sb.append(FMT_SPACE);
             }
-
-            sb.append(FMT_SECTION_ENTITY);
-            sb.append(FMT_SPACE);
             
             // If we have a standard IPMC listing, the chapter and section
             // numbers are actually in the sub-section number, so just use that number
             // such as 302.1.1: Chapter 3, section 2, subsec 1, subsubsec 1
-            if(ce.getOrdchapterNo() != 0 
-                    && ce.getOrdSecNum().contains(String.valueOf(ce.getOrdchapterNo()))){
-                
-            }
-            if(ce.getOrdSecNum() != null 
-                        && ce.getOrdSubSecNum() != null 
-                        && ce.getOrdSubSecNum().contains(ce.getOrdSecNum())){
+           
+            // check if section number is in sub-section number
+            if(checkForPureIRCRecursiveListing(ce)){
+//                System.out.println("CodeCoordinator.buildOrdinanceHeaderString | Found pure IRC");
+
+                sb.append(FMT_SECTION_ENTITY);
+                sb.append(FMT_SPACE);
                 if(ce.getOrdSubSubSecNum() != null 
-                        && ce.getOrdSubSubSecNum().contains(ce.getOrdSubSecNum())){
+                        && !ce.getOrdSubSubSecNum().equals("''")){
                     // eg 302.1.1
                     sb.append(ce.getOrdSubSubSecNum());
                 } else { // we don't have a recursive sub-sub sec number, so use sub-sec number
-                    sb.append(FMT_SPACE);
                     sb.append(ce.getOrdSubSecNum());
                     sb.append(FMT_COLON);
                     sb.append(FMT_SPACE);
                 }
-                
+                // now insert the titles
+                // NOTE we are not using chapter titles in the standard IRC
+                // they are implied by the section and subsection titles
                 
                 if(ce.getOrdSecTitle() != null){
                     sb.append(ce.getOrdSecTitle());
@@ -252,11 +252,102 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
                 if(ce.getOrdSubSecTitle() != null){
                     sb.append(ce.getOrdSubSecTitle());
                 }
-            } else { // Section number is not inside sub-section number, so use the section number
-                // TODO: Finsish
-            } 
+            } else { // We do not have a pure IRC, so piece the header together straight across
+                // we have a non-zero chapter number
+                if(ce.getOrdchapterNo() != 0){
+                    sb.append(FMT_CH);
+                    sb.append(ce.getOrdchapterNo());
+                    if(ce.getOrdchapterTitle()!= null && !ce.getOrdchapterTitle().equals("''")){
+                        sb.append(FMT_COLON);
+                        sb.append(ce.getOrdchapterTitle());
+                    }
+                }
+                // setup our section
+                // if we have a section number, put it in
+                if(ce.getOrdSecNum() != null && !ce.getOrdSecNum().equals("''")){
+                    sb.append(FMT_SPACE);
+                    sb.append(FMT_SECTION_ENTITY);
+                    sb.append(FMT_SPACE);
+                    sb.append(ce.getOrdSecNum());
+                    // if we have a sub sec number, it follows in parents (a)
+                    if(ce.getOrdSubSecNum() != null && !ce.getOrdSubSecNum().equals("''")){
+                        sb.append(FMT_PAREN_L);
+                        sb.append(ce.getOrdSubSecNum());
+                        sb.append(FMT_PAREN_R);
+                        // if we have a sub sub sec number, it follows in parents (1)
+                        if(ce.getOrdSubSubSecNum() != null && !ce.getOrdSubSubSecNum().equals("''")){
+                            sb.append(FMT_PAREN_L);
+                            sb.append(ce.getOrdSubSecNum());
+                            sb.append(FMT_PAREN_R);
+                        }
+                    }
+                } // done with section numbers, now for section titles
+                
+                if(ce.getOrdSecTitle() != null && !ce.getOrdSecTitle().equals("''")){
+                    sb.append(FMT_SPACE);
+                    sb.append(ce.getOrdSecTitle());
+                }
+                if(ce.getOrdSubSecTitle() != null && !ce.getOrdSubSecTitle().equals("''")){
+                    sb.append(FMT_SPACE);
+                    sb.append(FMT_DASH);
+                    sb.append(FMT_SPACE);
+                    sb.append(ce.getOrdSubSecTitle());
+                }
+            } // end outer if check on standard IRC 
+//            System.out.println("CodeCoordinator.buildOrdinanceHeaderString | eleID:  " + ce.getElementID() );
+//            System.out.println("CodeCoordinator.buildOrdinanceHeaderString | headerString:  " + sb.toString() );
+        } // element not null
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Logic method for checking if a code element has been entered 
+     * into the system using standard IRC recursive listing
+     * such that the chapter and section numbers are in the sub-section
+     * number, e.g. Chapter 7, Section 703, subsection 703.1: We only 
+     * want to use 703.1 in the display, since inclusion of the ch & sec
+     * is redundant
+     * @param ele to check
+     * @return true if the ch + sec are in the sub-section, and if
+     * sub-sub is not null, the sub-section is in the sub-sub section
+     */
+    private boolean checkForPureIRCRecursiveListing(CodeElement ce){
+        
+        boolean isPureIRCFormat = true;
+        
+        // nulls or zero for ch, sec, and subsec violates purity
+        if(ce.getOrdchapterNo() == 0 
+                || ce.getOrdSecNum() == null
+                || ce.getOrdSubSecNum() == null){
+            return false;
         }
-         return sb.toString();
+        
+        // no ch, sec, or sub-sec titles violates purity
+        if(ce.getOrdchapterTitle() == null
+                || ce.getOrdSecTitle() == null
+                || ce.getOrdSubSecTitle() == null){
+            return false;
+        }
+            
+        // chapter No. should be in our section #
+        if(!ce.getOrdSecNum().contains(String.valueOf(ce.getOrdchapterNo()))){
+            return false;    
+        }
+        
+        // sec number should be in our sub-section #
+        if(!ce.getOrdSubSecNum().contains(ce.getOrdSecNum())){
+            return false;
+        }
+        
+        // if there is a sub-sub number, section should be in there, too
+        if(ce.getOrdSubSubSecNum() != null && !ce.getOrdSubSecNum().equals("''")){
+            if(!ce.getOrdSubSubSecNum().contains(ce.getOrdSubSecNum())){
+                return false;
+            }
+        }
+           
+        return isPureIRCFormat;
     }
     
     
@@ -599,9 +690,7 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex.toString());
         }
-     
         return new ArrayList<>();
-        
     }
     
     
@@ -611,8 +700,133 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     // *************************************************************
     
     
-     
+    /**
+     * Factory method for guide entry skeletons (i.e. ID = 0)
+     * @return 
+     */
+    public CodeElementGuideEntry getCodeElementGuideEntrySkeleton(){
+        return new CodeElementGuideEntry();
+    }
+    
+    /**
+     * Logic intermediary for CodeElementGuideEntry object inserts
+     * @param cege
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void insertCodeElementGuideEntry(CodeElementGuideEntry cege) throws BObStatusException, IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        if(cege == null){
+            throw new BObStatusException("Cannot insert null guide entry");
+        }
+        ci.insertCodeElementGuideEntry(cege);
+    }
     
     
+    /**
+     * Logic intermediary for CodeElementGuideEntry objects
+     * @param cegeid
+     * @return
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public CodeElementGuideEntry getCodeElementGuideEntry(int cegeid) throws BObStatusException, IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        if(cegeid == 0){
+            throw new BObStatusException("Cannot get entry with id Zero");
+        }
+        return ci.getCodeElementGuideEntry(cegeid);
+        
+    }
     
+    /**
+     * Extracts al code guide entries from the DB
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<CodeElementGuideEntry> getCodeElementGuideEntryListComplete() throws IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        return ci.getCodeElementGuideEntries();
+    }
+    
+    /**
+     * Logic intermediary for updates to CodeGuideEntry objects
+     * @param cege
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void updateCodeElementGuideEntry(CodeElementGuideEntry cege) throws BObStatusException, IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        if(cege == null){
+            throw new BObStatusException("Cannot update entry with null input");
+        }
+        ci.updateCodeElementGuideEntry(cege);
+        
+    }
+    
+    /**
+     * Convenience method for linking a batch of CodeElements to a single guide entry.
+     * I iterate and call linkCodeElementToGuideEntry
+     * @param cel
+     * @param cege 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void linkCodeElementListToCodeGuideEntry(List<CodeElement> cel, CodeElementGuideEntry cege) throws BObStatusException, IntegrationException{
+        if(cel == null || cel.isEmpty() || cege == null){
+            throw new BObStatusException("Cannot link code elements to guide with null or empty list or null guide entry");
+        }
+        for(CodeElement ce: cel){
+            ce.setGuideEntry(cege);
+            linkCodeElementToGuideEntry(ce);
+        }
+        
+    }
+    
+    /**
+     * Iterates over teh list of CodeElements; if they have a non-null
+     * code guide entry, write that to the DB. If null, remove any link
+     * @param eleList 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateAllCodeGuideEntryLinks(List<CodeElement> eleList) throws BObStatusException, IntegrationException{
+        if(eleList == null || eleList.isEmpty()){
+            throw new BObStatusException("Cannot update code guide entries with null or empty element list");
+        }
+        for(CodeElement ele: eleList){
+            linkCodeElementToGuideEntry(ele);
+        }
+    }
+    
+    
+    /**
+     * LInks or unlinks CodeElement to guide entry. 
+     * @param ce
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void linkCodeElementToGuideEntry(CodeElement ce) throws BObStatusException, IntegrationException{
+        CodeIntegrator ci = getCodeIntegrator();
+        if(ce == null ){
+            throw new BObStatusException("Cannot link code guide to element with null element or entry");
+        }
+        
+        ci.linkElementToCodeGuideEntry(ce);
+        
+    }
+    
+    /**
+     * Logic container for removing a code guide entry
+     * @param cege 
+     */
+    public void removeCodeElementGuideEntry(CodeElementGuideEntry cege) throws BObStatusException, IntegrationException{
+        if(cege == null){
+            throw new BObStatusException("Cannot remove a null guide entry");
+        }
+            
+        CodeIntegrator ci = getCodeIntegrator();
+        ci.deleteCodeElementGuideEntry(cege);
+        
+    }
 }

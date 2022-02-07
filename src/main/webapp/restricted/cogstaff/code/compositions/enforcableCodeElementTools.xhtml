@@ -1,0 +1,98 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="eceview-growl-form">
+        <p:growl id="eceview-growl" />
+    </h:form>
+
+    <p:dialog id="eceview-dialog"
+              widgetVar="eceview-dialog-var"
+              header="View Enforcable Code Element Details"
+              closable="true"
+              closeOnEscape="true"
+              modal="true"
+              height="500"
+              width="700"
+              resizable="true"
+              responsive="true">
+
+        <h:form id="eceview-form">
+            <div class="outlinedBox">
+
+
+
+                <div class="rowExpansion"
+                     style="font-size: 1.4em;">
+                    <h:outputText value="&quot;" />
+                    <h:outputText escape="false" 
+                                  value="#{sessionBean.sessEnforcableCodeElement.ordTechnicalText}" 
+                                  styleClass="monospace"
+                                  />
+                    <h:outputText value="&quot;" />
+                </div>
+
+
+                <h2>Meta data</h2>
+
+                <div class="ui-g data_container_nested_restrict">
+                    <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                        <div class="restrict-data-field-label-inline" >
+                            <h:outputLabel  for="ord-id">
+                                <h:outputText value="ID" />
+                            </h:outputLabel>
+                        </div>
+                        <div class="restrict-data-field-value-inline" >
+                            <h:outputText id="ord-id" 
+                                          value="#{sessionBean.sessEnforcableCodeElement.elementID}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                        <div class="restrict-data-field-label-inline" >
+                            <h:outputLabel  for="ord-created">
+                                <h:outputText value="Created" />
+                            </h:outputLabel>
+                        </div>
+                        <div class="restrict-data-field-value-inline" >
+                            <h:outputText id="ord-created" 
+                                          value="#{codeElementBB.getPrettyDateNoTime(sessionBean.sessEnforcableCodeElement.createdTS)}"/>
+                            <h:outputText value="#{!(empty sessionBean.sessEnforcableCodeElement.createdBy) ? ' by ' : ''}"/>
+                            <h:outputText value="#{!(empty sessionBean.sessEnforcableCodeElement.createdBy) ? sessionBean.sessEnforcableCodeElement.createdBy.phumanlastName : ''}"/>
+                        </div>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                        <div class="restrict-data-field-label-inline" >
+                            <h:outputLabel  for="ord-updated">
+                                <h:outputText value="Last updated" />
+                            </h:outputLabel>
+                        </div>
+                        <div class="restrict-data-field-value-inline" >
+                            <h:outputText id="ord-updated" 
+                                          value="#{codeElementBB.getPrettyDateNoTime(sessionBean.sessEnforcableCodeElement.lastUpdatedTS)}"/>
+                            <h:outputText value="#{!(empty sessionBean.sessEnforcableCodeElement.lastupdatedBy) ? ' by ' : ''}"/>
+                            <h:outputText value="#{!(empty sessionBean.sessEnforcableCodeElement.lastupdatedBy) ? sessionBean.sessEnforcableCodeElement.lastupdatedBy.perhumanstName : ''}"/>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <p:spacer height="15px"/>
+                <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                <div class="rowExpansion">
+                    <h:outputText escape="false" value="#{sessionBean.sessEnforcableCodeElement.guideEntry.enforcementGuidelines}"/>
+                </div>
+
+                <p:spacer height="15px"/>
+
+                <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                <div class="rowExpansion">
+                    <h:outputText escape="false" value="#{sessionBean.sessEnforcableCodeElement.guideEntry.inspectionGuidelines}"/>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>

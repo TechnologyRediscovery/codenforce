@@ -180,13 +180,25 @@
                                                                           value="ordinances"
                                                                           action="#{navigationBB.onOrdinancesLinkClick}"
                                                                           ajax="false"/>
+                                                        
+                                                        <h:outputText value=" | " />
+
+                                                        <p:commandLink      id="navcontres-button-categories" 
+                                                                            value="categories"
+                                                                            oncomplete="PF('codeguide-list-dialog-var').show()"
+                                                                            update="  codeguide-list-dialog
+                                                                                        codeguide-list-form"
+                                                                            actionListener="#{codeElementGuideBB.onViewCodeGuideNavLinkClick}"
+                                                                            ajax="true"/>
                                                         <br/>
 
                                                         <p:commandLink    id="navcontres-button-codebook" 
                                                                           value="code book"
                                                                           action="#{navigationBB.onCodebookLinkClick}"
                                                                           ajax="false"/>
+                                                        
                                                         <h:outputText value=" | " />
+                                                        
                                                         <p:commandLink    id="navcontres-button-checklists" 
                                                                           value="checklists"
                                                                           action="#{navigationBB.onChecklistsLinkClick()}"
@@ -204,7 +216,7 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                <ui:include src="/restricted/cogstaff/code/compositions/codeGuideTools.xhtml" />
 
                                 <div class="activebob-container p-col"
                                      id="aob-property">

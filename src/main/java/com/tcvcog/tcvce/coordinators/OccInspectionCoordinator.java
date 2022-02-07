@@ -20,10 +20,13 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Municipality;
+import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.*;
@@ -770,6 +773,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      */
     public OccChecklistTemplate getOccChecklistTemplateSkeleton(Municipality muni){
         OccChecklistTemplate oct = new OccChecklistTemplate();
+        oct.setActive(true);
         oct.setMuni(muni);
         return oct;
         
@@ -876,6 +880,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         if(plate == null){
             throw new BObStatusException("Cannot insert a null template");
         }
+        plate.setActive(true);
         OccChecklistIntegrator oci = getOccChecklistIntegrator();
         return oci.insertChecklistTemplateMetadata(plate);
         
@@ -958,6 +963,24 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     }
     
     /**
+     * We want the user to be able to turn on or off required flags
+     * on the ECEs before we link them to a space type, so this method
+     * wraps an arbitrary list of ECEs in OccSpaceElement objects
+     * that are skeletons--no IDs--since they haven't been in the DB yet
+     * @param ecel 
+     * @return  
+     */
+    public List<OccSpaceElement> wrapECEListInOccSpaceElementWrapper(List<EnforcableCodeElement> ecel){
+        List<OccSpaceElement> osel = new ArrayList<>();
+        if(ecel != null && !ecel.isEmpty()){
+            for(EnforcableCodeElement ece: ecel){
+                osel.add(new OccSpaceElement(ece));
+            }
+        }
+        return osel;
+    }
+    
+    /**
      * Undertakes an update operation on a space type
      * @param ost 
      */
@@ -1019,6 +1042,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * to the given occChecklistTemplate
      * 
      * @param plate
+     * @param ost
      * @param required
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
@@ -1034,6 +1058,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             
             OccSpaceTypeChecklistified ostchk = new OccSpaceTypeChecklistified(ost);
             ostchk.setRequired(required);
+            ostchk.setChecklistParentID(plate.getInspectionChecklistID());
             oci.verifyUniqueChecklistSpaceTypeLink(ostchk);
             oci.insertOccChecklistSpaceTypeChecklistified(ostchk);
         
@@ -1078,17 +1103,22 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     
     /**
      * Connects a given list of OccSpaceElements to the provided SpaceType that
-     * has been connected to a given checklist
+     * has been connected to a given checklist.
+     * Will complain with BOBStatusException if the pairing is not unique on the space type.
      * @param ostc
-     * @param ecel
+     * @param ose
+     * @throws com.tcvcog.tcvce.domain.BObStatusException: for many reasons, including unique mappings
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void insertAndLinkCodeElementsToSpaceType(OccSpaceTypeChecklistified ostc, List<EnforcableCodeElement> ecel) throws BObStatusException, IntegrationException{
-        if(ostc == null || ecel == null || ecel.isEmpty()){
-            throw new BObStatusException("cannot insert and link elements to space types with null inputs or empty element list");
-            
+    public void insertAndLinkCodeElementsToSpaceType(OccSpaceTypeChecklistified ostc, OccSpaceElement ose) throws BObStatusException, IntegrationException{
+        if(ostc == null || ose == null ){
+            throw new BObStatusException("Cannot insert and link elements to space with null space type or ordinance");
         }
         OccChecklistIntegrator oci = getOccChecklistIntegrator();
-        oci.attachCodeElementsToSpaceTypeInChecklist(ostc, ecel);
+        
+        ose.setParentSpaceTypeID(ostc.getChecklistSpaceTypeID());
+        oci.verifyUniqueCodeElementInSpaceType(ose);
+        oci.attachCodeElementsToSpaceTypeInChecklist(ose);
         
     }
     
@@ -1108,6 +1138,44 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         getOccChecklistIntegrator().detachOccSpaceElementFromOccSpaceTypeChecklistified(ose);
     }
     
+    
+    
+    /**
+     * Implements logic to create a pseudo deep copy of a given checklist template
+     * to the target muni
+     * @param muniTarget where the checklist should be copied. This muni will
+     * be turned into a muni DataHeavy using its default CodeBook. Only 
+     * EnforcableCodeElements which wrap code elements in the target Muni's default 
+     * codebook which match the source template will be incorporated into the
+     * cloned checklist
+     * 
+     * TODO: Finish my guts 
+     * 
+     * @param template
+     * @param ua
+     * @return the ID of the new checklist
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public int cloneOccChecklistTemplate(   Municipality muniTarget, 
+                                            OccChecklistTemplate template, 
+                                            UserAuthorized ua) 
+            throws BObStatusException, IntegrationException, AuthorizationException, EventException{
+        
+        if(muniTarget == null || template == null || ua == null){
+            throw new BObStatusException("cannot clone checklist with null muni or source template");
+        }
+        
+        
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        MunicipalityDataHeavy mdh = mc.assembleMuniDataHeavy(muniTarget, ua);
+        
+        CodeSet codeSet = mdh.getCodeSet();
+        
+        
+        return 0;
+        
+        
+    }
     
     
     

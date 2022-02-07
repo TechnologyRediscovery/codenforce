@@ -36,78 +36,7 @@
                             
                             <p:spacer height="15px"/>
                             
-                            <p:dataTable
-                                id="violationTable"
-                                value="#{codeElementGuideBB.entryList}"
-                                selection="#{codeElementGuideBB.selectedGuideEntry}"
-                                tableStyleClass="primeDataTable"
-                                draggableColumns="true"
-                                selectionMode="single"
-                                rowKey="#{cege.guideEntryID}"
-                                reflow="true"
-                                var="cege"
-                                rowExpandMode="multiple"
-                                expandedRow="false">
-
-                                <p:column width="3%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Expand" />
-                                    </f:facet>
-                                    <p:rowToggler />
-                                </p:column>
-                                
-                                <p:column width="3%">
-                                    <f:facet name="header">
-                                        <h:outputText value="no." />
-                                    </f:facet>
-                                    <h:outputText value="#{cege.guideEntryID}"/>
-                                </p:column>
-
-                                <p:column width="15%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Category" />
-                                    </f:facet>
-                                    <h:outputText value="#{cege.category}"/>
-                                </p:column>
-
-                                <p:column width="15%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Sub Category" />
-                                    </f:facet>
-                                    <h:outputText value="#{cege.subCategory}"/>
-                                </p:column>
-                                
-                                <p:column width="20%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Description" />
-                                    </f:facet>
-                                    <h:outputText value="#{cege.description}"/>
-                                </p:column>
-                                
-                                <p:column width="8%">
-                                    <f:facet name="header">
-                                        <h:outputText value="Priority?" />
-                                    </f:facet>
-                                    <h:outputText value="#{cege.priority}"/>
-                                </p:column>
-                                
-
-                                <p:rowExpansion>
-                                    <div class="outlinedBox">
-                                        
-
-                                    <h:outputLabel styleClass="bold" value="Enforcement Gudielines:"/>
-                                    <p:spacer height="10px"/>
-                                    <h:outputText value="#{cege.enforcementGuidelines}" escape="false"/>
-                                    <p:spacer height="15px"/>
-                                    <h:outputLabel styleClass="bold" value="Inspection Gudielines:"/>
-                                    <p:spacer height="10px"/>
-                                    <h:outputText value="#{cege.inspectionGuidelines}" escape="false"/>
-                                    </div>
-
-                                </p:rowExpansion>
-
-                            </p:dataTable> 
+                        
                             
                             <p:spacer height="15px"/>
                             

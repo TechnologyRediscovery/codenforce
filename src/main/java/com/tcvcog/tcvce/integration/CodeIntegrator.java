@@ -1290,7 +1290,11 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     // *************************************************************
    
     
-    
+    /**
+     * Creates a new record in the codeelementguide table
+     * @param cege
+     * @throws IntegrationException 
+     */
     public void insertCodeElementGuideEntry(CodeElementGuideEntry cege) throws IntegrationException{
         String query =  "INSERT INTO public.codeelementguide(\n" +
                         "            guideentryid, category, subcategory, description, enforcementguidelines, \n" +
@@ -1324,6 +1328,11 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
     }
     
+    /**
+     * Updates a record in the guide table
+     * @param cege
+     * @throws IntegrationException 
+     */
     public void updateCodeElementGuideEntry(CodeElementGuideEntry cege) throws IntegrationException{
         String query =  "UPDATE public.codeelementguide\n" +
                         "   SET category=?, subcategory=?, description=?, enforcementguidelines=?, \n" +
@@ -1356,6 +1365,11 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     }
    
     
+    /**
+     * Removes a code guide entry from the db
+     * @param ge
+     * @throws IntegrationException 
+     */
     public void deleteCodeElementGuideEntry(CodeElementGuideEntry ge) throws IntegrationException{
         String query =  "DELETE FROM public.codeelementguide\n" +
                         " WHERE guidenetryid=?;";
@@ -1380,6 +1394,12 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
+    /**
+     * Extracts a single code guide from the DB
+     * @param entryid
+     * @return
+     * @throws IntegrationException 
+     */
     public CodeElementGuideEntry getCodeElementGuideEntry(int entryid) throws IntegrationException{
         String query =  "SELECT guideentryid, category, subcategory, description, enforcementguidelines, \n" +
                         " inspectionguidelines, priority\n" +
@@ -1414,7 +1434,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      * @return the full code guide for browsing
      * @throws IntegrationException 
      */
-    public ArrayList<CodeElementGuideEntry> getCodeElementGuideEntries() throws IntegrationException{
+    public List<CodeElementGuideEntry> getCodeElementGuideEntries() throws IntegrationException{
         String query =  "SELECT guideentryid, category, subcategory, description, enforcementguidelines, \n" +
                         "       inspectionguidelines, priority\n" +
                         "  FROM public.codeelementguide;";
@@ -1444,6 +1464,12 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         return cegelist;
     }
     
+    /**
+     * Generator for guide entries
+     * @param rs with all fields on codeelementugide table
+     * @return fully baked guide entry
+     * @throws SQLException 
+     */
     private CodeElementGuideEntry generateCodeElementGuideEntry(ResultSet rs) throws SQLException{
         CodeElementGuideEntry cege = new CodeElementGuideEntry();
         cege.setGuideEntryID(rs.getInt("guideentryid"));
@@ -1456,29 +1482,44 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         return cege;
     }
     
-    public void linkElementToCodeGuideEntry(CodeElement element, int codeGuideEntryID) throws IntegrationException{
-        String query =  "update codeelement set guideentryid = ? where elementid = ?;";
+    /**
+     * Connects a code element with a code guide entry
+     
+     * @param element cannot be null. If the CodeGuideEntry in its belly
+     * is null, I'll write null to the DB, removing any existing link
+     * 
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void linkElementToCodeGuideEntry(CodeElement element) throws IntegrationException, BObStatusException{
+        if(element == null){
+            throw new BObStatusException("Cannot link element to guide entry with null element");
+        }
+        
+        String query =  "UPDATE codeelement SET guideentryid = ? WHERE elementid = ?;";
         Connection con = null;
         PreparedStatement stmt = null;
 
          try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, codeGuideEntryID);
+            if(element.getGuideEntry() != null){
+                stmt.setInt(1, element.getGuideEntry().getGuideEntryID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
             stmt.setInt(2, element.getElementID());
             stmt.execute();
              
         } catch (SQLException ex) { 
              System.out.println(ex.toString());
              throw new IntegrationException("Unable to link element id " + element.getElementID() 
-                     + " to guide entry with ID of " + codeGuideEntryID 
-                     + ". Make sure your guide entry ID exists in the CodeGuide.", ex);
+                     + " to guide entry. "
+                     + "Make sure your guide entry ID exists in the CodeGuide.", ex);
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
-    
- 
     
 } // close class

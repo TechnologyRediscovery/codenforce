@@ -23,7 +23,8 @@ import java.io.Serializable;
  *
  * @author ellen bascomb of apt 31y
  */
-public class CodeElementGuideEntry implements Serializable {
+public class CodeElementGuideEntry 
+        implements Serializable {
     
     private int guideEntryID;
     private String category;
@@ -131,6 +132,28 @@ public class CodeElementGuideEntry implements Serializable {
      */
     public void setPriority(boolean priority) {
         this.priority = priority;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + this.guideEntryID;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        final CodeElementGuideEntry other = (CodeElementGuideEntry) obj;
+        if (this.guideEntryID != other.guideEntryID) {
+            return false;
+        }
+        return true;
     }
     
    

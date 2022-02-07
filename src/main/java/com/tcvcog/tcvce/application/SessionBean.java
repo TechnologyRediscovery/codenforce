@@ -92,7 +92,8 @@ public class    SessionBean
     
     private CodeSource sessCodeSource;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
-    private EnforcableCodeElement selectedEnfCodeElement;
+    private List<CodeElementGuideEntry> sessCodeGuideList;
+    private EnforcableCodeElement sessEnforcableCodeElement;
     private CodeElement activeCodeElement;
     
     private OccChecklistTemplate sessChecklistTemplate;
@@ -692,10 +693,10 @@ public class    SessionBean
     }
 
     /**
-     * @return the selectedEnfCodeElement
+     * @return the sessEnforcableCodeElement
      */
-    public EnforcableCodeElement getSelectedEnfCodeElement() {
-        return selectedEnfCodeElement;
+    public EnforcableCodeElement getSessEnforcableCodeElement() {
+        return sessEnforcableCodeElement;
     }
 
     /**
@@ -752,10 +753,10 @@ public class    SessionBean
     }
 
     /**
-     * @param selectedEnfCodeElement the selectedEnfCodeElement to set
+     * @param sessEnforcableCodeElement the sessEnforcableCodeElement to set
      */
-    public void setSelectedEnfCodeElement(EnforcableCodeElement selectedEnfCodeElement) {
-        this.selectedEnfCodeElement = selectedEnfCodeElement;
+    public void setSessEnforcableCodeElement(EnforcableCodeElement sessEnforcableCodeElement) {
+        this.sessEnforcableCodeElement = sessEnforcableCodeElement;
     }
 
     /**
@@ -2038,6 +2039,20 @@ public class    SessionBean
      */
     public void setSessOccSpaceType(OccSpaceType sessOccSpaceType) {
         this.sessOccSpaceType = sessOccSpaceType;
+    }
+
+    /**
+     * @return the sessCodeGuideList
+     */
+    public List<CodeElementGuideEntry> getSessCodeGuideList() {
+        return sessCodeGuideList;
+    }
+
+    /**
+     * @param sessCodeGuideList the sessCodeGuideList to set
+     */
+    public void setSessCodeGuideList(List<CodeElementGuideEntry> sessCodeGuideList) {
+        this.sessCodeGuideList = sessCodeGuideList;
     }
 
     

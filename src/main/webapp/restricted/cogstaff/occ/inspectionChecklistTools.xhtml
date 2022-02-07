@@ -21,7 +21,8 @@
 
                         <h:form id="checklists-growl-form">
                             <p:growl id="checklists-growl"
-                                     life="3000"
+                                     life="12000"
+                                     sticky="false"
                                      keepAlive="true"
                                      globalOnly="false"/>
                         </h:form>
@@ -52,41 +53,46 @@
                                                         value="#{checklistsBB.checklistTemplateList}"
                                                         rowKey="#{chklst.inspectionChecklistID}"
                                                         reflow="true">
-                                            <p:column style="width:2rem">
-                                                <p:rowToggler/>
-                                            </p:column>
-                                            <p:column headerText="ID">
+                                            <p:column headerText="ID"
+                                                      style="width:10%;">
                                                 <h:outputText value="#{chklst.inspectionChecklistID}" />
                                             </p:column>
                                             <p:column headerText="Title"
-                                                      style="width:10%;">
+                                                      style="width:20%;">
                                                 <h:outputText value="#{chklst.title}" />
                                             </p:column>
-                                            
+
                                             <p:column headerText="Active"
                                                       style="width:10%;">
                                                 <h:outputText value="#{chklst.active ? 'Active':'Deactivated'}" />
                                             </p:column>
-                                            
-                                            <p:column headerText="Code Source"
-                                                      style="width:10%;">
+
+                                            <p:column headerText="Source"
+                                                      style="width:25%;">
                                                 <h:outputText value="#{chklst.governingCodeSource.sourceName} (#{chklst.governingCodeSource.sourceYear})" />
                                             </p:column>
 
-                                            <p:column headerText="Actions">
-                                                <p:commandLink ajax="true"
+                                            <p:column headerText="Actions"
+                                                      style="width:30%;">
+                                                <p:commandLink  id="checklist-loadspacetypelist-commandlink"
+                                                                ajax="true"
                                                                style="color:blue;"
-                                                               oncomplete="PF('checklist-infoedit-dialog').show()"
+                                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                               update="spacetype-list-form"
+                                                               value="load checklist"
+                                                               actionListener="#{checklistsBB.onChecklistViewEditLinkClick(chklst)}">
+                                                </p:commandLink>
+                                                <h:outputText value=" | " />
+                                                <p:commandLink  id="checklist-infoedit-commandlink"
+                                                                ajax="true"
+                                                               style="color:blue;"
+                                                               oncomplete="PF('checklist-infoedit-dialog-var').show()"
                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                                update="checklist-infoedit-dialog"
-                                                               value="view/edit"
+                                                               value="edit"
                                                                actionListener="#{checklistsBB.onChecklistViewEditLinkClick(chklst)}">
                                                 </p:commandLink>
                                             </p:column>
-                                            <p:rowExpansion>
-
-                                                <h:outputText value="expanded text" />
-                                            </p:rowExpansion>
                                         </p:dataTable>
 
 
@@ -100,54 +106,70 @@
                                 <h:form id="spacetype-list-form">
 
                                     <h2>
-                                        <h:outputText value="Configure space types in #{chklst.title}"/> 
+                                        <h:outputText value="Configure space types and ordinances in checklist '#{checklistsBB.currentChecklistTemplate.title}' (ID:#{checklistsBB.currentChecklistTemplate.inspectionChecklistID})" /> 
                                     </h2>
 
                                     <p:commandButton id="checklist-create-init-button"
                                                      value="Add space type"
                                                      icon="fa fa-plus"
-                                                     oncomplete="PF('spacetypes-dialog-var').show()"
+                                                     disabled="#{empty checklistsBB.currentChecklistTemplate}"
+                                                     oncomplete="PF('addspacetype-dialog-var').show()"
                                                      actionListener="#{checklistsBB.onSpaceTypeLinkInitButtonChange}"
-                                                     update="checklist-infoedit-dialog"/>
-
+                                                     update="addspacetype-dialog
+                                                     addspacetype-form"/>
+                                    <p:spacer height="5px" />
 
                                     <p:dataTable id="checklist-spacetypes-dt"
                                                  value="#{checklistsBB.currentChecklistTemplate.occSpaceTypeList}"
                                                  var="ost" 
                                                  rowKey="#{ost.checklistSpaceTypeID}"
                                                  stripedRows="true"
+                                                 reflow="true"
+                                                 scrollable="true"
+                                                 sortBy="#{ost.spaceTypeTitle}"
                                                  rowExpandMode="multiple">
 
 
-                                        <p:column style="width:2rem">
+                                        <p:column style="width:5%" 
+                                                  headerText="Exp.">
                                             <p:rowToggler/>
                                         </p:column>
-                                        
-                                        <p:column headerText="CSTID">
-                                            <h:outputText value="#{ost.checklistSpaceTypeID}"/>
-                                        </p:column>
-                                        
-                                        <p:column headerText="Type ID">
-                                            <h:outputText value="#{ost.spaceTypeID}"/>
-                                        </p:column>
-                                        
-                                        <p:column headerText="Chklst ID">
-                                            <h:outputText value="#{ost.checklistParentID}"/>
-                                        </p:column>
-                                        
-                                        <p:column headerText="Name">
+                                        <p:column headerText="Name"
+                                                  style="width:15%">
                                             <h:outputText value="#{ost.spaceTypeTitle}"/>
                                         </p:column>
-                                        
-                                        <p:column headerText="Description">
-                                            <h:outputText value="#{ost.spaceTypeDescription}"/>
+
+                                        <p:column headerText="Description"
+                                                  style="width:20%">
+                                            <div class="wrapText">
+                                                <h:outputText value="#{ost.spaceTypeDescription}"/>
+                                            </div>
                                         </p:column>
-                                        
-                                        <p:column headerText="Required">
+
+                                        <p:column headerText="Required"
+                                                  style="width:5%"
+                                                  sortBy="#{ost.required}">
                                             <i class="#{ost.required ? 'pi pi-star' : ''}"/>
                                         </p:column>
-                                        
-                                        <p:column headerText="Actions">
+
+                                        <p:column headerText="CSTID"
+                                                  style="width:5%">
+                                            <h:outputText value="#{ost.checklistSpaceTypeID}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Type ID"
+                                                  style="width:5%">
+                                            <h:outputText value="#{ost.spaceTypeID}"/>
+                                        </p:column>
+
+                                        <p:column headerText="Chklst ID"
+                                                  style="width:5%">
+                                            <h:outputText value="#{ost.checklistParentID}"/>
+                                        </p:column>
+
+
+                                        <p:column headerText="Actions"
+                                                  style="width:30%">
 
                                             <p:commandLink  id="occspacetype-linkords-link"
                                                             ajax="true"
@@ -155,41 +177,131 @@
                                                             oncomplete="PF('select-ece-dialog-var').show()"
                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                             update="select-ece-form"
-                                                            value="link ordinances to this space type"
+                                                            value="link ordinances"
                                                             actionListener="#{checklistsBB.onChooseOrdinancesToLinkToSpaceTypeLinkCLick(ost)}" />
-                                                            
-                                            
-                                            
+
                                             <h:outputText value=" | " />
 
                                             <p:commandLink  id="occspacetype-togglerequired-link"
                                                             ajax="true"
                                                             style="color:blue;"
-                                                            oncomplete="PF('select-ece-dialog-var').show()"
                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                            update="@form"
-                                                            value="#{ost.required ? 'declare optional':'declare required'}"
+                                                            update="@form
+                                                            @form:@parent:checklists-growl-form"
+                                                            value="#{ost.required ? 'mark as optional':'mark as required'}"
                                                             actionListener="#{checklistsBB.onToggleRequiredOccSpaceTypeChecklistified(ost)}" />
+
+                                            <h:outputText value=" | " />
                                             
+
+                                            <p:commandLink  id="occspacetype-remove-init-link"
+                                                            ajax="true"
+                                                            style="color:blue;"
+                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                            update="remove-ost-confirm-dialog
+                                                            remove-ost-confirm-form"
+                                                            value="remove"
+                                                            oncomplete="PF('remove-ost-confirm-dialog-var').show();"
+                                                            actionListener="#{checklistsBB.onRemoveSpaceTypeFromChecklistInit(ost)}" >
+                                            </p:commandLink>
+                                            
+
 
                                         </p:column>
                                         <p:rowExpansion>
+                                            <h3>
+                                                <h:outputText value="Ordinances to check while inspecting: #{ost.spaceTypeTitle}" />
+                                            </h3>
                                             <p:dataTable id="ordbytype-table"
-                                                         var="ord"
+                                                         var="occSpcEle"
                                                          value="#{ost.codeElementList}"
-                                                         rowKey="#{ord.elementID}"
+                                                         rowKey="#{occSpcEle.occChecklistSpaceTypeElementID}"
                                                          stripedRows="true">
+                                                   <p:column style="width:5%" 
+                                                            headerText="Exp.">
+                                                      <p:rowToggler/>
+                                                  </p:column>
+                                                <p:column headerText="OCSTID"
+                                                          style="width:7%">
+                                                    <h:outputText value="#{occSpcEle.occChecklistSpaceTypeElementID}"/>
+                                                </p:column>
+                                                <p:column headerText="Ordinance"
+                                                          style="width:40%">
+                                                    <h:outputText value="#{occSpcEle.headerString}"
+                                                                  escape="false"/>
+                                                </p:column>
+                                                <p:column headerText="Req?"
+                                                          style="width:7%">
+                                                    <i class="#{occSpcEle.requiredForInspection ? 'pi pi-star' : ''}"/>
+                                                </p:column>
+                                                <p:column headerText="Category"
+                                                          style="width:15%"
+                                                          sortBy="#{occSpcEle.guideEntry.category}">
+                                                    <h:outputText value="#{occSpcEle.guideEntry.category}" />
+                                                </p:column>
+                                                <p:column headerText="Subcategory"
+                                                          style="width:15%"
+                                                          sortBy="#{occSpcEle.guideEntry.subCategory}">
+                                                    <h:outputText value="#{occSpcEle.guideEntry.subCategory}" />
+                                                </p:column>
+                                                
+                                                <p:column headerText="Actions"
+                                                          style="width:25%">
+                                                    
+                                                    <p:commandLink  id="occspacetype-vieworddetails-commandlink"
+                                                                    ajax="true"
+                                                                    style="color:blue;"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                    update="eceview-dialog
+                                                                            eceview-dialog"
+                                                                    value="ord details"
+                                                                    oncomplete="PF('eceview-dialog-var').show();"
+                                                                    actionListener="#{checklistsBB.onViewOrdinanceDetailsLinkClick(occSpcEle)}" />
 
-                                                <p:column headerText="EleID">
-                                                    <h:outputText value="#{ord.occChecklistSpaceTypeElementID}"/>
-                                                </p:column>
-                                                <p:column headerText="subsec">
-                                                    <h:outputText value="#{ord.headerString}"/>
-                                                </p:column>
-                                                <p:column headerText="Required">
-                                                    <i class="#{ord.requiredForInspection ? 'pi pi-star' : ''}"/>
-                                                </p:column>
+                                                    <h:outputText value=" | " />
+                                                    
+                                                    <p:commandLink  id="occspacetype-togglerequired-link"
+                                                                    ajax="true"
+                                                                    style="color:blue;"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    update="@form
+                                                                    @form:@parent:checklists-growl-form"
+                                                                    value="#{occSpcEle.requiredForInspection ? 'mark as optional':'mark as required'}"
+                                                                    actionListener="#{checklistsBB.onToggleRequiredOccSpaceElement(occSpcEle)}" />
 
+                                                    <h:outputText value=" | " />
+
+                                                    <p:commandLink  id="occspaceelement-remove-init-link"
+                                                                    ajax="true"
+                                                                    style="color:blue;"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                    update="remove-ose-confirm-dialog
+                                                                    remove-ose-confirm-form"
+                                                                    oncomplete="PF('remove-ose-confirm-dialog-var').show();"
+                                                                    value="remove"
+                                                                    actionListener="#{checklistsBB.onRemoveOccSpaceElementFromSpaceTypeInit(occSpcEle)}" >
+                                                        
+                                                    </p:commandLink>
+                                                  
+                                                </p:column>
+                                                <p:rowExpansion>
+                                                    
+                                                    <div class="p-grid">
+                                                        <div class="p-col-3">
+                                                            Technical Text
+                                                        </div>
+                                                        <div class="p-col-9">
+                                                            
+                                                            <h:outputText value="#{occSpcEle.headerString}"
+                                                                          escape="false"/>
+                                                            <p:spacer height="3px" />
+                                                            <div class="wrapText">
+                                                                <h:outputText value="#{occSpcEle.ordTechnicalText}"
+                                                                              escape="false" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </p:rowExpansion>
                                             </p:dataTable>
                                         </p:rowExpansion>
                                     </p:dataTable>
@@ -197,7 +309,139 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <ui:include src="/restricted/cogstaff/code/compositions/enforcableCodeElementTools.xhtml" />
 
+                    
+                    <p:confirmDialog id="remove-ost-confirm-dialog"
+                                     widgetVar="remove-ost-confirm-dialog-var"
+                                     header="Confirm removal of Space Type from Checklist?"
+                                     closeOnEscape="true"
+                                     closable="true"
+                                     responsive="true">
+                        
+                        <h:form id="remove-ost-confirm-form">
+                            
+
+                            <p:commandButton  id="occspacetype-remove-link"
+                                            ajax="true"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                            update="@form:@parent:checklists-growl-form
+                                                    spacetype-list-form"
+                                            value="Confirm removal of space type #{checklistsBB.currentOccSpaceTypeChecklistified.spaceTypeTitle} from checklist ID: #{checklistsBB.currentChecklistTemplate.inspectionChecklistID}"
+                                            actionListener="#{checklistsBB.onRemoveSpaceTypeFromChecklist}" 
+                                            oncomplete="PF('remove-ost-confirm-dialog-var').hide()">
+
+
+                            </p:commandButton>
+                            
+                            <p:spacer height="5px" />
+                            
+                            <div class="gray_button">
+
+                                <p:commandButton id="remove-ost-abort-button"
+                                                 value="Cancel"
+                                                 styleClass="gray-button"
+                                                 rendered="true"
+                                                 icon="fa fa-stop"
+                                                 process="@none"
+                                                 immediate="true"
+                                                 actionListener="#{checklistsBB.onRemoveOperationAbortButtonPress}"
+                                                 oncomplete="PF('remove-ost-confirm-dialog-var').hide()" />
+                            </div>
+
+                            
+                        </h:form>
+                        
+                        
+                        
+                    </p:confirmDialog>
+                    
+                    <p:confirmDialog id="remove-ose-confirm-dialog"
+                                     widgetVar="remove-ose-confirm-dialog-var"
+                                     header="Confirm removal of ordinance from space type?">
+                        <h:form id="remove-ose-confirm-form">
+                            
+                        
+                            <p:commandButton  id="occspaceelement-remove-button"
+                                            ajax="true"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                            update="spacetype-list-form
+                                            @form:@parent:checklists-growl-form"
+                                            oncomplete="PF('remove-ose-confirm-dialog-var').hide()"
+                                            value="Confirm removal of ordinance ECEID: #{checklistsBB.currentOccSpaceElement.codeSetElementID} from current space type?"
+                                            actionListener="#{checklistsBB.onRemoveOccSpaceElementFromSpaceType}" >
+                                                        
+                            </p:commandButton>
+                            <p:spacer height="5px" />
+                            
+                            <div class="gray_button">
+
+                                <p:commandButton id="remove-ose-abort-button"
+                                                 value="Cancel"
+                                                 styleClass="gray-button"
+                                                 rendered="true"
+                                                 icon="fa fa-stop"
+                                                 process="@none"
+                                                 immediate="true"
+                                                 actionListener="#{checklistsBB.onRemoveOperationAbortButtonPress}"
+                                                 oncomplete="PF('remove-ose-confirm-dialog-var').hide()" />
+                            </div>
+                            
+                        
+                        </h:form>
+                        
+                        
+                    </p:confirmDialog>
+                    
+                    
+                    
+                    <p:confirmDialog id="remove-checklist-confirm-dialog"
+                                     widgetVar="remove-checklist-confirm-dialog-var"
+                                     header="Confirm deactivation of checklist?"
+                                     closeOnEscape="true"
+                                     closable="true"
+                                     responsive="true">
+                        
+                        <h:form id="remove-checklist-confirm-form">
+                            
+
+                            <p:commandButton  id="checklist-remove-commit-button"
+                                            ajax="true"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                            update="@form:@parent:checklists-growl-form
+                                                    spacetype-list-form
+                                                    checklists-form"
+                                                    value="Confirm removal of checklist ID: #{checklistsBB.currentChecklistTemplate.inspectionChecklistID} (#{checklistsBB.currentChecklistTemplate.title})"
+                                                    actionListener="#{checklistsBB.onDeactivateChecklistButtonPress}" 
+                                            oncomplete="PF('remove-checklist-confirm-dialog-var').hide()">
+
+
+                            </p:commandButton>
+                            
+                            <p:spacer height="5px" />
+                            
+                            <div class="gray_button">
+
+                                <p:commandButton id="remove-checklist-abort-button"
+                                                 value="Cancel"
+                                                 styleClass="gray-button"
+                                                 rendered="true"
+                                                 icon="fa fa-stop"
+                                                 process="@none"
+                                                 immediate="true"
+                                                 actionListener="#{checklistsBB.onRemoveOperationAbortButtonPress}"
+                                                 oncomplete="PF('remove-checklist-confirm-dialog-var').hide()" />
+                            </div>
+
+                            
+                        </h:form>
+                        
+                        
+                        
+                    </p:confirmDialog>
+                    
+                    
                     <p:dialog id="checklist-infoedit-dialog"
                               width="1000"
                               widgetVar="checklist-infoedit-dialog-var"
@@ -216,6 +460,7 @@
                                              actionListener="#{checklistsBB.onToggleEditModeChecklistTemplateButtonClick}"
                                              oncomplete="PF('checklist-infoedit-dialog-var').show()"
                                              update="@form
+                                             @form:@parent:checklists-form
                                              @form:@parent:checklists-growl-form"/>
 
                             <div class="gray_button">
@@ -228,7 +473,7 @@
                                                  process="@none"
                                                  immediate="true"
                                                  actionListener="#{checklistsBB.onEditModeChecklistTemplateAbort}"
-                                                 oncomplete="PF('checklist-infoedit-dialog-var').show()"
+                                                 oncomplete="PF('checklist-infoedit-dialog-var').hide()"
                                                  update="@form
                                                  @form:@parent:checklists-growl-form"/>
                             </div>
@@ -248,6 +493,7 @@
                                 </div>
                                 <div class="p-col-6">
                                     <h:outputText value="#{checklistsBB.currentChecklistTemplate.muni.muniName}" 
+                                                  rendered="#{!checklistsBB.editModeCurrentChecklistTemplate}"
                                                   />
 
                                     <p:selectOneMenu 
@@ -329,27 +575,31 @@
                                     <p:commandLink  id="checkist-deactivate-clink"
                                                     ajax="true"
                                                     style="color:blue;"
-                                                    oncomplete="PF('checklist-infoedit-dialog-var').show()"
+                                                    oncomplete="PF('remove-checklist-confirm-dialog-var').show()"
                                                     rendered="#{!checklistsBB.editModeCurrentChecklistTemplate}"
                                                     update="checklists-form
-                                                    checklists-growl-form"
+                                                    checklists-growl-form
+                                                    remove-checklist-confirm-dialog
+                                                    remove-checklist-confirm-form"
                                                     value="Deactivate checklist ID #{checklistsBB.currentChecklistTemplate.inspectionChecklistID}"
-                                                    actionListener="#{checklistsBB.onDeactivateChecklistLinkClick}">
+                                                    actionListener="#{checklistsBB.onDeactivateChecklistInitLinkClick}">
 
                                     </p:commandLink>
-
-
                                 </div>
                             </div>
 
                         </h:form>
                     </p:dialog>
 
+                    
+                    
 
                     <p:dialog id="select-ece-dialog"
                               widgetVar="select-ece-dialog-var"
                               header="Select code elements to inspect in #{checklistsBB.currentOccSpaceTypeChecklistified.spaceTypeTitle}"
                               modal="true"
+                              height="800px"
+                              width="1200px"
                               closeOnEscape="true"
                               closable="true"
                               resizable="true">
@@ -364,12 +614,9 @@
                                              style="width: 275px"
                                              disabled="#{empty codeSetBB.currentCodeSet}"
                                              oncomplete="PF('select-ece-dialog-var').hide();"
-                                             update="
-                                             checklists-growl-form
-                                             select-ece-dialog
-                                             select-ece-form
-                                             "
-                                             actionListener="#{checklistsBB.on}" />
+                                             update="   checklists-growl-form
+                                                        spacetype-list-form"
+                                            actionListener="#{checklistsBB.onLinkSelectedECEsToSpaceType}" />
 
                             <p:spacer height="5px" />
 
@@ -385,15 +632,16 @@
                             <p:dataTable
                                 id="elements-table"
                                 var="cse"
-                                value="#{checklistsBB.currentCodeSet.enfCodeElementList}"
+                                value="#{checklistsBB.occSpaceElementList}"
                                 rowKey="#{cse.codeSetElementID}"
                                 tableStyleClass="primeDataTable"
                                 resizableColumns="true"
                                 rowExpandMode="single"
                                 expandedRow="false"
-                                selection="#{checklistsBB.codeElementListSelected}"
-                                filteredValue="#{checklistsBB.codeElementListFiltered}"
-                                widgetVar=""
+                                selection="#{checklistsBB.occSpaceElementListSelected}"
+                                filteredValue="#{checklistsBB.occSpaceElementListFiltered}"
+                                widgetVar="elements-table-var"
+                                scrollable="true"
                                 tabindex="1">
 
 
@@ -404,9 +652,9 @@
                                     </f:facet>
                                     <p:rowToggler/>
                                 </p:column>
-                                
-                                  <p:column selectionMode="multiple" 
-                                                  style="width:16px;text-align:center"/>
+
+                                <p:column selectionMode="multiple" 
+                                          style="width:16px;text-align:center"/>
 
                                 <p:column width="5%" 
                                           sortBy="#{cse.codeSetElementID}">
@@ -487,12 +735,12 @@
                                 </p:column>
 
                                 <p:column   width="15%"
-                                            headerText="Actions"
+                                            headerText="Required?"
                                             styleClass="centeredColumnContent"
                                             >
 
+                                    <p:selectBooleanCheckbox value="#{cse.requiredForInspection}" />
 
-                              
 
                                 </p:column>
 
@@ -651,8 +899,8 @@
                               closable="true"
                               closeOnEscape="true"
                               modal="true"
-                              height="400"
-                              width="500"
+                              height="600"
+                              width="800"
                               resizable="true"
                               responsive="true">
 
@@ -661,13 +909,15 @@
                             <p:commandButton id="spacetype-new-init-button"
                                              value="Create new space type"
                                              icon="fa fa-plus"
+                                             ajax="true"
                                              oncomplete="PF('createnewspacetype-dialog-var').show()"
                                              actionListener="#{checklistsBB.onCreateNewSpaceTypeInitButtonPush}"
                                              update="createnewspacetype-dialog
                                              createnewspacetype-form"/>
 
+                            <p:spacer height="10px" />
                             <div class="p-grid">
-                                <div class="p-col-6">
+                                <div class="p-col-8">
                                     Choose the space types:
                                     <p:dataTable id="ordbytype-table"
                                                  var="tpe"
@@ -695,10 +945,12 @@
 
 
                                 </div>
-                                <div class="p-col-6">
-
+                                <div class="p-col-4">
+                                    <h:outputText value="Add space types as required?" />
+                                    <p:spacer height="3px" />
                                     <p:selectBooleanCheckbox value="#{checklistsBB.spaceTypeBatchRequired}" 
-                                                             label="Require space type in inspection"/>
+                                                             label="Require space type in inspection"
+                                                             />
                                 </div>
                             </div>
                             <p:spacer height="5px" />
@@ -706,9 +958,10 @@
                             <p:commandButton id="addspacetype-addcommit-button"
                                              value="Add selected spaces to checklist"
                                              icon="fa fa-plus"
-                                             oncomplete="PF('').show()"
+                                             oncomplete="PF('addspacetype-dialog-var').hide()"
                                              actionListener="#{checklistsBB.onLinkSelectedSpaceTypesToChecklist}"
-                                             update="checklist-infoedit-dialog"/>
+                                             update="   spacetype-list-form
+                                                        checklists-growl-form"/>
 
                             <p:spacer height="5px" />
                             <div class="ui-button gray_button">
@@ -722,10 +975,10 @@
                             </div>
                         </h:form>
                     </p:dialog>
-                    
-                    
-                    
-                    
+
+
+
+
 
                     <p:dialog id="createnewspacetype-dialog"
                               widgetVar="createnewspacetype-dialog-var"
@@ -740,15 +993,26 @@
 
                         <h:form id="createnewspacetype-form">
                             
-                              <p:commandButton id="createnewspacetype-toggleedit-button"
-                                               value="#{checklistsBB.editModeCurrentOccSpaceType ? 'Save Changes' : 'Edit'}"
+                            <p>
+                                A space type is a general category for a kind of room or area in or on a property, 
+                                such as "Bathroom" or "In-ground pool" or "Kitchen". Note that these space types
+                                have no instructions for inspections inside of them--they are just labels. Given their 
+                                commonality across properties and municipalities, they are shared across all municipalities.
+                                Please be thoughtful to not add redundant space types.
+                            </p>
+
+                            <p:commandButton id="createnewspacetype-toggleedit-button"
+                                             value="#{checklistsBB.editModeCurrentOccSpaceType ? 'Save Changes' : 'Edit'}"
                                              disabled="false"
+                                             ajax="true"
                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                              icon="fa #{checklistsBB.editModeCurrentOccSpaceType? 'fa-check' : 'fa-pencil'}"
                                              actionListener="#{checklistsBB.onEditModeOccSpaceTypeToggleButtonPush}"
-                                             oncomplete="PF('createnewspacetype-dialog-var').hide(): "
-                                             update="addspacetype-form
-                                             @form:@parent:checklists-growl-form"/>
+                                             oncomplete="PF('createnewspacetype-dialog-var').hide();
+                                             PF('addspacetype-dialog-var').show();"
+                                             update="   addspacetype-form
+                                                        @form:@parent:checklists-growl-form
+                                                        addspacetype-dialog"/>
 
                             <div class="gray_button">
 
@@ -765,17 +1029,14 @@
                                                  @form:@parent:checklists-growl-form"/>
                             </div>
 
-                            
-                            
-                            
-                             <div class="p-grid">
+                            <div class="p-grid">
                                 <div class="p-col-6">
                                     ID
                                 </div>
                                 <div class="p-col-6">
-                                    <h:outputText value="#{checklistsBB.currentOccSpaceType eq 0 ? '(New space type)' :checklistsBB.currentOccSpaceType.spaceTypeID}" />
+                                    <h:outputText value="#{checklistsBB.currentOccSpaceType.spaceTypeID eq 0 ? '(New space type)' :checklistsBB.currentOccSpaceType.spaceTypeID}" />
                                 </div>
-                                 
+
                                 <div class="p-col-6">
                                     Title
                                 </div>
@@ -783,9 +1044,9 @@
                                     <h:outputText value="#{checklistsBB.currentOccSpaceType.spaceTypeTitle}" 
                                                   rendered="#{!checklistsBB.editModeCurrentOccSpaceType}"/>
                                     <p:inputText value="#{checklistsBB.currentOccSpaceType.spaceTypeTitle}" 
-                                                  rendered="#{checklistsBB.editModeCurrentOccSpaceType}"/>
+                                                 rendered="#{checklistsBB.editModeCurrentOccSpaceType}"/>
                                 </div>
-                                 
+
                                 <div class="p-col-6">
                                     Description
                                 </div>
@@ -793,11 +1054,16 @@
                                     <h:outputText value="#{checklistsBB.currentOccSpaceType.spaceTypeDescription}" 
                                                   rendered="#{!checklistsBB.editModeCurrentOccSpaceType}"/>
                                     <p:inputText value="#{checklistsBB.currentOccSpaceType.spaceTypeDescription}" 
-                                                  rendered="#{checklistsBB.editModeCurrentOccSpaceType}"/>
+                                                 rendered="#{checklistsBB.editModeCurrentOccSpaceType}"/>
                                 </div>
-                             </div>
+                            </div>
                         </h:form>
                     </p:dialog>
+                    
+                    
+                    
+                    
+                    
                 </f:view>
             </ui:define>
         </ui:composition>

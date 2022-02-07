@@ -17,13 +17,16 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.EntityUtils;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Mapped to fields of the spacetype table
  * @author EC Darsow
  */
-public class OccSpaceType extends EntityUtils{
+public class OccSpaceType 
+        extends EntityUtils 
+        implements Serializable{
     protected int spaceTypeID;
     protected String spaceTypeTitle;
     protected String spaceTypeDescription;
@@ -80,8 +83,30 @@ public class OccSpaceType extends EntityUtils{
         this.spaceTypeDescription = spaceTypeDescription;
     }
 
-    
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 83 * hash + this.spaceTypeID;
+        return hash;
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+//        if (getClass() != obj.getClass()) {
+//            return false;
+//        }
+        final OccSpaceType other = (OccSpaceType) obj;
+        if (this.spaceTypeID != other.spaceTypeID) {
+            return false;
+        }
+        return true;
+    }
 
   
 }

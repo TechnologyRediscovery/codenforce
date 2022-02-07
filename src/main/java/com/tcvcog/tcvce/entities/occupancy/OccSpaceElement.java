@@ -34,7 +34,8 @@ import com.tcvcog.tcvce.entities.EnforcableCodeElement;
  * 
  * @author sylvia
  */
-public class OccSpaceElement extends EnforcableCodeElement {
+public class OccSpaceElement 
+        extends EnforcableCodeElement {
     
     protected int occChecklistSpaceTypeElementID;
     protected boolean requiredForInspection;
@@ -97,5 +98,6 @@ public class OccSpaceElement extends EnforcableCodeElement {
         this.parentSpaceTypeID = parentSpaceTypeID;
     }
 
-   
+    
+    
 }

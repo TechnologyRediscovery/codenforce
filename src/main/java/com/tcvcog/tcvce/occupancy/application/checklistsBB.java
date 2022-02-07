@@ -48,11 +48,11 @@ public class checklistsBB extends BackingBeanUtils {
     private boolean editModeCurrentOccSpaceTypeChecklistified;
     
     private CodeSet currentCodeSet;
-    
-    
 
-    private List<EnforcableCodeElement> codeElementListFiltered;
-    private List<EnforcableCodeElement> codeElementListSelected;
+    private OccSpaceElement currentOccSpaceElement;
+    private List<OccSpaceElement> occSpaceElementList;
+    private List<OccSpaceElement> occSpaceElementListSelected;
+    private List<OccSpaceElement> occSpaceElementListFiltered;
 
     /**
      * Creates a new instance of checklistsBB
@@ -65,13 +65,15 @@ public class checklistsBB extends BackingBeanUtils {
      */
     @PostConstruct
     public void initBean() {
-
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
         CodeCoordinator cc = getCodeCoordinator();
         try {
-            refreshCurrentChecklistTemplateAndList();
+            refreshCurrentChecklistTemplateList();
             codeSourceList = cc.getCodeSourceList();
-            initSpaceTypeLists();
+            refreshSpaceTypeListAndClearSelected();
             currentCodeSet = getSessionBean().getSessCodeSet();
+            occSpaceElementList = oic.wrapECEListInOccSpaceElementWrapper(currentCodeSet.getEnfCodeElementList());
+            occSpaceElementListFiltered = new ArrayList<>();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -81,7 +83,7 @@ public class checklistsBB extends BackingBeanUtils {
     /**
      * Sets member with list of all space types--muni agnostic
      */
-    private void initSpaceTypeLists() throws IntegrationException{
+    private void refreshSpaceTypeListAndClearSelected() throws IntegrationException{
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         spaceTypeList = oic.getOccSpaceTypeList();
         spaceTypeListSelected = new ArrayList<>();
@@ -106,7 +108,9 @@ public class checklistsBB extends BackingBeanUtils {
      * @param oct
      */
     public void onChecklistViewEditLinkClick(OccChecklistTemplate oct) {
+        System.out.println("ChecklistsBB.onChecklistViewEditLinkClick | ChecklsitID: " + oct.getInspectionChecklistID());
         currentChecklistTemplate = oct;
+        refreshCurrentChecklistTemplate();
 
     }
     
@@ -128,22 +132,23 @@ public class checklistsBB extends BackingBeanUtils {
     public void toggleEditModeChecklistTemplate() {
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
+            System.out.println("InspectionsBB.toggleEditModeChecklistTemplate | start of method value: " + editModeCurrentChecklistTemplate);
             if (editModeCurrentChecklistTemplate) {
                 if (currentChecklistTemplate == null) {
                     throw new BObStatusException("Cannot edit a null current checklist template");
                 }
                 if(currentChecklistTemplate.getInspectionChecklistID() == 0){
-                    oic.insertChecklistTemplateMetadata(currentChecklistTemplate);
+                    int freshid = oic.insertChecklistTemplateMetadata(currentChecklistTemplate);
+                    currentChecklistTemplate = oic.getChecklistTemplate(freshid);
+                    System.out.println("InspectionsBB.toggleEditModeChecklistTemplate | inserted...");
                 } else {
                     oic.updateChecklistTemplateMetadata(currentChecklistTemplate);
+                    System.out.println("InspectionsBB.toggleEditModeChecklistTemplate | updated...");
                 }
+                refreshCurrentChecklistTemplateList();
+                refreshCurrentChecklistTemplate();
 
-            } else {
-                getFacesContext().addMessage(null,
-                       new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                               "You are now editing checklist ID " + currentChecklistTemplate.getInspectionChecklistID(), ""));
-
-            }
+            } 
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
@@ -170,28 +175,50 @@ public class checklistsBB extends BackingBeanUtils {
      * Grabs a fresh copy of the checklist list from DB 
      * and restores the current template to the current Role
      */
-    public void refreshCurrentChecklistTemplateAndList(){
+    public void refreshCurrentChecklistTemplateList(){
         OccInspectionCoordinator osi = getOccInspectionCoordinator();
         try {
             checklistTemplateList = osi.getOccChecklistTemplateList(getSessionBean().getSessMuni());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        if(currentChecklistTemplate != null && checklistTemplateList != null && !checklistTemplateList.isEmpty()){
-            // replace our currentChecklistTemplate with a fresh one from the complete list we just got
-            currentChecklistTemplate = checklistTemplateList.get(checklistTemplateList.indexOf(currentChecklistTemplate));
+       
+    }
+    
+    /**
+     * Asks the coordinator for a fresh copy of the current checklist
+     */
+    public void refreshCurrentChecklistTemplate(){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        if(currentChecklistTemplate !=  null){
+            try {
+                currentChecklistTemplate = oic.getChecklistTemplate(currentChecklistTemplate.getInspectionChecklistID());
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
         }
     }
+    
+    /**
+     * Listener for user requests to start the deactivation process
+     * @param oct to be deactivated in next step
+     */
+    public void onDeactivateChecklistInitLinkClick(ActionEvent ev){
+        System.out.println("ChecklistsBB.onDeactivateChecklistInitLinkClick");
+        
+    }
+    
     
     /**
      * Listener for user requests to deactivate a checklist
      * @param ev 
      */
-    public void onDeactivateChecklistLinkClick(ActionEvent ev){
+    public void onDeactivateChecklistButtonPress(ActionEvent ev){
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         if(currentChecklistTemplate != null){
             try {
                 oic.deactivateChecklistTemplate(getSessionBean().getSessUser(), currentChecklistTemplate);
+                refreshCurrentChecklistTemplateList();
                 getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO, 
                                "Deactivated checklist template ID: " 
@@ -213,6 +240,7 @@ public class checklistsBB extends BackingBeanUtils {
     public void onCreateNewSpaceTypeInitButtonPush(ActionEvent ev){
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         currentOccSpaceType = oic.getOccSpaceTypeSkeleton();
+        editModeCurrentOccSpaceType = true;
     }
     
     
@@ -231,9 +259,18 @@ public class checklistsBB extends BackingBeanUtils {
                 }
                 if(currentOccSpaceType.getSpaceTypeID() == 0){
                     oic.insertSpaceType(currentOccSpaceType);
+                    getFacesContext().addMessage(null,
+                           new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                                   "Success: Added new space type: " + currentOccSpaceType.getSpaceTypeTitle(), ""));
                 } else {
                     oic.updateSpaceType(currentOccSpaceType);
+                    getFacesContext().addMessage(null,
+                           new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                                   "Success: Updated space type: " + currentOccSpaceType.getSpaceTypeTitle(), ""));
                 }
+                refreshSpaceTypeListAndClearSelected();
+                // rebuild our spaceType list with the new values
+                onSpaceTypeLinkInit();
 
             } else {
                 getFacesContext().addMessage(null,
@@ -262,6 +299,7 @@ public class checklistsBB extends BackingBeanUtils {
         
     }
     
+    
     /**
      * Listener for user requests to abort the edit of a checklist
      * @param ev 
@@ -273,16 +311,37 @@ public class checklistsBB extends BackingBeanUtils {
         
     }
     
-    
     /**
-     * Listener for user requests to add a space type to a checklist
+     * Listener for user requests to start the link process
+     * between a space type and the current checklist
      * @param ev 
      */
     public void onSpaceTypeLinkInitButtonChange(ActionEvent ev){
+        onSpaceTypeLinkInit();
+    }
+    
+    
+    /**
+     * Builds a custom spaceTypeLIst that only includes unique values
+     * for the current Checklist
+     */
+    private void onSpaceTypeLinkInit(){
         // Take out the space types already linked
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         List<OccSpaceType> tempTypeList = new ArrayList<>();
-        if(spaceTypeList != null && currentChecklistTemplate != null && !currentChecklistTemplate.getOccSpaceTypeList().isEmpty()){
+        if(spaceTypeList == null){
+            spaceTypeList = new ArrayList<>();
+        }
+        if(spaceTypeListSelected == null){
+            spaceTypeListSelected = new ArrayList();
+        }
+        if(!spaceTypeListSelected.isEmpty()){
+            spaceTypeListSelected.clear();
+        }
+
+        if(     currentChecklistTemplate != null 
+                && currentChecklistTemplate.getOccSpaceTypeList() != null 
+                && !currentChecklistTemplate.getOccSpaceTypeList().isEmpty()){
             List<OccSpaceType> typesInChecklist = oic.downcastOccSpaceTypeChecklistified(currentChecklistTemplate.getOccSpaceTypeList());
             // Don't display space types that are already in the template
             for(OccSpaceType ost: spaceTypeList){
@@ -290,9 +349,8 @@ public class checklistsBB extends BackingBeanUtils {
                     tempTypeList.add(ost);
                 }
             }
-        }
-        spaceTypeList = tempTypeList;
-        
+            spaceTypeList = tempTypeList;
+        } 
     }
     /**
      * Listener for user requests to attach all their
@@ -313,6 +371,7 @@ public class checklistsBB extends BackingBeanUtils {
                            new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
                 } 
             }
+            refreshCurrentChecklistTemplate();
         }
     }
 
@@ -326,6 +385,120 @@ public class checklistsBB extends BackingBeanUtils {
         
     }
     
+    /**
+     * Listener for user requests to connect their selected
+     * code elements to the current SpaceType
+     * 
+     * @param ev 
+     */
+    public void onLinkSelectedECEsToSpaceType(ActionEvent ev){
+        if(occSpaceElementListSelected != null && !occSpaceElementListSelected.isEmpty()){
+            System.out.println("ChecklistsBB.onLinkSelectedECEsToSpaceType | selected list size " + occSpaceElementListSelected.size());
+            OccInspectionCoordinator oic = getOccInspectionCoordinator();
+            for(OccSpaceElement ose: occSpaceElementListSelected){
+                try {
+                    oic.insertAndLinkCodeElementsToSpaceType(currentOccSpaceTypeChecklistified, ose);
+                     getFacesContext().addMessage(null,
+                               new FacesMessage(FacesMessage.SEVERITY_INFO,"Successfully linked code element ID: " 
+                                       + ose.getCodeSetElementID()  
+                                       + " to checklist space type: " 
+                                       + currentOccSpaceTypeChecklistified.getChecklistSpaceTypeID(), ""));
+                } catch (BObStatusException | IntegrationException ex) {
+                    System.out.println(ex);
+                     getFacesContext().addMessage(null,
+                               new FacesMessage(FacesMessage.SEVERITY_ERROR,"Error linking ordinances to space type: " + ex.getMessage(), ""));
+                } 
+            }
+            refreshCurrentChecklistTemplate();
+            occSpaceElementListSelected.clear();
+        } // null inputs check
+    }
+    
+    /**
+     * Listener to view the details of an enforcable ordinance in a space type.
+     * Sets up the session bean to hold the choice, and lets the template be
+     * displayed
+     * @param ose to view
+     */
+    public void onViewOrdinanceDetailsLinkClick(OccSpaceElement ose){
+        System.out.println("ChecklistsBB.onViewOrdinanceDetailsLinkClick | cseID: " + ose.getCodeSetElementID());
+        getSessionBean().setSessEnforcableCodeElement((EnforcableCodeElement) ose);
+    }
+    
+    
+    /**
+     * Listener to start the removal process of a space type from a checklist
+     * @param ostchk 
+     */
+    public void onRemoveSpaceTypeFromChecklistInit(OccSpaceTypeChecklistified ostchk){
+        currentOccSpaceTypeChecklistified = ostchk;
+    }
+    
+    /**
+     * Listener for user requests to remove a space type from a the current checklist
+     * @param ostchk
+     */
+    public void onRemoveSpaceTypeFromChecklist(){
+        if(currentOccSpaceTypeChecklistified != null){
+            
+            System.out.println("ChecklistsBB.onRemoveSpaceTypeFromChecklist | OSTID: " + currentOccSpaceTypeChecklistified.getChecklistSpaceTypeID());
+            OccInspectionCoordinator oic = getOccInspectionCoordinator();
+            try {
+                oic.detachOccSpaceTypeChecklistifiedFromTemplate(currentOccSpaceTypeChecklistified);
+                refreshCurrentChecklistTemplate();
+                  getFacesContext().addMessage(null,
+                               new FacesMessage(FacesMessage.SEVERITY_INFO,"Successfully removed Space Type ID: " + currentOccSpaceTypeChecklistified.getSpaceTypeID(), ""));
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                  getFacesContext().addMessage(null,
+                               new FacesMessage(FacesMessage.SEVERITY_ERROR,ex.getMessage() + " | On space typeID: "+ currentOccSpaceTypeChecklistified.getSpaceTypeID(), ""));
+            } 
+        }
+        
+    }
+
+
+    /**
+     * Listener for user requests to start the removal process.
+     * @param ose 
+     */
+    public void onRemoveOccSpaceElementFromSpaceTypeInit(OccSpaceElement ose){
+        currentOccSpaceElement = ose;
+    }
+
+    /**
+     * Listener for user requests to remove a space element from the type
+     * @param ose 
+     */
+    public void onRemoveOccSpaceElementFromSpaceType(){
+        if(currentOccSpaceElement != null){
+            
+            System.out.println("ChecklistsBB.onRemoveSpaceElementFromSpace | OSEID: " + currentOccSpaceElement.getOccChecklistSpaceTypeElementID());
+            
+            OccInspectionCoordinator oic = getOccInspectionCoordinator();
+            try {
+                oic.detachCodeElementFromSpaceType(currentOccSpaceElement);
+                refreshCurrentChecklistTemplate();
+                getFacesContext().addMessage(null,
+                             new FacesMessage(FacesMessage.SEVERITY_INFO," Successfully removed occ space element ID: "+ currentOccSpaceElement.getOccChecklistSpaceTypeElementID(), ""));
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                             new FacesMessage(FacesMessage.SEVERITY_ERROR,ex.getMessage() + " | On space element ID: "+ currentOccSpaceElement.getOccChecklistSpaceTypeElementID(), ""));
+            } 
+        } else {
+            System.out.println("ChecklistsBB.onRemoveSpaceElementFromSpace | NULL OSE INPUT!!");
+        }
+    }
+    
+    /**
+     * Listener for user requests to abort the removal process
+     * @param ev 
+     */
+    public void onRemoveOperationAbortButtonPress(ActionEvent ev){
+        System.out.println("InspectionsBB.onRemoveOperationAbortButtonPress");
+    }
+    
    
     
     /**
@@ -334,12 +507,18 @@ public class checklistsBB extends BackingBeanUtils {
      */
     public void onToggleRequiredOccSpaceTypeChecklistified(OccSpaceTypeChecklistified oschk){
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        System.out.println("ChecklistsBB.onToggleRequiredOccSpaceTypeChecklistified | ostchkID: " + oschk.getChecklistSpaceTypeID());
         try {
             // flip!
             oschk.setRequired(!oschk.isRequired());
             oic.updateSpaceTypeChecklistified(oschk);
+            refreshCurrentChecklistTemplate();
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO, "Toggled Required on OccSpaceType ID " + oschk.getChecklistSpaceTypeID() + " to " + oschk.isRequired(), ""));
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO, ex.getMessage(), ""));
         } 
     }
     
@@ -349,17 +528,24 @@ public class checklistsBB extends BackingBeanUtils {
      */
     public void onToggleRequiredOccSpaceElement(OccSpaceElement ose){
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
-        try {
-            oic.toggleRequiredAndUpdateOccSpaceElement(ose);
+        if(ose != null){
+
+            System.out.println("ChecklistsBB.onToggleRequiredOccSpaceElement | oseID: " + ose.getOccChecklistSpaceTypeElementID());
+            try {
+                oic.toggleRequiredAndUpdateOccSpaceElement(ose);
+                refreshCurrentChecklistTemplate();
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO, "Toggled Required on OccSpaceElement ID " + ose.getOccChecklistSpaceTypeElementID() + " to " + ose.isRequiredForInspection(), ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+            }
+        } else {
             getFacesContext().addMessage(null,
-                   new FacesMessage(FacesMessage.SEVERITY_INFO, "Toggled Required on OccSpaceElement ID " + ose.getOccChecklistSpaceTypeElementID() + " to " + ose.isRequiredForInspection(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                   new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR, "No OccSpaceElement selected", ""));
+        
         }
-        
-        
     }
     
     
@@ -425,17 +611,17 @@ public class checklistsBB extends BackingBeanUtils {
     }
 
     /**
-     * @return the codeElementListFiltered
+     * @return the occSpaceElementList
      */
-    public List<EnforcableCodeElement> getCodeElementListFiltered() {
-        return codeElementListFiltered;
+    public List<OccSpaceElement> getOccSpaceElementList() {
+        return occSpaceElementList;
     }
 
     /**
-     * @return the codeElementListSelected
+     * @return the occSpaceElementListSelected
      */
-    public List<EnforcableCodeElement> getCodeElementListSelected() {
-        return codeElementListSelected;
+    public List<OccSpaceElement> getOccSpaceElementListSelected() {
+        return occSpaceElementListSelected;
     }
 
     /**
@@ -491,17 +677,17 @@ public class checklistsBB extends BackingBeanUtils {
     }
 
     /**
-     * @param codeElementListFiltered the codeElementListFiltered to set
+     * @param occSpaceElementList the occSpaceElementList to set
      */
-    public void setCodeElementListFiltered(List<EnforcableCodeElement> codeElementListFiltered) {
-        this.codeElementListFiltered = codeElementListFiltered;
+    public void setOccSpaceElementList(List<OccSpaceElement> occSpaceElementList) {
+        this.occSpaceElementList = occSpaceElementList;
     }
 
     /**
-     * @param codeElementListSelected the codeElementListSelected to set
+     * @param occSpaceElementListSelected the occSpaceElementListSelected to set
      */
-    public void setCodeElementListSelected(List<EnforcableCodeElement> codeElementListSelected) {
-        this.codeElementListSelected = codeElementListSelected;
+    public void setOccSpaceElementListSelected(List<OccSpaceElement> occSpaceElementListSelected) {
+        this.occSpaceElementListSelected = occSpaceElementListSelected;
     }
 
     /**
@@ -572,6 +758,34 @@ public class checklistsBB extends BackingBeanUtils {
      */
     public void setCurrentCodeSet(CodeSet currentCodeSet) {
         this.currentCodeSet = currentCodeSet;
+    }
+
+    /**
+     * @return the occSpaceElementListFiltered
+     */
+    public List<OccSpaceElement> getOccSpaceElementListFiltered() {
+        return occSpaceElementListFiltered;
+    }
+
+    /**
+     * @param occSpaceElementListFiltered the occSpaceElementListFiltered to set
+     */
+    public void setOccSpaceElementListFiltered(List<OccSpaceElement> occSpaceElementListFiltered) {
+        this.occSpaceElementListFiltered = occSpaceElementListFiltered;
+    }
+
+    /**
+     * @return the currentOccSpaceElement
+     */
+    public OccSpaceElement getCurrentOccSpaceElement() {
+        return currentOccSpaceElement;
+    }
+
+    /**
+     * @param CurrentOccSpaceElement the currentOccSpaceElement to set
+     */
+    public void setCurrentOccSpaceElement(OccSpaceElement CurrentOccSpaceElement) {
+        this.currentOccSpaceElement = CurrentOccSpaceElement;
     }
 
 }
