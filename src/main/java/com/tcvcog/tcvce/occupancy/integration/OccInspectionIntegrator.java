@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -263,6 +264,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             UserIntegrator ui = getUserIntegrator();
             BlobIntegrator bi = getBlobIntegrator();
             BlobCoordinator bc = getBlobCoordinator();
+            SystemIntegrator si = getSystemIntegrator();
             OccInspectedSpaceElement inspectedEle = null;
         try {
             
@@ -285,7 +287,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             inspectedEle.setInspectedSpaceID(rs.getInt("inspectedspace_inspectedspaceid"));
             inspectedEle.setOverrideRequiredFlag_thisElementNotInspectedBy(ui.getUser(rs.getInt("overriderequiredflagnotinspected_userid")));
             
-            inspectedEle.setFailureIntensityClassID(rs.getInt("failureseverity_intensityclassid"));
+            inspectedEle.setFaillureSeverity(si.getIntensityClass(rs.getInt("failureseverity_intensityclassid")));
             
             inspectedEle.setMigrateToCaseOnFail(rs.getBoolean("migratetocecaseonfail"));
             
@@ -612,8 +614,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             
             stmt.setInt(9, inspElement.getOccChecklistSpaceTypeElementID());
 
-            if(inspElement.getFailureIntensityClassID() != 0){
-                stmt.setInt(10, inspElement.getFailureIntensityClassID());
+            if(inspElement.getFaillureSeverity()!= null){
+                stmt.setInt(10, inspElement.getFaillureSeverity().getClassID());
             } else {
                 stmt.setNull(10,java.sql.Types.NULL);
             }
@@ -685,9 +687,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
-
-            // TODO: failure severity classes
-            stmt.setNull(6, java.sql.Types.NULL);
+            
+            if(inspElement.getFaillureSeverity()!= null){
+                stmt.setInt(6, inspElement.getFaillureSeverity().getClassID());
+            } else {
+                stmt.setNull(6,java.sql.Types.NULL);
+            }
 
             stmt.setInt(7, inspElement.getInspectedSpaceElementID());
 

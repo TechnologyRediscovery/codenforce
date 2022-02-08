@@ -1715,11 +1715,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
-    <managed-bean>
-        <managed-bean-name>manageBlobBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ManageBlobBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>    
+   
     <managed-bean>
         <managed-bean-name>cECaseBlobsBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseBlobsBB</managed-bean-class>

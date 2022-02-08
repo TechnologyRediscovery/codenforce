@@ -5,15 +5,18 @@ import com.tcvcog.tcvce.application.SessionBean;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.*;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
+import com.tcvcog.tcvce.util.Constants;
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,6 +38,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
 
     private List<OccInspectionCause> causeList;
     private List<OccInspectionDetermination> determinationList;
+    private List<IntensityClass> failSeverityList;
     
     // Form items--these need to be organized
     private OccChecklistTemplate selectedChecklistTemplate;
@@ -76,7 +80,25 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         // Initialize list of checklist templates
        initChecklistTemplates();
        initUserList();
+       initSeverityClassList();
+       
+       
         
+    }
+    
+    /**
+     * Sets up our severity class list
+     */
+    private void initSeverityClassList(){
+        SystemCoordinator sysCor = getSystemCoordinator();
+        try{
+            
+            failSeverityList = sysCor.getIntensitySchemaWithClasses(
+                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_violationseverity"))
+                    .getClassList();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
     }
 
     /**
@@ -141,7 +163,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                  new FacesMessage(FacesMessage.SEVERITY_INFO,
                          "Created new inspection!: " + selectedInspection.getInspectionID(), ""));
 
-            refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
+            refreshCurrentInspectionAndRestoreSelectedSpace();
         } catch (InspectionException | IntegrationException | BObStatusException | BlobException ex) {
             System.out.println("Failed to create new OccInspection: " + ex);
         }
@@ -217,7 +239,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                  getFacesContext().addMessage(null,
                      new FacesMessage(FacesMessage.SEVERITY_INFO,
                              "Updated inspection ID: " + selectedInspection.getInspectionID(), ""));
-                refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
+                refreshCurrentInspectionAndRestoreSelectedSpace();
             } catch (IntegrationException | BObStatusException | BlobException ex) {
                 System.out.println(ex);
                  getFacesContext().addMessage(null,
@@ -306,7 +328,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Inspection determination has been certified and inspection is now locked!",  ""));
-            refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
+            refreshCurrentInspectionAndRestoreSelectedSpace();
         } catch (IntegrationException | AuthorizationException | BObStatusException | BlobException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
@@ -327,7 +349,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Inspection has been decertified and determination removed!",  ""));
-                refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
+                refreshCurrentInspectionAndRestoreSelectedSpace();
             } catch (IntegrationException | BObStatusException | BlobException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
@@ -361,7 +383,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO,
                          "Added space to inspection", ""));
-            refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
+            refreshCurrentInspectionAndRestoreSelectedSpace();
 
         } catch (IntegrationException | BObStatusException | BlobException ex) {
             System.out.println("Failed to add selected space to skeleton inspection object: " + ex);
@@ -410,7 +432,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         System.out.println("OccInspectionBB.onElementInspectionStatusButtonChange | oise: " + oise.getInspectedSpaceElementID() + " status: " + oise.getStatusEnum().getLabel());
         try {
             oic.inspectionAction_recordElementInspectionByStatusEnum(oise, getSessionBean().getSessUser(), selectedInspection, useDefaultFindingsOnCurrentOISE);
-            refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
+            refreshCurrentInspectionAndRestoreSelectedSpace();
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Recorded status of element ID: " + oise.getInspectedSpaceElementID(), ""));
@@ -438,7 +460,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                                                                     getSessionBean().getSessUser(), 
                                                                     selectedInspection, 
                                                                     useDefaultFindingsOnCurrentOISE);
-                refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod();
+                refreshCurrentInspectionAndRestoreSelectedSpace();
                 getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Success! Applied status " 
@@ -463,10 +485,11 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
             oic.inspectionAction_updateSpaceElementData(selectedInspectedSpace);
+            refreshCurrentInspectionAndRestoreSelectedSpace();
             getFacesContext().addMessage(null,
                    new FacesMessage(FacesMessage.SEVERITY_INFO,
                            "Saved changes to space: " + selectedInspectedSpace.getType().getSpaceTypeTitle() + " id " + selectedInspectedSpace.getInspectedSpaceID(), ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException | BlobException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -484,10 +507,12 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      * the UI just has to say to udpate any linked UI elements to see
      * updates
      */
-    private void refreshCurrentInspectionAndRestoreSelectedSpaceAndReloadSessPeriod() throws IntegrationException, BObStatusException, BlobException{
+    private void refreshCurrentInspectionAndRestoreSelectedSpace() 
+            throws IntegrationException, BObStatusException, BlobException{
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         selectedInspection = oic.getOccInspection(selectedInspection.getInspectionID());
         if(selectedInspectedSpace != null){
+            // go find my current space in the inspection and make it the selected one
             for(OccInspectedSpace ois: selectedInspection.getInspectedSpaceList()){
                 if(ois.getInspectedSpaceID() == selectedInspectedSpace.getInspectedSpaceID()){
                     selectedInspectedSpace = oic.configureElementDisplay(ois);
@@ -496,9 +521,16 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
                 }
             }
         }
+    }
+    
+    /**
+     * Tells session bean to reload itself
+     */
+    private void reloadSessionOccPeriod(){
         // We also need to get our occ period updated with this inspection
         // the contract says to pass null to refresh the current session period
         getSessionBean().setSessOccPeriod(null);
+        
     }
     
     /**
@@ -750,6 +782,7 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      * @param useDefaultFindingsOnCurrentOISE the useDefaultFindingsOnCurrentOISE to set
      */
     public void setUseDefaultFindingsOnCurrentOISE(boolean useDefaultFindingsOnCurrentOISE) {
+        System.out.println("InspectionsBB.setUseDefaultFindingsOnCurrentOISE | " + useDefaultFindingsOnCurrentOISE);
         this.useDefaultFindingsOnCurrentOISE = useDefaultFindingsOnCurrentOISE;
     }
 
@@ -835,5 +868,19 @@ public class OccInspectionsBB extends BackingBeanUtils implements Serializable {
      */
     public void setInspectionReportConfig(ReportConfigOccInspection inspectionReportConfig) {
         this.inspectionReportConfig = inspectionReportConfig;
+    }
+
+    /**
+     * @return the failSeverityList
+     */
+    public List<IntensityClass> getFailSeverityList() {
+        return failSeverityList;
+    }
+
+    /**
+     * @param failSeverityList the failSeverityList to set
+     */
+    public void setFailSeverityList(List<IntensityClass> failSeverityList) {
+        this.failSeverityList = failSeverityList;
     }
 }

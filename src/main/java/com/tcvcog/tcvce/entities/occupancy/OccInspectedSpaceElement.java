@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.BlobLinkEnum;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
+import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -58,7 +59,8 @@ public class OccInspectedSpaceElement
 
     private List<BlobLight> blobList;
     private OccLocationDescriptor location;
-    private int failureIntensityClassID;
+    
+    private IntensityClass faillureSeverity;
     private OccInspectableStatus status;
 
     private boolean migrateToCaseOnFail;
@@ -98,7 +100,7 @@ public class OccInspectedSpaceElement
             this.blobList = occInspectedSpaceElement.getBlobList();
             
             this.location = occInspectedSpaceElement.getLocation();
-            this.failureIntensityClassID = occInspectedSpaceElement.getFailureIntensityClassID();
+            this.faillureSeverity = occInspectedSpaceElement.getFaillureSeverity();
             this.status = occInspectedSpaceElement.getStatus();
             
             this.inspectedSpaceID = occInspectedSpaceElement.getInspectedSpaceID();
@@ -232,19 +234,6 @@ public class OccInspectedSpaceElement
         this.overrideRequiredFlag_thisElementNotInspectedBy = overrideRequiredFlag_thisElementNotInspectedBy;
     }
 
-    /**
-     * @return the failureIntensityClassID
-     */
-    public int getFailureIntensityClassID() {
-        return failureIntensityClassID;
-    }
-
-    /**
-     * @param failureIntensityClassID the failureIntensityClassID to set
-     */
-    public void setFailureIntensityClassID(int failureIntensityClassID) {
-        this.failureIntensityClassID = failureIntensityClassID;
-    }
 
     @Override
     public int hashCode() {
@@ -258,7 +247,6 @@ public class OccInspectedSpaceElement
         hash = 97 * hash + Objects.hashCode(this.overrideRequiredFlag_thisElementNotInspectedBy);
         hash = 97 * hash + Objects.hashCode(this.inspectionNotes);
         hash = 97 * hash + Objects.hashCode(this.location);
-        hash = 97 * hash + this.failureIntensityClassID;
         return hash;
     }
 
@@ -270,47 +258,11 @@ public class OccInspectedSpaceElement
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        if (obj instanceof CodeElement){
-            if(this.elementID == ((CodeElement) obj).getElementID()){
-                return true;
-            } else {
-                return false;
-            }
-        }
         final OccInspectedSpaceElement other = (OccInspectedSpaceElement) obj;
         if (this.inspectedSpaceElementID != other.inspectedSpaceElementID) {
             return false;
         }
-        if (this.required != other.required) {
-            return false;
-        }
-        if (this.failureIntensityClassID != other.failureIntensityClassID) {
-            return false;
-        }
-        if (!Objects.equals(this.inspectionNotes, other.inspectionNotes)) {
-            return false;
-        }
-        if (!Objects.equals(this.lastInspectedTS, other.lastInspectedTS)) {
-            return false;
-        }
-        if (!Objects.equals(this.lastInspectedBy, other.lastInspectedBy)) {
-            return false;
-        }
-        if (!Objects.equals(this.complianceGrantedTS, other.complianceGrantedTS)) {
-            return false;
-        }
-        if (!Objects.equals(this.complianceGrantedBy, other.complianceGrantedBy)) {
-            return false;
-        }
-        if (!Objects.equals(this.overrideRequiredFlag_thisElementNotInspectedBy, other.overrideRequiredFlag_thisElementNotInspectedBy)) {
-            return false;
-        }
-        if (!Objects.equals(this.location, other.location)) {
-            return false;
-        }
+       
         return true;
     }
 
@@ -424,5 +376,19 @@ public class OccInspectedSpaceElement
     @Override
     public int getBlobUpstreamPoolEnumPoolFeederID() {
         return occInspectionID;
+    }
+
+    /**
+     * @return the faillureSeverity
+     */
+    public IntensityClass getFaillureSeverity() {
+        return faillureSeverity;
+    }
+
+    /**
+     * @param faillureSeverity the faillureSeverity to set
+     */
+    public void setFaillureSeverity(IntensityClass faillureSeverity) {
+        this.faillureSeverity = faillureSeverity;
     }
 }

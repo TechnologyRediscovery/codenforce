@@ -889,11 +889,12 @@
                                        var="status" 
                                        itemLabel="#{status.label}"/>
                     </p:selectOneMenu>
+                    <p:spacer height="3px" />
 
                     <p:commandLink     id="applybatch-cl"
                                        ajax="true"
                                        style="color:blue;"
-                                       update="@form:@parent:inspections-entryscreen-form:element-accordion
+                                       update="@form:@parent:space-element-accordion-form:element-accordion
                                        @form:@parent:inspections-growl-form"
                                        value="Batch apply to all ords"
                                        actionListener="#{occInspectionsBB.onBatchProcessElementLinkClick}" />
@@ -901,11 +902,14 @@
             </div>
             <div>
                 <h:form id="stinspection-tools-form">
+                    <p>use default findings on fail: </p>
 
                     <p:selectBooleanCheckbox id="stinspection-usedefaultfindings-cb"
                                              value="#{occInspectionsBB.useDefaultFindingsOnCurrentOISE}"
                                              label="use default findings"
-                                             title="when an element fails, populate findings with default findings on the ordinance"/>
+                                             title="when an element fails, populate findings with default findings on the ordinance">
+                        <p:ajax />
+                    </p:selectBooleanCheckbox>
 
                     <h:outputText value=" | " />
 
@@ -924,7 +928,9 @@
                                        update=""
                                        value="remove space from inspection"
                                        actionListener="#{occInspectionsBB.onSpaceTypeRemoveLinkClick}" >
-                        <p:confirm header="Confirmation" message="Do you want to delete this inspected space?" icon="pi pi-info-circle"/>
+                        <p:confirm header="Confirm remove space from inspection?"
+                                   message="Are you sure?"
+                                   icon="ui-icon-alert" />
                     </p:commandLink>
 
                     <p>Filter elements (See mobile specs) </p>
@@ -934,6 +940,7 @@
 
             </div>
         </div>
+
 
         <p:separator />
 
@@ -948,8 +955,10 @@
                              oncomplete="PF('inspections-entryscreen-var').hide()"
                              update="@form:@parent:inspections-form
                              @form:@parent:inspections-growl-form"/>
+        </h:form>
+        <p:spacer height="5px" />
 
-            <p:spacer height="5px" />
+        <h:form id="space-element-accordion-form">
             <p:accordionPanel id="element-accordion"
                               value="#{occInspectionsBB.selectedInspectedSpace.inspectedElementGroupList}" 
                               var="elegrp"
@@ -958,108 +967,121 @@
                 <p:tab title="#{elegrp.groupTitle}">
                     <p:repeat   value="#{elegrp.elementList}" 
                                 var="spaceElement">
-                        <div class="p-grid">
-                            <div class="p-col-12 p-md-4">
-                                <h2>
-                                    <h:outputText value="ch. #{spaceElement.ordchapterNo}: #{spaceElement.ordchapterTitle}" />
-                                </h2>
-                                <h3>
-                                    <h:outputText value="§#{spaceElement.ordSecNum}:#{spaceElement.ordSecTitle}" />
-                                </h3>
-                                <h3>
-                                    <h:outputText value="§§#{spaceElement.ordSubSecNum} #{spaceElement.ordSubSecTitle}" 
-                                                  rendered="#{!empty spaceElement.ordSubSecNum}"/>
+                        <div class="p-grid nested-grid">
+                            <div class="p-col-8">
+                                <div class="p-grid">
+                                    <div class="p-col-12">
+                                        <h2>
+                                            <h:outputText value="#{spaceElement.headerString}"
+                                                          escape="false" />
+                                        </h2>
+                                    </div>
 
-                                    <h:outputText value=" | " />
+                                    <div class="p-col-4">
+                                        <p:commandLink     id="spaceelement-vieword-cl"
+                                                           ajax="true"
+                                                           type="button"
+                                                           style="color:blue;"
+                                                           actionListener="#{occInspectionsBB.onSpaceElementViewLinkClick(spaceElement)}"
+                                                           update="codeelement-fulltext-dialog"
+                                                           oncomplete="PF('codeelement-fulltext-dialog-var').show();"
+                                                           value="ordinance text"/>
 
-                                    <h:outputText value="§§#{spaceElement.ordSubSubSecNum} #{spaceElement.ordSubSubSecTitle}" 
-                                                  rendered="#{!empty spaceElement.ordSubSubSecNum}"/>
-                                </h3> 
-                                <p:spacer height="5px" />
-                                <p>
-                                    <h:outputText id="oiseinfo"
-                                                  value="OISEleID: #{spaceElement.inspectedSpaceElementID} | OCSTEleID #{spaceElement.occChecklistSpaceTypeElementID}" />
-                                </p>
+                                        <h:outputText value=" | " />
 
+                                        <p:commandLink     id="spaceelement-viewmeta"
+                                                           ajax="true"
+                                                           type="button"
+                                                           style="color:blue;"
+                                                           actionListener="#{occInspectionsBB.onSpaceElementViewLinkClick(spaceElement)}"
+                                                           update="codeelement-metadata-dialog"
+                                                           oncomplete="PF('codeelement-metadata-dialog-var').show();"
+                                                           value="element info"/>
 
-                                <p:commandLink     id="spaceelement-vieword-cl"
-                                                   ajax="true"
-                                                   type="button"
-                                                   style="color:blue;"
-                                                   actionListener="#{occInspectionsBB.onSpaceElementViewLinkClick(spaceElement)}"
-                                                   update="codeelement-fulltext-dialog"
-                                                   oncomplete="PF('codeelement-fulltext-dialog-var').show();"
-                                                   value="ordinance text"/>
+                                    </div>
+                                    <div class="p-col-8">
+                                        <div class="p-grid">
+                                            <div class="p-col-12>">
 
-                                <h:outputText value=" | " />
+                                                <p:selectOneButton id="inspections-entryscreen-statussel" 
+                                                                   value="#{spaceElement.statusEnum}" 
+                                                                   unselectable="false">
+                                                    <!-- Strangely this element needs to update itself to call the setter -->
+                                                    <p:ajax listener="#{occInspectionsBB.onElementInspectionStatusButtonChange(spaceElement)}" />
+                                                    <p:ajax update="inspections-entryscreen-statussel"/>
+                                                    <!--<p:ajax update="@form:element-accordion"/>-->
+                                                    <p:ajax update="@form:@parent:inspections-growl-form"/>
+                                                    <p:ajax update="@form"/>
+                                                    <f:selectItems value="#{occInspectionsBB.statuses}" 
+                                                                   var="status" 
+                                                                   itemLabel="#{status.label}"/>
+                                                </p:selectOneButton>
+                                            </div>
+                                            <div class="p-col-12>">
+                                                <p:selectBooleanCheckbox    id="insp-ele-excludefromnov-cb"
+                                                                            itemLabel="Include in code enf. case"
+                                                                            rendered="#{(!empty spaceElement.lastInspectedTS) and (empty spaceElement.complianceGrantedTS)}"
+                                                                            value="#{spaceElement.migrateToCaseOnFail}"/>
+                                                <p:spacer height="5px" />
+                                                <p>
+                                                    <h:outputText id="inspectedby-user"
+                                                                  value="Inspected by: #{spaceElement.lastInspectedBy.human.name}" 
+                                                                  rendered="#{!empty spaceElement.lastInspectedBy}"/>
+                                                    <p:spacer height="2px" />
+                                                    <h:outputText id="inspectedby-ts"
+                                                                  value="on #{occInspectionsBB.getPrettyDate(spaceElement.lastInspectedTS)}" 
+                                                                  rendered="#{!empty spaceElement.lastInspectedTS}"/>
+                                                    <p:spacer height="2px" />
+                                                    <h:outputText id="inspectedby-failed"
+                                                                  value="Failed! (no compliance)" 
+                                                                  rendered="#{!empty spaceElement.lastInspectedTS and empty spaceElement.complianceGrantedTS}"/>
+                                                    <p:spacer height="2px" />
+                                                    <h:outputText id="inspectedby-comp-user"
+                                                                  value="Compliance granted by: #{spaceElement.complianceGrantedBy.human.name}" 
+                                                                  rendered="#{!empty spaceElement.complianceGrantedBy}"/>
+                                                    <p:spacer height="2px" />
+                                                    <h:outputText id="inspectedby-comp-ts"
+                                                                  value="on #{occInspectionsBB.getPrettyDate(spaceElement.complianceGrantedTS)}" 
+                                                                  rendered="#{!empty spaceElement.complianceGrantedTS}"/>
 
-                                <p:commandLink     id="spaceelement-viewmeta"
-                                                   ajax="true"
-                                                   type="button"
-                                                   style="color:blue;"
-                                                   actionListener="#{occInspectionsBB.onSpaceElementViewLinkClick(spaceElement)}"
-                                                   update="codeelement-metadata-dialog"
-                                                   oncomplete="PF('codeelement-metadata-dialog-var').show();"
-                                                   value="element info"/>
+                                                </p>
+                                            </div>
+                                            <div class="p-col-12">
 
+                                                <p:outputLabel  for="fail-severity-som"
+                                                                rendered="#{!empty spaceElement.lastInspectedTS and empty spaceElement.complianceGrantedTS}">
+                                                    <h:outputText value="Failure severity" />
+                                                </p:outputLabel>
 
+                                                <h:selectOneMenu id="fail-severity-som"
+                                                                 value="#{spaceElement.faillureSeverity}" 
+                                                                 rendered="#{!empty spaceElement.lastInspectedTS and empty spaceElement.complianceGrantedTS}">
+                                                    <f:converter converterId="intensityClassConverter"/>
 
-                            </div>
-                            <div class="p-col-12 p-md-4 p-mt-5">
-                                <p:selectOneButton id="inspections-entryscreen-statussel" 
-                                                   value="#{spaceElement.statusEnum}" 
-                                                   unselectable="false">
-                                    <!-- Strangely this element needs to update itself to call the setter -->
-                                    <p:ajax listener="#{occInspectionsBB.onElementInspectionStatusButtonChange(spaceElement)}" />
-                                    <p:ajax update="inspections-entryscreen-statussel"/>
-                                    <!--<p:ajax update="@form:element-accordion"/>-->
-                                    <p:ajax update="@form:@parent:inspections-growl-form"/>
-                                    <p:ajax update="@form"/>
-                                    <f:selectItems value="#{occInspectionsBB.statuses}" 
-                                                   var="status" 
-                                                   itemLabel="#{status.label}"/>
-                                </p:selectOneButton>
-                                <div class="p-d-flex p-mt-2 p-jc-end">
-                                    <p:selectBooleanCheckbox    id="insp-ele-excludefromnov-cb"
-                                                                itemLabel="Include fail in Code Enf Case"
-                                                                rendered="#{(!empty spaceElement.lastInspectedTS) and (empty spaceElement.complianceGrantedTS)}"
-                                                                value="#{spaceElement.migrateToCaseOnFail}"/>
-                                    <p:spacer height="5px" />
+                                                    <f:selectItem itemLabel="select a severity" 
+                                                                  noSelectionOption="true" />
 
-                                    <p>
-                                        <h:outputText id="inspectedby-user"
-                                                      value="Inspected by: #{spaceElement.lastInspectedBy.human.name}" 
-                                                      rendered="#{!empty spaceElement.lastInspectedBy}"/>
-                                        <p:spacer height="2px" />
-                                        <h:outputText id="inspectedby-ts"
-                                                      value="on #{occInspectionsBB.getPrettyDate(spaceElement.lastInspectedTS)}" 
-                                                      rendered="#{!empty spaceElement.lastInspectedTS}"/>
-                                        <p:spacer height="2px" />
-                                        <h:outputText id="inspectedby-failed"
-                                                      value="Failed! (no compliance)" 
-                                                      rendered="#{!empty spaceElement.lastInspectedTS and empty spaceElement.complianceGrantedTS}"/>
-                                        <p:spacer height="2px" />
-                                        <h:outputText id="inspectedby-comp-user"
-                                                      value="Compliance granted by: #{spaceElement.complianceGrantedBy.human.name}" 
-                                                      rendered="#{!empty spaceElement.complianceGrantedBy}"/>
-                                        <p:spacer height="2px" />
-                                        <h:outputText id="inspectedby-comp-ts"
-                                                      value="on #{occInspectionsBB.getPrettyDate(spaceElement.complianceGrantedTS)}" 
-                                                      rendered="#{!empty spaceElement.complianceGrantedTS}"/>
+                                                    <f:selectItems id="fail-severity-selitems"
+                                                                   value="#{occInspectionsBB.failSeverityList}"
+                                                                   var="ic" itemValue="#{ic}" 
+                                                                   itemLabel="#{ic.numericRating}: #{ic.title}"/>
 
-                                    </p>
+                                                </h:selectOneMenu>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="p-col-12 p-md-4">
-                                <div class="p-d-flex">
-                                    <div>
+                            <div class="p-col-4">
+                                <div class="p-grid">
+                                    <div class="p-col-12">
                                         <p class="p-mb-0">Findings:</p>
                                         <p:inputTextarea    id="element-findings"
                                                             value="#{spaceElement.inspectionNotes}"
                                                             rows="6" cols="33"/>
 
                                     </div>
-                                    <div class="p-mx-3 p-mt-5">
+                                    <div class="p-col-12">
 
                                         <p:commandLink  id="oise-uploadphotos-cl"
                                                         ajax="true"
@@ -1073,7 +1095,7 @@
 
                                         </p:commandLink>
 
-                                        <p:spacer height="5px" />
+                                        <h:outputText value=" | " />
 
                                         <p:commandLink  id="oise-viewphotos-cl"
                                                         ajax="true"
@@ -1091,16 +1113,30 @@
                                 </div>
                             </div>
                         </div>
+                        <p:separator />
                     </p:repeat>
                 </p:tab>
             </p:accordionPanel>
-
-            <p:separator />
-
-            <p:commandButton value="Add Ordinance" icon="pi pi-plus"/>
-
         </h:form>
+
     </p:dialog>
+
+
+    <p:confirmDialog    id="confirmdialog-global"
+                        global="true">
+        <h:form id="confirm-global-form">
+            
+            <p:commandButton value="Yes"
+                             type="button"
+                             styleClass="ui-confirmdialog-yes"
+                             icon="ui-icon-check" />
+            <p:commandButton value="No"
+                             type="button"
+                             styleClass="ui-confirmdialog-no"
+                             icon="ui-icon-check" />
+        </h:form>
+    </p:confirmDialog>
+
 
     <p:dialog id="codeelement-fulltext-dialog"
               widgetVar="codeelement-fulltext-dialog-var"
@@ -1260,9 +1296,9 @@
               responsive="true">
 
         <h:form id="inspection-reportconfig-form">
-        
-            
-        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+
+            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                 <div class="restrict-main-contents-io-link">
 
                     <p:commandLink  ajax="false" 
@@ -1283,71 +1319,71 @@
                     </div>
                 </div>
             </div>
-            
-            
-            
-            <h2>Report Settings: Include...</h2>
-             <div class="p-grid">
 
-                    <div class="p-col-6">
-                        Parent Object info (Occ Period or CECase)
-                    </div>
-                    <div class="p-col-6">
-                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeOccPeriodInfoHeader}" />
-                    </div>
-                    <div class="p-col-6">
-                        Photos on passed items
-                    </div>
-                    <div class="p-col-6">
-                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includePhotos_pass}" />
-                    </div>
-                    <div class="p-col-6">
-                        Photos on failed items
-                    </div>
-                    <div class="p-col-6">
-                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includePhotos_fail}" />
-                    </div>
-                    <div class="p-col-6">
-                        Full ordinance text
-                    </div>
-                    <div class="p-col-6">
-                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeFullOrdText}" />
-                    </div>
-                    <div class="p-col-6">
-                        Item notes 
-                    </div>
-                    <div class="p-col-6">
-                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeElementNotes}" />
-                    </div>
-                    <div class="p-col-6">
-                        Inspection timestamp by item
-                    </div>
-                    <div class="p-col-6">
-                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeElementLastInspectedInfo}" />
-                    </div>
-                    <div class="p-col-6">
-                        Compliance granted timestamp by item
-                    </div>
-                    <div class="p-col-6">
-                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeElementComplianceInfo}" />
-                    </div>
-                    <div class="p-col-6">
-                        Inspector signature
-                    </div>
-                    <div class="p-col-6">
-                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeSignature}" 
-                                                 disabled="true"/>
-                    </div>
-                    <div class="p-col-6">
-                        Remedy info
-                    </div>
-                    <div class="p-col-6">
-                        <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeRemedyInfo}" 
-                                                 disabled="true"/>
-                    </div>
-             </div>
-            
-            
+
+
+            <h2>Report Settings: Include...</h2>
+            <div class="p-grid">
+
+                <div class="p-col-6">
+                    Parent Object info (Occ Period or CECase)
+                </div>
+                <div class="p-col-6">
+                    <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeOccPeriodInfoHeader}" />
+                </div>
+                <div class="p-col-6">
+                    Photos on passed items
+                </div>
+                <div class="p-col-6">
+                    <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includePhotos_pass}" />
+                </div>
+                <div class="p-col-6">
+                    Photos on failed items
+                </div>
+                <div class="p-col-6">
+                    <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includePhotos_fail}" />
+                </div>
+                <div class="p-col-6">
+                    Full ordinance text
+                </div>
+                <div class="p-col-6">
+                    <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeFullOrdText}" />
+                </div>
+                <div class="p-col-6">
+                    Item notes 
+                </div>
+                <div class="p-col-6">
+                    <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeElementNotes}" />
+                </div>
+                <div class="p-col-6">
+                    Inspection timestamp by item
+                </div>
+                <div class="p-col-6">
+                    <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeElementLastInspectedInfo}" />
+                </div>
+                <div class="p-col-6">
+                    Compliance granted timestamp by item
+                </div>
+                <div class="p-col-6">
+                    <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeElementComplianceInfo}" />
+                </div>
+                <div class="p-col-6">
+                    Inspector signature
+                </div>
+                <div class="p-col-6">
+                    <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeSignature}" 
+                                             disabled="true"/>
+                </div>
+                <div class="p-col-6">
+                    Remedy info
+                </div>
+                <div class="p-col-6">
+                    <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includeRemedyInfo}" 
+                                             disabled="true"/>
+                </div>
+            </div>
+
+
 
             <p:spacer height="5px" />
 
