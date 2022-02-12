@@ -648,12 +648,12 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         StringBuilder sb = new StringBuilder();
         if (formerProp != null) {
             sb.append("Previous address: ");
-            sb.append(formerProp.getAddress());
+            sb.append(formerProp.getAddressString());
             sb.append(" (");
             sb.append(formerProp.getMuni().getMuniName());
             sb.append(")");
             sb.append("New address: ");
-            sb.append(selectedRequest.getRequestProperty().getAddress());
+            sb.append(selectedRequest.getRequestProperty().getAddressString());
             sb.append(" (");
             sb.append(selectedRequest.getRequestProperty().getMuni().getMuniName());
             sb.append(")");

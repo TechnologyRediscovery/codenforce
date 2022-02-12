@@ -38,8 +38,8 @@ public class AddressParse {
     private static Property parseAddress(Property prop){
         Pattern pat = Pattern.compile("(?<num>\\d+[a-zA-Z]*)\\W+(?<street>\\w.*)");
         Pattern patStreet = Pattern.compile("\\s([a-zA-Z0-9][a-zA-Z_\\s.]*)");
-        Matcher matPat = pat.matcher(prop.getAddress());
-        Matcher matStreet = patStreet.matcher(prop.getAddress());
+        Matcher matPat = pat.matcher(prop.getAddressString());
+        Matcher matStreet = patStreet.matcher(prop.getAddressString());
         
         while (matPat.find()){
             System.out.println(matPat.group());

@@ -311,7 +311,7 @@
                                                     <f:facet name="header">
                                                         <h:outputText value="Address"/>
                                                     </f:facet>
-                                                    <h:outputText value="#{prop.address}" />
+                                                    <h:outputText value="#{prop.addressString}" />
                                                 </p:column>
 
                                                 <p:column width="35%" style="text-align: center">
@@ -401,7 +401,7 @@
                                         <p:panel id="propinfo-panel-info"
                                                  toggleable="true"
                                                  collapsed="false"
-                                                 header="#{propertySearchBB.currentProperty.address} (#{propertySearchBB.currentProperty.muni.muniName})"
+                                                 header="#{propertySearchBB.currentProperty.addressString} (#{propertySearchBB.currentProperty.muni.muniName})"
                                                  rendered="#{propertySearchBB.currentPropertySelected}"
                                                  >
                                             <h:form id="evruleconfig-panel-info-form">
@@ -438,7 +438,7 @@
                                                         <!--NESTED DATA VALUE INLINE -->
                                                         <div class="restrict-data-field-value-inline" >
 
-                                                            <h:outputText value="#{propertySearchBB.currentProperty.address}" />
+                                                            <h:outputText value="#{propertySearchBB.currentProperty.addressString}" />
                                                             <br/>
                                                             <h:outputText value="#{propertySearchBB.currentProperty.address_city}" />
                                                             <h:outputText value=", " />
@@ -1356,7 +1356,7 @@
                                 resizable="true"
                                 closable="true"
                                 closeOnEscape="true"
-                                header="Photos and Documents on #{propertySearchBB.currentProperty.address} (#{propertySearchBB.currentProperty.muni.muniName})"
+                                header="Photos and Documents on #{propertySearchBB.curraddressStringerty.address} (#{propertySearchBB.currentProperty.muni.muniName})"
                                 rendered="true"
                                 > 
 
@@ -1506,7 +1506,7 @@
 
                     
                     <p:dialog id="prop-addupdate-dialog"
-                              header="#{propertySearchBB.currentProperty.propertyID == 0 ? 'New property record':propertySearchBB.currentProperty.address}"
+                              header="#{propertySearchBB.currentProperty.propertyID == 0 ? 'New property record':propertySaddressString.currentProperty.address}"
                               modal="true"
                               height="800" 
                               width="550"
@@ -1576,7 +1576,7 @@
                                     <p:outputLabel value="Street Address"/>
                                     <p:spacer width="3px"/>
                                     <p:inputText    id="prop-add-address-it"
-                                                    value="#{propertySearchBB.currentProperty.address}"
+                                                    value="#{propertySearchBaddressStringntProperty.address}"
                                                     />
                                 </div>
 
@@ -1881,7 +1881,7 @@
                               width="550"
                               widgetVar="prop-remove-dialog-var"
                               closable="true"
-                              header="Remove property #{propertySearchBB.currentProperty.address}"
+                              header="Remove property #{propertySaddressString.currentProperty.address}"
                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                               >
 

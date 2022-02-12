@@ -257,14 +257,7 @@ public class    BlobUtilitiesBB
      */
     public IFace_BlobHolder getCurrentBlobHolder() {
         currentBlobHolder = getSessionBean().getSessBlobHolder();
-        if(currentBlobHolder != null){
-            System.out.println("BlobUtilitiesBB.getCurrentBlobHolder | Class " + currentBlobHolder.getClass());
-            System.out.println("BlobUtilitiesBB.getCurrentBlobHolder | parent ID: " + currentBlobHolder.getParentObjectID());
-            
-        } else {
-            System.out.println("BlobUtilitiesBB.getCurrentBlobHolder" );
-            
-        }
+        
         return currentBlobHolder;
     }
 

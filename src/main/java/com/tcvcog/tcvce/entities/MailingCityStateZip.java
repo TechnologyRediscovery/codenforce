@@ -29,7 +29,10 @@ public class MailingCityStateZip {
     private String city;
     
     private MailingCityStateZipRecordTypeEnum recordType;
-    private MailingCityStateZipRecordTypeEnum defaultType;
+    private MailingCityStateZipDefaultTypeEnum defaultType;
+    private String recordTypeString;
+    private String defaultTypeString;
+    
     private String defaultCity;
 
     /**
@@ -112,7 +115,7 @@ public class MailingCityStateZip {
     /**
      * @return the defaultType
      */
-    public MailingCityStateZipRecordTypeEnum getDefaultType() {
+    public MailingCityStateZipDefaultTypeEnum getDefaultType() {
         return defaultType;
     }
 
@@ -133,7 +136,7 @@ public class MailingCityStateZip {
     /**
      * @param defaultType the defaultType to set
      */
-    public void setDefaultType(MailingCityStateZipRecordTypeEnum defaultType) {
+    public void setDefaultType(MailingCityStateZipDefaultTypeEnum defaultType) {
         this.defaultType = defaultType;
     }
 
@@ -142,6 +145,34 @@ public class MailingCityStateZip {
      */
     public void setDefaultCity(String defaultCity) {
         this.defaultCity = defaultCity;
+    }
+
+    /**
+     * @return the recordTypeString
+     */
+    public String getRecordTypeString() {
+        return recordTypeString;
+    }
+
+    /**
+     * @return the defaultTypeString
+     */
+    public String getDefaultTypeString() {
+        return defaultTypeString;
+    }
+
+    /**
+     * @param recordTypeString the recordTypeString to set
+     */
+    public void setRecordTypeString(String recordTypeString) {
+        this.recordTypeString = recordTypeString;
+    }
+
+    /**
+     * @param defaultTypeString the defaultTypeString to set
+     */
+    public void setDefaultTypeString(String defaultTypeString) {
+        this.defaultTypeString = defaultTypeString;
     }
     
     

@@ -34,7 +34,7 @@
                                  value="#{addressBB.addressEditMode? 'Save changes' : 'Edit'}"
                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                  icon="fa #{addressBB.addressEditMode ? 'fa-check' : 'fa-pencil'}"
-                                 actionListener="#{personBB.toggleEmailEditMode}"
+                                 actionListener="#{addressBB.toggleMailingAddressEditMode}"
                                  oncomplete="PF('address-dialog-var').show()"
                                  update="address-info-form"/>
 
@@ -42,7 +42,7 @@
                                  value="Search for Zip, City, and State"
                                  rendered="true"
                                  icon="fa fa-address-book"
-                                 oncomplete="PF('csz-dialog-var').show()"
+                                 oncomplete="PF('address-mngr-var').show()"
                                  />
 
 
@@ -94,7 +94,7 @@
                                       value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.name : ''}"/>
 
                         <p:inputText rendered="#{addressBB.addressEditMode}"
-                                     value="#{addressBB.currentAddress.poBox}" />
+                                     value="#{addressBB.currentAddress.street}" />
                     </div>
 
                     <div class="p-col-6">City</div>
@@ -209,188 +209,510 @@
         </p:panel>
     </p:dialog>
 
-    <p:dialog   id="csz-dialog"
-                height="700" width="800"
-                widgetVar="csz-dialog-var"
+    <p:dialog   id="address-mngr"
+                height="600" width="1200"
+                widgetVar="address-mngr-var"
                 responsive="true"
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
                 modal="true"
-                header="Search for City, State, ZIP Code"
+                header="Address Manager"
                 rendered="true"
                 >
 
-        <p:panel id="csz-search-panel"
-                 toggleable="true"
-                 collapsed="false"
-                 header="City, State, ZIP Code Search">
+        <div class="p-grid">
+            <div class="p-col">
+                <p:panel id="csz-search-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="City, State, ZIP Code Search">
 
-            <h:form id="csz-search-form">
-
-
-                <p:selectOneMenu id="csz-search-query-som"
-                                 tabindex="1"
-                                 value="#{addressBB.selectedCSZQuery}"
-                                 style="width: 100%"
-                                 >
-                    <f:converter converterId="bOBQueryConverter"/>
-
-                    <f:selectItem itemLabel="select a query..."
-                                  noSelectionOption="true"
-                                  itemDisabled="true"
-                                  />
-                    <f:selectItems id="csz-search-query-si"
-                                   value="#{propertySearchBB.queryList}"
-                                   var="ql"
-                                   itemValue="#{ql}"
-                                   itemLabel="#{ql.queryTitle}" 
-                                   />
-                    <p:ajax update="param-itfield-city 
-                            param-itfield-zip"
-                            listener="#{addressBB.onQueryChange}"
-                            />
-                </p:selectOneMenu>
+                    <h:form id="csz-search-form">
 
 
-                <p:commandButton id="csz-search-button"
-                                 value="Search"
-                                 rendered="true"
-                                 icon="fa fa-search"
-                                 actionListener="#{addressBB.onQueryCSZExecuteButtonChange}"
-                                 oncomplete="PF('csz-dialog-var').show()"
-                                 update="   csz-search-form"/>
+                        <p:selectOneMenu id="csz-search-query-som"
+                                         tabindex="1"
+                                         value="#{addressBB.selectedCSZQuery}"
+                                         style="width: 100%"
+                                         >
+                            <f:converter converterId="bOBQueryConverter"/>
+
+                            <f:selectItem itemLabel="select a query..."
+                                          noSelectionOption="true"
+                                          itemDisabled="true"
+                                          />
+                            <f:selectItems id="csz-search-query-si"
+                                           value="#{addressBB.qcszEnumList}"
+                                           var="ql"
+                                           itemValue="#{ql}"
+                                           itemLabel="#{ql.queryTitle}" 
+                                           />
+                            <p:ajax update="param-itfield-city 
+                                    param-itfield-zip
+                                    param-itfield-state
+                                    addresses-growl-form"
+                                    listener="#{addressBB.onQueryChange}"
+                                    />
+                        </p:selectOneMenu>
 
 
-                <div class="restrict-main-contents-io-button gray_button">
-
-                    <p:commandButton    id="csz-search-abort-button"
-                                        ajax="true"
-                                        rendered="true"
-                                        value="Abort search"
-                                        process="@none"
-                                        immediate="true"
-                                        actionListener="#{addressBB.onQueryOperationCancelButtonChange}"
-                                        oncomplete="PF('csz-dialog-var').hide()"
-                                        icon="fa fa-stop" />
-
-
-                    <p:commandButton    id="csz-search-clear-button"
-                                        ajax="true"
-                                        rendered="true"
-                                        value="Reset search"
-                                        process="@none"
-                                        immediate="true"
-                                        actionListener="#{addressBB.onQueryResetButtonChange}"
-                                        oncomplete="PF('csz-dialog-var').show()"
-                                        icon="fa fa-eraser" />
-
-                </div>
-
-                <p:spacer height="5px"/>    
-
-                <div class="p-grid">
-                    <div class="p-col-6">ZIP Code</div>
-
-                    <div class="p-col-6">
-                        <p:inputText    id="param-itfield-zip"
-                                        value="#{addressBB.selectedCSZQuery.primaryParams.zip_val}" 
-                                        disabled="#{!addressBB.selectedCSZQuery.primaryParams.zip_ctl}"/>
-                    </div>
-                    <div class="p-col-6">City</div>
-
-                    <div class="p-col-6">
-                        <p:inputText    id="param-itfield-city"
-                                        value="#{addressBB.selectedCSZQuery.primaryParams.city_val}" 
-                                        disabled="#{!addressBB.selectedCSZQuery.primaryParams.city_ctl}"/>
-                    </div>
-                </div>
-
-                <p:spacer height="5px"/>    
-
-
-                <p:dataTable    id="csz-results-table"
-                                value="#{addressBB.selectedCSZQuery.results}"
-                                var="csz"
-                                rowKey="#{csz.cityStateZipID}"
-                                tableStyleClass="primeDataTable"
-                                draggableRows="true" 
-                                tabindex="6">
-
-
-                    <p:column width="10%">
-                        <f:facet name="header">
-                            <h:outputText value="ID"/>
-                        </f:facet>
-                        <h:outputText value="#{csz.cityStateZipID}" />
-                    </p:column>
-
-
-                    <p:column width="10%">
-                        <f:facet name="header">
-                            <h:outputText value="ZIP Code"/>
-                        </f:facet>
-                        <h:outputText value="#{csz.zipCode}" />
-                    </p:column>
-
-
-                    <p:column width="25%">
-                        <f:facet name="header">
-                            <h:outputText value="City"/>
-                        </f:facet>
-                        <h:outputText value="#{csz.city}" />
-                    </p:column>
-
-
-                    <p:column width="10%">
-                        <f:facet name="header">
-                            <h:outputText value="State"/>
-                        </f:facet>
-                        <h:outputText value="#{csz.state}" />
-                    </p:column>
-
-
-                    <p:column width="10%">
-                        <f:facet name="header">
-                            <h:outputText value="Type"/>
-                        </f:facet>
-                        <h:outputText value="#{csz.recordType.typeTitle}" />
-                    </p:column>
-
-
-                    <p:column width="10%">
-                        <f:facet name="header">
-                            <h:outputText value="Default Role"/>
-                        </f:facet>
-                        <h:outputText value="#{csz.defaultType.typeTitle}" />
-                    </p:column>
-
-                    <p:column width="15%">
-                        <f:facet name="header">
-                            <h:outputText value="Default Cotu"/>
-                        </f:facet>
-                        <h:outputText value="#{csz.defaultCity}" />
-                    </p:column>
-
-
-                    <p:column width="10%">
-                        <f:facet name="header">
-                            <h:outputText value="Actions"/>
-                        </f:facet>
-
-                        <p:commandButton id="csz-select"
-                                         value="Select"
+                        <p:commandButton id="csz-search-button"
+                                         value="Search"
                                          rendered="true"
-                                         icon="fa fa-check"
-                                         actionListener="#{addressBB.selectCityStateZip(csz)}"
-                                         oncomplete="PF('csz-dialog-var').hide()"
-                                         />
+                                         icon="fa fa-search"
+                                         actionListener="#{addressBB.onQueryCSZExecuteButtonChange}"
+                                         oncomplete="PF('address-mngr-var').show()"
+                                         update="   csz-search-form
+                                         addresses-growl-form"/>
 
-                    </p:column>
-                </p:dataTable>
-            </h:form>
-        </p:panel>
+
+                        <div class="restrict-main-contents-io-button gray_button">
+
+
+
+
+                            <p:commandButton    id="csz-search-clear-button"
+                                                ajax="true"
+                                                rendered="true"
+                                                value="Reset search"
+                                                actionListener="#{addressBB.onQueryResetButtonChange}"
+                                                update="addresses-growl-form
+                                                @form"
+                                                icon="fa fa-eraser" />
+
+                        </div>
+
+                        <p:spacer height="5px"/>    
+
+                        <div class="p-grid">
+                            <div class="p-col-6">ZIP Code</div>
+
+                            <div class="p-col-6">
+                                <p:inputText    id="param-itfield-zip"
+                                                value="#{addressBB.selectedCSZQuery.primaryParams.zip_val}" 
+                                                disabled="#{!addressBB.selectedCSZQuery.primaryParams.zip_ctl}" />
+                            </div>
+                            <div class="p-col-6">City</div>
+
+                            <div class="p-col-6">
+                                <p:inputText    id="param-itfield-city"
+                                                value="#{addressBB.selectedCSZQuery.primaryParams.city_val}" 
+                                                disabled="#{!addressBB.selectedCSZQuery.primaryParams.city_ctl}" />
+                            </div>
+                            <div class="p-col-6">State</div>
+
+                            <div class="p-col-6">
+                                <p:inputText    id="param-itfield-state"
+                                                value="#{addressBB.selectedCSZQuery.primaryParams.state_val}" 
+                                                disabled="#{!addressBB.selectedCSZQuery.primaryParams.state_ctl}" />
+                            </div>
+                        </div>
+
+                        <p:spacer height="5px"/>    
+
+                        <p:dataTable    id="csz-results-table"
+                                        value="#{addressBB.selectedCSZQuery.results}"
+                                        var="csz"
+                                        lazy="false"
+                                        rowKey="#{csz.cityStateZipID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="true" 
+                                        stripedRows="true"
+                                        rowExpandMode="multiple"
+                                        tabindex="6">
+
+                            <p:column width="10%" 
+                                      headerText="Exp.">
+                                <p:rowToggler/>
+                            </p:column>
+
+                            <p:column width="20%">
+                                <f:facet name="header">
+                                    <h:outputText value="ZIP Code"/>
+                                </f:facet>
+                                <h:outputText value="#{csz.zipCode}" />
+                            </p:column>
+
+                            <p:column width="40%">
+                                <f:facet name="header">
+                                    <h:outputText value="City"/>
+                                </f:facet>
+                                <h:outputText value="#{csz.city}" />
+                            </p:column>
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="State"/>
+                                </f:facet>
+                                <h:outputText value="#{csz.state}" />
+                            </p:column>
+
+                            <p:column width="20%">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+
+                                <p:commandLink  id="csz-select"
+                                                value="load streets"
+                                                style="color:blue;"
+                                                rendered="true"
+                                                actionListener="#{addressBB.selectCityStateZip(csz)}"
+                                                ajax="true"
+                                                update="address-dialog
+                                                address-info-form
+                                                street-search-form
+                                                addresses-growl-form"
+                                                />
+                            </p:column>
+                            <p:rowExpansion>
+                                <div class="p-grid">
+
+                                    <div class="p-col-4">
+                                        City/State/Zip ID
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{csz.cityStateZipID}" />
+                                    </div>
+                                    <div class="p-col-4">
+                                        Record Type
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{csz.recordTypeString}" />
+                                    </div>
+                                    <div class="p-col-4">
+                                        Default role
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{csz.defaultTypeString}" />
+                                    </div>
+                                    <div class="p-col-4">
+                                        Default City
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{csz.defaultCity}" />
+                                    </div>
+                                </div>
+                            </p:rowExpansion>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>  
+            </div>
+
+            <div class="p-col">
+
+                <p:panel id="street-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Street">
+
+                    <h:form id="street-search-form">
+
+                        <h3>
+                            <h:outputText value="Viewing all streets in ZIP Code: #{addressBB.currentCityStateZip.zipCode} (#{addressBB.currentCityStateZip.defaultCity}, #{addressBB.currentCityStateZip.state})" />
+                        </h3>
+
+                        <p:commandButton id="street-create-init-button"
+                                         value="New street"
+                                         icon="fa fa-plus"
+                                         oncomplete="PF('street-infoedit-dialog-var').show()"
+                                         actionListener="#{addressBB.onMailingStreetCreateInitButtonChange}"
+                                         update="street-infoedit-dialog
+                                         street-infoedit-form"/>
+
+                        <p:spacer height="5px"/>
+
+                        <p:dataTable    id="street-results-table"
+                                        value="#{addressBB.streetList}"
+                                        var="street"
+                                        lazy="false"
+                                        scrollable="true"
+                                        scrollRows="10"
+                                        rowKey="#{street.streetID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="true" 
+                                        tabindex="6">
+
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="ID"/>
+                                </f:facet>
+                                <h:outputText value="#{street.streetID}" />
+                            </p:column>
+
+                            <p:column width="40%">
+                                <f:facet name="header">
+                                    <h:outputText value="Street Name"/>
+                                </f:facet>
+                                <h:outputText value="#{street.name}" />
+                            </p:column>
+
+                            <p:column width="15%">
+                                <f:facet name="header">
+                                    <h:outputText value="ZIP Code"/>
+                                </f:facet>
+                                <h:outputText value="#{street.cityStateZip.zipCode}" />
+                            </p:column>
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="State"/>
+                                </f:facet>
+                                <h:outputText value="#{street.cityStateZip.state}" />
+                            </p:column>
+
+
+                            <p:column width="25%">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+
+
+                                <p:commandLink  id="street-viewedit"
+                                                value="view/edit"
+                                                style="color:blue;"
+                                                rendered="true"
+                                                actionListener="#{addressBB.onStreetViewEditLinkClick(street)}"
+                                                ajax="true"
+                                                update="street-infoedit-dialog
+                                                street-infoedit-form"
+                                                />
+
+                                <h:outputText value=" | " />
+
+
+                                <p:commandLink  id="street-select"
+                                                value="load addresses"
+                                                style="color:blue;"
+                                                rendered="true"
+                                                actionListener="#{addressBB.onStreetSelectLinkClick(street)}"
+                                                ajax="true"
+                                                update="building-panel
+                                                building-form
+                                                addresses-growl-form"
+                                                />
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+
+                <p:panel id="building-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Addresses">
+                    <h:form id="building-form">
+
+                        <p:commandButton id="address-create-init-button"
+                                         value="New address on #{addressBB.currentStreet.name}"
+                                         rendered="#{!empty addressBB.currentStreet}"
+                                         icon="fa fa-plus"
+                                         oncomplete="PF('address-dialog-var').show()"
+                                         actionListener="#{addressBB.onMailingAddressAddInitButtonChange}"
+                                         update="address-dialog
+                                         address-info-form
+                                         addresses-growl-form"/>
+
+                        <p:spacer height="5px" />
+
+                        <p:dataTable    id="address-results-table"
+                                        value="#{addressBB.mailingAddressList}"
+                                        var="addr"
+                                        lazy="false"
+                                        rowKey="#{addr.addressID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="true" 
+                                        stripedRows="true"
+                                        tabindex="6">
+
+                            <p:column width="20%">
+                                <f:facet name="header">
+                                    <h:outputText value="Bldg No."/>
+                                </f:facet>
+                                <h:outputText value="#{addr.buildingNo}" />
+                            </p:column>
+
+                            <p:column width="25%">
+                                <f:facet name="header">
+                                    <h:outputText value="Street"/>
+                                </f:facet>
+                                <h:outputText value="#{addr.street.name}" />
+                            </p:column>
+
+                            <p:column width="25%">
+                                <f:facet name="header">
+                                    <h:outputText value="City"/>
+                                </f:facet>
+                                <h:outputText value="#{addr.street.cityStateZip.defaultCity}" />
+                            </p:column>
+
+                            <p:column width="20%">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+
+                                <p:commandLink  id="address-select"
+                                                value="view/edit"
+                                                style="color:blue;"
+                                                rendered="true"
+                                                actionListener="#{addressBB.onMailingAddressViewEditLinkClick(addr)}"
+                                                ajax="true"
+                                                oncomplete="PF('address-dialog-var').show();"
+                                                update="address-dialog
+                                                address-info-form
+                                                addresses-growl-form"
+                                                />
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+            </div>
+        </div>
+    </p:dialog>
+
+    <p:dialog id="street-infoedit-dialog"
+              width="1000"
+              widgetVar="street-infoedit-dialog-var"
+              header="Street: #{addressBB.currentStreet.streetID eq 0 ? '(New street)' : addressBB.currentStreet.name}"
+              modal="true"
+              closeOnEscape="true"
+              closable="true"
+              resizable="true">
+        <h:form id="street-infoedit-form">
+
+            <p:commandButton id="street-edit-button"
+                             value="#{addressBB.editModeCurrentStreet ? 'Save Changes' : 'Edit'}"
+                             disabled="#{!addressBB.currentStreet.active}"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             icon="fa #{addressBB.editModeCurrentStreet ? 'fa-check' : 'fa-pencil'}"
+                             actionListener="#{addressBB.onToggleStreetEditModeButtonChange}"
+                             oncomplete="PF('street-infoedit-dialog-var').show()"
+                             update="@form
+                             "/>
+
+            <div class="gray_button">
+
+                <p:commandButton id="street-edit-abort"
+                                 value="Cancel"
+                                 styleClass="gray-button"
+                                 rendered="#{addressBB.editModeCurrentStreet}"
+                                 icon="fa fa-stop"
+                                 process="@none"
+                                 immediate="true"
+                                 actionListener="#{addressBB.onMailingStreetEditAbort}"
+                                 oncomplete="PF('street-infoedit-dialog-var').hide()"
+                                 />
+            </div>
+
+            <div class="p-grid">
+                <div class="p-col-6">
+                    ID
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.currentStreet.streetID eq 0 ? '(New street)' : addressBB.currentStreet.streetID}" />
+                </div>
+
+                <div class="p-col-6">
+                    Street Name
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.currentStreet.name}" 
+                                  rendered="#{!addressBB.editModeCurrentStreet}"
+                                  />
+                    <p:inputText value="#{addressBB.currentStreet.name}" 
+                                 rendered="#{!addressBB.editModeCurrentStreet}"
+                                 />
+                </div>
+                <div class="p-col-6">
+                    City, State, Zip
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.currentStreet.cityStateZip.city}" 
+                                  rendered="true"
+                                  />
+                    <h:outputText value=", " />
+                    <h:outputText value="#{addressBB.currentStreet.cityStateZip.state}" 
+                                  rendered="true"
+                                  />
+
+                    <h:outputText value=" " />
+                    <h:outputText value="#{addressBB.currentStreet.cityStateZip.zipCode}" 
+                                  rendered="true"
+                                  />
+
+                    <p:spacer height="3px" />
+                    <h:outputText value="(CSZip ID:#{addressBB.currentStreet.cityStateZip.cityStateZipID})" 
+                                  rendered="true"
+                                  />
+                </div>
+
+                <div class="p-col-6">
+                    Created
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.getPrettyDate(addressBB.currentStreet.createdTS)}" />
+
+                </div>
+                <div class="p-col-6">
+                    Active
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.currentStreet.active ? 'Active' : 'Deactivated'}" />
+
+
+                    <p:commandLink  id="street-deactivate-clink"
+                                    ajax="true"
+                                    style="color:blue;"
+                                    oncomplete="PF('remove-street-confirm-dialog-var').show()"
+                                    rendered="#{!addressBB.editModeCurrentStreet}"
+                                    update="remove-street-confirm-dialog
+                                    remove-street-confirm-form"
+                                    value="Deactivate street ID #{addressBB.currentStreet.streetID}"
+                                    actionListener="#{addressBB.onMailingStreetDeactivateInitLinkClick}">
+
+                    </p:commandLink>
+                </div>
+            </div>
+        </h:form>
     </p:dialog>
 
 
+
+    <p:confirmDialog id="remove-street-confirm-dialog"
+                     widgetVar="remove-street-confirm-dialog-var"
+                     header="Confirm deactivation of street?"
+                     closeOnEscape="true"
+                     closable="true"
+                     responsive="true">
+
+        <h:form id="remove-street-confirm-form">
+
+
+            <p:commandButton  id="street-remove-commit-button"
+                              ajax="true"
+                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                              update="addresses-growl-form"
+                              value="Confirm removal of street #{addressBB.currentStreet.name} (ID: #{addressBB.currentStreet.streetID})"
+                              actionListener="#{addressBB.onMailingStreetDeactivateCommit}" 
+                              oncomplete="PF('remove-street-confirm-dialog-var').hide()">
+
+
+            </p:commandButton>
+
+            <p:spacer height="5px" />
+
+            <div class="gray_button">
+
+                <p:commandButton id="remove-street-abort-button"
+                                 value="Cancel"
+                                 styleClass="gray-button"
+                                 rendered="true"
+                                 icon="fa fa-stop"
+                                 process="@none"
+                                 immediate="true"
+                                 actionListener="#{addressBB.onMailingStreetEditAbort}"
+                                 oncomplete="PF('remove-street-confirm-dialog-var').hide()" />
+            </div>
+        </h:form>
+    </p:confirmDialog>
 </ui:composition>

@@ -45,7 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <h:form id="cecaselists-launcher">
                             <h1>
                                 <h:outputText id="header-type-ot" value="#{ceCaseSearchProfileBB.currentCase.caseName} @ "/> 
-                                <h:outputText id="header-addr-ot" value="#{ceCaseSearchProfileBB.currentCase.property.address} "/>  
+                                <h:outputText id="header-addr-ot" value="#{ceCaseSearchProfileBB.currentCase.property.addressString} "/>  
                                 <h:outputText id="header-muni-ot" value="(#{ceCaseSearchProfileBB.currentCase.property.muni.muniName})"/>  
                             </h1>
 
@@ -311,7 +311,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                 icon="fa fa-home"
                                                                                 action="#{ceCaseSearchProfileBB.exploreProperty}"
                                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                                value="view property: #{ceCaseSearchProfileBB.currentCasePropDataHeavy.address}"/>
+                                                                                value="view property: #{ceCaseSearchProfileBB.currentCasePropDataHeavy.addressString}"/>
 
 
                                                     </div>
@@ -1504,7 +1504,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <f:selectItem itemLabel="select a property..." noSelectionOption="true" />
                                             <f:selectItems id="cecase-property-selitems"
                                                            value="#{systemServicesBB.bbSessionPropertyList}"
-                                                           var="prop" itemValue="#{prop}" itemLabel="#{prop.address} (#{prop.muni.muniName})"/>
+                                                           var="prop" itemValue="#{prop}" itemLabel="#{prop.addressString} (#{prop.muni.muniName})"/>
                                         </h:selectOneMenu>
                                     </ui:remove>
                                 </div>
@@ -2563,7 +2563,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h2>Property-connected persons</h2>
 
                                     <p>Table contains all Persons currently connected to this case's property:
-                                        <h:outputText value="#{noticeOfViolationBB.currentCase.property.address}" />
+                                        <h:outputText value="#{noticeOfViolationBB.currentCase.property.addressString}" />
                                         If your intended addressee is not in this table, navigate to the Persons manager and create a new
                                         Person on this property or connect an existing person to the property.</p>
 
@@ -3179,7 +3179,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 closable="true"
                                 closeOnEscape="true"
                                 rendered="true"
-                                header="Record New Code Violation @ #{ceCaseSearchProfileBB.currentCase.property.address}">
+                                header="Record New Code Violation @ #{ceCaseSearchProfileBB.currentCase.property.addressString}">
 
                         <h:form id="violation-add-form">
 
@@ -3494,7 +3494,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <!--NESTED DATA VALUE INLINE -->
                                     <div class="restrict-data-field-value-inline" >
                                         <h:outputText id="violation-prop-ot"
-                                                      value="#{ceCaseSearchProfileBB.currentCase.property.address}"
+                                                      value="#{ceCaseSearchProfileBB.currentCase.property.addressString}"
                                                       />
                                         <h:outputText id="violation-prop1-ot"
                                                       value=", #{ceCaseSearchProfileBB.currentCase.property.muni.muniName}"

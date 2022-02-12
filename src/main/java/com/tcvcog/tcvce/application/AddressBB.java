@@ -5,16 +5,17 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.MailingAddress;
 import com.tcvcog.tcvce.entities.MailingCityStateZip;
+import com.tcvcog.tcvce.entities.MailingStreet;
 import com.tcvcog.tcvce.entities.search.QueryMailingCityStateZip;
-import com.tcvcog.tcvce.entities.search.QueryMailingCityStateZipEnum;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,11 +30,19 @@ import javax.faces.event.ActionEvent;
 public  class   AddressBB 
         extends BackingBeanUtils{
 
+    private MailingStreet currentStreet;
+    private List<MailingStreet> streetList;
+    private boolean editModeCurrentStreet;
+    
+    
+    
     private MailingAddress currentAddress;
-    private boolean addressEditMode;
+    private List<MailingAddress> mailingAddressList;
+    private boolean editModeCurrentAddress;
     private MailingCityStateZip currentCityStateZip;
     private String formBuildingNo;
     private String formStreet;
+    private boolean formPOBox;
     private String formCity;
     private String formZip;
     
@@ -57,6 +66,10 @@ public  class   AddressBB
         
         SearchCoordinator srchc = getSearchCoordinator();
         qcszEnumList = srchc.buildQueryMailingCityStateZipList(getSessionBean().getSessUser().getMyCredential());
+        if(qcszEnumList != null && !qcszEnumList.isEmpty()){
+            selectedCSZQuery = qcszEnumList.get(0);
+            
+        }
         
     }
     
@@ -86,7 +99,8 @@ public  class   AddressBB
      * listener for changes in the query drop down dialog
      * @param ev 
      */
-    public void onQueryChange(ActionEvent ev){
+    public void onQueryChange(){
+        System.out.println("AddressBB.onQueryChange | Selected Zip Query: " + selectedCSZQuery.getQueryTitle());
         
         
     }
@@ -121,6 +135,12 @@ public  class   AddressBB
      */
     public void selectCityStateZip(MailingCityStateZip mcsz){
         getSessionBean().setSessMailingCityStateZip(mcsz);
+        currentCityStateZip = mcsz;
+        if(currentAddress != null && currentAddress.getStreet() != null){
+            currentAddress.getStreet().setCityStateZip(currentCityStateZip);
+        }
+        
+        searchForMailingStreet();
         
         
     }
@@ -130,10 +150,211 @@ public  class   AddressBB
     /**********************************************************/
     
     /**
-     * Listener for user clicks of the mailing address edit mode
+     * Listener for user requests to view street info
+     * @param ms the MailingStreet to query
+     */
+    public void onStreetViewEditLinkClick(MailingStreet ms){
+        currentStreet = ms;
+    }
+    
+    /**
+     * Listener for user requests to create a new street
+     */
+    public void onMailingStreetCreateInitButtonChange(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        currentStreet = pc.getMailingStreetSkeleton(currentCityStateZip);
+    }
+    
+    /**
+     * Listener for user requests to see building Numbers
+     * connected to this street. Initiates DB search of this
+     * Street in this ZIP Code
+     * @param ms the MailingStreet to query
+     */
+    public void onStreetSelectLinkClick(MailingStreet ms){
+        System.out.println("AddressBB.onStreetSelectLinkClick");
+        currentStreet = ms;
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            mailingAddressList = pc.getMailingAddressListByStreet(currentStreet);
+            if(mailingAddressList != null){
+                getFacesContext().addMessage(null,
+                               new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                       "Search for addresses returned " + mailingAddressList.size(),""));
+            } 
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                           new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                   "Could not find Addresses by Street, Sorry" ,""));
+        } 
+    }
+    
+    
+    
+    /**
+     * Listener for user requests to search for a street
+     * @param ev 
+     */
+    public void onSearchForMailingStreet(ActionEvent ev){
+        
+        searchForMailingStreet();
+    }
+    
+    
+    /**
+     * Undertakes a street search
+     */
+    public void searchForMailingStreet(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        System.out.println("AddressBB.searchForMailingStreet");
+        try {
+            streetList = pc.searchForMailingStreet(formStreet, currentCityStateZip);
+            if(streetList != null){
+                getFacesContext().addMessage(null,
+                           new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                   "Search for Streets returned " + streetList.size(),""));
+            } 
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Fatal: Could not search for streets, sorry! ",""));
+            
+        } 
+    }
+    
+    
+     /**
+     * Listener for user requests to change to or from edit mode on mailing address
+     * @param ev 
+     */
+    public void onToggleStreetEditModeButtonChange(ActionEvent ev){
+        toggleStreetEditMode();
+    }
+    
+    /**
+     * Toggles the mailing address edit mode
+     */
+    public void toggleStreetEditMode(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        System.out.println("AddressBB.toggleStreetEditMode");
+        if(editModeCurrentStreet){
+            
+            try {
+                if(currentStreet.getStreetID() == 0){
+                    pc.insertMailingStreet(currentStreet, getSessionBean().getSessUser());
+                    getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "StreetInsert successful",""));
+                } else {
+                    pc.updateMailingStreet(currentStreet, getSessionBean().getSessUser());
+                    getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Street update successful",""));
+                }
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update or add  this street",""));
+            } 
+        }
+        editModeCurrentStreet = !editModeCurrentStreet;
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to start the process of adding a mailing address
+     * @param ev 
+     */
+    public void onMailingStreetInitButtonChange(ActionEvent ev){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        currentStreet = pc.getMailingStreetSkeleton(currentCityStateZip);
+        
+    }
+
+    /**
+     * Listener for user requests to abort street edit
+     * @param ev 
+     */
+    public void onMailingStreetEditAbort(ActionEvent ev){
+        System.out.println("AddressBB.onMailingStreetEditAbort");
+    }
+    
+    /**
+     * Listener to start the street deac process
+     */
+    public void onMailingStreetDeactivateInitLinkClick(ActionEvent ev){
+        System.out.println("AddressBB.onMailingStreetDeactivateInit");
+    }
+    
+    /**
+     * Listener for user requests to confirm delete of street
+     */
+    public void onMailingStreetDeactivateCommit(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        System.out.println("AddressBB.onMailingStreetDeactivateCommit");
+        try {
+            pc.deactivateMailingStreet(currentStreet, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_INFO,
+                       "Street deactivated",""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                       "Could not remove this street",""));
+        } 
+        
+    }
+    
+    /**
+     * Listener to view current Maling addresss
+     * @param ma 
+     */
+    public void onMailingAddressViewEditLinkClick(MailingAddress ma){
+        currentAddress = ma;
+        getSessionBean().setSessMailingAddress(currentAddress);
+    }
+    
+    /**
+     * Listener for user requests to change to or from edit mode on mailing address
+     * @param ev 
+     */
+    public void onToggleMailingAddressEditModeButtonChange(ActionEvent ev){
+        toggleMailingAddressEditMode();
+    }
+    
+    /**
+     * Toggles the mailing address edit mode
      */
     public void toggleMailingAddressEditMode(){
-        
+        PropertyCoordinator pc = getPropertyCoordinator();
+        System.out.println("AddressBB.toggleMailingAddressEditMode");
+        if(isEditModeCurrentAddress()){
+            
+            try {
+                if(currentAddress.getAddressID() == 0){
+                    pc.insertMailingAddress(currentAddress, getSessionBean().getSessUser());
+                    getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Address Insert successful",""));
+                } else {
+                    pc.updateMailingAddress(currentAddress, getSessionBean().getSessUser());
+                    getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Address update successful",""));
+                }
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update or delete this address",""));
+            } 
+        }
+        setEditModeCurrentAddress(!isEditModeCurrentAddress());
         
     }
     
@@ -143,33 +364,9 @@ public  class   AddressBB
      * @param ev 
      */
     public void onMailingAddressAddInitButtonChange(ActionEvent ev){
-        
-        
-    }
-    
-    /**
-     * Listener for user requests to finalize the process of adding a mailing address
-     * @param ev 
-     */
-    public void onMailingAddressAddCommitButtonChange(ActionEvent ev){
-        
-    }
-    
-    /**
-     * Listener for user requests to start the process of editing a mailing address
-     * @param ma
-     */
-    public void onMailingAddressEditInitButtonChange(MailingAddress ma){
-        
-        
-    }
-    
-    /**
-     * Listener for user requests to finalize mailing address edits
-     * @param ev 
-     */
-    public void onMailingAddressEditCommitButtonChange(ActionEvent ev){
-        
+        PropertyCoordinator pc = getPropertyCoordinator();
+        currentAddress = pc.getMailingAddressSkeleton();
+        editModeCurrentAddress = true;
         
     }
     
@@ -197,10 +394,10 @@ public  class   AddressBB
     }
 
     /**
-     * @return the addressEditMode
+     * @return the editModeCurrentAddress
      */
     public boolean isAddressEditMode() {
-        return addressEditMode;
+        return isEditModeCurrentAddress();
     }
 
     /**
@@ -246,10 +443,10 @@ public  class   AddressBB
     }
 
     /**
-     * @param addressEditMode the addressEditMode to set
+     * @param addressEditMode the editModeCurrentAddress to set
      */
     public void setAddressEditMode(boolean addressEditMode) {
-        this.addressEditMode = addressEditMode;
+        this.setEditModeCurrentAddress(addressEditMode);
     }
 
     /**
@@ -327,6 +524,90 @@ public  class   AddressBB
      */
     public void setSelectedCSZQuery(QueryMailingCityStateZip selectedCSZQuery) {
         this.selectedCSZQuery = selectedCSZQuery;
+    }
+
+    /**
+     * @return the streetList
+     */
+    public List<MailingStreet> getStreetList() {
+        return streetList;
+    }
+
+    /**
+     * @return the editModeCurrentStreet
+     */
+    public boolean isEditModeCurrentStreet() {
+        return editModeCurrentStreet;
+    }
+
+    /**
+     * @return the editModeCurrentAddress
+     */
+    public boolean isEditModeCurrentAddress() {
+        return editModeCurrentAddress;
+    }
+
+    /**
+     * @param streetList the streetList to set
+     */
+    public void setStreetList(List<MailingStreet> streetList) {
+        this.streetList = streetList;
+    }
+
+    /**
+     * @param editModeCurrentStreet the editModeCurrentStreet to set
+     */
+    public void setEditModeCurrentStreet(boolean editModeCurrentStreet) {
+        this.editModeCurrentStreet = editModeCurrentStreet;
+    }
+
+    /**
+     * @param editModeCurrentAddress the editModeCurrentAddress to set
+     */
+    public void setEditModeCurrentAddress(boolean editModeCurrentAddress) {
+        this.editModeCurrentAddress = editModeCurrentAddress;
+    }
+
+    /**
+     * @return the currentStreet
+     */
+    public MailingStreet getCurrentStreet() {
+        return currentStreet;
+    }
+
+    /**
+     * @param currentStreet the currentStreet to set
+     */
+    public void setCurrentStreet(MailingStreet currentStreet) {
+        this.currentStreet = currentStreet;
+    }
+
+    /**
+     * @return the formPOBox
+     */
+    public boolean isFormPOBox() {
+        return formPOBox;
+    }
+
+    /**
+     * @param formPOBox the formPOBox to set
+     */
+    public void setFormPOBox(boolean formPOBox) {
+        this.formPOBox = formPOBox;
+    }
+
+    /**
+     * @return the mailingAddressList
+     */
+    public List<MailingAddress> getMailingAddressList() {
+        return mailingAddressList;
+    }
+
+    /**
+     * @param mailingAddressList the mailingAddressList to set
+     */
+    public void setMailingAddressList(List<MailingAddress> mailingAddressList) {
+        this.mailingAddressList = mailingAddressList;
     }
     
     

@@ -48,7 +48,7 @@ public class PropertyConverter extends EntityConverter implements Converter{
         }
         
         Property p = (Property) o;
-        String title = p.getAddress() + " (" + p.getMuni().getMuniName() + ")";
+        String title = p.getAddressString() + " (" + p.getMuni().getMuniName() + ")";
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;

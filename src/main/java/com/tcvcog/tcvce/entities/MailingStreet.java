@@ -29,7 +29,7 @@ public class MailingStreet extends TrackedEntity{
     private MailingCityStateZip cityStateZip;
     private String notes;
     private boolean poBox;
-    private LocalDateTime createdTS;
+    
     
     final String TABLE_NAME = "mailingstreet";
     final String PK_NAME = "streetid";
@@ -70,12 +70,7 @@ public class MailingStreet extends TrackedEntity{
         return poBox;
     }
 
-    /**
-     * @return the createdTS
-     */
-    public LocalDateTime getCreatedTS() {
-        return createdTS;
-    }
+  
 
     /**
      * @param streetID the streetID to set
@@ -112,12 +107,7 @@ public class MailingStreet extends TrackedEntity{
         this.poBox = poBox;
     }
 
-    /**
-     * @param createdTS the createdTS to set
-     */
-    public void setCreatedTS(LocalDateTime createdTS) {
-        this.createdTS = createdTS;
-    }
+  
 
     @Override
     public String getPKFieldName() {

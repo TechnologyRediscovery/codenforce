@@ -332,7 +332,7 @@ public class PropertySearchBB extends BackingBeanUtils{
             getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessUser()));
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                        "Managing property at " + prop.getAddress() , ""));
+                                        "Managing property at " + prop.getAddressString() , ""));
             sc.logObjectView(getSessionBean().getSessUser(), prop);
             return "propertyInfo";
         } catch (IntegrationException | BObStatusException | SearchException ex) {
@@ -360,7 +360,7 @@ public class PropertySearchBB extends BackingBeanUtils{
             setCurrentProperty(pc.assemblePropertyDataHeavy(currentProperty, getSessionBean().getSessUser()));
              getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Reloaded property at " + currentProperty.getAddress(), ""));
+                                "Reloaded property at " + currentProperty.getAddressString(), ""));
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
@@ -716,42 +716,7 @@ public class PropertySearchBB extends BackingBeanUtils{
     // ********************************************************
     
     
-    /**
-     * Listener for user requests to upload a file and attach to case
-     *
-     * @param ev
-     */
-    public void onBlobUploadCommitButtonChange(FileUploadEvent ev) {
-        PropertyCoordinator pc = getPropertyCoordinator();
-        
-        try {
-            BlobCoordinator blobc = getBlobCoordinator();
-            
-            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
-            blob.setBytes(ev.getFile().getContent());
-            blob.setFilename(ev.getFile().getFileName());
-            blob.setMuni(getSessionBean().getSessMuni());
-            Blob freshBlob = pc.blob_property_storeAndAttachBlob(getSessionBean().getSessUser(), blob, currentProperty);
-            // ship to coordinator for storage
-            if(freshBlob != null){
-                System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getPhotoDocID());
-
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Successfully stored photo/doc with ID " + freshBlob.getPhotoDocID(), ""));
-
-            } 
-            reloadCurrentPropertyDataHeavy();
-        } catch (IntegrationException | IOException | NoSuchElementException | BlobException | BlobTypeException | BObStatusException ex) {
-
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Unable to save photo or doc due to a system error, sorry!", ""));
-            System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | upload failed! " + ex);
-            System.out.println(ex);
-        } 
-    }
-
+    
      
     /**
      * Listener for user requests to start the blob update process

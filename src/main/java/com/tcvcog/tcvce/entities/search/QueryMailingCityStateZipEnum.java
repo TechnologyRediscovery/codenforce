@@ -15,17 +15,17 @@ import com.tcvcog.tcvce.entities.RoleType;
  */
 public enum QueryMailingCityStateZipEnum 
 implements IFace_RankLowerBounded{
-    ZIPCODES_BY_CITY_AND_STATE         (   "Zip codes in a given city and state",
+    ZIPCODES_BY_CITY_AND_STATE         (   "ZIP Codes by city and state",
                                     "Returns zip codes associated with a city and state based on a case insensitive search of city",
                                     RoleType.Public,
                                     false),
     
-    ALL_RECORDS_BY_ZIPCODE         (   "All records assocaited by zip",
+    ALL_RECORDS_BY_ZIPCODE         (   "ZIP Code Search: All Records",
                                     "Returns all record types for a gizen ZIP Code",
                                     RoleType.MuniStaff,
                                     false),
     
-    VALID_RECORDS_BY_ZIPCODE   (   "All valid records assocaited by zip",
+    VALID_RECORDS_BY_ZIPCODE   (   "ZIP Code Search: Valid records only",
                                     "Returns only valid record types for a gizen ZIP Code",
                                     RoleType.Public,
                                     false),

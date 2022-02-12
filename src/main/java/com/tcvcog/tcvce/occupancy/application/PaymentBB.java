@@ -440,7 +440,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
             PropertyCoordinator pc = getPropertyCoordinator();
             try {
-                return pc.getPropertyByPropUnitID(currentOccPeriod.getPropertyUnitID()).getAddress();
+                return pc.getPropertyByPropUnitID(currentOccPeriod.getPropertyUnitID()).getAddressString();
             } catch (IntegrationException ex) {
                 System.out.println(ex.toString());
                 getFacesContext().addMessage(null,
@@ -453,7 +453,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
             CaseCoordinator cc = getCaseCoordinator();
             try {
-                address = cc.cecase_assembleCECasePropertyUnitHeavy(currentCase).getProperty().getAddress();
+                address = cc.cecase_assembleCECasePropertyUnitHeavy(currentCase).getProperty().getAddressString();
             } catch (IntegrationException | SearchException ex) {
                 System.out.println(ex);
             }

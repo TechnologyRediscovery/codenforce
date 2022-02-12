@@ -49,11 +49,21 @@ public class        Property
      * @return a string rep of building no & street
      */
 
-    public String getAddress(){
+    public String getAddressString(){
         if(addresses != null && !addresses.isEmpty()){
             return addresses.get(0).buildingNo + " " + addresses.get(0).getStreet();
         } else {
             return "[No Address]";
+        }
+        
+    }
+    
+ 
+    public MailingAddress getAddress(){
+        if(addresses != null && !addresses.isEmpty()){
+            return addresses.get(0);
+        } else {
+            return new MailingAddress();
         }
         
     }

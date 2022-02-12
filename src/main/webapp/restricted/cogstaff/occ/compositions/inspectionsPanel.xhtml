@@ -961,12 +961,15 @@
         <h:form id="space-element-accordion-form">
             <p:accordionPanel id="element-accordion"
                               value="#{occInspectionsBB.selectedInspectedSpace.inspectedElementGroupList}" 
-                              var="elegrp"
+                              var="elegrp" multiple="true"
                               >
                 <p:ajax/>
-                <p:tab title="#{elegrp.groupTitle}">
-                    <p:repeat   value="#{elegrp.elementList}" 
-                                var="spaceElement">
+                <p:tab title="#{elegrp.groupTitle}"
+                       >
+                    <p:repeat   id="elements-repeat"
+                                value="#{elegrp.elementList}" 
+                                var="spaceElement"
+                                varStatus="eleStatus">
                         <div class="p-grid nested-grid">
                             <div class="p-col-8">
                                 <div class="p-grid">
@@ -1005,7 +1008,8 @@
 
                                                 <p:selectOneButton id="inspections-entryscreen-statussel" 
                                                                    value="#{spaceElement.statusEnum}" 
-                                                                   unselectable="false">
+                                                                   unselectable="false"
+                                                                   >
                                                     <!-- Strangely this element needs to update itself to call the setter -->
                                                     <p:ajax listener="#{occInspectionsBB.onElementInspectionStatusButtonChange(spaceElement)}" />
                                                     <p:ajax update="inspections-entryscreen-statussel"/>

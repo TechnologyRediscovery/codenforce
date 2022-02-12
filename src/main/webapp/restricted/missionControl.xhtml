@@ -277,7 +277,7 @@
                                                     <h:outputText value="#{ef.category.eventType.label}: #{ef.category.eventCategoryTitle}"
                                                                   style="font-weight: bold;"/>
                                                     <p:spacer height="5px" />
-                                                    <h:outputText value="#{ef.property.address} (#{ef.property.muni.muniName}): Case ID: #{ef.cecase.caseID}"/>
+                                                    <h:outputText value="#{ef.property.addressString} (#{ef.property.muni.muniName}): Case ID: #{ef.cecase.caseID}"/>
                                                 </div>
                                             </p:column>
 
@@ -544,7 +544,7 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="Address"/>
                                                 </f:facet>
-                                                <h:outputText value="#{prop.address}" />
+                                                <h:outputText value="#addressStringddress}" />
                                             </p:column>
 
                                             <p:column width="35%" style="text-align: center">
@@ -750,11 +750,11 @@
                                                               style="font-style: italic"/>
 
                                             </p:column>
-                                            <p:column width="12%" sortBy="#{c.property.address}">
+                                            <p:column width="12%" sortBy="#{c.property.addressString}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Property" />
                                                 </f:facet>
-                                                <h:outputText value="#{c.property.address} "/>
+                                                <h:outputText value="#{c.property.addressString} "/>
                                                 <p:spacer height="2px"/>
                                                 <h:outputText value=" (#{c.property.muni.muniName})"/>
                                             </p:column>
@@ -845,7 +845,7 @@
                                                 <p:column headerText="Address"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{r.requestProperty.address}"/>
+                                                    <h:outputText value="#{r.requestProperty.addressString}"/>
 
                                                 </p:column>
 

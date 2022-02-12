@@ -102,7 +102,7 @@ public abstract class PublicInfoBundle implements Serializable {
                 setAddressAssociated(false);
             } else {
                 setAddressAssociated(true);
-                setPropertyAddress(prop.getAddress());
+                setPropertyAddress(prop.getAddressString());
             }
         
     }

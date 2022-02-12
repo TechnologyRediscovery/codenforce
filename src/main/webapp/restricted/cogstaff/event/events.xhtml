@@ -1718,7 +1718,7 @@
 
                                             <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
                                             <f:selectItems value="#{systemServicesBB.propertyListForSearch}"  var="prop" itemValue="#{prop}" 
-                                                           itemLabel="#{prop.address} (#{prop.muni.muniName})"/>
+                                                           itemLabel="#{prop.addressString} (#{prop.muni.muniName})"/>
                                             <f:converter converterId="propertyConverter"/>
 
                                         </p:selectOneMenu>

@@ -64,6 +64,237 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     }
 
     
+    /**
+     *  ***************************************************
+     *  ***************************************************
+     *  ************* MAILING ADDRESS CENTRAL *************
+     *  ***************************************************
+     *  ***************************************************
+     */
+    
+    
+    /**
+     * Factory for MailingStreet objects
+     * @param csz to be injected into the new street, can be null
+     * @return the empty MailingStreet with id = 0
+     */
+    public MailingStreet getMailingStreetSkeleton(MailingCityStateZip csz){
+        MailingStreet ms = new MailingStreet();
+        ms.setCityStateZip(csz);
+        return ms;
+    }
+    
+    /**
+     * Factory method for address objects
+     * @return 
+     */
+    public MailingAddress getMailingAddressSkeleton(){
+        MailingAddress ma = new MailingAddress();
+        ma.setStreet(new MailingStreet());
+        return ma;
+    }
+    
+    
+    /**
+     * Logic container for inserting a new MailingStreet
+     * @param street
+     * @param ua
+     * @return
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public int insertMailingStreet(MailingStreet street, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(street == null || street.getCityStateZip() == null || ua == null){
+            throw new BObStatusException("Cannot insert street with null street, zip, or user");
+        }
+        
+        PropertyIntegrator pi = getPropertyIntegrator();
+        street.setCreatedBy(ua);
+        street.setLastUpdatedBy(ua);
+        return pi.insertMailingStreet(street);
+        
+    }
+    
+    
+    /**
+     * Logic intermediary for updating a MailingStreet
+     * @param street
+     * @param ua
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void updateMailingStreet(MailingStreet street, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(street == null || street.getCityStateZip() == null || ua == null){
+            throw new BObStatusException("Cannot insert street with null street, zip, or user");
+        }
+        
+        PropertyIntegrator pi = getPropertyIntegrator();
+        street.setLastUpdatedBy(ua);
+        pi.updateMailingStreet(street);
+        
+    }
+    
+    
+    /**
+     * Logic container for deactivating a street record
+     * @param street
+     * @param ua
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void deactivateMailingStreet(MailingStreet street, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(street == null || street.getCityStateZip() == null || ua == null){
+            throw new BObStatusException("Cannot insert street with null street, zip, or user");
+        }
+        
+        PropertyIntegrator pi = getPropertyIntegrator();
+        street.setLastUpdatedBy(ua);
+        street.setDeactivatedBy(ua);
+        pi.updateMailingStreet(street);
+        
+    }
+    
+    /**
+     * Asks the integrator to fetch a list of MailingStreets given one, both or neither
+     * of the Street name part and CityStateZip
+     * @param streetName can be null
+     * @param csz can be null
+     * @return a list, perhaps with results
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public List<MailingStreet> searchForMailingStreet(String streetName, MailingCityStateZip csz) throws IntegrationException, BObStatusException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.searchForStreetsByNameAndZip(streetName, csz);
+        
+    }
+    
+    /**
+     * Extracts mailing address objects by street
+     * @param mstreet
+     * @return a list, potentially of 1 or more addresses at the given street
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public List<MailingAddress> getMailingAddressListByStreet(MailingStreet mstreet) throws IntegrationException, BObStatusException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.getMailingAddressListByStreet(mstreet);
+        
+        
+    }
+    
+    
+    
+     /**
+     * Logic container for retrieving city/state/zip objects
+     * @param cszid
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public MailingCityStateZip getMailingCityStateZip(int cszid) throws IntegrationException, BObStatusException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.getMailingCityStateZip(cszid);
+    }
+
+    
+    /**
+     * Logic stop for inserts of MailingAddress objects
+     * @param addr to update; i'll inject the last updated by
+     * @param ua doing the updating
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void insertMailingAddress(MailingAddress addr, UserAuthorized ua) 
+            throws BObStatusException, IntegrationException{
+        if(addr == null || ua == null){
+            throw new BObStatusException("Cannot update address with null incoming address or user");
+        }
+        
+        if(addr.getStreet() == null || addr.getStreet().getCityStateZip() == null){
+            throw new BObStatusException("cannot insert addres with null street or city/state/zip");
+        }
+        PropertyIntegrator pi = getPropertyIntegrator();
+        addr.setCreatedBy(ua);
+        addr.setLastUpdatedBy(ua);
+        pi.updateMailingAddress(addr);
+    }
+    
+    /**
+     * Logic stop for updates to MailingAddress objects
+     * @param addr to update; i'll inject the last updated by
+     * @param ua doing the updating
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void updateMailingAddress(MailingAddress addr, UserAuthorized ua) 
+            throws BObStatusException, IntegrationException{
+        if(addr == null || ua == null){
+            throw new BObStatusException("Cannot update address with null incoming address or user");
+        }
+        PropertyIntegrator pi = getPropertyIntegrator();
+        addr.setLastUpdatedBy(ua);
+        pi.updateMailingAddress(addr);
+    }
+    
+    /**
+     * Deactivates a record in MailingAddress
+     * @param addr
+     * @param ua
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void deactivateMailingAddress(MailingAddress addr, UserAuthorized ua) 
+            throws BObStatusException, IntegrationException{
+        if(addr == null || ua == null){
+            throw new BObStatusException("Cannot update address with null incoming address or user");
+        }
+        PropertyIntegrator pi = getPropertyIntegrator();
+        addr.setDeactivatedBy(ua);
+        addr.setLastUpdatedBy(ua);
+        addr.setDeactivatedTS(LocalDateTime.now());
+        pi.updateMailingAddress(addr);
+    }
+    
+    
+    
+    
+    
+     /**
+     * Extracts the house number and street name from the address field
+     * and injects into separate members on Property
+     * 
+     * @param prop
+     * @return 
+     */
+    private Property parseAddress(Property prop){
+        if(prop.getAddressString() != null){
+            
+
+            Pattern patNum = Pattern.compile("(?<num>\\d+[a-zA-Z]*)\\W+(?<street>\\w.*)");
+            Matcher matNum = patNum.matcher(prop.getAddressString());
+
+            while (matNum.find()){
+                // Don't need this for humanization since we're already separating out num and street
+//                prop.setAddressNum(matNum.group("num"));
+//                prop.setAddressStreet(matNum.group("street"));
+            }
+
+        }
+        return prop;
+    }
+    
+    
+        
+    /**
+     *  ***************************************************
+     *  ***************************************************
+     *  ************* PROPERTY OTHER **********************
+     *  ***************************************************
+     *  ***************************************************
+     */
+    
+    
     
     /**
      * Pass through for getting a property count by municode
@@ -310,34 +541,12 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         p.setUnitList(pi.getPropertyUnitList(p));
         p.setAddresses(pi.getMailingAddressListByParcel(p.getParcelKey()));
         
-        parseAddress(p);
+        // Don't need this for humanization
+//        parseAddress(p);
         return p;
     }
     
-    /**
-     * Extracts the house number and street name from the address field
-     * and injects into separate members on Property
-     * 
-     * @param prop
-     * @return 
-     */
-    private Property parseAddress(Property prop){
-        if(prop.getAddress() != null){
-            
-
-            Pattern patNum = Pattern.compile("(?<num>\\d+[a-zA-Z]*)\\W+(?<street>\\w.*)");
-            Matcher matNum = patNum.matcher(prop.getAddress());
-
-            while (matNum.find()){
-                // Don't need this for humanization since we're already separating out num and street
-//                prop.setAddressNum(matNum.group("num"));
-//                prop.setAddressStreet(matNum.group("street"));
-            }
-
-        }
-        return prop;
-    }
-    
+   
     
 
     /**
@@ -390,35 +599,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
     }
     
-   /**
-     * Primary pathway for inserting blobs for attachment to a CECase
-     * Liaises with the BlobCoordinator and Integrator as needed
-     * @param ua
-     * @param blob
-     * @param prop
-     * @return fresh blob
-     * @throws BlobException
-     * @throws IOException
-     * @throws IntegrationException
-     * @throws BlobTypeException 
-     * @throws com.tcvcog.tcvce.domain.BObStatusException 
-     */
-    public Blob blob_property_storeAndAttachBlob(UserAuthorized ua, Blob blob, Property prop) 
-            throws BlobException, IOException, IntegrationException, BlobTypeException, BObStatusException{
-        BlobCoordinator bc = getBlobCoordinator();
-        if(ua == null || blob == null || prop == null){
-            throw new BObStatusException("Cannot link blob to property with null prop, blob, or user");
-        }
-        
-        blob.setCreatedBy(ua);
-        throw new BlobException("Fatal error: Cannot attach blob to prop: must update code for IFace_BlobHolder");
-        
-//        Blob freshBlob = bc.storeBlob(blob);
-//        bc.linkBlobToProperty(freshBlob, prop);
-//        return freshBlob;
-        
-    }
-    
+  
 
     /**
      * Logic container for choosing a property info case
@@ -464,7 +645,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                 try {
                     cse.setCaseManager(uc.user_getUser(ua.getMyCredential().getGoverningAuthPeriod().getUserID()));
                     cse.setPropertyInfoCase(true);
-                    cse.setNotes("This is a Case object that contains information and events attached to " + p.getAddress() + ". "
+                    cse.setNotes("This is a Case object that contains information and events attached to " + p.getAddressString() + ". "
                             + "This case does not represent an actual code enforcement case.");
                     cse.setCaseID(cc.cecase_insertNewCECase(cse, ua, null));
                     csehv = cc.cecase_assembleCECaseDataHeavy(cse, ua);
@@ -676,18 +857,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     }
     
     
-    /**
-     * Logic container for retrieving city/state/zip objects
-     * @param cszid
-     * @return
-     * @throws IntegrationException
-     * @throws BObStatusException 
-     */
-    public MailingCityStateZip getMailingCityStateZip(int cszid) throws IntegrationException, BObStatusException{
-        PropertyIntegrator pi = getPropertyIntegrator();
-        return pi.getMailingCityStateZip(cszid);
-    }
-
+   
     /**
      *
      * 

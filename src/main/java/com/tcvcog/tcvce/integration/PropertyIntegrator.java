@@ -37,6 +37,8 @@ import com.tcvcog.tcvce.entities.HumanMailingAddressLink;
 import com.tcvcog.tcvce.entities.HumanParcelLink;
 import com.tcvcog.tcvce.entities.MailingAddress;
 import com.tcvcog.tcvce.entities.MailingCityStateZip;
+import com.tcvcog.tcvce.entities.MailingCityStateZipDefaultTypeEnum;
+import com.tcvcog.tcvce.entities.MailingCityStateZipRecordTypeEnum;
 import com.tcvcog.tcvce.entities.MailingStreet;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Parcel;
@@ -55,6 +57,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -528,6 +531,14 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         mcsz.setStateID(rs.getInt("sid"));
         mcsz.setZipCode(rs.getString("zip_code"));
         
+// Couldn't get enum matching to work
+//        mcsz.setDefaultType(MailingCityStateZipDefaultTypeEnum.valueOf(rs.getString("default_type")));
+//        mcsz.setRecordType(MailingCityStateZipRecordTypeEnum.valueOf(rs.getString("list_type")));
+
+        mcsz.setDefaultTypeString(rs.getString("default_type"));
+        mcsz.setRecordTypeString(rs.getString("list_type"));
+        mcsz.setDefaultCity(rs.getString("default_city"));
+        
         return mcsz;
     }
     
@@ -829,6 +840,50 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         return hmal;
     }
     
+     /**
+     * Extracts all mailing addresses associated with a given street
+     * @param street
+     * @return the list of address objects
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public List<MailingAddress> getMailingAddressListByStreet(MailingStreet street) 
+            throws IntegrationException, BObStatusException{
+        
+        if(street == null || street.getStreetID() == 0){
+            throw new BObStatusException("Cannot query addresses by street with null street or streetid = 0");
+        }
+        
+        List<MailingAddress> mal = new ArrayList<>();
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            String s =  "SELECT addressid FROM public.mailingaddress WHERE street_streetid=? AND deactivatedts IS NULL;";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, street.getStreetID());
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                mal.add(getMailingAddress(rs.getInt("addressid")));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return mal;
+    }
+    
+    
     
     /**
      * Populator of link object between a human and a mailing address
@@ -858,6 +913,205 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     }
     
+    
+    /**
+     * Creates a new record in the mailingstreet table
+     * @param ms to insert, not null with ID = 0
+     * @return the fresh ID
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public int insertMailingStreet(MailingStreet ms) throws BObStatusException, IntegrationException{
+        
+        if(ms == null || ms.getStreetID() != 0 || ms.getCityStateZip() == null || ms.getCityStateZip().getCityStateZipID() == 0){
+            throw new BObStatusException("Cannot insert street with null street or ID != 0, or zip of null or id = 0");
+        }
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int freshID = 0;
+
+        try {
+            
+            String s =  "INSERT INTO public.mailingstreet(\n" +
+                        "            streetid, name, namevariantsarr, citystatezip_cszipid, notes, \n" +
+                        "            pobox, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
+                        "            ?, now(), ?, now(), ?);";
+            
+            stmt = con.prepareStatement(s);
+            
+            stmt.setString(1, ms.getName());
+            // don't do anything with name variants yet
+            stmt.setNull(2, java.sql.Types.NULL);
+            stmt.setInt(3, ms.getCityStateZip().getCityStateZipID());
+            stmt.setString(4, ms.getNotes());
+            
+            stmt.setBoolean(5, ms.isPoBox());
+            if(ms.getCreatedBy() != null){
+                stmt.setInt(6, ms.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            if(ms.getLastUpdatedBy() != null){
+                stmt.setInt(7, ms.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+
+            stmt.execute();
+            
+            
+            String idNumQuery = "SELECT currval('mailingstreet_streetid_seq');";
+            Statement st = con.createStatement();
+            rs = st.executeQuery(idNumQuery);
+            rs.next();
+
+            while (rs.next()) {
+                freshID = rs.getInt("currval");
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.insertMailingStreet", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return freshID;
+    }
+    
+    
+    /**
+     * Updates a record in the mailingstreet table
+     * @param ms must be not null and ID != 0
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void updateMailingStreet(MailingStreet ms) throws BObStatusException, IntegrationException{
+          if(ms == null || ms.getStreetID() != 0 || ms.getCityStateZip() == null || ms.getCityStateZip().getCityStateZipID() == 0){
+            throw new BObStatusException("Cannot insert street with null street or ID != 0, or zip of null or id = 0");
+        }
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            
+            String s =  "UPDATE public.mailingstreet\n" +
+                        "   SET name=?, namevariantsarr=?, citystatezip_cszipid=?, \n" +
+                        "       notes=?, pobox=?, lastupdatedts=now(), \n" +
+                        "       lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?\n" +
+                        " WHERE streetid=?;";
+            
+            
+            stmt = con.prepareStatement(s);
+            
+            stmt.setString(1, ms.getName());
+            // don't do anything with name variants yet
+            stmt.setNull(2, java.sql.Types.NULL);
+            stmt.setInt(3, ms.getCityStateZip().getCityStateZipID());
+            stmt.setString(4, ms.getNotes());
+            
+            stmt.setBoolean(5, ms.isPoBox());
+           
+            if(ms.getLastUpdatedBy() != null){
+                stmt.setInt(6, ms.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
+            if(ms.getDeactivatedBy() != null){
+                stmt.setTimestamp(7, java.sql.Timestamp.valueOf(LocalDateTime.now()));
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            if(ms.getDeactivatedBy() != null){
+                stmt.setInt(8, ms.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(9, ms.getStreetID());
+            
+            stmt.executeUpdate();
+            
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.updateMailingStreet", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    
+    /**
+     * Extracts streets by a Street String and a mailing zip
+     * If both are null, you'll get all streets.
+     * 
+     * @param street returns all streets in zip if null
+     * @param csz returns matching streets across all zips if null
+     * @return matching Streets
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public List<MailingStreet> searchForStreetsByNameAndZip(String street, MailingCityStateZip csz) 
+            throws IntegrationException, BObStatusException{
+        
+        List<MailingStreet> streetList = new ArrayList<>();
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("SELECT streetid FROM mailingstreet ");
+            sb.append(" WHERE streetid IS NOT NULL AND deactivatedts IS NULL ");
+            
+            if(street != null){
+                sb.append("AND name ILIKE ? ");
+            }
+            
+            if(csz != null){
+                sb.append(" AND citystatezip_cszipid = ?");
+            }
+            sb.append(";");
+            
+            stmt = con.prepareStatement(sb.toString());
+            int paramCounter = 0;
+            
+            if(street != null){
+                StringBuilder strB = new StringBuilder();
+                strB.append("%");
+                strB.append(street);
+                strB.append("%");
+                stmt.setString(++paramCounter, street);
+            }
+            
+            if(csz != null){
+                stmt.setInt(++paramCounter, csz.getCityStateZipID());
+            }
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                streetList.add(getMailingStreet(rs.getInt("streetid")));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return streetList;
+    }
     
     
       /**
@@ -951,7 +1205,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             if (!params.isBobID_ctl()) {
                 
                 if (params.isZip_ctl()) {
-                     stmt.setString(++paramCounter, params.getZip_val());
+                    str = new StringBuilder();
+                    str.append("%");
+                    str.append(params.getZip_val());
+                    str.append("%");
+                     stmt.setString(++paramCounter, str.toString());
                 }
                 
                 if (params.isState_ctl()) {
@@ -993,6 +1251,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             params.appendToParamLog("City State Zip query before execution: ");
             params.appendToParamLog(stmt.toString());
+            System.out.println("PropertyIntegrator.searchForMailingCityStateZip | SQL " + params.extractRawSQL());
             rs = stmt.executeQuery();
             
             int counter = 0;
@@ -1065,14 +1324,14 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     
   
     /**
-     * Updates a record in the mailingaddress table
+     * Updates a record in the mailingaddress table; I can also deactivate records
      * @param addr with fields as they are to be udpated
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public void updateMailingAddress(MailingAddress addr) throws BObStatusException, IntegrationException{
-        if(addr == null){
-            throw new BObStatusException("Cannot update a null object");
+        if(addr == null || addr.getStreet() == null || addr.getStreet().getStreetID() == 0 || addr.getStreet().getCityStateZip() == null){
+            throw new BObStatusException("Cannot update a null adress, or street, or street ID = 0, or CSZ null");
         }
         
         Connection con = getPostgresCon();
@@ -1085,7 +1344,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                         "   SET bldgno=?, street_streetid=?, verifiedts=?, verifiedby_userid=?, \n" +
                         "       verifiedsource_sourceid=?, source_sourceid=?, createdby=?, \n" +
                         "       lastupdatedts=now(), lastupdatedby_userid=?, \n" +
-                        "       notes=? " +
+                        "       notes=?, deactivatedts=?, deactivatedby_userid=? " +
                         "       WHERE addressid=?;";
             
             stmt = con.prepareStatement(s);
@@ -1136,7 +1395,18 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             stmt.setString(9, addr.getNotes());
             
-            stmt.setInt(10, addr.getAddressID());
+            if(addr.getDeactivatedTS() != null){
+                stmt.setTimestamp(10, java.sql.Timestamp.valueOf(addr.getDeactivatedTS()));
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
+            }
+            
+            if(addr.getDeactivatedBy() != null){
+                stmt.setInt(11, addr.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
+            stmt.setInt(12, addr.getAddressID());
 
             stmt.execute();
 
@@ -1155,7 +1425,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @return the ID of the freshly inserted address
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public int insertMailingAddress(MailingAddress addr) throws IntegrationException{
+    public int insertMailingAddress(MailingAddress addr) throws IntegrationException, BObStatusException{
+        
+        if(addr == null || addr.getStreet() == null || addr.getStreet().getStreetID() == 0 || addr.getStreet().getCityStateZip() == null){
+            throw new BObStatusException("Cannot update a null adress, or street, or street ID = 0, or CSZ null");
+        }
         
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;

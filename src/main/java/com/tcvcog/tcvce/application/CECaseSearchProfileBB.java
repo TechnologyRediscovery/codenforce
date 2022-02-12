@@ -2241,7 +2241,7 @@ public class CECaseSearchProfileBB
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO, 
                      "Successfully added " + freshPerson.getFirstName() + " to the Database!" 
-                         + " and connected to " + property.getAddress(), ""));
+                         + " and connected to " + property.getAddressString(), ""));
            } catch (IntegrationException | BObStatusException ex) {
                System.out.println(ex.toString());
                   getFacesContext().addMessage(null,

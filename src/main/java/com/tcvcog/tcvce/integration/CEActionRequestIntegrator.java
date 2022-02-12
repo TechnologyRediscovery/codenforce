@@ -200,7 +200,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
             if (actionRequest.isIsAtKnownAddress()) {
                 stmt.setInt(3, actionRequest.getRequestProperty().getParcelKey());
-                actionRequest.setAddressOfConcern(actionRequest.getRequestProperty().getAddress());
+                actionRequest.setAddressOfConcern(actionRequest.getRequestProperty().getAddressString());
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }

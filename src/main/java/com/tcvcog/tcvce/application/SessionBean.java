@@ -114,6 +114,7 @@ public class    SessionBean
     private boolean startPropInfoPageWithAdd;
     
     private MailingCityStateZip sessMailingCityStateZip;
+    private MailingAddress sessMailingAddress;
     
     /* >>> QUERY PROPERTY <<< */
     private QueryProperty queryProperty;
@@ -2053,6 +2054,20 @@ public class    SessionBean
      */
     public void setSessCodeGuideList(List<CodeElementGuideEntry> sessCodeGuideList) {
         this.sessCodeGuideList = sessCodeGuideList;
+    }
+
+    /**
+     * @return the sessMailingAddress
+     */
+    public MailingAddress getSessMailingAddress() {
+        return sessMailingAddress;
+    }
+
+    /**
+     * @param sessMailingAddress the sessMailingAddress to set
+     */
+    public void setSessMailingAddress(MailingAddress sessMailingAddress) {
+        this.sessMailingAddress = sessMailingAddress;
     }
 
     

@@ -240,7 +240,9 @@
                                             <div class="aob-container aob-container-objectstring">
 
 
-                                                <h:outputText value="#{sessionBean.sessProperty.address}"/>
+                                                <h:outputText value="#{systemServicesBB.bbSessionProperty.address.buildingNo}"/>
+                                                <h:outputText value=" "/>
+                                                <h:outputText value="#{systemServicesBB.bbSessionProperty.address.street.name}"/>
 
                                             </div>
                                             <h:form id="topnav-prop-form">
@@ -260,6 +262,14 @@
                                                                        value="change"
                                                                        oncomplete="PF('activebob-proplist-overlay-var').show();"/>
                                                     </div>
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink id="activebob-addresses-cb"
+                                                                       value="addresses"
+                                                                       ajax="true"
+                                                                       actionListener="#{navigationBB.onAddressManagerViewLinkClick}"
+                                                                       oncomplete="PF('address-mngr-var').show();"/>
+                                                    </div>
 
                                                     <p:overlayPanel id="activebob-proplist-overlay"
                                                                     widgetVar="activebob-proplist-overlay-var"
@@ -271,7 +281,7 @@
                                                                    value="#{sessionBean.sessPropertyList}"
                                                                    var="sprop">
 
-                                                            <h:outputText value="#{sprop.address}"/>
+                                                            <h:outputText value="#{sprop.addressString}"/>
 
                                                             <div class="restrict-main-contents-io-link link-button">
                                                                 <p:commandLink id="activebob-proplist-prop-explore-cl"
@@ -288,6 +298,8 @@
                                                     </p:overlayPanel>
                                                 </div>
                                             </h:form>
+                                            
+                                            <ui:include src="/restricted/cogstaff/prop/compositions/addresses.xhtml"/>
 
                                         </div>
 
@@ -439,7 +451,7 @@
                                                     <p:commandLink id="activebob-proplist-prop-explore-cl"
                                                                    ajax="false"
                                                                    action="#{navigationBB.onCECaseListItemSelect(cse)}">
-                                                        <h:outputText value="#{cse.caseName} at #{cse.property.address} (ID:#{cse.caseID})"/>
+                                                        <h:outputText value="#{cse.caseName} at #{cse.property.addressString} (ID:#{cse.caseID})"/>
                                                     </p:commandLink>
 
 
@@ -499,7 +511,7 @@
                                                     <p:commandLink id="activebob-proplist-prop-explore-cl"
                                                                    ajax="false"
                                                                    action="#{navigationBB.onOccPeriodListItemSelect(ose)}">
-                                                        <h:outputText value="#{ose.propUnitProp.property.address} #{ose.propUnitProp.unitNumber} (ID:#{ose.periodID})"/>
+                                                        <h:outputText value="#{ose.propUnitProp.property.addressString} #{ose.propUnitProp.unitNumber} (ID:#{ose.periodID})"/>
                                                     </p:commandLink>
 
 

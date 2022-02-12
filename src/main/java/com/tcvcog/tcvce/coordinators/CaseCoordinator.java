@@ -2965,7 +2965,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 //        sb.append("Case: ");
 //        sb.append(cse.getCaseName());
 //        sb.append(" at ");
-//        sb.append(cc.cecase_assembleCECasePropertyUnitHeavy(cse).getProperty().getAddress());
+//        sb.append(cc.cecase_assembleCECasePropertyUnitHeavy(cse).getProperty().getAddressString());
 //        sb.append("(");
 //        sb.append(cc.cecase_assembleCECasePropertyUnitHeavy(cse).getProperty().getMuni().getMuniName());
 //        sb.append(")");

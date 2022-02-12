@@ -345,7 +345,7 @@ public class PersonSearchBB extends BackingBeanUtils{
                    getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Successfully added " + currentPerson.getFirstName() + " to the Database!" 
-                                + " and connected to " + property.getAddress(), ""));
+                                + " and connected to " + property.getAddressString(), ""));
                } else {
 
                    getFacesContext().addMessage(null,

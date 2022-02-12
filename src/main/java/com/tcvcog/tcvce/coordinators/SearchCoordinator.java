@@ -432,7 +432,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                     }
                 } catch (IntegrationException | BObStatusException ex) {
                     System.out.println(ex);
-                    throw new SearchException("Integration error when querying CEARS");
+                    throw new SearchException("Integration error when querying ZIP Codes!");
                 }
             q.addToResults(mcszTempList);
             q.appendToQueryLog(sp);
@@ -2656,7 +2656,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
           // client injects value
           
           params.setRecordType_ctl(true);
-          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT_AND_RECOGNIZED);
+          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT);
           
           params.setDefaultType_ctl(false);
           
@@ -2677,7 +2677,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
           params.setCity_ctl(false);
           
           params.setRecordType_ctl(true);
-          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.ALL);
+          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT);
           
           params.setDefaultType_ctl(false);
           
@@ -2698,7 +2698,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
           params.setCity_ctl(false);
           
           params.setRecordType_ctl(true);
-          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT_AND_RECOGNIZED);
+          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT);
           
           params.setDefaultType_ctl(false);
           

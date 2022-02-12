@@ -166,7 +166,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:form id="cearManage-form-lookup">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+                                                             
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
                                                     <h:panelGroup>
@@ -336,7 +336,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:form id="cearManage-form-actions">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+                                                             
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -371,7 +371,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Address:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearActionsTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.addressString}"/>
                                                             <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
@@ -552,7 +552,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:form id="cearManage-form-objects">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -560,7 +559,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Property:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearObjectsTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>
+                                                            <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.addressString}"/>
                                                             <p:outputLabel value="&#160;#{cEActionRequestsBB.selectedRequest.requestProperty.muni.muniName}"/>
                                                         </div>
                                                         <p:spacer height="5px"/>
@@ -648,7 +647,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:form id="cearManage-form-notes">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+                                                             
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -719,7 +718,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                         <h:form id="attach-to-existing-case-form">
 
-                            <p>Choose an existing case on <h:outputLabel for="invalidMessageITA" value="#{cEActionRequestsBB.selectedRequest.requestProperty.address}"/>:</p>
+                            <p>Choose an existing case on <h:outputLabel for="invalidMessageITA" value="#{cEActionRequestsBB.selectedRequest.requaddressStringerty.address}"/>:</p>
                             <p:scrollPanel>
                                 <p:dataScroller
                                     id="cases-on-selected-request-property-DS"
@@ -845,7 +844,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 <f:selectItems id="muniNameList" value="#{systemServicesBB.bbSessionUser.authMuniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
                             </p:selectOneMenu>
 
-                            <h:panelGrid columns="3" layout="grid">
+                            <h:panelGrid columns="3" >
 
                                 <h:panelGroup>
                                     <p:outputLabel for="propSearchHouseNumIT">
@@ -890,7 +889,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 selection="#{cEActionRequestsBB.propertyForPropSwitch}"
                                 rowKey="#{prop.propertyID}">
                                 <p:column headerText="Address">
-                                    <h:outputText value="#{prop.address}"/>
+                                    <h:outputText value="#{prop.addressString}"/>
                                 </p:column>
                                 <p:column headerText="Municipality">
                                     <h:outputText value="#{prop.muni.muniName}"/>

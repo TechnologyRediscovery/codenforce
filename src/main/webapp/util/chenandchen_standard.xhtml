@@ -183,11 +183,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </f:facet>
                                                     <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDateNoTime(c.originationDate)}"/>
                                                 </p:column>
-                                                <p:column width="15%" sortBy="#{c.property.address}">
+                                                <p:column width="15%" sortBy="#{c.property.addressString}">
                                                     <f:facet name="header">
                                                         <h:outputText value="Property" />
                                                     </f:facet>
-                                                    <h:outputText value="#{c.property.address} "/>
+                                                    <h:outputText value="#{c.property.addressString} "/>
                                                     <p:spacer height="2px"/>
                                                     <h:outputText value=" (#{c.property.muni.muniName})"/>
                                                 </p:column>
@@ -256,7 +256,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <h:form id="cecaselists-launcher">
                                         <h2>
                                             <h:outputText id="header-type-ot" value="#{ceCaseSearchProfileBB.currentCase.caseName} @ "/> 
-                                            <h:outputText id="header-addr-ot" value="#{ceCaseSearchProfileBB.currentCase.property.address} "/>  
+                                            <h:outputText id="header-addr-ot" value="#{ceCaseSearchProfileBB.currentCase.property.addressString} "/>  
                                             <h:outputText id="header-muni-ot" value="(#{ceCaseSearchProfileBB.currentCase.property.muni.muniName})"/>  
                                         </h2>
 
@@ -312,7 +312,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     icon="fa fa-archive" 
                                                                     styleClass="noFill button-size-small"
                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                    value="Open a New Code Enforcement Case at #{ceCaseSearchProfileBB.currentCase.property.address}" />
+                                                                    value="Open a New Code Enforcement Case at #{ceCaseSearchProfileBB.currentCase.property.addressString}" />
 
 
                                             </h:form>

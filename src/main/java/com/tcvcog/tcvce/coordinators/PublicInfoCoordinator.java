@@ -239,7 +239,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 pib.setAddressAssociated(false);
             } else {
                 pib.setAddressAssociated(true);
-                pib.setPropertyAddress(c.getProperty().getAddress());
+                pib.setPropertyAddress(c.getProperty().getAddressString());
             }
 
             ArrayList<PublicInfoBundleEventCnF> eventBundles = new ArrayList<>();
@@ -1120,7 +1120,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         Property exportable = pc.getProperty(unbundled.getParcelKey());
 
 /// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                            
-//        exportable.setAddress(unbundled.getAddress());
+//        exportable.setAddress(unbundled.getAddressString());
 //        exportable.setStatus(unbundled.getStatus());
 //        exportable.setMuni(unbundled.getMuni());
 //        exportable.setParID(unbundled.getParID());

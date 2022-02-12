@@ -176,7 +176,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             
             //If there is no working prop or if the working prop's address is not equal to the active prop's address
             if (getSessionBean().getOccPermitAppWorkingProp() == null
-                    || !getSessionBean().getOccPermitAppWorkingProp().getBundledProperty().getAddress().equalsIgnoreCase(selectedProperty.getBundledProperty().getAddress())) {
+                    || !getSessionBean().getOccPermitAppWorkingProp().getBundledProperty().getAddressString().equalsIgnoreCase(selectedProperty.getBundledProperty().getAddressString())) {
 
                 if (selectedProperty.getUnitList() == null) {
 
