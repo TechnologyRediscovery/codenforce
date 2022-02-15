@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2017 ellen bascomb of apt 31y
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
+import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
@@ -120,6 +121,64 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return linkedHumans;
         
     }
+    
+    
+    /**
+     * Builds a list of linked humans based on an Enum and a human
+     * @param lose
+     * @param hum
+     * @return the HumanLinks associated with the given human in the object family of the Enum
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<HumanLink> getHumanLinksByLinkedObjectEnum(LinkedObjectSchemaEnum lose, Human hum) throws IntegrationException{
+         Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        if(lose == null || hum == null){
+            throw new IntegrationException("Cannot get linked humans with null enum or human");
+        }
+        
+        List<HumanLink> linkedHumans = new ArrayList<>();
+
+        try {
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("SELECT linkid, human_humanid, linkedobjectrole_lorid, \n");
+            sb.append("createdts, createdby_userid, lastupdatedts, lastupdatedby_userid,");
+            sb.append("deactivatedts, deactivatedby_userid, notes, source_sourceid,  ");
+            sb.append(lose.getTargetTableFKField());
+            sb.append(" FROM ");
+            sb.append(lose.getLinkingTableName());
+            sb.append(" WHERE ");
+            sb.append("human_humanid");
+            sb.append("=?");
+            sb.append(";");
+            
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, hum.getHumanID());
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                HumanLink hl = generateHumanLink(rs, getHuman(rs.getInt("human_humanid")));
+                hl.setSchemaEnum(lose);
+                hl.setParentObjectID(rs.getInt(lose.getTargetTableFKField()));
+                linkedHumans.add(hl);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getHumanLinkIDList()| Unable to retrieve person", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return linkedHumans;
+    }
+    
+    
+    
     
     /**
      * Looks up a Human given a human and creates a returns a new instance

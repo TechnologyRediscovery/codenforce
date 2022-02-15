@@ -234,5 +234,15 @@ public class ParcelMailingAddressLink
         linkRole = lor;
     }
 
+    @Override
+    public LinkedObjectSchemaEnum getLinkedObjectSchemaEnum() {
+        return ROLE_SCHEMA;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return addressID;
+    }
+
    
 }

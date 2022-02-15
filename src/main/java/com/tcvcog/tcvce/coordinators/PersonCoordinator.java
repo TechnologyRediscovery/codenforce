@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonDataHeavy;
+import com.tcvcog.tcvce.entities.PersonLinkHeavy;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PersonWithChanges;
 import com.tcvcog.tcvce.entities.User;
@@ -46,6 +46,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import com.tcvcog.tcvce.entities.IFace_PersonListHolder;
+import com.tcvcog.tcvce.entities.LinkedObjectFamilyEnum;
+import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 
 /**
  * The master controller class for Humans and their Java incarnation called
@@ -257,47 +259,38 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * Builds a data heavy version of a person
      * Implements logic depending on if the person is a skeleton or not
      * @param pers
-     * @param cred
-     * @return
+     * @return the fully baked person with a link list in its belly
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public PersonDataHeavy assemblePersonDataHeavy(Person pers, Credential cred) throws IntegrationException, BObStatusException{
-        PersonDataHeavy pdh = null;
-        if(pers != null && cred != null){
-            // if we have a skeleton person, don't try to get a person from the DB, since there's no ID
-            if(pers.getHumanID() == 0){
-                pdh = new PersonDataHeavy(pers, cred);
-                
-            } else {
-
-               pdh = new PersonDataHeavy(getPerson(pers), cred);
-               SearchCoordinator sc = getSearchCoordinator();
-
-               try {
-                   QueryCECase qcse = sc.initQuery(QueryCECaseEnum.PERSINFOCASES, cred);
-                   qcse.getPrimaryParams().setPersonInfoCaseID_val(pers);
-                   pdh.setCaseList(sc.runQuery(qcse).getResults());
-
-       //            QueryOccPeriod qop = sc.initQuery(QueryOccPeriodEnum.PERSONS, cred);
-       //            qop.getPrimaryParams().setPerson_val(pers);
-       //            pdh.setPeriodList(sc.runQuery(qop).getBOBResultList());
-
-       //            TURNED OFF TO MIGRATE TO HUMANIZATION
-       //            QueryProperty qprop = sc.initQuery(QueryPropertyEnum.PERSONS, cred);
-       //            qprop.getPrimaryParams().setPerson_val(pers);
-       //            pdh.setPropertyList(sc.runQuery(qprop).getBOBResultList());
-
-       //            QueryEvent qe = sc.initQuery(QueryEventEnum.PERSONS, cred);
-       //            qe.getPrimaryParams().setPerson_val(pers);
-       //            pdh.setEventList(sc.runQuery(qe).getBOBResultList());
-
-               } catch (SearchException ex) {
-                   System.out.println(ex);
-               }
-            }
+    public PersonLinkHeavy assemblePersonLinkHeavy(Person pers) throws IntegrationException, BObStatusException{
+        PersonLinkHeavy persLinkHeavy = null;
+        PersonIntegrator pi = getPersonIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        if(pers == null){
+            throw new BObStatusException("Cannot assemble person link heavy with null input person");
+            
         }
-        return pdh;
+        persLinkHeavy = new PersonLinkHeavy(pers);
+        List<HumanLink> hll = new ArrayList<>();
+        List<LinkedObjectSchemaEnum> schemaList = sc.assembleLinkedObjectSchemaEnumListByFamily(LinkedObjectFamilyEnum.HUMAN);
+        if(schemaList != null && !schemaList.isEmpty()){
+            // iterate over all the enums that describe possible human links
+            // and get their linked object IDs, injecting them to the master list
+            // for display in the UI
+            for(LinkedObjectSchemaEnum lose: schemaList){
+                if(lose.isACTIVELINK()){
+                    System.out.println("PersonCoordinator.assemblePersonLinkHeavy | Checking enum " + lose.getLinkingTableName());
+                    List<HumanLink> hllinternal = pi.getHumanLinksByLinkedObjectEnum(lose, persLinkHeavy);
+                    System.out.println("PersonCoordinator.assemblePersonLinkHeavy | Links:  " + hllinternal.size());
+                    hll.addAll(hllinternal);
+                }
+            }
+        }       
+        persLinkHeavy.setHumanLinkList(hll);
+        return persLinkHeavy;
     }
+    
     
     /**
      * Logic container for Person object assembly

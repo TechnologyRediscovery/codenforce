@@ -28,6 +28,8 @@ import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.IFace_noteHolder;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.IntensitySchema;
+import com.tcvcog.tcvce.entities.LinkedObjectFamilyEnum;
+import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.PrintStyle;
@@ -44,6 +46,7 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -138,6 +141,31 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      */
     protected void requestBaseInternalAccessCredential(UserAuthorized ua) {
         // TODO: Finish guts
+    }
+    
+    /**
+     * Iterates through all values in LinkedObjectSchemaEnum and returns
+     * only those that are of the inputted family
+     * @param fam not null
+     * @return a list, perhaps with instances of LinkedObjectFamilyEnum
+     * @throws BObStatusException for null input
+     */
+    public List<LinkedObjectSchemaEnum> assembleLinkedObjectSchemaEnumListByFamily(LinkedObjectFamilyEnum fam) throws BObStatusException{
+        if(fam == null){
+            throw new BObStatusException("Cannot assemble linked object schema list with null family");
+        }
+        
+        List<LinkedObjectSchemaEnum> rawSchemaList = new ArrayList<>();
+        List<LinkedObjectSchemaEnum> chosenSchemas = new ArrayList<>();
+        rawSchemaList.addAll(Arrays.asList(LinkedObjectSchemaEnum.values()));
+        if(!rawSchemaList.isEmpty()){
+            for(LinkedObjectSchemaEnum lose: rawSchemaList){
+                if(lose.getLinkedObjectFamilyEnum() == fam){
+                    chosenSchemas.add(lose);
+                }
+            }
+        }
+        return chosenSchemas;
     }
 
     /**

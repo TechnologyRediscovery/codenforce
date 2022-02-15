@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonDataHeavy;
+import com.tcvcog.tcvce.entities.PersonLinkHeavy;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
@@ -44,7 +44,7 @@ import javax.faces.event.ActionEvent;
  */
 public class PersonSearchBB extends BackingBeanUtils{
 
-    private PersonDataHeavy currentPerson;
+    private Person currentPerson;
     
     private boolean onPageLoad_viewCurrentPersonProfile;
     private boolean onPageLoad_editCurrentPerson;
@@ -95,19 +95,15 @@ public class PersonSearchBB extends BackingBeanUtils{
        
        try{
             if(getSessionBean().getSessPersonQueued() != null){
-                    currentPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPersonQueued(),
-                            cred);
+                    currentPerson = pc.getPerson(getSessionBean().getSessPersonQueued());
                  getSessionBean().setSessPerson(currentPerson);
                  getSessionBean().setSessPersonQueued(null);
             } else if (getSessionBean().getSessPerson() != null){
-                 currentPerson = pc.assemblePersonDataHeavy(getSessionBean().getSessPerson(),
-                            cred);
+                 currentPerson = pc.getPerson(getSessionBean().getSessPerson());
             } else if(personList != null && !personList.isEmpty()){
-                 currentPerson = pc.assemblePersonDataHeavy(personList.get(0),
-                            cred);
+                 currentPerson = pc.getPerson(personList.get(0));
             } else {
-                currentPerson = pc.assemblePersonDataHeavy(pc.getPerson(getSessionBean().getSessUser().getHuman()),
-                            cred);
+                currentPerson = pc.getPerson(getSessionBean().getSessUser().getHuman());
             }
        } catch (IntegrationException | BObStatusException ex){
            System.out.println(ex);
@@ -234,8 +230,9 @@ public class PersonSearchBB extends BackingBeanUtils{
         SystemIntegrator si = getSystemIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getMyCredential()));
-            currentPerson = pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getKeyCard());
+            Person per = pc.getPerson(p);
+            getSessionBean().setSessPerson(per);
+            currentPerson = per;
             si.logObjectView_OverwriteDate(getSessionBean().getSessUser(), p);
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
@@ -318,13 +315,7 @@ public class PersonSearchBB extends BackingBeanUtils{
       */
     public void personCreateInit(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-        try {
-            currentPerson = pc.assemblePersonDataHeavy(
-                    pc.createPersonSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni()),
-                    getSessionBean().getSessUser().getKeyCard());
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-        }
+        currentPerson = pc.createPersonSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
     }
     
     /**
@@ -337,7 +328,7 @@ public class PersonSearchBB extends BackingBeanUtils{
     
         try {
             Person p = pc.humanAdd(currentPerson, getSessionBean().getSessUser());
-            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p,getSessionBean().getSessUser().getKeyCard()));
+            getSessionBean().setSessPerson(pc.getPerson(p));
                if(isConnectToActiveProperty()){
                    
                    Property property = getSessionBean().getSessProperty();
@@ -365,7 +356,7 @@ public class PersonSearchBB extends BackingBeanUtils{
     public void refreshCurrentPerson(){
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            currentPerson = pc.assemblePersonDataHeavy(currentPerson, getSessionBean().getSessUser().getKeyCard());
+            currentPerson = pc.getPerson(currentPerson);
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
@@ -420,14 +411,14 @@ public class PersonSearchBB extends BackingBeanUtils{
     /**
      * @return the currentPerson
      */
-    public PersonDataHeavy getCurrentPerson() {
+    public Person getCurrentPerson() {
         return currentPerson;
     }
 
     /**
      * @param currentPerson the currentPerson to set
      */
-    public void setCurrentPerson(PersonDataHeavy currentPerson) {
+    public void setCurrentPerson(PersonLinkHeavy currentPerson) {
         this.currentPerson = currentPerson;
     }
 

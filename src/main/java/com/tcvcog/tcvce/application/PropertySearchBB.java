@@ -652,7 +652,7 @@ public class PropertySearchBB extends BackingBeanUtils{
         if (p != null) {
             getSessionBean().getSessPersonList().add(0, p);
             try {
-                getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(p, getSessionBean().getSessUser().getKeyCard()));
+                getSessionBean().setSessPerson(pc.getPerson(p));
             } catch (IntegrationException |  BObStatusException ex) {
                 System.out.println(ex);
             }

@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Encapsulates a mailing address
@@ -39,6 +40,25 @@ public  class   MailingAddress
     protected BOBSource source;
     protected String notes;
     
+    
+    @Override
+    public String toString(){
+        StringBuilder sb  = new StringBuilder();
+        sb.append(buildingNo);
+        if(street != null){
+            sb.append(" ");
+            sb.append(street.getName());
+            sb.append("<br />");
+            if(street.getCityStateZip() != null){
+                sb.append(street.getCityStateZip().getCity());
+                sb.append(", ");
+                sb.append(street.getCityStateZip().getState());
+                sb.append(" ");
+                sb.append(street.getCityStateZip().getZipCode());
+            }
+        }
+        return sb.toString();
+    }
     
     /**
      * @return the addressID
@@ -182,5 +202,40 @@ public  class   MailingAddress
         this.verifiedSource = verifiedSource;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + this.addressID;
+        hash = 83 * hash + Objects.hashCode(this.buildingNo);
+        hash = 83 * hash + Objects.hashCode(this.street);
+        hash = 83 * hash + this.poBox;
+        hash = 83 * hash + Objects.hashCode(this.verifiedTS);
+        hash = 83 * hash + Objects.hashCode(this.verifiedBy);
+        hash = 83 * hash + Objects.hashCode(this.verifiedSource);
+        hash = 83 * hash + Objects.hashCode(this.source);
+        hash = 83 * hash + Objects.hashCode(this.notes);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MailingAddress other = (MailingAddress) obj;
+        if (this.addressID != other.addressID) {
+            return false;
+        }
+        return true;
+    }
+
+    
+    
    
 }

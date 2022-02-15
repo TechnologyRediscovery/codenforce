@@ -52,4 +52,8 @@ public  interface   IFace_trackedEntityLink
     public LinkedObjectRole getLinkedObjectRole();
     public void setLinkedObjectRole(LinkedObjectRole lor);
     
+    public LinkedObjectSchemaEnum getLinkedObjectSchemaEnum();
+    
+    public int getParentObjectID();
+    
 }

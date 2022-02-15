@@ -59,7 +59,7 @@ import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonDataHeavy;
+import com.tcvcog.tcvce.entities.PersonLinkHeavy;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.Proposal;
@@ -2231,16 +2231,16 @@ public class CECaseSearchProfileBB
     
         try {
            Person per = pc.humanAdd(workingPerson, getSessionBean().getSessUser());
-            PersonDataHeavy freshPerson = pc.assemblePersonDataHeavy(per,getSessionBean().getSessUser().getKeyCard());
-            getSessionBean().setSessPerson(freshPerson);
-            HumanLink hl = new HumanLink(freshPerson);
+            
+            getSessionBean().setSessPerson(per);
+            HumanLink hl = new HumanLink(per);
         
             Property property = currentCase.getProperty();
             
             pc.linkHuman(currentCase, hl, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                     "Successfully added " + freshPerson.getFirstName() + " to the Database!" 
+                     "Successfully added " + per.getName() + " to the Database!" 
                          + " and connected to " + property.getAddressString(), ""));
            } catch (IntegrationException | BObStatusException ex) {
                System.out.println(ex.toString());

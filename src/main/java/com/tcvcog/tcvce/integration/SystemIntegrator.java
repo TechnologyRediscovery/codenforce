@@ -32,6 +32,7 @@ import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.entities.LinkedObjectRole;
+import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PrintStyle;
@@ -343,6 +344,13 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             lor.setRoleID(rs.getInt("lorid"));
             
             lor.setTitle((rs.getString("title")));
+            
+//            try{
+//                lor.setSchema(LinkedObjectSchemaEnum.valueOf(rs.getString("lorschema_schemaid")));
+//            } catch (IllegalArgumentException ex){
+//                System.out.println("SystemIntgrator.generateLinkedObjectRole | Could not match Linked Object Role with Schema!");
+//                System.out.println(ex);
+//            }
             
             if(rs.getTimestamp("createdts") != null){
                 lor.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                

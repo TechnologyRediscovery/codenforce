@@ -14,10 +14,14 @@ import com.tcvcog.tcvce.entities.ContactEmail;
 import com.tcvcog.tcvce.entities.ContactPhone;
 import com.tcvcog.tcvce.entities.ContactPhoneType;
 import com.tcvcog.tcvce.entities.Human;
+import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
 import com.tcvcog.tcvce.entities.MailingAddress;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.PersonLinkHeavy;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -34,6 +38,9 @@ public class PersonBB extends BackingBeanUtils {
     
     private Person currentPerson;
     private boolean currentPersonHumanFieldsEditMode;
+    
+    private PersonLinkHeavy currentPersonLinkHeavy;
+    private HumanLink currentHumanLink;
     
     private MailingAddress currentMailingAddress;
     private boolean currentMailingAddressEditMode;
@@ -404,6 +411,45 @@ public class PersonBB extends BackingBeanUtils {
     
     
     /***********************************************************/
+    /************** LINK MANAGE INFRASTRUCTURE *****************/
+    /**********************************************************/
+    
+    /**
+     * Listener for user requests to load person links
+     * @param ev 
+     */
+    public void onLoadPersonLinks(ActionEvent ev){
+        if(currentPerson != null){
+            PersonCoordinator pc = getPersonCoordinator();
+            try {
+                currentPersonLinkHeavy = pc.assemblePersonLinkHeavy(currentPerson);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Loaded person " + currentPersonLinkHeavy.getHumanLinkList().size() + " links!", ""));
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal: Could not load person links, sorry!", ""));
+                
+            } 
+        }
+    }
+    
+    
+    /**
+     * Listener for user requests to load information about the human link
+     * @param hl 
+     */
+    public void onPersonLinkViewInfoLinkClick(HumanLink hl){
+        
+        
+    }
+    
+    
+    
+    
+    /***********************************************************/
     /********************* GETTERS AND SETTERS  ****************/
     /**********************************************************/
     
@@ -578,6 +624,34 @@ public class PersonBB extends BackingBeanUtils {
      */
     public void setSourceList(List<BOBSource> sourceList) {
         this.sourceList = sourceList;
+    }
+
+    /**
+     * @return the currentPersonLinkHeavy
+     */
+    public PersonLinkHeavy getCurrentPersonLinkHeavy() {
+        return currentPersonLinkHeavy;
+    }
+
+    /**
+     * @param currentPersonLinkHeavy the currentPersonLinkHeavy to set
+     */
+    public void setCurrentPersonLinkHeavy(PersonLinkHeavy currentPersonLinkHeavy) {
+        this.currentPersonLinkHeavy = currentPersonLinkHeavy;
+    }
+
+    /**
+     * @return the currentHumanLink
+     */
+    public HumanLink getCurrentHumanLink() {
+        return currentHumanLink;
+    }
+
+    /**
+     * @param currentHumanLink the currentHumanLink to set
+     */
+    public void setCurrentHumanLink(HumanLink currentHumanLink) {
+        this.currentHumanLink = currentHumanLink;
     }
     
      

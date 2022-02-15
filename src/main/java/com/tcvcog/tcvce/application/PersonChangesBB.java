@@ -146,7 +146,7 @@ public class PersonChangesBB
         PersonCoordinator pc = getPersonCoordinator();
 
         try {
-            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(person, getSessionBean().getSessUser().getMyCredential()));
+            getSessionBean().setSessPerson(pc.getPerson(person));
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }

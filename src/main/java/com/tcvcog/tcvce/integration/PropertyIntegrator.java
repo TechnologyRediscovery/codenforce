@@ -34,7 +34,6 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.ContactEmail;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.HumanMailingAddressLink;
-import com.tcvcog.tcvce.entities.HumanParcelLink;
 import com.tcvcog.tcvce.entities.MailingAddress;
 import com.tcvcog.tcvce.entities.MailingCityStateZip;
 import com.tcvcog.tcvce.entities.MailingCityStateZipDefaultTypeEnum;

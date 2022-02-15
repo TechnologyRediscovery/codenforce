@@ -16,6 +16,7 @@ import com.tcvcog.tcvce.entities.MailingAddress;
 import com.tcvcog.tcvce.entities.MailingCityStateZip;
 import com.tcvcog.tcvce.entities.MailingStreet;
 import com.tcvcog.tcvce.entities.search.QueryMailingCityStateZip;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,14 +33,19 @@ public  class   AddressBB
 
     private MailingStreet currentStreet;
     private List<MailingStreet> streetList;
+    private List<MailingStreet> streetListFiltered;
     private boolean editModeCurrentStreet;
     
     
     
     private MailingAddress currentAddress;
     private List<MailingAddress> mailingAddressList;
+    private List<MailingAddress> mailingAddressListFiltered;
+    
     private boolean editModeCurrentAddress;
     private MailingCityStateZip currentCityStateZip;
+    private List<MailingCityStateZip> cityStateZipListFiltered;
+    
     private String formBuildingNo;
     private String formStreet;
     private boolean formPOBox;
@@ -68,8 +74,13 @@ public  class   AddressBB
         qcszEnumList = srchc.buildQueryMailingCityStateZipList(getSessionBean().getSessUser().getMyCredential());
         if(qcszEnumList != null && !qcszEnumList.isEmpty()){
             selectedCSZQuery = qcszEnumList.get(0);
-            
         }
+        
+        // LOAD UP OUR FILTERED LISTS 
+        cityStateZipListFiltered = new ArrayList<>();
+        streetListFiltered = new ArrayList<>();
+        mailingAddressListFiltered = new ArrayList<>();
+        
         
     }
     
@@ -375,7 +386,7 @@ public  class   AddressBB
      * @param ev 
      */
     public void onMailingAddressAbortOperationButtonChange(ActionEvent ev){
-        
+        editModeCurrentAddress = false;
     }
     
     
@@ -608,6 +619,48 @@ public  class   AddressBB
      */
     public void setMailingAddressList(List<MailingAddress> mailingAddressList) {
         this.mailingAddressList = mailingAddressList;
+    }
+
+    /**
+     * @return the streetListFiltered
+     */
+    public List<MailingStreet> getStreetListFiltered() {
+        return streetListFiltered;
+    }
+
+    /**
+     * @return the mailingAddressListFiltered
+     */
+    public List<MailingAddress> getMailingAddressListFiltered() {
+        return mailingAddressListFiltered;
+    }
+
+    /**
+     * @return the cityStateZipListFiltered
+     */
+    public List<MailingCityStateZip> getCityStateZipListFiltered() {
+        return cityStateZipListFiltered;
+    }
+
+    /**
+     * @param streetListFiltered the streetListFiltered to set
+     */
+    public void setStreetListFiltered(List<MailingStreet> streetListFiltered) {
+        this.streetListFiltered = streetListFiltered;
+    }
+
+    /**
+     * @param mailingAddressListFiltered the mailingAddressListFiltered to set
+     */
+    public void setMailingAddressListFiltered(List<MailingAddress> mailingAddressListFiltered) {
+        this.mailingAddressListFiltered = mailingAddressListFiltered;
+    }
+
+    /**
+     * @param cityStateZipListFiltered the cityStateZipListFiltered to set
+     */
+    public void setCityStateZipListFiltered(List<MailingCityStateZip> cityStateZipListFiltered) {
+        this.cityStateZipListFiltered = cityStateZipListFiltered;
     }
     
     

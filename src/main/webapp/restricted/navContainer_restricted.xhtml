@@ -270,6 +270,12 @@
                                                                        actionListener="#{navigationBB.onAddressManagerViewLinkClick}"
                                                                        oncomplete="PF('address-mngr-var').show();"/>
                                                     </div>
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <h:outputText value="Session address: #{sessionBean.sessMailingAddress.buildingNo} #{sessionBean.sessMailingAddress.street.name}" />
+                                                    <p:spacer height="2px" />
+                                                    <h:outputText value="#{sessionBean.sessMailingAddress.street.cityStateZip.city}, #{sessionBean.sessMailingAddress.street.cityStateZip.state} #{sessionBean.sessMailingAddress.street.cityStateZip.zipCode}" />
 
                                                     <p:overlayPanel id="activebob-proplist-overlay"
                                                                     widgetVar="activebob-proplist-overlay-var"

@@ -781,11 +781,6 @@
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>personCECasesBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonCECasesBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
     
     <managed-bean>
         <managed-bean-name>personChangesBB</managed-bean-name>

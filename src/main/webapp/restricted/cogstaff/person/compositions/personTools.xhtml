@@ -3,662 +3,739 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns="http://www.w3.org/1999/xhtml">
-    
 
-        <h:form id="persontools-growl-form">
-            
-            <p:growl id="persontools-growl"
-                     globalOnly="false" 
-                     />
-        </h:form>
+    <h:form id="persontools-growl-form">
 
-        <p:dialog   id="person-profile-dialog"
-                    height="700" width="600"
-                    widgetVar="person-profile-dialog-var"
-                    responsive="true"
-                    resizable="true"
-                    closable="true"
-                    closeOnEscape="true"
-                    modal="true"
-                    header="Person ID: #{personBB.currentPerson.humanID} Profile"
-                    rendered="true"
-                    >
+        <p:growl id="persontools-growl"
+                 globalOnly="false" 
+                 />
+    </h:form>
 
-            <p:panel id="person-profile-info-panel"
-                     toggleable="true"
-                     collapsed="false"
-                     header="Basic Info">
+    <p:dialog   id="person-profile-dialog"
+                height="700" width="1200"
+                widgetVar="person-profile-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Person ID: #{personBB.currentPerson.humanID} Profile"
+                rendered="true"
+                >
 
-                <h:form id="person-info-form">
+        <div class="p-grid">
+            <div class="p-col">
 
-                    <p:commandButton id="person-profile-info-edit-button"
-                                     value="#{personBB.currentPersonHumanFieldsEditMode ? 'Save changes' : 'Edit'}"
-                                     rendered="true"
-                                     ajax="true"
-                                     icon="fa #{personBB.currentPersonHumanFieldsEditMode ? 'fa-check' : 'fa-pencil'}"
-                                     actionListener="#{personBB.toggleHumanEditMode}"
-                                     update="@form
-                                            @form:@parent:persontools-growl-form"
-                                    />
+                <p:panel id="person-profile-info-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Basic Info">
 
+                    <h:form id="person-info-form">
 
-                    <div class="restrict-main-contents-io-button gray_button">
-
-                        <p:commandButton    id="person-profile-info-edit-abort-button"
-                                            ajax="true"
-                                            rendered="#{personBB.currentPersonHumanFieldsEditMode}"
-                                            value="Abort edit"
-                                            process="@none"
-                                            actionListener="#{personBB.onHumanOperationAbortButtonChange}"
-                                            update="@form:@parent:persontools-growl-form
-                                                    @form"
-                                            icon="fa fa-stop" />
-
-                    </div>
-
-                    <p:spacer height="5px"/>    
-
-                    <div class="p-grid">
-                        <div class="p-col-6">Person ID</div>
-
-                        <div class="p-col-6">
-                            <h:outputText rendered="true" 
-                                          value="#{personBB.currentPerson.humanID}"/>
-
-                        </div>
-
-                        <div class="p-col-6">Name</div>
-                        <div class="p-col-6">
-                            <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
-                                          value="#{personBB.currentPerson.name}"/>
-
-                            <p:inputText rendered="#{personBB.currentPersonHumanFieldsEditMode}"
-                                         value="#{personBB.currentPerson.name}"
-                                         required="true"
-                                         requiredMessage="All person records require at least a last name."/>
-                        </div>
-
-                        <div class="p-col-6">Job title</div>
-                        <div class="p-col-6">
-                            <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
-                                          value="#{personBB.currentPerson.jobTitle}"/>
-
-                            <p:inputText rendered="#{personBB.currentPersonHumanFieldsEditMode}"
-                                         value="#{personBB.currentPerson.jobTitle}"
-                                         required="false"/>
-                        </div>
+                        <p:commandButton id="person-profile-info-edit-button"
+                                         value="#{personBB.currentPersonHumanFieldsEditMode ? 'Save changes' : 'Edit'}"
+                                         rendered="true"
+                                         ajax="true"
+                                         icon="fa #{personBB.currentPersonHumanFieldsEditMode ? 'fa-check' : 'fa-pencil'}"
+                                         actionListener="#{personBB.toggleHumanEditMode}"
+                                         update="@form
+                                         @form:@parent:persontools-growl-form"
+                                         />
 
 
-                        <div class="p-col-6">Multi-Person</div>
-                        <div class="p-col-6">
-                            <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
-                                            value="#{personBB.currentPerson.multiHuman ? 'Yes' : 'No'}" />
+                        <div class="restrict-main-contents-io-button gray_button">
 
-                            <p:selectBooleanCheckbox rendered="#{personBB.currentPersonHumanFieldsEditMode}"
-                                                     value="#{personBB.currentPerson.multiHuman}" />
-                        </div>
-
-                        <div class="p-col-6">Business entity</div>
-                        <div class="p-col-6">
-                            <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
-                                            value="#{personBB.currentPerson.businessEntity ? 'Yes' : 'No'}" />
-
-                            <p:selectBooleanCheckbox rendered="#{personBB.currentPersonHumanFieldsEditMode}"
-                                                     value="#{personBB.currentPerson.businessEntity}" />
-                        </div>
-                        <div class="p-col-6">Record Source</div>
-                        <div class="p-col-6">
-                            <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
-                                            value="#{!empty personBB.currentPerson.source ? personBB.currentPerson.source.title : ''}" />
-
-                            <h:selectOneMenu id="prop-add-source-som"
-                                             value="#{personBB.currentPerson.source}" 
-                                             style="width:175px;height:25px"
-                                             rendered="#{personBB.currentPersonHumanFieldsEditMode}">
-                                <f:converter converterId="bobSourceConverter"/>
-                                <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
-                                <f:selectItems id="pers-info-source-selitems"
-                                               value="#{personBB.sourceList}"
-                                               var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
-                            </h:selectOneMenu>
-
-                        </div>
-
-
-                        <div class="p-col-6">Creation</div>
-                        <div class="p-col-6">
-                            <h:outputText value="#{personBB.getPrettyDate(personBB.currentPerson.createdTS)}" />
-                            
-                            <h:outputText   rendered="#{!empty personBB.currentPerson.createdBy}"
-                                            value="by #{personBB.currentPerson.createdBy.username}" />
-                        </div>
-
-                        <div class="p-col-6">Last update</div>
-                        <div class="p-col-6">
-                            <h:outputText value="#{personBB.getPrettyDate(personBB.currentPerson.lastUpdatedTS)}" />
-                            <p:spacer height="2px" />
-                            <h:outputText   rendered="#{!empty personBB.currentPerson.lastUpdatedBy}"
-                                            value="by #{personBB.currentPerson.lastUpdatedBy.username}" />
-                        </div>
-
-                        <div class="p-col-6">Record status</div>
-                        <div class="p-col-6">
-                            <h:outputText value="#{empty personBB.currentPerson.deactivatedTS ? 'active' : 'deactivated on'}" />
-                            <p:spacer height="2px" />
-                            <h:outputText value="#{empty personBB.currentPerson.deactivatedTS ? '' : personBB.getPrettyDate(personBB.currentPerson.deactivatedTS) }" />
-                            <p:spacer height="2px" />
-                            <h:outputText   rendered="#{!empty personBB.currentPerson.deactivatedBy}"
-                                            value="by #{personBB.currentPerson.deactivatedBy.username}" />
-                        </div>
-                    </div>
-                    
-                    <div class="p-col-6">Under 18?</div>
-                    <div class="p-col-6">
-                        <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
-                                        value="#{empty personBB.currentPerson.under18 ? 'Yes' : 'No'}" />
-
-                        <p:spacer height="2px" />
-                        <p:selectBooleanCheckbox rendered="#{personBB.currentPersonHumanFieldsEditMode}"
-                                                 value="#{personBB.currentPerson.under18}" />
-                    </div>
-
-                    <div class="p-col-6">
-                        Date of Birth
-                    </div>
-                    <div class="p-col-6">
-
-                        <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
-                                      value="#{personBB.currentPerson.dob}"/>
-                        <p:spacer height="2px" />
-
-                        <p:calendar id="person-dor-it"
-                                    rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
-                                    value="#{personBB.currentPerson.dob}"
-                                    mode="popup" tabindex="3"
-                                    showOn="button"
-                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                    navigator="true" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                    showButtonPanel="true"
-                                    showTodayButton="true"
-                                    required="false"/>
-                    </div>
-
-                    <div class="p-col-6">
-                        Deceased date
-                    </div>
-
-                    <div class="p-col-6">
-
-                        <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
-                                      value="#{personBB.getPrettyDateNoTime(personBB.currentPerson.deceasedDate)}"/>
-
-                        <p:spacer height="2px" />
-                        <h:outputText rendered="#{!empty personBB.currentPersonHumanFieldsEditMode and !empty personBB.currentPerson.deceasedBy}" 
-                                      value="recorded by user: #{personBB.currentPerson.deceasedBy.username}"/>
-
-                        <p:calendar id="person-dod-it"
-                                    rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
-                                    value="#{personBB.currentPerson.deceasedDate}"
-                                    mode="popup" tabindex="3"
-                                    showOn="button"
-                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                    navigator="true" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                    showButtonPanel="true"
-                                    showTodayButton="true"
-                                    required="false"/>
-                    </div>
-                </h:form>
-            </p:panel>
-
-            <p:panel id="person-adresses-panel"
-                     toggleable="true"
-                     collapsed="false"
-                     header="Addresses">
-                
-
-                <h:form id="person-profile-addresses-form">
-
-
-                    <p:commandButton      id="addresses-add-cb"
-                                        ajax="true"
-                                        actionListener="#{addressBB.onMailingAddressAddInitButtonChange}"
-                                        oncomplete="PF('address-dialog-var').show()"
-                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                        value="Add address" />
-
-
-                    <p:spacer height="5px"/>
-
-
-                    <p:dataTable    id="person-addresses-table"
-                                    value="#{personBB.currentPerson.addressList}"
-                                    var="hmal"
-                                    rowKey="#{hmal.addressID}"
-                                    tableStyleClass="primeDataTable"
-                                    draggableRows="true" 
-                                    tabindex="6">
-
-
-                        <p:column width="10%">
-                            <f:facet name="header">
-                                <h:outputText value="ID"/>
-                            </f:facet>
-                            <h:outputText value="#{hmal.addressID}" />
-                        </p:column>
-
-                        <p:column width="50%">
-                            <f:facet name="header">
-                                <h:outputText value="Address"/>
-                            </f:facet>
-
-                            <h:outputText   rendered="#{hmal.poBox != 0}"
-                                            value="#{hmal.poBox}" />
-
-                            <h:outputText   rendered="#{hmal.poBox eq 0}"
-                                            value="#{hmal.buildingNo}" />
-                            <h:outputText   rendered="#{hmal.poBox eq 0}"
-                                            value=" " />
-                            <h:outputText   rendered="#{hmal.poBox eq 0}"
-                                            value="#{hmal.street.name}" />
-
-                            <p:spacer height="2px" />
-
-                            <h:outputText value="#{hmal.street.cityStateZip.city}" />
-                            <h:outputText value=", " />
-                            <h:outputText value="#{hmal.street.cityStateZip.state}" />
-                            <h:outputText value=" " />
-                            <h:outputText value="#{hmal.street.cityStateZip.zipCode}" />
-                        </p:column>
-
-                        <p:column width="25%">
-                            <f:facet name="header">
-                                <h:outputText value="Actions"/>
-                            </f:facet>
-
-                            <p:commandLink      id="address-actions-cl"
+                            <p:commandButton    id="person-profile-info-edit-abort-button"
                                                 ajax="true"
-                                                actionListener="#{addressBB.onMailingAddressEditInitButtonChange(hmal)}"
-                                                style="color:blue;"
-                                                oncomplete="PF('address-dialog-var).show()"
-                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                update="address-form"
-                                                value="view/edit" />
-
-                        </p:column>
-                    </p:dataTable>
-                </h:form>          
-            </p:panel>
-
-            <p:panel id="person-profile-phones-panel"
-                     toggleable="true"
-                     collapsed="false"
-                     header="Phone numbers">
-
-
-                <h:form id="person-profile-phones-form">
-
-                    
-                    <p:commandButton     id="phones-add-cb"
-                                        ajax="true"
-                                        actionListener="#{personBB.onPhoneAddInitButtonChange}"
-                                        oncomplete="PF('phone-dialog-var').show()"
-                                        rendered="true"
-                                        value="Add phone number" 
-                                        update="@form:@parent:phone-info-form"/>
-
-
-                    <p:spacer height="5px"/>
-
-
-                    <p:dataTable    id="person-phones-table"
-                                    value="#{personBB.currentPerson.phoneList}"
-                                    var="ph"
-                                    rowKey="#{ph.phoneID}"
-                                    tableStyleClass="primeDataTable"
-                                    draggableRows="true" 
-                                    tabindex="6">
-
-
-                        <p:column width="10%">
-                            <f:facet name="header">
-                                <h:outputText value="ID"/>
-                            </f:facet>
-                            <h:outputText value="#{ph.phoneID}" />
-                        </p:column>
-
-                        <p:column width="40%">
-                            <f:facet name="header">
-                                <h:outputText value="Number"/>
-                            </f:facet>
-                            <h:outputText value="#{ph.phoneNumber}" />
-                        </p:column>
-
-                        <p:column width="25%">
-                            <f:facet name="header">
-                                <h:outputText value="Type"/>
-                            </f:facet>
-                            <h:outputText value="#{ph.phoneType.title}" />
-                        </p:column>
-
-                        <p:column width="25%">
-                            <f:facet name="header">
-                                <h:outputText value="Actions"/>
-                            </f:facet>
-
-                            <p:commandLink      id="phone-actions-cl"
-                                                ajax="true"
-                                                actionListener="#{personBB.onPhoneEditInitButtonChange(ph)}"
-                                                style="color:blue;"
-                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                oncomplete="PF('phone-dialog-var').show()"
-                                                update="@form:@parent:phone-info-form"
-                                                value="edit" />
-
-                        </p:column>
-                    </p:dataTable>
-                </h:form>               
-
-            </p:panel>
-
-            <p:panel id="person-profile-emails-panel"
-                     toggleable="true"
-                     collapsed="false"
-                     header="Email addresses">
-
-
-                <h:form id="person-profile-emails-form">
-
-                    <p:commandButton      id="email-add-cb"
-                                        ajax="true"
-                                        actionListener="#{personBB.onEmailAddInitButtonChange}"
-                                        oncomplete="PF('email-dialog-var').show()"
-                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                        update="@form:@parent:email-info-form"
-                                        value="Add email address" />
-
-                    <p:spacer height="5px"/>
-
-                    <p:dataTable    id="person-emails-table"
-                                    value="#{personBB.currentPerson.emailList}"
-                                    var="ea"
-                                    rowKey="#{ea.emailID}"
-                                    tableStyleClass="primeDataTable"
-                                    draggableRows="true" 
-                                    tabindex="6">
-
-
-                        <p:column width="10%">
-                            <f:facet name="header">
-                                <h:outputText value="ID"/>
-                            </f:facet>
-                            <h:outputText value="#{ea.emailID}" />
-                        </p:column>
-
-                        <p:column width="40%">
-                            <f:facet name="header">
-                                <h:outputText value="Address"/>
-                            </f:facet>
-                            <h:outputText value="#{ea.emailaddress}" />
-                        </p:column>
-
-                        <p:column width="25%">
-                            <f:facet name="header">
-                                <h:outputText value="Actions"/>
-                            </f:facet>
-
-                            <p:commandLink      id="email-actions-cl"
-                                                ajax="true"
-                                                actionListener="#{personBB.onEmailEditInitButtonChange(ea)}"
-                                                style="color:blue;"
-                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                update="@form:@parent:email-info-form"
-                                                oncomplete="PF('email-dialog-var').show()"
-                                                value="view/edit" />
-
-                        </p:column>
-                    </p:dataTable>
-                </h:form>               
-
-            </p:panel>
-
-        </p:dialog>
-
-
-        <p:dialog   id="phone-dialog"
-                    height="700" width="600"
-                    widgetVar="phone-dialog-var"
-                    responsive="true"
-                    resizable="true"
-                    closable="true"
-                    closeOnEscape="true"
-                    modal="true"
-                    header="#{personBB.currentContactPhone.phoneID eq 0 ? 'Create new phone number' : 'View/Edit phone number'}"
-                    rendered="true"
-                    >
-
-            <p:panel id="phone-info-panel"
-                     toggleable="true"
-                     collapsed="false"
-                     header="Phone Info">
-
-                <h:form id="phone-info-form">
-
-                    <p:commandButton id="phone-edit-button"
-                                     value="#{personBB.currentContactPhoneEditMode? 'Save changes' : 'Edit'}"
-                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                     icon="fa #{personBB.currentContactPhoneEditMode ? 'fa-check' : 'fa-pencil'}"
-                                     ajax="true"
-                                     actionListener="#{personBB.togglePhoneEditMode}"
-                                     oncomplete="PF('phone-dialog-var').show()"
-                                     update="@form"/>
-
-
-                    <div class="restrict-main-contents-io-button gray_button">
-
-                        <p:commandButton    id="phone-edit-abort-button"
-                                            ajax="true"
-                                            rendered="#{personBB.currentContactPhoneEditMode}"
-                                            value="Abort edit"
-                                            process="@none"
-                                            immediate="true"
-                                            actionListener="#{personBB.onPhoneOperationAbortButtonChange}"
-                                            oncomplete="PF('person-profile-dialog-var').show()"
-                                            update="@form"
-                                            icon="fa fa-stop" />
-
-                    </div>
-
-                    <p:spacer height="5px"/>    
-
-                    <div class="p-grid">
-                        <div class="p-col-6">Phone ID</div>
-
-                        <div class="p-col-6">
-                            <h:outputText rendered="#{!personBB.currentContactPhoneEditMode}" 
-                                          value="#{personBB.currentContactPhone.phoneID eq 0 ? 'new record' : personBB.currentContactPhone.phoneID}"/>
+                                                rendered="#{personBB.currentPersonHumanFieldsEditMode}"
+                                                value="Abort edit"
+                                                process="@none"
+                                                actionListener="#{personBB.onHumanOperationAbortButtonChange}"
+                                                update="@form:@parent:persontools-growl-form
+                                                @form"
+                                                icon="fa fa-stop" />
 
                         </div>
 
-                        <div class="p-col-6">Number</div>
-                        <div class="p-col-6">
-                            <h:outputText rendered="#{!personBB.currentContactPhoneEditMode}" 
-                                          value="#{personBB.currentContactPhone.phoneNumber}"/>
+                        <p:spacer height="5px"/>    
 
-                            <p:inputMask    id="phone-inputmask"
-                                            rendered="#{personBB.currentContactPhoneEditMode}"
-                                            value="#{personBB.currentContactPhone.phoneNumber}"
-                                            mask="(999) 999-9999" 
-                                            validateMask="true"
-                                            validatorMessage="Enter phone in format (xxx) xxx-xxxx"
-                                            requiredMessage="A phone number is required to complete the form"
-                                            required="true"/>
-                        </div>
+                        <div class="p-grid">
+                            <div class="p-col-6">Person ID</div>
 
-                        <div class="p-col-6">Type</div>
-                        <div class="p-col-6">
-                            <h:outputText rendered="#{!personBB.currentContactPhoneEditMode}" 
-                                          value="#{personBB.currentContactPhone.phoneType.title}"/>
+                            <div class="p-col-6">
+                                <h:outputText rendered="true" 
+                                              value="#{personBB.currentPerson.humanID}"/>
 
-                            <p:selectOneMenu id="phone-type-som"
+                            </div>
+
+                            <div class="p-col-6">Name</div>
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
+                                              value="#{personBB.currentPerson.name}"/>
+
+                                <p:inputText rendered="#{personBB.currentPersonHumanFieldsEditMode}"
+                                             value="#{personBB.currentPerson.name}"
                                              required="true"
-                                             rendered="#{personBB.currentContactPhoneEditMode}" 
-                                             value="#{personBB.currentContactPhone.phoneType}">
-                                <f:converter converterId="phoneTypeConverter"/>
-                                <f:selectItems value="#{personBB.phoneTypeList}"
-                                               var="cft" 
-                                               itemValue="#{cft}" 
-                                               itemLabel="#{cft.title}"/>
-                            </p:selectOneMenu>
+                                             requiredMessage="All person records require at least a last name."/>
+                            </div>
 
+                            <div class="p-col-6">Job title</div>
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
+                                              value="#{personBB.currentPerson.jobTitle}"/>
+
+                                <p:inputText rendered="#{personBB.currentPersonHumanFieldsEditMode}"
+                                             value="#{personBB.currentPerson.jobTitle}"
+                                             required="false"/>
+                            </div>
+
+
+                            <div class="p-col-6">Multi-Person</div>
+                            <div class="p-col-6">
+                                <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
+                                                value="#{personBB.currentPerson.multiHuman ? 'Yes' : 'No'}" />
+
+                                <p:selectBooleanCheckbox rendered="#{personBB.currentPersonHumanFieldsEditMode}"
+                                                         value="#{personBB.currentPerson.multiHuman}" />
+                            </div>
+
+                            <div class="p-col-6">Business entity</div>
+                            <div class="p-col-6">
+                                <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
+                                                value="#{personBB.currentPerson.businessEntity ? 'Yes' : 'No'}" />
+
+                                <p:selectBooleanCheckbox rendered="#{personBB.currentPersonHumanFieldsEditMode}"
+                                                         value="#{personBB.currentPerson.businessEntity}" />
+                            </div>
+                            <div class="p-col-6">Record Source</div>
+                            <div class="p-col-6">
+                                <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
+                                                value="#{!empty personBB.currentPerson.source ? personBB.currentPerson.source.title : ''}" />
+
+                                <h:selectOneMenu id="prop-add-source-som"
+                                                 value="#{personBB.currentPerson.source}" 
+                                                 style="width:175px;height:25px"
+                                                 rendered="#{personBB.currentPersonHumanFieldsEditMode}">
+                                    <f:converter converterId="bobSourceConverter"/>
+                                    <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
+                                    <f:selectItems id="pers-info-source-selitems"
+                                                   value="#{personBB.sourceList}"
+                                                   var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
+                                </h:selectOneMenu>
+
+                            </div>
+
+
+                            <div class="p-col-6">Creation</div>
+                            <div class="p-col-6">
+                                <h:outputText value="#{personBB.getPrettyDate(personBB.currentPerson.createdTS)}" />
+
+                                <h:outputText   rendered="#{!empty personBB.currentPerson.createdBy}"
+                                                value="by #{personBB.currentPerson.createdBy.username}" />
+                            </div>
+
+                            <div class="p-col-6">Last update</div>
+                            <div class="p-col-6">
+                                <h:outputText value="#{personBB.getPrettyDate(personBB.currentPerson.lastUpdatedTS)}" />
+                                <p:spacer height="2px" />
+                                <h:outputText   rendered="#{!empty personBB.currentPerson.lastUpdatedBy}"
+                                                value="by #{personBB.currentPerson.lastUpdatedBy.username}" />
+                            </div>
+
+                            <div class="p-col-6">Record status</div>
+                            <div class="p-col-6">
+                                <h:outputText value="#{empty personBB.currentPerson.deactivatedTS ? 'active' : 'deactivated on'}" />
+                                <p:spacer height="2px" />
+                                <h:outputText value="#{empty personBB.currentPerson.deactivatedTS ? '' : personBB.getPrettyDate(personBB.currentPerson.deactivatedTS) }" />
+                                <p:spacer height="2px" />
+                                <h:outputText   rendered="#{!empty personBB.currentPerson.deactivatedBy}"
+                                                value="by #{personBB.currentPerson.deactivatedBy.username}" />
+                            </div>
                         </div>
 
-                        <div class="p-col-6">Extension</div>
+                        <div class="p-col-6">Under 18?</div>
                         <div class="p-col-6">
-                            <h:outputText rendered="#{!personBB.currentContactPhoneEditMode}" 
-                                          value="#{personBB.currentContactPhone.extension}"/>
+                            <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
+                                            value="#{empty personBB.currentPerson.under18 ? 'Yes' : 'No'}" />
 
-                            <p:inputNumber rendered="#{personBB.currentContactPhoneEditMode}"
-                                           value="#{personBB.currentContactPhone.extension}"
-                                           decimalPlaces="0"
-                                           minValue="0"
-                                           maxValue="99999999" 
-                                           required="false"/>
-
-                        </div>
-
-                        <div class="p-col-6">Disconnected?</div>
-                        <div class="p-col-6">
-                            <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
-                                            value="#{empty personBB.currentContactPhone.disconnectTS ? 'No' : 'Yes'}" />
-
-                            <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
-                                            value="#{!empty personBB.currentContactPhone.disconnectTS ? 'Recorded by ' : ''}" />
-
-                            <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
-                                            value="#{!empty personBB.currentContactPhone.disconnectRecordedBy ? personBB.currentContactPhone.disconnectRecordedBy.username : ''}" />
-
-                            <p:spacer height="5px" />
-
-                            <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
-                                            value="#{!empty personBB.currentContactPhone.disconnectTS ? 'on ' : ''}" />
-
-                            <p:selectBooleanCheckbox rendered="#{personBB.currentContactPhoneEditMode}"
-                                                     value="#{personBB.getPrettyDateNoTime(personBB.currentContactPhone.disconnectTS)}" />
-                        </div>
-
-                        <div class="p-col-6">Creation</div>
-                        <div class="p-col-6">
-                            <h:outputText value="#{personBB.getPrettyDate(personBB.currentContactPhone.createdTS)}" />
                             <p:spacer height="2px" />
-                            <h:outputText   rendered="#{!empty personBB.currentContactPhone.createdBy}"
-                                            value="by #{personBB.currentContactPhone.createdBy.username}" />
+                            <p:selectBooleanCheckbox rendered="#{personBB.currentPersonHumanFieldsEditMode}"
+                                                     value="#{personBB.currentPerson.under18}" />
                         </div>
 
-                        <div class="p-col-6">Last update</div>
                         <div class="p-col-6">
-                            <h:outputText value="#{personBB.getPrettyDate(personBB.currentContactPhone.lastUpdatedTS)}" />
+                            Date of Birth
+                        </div>
+                        <div class="p-col-6">
+
+                            <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
+                                          value="#{personBB.currentPerson.dob}"/>
                             <p:spacer height="2px" />
-                            <h:outputText   rendered="#{!empty personBB.currentContactPhone.lastUpdatedBy}"
-                                            value="by #{personBB.currentContactPhone.lastUpdatedBy.username}" />
+
+                            <p:calendar id="person-dor-it"
+                                        rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
+                                        value="#{personBB.currentPerson.dob}"
+                                        mode="popup" tabindex="3"
+                                        showOn="button"
+                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                        navigator="true" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                        showButtonPanel="true"
+                                        showTodayButton="true"
+                                        required="false"/>
                         </div>
 
-                        <div class="p-col-6">Record status</div>
                         <div class="p-col-6">
-                            <h:outputText value="#{empty personBB.currentContactPhone.deactivatedTS ? 'active' : 'deactivated on'}" />
-                            <p:spacer height="2px" />
-                            <h:outputText value="#{empty personBB.currentContactPhone.deactivatedTS ? '' : personBB.getPrettyDate(personBB.currentContactPhone.deactivatedTS) }" />
-                            <p:spacer height="2px" />
-                            <h:outputText   rendered="#{!empty personBB.currentContactPhone.deactivatedBy}"
-                                            value="by #{personBB.currentContactPhone.deactivatedBy.username}" />
+                            Deceased date
                         </div>
+
+                        <div class="p-col-6">
+
+                            <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
+                                          value="#{personBB.getPrettyDateNoTime(personBB.currentPerson.deceasedDate)}"/>
+
+                            <p:spacer height="2px" />
+                            <h:outputText rendered="#{!empty personBB.currentPersonHumanFieldsEditMode and !empty personBB.currentPerson.deceasedBy}" 
+                                          value="recorded by user: #{personBB.currentPerson.deceasedBy.username}"/>
+
+                            <p:calendar id="person-dod-it"
+                                        rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
+                                        value="#{personBB.currentPerson.deceasedDate}"
+                                        mode="popup" tabindex="3"
+                                        showOn="button"
+                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                        navigator="true" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                        showButtonPanel="true"
+                                        showTodayButton="true"
+                                        required="false"/>
+                        </div>
+                    </h:form>
+                </p:panel>
+
+                <p:panel id="person-adresses-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Addresses">
+
+                    <h:form id="person-profile-addresses-form">
+
+                        <p:commandButton      id="addresses-add-cb"
+                                              ajax="true"
+                                              actionListener="#{addressBB.onMailingAddressAddInitButtonChange}"
+                                              oncomplete="PF('address-dialog-var').show()"
+                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                              value="Add address" />
+
+
+                        <p:spacer height="5px"/>
+
+                        <p:dataTable    id="person-addresses-table"
+                                        value="#{personBB.currentPerson.addressList}"
+                                        var="hmal"
+                                        rowKey="#{hmal.addressID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="true" 
+                                        tabindex="6">
+
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="ID"/>
+                                </f:facet>
+                                <h:outputText value="#{hmal.addressID}" />
+                            </p:column>
+
+                            <p:column width="50%">
+                                <f:facet name="header">
+                                    <h:outputText value="Address"/>
+                                </f:facet>
+
+                                <h:outputText   rendered="#{hmal.poBox != 0}"
+                                                value="#{hmal.poBox}" />
+
+                                <h:outputText   rendered="#{hmal.poBox eq 0}"
+                                                value="#{hmal.buildingNo}" />
+                                <h:outputText   rendered="#{hmal.poBox eq 0}"
+                                                value=" " />
+                                <h:outputText   rendered="#{hmal.poBox eq 0}"
+                                                value="#{hmal.street.name}" />
+
+                                <p:spacer height="2px" />
+
+                                <h:outputText value="#{hmal.street.cityStateZip.city}" />
+                                <h:outputText value=", " />
+                                <h:outputText value="#{hmal.street.cityStateZip.state}" />
+                                <h:outputText value=" " />
+                                <h:outputText value="#{hmal.street.cityStateZip.zipCode}" />
+                            </p:column>
+
+                            <p:column width="25%">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+
+                                <p:commandLink      id="address-actions-cl"
+                                                    ajax="true"
+                                                    actionListener="#{addressBB.onMailingAddressEditInitButtonChange(hmal)}"
+                                                    style="color:blue;"
+                                                    oncomplete="PF('address-dialog-var).show()"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                    update="address-form"
+                                                    value="view/edit" />
+
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>          
+                </p:panel>
+
+                <p:panel id="person-profile-phones-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Phone numbers">
+
+                    <h:form id="person-profile-phones-form">
+
+                        <p:commandButton     id="phones-add-cb"
+                                             ajax="true"
+                                             actionListener="#{personBB.onPhoneAddInitButtonChange}"
+                                             oncomplete="PF('phone-dialog-var').show()"
+                                             rendered="true"
+                                             value="Add phone number" 
+                                             update="@form:@parent:phone-info-form"/>
+
+
+                        <p:spacer height="5px"/>
+
+                        <p:dataTable    id="person-phones-table"
+                                        value="#{personBB.currentPerson.phoneList}"
+                                        var="ph"
+                                        rowKey="#{ph.phoneID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="true" 
+                                        tabindex="6">
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="ID"/>
+                                </f:facet>
+                                <h:outputText value="#{ph.phoneID}" />
+                            </p:column>
+
+                            <p:column width="40%">
+                                <f:facet name="header">
+                                    <h:outputText value="Number"/>
+                                </f:facet>
+                                <h:outputText value="#{ph.phoneNumber}" />
+                            </p:column>
+
+                            <p:column width="25%">
+                                <f:facet name="header">
+                                    <h:outputText value="Type"/>
+                                </f:facet>
+                                <h:outputText value="#{ph.phoneType.title}" />
+                            </p:column>
+
+                            <p:column width="25%">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+
+                                <p:commandLink      id="phone-actions-cl"
+                                                    ajax="true"
+                                                    actionListener="#{personBB.onPhoneEditInitButtonChange(ph)}"
+                                                    style="color:blue;"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                    oncomplete="PF('phone-dialog-var').show()"
+                                                    update="@form:@parent:phone-info-form"
+                                                    value="edit" />
+
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>   
+                </p:panel>
+
+                <p:panel id="person-emails-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Email addresses">
+
+
+                    <h:form id="person-profile-emails-form">
+
+                        <p:commandButton      id="email-add-cb"
+                                              ajax="true"
+                                              actionListener="#{personBB.onEmailAddInitButtonChange}"
+                                              oncomplete="PF('email-dialog-var').show()"
+                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                              update="@form:@parent:email-info-form"
+                                              value="Add email address" />
+
+                        <p:spacer height="5px"/>
+
+                        <p:dataTable    id="person-emails-table"
+                                        value="#{personBB.currentPerson.emailList}"
+                                        var="ea"
+                                        rowKey="#{ea.emailID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="true" 
+                                        tabindex="6">
+
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="ID"/>
+                                </f:facet>
+                                <h:outputText value="#{ea.emailID}" />
+                            </p:column>
+
+                            <p:column width="40%">
+                                <f:facet name="header">
+                                    <h:outputText value="Address"/>
+                                </f:facet>
+                                <h:outputText value="#{ea.emailaddress}" />
+                            </p:column>
+
+                            <p:column width="25%">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+
+                                <p:commandLink      id="email-actions-cl"
+                                                    ajax="true"
+                                                    actionListener="#{personBB.onEmailEditInitButtonChange(ea)}"
+                                                    style="color:blue;"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                    update="@form:@parent:email-info-form"
+                                                    oncomplete="PF('email-dialog-var').show()"
+                                                    value="view/edit" />
+
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>               
+                </p:panel>
+
+            </div>
+            <div class="p-col">
+                <p:panel id="person-links-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Person Connections">
+                    <h:form id="person-links-form">
+
+                        <p:commandButton      id="load-personlinks-button"
+                                              ajax="true"
+                                              actionListener="#{personBB.onLoadPersonLinks}"
+                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                              update="person-links-table
+                                              persontools-growl-form"
+                                              value="Load object connections for #{personBB.currentPerson.name}" />
+
+                        <p:spacer height="5px" />
+
+                        <p:dataTable    id="person-links-table"
+                                        value="#{personBB.currentPersonLinkHeavy.humanLinkList}"
+                                        var="hl"
+                                        rowKey="#{hl.linkID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="true" 
+                                        tabindex="6"
+                                        rowExpandMode="multiple">
+                            <p:column width="5%" 
+                                      headerText="Exp.">
+                                <p:rowToggler/>
+                            </p:column>
+                            <p:column width="35%"
+                                      sortBy="#{hl.linkedObjectSchemaEnum.TARGET_OBJECT_FRIENDLY_NAME}">
+                                <f:facet name="header">
+                                    <h:outputText value="Object"/>
+                                </f:facet>
+                                <h:outputText value="#{hl.linkedObjectSchemaEnum.TARGET_OBJECT_FRIENDLY_NAME}" />
+                            </p:column>
+
+
+                            <p:column width="30%">
+                                <f:facet name="header">
+                                    <h:outputText value="Relationship"/>
+                                </f:facet>
+                                <h:outputText value="#{hl.linkedObjectRole.title}" />
+                            </p:column>
+
+                            <p:column width="20%">
+                                <f:facet name="header">
+                                    <h:outputText value="ID"/>
+                                </f:facet>
+                                <h:outputText value="#{hl.parentObjectID}" />
+                            </p:column>
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+                                <p:commandLink      id="link-load-cl"
+                                                    ajax="true"
+                                                    actionListener="#{personBB.onPersonLinkViewInfoLinkClick(hl)}"
+                                                    style="color:blue;"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                    oncomplete="PF('person-profile-dialog-var').show()"
+                                                    value="Load" />
+                            </p:column>
+
+                            <p:rowExpansion>
+                                <div class="p-grid">
+                                    <div class="p-col-4">
+                                        link attribute
+                                        
+                                    </div>
+                                    <div class="p-col-8">
+                                        link value
+                                    </div>
+                                </div>
+                            </p:rowExpansion>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+            </div>
+        </div>
+
+
+    </p:dialog>
+
+
+    <p:dialog   id="phone-dialog"
+                height="700" width="600"
+                widgetVar="phone-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="#{personBB.currentContactPhone.phoneID eq 0 ? 'Create new phone number' : 'View/Edit phone number'}"
+                rendered="true"
+                >
+
+        <p:panel id="phone-info-panel"
+                 toggleable="true"
+                 collapsed="false"
+                 header="Phone Info">
+
+            <h:form id="phone-info-form">
+
+                <p:commandButton id="phone-edit-button"
+                                 value="#{personBB.currentContactPhoneEditMode? 'Save changes' : 'Edit'}"
+                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                 icon="fa #{personBB.currentContactPhoneEditMode ? 'fa-check' : 'fa-pencil'}"
+                                 ajax="true"
+                                 actionListener="#{personBB.togglePhoneEditMode}"
+                                 oncomplete="PF('phone-dialog-var').show()"
+                                 update="@form"/>
+
+
+                <div class="restrict-main-contents-io-button gray_button">
+
+                    <p:commandButton    id="phone-edit-abort-button"
+                                        ajax="true"
+                                        rendered="#{personBB.currentContactPhoneEditMode}"
+                                        value="Abort edit"
+                                        process="@none"
+                                        immediate="true"
+                                        actionListener="#{personBB.onPhoneOperationAbortButtonChange}"
+                                        oncomplete="PF('person-profile-dialog-var').show()"
+                                        update="@form"
+                                        icon="fa fa-stop" />
+
+                </div>
+
+                <p:spacer height="5px"/>    
+
+                <div class="p-grid">
+                    <div class="p-col-6">Phone ID</div>
+
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!personBB.currentContactPhoneEditMode}" 
+                                      value="#{personBB.currentContactPhone.phoneID eq 0 ? 'new record' : personBB.currentContactPhone.phoneID}"/>
+
                     </div>
-                </h:form>
-            </p:panel>
-        </p:dialog>
 
+                    <div class="p-col-6">Number</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!personBB.currentContactPhoneEditMode}" 
+                                      value="#{personBB.currentContactPhone.phoneNumber}"/>
 
+                        <p:inputMask    id="phone-inputmask"
+                                        rendered="#{personBB.currentContactPhoneEditMode}"
+                                        value="#{personBB.currentContactPhone.phoneNumber}"
+                                        mask="(999) 999-9999" 
+                                        validateMask="true"
+                                        validatorMessage="Enter phone in format (xxx) xxx-xxxx"
+                                        requiredMessage="A phone number is required to complete the form"
+                                        required="true"/>
+                    </div>
 
-        <p:dialog   id="email-dialog"
-                    height="700" width="600"
-                    widgetVar="email-dialog-var"
-                    responsive="true"
-                    resizable="true"
-                    closable="true"
-                    closeOnEscape="true"
-                    modal="true"
-                    header="#{personBB.currentContactEmail.emailID eq 0 ? 'Create new email address' : 'View/Edit email address'}"
-                    rendered="true"
-                    >
+                    <div class="p-col-6">Type</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!personBB.currentContactPhoneEditMode}" 
+                                      value="#{personBB.currentContactPhone.phoneType.title}"/>
 
-            <p:panel id="email-info-panel"
-                     toggleable="true"
-                     collapsed="false"
-                     header="Email Info">
-
-                <h:form id="email-info-form">
-
-                    <p:commandButton id="email-edit-button"
-                                     value="#{personBB.currentContactEmailEditMode? 'Save changes' : 'Edit'}"
-                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                     icon="fa #{personBB.currentContactEmailEditMode ? 'fa-check' : 'fa-pencil'}"
-                                     actionListener="#{personBB.toggleEmailEditMode}"
-                                     oncomplete="PF('email-dialog-var').show()"
-                                     update="email-info-form"/>
-
-
-                    <div class="restrict-main-contents-io-button gray_button">
-
-                        <p:commandButton    id="email-edit-abort-button"
-                                            ajax="true"
-                                            rendered="#{personBB.currentContactEmailEditMode}"
-                                            value="Abort edit"
-                                            process="@none"
-                                            immediate="true"
-                                            actionListener="#{personBB.onEmailOperationAbortButtonChange}"
-                                            oncomplete="PF('person-profile-dialog-var').show()"
-                                            update="email-info-form"
-                                            icon="fa fa-stop" />
+                        <p:selectOneMenu id="phone-type-som"
+                                         required="true"
+                                         rendered="#{personBB.currentContactPhoneEditMode}" 
+                                         value="#{personBB.currentContactPhone.phoneType}">
+                            <f:converter converterId="phoneTypeConverter"/>
+                            <f:selectItems value="#{personBB.phoneTypeList}"
+                                           var="cft" 
+                                           itemValue="#{cft}" 
+                                           itemLabel="#{cft.title}"/>
+                        </p:selectOneMenu>
 
                     </div>
 
-                    <p:spacer height="5px"/>    
+                    <div class="p-col-6">Extension</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!personBB.currentContactPhoneEditMode}" 
+                                      value="#{personBB.currentContactPhone.extension}"/>
 
-                    <div class="p-grid">
-                        <div class="p-col-6">Email ID</div>
+                        <p:inputNumber rendered="#{personBB.currentContactPhoneEditMode}"
+                                       value="#{personBB.currentContactPhone.extension}"
+                                       decimalPlaces="0"
+                                       minValue="0"
+                                       maxValue="99999999" 
+                                       required="false"/>
 
-                        <div class="p-col-6">
-                            <h:outputText rendered="#{!personBB.currentContactEmailEditMode}" 
-                                          value="#{personBB.currentContactEmail.emailID eq 0 ? 'new record' : personBB.currentContactEmail.emailID}"/>
+                    </div>
 
-                            <p:inputMask    id="email-inputmask"
-                                            rendered="#{personBB.currentContactEmailEditMode}"
-                                            value="#{personBB.currentContactEmail.emailaddress}"
-                                            mask="a*@a*.a*" 
-                                            validateMask="true"
-                                            validatorMessage="Enter email in format address@domain.com/org/etc"
-                                            requiredMessage="An email address is required to complete the form"
-                                            required="true"/>
-                        </div>
+                    <div class="p-col-6">Disconnected?</div>
+                    <div class="p-col-6">
+                        <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
+                                        value="#{empty personBB.currentContactPhone.disconnectTS ? 'No' : 'Yes'}" />
 
-                        <div class="p-col-6">Address</div>
-                        <div class="p-col-6">
-                            <h:outputText rendered="#{!personBB.currentContactEmailEditMode}" 
-                                          value="#{personBB.currentContactEmail.emailaddress}"/>
+                        <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
+                                        value="#{!empty personBB.currentContactPhone.disconnectTS ? 'Recorded by ' : ''}" />
 
-                        </div>
+                        <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
+                                        value="#{!empty personBB.currentContactPhone.disconnectRecordedBy ? personBB.currentContactPhone.disconnectRecordedBy.username : ''}" />
+
+                        <p:spacer height="5px" />
+
+                        <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
+                                        value="#{!empty personBB.currentContactPhone.disconnectTS ? 'on ' : ''}" />
+
+                        <p:selectBooleanCheckbox rendered="#{personBB.currentContactPhoneEditMode}"
+                                                 value="#{personBB.getPrettyDateNoTime(personBB.currentContactPhone.disconnectTS)}" />
+                    </div>
+
+                    <div class="p-col-6">Creation</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{personBB.getPrettyDate(personBB.currentContactPhone.createdTS)}" />
+                        <p:spacer height="2px" />
+                        <h:outputText   rendered="#{!empty personBB.currentContactPhone.createdBy}"
+                                        value="by #{personBB.currentContactPhone.createdBy.username}" />
+                    </div>
+
+                    <div class="p-col-6">Last update</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{personBB.getPrettyDate(personBB.currentContactPhone.lastUpdatedTS)}" />
+                        <p:spacer height="2px" />
+                        <h:outputText   rendered="#{!empty personBB.currentContactPhone.lastUpdatedBy}"
+                                        value="by #{personBB.currentContactPhone.lastUpdatedBy.username}" />
+                    </div>
+
+                    <div class="p-col-6">Record status</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{empty personBB.currentContactPhone.deactivatedTS ? 'active' : 'deactivated on'}" />
+                        <p:spacer height="2px" />
+                        <h:outputText value="#{empty personBB.currentContactPhone.deactivatedTS ? '' : personBB.getPrettyDate(personBB.currentContactPhone.deactivatedTS) }" />
+                        <p:spacer height="2px" />
+                        <h:outputText   rendered="#{!empty personBB.currentContactPhone.deactivatedBy}"
+                                        value="by #{personBB.currentContactPhone.deactivatedBy.username}" />
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+    </p:dialog>
 
 
-                        <div class="p-col-6">Bounce?</div>
-                        <div class="p-col-6">
-                            <h:outputText   rendered="#{!personBB.currentContactEmailEditMode}"
-                                            value="#{empty personBB.currentContactEmail.bounceTS ? 'No' : 'Yes'}" />
 
-                            <h:outputText   rendered="#{!personBB.currentContactEmailEditMode}"
-                                            value="#{!empty personBB.currentContactEmail.bounceTS ? 'Bounce on ' : ''}" />
-                            
-                            <p:calendar id="email-bounce-cal"  
-                                        rendered="#{personBB.currentContactEmailEditMode}" 
-                                        value="#{personBB.currentContactEmail.bounceTS}"
+    <p:dialog   id="email-dialog"
+                height="700" width="600"
+                widgetVar="email-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="#{personBB.currentContactEmail.emailID eq 0 ? 'Create new email address' : 'View/Edit email address'}"
+                rendered="true"
+                >
+
+        <p:panel id="email-info-panel"
+                 toggleable="true"
+                 collapsed="false"
+                 header="Email Info">
+
+            <h:form id="email-info-form">
+
+                <p:commandButton id="email-edit-button"
+                                 value="#{personBB.currentContactEmailEditMode? 'Save changes' : 'Edit'}"
+                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                 icon="fa #{personBB.currentContactEmailEditMode ? 'fa-check' : 'fa-pencil'}"
+                                 actionListener="#{personBB.toggleEmailEditMode}"
+                                 oncomplete="PF('email-dialog-var').show()"
+                                 update="email-info-form"/>
+
+
+                <div class="restrict-main-contents-io-button gray_button">
+
+                    <p:commandButton    id="email-edit-abort-button"
+                                        ajax="true"
+                                        rendered="#{personBB.currentContactEmailEditMode}"
+                                        value="Abort edit"
+                                        process="@none"
+                                        immediate="true"
+                                        actionListener="#{personBB.onEmailOperationAbortButtonChange}"
+                                        oncomplete="PF('person-profile-dialog-var').show()"
+                                        update="email-info-form"
+                                        icon="fa fa-stop" />
+
+                </div>
+
+                <p:spacer height="5px"/>    
+
+                <div class="p-grid">
+                    <div class="p-col-6">Email ID</div>
+
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!personBB.currentContactEmailEditMode}" 
+                                      value="#{personBB.currentContactEmail.emailID eq 0 ? 'new record' : personBB.currentContactEmail.emailID}"/>
+
+                        <p:inputMask    id="email-inputmask"
+                                        rendered="#{personBB.currentContactEmailEditMode}"
+                                        value="#{personBB.currentContactEmail.emailaddress}"
+                                        mask="a*@a*.a*" 
+                                        validateMask="true"
+                                        validatorMessage="Enter email in format address@domain.com/org/etc"
+                                        requiredMessage="An email address is required to complete the form"
+                                        required="true"/>
+                    </div>
+
+                    <div class="p-col-6">Address</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!personBB.currentContactEmailEditMode}" 
+                                      value="#{personBB.currentContactEmail.emailaddress}"/>
+
+                    </div>
+
+
+                    <div class="p-col-6">Bounce?</div>
+                    <div class="p-col-6">
+                        <h:outputText   rendered="#{!personBB.currentContactEmailEditMode}"
+                                        value="#{empty personBB.currentContactEmail.bounceTS ? 'No' : 'Yes'}" />
+
+                        <h:outputText   rendered="#{!personBB.currentContactEmailEditMode}"
+                                        value="#{!empty personBB.currentContactEmail.bounceTS ? 'Bounce on ' : ''}" />
+
+                        <p:calendar id="email-bounce-cal"  
+                                    rendered="#{personBB.currentContactEmailEditMode}" 
+                                    value="#{personBB.currentContactEmail.bounceTS}"
                                     mode="popup" tabindex="3"
                                     showOn="button"
                                     pattern="EEE, dd MMM, yyyy HH:mm:ss"
@@ -667,37 +744,37 @@
                                     showTodayButton="true"
                                     required="false"/>
 
-                           
-                        </div>
 
-                        <div class="p-col-6">Creation</div>
-                        <div class="p-col-6">
-                            <h:outputText value="#{personBB.getPrettyDate(personBB.currentContactEmail.createdTS)}" />
-                            <p:spacer height="2px" />
-                            <h:outputText   rendered="#{!empty personBB.currentContactEmail.createdBy}"
-                                            value="by #{personBB.currentContactEmail.createdBy.username}" />
-                        </div>
-
-                        <div class="p-col-6">Last update</div>
-                        <div class="p-col-6">
-                            <h:outputText value="#{personBB.getPrettyDate(personBB.currentContactEmail.lastUpdatedTS)}" />
-                            <p:spacer height="2px" />
-                            <h:outputText   rendered="#{!empty personBB.currentContactEmail.lastUpdatedBy}"
-                                            value="by #{personBB.currentContactEmail.lastUpdatedBy.username}" />
-                        </div>
-
-                        <div class="p-col-6">Record status</div>
-                        <div class="p-col-6">
-                            <h:outputText value="#{empty personBB.currentContactEmail.deactivatedTS ? 'active' : 'deactivated on'}" />
-                            <p:spacer height="2px" />
-                            <h:outputText value="#{empty personBB.currentContactEmail.deactivatedTS ? '' : personBB.getPrettyDate(personBB.currentContactEmail.deactivatedTS) }" />
-                            <p:spacer height="2px" />
-                            <h:outputText   rendered="#{!empty personBB.currentContactEmail.deactivatedBy}"
-                                            value="by #{personBB.currentContactEmail.deactivatedBy.username}" />
-                        </div>
                     </div>
-                </h:form>
-            </p:panel>
-        </p:dialog>
-    
+
+                    <div class="p-col-6">Creation</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{personBB.getPrettyDate(personBB.currentContactEmail.createdTS)}" />
+                        <p:spacer height="2px" />
+                        <h:outputText   rendered="#{!empty personBB.currentContactEmail.createdBy}"
+                                        value="by #{personBB.currentContactEmail.createdBy.username}" />
+                    </div>
+
+                    <div class="p-col-6">Last update</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{personBB.getPrettyDate(personBB.currentContactEmail.lastUpdatedTS)}" />
+                        <p:spacer height="2px" />
+                        <h:outputText   rendered="#{!empty personBB.currentContactEmail.lastUpdatedBy}"
+                                        value="by #{personBB.currentContactEmail.lastUpdatedBy.username}" />
+                    </div>
+
+                    <div class="p-col-6">Record status</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{empty personBB.currentContactEmail.deactivatedTS ? 'active' : 'deactivated on'}" />
+                        <p:spacer height="2px" />
+                        <h:outputText value="#{empty personBB.currentContactEmail.deactivatedTS ? '' : personBB.getPrettyDate(personBB.currentContactEmail.deactivatedTS) }" />
+                        <p:spacer height="2px" />
+                        <h:outputText   rendered="#{!empty personBB.currentContactEmail.deactivatedBy}"
+                                        value="by #{personBB.currentContactEmail.deactivatedBy.username}" />
+                    </div>
+                </div>
+            </h:form>
+        </p:panel>
+    </p:dialog>
+
 </ui:composition>

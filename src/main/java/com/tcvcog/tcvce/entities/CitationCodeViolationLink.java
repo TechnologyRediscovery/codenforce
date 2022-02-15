@@ -32,7 +32,7 @@ public class CitationCodeViolationLink
         implements IFace_trackedEntityLink{
     
   
-    
+    protected LinkedObjectSchemaEnum schemaEnum = LinkedObjectSchemaEnum.CITATION_CODEVIOLATION;
     protected int citationViolationID;
 //    protected LinkedObjectRole linkRole;
     
@@ -248,6 +248,21 @@ public class CitationCodeViolationLink
     @Override
     public String getDBTableName() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public LinkedObjectSchemaEnum getLinkedObjectSchemaEnum() {
+        return schemaEnum;
+    }
+
+    
+    public void setLinkedObjectSchemaEnum(LinkedObjectSchemaEnum lose) {
+        schemaEnum = lose;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return citationViolationID;
     }
 
     

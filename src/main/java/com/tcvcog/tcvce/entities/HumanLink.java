@@ -30,6 +30,7 @@ public class        HumanLink
     protected int linkID;
     
     protected LinkedObjectRole linkRole;
+    protected LinkedObjectSchemaEnum schemaEnum;
     protected BOBSource linkSource;
     
     protected LocalDateTime linkCreatedTS;
@@ -42,6 +43,8 @@ public class        HumanLink
     protected int linkDeactivatedByUserID;
     
     protected String linkNotes;
+    
+    protected int parentObjectID;
     
     public HumanLink(Human h){
         
@@ -245,5 +248,28 @@ public class        HumanLink
         this.linkID = linkID;
     }
 
+    @Override
+    public LinkedObjectSchemaEnum getLinkedObjectSchemaEnum() {
+        return schemaEnum;
+    }
+
+    /**
+     * @param schemaEnum the schemaEnum to set
+     */
+    public void setSchemaEnum(LinkedObjectSchemaEnum schemaEnum) {
+        this.schemaEnum = schemaEnum;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return parentObjectID;
+    }
+
+    public void setParentObjectID(int pid){
+        parentObjectID = pid;
+    }
+  
+
+   
    
 }
