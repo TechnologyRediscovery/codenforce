@@ -27,21 +27,14 @@ public enum SearchParamsPersonDateFieldsEnum
         implements  IFace_dateFieldHolder {
     
     CREATED_TS            ("Creation timestamp", 
-                            "person.creationtimestamp"), 
+                            "human.createdts"), 
     
     LAST_UPDATED            ("Last update  timestamp", 
-                            "person.lastupdated"), 
+                            "human.lastupdatedts"), 
     
-    
-    GHOSTCREATION_TS        ("Ghost creation timestamp", 
-                            "ghosttimestamp"), 
-    
-    
-    CLONECREATION_TS        ("Clone creation timestamp", 
-                            "ghosttimestamp"), 
     
     EXPIRY                  ("Expiry date", 
-                            "person.expirydate"); 
+                            "human.deceaseddate"); 
    
     
     private final String title;

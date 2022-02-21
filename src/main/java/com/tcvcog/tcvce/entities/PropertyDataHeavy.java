@@ -30,10 +30,9 @@ import java.util.List;
 public  class       PropertyDataHeavy 
         extends     Property 
         implements  IFace_CredentialSigned,
-                    IFace_humanListHolder,
-                    IFace_PersonListHolder{
+                    IFace_humanListHolder{
     
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUIM = LinkedObjectSchemaEnum.CECASEHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUIM = LinkedObjectSchemaEnum.CECaseHuman;
     protected List<HumanLink> humanLinkList;
     protected List<Person> personList;
     
@@ -64,16 +63,6 @@ public  class       PropertyDataHeavy
         this.addresses = prop.getAddresses();
         
         
-    }
-    
-     @Override
-    public List<Person> getPersonList() {
-        return personList;
-    }
-
-    @Override
-    public void setPersonList(List<Person> pList) {
-        personList = pList;
     }
     
     

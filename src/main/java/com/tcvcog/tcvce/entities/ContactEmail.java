@@ -27,6 +27,8 @@ public  class   ContactEmail
     
     final static String TABLE_NAME = "contactemail";
     final static String PKFIELD = "emailid";
+    final static String HFNAME = "Email Address";
+    
     
     protected int emailID;
     protected int humanID;
@@ -124,6 +126,11 @@ public  class   ContactEmail
     @Override
     public String getDBTableName() {
         return TABLE_NAME;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return HFNAME;
     }
     
 }

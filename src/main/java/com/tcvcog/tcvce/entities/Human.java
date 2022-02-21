@@ -31,6 +31,8 @@ public  class   Human
     
         static final String TABLE_NAME = "public.human";
         static final String PKFIELD = "humanid";
+        static final String HFNAME = "Person";
+        
         
         protected int humanID;
         protected String name;
@@ -278,6 +280,11 @@ public  class   Human
     @Override
     public String getDBTableName() {
         return TABLE_NAME;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return HFNAME;
     }
 
         

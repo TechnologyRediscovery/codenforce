@@ -38,9 +38,13 @@ public  class       OccPeriod
                     IFace_EventHolder,
                     Comparable<OccPeriod>,
                     IFace_ActivatableBOB,
-                    IFace_NoteHolder {
+                    IFace_noteHolder {
     
-
+    final static String OCCPERIOD_TABLE_NAME = "occperiod";
+    final static String OCCPERIOD_PK_FIELD = "periodid";
+    final static String OCCPERIOD_HFNAME = "Occupancy Period";
+    
+    
     
     protected int periodID;
     protected int propertyUnitID;
@@ -608,5 +612,25 @@ public  class       OccPeriod
     @Override
     public int getBObID() {
         return periodID;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return OCCPERIOD_PK_FIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+        return periodID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return OCCPERIOD_TABLE_NAME;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return OCCPERIOD_HFNAME;
     }
 }

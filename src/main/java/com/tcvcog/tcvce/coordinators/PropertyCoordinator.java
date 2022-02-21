@@ -327,6 +327,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyDataHeavy pdh = null;
         BlobCoordinator bc = getBlobCoordinator();
         BlobIntegrator bi = getBlobIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
         
         if(prop != null && ua != null){
             // if we've been given a skeleton, just inject it into data heavy subclass
@@ -363,14 +364,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    }
 
                    // Person list
-                   QueryPerson qp = sc.initQuery(QueryPersonEnum.PROPERTY_PERSONS, ua.getKeyCard());
-                   qp.getPrimaryParams().setProperty_val(prop);
-                   // Fix for humanization
-                   pdh.setHumanLinkList(new ArrayList<>());
-//                   pdh.setPersonList(sc.runQuery(qp).getBOBResultList());
-//                   System.out.println("PropertyCoordinator.assemblePropertyDH: personlist size: " + pdh.getPersonList().size());
+                   pdh.setHumanLinkList(pc.assembleLinkedHumanLinks(pdh));
 
-                   // wait on blobs
                    pdh.setBlobList(bc.getBlobLightList(bi.getBlobIDs(prop)));
                    // external data
                    pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getParcelKey())));

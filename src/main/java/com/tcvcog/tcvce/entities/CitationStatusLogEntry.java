@@ -33,6 +33,7 @@ public class    CitationStatusLogEntry
     
     final static String CITATION_STATUS_TABLE = "citationcitationstatus";
     final static String CITATION_STATUS_PKFIELD = "citationstatusid";
+    final static String HF_NAME = "Citation status log entry";
     
     private int logEntryID;
     private int citationID;
@@ -182,6 +183,11 @@ public class    CitationStatusLogEntry
      */
     public void setCourtEntity(CourtEntity courtEntity) {
         this.courtEntity = courtEntity;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return HF_NAME;
     }
     
 }

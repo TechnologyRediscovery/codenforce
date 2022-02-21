@@ -17,7 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- * Species an interface of a single getter and a single setter for a DB notes field
+ * Specifies an interface of a single getter and a single setter for a DB notes field
  * Note that this interface extends IFace_keyIdentified which means you can ask
  * a noteholder for its DB table name, primary key field name, and the object's PK/ID
  * 
@@ -36,4 +36,11 @@ public interface IFace_noteHolder
      * @param n the notes to set
      */
     public void setNotes(String n);
+    
+    /**
+     * Implementers can tell the UI what it is
+     * in a nice String
+     * @return the human friendly name of the note holder
+     */
+    public String getNoteHolderFriendlyName();
 }

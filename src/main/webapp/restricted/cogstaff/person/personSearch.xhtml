@@ -25,8 +25,6 @@
 
                         <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
                                      columnClasses="gridTd, gridTd">
-
-                          
                             
                             <h:panelGroup>
                                 
@@ -48,145 +46,10 @@
                                                             />
                                     </h:form>
                                 </p:panel>
-                                
-                                <p:panel    id="pers-search-results-panel"
-                                            toggleable="true"
-                                            widgetVar="pers-search-results-panel-var"
-                                            collapsed="false"
-                                            header="Person search results in #{personSearchBB.paramsSelected.muni_val.muniName}">
-                                    
-                                    <h:form id="pers-search-results-form">
-                                        
-                                        <div class="ui-g data_container_nested_restrict">
-                                            
-                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
-                                                   <div class="restrict-main-contents-io-link">
-
-                                                        <p:commandLink     id="load-history-cb"
-                                                                            actionListener="#{personSearchBB.loadPersonHistory}"
-                                                                            ajax="true"
-                                                                            value="load person history"
-                                                                            update="pers-search-results-form
-                                                                            pers-search-messages-form"
-                                                                             />
-
-
-                                                    </div>
-                                            </div>
-                                            
-                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
-                                                   <div class="restrict-main-contents-io-link">
-
-                                                        <p:commandLink      id="clear-results-cb"
-                                                                            actionListener="#{personSearchBB.clearResultList}"
-                                                                            ajax="true"
-                                                                            value="clear result list"
-                                                                            update="pers-search-results-form
-                                                                            pers-search-messages-form"/>
-
-
-                                                    </div>
-                                            </div>
-                                            
-                                        </div>
-                                        
-                                        <h:outputText value="list contains #{personSearchBB.personListSize} persons" 
-                                                          styleClass="italic"/>
-                                            <p:spacer height="5px" />
-
-                                        <p:spacer height="2px"/>
-
-                                        <p:dataTable
-                                            id="personTable"
-                                            var="per"
-                                            value="#{personSearchBB.personList}"
-                                            rowKey="#{per.personID}"
-                                            tableStyleClass="primeDataTable"
-                                            rowExpandMode="single"
-                                            resizableColumns="true"
-                                            expandedRow="false"
-                                            filteredValue="#{personSearchBB.filteredPersonList}"
-                                            widgetVar="personSelectListTable">
-
-                                            <p:column width="4%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="ID" />
-                                                </f:facet>
-                                                <h:outputText value="#{per.personID}"/>
-                                            </p:column>
-
-                                            <p:column width="10%" sortBy="#{per.personType.label}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Person Type" />
-                                                </f:facet>
-                                                <h:outputText value="#{per.personType.label}"/>
-                                            </p:column>
-
-
-                                            <p:column width="10%" sortBy="#{per.firstName}"
-                                                      filterBy="#{per.firstName}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="First" />
-                                                </f:facet>
-                                                <h:outputText value="#{per.firstName}"/>
-                                            </p:column>
-
-                                            <p:column width="10%" filterBy="#{per.lastName}"
-                                                      sortBy="#{per.lastName}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Last" />
-                                                </f:facet>
-                                                <h:outputText value="#{per.lastName}"/>
-                                            </p:column>
-
-                                            <p:column   width="20%"
-                                                        sortBy="#{per.addressStreet}"
-                                                        filterBy="#{per.addressStreet}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Address" />
-                                                </f:facet>
-                                                <h:outputText escape="false" value="#{per.addressStreet}"/>
-                                                <p:spacer height="5px"/>
-                                                <h:outputText value="#{per.addressCity}, #{per.addressState} #{per.addressZip}"/>
-                                            </p:column>
-
-                                            <p:column width="10%" >
-                                                <f:facet name="header">
-                                                    <h:outputText value="Actions" />
-                                                </f:facet>
-                                                
-                                                  <div class="ui-g data_container_nested_restrict">
-
-                                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                                                               <div class="restrict-main-contents-io-link">
-
-                                                                    <p:commandLink  action="#{personSearchBB.explorePerson(per)}"
-                                                                                    ajax="true" 
-                                                                                    value="view"
-                                                                                    actionListener="#{personSearchBB.explorePerson(per)}"
-                                                                                    oncomplete="PF('person-profile-dialog-var').show();"
-                                                                                    update="person-profile-form 
-                                                                                    person-profile-dialog"
-                                                                                         />
-
-
-                                                                </div>
-                                                        </div>
-                                                  </div>
-                                                
-
-                                            </p:column>
-                                        </p:dataTable>
-                                    </h:form>
-                                </p:panel>
-
                             </h:panelGroup>
                         </h:panelGrid>
                         <!--close main container-->
                     </div>
-                    
-                    
-                  
 
                     <p:dialog   header="Create Person"
                                 id="person-add-dialog"

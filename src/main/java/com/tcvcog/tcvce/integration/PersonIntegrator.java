@@ -61,7 +61,7 @@ import java.util.logging.Logger;
  */
 public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
-    final String ACTIVE_FIELD = "person.isactive";
+    final String PERSON_ACTIVE_FIELD = "human.deactivatedts";
     /**
      * Creates a new instance of PersonIntegrator
      */
@@ -107,7 +107,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                linkedHumans.add(generateHumanLink(rs, getHuman(rs.getInt("human_humanid"))));
+                HumanLink hl = generateHumanLink(rs, getHuman(rs.getInt("human_humanid")));
+                hl.setParentObjectID(hlh.getHostPK());
+                
+                linkedHumans.add(hl);
             }
 
         } catch (SQLException ex) {
@@ -161,7 +164,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
             while (rs.next()) {
                 HumanLink hl = generateHumanLink(rs, getHuman(rs.getInt("human_humanid")));
-                hl.setSchemaEnum(lose);
                 hl.setParentObjectID(rs.getInt(lose.getTargetTableFKField()));
                 linkedHumans.add(hl);
             }
@@ -277,13 +279,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 hl = new HumanLink(h);
                 si.populateTrackedLinkFields(hl, rs);
                 hl.setLinkID(rs.getInt("linkid"));
+                hl.setNotes(rs.getString("notes"));
                 hl.setLinkRole(si.getLinkedObjectRole(rs.getInt("linkedobjectrole_lorid")));
             } catch (BObStatusException ex) {
                 throw new IntegrationException(ex.getMessage());
-                
             }
         }
-        
         return hl;
     }
 
@@ -296,8 +297,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public int insertHumanLink(IFace_humanListHolder humanziedBOb, HumanLink hl) throws IntegrationException{
-        if (humanziedBOb == null || hl == null){
-            throw new IntegrationException("Cannot link a human and a list holder with null inputs");
+        if (humanziedBOb == null || hl == null || humanziedBOb.getHostPK() == 0){
+            throw new IntegrationException("Cannot link a human and a list holder with null inputs or host PK of 0");
         }
 
         Connection con = getPostgresCon();
@@ -362,7 +363,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+            throw new IntegrationException("PersonIntegrator.insertHumanLink| Unable to create human link", ex);
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -424,7 +425,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator.getPerson | Unable to retrieve person", ex);
+            throw new IntegrationException("PersonIntegrator.updateHumanLink | Unable to update link", ex);
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -436,13 +437,15 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
    /**
      * Updates a record in the appropriate linking table for a given human
      * to a given human list holder object =
-     * @param humanziedBOb the object to which the human shall be linked
      * @param hl the human to link
      * @throws IntegrationException 
      */
-    public void deactivateHumanLink(IFace_humanListHolder humanziedBOb, HumanLink hl) throws IntegrationException{
-        if (humanziedBOb == null || hl == null){
-            throw new IntegrationException("Cannot deactivate a human and a list holder with null inputs");
+    public void deactivateHumanLink(HumanLink hl) throws IntegrationException{
+        if (hl == null 
+                || hl.getLinkedObjectRole() == null 
+                || hl.getLinkedObjectRole().getSchema() == null  
+                || hl.getParentObjectID() == 0){
+            throw new IntegrationException("Cannot deactivate a human link with null link, schemaenum, or parent object ID == 0");
         }
 
         Connection con = getPostgresCon();
@@ -453,10 +456,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             StringBuilder sb = new StringBuilder();
             
             sb.append("UPDATE ");
-            sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getLinkingTableName());
+            sb.append(hl.getLinkedObjectRole().getSchema().getLinkingTableName());
             sb.append(" SET lastupdatedts=now(), lastupdatedby_userid=?, ");
             sb.append(" deactivatedts=now(), deactivatedby_userid=? WHERE ");
-            sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getLinkedTablePKField());
+            sb.append(hl.getLinkedObjectRole().getSchema().getLinkedTablePKField());
             sb.append(" = ?;");
                         
             stmt = con.prepareStatement(sb.toString());
@@ -468,7 +471,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(1, java.sql.Types.NULL);
             }
             
-            if(hl.getDeceasedBy() != null){
+            if(hl.getDeactivatedBy()!= null){
                 stmt.setInt(2, hl.getLinkDeactivatedByUserID());
             } else {
                 stmt.setNull(2, java.sql.Types.NULL);
@@ -481,6 +484,57 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("PersonIntegrator.deactivateHumanLink", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    /**
+     * Writes the value of the given HumanLink's notes over the existing notes
+     * @param hl
+     * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateHumanLinkNotes(HumanLink hl) throws BObStatusException, IntegrationException{
+        if(hl == null || hl.getLinkedObjectRole() == null || hl.getLinkedObjectRole().getSchema() == null){
+            throw new BObStatusException("Cannot write notes with null link or null LinkObjectSchemaEnum");            
+        }
+        
+        
+           Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        try {
+            
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append("UPDATE ");
+            sb.append(hl.getLinkedObjectRole().getSchema().getLinkingTableName());
+            sb.append(" SET lastupdatedts=now(), lastupdatedby_userid=?, ");
+            sb.append(" notes=? WHERE ");
+            sb.append(hl.getLinkedObjectRole().getSchema().getLinkedTablePKField());
+            sb.append(" = ?;");
+                        
+            stmt = con.prepareStatement(sb.toString());
+            
+            
+            if(hl.getLastUpdatedBy()!= null){
+                stmt.setInt(1, hl.getLinkLastUpdatedByUserID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            
+            stmt.setString(2, hl.getNotes());
+            
+            stmt.setInt(3, hl.getLinkID());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.updateHumanLinkNotes", ex);
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -1055,7 +1109,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             String s =  "UPDATE public.contactphone\n" +
                         "   SET human_humanid=?, phonenumber=?, phoneext=?, phonetype_typeid=?, \n" +
                         "       disconnectts=?, disconnect_userid=?, \n" +
-                        "       lastupdatedts=now(), lastupdatedby_userid=?, \n" +
+                        "       lastupdatedts=now(), lastupdatedby_userid=? \n" +
                         " WHERE phoneid=? ;";
             
             stmt = con.prepareStatement(s);
@@ -1250,7 +1304,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             
             String s = "SELECT phonetypeid, title, createdts, deactivatedts\n" +
-                       "  FROM public.contactphonetype WHERE deactivatedts IS NOT NULL";
+                       "  FROM public.contactphonetype WHERE deactivatedts IS NULL;";
             
             stmt = con.prepareStatement(s);
             
@@ -1400,6 +1454,34 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
         
         return personList;
+    }
+    
+    
+     public List<Integer> getPersonsMappedToAUser() throws IntegrationException{
+        List<Integer> humanidl = new ArrayList<>();
+        String selectQuery =  "SELECT DISTINCT personlink FROM public.login;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = con.prepareStatement(selectQuery);
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                humanidl.add(rs.getInt("personlink"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to get persons connected to users", ex);
+
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return humanidl;
     }
     
     /**
@@ -1661,15 +1743,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        params.appendSQL    ("SELECT DISTINCT personid FROM public.person \n");
-        params.appendSQL    ("LEFT OUTER JOIN public.propertyperson ON (person.personid = propertyperson.person_personid)\n");
-        params.appendSQL    ("LEFT OUTER JOIN public.property ON (property.propertyid = propertyperson.person_personid)\n");
-        params.appendSQL    ("LEFT OUTER JOIN public.occperiodperson ON (person.personid = occperiodperson.person_personid)\n");
-        params.appendSQL    ("LEFT OUTER JOIN public.eventperson ON (person.personid = eventperson.person_personid)\n");
-        params.appendSQL    ("LEFT OUTER JOIN public.citationperson ON (person.personid = citationperson.person_personid)\n");
-        params.appendSQL    ("LEFT OUTER JOIN public.personmergehistory ON (person.personid = personmergehistory.mergetarget_personid)\n");
-        params.appendSQL    ("LEFT OUTER JOIN public.personmunilink ON (person.personid = personmunilink.person_personid)\n");
-        params.appendSQL    ("WHERE personid IS NOT NULL \n");
+        params.appendSQL    ("SELECT DISTINCT humanid FROM public.human\n");
+        params.appendSQL    ("LEFT OUTER JOIN public.contactemail ON (human.humanid = contactemail.human_humanid)\n");
+        params.appendSQL    ("LEFT OUTER JOIN public.contactphone ON (human.humanid = contactphone.human_humanid)\n");
+        params.appendSQL    ("WHERE humanid IS NOT NULL \n");
         
         
         // ***********************************
@@ -1681,33 +1758,37 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             //******************************************************************
            // **   FILTERS COM-1, COM-2, COM-3, COM-6 MUNI,DATES,USER,ACTIVE  **
            // ******************************************************************
-            params = (SearchParamsPerson) sc.assembleBObSearchSQL_muniDatesUserActive(
-                                                                    params, 
-                                                                    SearchParamsPerson.MUNI_DBFIELD,
-                                                                    ACTIVE_FIELD);
+            params = (SearchParamsPerson) sc.assembleBObSearchSQL_muniDatesUserActive(params, 
+                                                                    null,
+                                                                    PERSON_ACTIVE_FIELD);
             
 
             // ***********************************
             // **    FILTER PERS-1              **
             // ***********************************
-            if (params.isName_first_ctl()){
-                params.appendSQL("AND fname ILIKE ? ");
+            if (params.isName_ctl()){
+                params.appendSQL("AND name ILIKE ? ");
             }
             
             // ***********************************
             // **    FILTER PERS-2              **
             // ***********************************
-            if (params.isName_last_ctl()){
-                params.appendSQL("AND lname ILIKE ? ");
+            if (params.isUnder18_ctl()){
+                params.appendSQL("AND under19= ");
+                if(params.isUnder18_val()){
+                    params.appendSQL("TRUE ");
+                } else {
+                    params.appendSQL("FALSE ");
+                }
             }
 
             // ***********************************
             // **    FILTER PERS-3              **
             // ***********************************
             
-            if(params.isName_compositeLNameOnly_ctl()){
-                params.appendSQL("AND compositelname=");
-                if(params.isName_compositeLNameOnly_val()){
+            if(params.isBusinessEntity_ctl()){
+                params.appendSQL("AND businessentity=");
+                if(params.isBusinessEntity_val()){
                     params.appendSQL("TRUE ");
                 } else {
                     params.appendSQL("FALSE ");
@@ -1717,60 +1798,41 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             // ***********************************
             // **    FILTER PERS-4              **
             // ***********************************
-            if (params.isPhoneNumber_ctl()){
-                params.appendSQL("AND phonecell ILIKE ? OR phonework ILIKE ? OR phonehome ILIKE ? ");
+            
+            if(params.isMultiHuman_ctl()){
+                params.appendSQL("AND multihuman=");
+                if(params.isMultiHuman_val()){
+                    params.appendSQL("TRUE ");
+                } else {
+                    params.appendSQL("FALSE ");
+                }
             }
             
             // ***********************************
             // **    FILTER PERS-5              **
             // ***********************************
-            if (params.isEmail_ctl()){
-                params.appendSQL("AND email ILIKE ? ");
+            if (params.isJobTitle_ctl()){
+                params.appendSQL("AND jobtitle ILIKE ? ");
             }
             
             // ***********************************
             // **    FILTER PERS-6              **
             // ***********************************
-            if (params.isAddress_streetNum_ctl()){
-                params.appendSQL("AND address_street ILIKE ? ");
+            if (params.isPhoneNumber_ctl()){
+                params.appendSQL("AND contactphone.phonenumber ILIKE ? ");
             }
             
             // ***********************************
             // **    FILTER PERS-7              **
             // ***********************************
-            if (params.isAddress_city_ctl()){
-                params.appendSQL("AND address_city ILIKE ? ");
+            if (params.isEmail_ctl()){
+                params.appendSQL("AND contactemail.emailaddress ILIKE ? ");
             }
             
             // ***********************************
             // **    FILTER PERS-8              **
             // ***********************************
-            if (params.isAddress_zip_ctl()){
-                params.appendSQL("AND  address_zip ILIKE ? ");
-            }
-            
-            // ***********************************
-            // **    FILTER PERS-9              **
-            // ***********************************
-            if(params.isPersonType_ctl()){
-                params.appendSQL("AND persontype = CAST(? AS persontype) ");
-            }
-            
-            // ***********************************
-            // **    FILTER PERS-10              **
-            // ***********************************
-            if(params.isVerified_ctl()){
-                params.appendSQL("AND humanverifiedby IS ");
-                if(params.isVerified_val()){
-                    params.appendSQL("NOT NULL ");
-                } else {
-                    params.appendSQL("NULL ");
-                }
-            }
-            
-            // ***********************************************
-            // **       FILTER PERS-11: BOb SOURCE          **
-            // ***********************************************
+       
              if (params.isSource_ctl()) {
                 if(params.getSource_val() != null){
                     params.appendSQL("AND bobsource_sourceid=? ");
@@ -1781,90 +1843,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             }
             
              
-             
-            // *******************************************
-            // **    FILTER PERS-12: PROPERTY           **
-            // *******************************************
-             if (params.isProperty_ctl()) {
-                if(params.getProperty_val()!= null){
-                    params.appendSQL("AND propertyperson.property_propertyid=? ");
-                } else {
-                    params.setProperty_ctl(false);
-                    params.appendToParamLog("PROPERTY: no Property object; prop filter disabled");
-                }
-            }
-            
-            // ***********************************************
-            // **       FILTER PERS-13: PROPERTY UNIT       **
-            // ***********************************************
-             if (params.isPropertyUnit_ctl()) {
-                if(params.getPropertyUnit_val()!= null){
-                    params.appendSQL("AND propertyunit_unitid=? ");
-                } else {
-                    params.setPropertyUnit_ctl(false);
-                    params.appendToParamLog("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
-                }
-            }
-            
-            // ***********************************
-            // **    FILTER PERS-14             **
-            // ***********************************
-             if(params.isOccPeriod_ctl()){
-                if(params.getOccPeriod_val() != null){
-                    params.appendSQL("AND occperiodperson.period_periodid=? ");
-                } else {
-                    params.setOccPeriod_ctl(false);
-                    params.appendToParamLog("OCC PERIOD: no OccPeriod object; occ period filter disabled");
-                }
-            }
-            
-            // ***********************************
-            // **    FILTER PERS-15             **
-            // ***********************************
-            if(params.isEvent_ctl()){
-                if(params.getEvent_Val() != null){
-                    params.appendSQL("AND event.ceevent_eventid=? ");
-                } else {
-                    params.setEvent_ctl(false);
-                    params.appendToParamLog("EVENT: no EventCnF object; event filter disabled");
-                }
-            }
-            // ***********************************
-            // **    FILTER PERS-16             **
-            // ***********************************
-            if(params.isCitation_ctl()){
-                if(params.getCitation_val() != null){
-                    params.appendSQL("AND citation.citation_citationid=? ");
-                } else {
-                    params.setCitation_ctl(false);
-                    params.appendToParamLog("CITATION: no Citation object; citation filter disabled");
-                }
-            }
-            // ***********************************
-            // **    FILTER PERS-17             **
-            // ***********************************
-            if(params.isMergeTarget_ctl()){
-                if(params.getMergeTarget_val() != null){
-                    params.appendSQL("AND personmergehistory.mergetarget_personid=? ");
-                } else {
-                    params.setMergeTarget_ctl(false);
-                    params.appendToParamLog("MergeTarget: no Person object as tartget; merge target filter disabled");
-                }
-            }
-            // ***********************************
-            // **    FILTER PERS-18             **
-            // ***********************************
-//            if(params.isMergeTarget_ctl()){
-//                if(params.getMergeTarget_val() != null){
-//                    params.appendSQL("AND personmunilink.person_personid=? ");
-//                } else {
-//                    params.setMergeTarget_ctl(false);
-//                    params.appendToParamLog("MUNICIPALITY: no MUNI object; muni filter disabled");
-//                }
-//            }
-            
+        
         } else {
-            params.appendSQL("AND personid=? ");
+            params.appendSQL("AND human.humanid=? ");
         }
         params.appendSQL(";");
         
@@ -1890,36 +1871,37 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 }
                 
                 // filter PERS-1
-                if (params.isName_first_ctl()){
+                if (params.isName_ctl()){
                     str = new StringBuilder();
                     str.append("%");
-                    str.append(params.getName_first_val());
+                    str.append(params.getName_val());
                     str.append("%");
                     stmt.setString(++paramCounter, str.toString());
                 }
                 
-                // filter PERS-2
-                if (params.isName_last_ctl()){
+                // filter PERS-2 - boolean
+                // filter PERS-3 - boolean
+                // filter PERS-4 - boolean
+                
+                // filter PERS-5
+                if (params.isJobTitle_ctl()){
                     str = new StringBuilder();
                     str.append("%");
-                    str.append(params.getName_last_val());
+                    str.append(params.getJobTitle_val());
                     str.append("%");
                     stmt.setString(++paramCounter, str.toString());
                 }
                 
-                // filter PERS-4
+                
+                // filter PERS-6
                 if (params.isPhoneNumber_ctl()){
                     str = new StringBuilder();
                     str.append("%");
                     str.append(params.getPhoneNumber_val());
                     str.append("%");
-                    //There are three phone number parameters, so we will set all three
-                    stmt.setString(++paramCounter, str.toString());
-                    stmt.setString(++paramCounter, str.toString());
-                    stmt.setString(++paramCounter, str.toString());
                 }
                 
-                // filter PERS-5
+                // filter PERS-7
                 if (params.isEmail_ctl()){
                     str = new StringBuilder();
                     str.append("%");
@@ -1927,80 +1909,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                     str.append("%");
                     stmt.setString(++paramCounter, str.toString());
                 }
-                
-                // filter PERS-6
-                if (params.isAddress_streetNum_ctl()){
-                    str = new StringBuilder();
-                    str.append("%");
-                    str.append(params.getAddress_streetNum_val());
-                    str.append("%");
-                    stmt.setString(++paramCounter, str.toString());
-                }
-                
-                // filter PERS-7
-                if (params.isAddress_city_ctl()){
-                    str = new StringBuilder();
-                    str.append("%");
-                    str.append(params.getAddress_city_val());
-                    str.append("%");
-                    stmt.setString(++paramCounter, str.toString());
-                }
-                
+            
                 // filter PERS-8
-                if (params.isAddress_zip_ctl()){
-                    str = new StringBuilder();
-                    str.append("%");
-                    str.append(params.getAddress_zip_val());
-                    str.append("%");
-                    stmt.setString(++paramCounter, str.toString());
-                }
-                
-                // filter PERS-9
-                if(params.isPersonType_ctl()){
-                    if(params.getPersonType_val() != null){
-                        stmt.setString(++paramCounter, params.getPersonType_val().name());
-                    } else {
-                        // choose arbitrarily
-                        stmt.setString(++paramCounter, PersonType.User.name());
-                    }
-                }
-                
-                // PERS-10 take zero arguments
-                
-                // filter PERS-11
                 if (params.isSource_ctl()) {
                      stmt.setInt(++paramCounter, params.getSource_val().getSourceid());
                 }
-                
-                // filter PERS-12
-                if (params.isProperty_ctl()) {
-                     stmt.setInt(++paramCounter, params.getProperty_val().getParcelKey());
-                }
-                
-                // filter PERS-13
-                if (params.isPropertyUnit_ctl()) {
-                     stmt.setInt(++paramCounter, params.getPropertyUnit_val().getUnitID());
-                }
-                // filter PERS-14
-                if (params.isOccPeriod_ctl()) {
-                     stmt.setInt(++paramCounter, params.getOccPeriod_val().getPeriodID());
-                }
-                // filter PERS-15
-                if (params.isEvent_ctl()) {
-                     stmt.setInt(++paramCounter, params.getEvent_Val().getEventID());
-                }
-                // filter PERS-16
-                if (params.isCitation_ctl()) {
-                     stmt.setInt(++paramCounter, params.getCitation_val().getCitationID());
-                }
-                // filter PERS-17
-                if (params.isMergeTarget_ctl()) {
-                     stmt.setInt(++paramCounter, params.getMergeTarget_val().getHumanID());
-                }
-//                // filter PERS-18
-//                if (params.isMuni_ctl()) {
-//                     stmt.setInt(++paramCounter, params.getMuni_val().getMuniCode());
-//                }
                 
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());
@@ -2019,7 +1932,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 maxResults = Integer.MAX_VALUE;
             }
             while (rs.next() && counter < maxResults) {
-                persIDList.add(rs.getInt("personid"));
+                persIDList.add(rs.getInt("humanid"));
                 counter++;
             }
         } catch (SQLException ex) {

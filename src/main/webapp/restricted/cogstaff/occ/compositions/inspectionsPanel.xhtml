@@ -129,7 +129,7 @@
                               style="width:10%;">
                         <h:outputText value="#{inspectedSpace.elementListPass.size()}" />
                     </p:column>
-                    <p:column headerText="Fail"
+                    <p:column headerText="Violation"
                               style="width:10%;">
                         <h:outputText value="#{inspectedSpace.elementListFail.size()}" />
                     </p:column>
@@ -147,7 +147,7 @@
                     </p:column>
                     <p:rowExpansion>
 
-                        <h4>Failed</h4>
+                        <h4>Violated</h4>
                         <ul>
                             <ui:repeat id="spaceele-uir-fail"
                                        value="#{inspectedSpace.elementListFail}"
@@ -902,12 +902,12 @@
             </div>
             <div>
                 <h:form id="stinspection-tools-form">
-                    <p>use default findings on fail: </p>
+                    <p>use default findings on violation: </p>
 
                     <p:selectBooleanCheckbox id="stinspection-usedefaultfindings-cb"
                                              value="#{occInspectionsBB.useDefaultFindingsOnCurrentOISE}"
                                              label="use default findings"
-                                             title="when an element fails, populate findings with default findings on the ordinance">
+                                             title="when an element is violated, populate findings with default findings on the ordinance">
                         <p:ajax />
                     </p:selectBooleanCheckbox>
 
@@ -1037,7 +1037,7 @@
                                                                   rendered="#{!empty spaceElement.lastInspectedTS}"/>
                                                     <p:spacer height="2px" />
                                                     <h:outputText id="inspectedby-failed"
-                                                                  value="Failed! (no compliance)" 
+                                                                  value="Violated" 
                                                                   rendered="#{!empty spaceElement.lastInspectedTS and empty spaceElement.complianceGrantedTS}"/>
                                                     <p:spacer height="2px" />
                                                     <h:outputText id="inspectedby-comp-user"
@@ -1054,7 +1054,7 @@
 
                                                 <p:outputLabel  for="fail-severity-som"
                                                                 rendered="#{!empty spaceElement.lastInspectedTS and empty spaceElement.complianceGrantedTS}">
-                                                    <h:outputText value="Failure severity" />
+                                                    <h:outputText value="Violation severity" />
                                                 </p:outputLabel>
 
                                                 <h:selectOneMenu id="fail-severity-som"
@@ -1342,7 +1342,7 @@
                     <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includePhotos_pass}" />
                 </div>
                 <div class="p-col-6">
-                    Photos on failed items
+                    Photos on violated items
                 </div>
                 <div class="p-col-6">
                     <p:selectBooleanCheckbox value="#{occInspectionsBB.inspectionReportConfig.includePhotos_fail}" />

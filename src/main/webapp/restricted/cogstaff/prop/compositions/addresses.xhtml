@@ -57,8 +57,6 @@
                                                 ajax="true"
                                                 rendered="#{addressBB.addressEditMode}"
                                                 value="Abort edit"
-                                                process="@none"
-                                                immediate="true"
                                                 actionListener="#{addressBB.onMailingAddressAbortOperationButtonChange}"
                                                 oncomplete="PF('address-dialog-var').show()"
                                                 update="address-info-form"
@@ -225,7 +223,7 @@
 
                     <h:form id="address-links-form">
 
-                        <h:outputText value="connections to #{addressBB.currentAddress.toString}"
+                        <h:outputText value="connections to #{addressBB.currentAddress.addressString}"
                                       escape="false" />
 
 

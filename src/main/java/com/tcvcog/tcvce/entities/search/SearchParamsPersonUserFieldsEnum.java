@@ -27,16 +27,18 @@ public enum SearchParamsPersonUserFieldsEnum
         implements IFace_userFieldHolder{
     
     CREATOR                 ("Creator", 
-                            "person.creator"), 
+                            "human.createdby_userid"), 
     
-    USERLINK                ("User linking person", 
-                            "userlink"), 
     
-    GHOSTEDBY               ("Converter into ghost", 
-                            "ghostby"), 
+    LASTUPDATEDBY           ("Last updated by", 
+                            "human.lastupdatedby_userid"),
     
-    CLONEDBY                 ("Cloner", 
-                            "clonedby"); 
+    DECEASEDBY           ("Declared deceased by", 
+                            "human.deceasedby_userid"),
+    
+    DEACTIVATEDBY           ("Deactivated by", 
+                            "human.deactivatedby_userid");
+    
    
     
     private final String title;

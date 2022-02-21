@@ -27,6 +27,7 @@ public  class   ContactPhone
     
     final static String TABLE_NAME = "contactphone";
     final static String PKFIELD = "phoneid";
+    final static String HF_NAME = "Phone number";
     
     
     protected int phoneID;
@@ -165,6 +166,11 @@ public  class   ContactPhone
     @Override
     public String getDBTableName() {
         return TABLE_NAME;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return HF_NAME;
     }
     
 }

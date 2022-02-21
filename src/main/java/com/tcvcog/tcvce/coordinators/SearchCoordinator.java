@@ -565,16 +565,28 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             // **         ACTIVE         **
             // **************************** 
             if(params.isActive_ctl()){
-                    params.appendSQL("AND ");
-                    if(activeField == null){
-                        params.appendSQL("active");
-                    } else {
-                        params.appendSQL(activeField);
-                    }
-                if(params.isActive_val()){
-                    params.appendSQL(" = TRUE ");
+                params.appendSQL("AND ");
+                boolean tsnull = false;
+                if(activeField != null){
+                    tsnull = activeField.contains("ts");
+                }
+                if(activeField == null){
+                    params.appendSQL("active");
                 } else {
-                    params.appendSQL(" = FALSE ");
+                    params.appendSQL(activeField);
+                }
+                if(params.isActive_val()){
+                    if(tsnull){
+                        params.appendSQL(" IS NULL ");
+                    } else {
+                        params.appendSQL(" = TRUE ");
+                    }
+                } else {
+                    if(tsnull){
+                        params.appendSQL(" IS NOT NULL ");
+                    } else {
+                        params.appendSQL(" = FALSE ");
+                    }
                 }
             } 
         
@@ -791,25 +803,34 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          QueryPerson  query;
          List<SearchParamsPerson> paramsList = new ArrayList<>();
          SearchParamsPerson params = genParams_person_initParams(cred);
+         // humans don't have a muni link in the sense of other objects
+         params.setMuni_ctl(false);
          
          
          switch(qName){
-            case ACTIVE_PERSONS:
-                paramsList.add(generateParams_persons_active(params, cred));
-                break;
-            case USER_PERSONS:
-                paramsList.add(generateParams_persons_users(params, cred));
-                break;
-            case PROPERTY_PERSONS:
-                paramsList.add(generateParams_person_prop(params, cred));
-                break;
-            case OCCPERIOD_PERSONS:
-                paramsList.add(generateParams_persons_occPeriod(params, cred));
-                break;
             case PERSON_NAME:
                 paramsList.add(generateParams_persons_name(params, cred));
                 break;
-                
+            case PHONE:
+                paramsList.add(generateParams_persons_phone(params, cred));
+                break;
+            case EMAIL:
+                paramsList.add(generateParams_persons_email(params, cred));
+                break;
+            case BUSINESSES:
+                paramsList.add(generateParams_persons_business(params, cred));
+                break;
+            case MINORS_ONLY:
+                paramsList.add(generateParams_persons_minors(params, cred));
+                break;
+            case MULIT_HUMANS:
+                paramsList.add(generateParams_persons_multiHuman(params, cred));
+                break;
+            case JOB_TITLE:
+                paramsList.add(generateParams_persons_jobTitle(params, cred));
+            case CUSTOM:
+                paramsList.add(params);
+                break;
          }
          
          query = new QueryPerson(qName, paramsList, cred);
@@ -1331,6 +1352,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setMuni_ctl(true);
         params.setMuni_val(cred.getGoverningAuthPeriod().getMuni());
         
+        
         // Shared param #2
         params.setDate_startEnd_ctl(false);
         params.setDate_field(null);
@@ -1500,50 +1522,31 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params = (SearchParamsPerson) genParams_initParams(params, cred);
         
         // filter PERS-1
-        params.setNames_rtMin(RoleType.MuniStaff);
-        params.setName_first_ctl(false);
-        params.setName_first_val(null);
+        params.setName_ctl(false);
+        params.setName_val(null);
         
         // filter PERS-2
-        params.setName_last_ctl(false);
-        params.setName_last_val(null);
+        params.setUnder18_ctl(false);
         
         // filter PERS-3
-        params.setName_compositeLNameOnly_ctl(false);
-        params.setName_compositeLNameOnly_val(false);
+        params.setBusinessEntity_ctl(false);
         
         // filter PERS-4
+        params.setMultiHuman_ctl(false);
+        
+        // filter PERS-5
+        params.setJobTitle_ctl(false);
+        params.setJobTitle_val(null);
+        
+        // filter PERS-6
         params.setPhoneNumber_rtMin(RoleType.MuniStaff);
         params.setPhoneNumber_ctl(false);
         params.setPhoneNumber_val(null);
         
-        // filter PERS-5
+        // filter PERS-7
         params.setEmail_rtMin(RoleType.MuniStaff);
         params.setEmail_ctl(false);
         params.setEmail_val(null);
-        
-        // filter PERS-6
-        params.setAddress_rtMin(RoleType.MuniStaff);
-        params.setAddress_streetNum_ctl(false);
-        params.setAddress_streetNum_val(null);
-        
-        // filter PERS-7
-        params.setAddress_city_ctl(false);
-        params.setAddress_city_val(null);
-        
-        // filter PERS-8
-        params.setAddress_zip_ctl(false);
-        params.setAddress_zip_val(null);
-        
-        // filter PERS-9
-        params.setPersonType_rtMin(RoleType.MuniStaff);
-        params.setPersonType_ctl(false);
-        params.setPersonType_val(null);
-        
-        // filter PERS-10
-        params.setVerified_rtMin(RoleType.MuniStaff);
-        params.setVerified_ctl(false);
-        params.setVerified_val(false);
        
         // filter PERS-11
         params.setSource_ctl(false);
@@ -1570,45 +1573,57 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     private SearchParamsPerson generateParams_persons_name(SearchParamsPerson params, Credential cred){
-        params.setFilterName("First and last name filters");
-        params.setName_first_ctl(true);
-        params.setName_last_ctl(true);
-        // downstream responsible for name parts
+        params.setFilterName("Name filter");
+        params.setName_ctl(true);
+        // downstream responsible for name String
         return params;
     }
     
-    private SearchParamsPerson generateParams_persons_occPeriod(SearchParamsPerson params, Credential cred){
-        params.setFilterName("Occ period id filter");
-        params.setFilterDescription("Persons whose type is a User");
-        
-        params.setOccPeriod_ctl(true);
-        // user responsible for downstream occ period
-        
+    private SearchParamsPerson generateParams_persons_phone(SearchParamsPerson params, Credential cred){
+        params.setFilterName("Phone number field");
+        params.setPhoneNumber_ctl(true);
+        // downstream sets phone String
         return params;
     }
     
-    private SearchParamsPerson generateParams_persons_users(SearchParamsPerson params, Credential cred){
-        params.setFilterName("User Persons");
-        params.setFilterDescription("Persons whose type is a User");
-        
-        params.setPersonType_ctl(true);
-        params.setPersonType_val(PersonType.User);
-        
+    private SearchParamsPerson generateParams_persons_email(SearchParamsPerson params, Credential cred){
+        params.setFilterName("Email field");
+        params.setEmail_ctl(true);
+        // downstream sets email String
         return params;
     }
     
-    private SearchParamsPerson generateParams_person_prop(SearchParamsPerson params, Credential cred){
-        // turn off muni ctl to try to get query working
-        params.setMuni_ctl(false);
-        params.setFilterName("Persons at property X");
-        params.setFilterDescription("Across all units");
-        
-        params.setProperty_ctl(true);
-        // how do we signal we need downstream data?
-        
+    private SearchParamsPerson generateParams_persons_minors(SearchParamsPerson params, Credential cred){
+        params.setFilterName("Minor filter only");
+        params.setUnder18_ctl(true);
+        params.setUnder18_val(true);
         return params;
     }
-   
+    
+    
+    private SearchParamsPerson generateParams_persons_business(SearchParamsPerson params, Credential cred){
+        params.setFilterName("businesses only ");
+        params.setBusinessEntity_ctl(true);
+        params.setBusinessEntity_val(true);
+        return params;
+    }
+    
+    private SearchParamsPerson generateParams_persons_jobTitle(SearchParamsPerson params, Credential cred){
+        params.setFilterName("Job title field");
+        params.setJobTitle_ctl(true);
+        // downstream sets job title String
+        return params;
+    }
+    
+    
+    private SearchParamsPerson generateParams_persons_multiHuman(SearchParamsPerson params, Credential cred){
+        params.setFilterName("Multi human flag to true");
+        params.setMultiHuman_ctl(true);
+        params.setMultiHuman_val(true);
+        return params;
+    }
+    
+    
     // END IV PERSON
     
     /* --------------------------------------------

@@ -293,6 +293,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * Retrieves a linked object role record from the DB
      * @param roleid
      * @return the new object or null if roleid is 0
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public LinkedObjectRole getLinkedObjectRole(int roleid) throws IntegrationException{
         LinkedObjectRole lor = null;
@@ -303,7 +304,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             PreparedStatement stmt = null;
             
             StringBuilder sb = new StringBuilder();
-            sb.append("SELECT lorid, lorschema_schemaid, title, description,  \n" );
+            sb.append("SELECT lorid, lorschema, title, description,  \n" );
             sb.append(" createdts, deactivatedts, notes\n");
             sb.append("FROM public.linkedobjectrole WHERE lorid=?;");
 
@@ -329,6 +330,83 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return lor;
     }
     
+    
+     /**
+     * Utility method for checking database status
+     * @return a string with all the patches and their TS
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public String getDatabasePatchRecord() throws IntegrationException{
+            
+            Connection con = getPostgresCon();
+            ResultSet rs = null;
+            PreparedStatement stmt = null;
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("SELECT patchnum, patchfilename, datepublished, patchauthor, notes\n" +
+                        "  FROM public.dbpatch;");
+            StringBuilder res = new StringBuilder();
+            try {
+                stmt = con.prepareStatement(sb.toString());
+                
+                rs = stmt.executeQuery();
+                
+                while (rs.next()) {
+                    res.append(rs.getInt("patchnum"));
+                    res.append(" | ");
+                    
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+                throw new IntegrationException("unable to get linked object role", ex);
+            } finally {
+                if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+                if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+                if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+            } // close finally
+        return res.toString();
+    }
+    
+    /**
+     * Extracts all database IDs of roles by schema enum
+     * @param lose
+     * @return 
+     */
+    public List<Integer> getLinkedObjectRoleListBySchemaFamily(LinkedObjectSchemaEnum lose) throws IntegrationException, BObStatusException{
+        if(lose == null){
+            throw new BObStatusException("Cannot fetch roles given null enum");
+            
+        }
+        List<Integer> idl = new ArrayList<>();
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT lorid FROM public.linkedobjectrole WHERE lorschema = CAST ( ? AS linkedobjectroleschema);");
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setString(1, lose.getRoleSChemaTypeString());
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                idl.add(rs.getInt("lorid"));
+
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to get linked object role ID list", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } 
+        return idl;
+    }
+    
     /**
      * Populates common fields among LinkedObjectRole family
      * 
@@ -345,12 +423,12 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             
             lor.setTitle((rs.getString("title")));
             
-//            try{
-//                lor.setSchema(LinkedObjectSchemaEnum.valueOf(rs.getString("lorschema_schemaid")));
-//            } catch (IllegalArgumentException ex){
-//                System.out.println("SystemIntgrator.generateLinkedObjectRole | Could not match Linked Object Role with Schema!");
-//                System.out.println(ex);
-//            }
+            try{
+                lor.setSchema(LinkedObjectSchemaEnum.valueOf(rs.getString("lorschema")));
+            } catch (IllegalArgumentException ex){
+                System.out.println("SystemIntgrator.generateLinkedObjectRole | Could not match Linked Object Role with Schema!");
+                System.out.println(ex);
+            }
             
             if(rs.getTimestamp("createdts") != null){
                 lor.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                

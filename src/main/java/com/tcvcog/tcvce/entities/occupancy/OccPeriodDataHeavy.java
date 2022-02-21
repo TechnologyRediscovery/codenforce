@@ -43,7 +43,7 @@ public  class       OccPeriodDataHeavy
                     IFace_humanListHolder,
                     IFace_BlobHolder{
     
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.OCCPERIODHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.OccPeriodHuman;
     final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.OCC_PERIOD;
     final static BlobLinkEnum BLOB_UPSTREAMPOOL_ENUM = BlobLinkEnum.PROPERTY;
     

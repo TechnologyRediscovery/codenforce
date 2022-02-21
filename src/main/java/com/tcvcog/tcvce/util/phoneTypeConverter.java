@@ -26,8 +26,8 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
 /**
- * Converter for EventCategory objects
- * @author Eric Darsow
+ * Converter for PhoneType objects
+ * @author Ellen Bascomb of apartment 31Y
  */
 
 @FacesConverter(value="phoneTypeConverter")

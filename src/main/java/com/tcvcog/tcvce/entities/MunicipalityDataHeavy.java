@@ -30,7 +30,7 @@ public  class       MunicipalityDataHeavy
                     IFace_humanListHolder,
                     IFace_BlobHolder{
     
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.MUNIHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.MuniHuman;
     
     private final static BlobLinkEnum BLOP_LINK_INFO = BlobLinkEnum.MUNICIPALITY;
     private final static BlobLinkEnum BLOP_UPSPTREAM_POOL = null;

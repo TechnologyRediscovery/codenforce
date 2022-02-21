@@ -36,8 +36,6 @@ public  class   AddressBB
     private List<MailingStreet> streetListFiltered;
     private boolean editModeCurrentStreet;
     
-    
-    
     private MailingAddress currentAddress;
     private List<MailingAddress> mailingAddressList;
     private List<MailingAddress> mailingAddressListFiltered;

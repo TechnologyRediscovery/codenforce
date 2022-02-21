@@ -30,7 +30,7 @@ public class        PropertyUnitDataHeavy
         extends     PropertyUnit
         implements  IFace_CredentialSigned,
                     IFace_humanListHolder{
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.PARCELUNITHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.ParcelUnitHuman;
 
     private List<OccPeriod> periodList;
     

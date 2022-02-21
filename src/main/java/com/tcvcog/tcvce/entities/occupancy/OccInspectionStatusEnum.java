@@ -26,7 +26,7 @@ public enum OccInspectionStatusEnum {
 
     NOTINSPECTED("Not inspected", 0, "inspectionStatusIcon_notinspected"),
     PASS("Passed", 1, "inspectionStatusIcon_pass"),
-    FAIL("Failed", 2, "inspectionStatusIcon_fail");
+    VIOLATION("Violated", 2, "inspectionStatusIcon_fail");
     
     private final String label;
     private final int phaseOrder;

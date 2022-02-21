@@ -115,7 +115,7 @@ public class OccInspectedSpace
     
     public List<OccInspectedSpaceElement> getElementListFail(){
         if(elementStatusMap != null){
-            return elementStatusMap.get(OccInspectionStatusEnum.FAIL);
+            return elementStatusMap.get(OccInspectionStatusEnum.VIOLATION);
         }
         return new ArrayList<>();
         

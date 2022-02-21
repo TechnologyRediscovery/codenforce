@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.IFace_noteHolder;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.entities.LinkedObjectFamilyEnum;
+import com.tcvcog.tcvce.entities.LinkedObjectRole;
 import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
@@ -51,6 +52,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -145,7 +148,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     
     /**
      * Iterates through all values in LinkedObjectSchemaEnum and returns
-     * only those that are of the inputted family
+     * only those that are of the inputted family (e.g. human links or address links)
      * @param fam not null
      * @return a list, perhaps with instances of LinkedObjectFamilyEnum
      * @throws BObStatusException for null input
@@ -166,6 +169,26 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             }
         }
         return chosenSchemas;
+    }
+    
+    
+    
+    /**
+     * Coordinates the creation of all LinkedObjectRoles given a link schema enum instance
+     * @param lose which set of roles you want
+     * @return a list, possibly containing LinkedObjectRoles ; never null
+     */
+    public List<LinkedObjectRole> assembleLinkedObjectRolesBySchema(LinkedObjectSchemaEnum lose) throws IntegrationException, BObStatusException{
+        List<LinkedObjectRole> roleList = new ArrayList<>();
+        SystemIntegrator si = getSystemIntegrator();
+        
+        List<Integer> idl = si.getLinkedObjectRoleListBySchemaFamily(lose);
+        if(idl != null && !idl.isEmpty()){
+            for(Integer i: idl){
+                roleList.add(si.getLinkedObjectRole(i));
+            }
+        }
+        return roleList;
     }
 
     /**
@@ -203,7 +226,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         // NOTE content
          if (mbp.getNewMessageContent() != null) {
             sb.append(Constants.FMT_HTML_BREAK);
-            sb.append(Constants.FMT_CONTENT);
+            // don't prepend the characters "Content: "!!!
+//            sb.append(Constants.FMT_CONTENT);
             sb.append(mbp.getNewMessageContent());
         }
          
@@ -261,6 +285,15 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             si.writeNotes(nh);
         }
         
+    }
+    
+    /**
+     * Utility for getting patch table to UI
+     * @return the Patch IDs
+     */
+    public String getDBPatchIDList() throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        return si.getDatabasePatchRecord();
     }
 
     /**

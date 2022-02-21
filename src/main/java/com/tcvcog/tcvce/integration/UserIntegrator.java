@@ -1002,7 +1002,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
      */   
     public int getUserID(String userName) throws IntegrationException{
         
-        System.out.println("UserIntegrator.getUser");
+        System.out.println("UserIntegrator.getUserID: ALPHA");
         Connection con = getPostgresCon();
         ResultSet rs = null;
         int userID = 0;

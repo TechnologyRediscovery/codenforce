@@ -38,7 +38,9 @@ public  class   CitationDocketRecord
     
     final static String PK_FIELD = "docketid";
     final static String TABLE_NAME = "citationdocketno";
-    protected LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CITATIONDCKETHUMAN;
+    final static String HF_NAME = "Citation Docket";
+    
+    protected LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CitationDocketHuman;
     
     protected int docketID;
     private int citationID;
@@ -185,6 +187,11 @@ public  class   CitationDocketRecord
      */
     public void setCitationID(int citationID) {
         this.citationID = citationID;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return HF_NAME;
     }
 
    

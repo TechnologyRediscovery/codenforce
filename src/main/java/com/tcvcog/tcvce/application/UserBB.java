@@ -89,14 +89,14 @@ public class UserBB extends BackingBeanUtils implements Serializable {
     }
     
     public void generateUserPersonList(ActionEvent ev){
-        SearchCoordinator sc = getSearchCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
         // user our fancy specialized query to get all Persons who are delcared to 
         // be user types
-        QueryPerson qp = sc.initQuery(QueryPersonEnum.USER_PERSONS, currentUser.getMyCredential());
+        
         try {
-            qp = sc.runQuery(qp);
-            userPersonList = qp.getResults();
-        } catch (SearchException ex) {
+        
+            userPersonList = pc.getHumansMappedToUsers();
+        } catch (IntegrationException ex) {
             System.out.println(ex);
         }
     }

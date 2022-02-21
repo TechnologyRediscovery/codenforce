@@ -35,7 +35,7 @@ public  class       Citation
     
     final static String CITATION_TABLE = "citation";
     final static String CITATION_PKFIELD = "citationid";
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CITATIONHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CitationHuman;
     
     private int cecaseID;
     

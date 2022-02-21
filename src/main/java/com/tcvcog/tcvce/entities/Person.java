@@ -18,10 +18,6 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import com.tcvcog.tcvce.util.DateTimeUtil;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Objects;
 import java.util.List;
 
 /**

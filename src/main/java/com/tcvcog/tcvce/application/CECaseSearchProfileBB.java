@@ -2230,7 +2230,7 @@ public class CECaseSearchProfileBB
         PersonCoordinator pc = getPersonCoordinator();
     
         try {
-           Person per = pc.humanAdd(workingPerson, getSessionBean().getSessUser());
+           Person per = pc.insertHuman(workingPerson, getSessionBean().getSessUser());
             
             getSessionBean().setSessPerson(per);
             HumanLink hl = new HumanLink(per);

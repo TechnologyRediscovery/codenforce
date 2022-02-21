@@ -29,7 +29,14 @@ public class        CECase
                     IFace_StatusLogHolder,
                     Comparable<CECase>,
                     IFace_ActivatableBOB,
-                    IFace_NoteHolder {
+                    IFace_noteHolder {
+    
+    final static String CASE_TABLE_NAME = "cecase";
+    final static String CASE_PK_FIELD = "caseid";
+    final static String CASE_FRIENDLY_NAME = "Code Enforcement Case";
+    
+    
+    
     
     protected int caseID;
     protected int publicControlCode;
@@ -766,6 +773,26 @@ public class        CECase
             sb.append(note);
             statusAssignmentLog = sb.toString();
         }
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return CASE_PK_FIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+        return caseID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return CASE_TABLE_NAME;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return CASE_FRIENDLY_NAME;
     }
 
    

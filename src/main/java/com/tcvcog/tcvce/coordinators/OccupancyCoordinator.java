@@ -149,7 +149,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         EventCoordinator ec = getEventCoordinator();
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
-
+        PersonCoordinator persc = getPersonCoordinator();
         OccPeriodDataHeavy opdh = new OccPeriodDataHeavy(per);
 
         // now get all the lists from their respective integrators
@@ -161,15 +161,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             // APPLICATION LIST
             opdh.setApplicationList(oi.getOccPermitApplicationList(opdh));
 
-            // PERSON LIST
-            QueryPerson qp = sc.initQuery(QueryPersonEnum.OCCPERIOD_PERSONS, cred);
-            if (!qp.getParamsList().isEmpty()) {
-                qp.getParamsList().get(0).setOccPeriod_val(per);
-            }
-            
+          
             // TODO: Humanization upgrade after Ben's integration
 
-//            opdh.setPersonList(sc.runQuery(qp).getBOBResultList());
+            opdh.setHumanLinkList(persc.assembleLinkedHumanLinks(opdh));
 
             // EVENT LIST
 

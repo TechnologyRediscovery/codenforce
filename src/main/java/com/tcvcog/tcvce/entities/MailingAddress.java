@@ -29,8 +29,11 @@ public  class   MailingAddress
                     IFace_noteHolder{ 
     final static String TABLE_NAME = "mailingaddress";
     final static String PK_FIELD = "addressid";
+    final static String HF_NAME = "Mailing Address";
+    
     
     protected int addressID;
+    protected String addressString;
     protected String buildingNo;
     protected MailingStreet street;
     protected int poBox;
@@ -41,8 +44,8 @@ public  class   MailingAddress
     protected String notes;
     
     
-    @Override
-    public String toString(){
+    
+    public String getAddressString(){
         StringBuilder sb  = new StringBuilder();
         sb.append(buildingNo);
         if(street != null){
@@ -233,6 +236,11 @@ public  class   MailingAddress
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return HF_NAME;
     }
 
     

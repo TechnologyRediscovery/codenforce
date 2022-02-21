@@ -29,7 +29,7 @@ public class CECaseDataHeavy
         IFace_humanListHolder{
 
     // accessed through methods specified in the interfaces
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CECASEHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CECaseHuman;
 
     private Property property;
     private PropertyUnit propertyUnit;

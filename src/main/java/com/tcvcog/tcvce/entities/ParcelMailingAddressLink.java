@@ -27,7 +27,7 @@ public class ParcelMailingAddressLink
         extends MailingAddress
         implements IFace_trackedEntityLink{
 
-    final static LinkedObjectSchemaEnum ROLE_SCHEMA = LinkedObjectSchemaEnum.PARCELMAILINGADDRESS;
+    final static LinkedObjectSchemaEnum ROLE_SCHEMA = LinkedObjectSchemaEnum.ParcelMailingaddress;
     
     protected LinkedObjectRole linkRole;
     protected BOBSource linkSource;
@@ -66,6 +66,7 @@ public class ParcelMailingAddressLink
     /**
      * @return the linkSource
      */
+    @Override
     public BOBSource getLinkSource() {
         return linkSource;
     }
@@ -73,6 +74,7 @@ public class ParcelMailingAddressLink
     /**
      * @param linkSource the linkSource to set
      */
+    @Override
     public void setLinkSource(BOBSource linkSource) {
         this.linkSource = linkSource;
     }
@@ -234,7 +236,7 @@ public class ParcelMailingAddressLink
         linkRole = lor;
     }
 
-    @Override
+    
     public LinkedObjectSchemaEnum getLinkedObjectSchemaEnum() {
         return ROLE_SCHEMA;
     }

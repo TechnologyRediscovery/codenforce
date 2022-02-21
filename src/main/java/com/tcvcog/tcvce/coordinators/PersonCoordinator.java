@@ -45,7 +45,6 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import com.tcvcog.tcvce.entities.IFace_PersonListHolder;
 import com.tcvcog.tcvce.entities.LinkedObjectFamilyEnum;
 import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 
@@ -85,6 +84,8 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         h = configureHuman(h);
          return h;
     }
+    
+    
     
     /**
      * Creates a HumanLink from a given Human PRIOR to being
@@ -137,8 +138,8 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public int linkHuman(IFace_humanListHolder hlh, HumanLink hum, UserAuthorized ua) throws BObStatusException, IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         
-        if(hlh == null || hum == null){
-            throw new BObStatusException("Cannot link human with null human or human holder");
+        if(hlh == null || hum == null || ua == null){
+            throw new BObStatusException("Cannot link human with null human or human holder or null user");
         }
         
         hum.setCreatedBy(ua);
@@ -150,23 +151,46 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Grand staircase entrance for deactivating a human holder and one of its humans
-     * @param hlh the host BOB
      * @param hl to deactivate
      * @param ua the user doing the deactivating
      * @throws BObStatusException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public void deactivateLinkedHuman(IFace_humanListHolder hlh, HumanLink hl, UserAuthorized ua) 
+    public void deactivateHumanLink(HumanLink hl, UserAuthorized ua) 
             throws BObStatusException, IntegrationException{
         
         PersonIntegrator pi = getPersonIntegrator();
         
-        if(hlh == null || hl == null){
-            throw new BObStatusException("Cannot link human with null human or human holder");
+        if(ua == null || hl == null){
+            throw new BObStatusException("Cannot deactivate human link with null user or link");
         }
         hl.setLastUpdatedBy(ua);
-        hl.setDeceasedBy(ua);
-        pi.deactivateHumanLink(hlh, hl);
+        hl.setDeactivatedBy(ua);
+        pi.deactivateHumanLink(hl);
+    }
+    
+    /**
+     * Takes in a human link and builds the note infrastructure and sends
+     * to be integrated
+     * @param hl without note appended, just the old notes in the notes field
+     * @param noteToAppend the string value of the note to append
+     * @param u doing the noting
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void appendNoteToHumanLink(HumanLink hl, String noteToAppend, UserAuthorized u) 
+            throws BObStatusException, IntegrationException{
+        SystemCoordinator sc = getSystemCoordinator();
+        PersonIntegrator pi =getPersonIntegrator();
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        if(hl  != null){
+            mbp.setExistingContent(hl.getNotes());
+            mbp.setUser(u);
+            mbp.setNewMessageContent(noteToAppend);
+            mbp.setHeader("LINK NOTE");
+            hl.setNotes(sc.appendNoteBlock(mbp));
+            pi.updateHumanLinkNotes(hl);
+        }
     }
     
     
@@ -248,13 +272,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public IFace_PersonListHolder assemblePersonList(IFace_PersonListHolder plh){
-        
-        return null;
-        
-        
-    }
-    
+  
     /**
      * Builds a data heavy version of a person
      * Implements logic depending on if the person is a skeleton or not
@@ -355,7 +373,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public Person humanAdd(Human h, UserAuthorized ua) throws IntegrationException, BObStatusException{
+    public Person insertHuman(Human h, UserAuthorized ua) throws IntegrationException, BObStatusException{
         SystemIntegrator si = getSystemIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
        
@@ -394,9 +412,25 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             System.out.println("PersonCoordinator.addNotesToPerson: person: " + p.getHumanID() + " notes: " + noteToAdd);
         } else {
             throw new BObStatusException("cannot append note given a null person, user, or note string");
-            
         }
-        
+    }
+    
+    
+    /**
+     * Queries DB for all humans who have been linked to a User in the table login
+     * @return a list, perhaps with the Humans mapped to hers
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<Human> getHumansMappedToUsers() throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        List<Human> hl = new ArrayList<>();
+        List<Integer> idl = pi.getPersonsMappedToAUser();
+        if(!idl.isEmpty()){
+            for(Integer i: idl){
+                hl.add(getHuman(i));
+            }
+        }
+        return hl;
     }
     
     // *******************************************************
@@ -699,6 +733,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * Returns the master list of all contact phone types
      * e.g. cell phone, home, work, etc. 
      * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
     public List<ContactPhoneType> getContactPhoneTypeList() throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();

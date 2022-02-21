@@ -504,17 +504,15 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsPerson spp = qp.getPrimaryParams();
-                spp.setName_last_ctl(true);
-                spp.setName_last_val(searchPerson.getLastName());
-                spp.setName_first_ctl(true);
-                spp.setName_first_val(searchPerson.getFirstName());
+                spp.setName_ctl(true);
+                spp.setName_val(searchPerson.getName());
                 spp.setEmail_ctl(true);
                 spp.setEmail_val(searchPerson.getEmail());
                 spp.setPhoneNumber_ctl(true);
                 //  ----->  TODO: Update for Humanization/Parcelization <------
 //                spp.setPhoneNumber_val(searchPerson.getPhoneCell());
-                spp.setAddress_streetNum_ctl(true);
-                spp.setAddress_streetNum_val(searchPerson.getAddressStreet());
+//                spp.setAddress_streetNum_ctl(true);
+//                spp.setAddress_streetNum_val(searchPerson.getAddressStreet());
                 sc.runQuery(qp);
             } else {
                 getFacesContext().addMessage(null,

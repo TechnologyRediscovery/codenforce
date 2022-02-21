@@ -11,6 +11,281 @@
                  />
     </h:form>
 
+
+
+
+    <p:dialog   id="human-search-dialog"
+                height="700" width="1200"
+                widgetVar="human-search-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Search for persons"
+                rendered="true"
+                >
+
+
+        <div class="p-grid">
+            <div class="p-col">
+
+                <p:panel    id="pers-search-query-panel"
+                            toggleable="true"
+                            widgetVar="pers-search-query-panel-var"
+                            collapsed="false"
+                            header="Search for persons">
+
+                    <h:form id="search-query-form">
+
+                        <h:outputLabel styleClass="bold" value="Available queries" for="search-query-som" />
+
+                        <p:spacer height="5px" />
+
+                        <p:selectOneMenu id="search-query-som" 
+                                         tabindex="1" 
+                                         value="#{personBB.querySelected}">
+                            <f:converter converterId="bOBQueryConverter"/>
+                            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+                            <f:selectItems id="search-query-si" value="#{personBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                            <p:ajax update="persontools-growl-form
+                                    search-query-form"
+                                    listener="#{personBB.changeQuerySelected}"/>
+                        </p:selectOneMenu>
+
+                        <p:spacer height="5px" />
+
+                        <h:outputLabel styleClass="bold" value="Description " />
+
+                        <div class='logoutput'>
+                            <h:outputText id="search-query-desc-ot" value="#{personBB.querySelected.queryName.desc}" />
+                        </div>
+
+                        <p:spacer height="5px" />
+
+                        <p:outputLabel for="pers-query-appendresults-chkbx">
+                            <h:outputText value="Append results to current result list? "
+                                          styleClass="bold"/>
+                        </p:outputLabel>
+
+                        <p:selectBooleanCheckbox   id="pers-query-appendresults-chkbx" 
+                                                   value="#{personBB.appendResultsToList}" 
+                                                   disabled="false" />
+
+                        <p:spacer height="5px" />
+
+                        <p:commandButton   id="pers-search-exec-cb" 
+                                           ajax="true" 
+                                           actionListener="#{personBB.executeQuery}"
+                                           icon="fa fa-search" 
+                                           styleClass="button"
+                                           value="execute selected query" 
+                                           disabled="#{personBB.querySelected.queryExecuted}"
+                                           update="persontools-growl-form
+                                           @form
+                                           pers-search-results-form
+                                           log-form"/>
+
+                        <p:commandButton   id="pers-search-clearquery-cb" 
+                                           ajax="true" 
+                                           actionListener="#{personBB.resetCurrentQuery}"
+                                           disabled="#{!personBB.querySelected.queryExecuted}"
+                                           icon="fa fa-eraser" 
+                                           styleClass="button"
+                                           value="reset query" 
+                                           update="persontools-growl-form
+                                           @form
+                                           log-form"/>
+
+                        <p:spacer height="5px" />
+
+                        <h:panelGrid  columns="1" 
+                                      cellpadding="10" 
+                                      columnClasses="gridTd-solid-back"
+                                      footerClass="gridFooter">
+
+                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                         columnClasses="gridTd-solid-back, gridTd-solid-back">
+
+                                <h:panelGroup>
+                                    <p:outputLabel for="pers-filter-name-first-ctl">
+                                        <h:outputText value="Name"
+                                                      styleClass="datum-label"/>
+                                    </p:outputLabel>
+                                    <p:selectBooleanCheckbox id="pers-filter-name-first-ctl" 
+                                                             value="#{personBB.paramsSelected.name_ctl}" 
+                                                             disabled="#{personBB.querySelected.queryExecuted}">
+                                        <p:ajax update="pers-filter-name-first-val"/>
+                                    </p:selectBooleanCheckbox>
+                                </h:panelGroup>
+                                <h:panelGroup>
+
+                                    <p:inputText id="pers-filter-name-first-val" value="#{personBB.paramsSelected.name_val}" 
+                                                 style="width: 200px;" tabindex="1" required="false" styleClass="inputText"
+                                                 disabled="#{!personBB.paramsSelected.name_ctl or personBB.querySelected.queryExecuted}">
+                                    </p:inputText>
+                                    <h:message for="pers-filter-name-first-val" showDetail="true" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+
+                            </h:panelGrid>
+
+
+                            <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
+                                         columnClasses="gridTd-solid-back, gridTd-solid-back">
+
+                                <h:panelGroup>
+                                    <p:outputLabel for="filter-bobid-val" value="Filter by person ID?"/>
+                                    <p:spacer height="5px"/>
+                                    <p:selectBooleanCheckbox id="filter-bobid-ctl" value="#{personBB.paramsSelected.bobID_ctl}" >
+                                        <p:ajax update="filter-bobid-val"/>
+                                    </p:selectBooleanCheckbox>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <p:outputLabel for="filter-bobid-val">
+                                        <h:outputText value="Person ID number"/>
+                                    </p:outputLabel>
+                                    <p:inputText id="filter-bobid-val" value="#{personBB.paramsSelected.bobID_val}" 
+                                                 style="width: 25%;" tabindex="3" required="false" styleClass="inputText"
+                                                 disabled="#{!personBB.paramsSelected.bobID_ctl}"/>
+                                    <h:message for="filter-bobid-val" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:form>
+                </p:panel>
+                <p:panel    id="pers-search-results-log-panel"
+                            toggleable="true"
+                            widgetVar="pers-search-results-log-var"
+                            collapsed="false"
+                            header="Query result log">
+                    <h:form id="log-form">
+
+
+                        <h:outputLabel styleClass="bold" value="Log" />
+                        <div class='logoutput'>
+
+                            <h:outputText id="search-results-querylog" 
+                                          value="#{personBB.querySelected.queryLog}" 
+                                          escape="false"/>
+                        </div>
+
+                    </h:form>
+                </p:panel>
+
+            </div>
+
+            <div class="p-col">
+
+                <p:panel    id="pers-search-results-panel"
+                            toggleable="true"
+                            widgetVar="pers-search-results-panel-var"
+                            collapsed="false"
+                            header="Person search results">
+
+                    <h:form id="pers-search-results-form">
+
+                        <div class="ui-g data_container_nested_restrict">
+
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
+                                <div class="restrict-main-contents-io-link">
+
+                                    <p:commandLink     id="load-history-cb"
+                                                       ajax="true"
+                                                       value="load person history"
+                                                       update="pers-search-results-form
+                                                       persontools-growl-form"
+                                                       />
+
+
+                                </div>
+                            </div>
+
+                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
+                                <div class="restrict-main-contents-io-link">
+
+                                    <p:commandLink      id="clear-results-cb"
+                                                        actionListener="#{personBB.clearResultList}"
+                                                        ajax="true"
+                                                        value="clear result list"
+                                                        update="pers-search-results-form
+                                                        persontools-growl-form"/>
+
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <h:outputText value="list contains #{personBB.querySelected.results.size()} persons" 
+                                      styleClass="italic"/>
+                        <p:spacer height="5px" />
+
+                        <p:spacer height="2px"/>
+
+                        <p:dataTable
+                            id="personTable"
+                            var="per"
+                            value="#{personBB.personList}"
+                            rowKey="#{per.personID}"
+                            tableStyleClass="primeDataTable"
+                            rowExpandMode="single"
+                            resizableColumns="true"
+                            expandedRow="false"
+                            filteredValue="#{personBB.filteredPersonList}"
+                            widgetVar="personSelectListTable">
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="ID" />
+                                </f:facet>
+                                <h:outputText value="#{per.humanID}"/>
+                            </p:column>
+
+                            <p:column width="40%" sortBy="#{per.name}"
+                                      filterBy="#{per.name}">
+                                <f:facet name="header">
+                                    <h:outputText value="Name" />
+                                </f:facet>
+                                <h:outputText value="#{per.name}"/>
+                            </p:column>
+
+                            <p:column width="10%" >
+                                <f:facet name="header">
+                                    <h:outputText value="Actions" />
+                                </f:facet>
+
+                                <div class="ui-g data_container_nested_restrict">
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                        <div class="restrict-main-contents-io-link">
+
+                                            <p:commandLink  id="person-view-commandlink"
+                                                            ajax="true" 
+                                                            value="view"
+                                                            actionListener="#{personBB.explorePerson(per)}"
+                                                            oncomplete="PF('person-profile-dialog-var').show();"
+                                                            update="person-info-form
+                                                            person-profile-addresses-form
+                                                            person-profile-phones-form
+                                                            person-profile-emails-form
+                                                            person-links-form
+                                                            person-profile-dialog"
+                                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+            </div>
+        </div>
+    </p:dialog>
+
     <p:dialog   id="person-profile-dialog"
                 height="700" width="1200"
                 widgetVar="person-profile-dialog-var"
@@ -19,7 +294,7 @@
                 closable="true"
                 closeOnEscape="true"
                 modal="true"
-                header="Person ID: #{personBB.currentPerson.humanID} Profile"
+                header="#{personBB.currentPerson.name} (ID: #{personBB.currentPerson.humanID}) Profile"
                 rendered="true"
                 >
 
@@ -29,7 +304,7 @@
                 <p:panel id="person-profile-info-panel"
                          toggleable="true"
                          collapsed="false"
-                         header="Basic Info">
+                         header="Basic Info for #{personBB.currentPerson.name}">
 
                     <h:form id="person-info-form">
 
@@ -50,7 +325,6 @@
                                                 ajax="true"
                                                 rendered="#{personBB.currentPersonHumanFieldsEditMode}"
                                                 value="Abort edit"
-                                                process="@none"
                                                 actionListener="#{personBB.onHumanOperationAbortButtonChange}"
                                                 update="@form:@parent:persontools-growl-form
                                                 @form"
@@ -152,65 +426,90 @@
                                 <h:outputText   rendered="#{!empty personBB.currentPerson.deactivatedBy}"
                                                 value="by #{personBB.currentPerson.deactivatedBy.username}" />
                             </div>
-                        </div>
 
-                        <div class="p-col-6">Under 18?</div>
-                        <div class="p-col-6">
-                            <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
-                                            value="#{empty personBB.currentPerson.under18 ? 'Yes' : 'No'}" />
+                            <div class="p-col-6">Under 18?</div>
+                            <div class="p-col-6">
+                                <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
+                                                value="#{empty personBB.currentPerson.under18 ? 'Yes' : 'No'}" />
 
-                            <p:spacer height="2px" />
-                            <p:selectBooleanCheckbox rendered="#{personBB.currentPersonHumanFieldsEditMode}"
-                                                     value="#{personBB.currentPerson.under18}" />
-                        </div>
+                                <p:spacer height="2px" />
+                                <p:selectBooleanCheckbox rendered="#{personBB.currentPersonHumanFieldsEditMode}"
+                                                         value="#{personBB.currentPerson.under18}" />
+                            </div>
 
-                        <div class="p-col-6">
-                            Date of Birth
-                        </div>
-                        <div class="p-col-6">
+                            <div class="p-col-6">
+                                Date of Birth
+                            </div>
+                            <div class="p-col-6">
 
-                            <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
-                                          value="#{personBB.currentPerson.dob}"/>
-                            <p:spacer height="2px" />
+                                <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
+                                              value="#{personBB.currentPerson.dob}"/>
+                                <p:spacer height="2px" />
 
-                            <p:calendar id="person-dor-it"
-                                        rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
-                                        value="#{personBB.currentPerson.dob}"
-                                        mode="popup" tabindex="3"
-                                        showOn="button"
-                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                        navigator="true" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                        showButtonPanel="true"
-                                        showTodayButton="true"
-                                        required="false"/>
-                        </div>
+                                <p:calendar id="person-dor-it"
+                                            rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
+                                            value="#{personBB.currentPerson.dob}"
+                                            mode="popup" tabindex="3"
+                                            showOn="button"
+                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                            navigator="true" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                            showButtonPanel="true"
+                                            showTodayButton="true"
+                                            required="false"/>
+                            </div>
 
-                        <div class="p-col-6">
-                            Deceased date
-                        </div>
+                            <div class="p-col-6">
+                                Deceased date
+                            </div>
 
-                        <div class="p-col-6">
+                            <div class="p-col-6">
 
-                            <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
-                                          value="#{personBB.getPrettyDateNoTime(personBB.currentPerson.deceasedDate)}"/>
+                                <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
+                                              value="#{personBB.getPrettyDateNoTime(personBB.currentPerson.deceasedDate)}"/>
 
-                            <p:spacer height="2px" />
-                            <h:outputText rendered="#{!empty personBB.currentPersonHumanFieldsEditMode and !empty personBB.currentPerson.deceasedBy}" 
-                                          value="recorded by user: #{personBB.currentPerson.deceasedBy.username}"/>
+                                <p:spacer height="2px" />
+                                <h:outputText rendered="#{!empty personBB.currentPersonHumanFieldsEditMode and !empty personBB.currentPerson.deceasedBy}" 
+                                              value="recorded by user: #{personBB.currentPerson.deceasedBy.username}"/>
 
-                            <p:calendar id="person-dod-it"
-                                        rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
-                                        value="#{personBB.currentPerson.deceasedDate}"
-                                        mode="popup" tabindex="3"
-                                        showOn="button"
-                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                        navigator="true" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                        showButtonPanel="true"
-                                        showTodayButton="true"
-                                        required="false"/>
+                                <p:calendar id="person-dod-it"
+                                            rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
+                                            value="#{personBB.currentPerson.deceasedDate}"
+                                            mode="popup" tabindex="3"
+                                            showOn="button"
+                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                            navigator="true" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
+                                            showButtonPanel="true"
+                                            showTodayButton="true"
+                                            required="false"/>
+                            </div>
+
+                            <div class="p-col-6">Notes
+                                <p:spacer height="3px" />
+                                <p:commandLink      id="person-note-init-cl"
+                                                    ajax="true"
+                                                    actionListener="#{personBB.onNoteAppendUniversalInitLinkClick(personBB.currentPerson)}"
+                                                    style="color:blue;"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                    disabled="#{personBB.currentPersonHumanFieldsEditMode}"
+                                                    oncomplete="PF('universal-note-dialog-var').show()"
+                                                    update="universal-note-dialog
+                                                    universal-note-form"
+                                                    value="add note" >
+                                    <f:param name="component-to-update" value="person-info-form" />
+                                </p:commandLink>
+
+
+                            </div>
+                            <div class="p-col-6">
+                                <h:outputText value="#{personBB.currentPerson.notes}" 
+                                              escape="false"/>
+                            </div>
                         </div>
                     </h:form>
                 </p:panel>
+
+            </div>
+            <div class="p-col">
 
                 <p:panel id="person-adresses-panel"
                          toggleable="true"
@@ -224,7 +523,8 @@
                                               actionListener="#{addressBB.onMailingAddressAddInitButtonChange}"
                                               oncomplete="PF('address-dialog-var').show()"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                              value="Add address" />
+                                              value="Connect Address" />
+
 
 
                         <p:spacer height="5px"/>
@@ -413,9 +713,6 @@
                         </p:dataTable>
                     </h:form>               
                 </p:panel>
-
-            </div>
-            <div class="p-col">
                 <p:panel id="person-links-panel"
                          toggleable="true"
                          collapsed="false"
@@ -424,7 +721,7 @@
 
                         <p:commandButton      id="load-personlinks-button"
                                               ajax="true"
-                                              actionListener="#{personBB.onLoadPersonLinks}"
+                                              actionListener="#{personBB.onLoadHumanLinks}"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                               update="person-links-table
                                               persontools-growl-form"
@@ -440,54 +737,101 @@
                                         draggableRows="true" 
                                         tabindex="6"
                                         rowExpandMode="multiple">
-                            <p:column width="5%" 
+                            <p:column width="10%" 
                                       headerText="Exp.">
                                 <p:rowToggler/>
                             </p:column>
-                            <p:column width="35%"
-                                      sortBy="#{hl.linkedObjectSchemaEnum.TARGET_OBJECT_FRIENDLY_NAME}">
+                            <p:column width="90%"
+                                      sortBy="#{hl.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME}">
                                 <f:facet name="header">
                                     <h:outputText value="Object"/>
                                 </f:facet>
-                                <h:outputText value="#{hl.linkedObjectSchemaEnum.TARGET_OBJECT_FRIENDLY_NAME}" />
-                            </p:column>
-
-
-                            <p:column width="30%">
-                                <f:facet name="header">
-                                    <h:outputText value="Relationship"/>
-                                </f:facet>
+                                <h:outputText value="#{personBB.currentPersonLinkHeavy.name}" />
+                                <h:outputText value="(ID:#{personBB.currentPersonLinkHeavy.humanID})" />
+                                <h:outputText value=" " />
                                 <h:outputText value="#{hl.linkedObjectRole.title}" />
-                            </p:column>
-
-                            <p:column width="20%">
-                                <f:facet name="header">
-                                    <h:outputText value="ID"/>
-                                </f:facet>
-                                <h:outputText value="#{hl.parentObjectID}" />
-                            </p:column>
-
-                            <p:column width="10%">
-                                <f:facet name="header">
-                                    <h:outputText value="Actions"/>
-                                </f:facet>
-                                <p:commandLink      id="link-load-cl"
-                                                    ajax="true"
-                                                    actionListener="#{personBB.onPersonLinkViewInfoLinkClick(hl)}"
+                                <h:outputText value=" " />
+                                <p:commandLink      id="link-loadtarget-cl"
+                                                    ajax="false"
+                                                    actionListener="#{personBB.onHumanLinkTargetIDLinkClick(hl)}"
                                                     style="color:blue;"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                    oncomplete="PF('person-profile-dialog-var').show()"
-                                                    value="Load" />
+                                                    value="#{hl.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME}(ID:#{hl.parentObjectID})" />
                             </p:column>
+
 
                             <p:rowExpansion>
                                 <div class="p-grid">
                                     <div class="p-col-4">
-                                        link attribute
-                                        
+                                        Link ID
                                     </div>
                                     <div class="p-col-8">
-                                        link value
+                                        <h:outputText value="#{hl.linkID}" />
+                                    </div>
+                                    <div class="p-col-4">
+                                        Parent field &amp; ID
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{!empty hl.linkedObjectRole ? hl.linkedObjectRole.schema.targetTableFKField : ''}" />
+                                        <h:outputText value=": #{hl.parentObjectID}" />
+                                    </div>
+                                    <div class="p-col-4">
+                                        Source
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{!empty hl.source ? hl.source.title : ''}" />
+                                    </div>
+                                    <div class="p-col-4">
+                                        Created
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{!empty hl.createdBy ? hl.createdBy.human.name : ''}" />
+                                        <p:spacer height="3px"
+                                                  rendered="#{!empty hl.createdTS}" />
+                                        <h:outputText value="#{!empty hl.createdTS ? personBB.getPrettyDate(hl.createdTS): ''}" />
+                                    </div>
+                                    <div class="p-col-4">
+                                        Last Updated
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{!empty hl.lastUpdatedBy ? hl.lastUpdatedBy.human.name : ''}" />
+                                        <p:spacer height="3px"
+                                                  rendered="#{!empty hl.lastUpdatedTS}" />
+                                        <h:outputText value="#{!empty hl.lastUpdatedTS? personBB.getPrettyDate(hl.lastUpdatedTS): ''}" />
+                                    </div>
+                                    <div class="p-col-4">
+                                        Deactivated
+                                        <p:spacer height="3px" />
+                                        <p:commandLink      id="link-deac-init-cl"
+                                                            ajax="true"
+                                                            actionListener="#{personBB.onHumanLinkSelectLinkClick(hl)}"
+                                                            style="color:blue;"
+                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                            oncomplete="PF('humanlink-deactivate-dialog-var').show()"
+                                                            value="deactivate" />
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{!empty hl.deactivatedBy? 'Deactivated record' : 'Active record'}" />
+                                        <p:spacer height="3px" />
+                                        <h:outputText value="#{!empty hl.deactivatedBy? hl.deactivatedBy.human.name : ''}" />
+                                        <p:spacer height="3px"
+                                                  rendered="#{!empty hl.deactivatedTS}" />
+                                        <h:outputText value="#{!empty hl.deactivatedTS? personBB.getPrettyDate(hl.deactivatedTS): ''}" />
+                                    </div>
+                                    <div class="p-col-4">
+                                        Notes
+                                        <p:spacer height="3px" />
+                                        <p:commandLink      id="link-newnote-init-cl"
+                                                            ajax="true"
+                                                            actionListener="#{personBB.onHumanLinkSelectLinkClick(hl)}"
+                                                            style="color:blue;"
+                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                            oncomplete="PF('humanlink-note-dialog-var').show()"
+                                                            value="add note" />
+                                    </div>
+                                    <div class="p-col-8 wrapText">
+                                        <h:outputText value="#{hl.notes}"
+                                                      escape="false"/>
                                     </div>
                                 </div>
                             </p:rowExpansion>
@@ -497,6 +841,204 @@
             </div>
         </div>
 
+
+    </p:dialog>
+
+
+    <p:dialog   id="human-createlink-dialog"
+                height="400" width="400"
+                widgetVar="human-createlink-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Connect #{personBB.currentPerson.name} to #{sessionBean.sessHumanListHolder.HUMAN_LINK_SCHEMA_ENUM.TARGET_OBJECT_FRIENDLY_NAME} (ID:#{sessionBean.sessHumanListHolder.hostPK}) "
+                rendered="true"
+                >
+
+        <h:form id="human-createlink-form">
+
+
+            <h:outputText value="#{personBB.currentPerson.name} (ID:#{personBB.currentPerson.humanID})" />
+            <p:spacer height="5px"/>
+
+            <p:selectOneMenu id="person-link-role-som" 
+                             value="#{personBB.selecetedLinkedObjetRole}" 
+                             converter="linkedObjectRoleConverter" 
+                             required="true">
+
+                <f:selectItem itemLabel="Choose a relationship" 
+                              itemDisabled="true"
+                              noSelectionOption="true"/>
+
+                <f:selectItems id="rolelist-si" 
+                               value="#{personBB.linkRoleCandidateList}" 
+                               var="lr" 
+                               itemValue="#{lr}" 
+                               itemLabel="#{lr.title}"/>
+            </p:selectOneMenu>
+
+            <p:spacer height="5px"/>
+
+            <h:outputText value="#{sessionBean.sessHumanListHolder.HUMAN_LINK_SCHEMA_ENUM.TARGET_OBJECT_FRIENDLY_NAME} (ID:#{sessionBean.sessHumanListHolder.hostPK}) " />
+
+            <p:spacer height="5px"/>
+            <p:commandLink      id="link-create-changetarget-cl"
+                                ajax="true"
+                                actionListener="#{personBB.onHumanLinkSelectLinkClick(hl)}"
+                                style="color:blue;"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                oncomplete="PF('humanlink-changetarget-dialog-var').show()"
+                                value="change link target" />
+            <p:spacer height="5px"/>
+
+            <p:commandButton id="human-creatlink-commit-button"
+                             value="Create link"
+                             rendered="true"
+                             icon="fa fa-link"
+                             ajax="true"
+                             actionListener="#{personBB.onHumanLinkCreateCommitButtonChange}"
+                             oncomplete="PF('human-createlink-dialog-var').hide()"
+                             update="person-links-form
+                             persontools-growl-form"/>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog   id="humanlink-note-dialog"
+                height="400" width="400"
+                widgetVar="humanlink-note-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Append note to Person Link ID: #{personBB.currentHumanLink.linkID}"
+                rendered="true"
+                >
+
+        <h:form id="humanlink-note-form">
+            <h:outputText value="Note content:" />
+
+            <p:spacer height="5px" />
+
+            <p:inputTextarea value="#{personBB.formHumanLinkNotes}"
+                             cols="40"
+                             scrollHeight="5" />
+
+            <p:spacer height="3px" />
+            <h:outputText value="(your username and the date/time will be automatically included)" />
+            <p:spacer height="5px" />
+
+            <p:commandButton id="humanlink-note-commit-button"
+                             value="Save note"
+                             rendered="true"
+                             icon="fa fa-sticky-note"
+                             ajax="true"
+                             actionListener="#{personBB.onHumanLinkNoteAppendCommitButtonChange}"
+                             oncomplete="PF('humanlink-note-dialog-var').hide()"
+                             update="person-links-form
+                             persontools-growl-form"/>
+
+
+        </h:form>
+
+    </p:dialog>
+
+
+    <p:dialog   id="humanlink-changetarget-dialog"
+                height="600" width="600"
+                widgetVar="humanlink-changetarget-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Choose new link target of #{personBB.currentPerson.name}"
+                rendered="true"
+                >
+
+        <h:form id="humanlink-changetarget-form">
+            <h:outputText value="All these session objects can hold a link to a person!" />
+
+
+            <div class="p-grid">
+                <div class="p-col-4">
+                    <h:outputText value="Property" />
+                </div>
+                <div class="p-col-8">
+                    <p:commandLink        id="activatehlh-property-cl"
+                                          ajax="true"
+                                          actionListener="#{personBB.onActivateNewHumanLinkTarget(sessionBean.sessProperty)}"
+                                          style="color:blue;"
+                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                          oncomplete="PF('humanlink-changetarget-dialog-var').hide()"
+                                          update="human-createlink-form
+                                          human-createlink-dialog"
+                                          value="#{sessionBean.sessProperty.addressString} (Parcel ID:#{sessionBean.sessProperty.countyParcelID}" />
+                </div>
+
+                <div class="p-col-4">
+                    <h:outputText value="Code Enforcement Case" />
+                </div>
+                <div class="p-col-8">
+                    <p:commandLink        id="activatehlh-cecase-cl"
+                                          ajax="true"
+                                          actionListener="#{personBB.onActivateNewHumanLinkTarget(sessionBean.sessCECase)}"
+                                          style="color:blue;"
+                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                          oncomplete="PF('humanlink-changetarget-dialog-var').hide()"
+                                          update="human-createlink-form
+                                          human-createlink-dialog"
+                                          value="#{sessionBean.sessCECase.caseName} (ID:#{sessionBean.sessCECase.caseID})" />
+                </div>
+
+                <div class="p-col-4">
+                    <h:outputText value="Occupancy Period" />
+                </div>
+                <div class="p-col-8">
+                    <p:commandLink        id="activatehlh-period-cl"
+                                          ajax="true"
+                                          actionListener="#{personBB.onActivateNewHumanLinkTarget(sessionBean.sessOccPeriod)}"
+                                          style="color:blue;"
+                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                          oncomplete="PF('humanlink-changetarget-dialog-var').hide()"
+                                          update="human-createlink-form
+                                          human-createlink-dialog"
+                                          value="#{sessionBean.sessOccPeriod.type.title} (ID:#{sessionBean.sessOccPeriod.periodID})" />
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+
+
+    <p:dialog   id="humanlink-deactivate-dialog"
+                height="400" width="400"
+                widgetVar="humanlink-deactivate-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Deactivate Person Link ID: #{personBB.currentHumanLink.linkID}"
+                rendered="true"
+                >
+
+        <h:form id="humanlink-deactivate-form">
+            <h:outputText value="Deactivating a human link is irreversible!" />
+
+            <p:commandButton id="humanlink-deactivate-confirm-button"
+                             value="Deactivate link ID: #{hl.linkID}"
+                             rendered="true"
+                             icon="fa fa-trash"
+                             ajax="true"
+                             actionListener="#{personBB.onHumanLinkDeactivateButtonChange}"
+                             oncomplete="PF('humanlink-deactivate-dialog-var').hide()"
+                             update="person-links-form
+                             persontools-growl-form"/>
+
+
+        </h:form>
 
     </p:dialog>
 
@@ -527,7 +1069,8 @@
                                  ajax="true"
                                  actionListener="#{personBB.togglePhoneEditMode}"
                                  oncomplete="PF('phone-dialog-var').show()"
-                                 update="@form"/>
+                                 update="@form
+                                 persontools-growl-form"/>
 
 
                 <div class="restrict-main-contents-io-button gray_button">
@@ -536,11 +1079,10 @@
                                         ajax="true"
                                         rendered="#{personBB.currentContactPhoneEditMode}"
                                         value="Abort edit"
-                                        process="@none"
-                                        immediate="true"
                                         actionListener="#{personBB.onPhoneOperationAbortButtonChange}"
                                         oncomplete="PF('person-profile-dialog-var').show()"
-                                        update="@form"
+                                        update="@form
+                                        persontools-growl-form"
                                         icon="fa fa-stop" />
 
                 </div>
@@ -581,6 +1123,10 @@
                                          rendered="#{personBB.currentContactPhoneEditMode}" 
                                          value="#{personBB.currentContactPhone.phoneType}">
                             <f:converter converterId="phoneTypeConverter"/>
+
+                            <f:selectItem itemLabel="Choose a type" 
+                                          itemDisabled="true"
+                                          noSelectionOption="true"/>
                             <f:selectItems value="#{personBB.phoneTypeList}"
                                            var="cft" 
                                            itemValue="#{cft}" 
@@ -592,7 +1138,7 @@
                     <div class="p-col-6">Extension</div>
                     <div class="p-col-6">
                         <h:outputText rendered="#{!personBB.currentContactPhoneEditMode}" 
-                                      value="#{personBB.currentContactPhone.extension}"/>
+                                      value="#{personBB.currentContactPhone.extension eq 0 ? '':personBB.currentContactPhone.extension}"/>
 
                         <p:inputNumber rendered="#{personBB.currentContactPhoneEditMode}"
                                        value="#{personBB.currentContactPhone.extension}"
@@ -612,7 +1158,7 @@
                                         value="#{!empty personBB.currentContactPhone.disconnectTS ? 'Recorded by ' : ''}" />
 
                         <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
-                                        value="#{!empty personBB.currentContactPhone.disconnectRecordedBy ? personBB.currentContactPhone.disconnectRecordedBy.username : ''}" />
+                                        value="#{!empty personBB.currentContactPhone.disconnectRecordedBy ? personBB.currentContactPhone.disconnectRecordedBy.human.name : ''}" />
 
                         <p:spacer height="5px" />
 
@@ -620,7 +1166,7 @@
                                         value="#{!empty personBB.currentContactPhone.disconnectTS ? 'on ' : ''}" />
 
                         <p:selectBooleanCheckbox rendered="#{personBB.currentContactPhoneEditMode}"
-                                                 value="#{personBB.getPrettyDateNoTime(personBB.currentContactPhone.disconnectTS)}" />
+                                                 value="#{personBB.currentContactPhoneDisconnected}" />
                     </div>
 
                     <div class="p-col-6">Creation</div>
@@ -648,6 +1194,29 @@
                         <h:outputText   rendered="#{!empty personBB.currentContactPhone.deactivatedBy}"
                                         value="by #{personBB.currentContactPhone.deactivatedBy.username}" />
                     </div>
+                    <div class="p-col-6">Notes
+                        <p:spacer height="3px" />
+                        <p:commandLink      id="phone-note-init-cl"
+                                            ajax="true"
+                                            actionListener="#{personBB.onNoteAppendUniversalInitLinkClick(personBB.currentContactPhone)}"
+                                            style="color:blue;"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                            disabled="#{personBB.currentContactPhoneEditMode}"
+                                            oncomplete="PF('universal-note-dialog-var').show()"
+                                            update="universal-note-dialog
+                                            universal-note-form"
+                                            value="add note" >
+                            <f:param name="component-to-update" value="phone-info-form" />
+                        </p:commandLink>
+
+
+                    </div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{personBB.currentContactPhone.notes}" 
+                                      escape="false"/>
+                    </div>
+
+
                 </div>
             </h:form>
         </p:panel>
@@ -772,9 +1341,75 @@
                         <h:outputText   rendered="#{!empty personBB.currentContactEmail.deactivatedBy}"
                                         value="by #{personBB.currentContactEmail.deactivatedBy.username}" />
                     </div>
+
+                    <div class="p-col-6">Notes
+                        <p:spacer height="3px" />
+                        <p:commandLink      id="email-note-init-cl"
+                                            ajax="true"
+                                            actionListener="#{personBB.onNoteAppendUniversalInitLinkClick(personBB.currentContactEmail)}"
+                                            style="color:blue;"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                            disabled="#{personBB.currentContactEmailEditMode}"
+                                            oncomplete="PF('universal-note-dialog-var').show()"
+                                            update="universal-note-dialog
+                                            universal-note-form"
+                                            value="add note" >
+                            <f:param name="component-to-update" value="email-info-form" />
+                        </p:commandLink>
+
+
+                    </div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{personBB.currentContactEmail.notes}" 
+                                      escape="false"/>
+                    </div>
                 </div>
             </h:form>
         </p:panel>
     </p:dialog>
+
+
+
+    <p:dialog   id="universal-note-dialog"
+                height="400" width="400"
+                widgetVar="universal-note-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Append note"
+                rendered="true"
+                >
+
+        <h:form id="universal-note-form">
+            <h:outputText value="Componse a new note for #{personBB.currentNoteHolder.noteHolderFriendlyName} (ID:#{personBB.currentNoteHolder.DBKey}):" />
+
+            <p:spacer height="5px" />
+
+            <p:inputTextarea value="#{personBB.formNewNoteUniversal}"
+                             cols="40"
+                             scrollHeight="5" />
+
+            <p:spacer height="3px" />
+            <h:outputText value="(your username and the date/time will be automatically included)" />
+            <p:spacer height="5px" />
+
+            <p:commandButton id="universal-note-commit-button"
+                             value="Attach note"
+                             rendered="true"
+                             icon="fa fa-sticky-note"
+                             ajax="true"
+                             actionListener="#{personBB.onNoteCommitOnNoteHolder}"
+                             oncomplete="PF('universal-note-dialog-var').hide()"
+                             update="#{personBB.pageComponentToUpdateAfterNoteCommit}
+                             persontools-growl-form"/>
+
+
+        </h:form>
+
+    </p:dialog>
+
+
 
 </ui:composition>

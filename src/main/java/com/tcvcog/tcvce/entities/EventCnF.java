@@ -36,7 +36,7 @@ public  class       EventCnF
                     IFace_ActivatableBOB,
                     IFace_humanListHolder{
     
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.EVENTHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.EventHuman;
     
     protected int eventID;
     protected EventCategory category;

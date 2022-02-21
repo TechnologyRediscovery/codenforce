@@ -16,17 +16,47 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  *
  * @author sylvia
  */
-public class ContactPhoneType {
+public class ContactPhoneType implements Serializable {
     protected int phoneTypeID;
     protected String title;
     protected LocalDateTime createdTS;
     protected LocalDateTime deactivatedTS;
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + this.phoneTypeID;
+        hash = 59 * hash + Objects.hashCode(this.title);
+        hash = 59 * hash + Objects.hashCode(this.createdTS);
+        hash = 59 * hash + Objects.hashCode(this.deactivatedTS);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ContactPhoneType other = (ContactPhoneType) obj;
+        if (this.phoneTypeID != other.phoneTypeID) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * @return the deactivatedTS

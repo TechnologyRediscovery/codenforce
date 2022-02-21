@@ -1,0 +1,1 @@
+/usr/bin/pg_dump --host localhost --port 20000 --username "sylvia" --role "sylvia" --no-password  --format tar --blobs --section pre-data --section data --section post-data --encoding UTF8 --verbose --file "/home/sylvia/db/remote_back_20-feb-22.backup" "cogdb"

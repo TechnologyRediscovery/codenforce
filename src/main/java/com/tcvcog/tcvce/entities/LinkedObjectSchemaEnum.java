@@ -24,7 +24,7 @@ package com.tcvcog.tcvce.entities;
  */
 public enum LinkedObjectSchemaEnum {
     
-    OCCAPPLICATIONHUMAN (   
+    OccApplicationHuman (   
                             "Occupancy Application - Person",
                             "public.occpermitapplicationhuman",
                             "OccApplicationHuman", 
@@ -35,7 +35,7 @@ public enum LinkedObjectSchemaEnum {
                             false
                         ),  // for Jurplel to update
     
-    CECASEHUMAN         (   
+    CECaseHuman         (   
                             "Code Enf. Case - Person",
                             "public.humancecase", 
                             "CECaseHuman", 
@@ -47,7 +47,7 @@ public enum LinkedObjectSchemaEnum {
         
                         ), 
     
-    OCCPERIODHUMAN      (
+    OccPeriodHuman      (
                             "Occupancy Period - Person",
                             "public.humanoccperiod",
                             "OccPeriodHuman", 
@@ -58,7 +58,7 @@ public enum LinkedObjectSchemaEnum {
                             true
                         ), 
     
-    PARCELHUMAN         (   
+    ParcelHuman         (   
                             "Parcel - Person",
                             "public.humanparcel",
                             "ParcelHuman", 
@@ -69,7 +69,7 @@ public enum LinkedObjectSchemaEnum {
                             true
                         ), 
     
-    PARCELUNITHUMAN     (   
+    ParcelUnitHuman     (   
                             "Parcel Unit - Person",
                             "public.humanparcelunit",
                             "ParcelUnitHuman", 
@@ -80,7 +80,7 @@ public enum LinkedObjectSchemaEnum {
                             true
                         ),
     
-    CITATIONHUMAN       (
+    CitationHuman       (
                             "Citation - Person",
                             "public.citationhuman",
                             "CitationHuman", 
@@ -91,7 +91,7 @@ public enum LinkedObjectSchemaEnum {
                             true
                         ), 
     
-    CITATIONDCKETHUMAN       (
+    CitationDocketHuman       (
                             "Citation Docket - Person",
                             "public.citationdockethuman",
                             "CitationDocketHuman", 
@@ -102,7 +102,7 @@ public enum LinkedObjectSchemaEnum {
                             false
                         ), 
     
-    EVENTHUMAN          (
+    EventHuman          (
                             "Event - Person",
                             "public.eventhuman",
                             "EventHuman", 
@@ -113,7 +113,7 @@ public enum LinkedObjectSchemaEnum {
                             true
                         ), 
     
-    MUNIHUMAN           (
+    MuniHuman           (
                             "Municipality - Person",
                             "public.humanmuni",
                             "MuniHuman",
@@ -124,7 +124,7 @@ public enum LinkedObjectSchemaEnum {
                             true
                         ),
     
-    HUMANMAILINGADDRESS (   
+    MailingaddressHuman (   
                             "Mailing Address - Person",
                             "humanmailingaddress",
                             "MailingaddressHuman", 
@@ -134,7 +134,7 @@ public enum LinkedObjectSchemaEnum {
                             LinkedObjectFamilyEnum.MAILING,
                             true
                         ), 
-    PARCELMAILINGADDRESS  (
+    ParcelMailingaddress  (
                             "Parcel - Mailing Address",
                             "parcelmailingaddress",
                             "ParcelMailingaddress", 

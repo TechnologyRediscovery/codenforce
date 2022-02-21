@@ -23,7 +23,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.DomainEnum;
-import com.tcvcog.tcvce.entities.IFace_NoteHolder;
+import com.tcvcog.tcvce.entities.IFace_noteHolder;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 
@@ -42,7 +42,7 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
 
     private DomainEnum pageDomain;
 
-    private IFace_NoteHolder currentNoteHolder;
+    private IFace_noteHolder currentNoteHolder;
 
     public NotesBB() {}
 
@@ -135,11 +135,11 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
         this.formNoteText = formNoteText;
     }
 
-    public IFace_NoteHolder getCurrentNoteHolder() {
+    public IFace_noteHolder getCurrentNoteHolder() {
         return currentNoteHolder;
     }
 
-    public void setCurrentNoteHolder(IFace_NoteHolder currentNoteHolder) {
+    public void setCurrentNoteHolder(IFace_noteHolder currentNoteHolder) {
         this.currentNoteHolder = currentNoteHolder;
     }
 

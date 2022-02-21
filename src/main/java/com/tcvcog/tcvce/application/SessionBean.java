@@ -167,6 +167,7 @@ public class    SessionBean
     
     private Person sessPerson;
     private ActivatableRouteEnum sessPersonRoute;
+    private IFace_humanListHolder sessHumanListHolder;
     
     private Person sessPersonQueued;
     private List<Person> sessPersonList;
@@ -2069,6 +2070,20 @@ public class    SessionBean
      */
     public void setSessMailingAddress(MailingAddress sessMailingAddress) {
         this.sessMailingAddress = sessMailingAddress;
+    }
+
+    /**
+     * @return the sessHumanListHolder
+     */
+    public IFace_humanListHolder getSessHumanListHolder() {
+        return sessHumanListHolder;
+    }
+
+    /**
+     * @param sessHumanListHolder the sessHumanListHolder to set
+     */
+    public void setSessHumanListHolder(IFace_humanListHolder sessHumanListHolder) {
+        this.sessHumanListHolder = sessHumanListHolder;
     }
 
     

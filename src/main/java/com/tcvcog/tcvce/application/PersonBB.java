@@ -6,9 +6,11 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.ContactEmail;
 import com.tcvcog.tcvce.entities.ContactPhone;
@@ -16,14 +18,24 @@ import com.tcvcog.tcvce.entities.ContactPhoneType;
 import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
+import com.tcvcog.tcvce.entities.IFace_noteHolder;
+import com.tcvcog.tcvce.entities.LinkedObjectRole;
+import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 import com.tcvcog.tcvce.entities.MailingAddress;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonLinkHeavy;
+import com.tcvcog.tcvce.entities.search.QueryPerson;
+import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 /**
@@ -33,27 +45,53 @@ import javax.faces.event.ActionEvent;
  */
 public class PersonBB extends BackingBeanUtils {
     
-    private IFace_humanListHolder currentHumanListHolder;
-
     
     private Person currentPerson;
     private boolean currentPersonHumanFieldsEditMode;
     
+    private IFace_noteHolder currentNoteHolder;
+    private String formNewNoteUniversal;
+    private String pageComponentToUpdateAfterNoteCommit;
+    
+    private List<LinkedObjectRole> linkRoleCandidateList;
+    private LinkedObjectRole selecetedLinkedObjetRole;
+    
     private PersonLinkHeavy currentPersonLinkHeavy;
     private HumanLink currentHumanLink;
+    private String formHumanLinkNotes;
     
     private MailingAddress currentMailingAddress;
     private boolean currentMailingAddressEditMode;
     
+    // PHONE STUFF
     private ContactPhone currentContactPhone;
     private boolean currentContactPhoneEditMode;
     private List<ContactPhoneType> phoneTypeList;
     private boolean currentContactPhoneDisconnected;
     
+    
+    // EMAIL STUFF
     private ContactEmail currentContactEmail;
     private boolean currentContactEmailEditMode;
     
     private List<BOBSource> sourceList;
+    
+    
+    // ********************************************************
+    // *************** MIGRATED SEARCH STUFF ******************
+    // ********************************************************
+    private QueryPerson querySelected;
+    private List<QueryPerson> queryList;
+    private SearchParamsPerson paramsSelected;
+    private String queryLog;
+    
+    private List<Person> personList;
+    private List<Person> filteredPersonList;
+    private boolean appendResultsToList;
+    
+    
+    
+    
     
     /**
      * Creates a new instance of PersonBB
@@ -72,15 +110,159 @@ public class PersonBB extends BackingBeanUtils {
         currentContactPhoneEditMode = false;
         currentContactEmailEditMode = false;
         
+        
         try {
+            loadLinkedObjectRoleListUsingSessionHLH();
             phoneTypeList = pc.getContactPhoneTypeList();
             sourceList = sc.getBobSourceListComplete();
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        }
+        setupQueryInfrastructure();
+    }
+    
+    /**
+     * Utility method for loading link roles based on session list holder
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    private void loadLinkedObjectRoleListUsingSessionHLH() throws IntegrationException, BObStatusException{
+        SystemCoordinator sc = getSystemCoordinator();
+        if(getSessionBean().getSessHumanListHolder() != null){
+            linkRoleCandidateList = sc.assembleLinkedObjectRolesBySchema(getSessionBean().getSessHumanListHolder().getHUMAN_LINK_SCHEMA_ENUM());
+        }
+        
+    }
+    
+    /**********************************************************/
+    /************** SEARCH ORGANS - MIGRATED!! ****************/
+    /**********************************************************/
+        
+    private void setupQueryInfrastructure(){
+        SearchCoordinator sc = getSearchCoordinator();
+
+        personList = new ArrayList<>();
+        appendResultsToList = false;
+        filteredPersonList = new ArrayList<>();
+        try {
+            setQueryList(sc.buildQueryPersonList(getSessionBean().getSessUser().getMyCredential()));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
         
+        if(queryList != null && !queryList.isEmpty()){
+            querySelected = getQueryList().get(0);
+        }
+        
+        if(querySelected != null && querySelected.getPrimaryParams() != null){
+            paramsSelected = getQuerySelected().getPrimaryParams();
+        }
+    
+    }
+    
+    /**
+     * Listener for user clicks of the "search" link for persons
+     * @param ev 
+     */
+    public void onPersonSearchInitLinkClick(ActionEvent ev){
+        System.out.println("Search for Persons INIT");
+    }
+    
+    /**
+     * Listener for user requests to clear the person list
+     * @param ev 
+     */
+    public void clearResultList(ActionEvent ev){
+        getPersonList().clear();
         
     }
+      /**
+     * Listener method for changes to the query drop down box
+     */
+    public void changeQuerySelected(){
+        
+        if(getQuerySelected() != null && getQuerySelected().getPrimaryParams() != null){
+            setParamsSelected(getQuerySelected().getPrimaryParams());
+        }
+    
+        getFacesContext().addMessage(null,
+            new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "New query loaded!", ""));
+
+        
+    }
+    
+    /**
+     * Listener for user request to execute the query!
+     * 
+     * @param event 
+     */
+    public void executeQuery(ActionEvent event){
+        PersonCoordinator pc = getPersonCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
+        try {
+            List<Person> pl = pc.assemblePersonListFromHumanList(sc.runQuery(getQuerySelected()).getBOBResultList());
+            
+            if(!appendResultsToList && personList != null){
+                personList.clear();
+            } 
+            getPersonList().addAll(pl);
+            setQueryLog(getQuerySelected().getQueryLog());
+            
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Your search completed with " + pl.size() + " results", ""));
+            
+        } catch (SearchException | IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to complete search! ", ""));
+        }
+    }
+    
+    /**
+     * listener for user requests to clear the current query
+     * @param ev 
+     */
+    public void resetCurrentQuery(ActionEvent ev){
+        setupQueryInfrastructure();
+        System.out.println("PersonSearchBB.resetCurrentQuery ");
+//        querySelected = sc.initQuery(QueryPersonEnum.valueOf(querySelected.getQueryName().toString()),
+//                getSessionBean().getSessUser().getMyCredential());
+        
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Query list rebuilt; filters reset", ""));
+        
+        setQueryLog(null);
+        
+    }
+        
+    /**
+     * Responds to the user wanting to view a person from the search result list
+     * @param p
+     */
+    public void explorePerson(Person p){
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            Person per = pc.getPerson(p);
+            getSessionBean().setSessPerson(per);
+            currentPerson = per;
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Person history logging is broken!",""));
+        }
+    }
+
+    
+    
+    
+    
+    
+    
     
     /**********************************************************/
     /************** REFRESHING  *******************************/
@@ -146,7 +328,7 @@ public class PersonBB extends BackingBeanUtils {
     public void onHumanAddCommitButtonChange(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            currentPerson = pc.humanAdd(currentPerson, getSessionBean().getSessUser());
+            currentPerson = pc.insertHuman(currentPerson, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Succesfully added person to database!", ""));
@@ -273,7 +455,7 @@ public class PersonBB extends BackingBeanUtils {
         if(ph != null){
             currentContactPhone = ph;
         }
-        currentContactEmailEditMode = true;
+        currentContactPhoneEditMode = true;
     }
     
     /**
@@ -283,8 +465,17 @@ public class PersonBB extends BackingBeanUtils {
     public void onPhoneEditCommitButtonChange(){
          PersonCoordinator pc = getPersonCoordinator();
         try {
+            if(currentContactPhoneDisconnected){
+                currentContactPhone.setDisconnectTS(LocalDateTime.now());
+                currentContactPhone.setDisconnectRecordedBy(getSessionBean().getSessUser());
+                getFacesContext().addMessage(null,
+                     new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Marked phone number ID " + currentContactPhone.getPhoneID() + " as disconnected!", ""));
+            }
             pc.contactPhoneUpdate(currentContactPhone, getSessionBean().getSessUser());
             currentContactPhone = pc.getContactPhone(currentContactPhone);
+            // reset our form
+            currentContactPhoneDisconnected = false;
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Succesfully Updated new phone number with ID " + currentContactPhone.getPhoneID(), ""));
@@ -418,7 +609,7 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to load person links
      * @param ev 
      */
-    public void onLoadPersonLinks(ActionEvent ev){
+    public void onLoadHumanLinks(ActionEvent ev){
         if(currentPerson != null){
             PersonCoordinator pc = getPersonCoordinator();
             try {
@@ -441,9 +632,187 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to load information about the human link
      * @param hl 
      */
-    public void onPersonLinkViewInfoLinkClick(HumanLink hl){
+    public void onHumanLinkSelectLinkClick(HumanLink hl){
+        currentHumanLink = hl;
+        
+    }
+
+    /**
+     * Listener f
+     * @param ev 
+     */
+    public void onChangeHumanLinkTargetLinkClick(ActionEvent ev){
+        
+    }
+    
+    /**
+     * Listener for user clicks of a human link holder
+     * @param hlh 
+     */
+    public void onActivateNewHumanLinkTarget(IFace_humanListHolder hlh){
+        try {
+            loadLinkedObjectRoleListUsingSessionHLH();
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
+        getSessionBean().setSessHumanListHolder(hlh);
+    }
+    
+    /**
+     * Listener for user clicks of the link representing the
+     * target of a human link, such as a case or an event
+     *
+     * TODO: Finish me!
+     *
+     * @param hl the human link to explore
+     * @return page nav route
+     */
+    public String onHumanLinkTargetIDLinkClick(HumanLink hl){
+        
+        return "";
+    }
+    
+    /**
+     * Listener for user requests to complete the note appending process
+     * on a human link
+     * @param ev 
+     */
+    public void onHumanLinkNoteAppendCommitButtonChange(ActionEvent ev){
+       PersonCoordinator pc = getPersonCoordinator();
+        try {
+            pc.appendNoteToHumanLink(currentHumanLink, formHumanLinkNotes, getSessionBean().getSessUser());
+            onLoadHumanLinks(null);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Note write success!", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Fatal: Could not append note: " + ex.getMessage(), ""));
+        }
+        
+    }
+    
+    /**
+     * Listener for user requests to complete the note appending process
+     * on a human link
+     * @param ev 
+     */
+    public void onHumanLinkDeactivateButtonChange(ActionEvent ev){
+       PersonCoordinator pc = getPersonCoordinator();
+        try {
+            pc.deactivateHumanLink(currentHumanLink, getSessionBean().getSessUser());
+            onLoadHumanLinks(ev);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Link deactivate success!", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Fatal: Could not deactivate human link: " + ex.getMessage(), ""));
+        }
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to link the current IFace_HumanListHolder
+     * to the current person with the currently selected role
+     * @param ev 
+     */
+    public void onHumanLinkCreateCommitButtonChange(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            pc.linkHuman(getSessionBean().getSessHumanListHolder(), currentHumanLink, getSessionBean().getSessUser());
+            refreshCurrentPerson();
+            onLoadHumanLinks(null);
+            getFacesContext().addMessage(null,
+                  new FacesMessage(FacesMessage.SEVERITY_INFO,
+                          "Successfully linked human!", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+          
+          getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Fatal: Could not deactivate human link: " + ex.getMessage(), ""));
+        } 
         
         
+    }
+    
+    
+    
+    
+    
+    
+    /***********************************************************/
+    /********************* MISC STUFF           ****************/
+    /***********************************************************/
+    
+    /**
+     * Starts the note adding process on a general note holding object
+     * @param holder 
+     */
+    public void onNoteAppendUniversalInitLinkClick(IFace_noteHolder holder){
+        currentNoteHolder = holder;
+        formNewNoteUniversal = "";
+        pageComponentToUpdateAfterNoteCommit = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("component-to-update");
+        System.out.println("PersonBB.onNoteAppendUniversalInitLinkClick | page comp: " + pageComponentToUpdateAfterNoteCommit);
+    }
+    
+    /**
+     * Listener for user aborts of the noting process
+     * @param ev 
+     */
+    public void onNoteAppendOperationAbort(ActionEvent ev){
+        formNewNoteUniversal = "";
+        
+    }
+    
+    /**
+     * Listener for user to commit notes to a universal note holder
+     * @param ev
+     */
+    public void onNoteCommitOnNoteHolder(ActionEvent ev){
+        SystemCoordinator sc = getSystemCoordinator();
+        if(currentNoteHolder != null){
+            MessageBuilderParams mbp = new MessageBuilderParams(currentNoteHolder.getNotes(), 
+                    null, null, formNewNoteUniversal, getSessionBean().getSessUser(), null);
+            currentNoteHolder.setNotes(sc.appendNoteBlock(mbp));
+            try {
+                sc.writeNotes(currentNoteHolder, getSessionBean().getSessUser());
+                refreshCurrentNoteHolder();
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Note write success on :  " + currentNoteHolder.getNoteHolderFriendlyName(), ""));
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal note error:  " + ex.getMessage(), ""));
+                
+            } 
+            formNewNoteUniversal = "";
+        }
+    }
+    
+    /**
+     * Internal method for asking what type the NoteHolder is
+     * and fetching a new copy from the DB. The UI will update itself
+     */
+    private void refreshCurrentNoteHolder() throws IntegrationException{
+        PersonCoordinator pc = getPersonCoordinator();
+        if(currentNoteHolder != null){
+            if(currentNoteHolder instanceof ContactEmail){
+                currentContactEmail = pc.getContactEmail(currentContactEmail);
+                System.out.println("PersonBB.refreshCurrentNoteHolder | refreshing email");
+            } else if(currentNoteHolder instanceof ContactPhone){
+                currentContactPhone = pc.getContactPhone(currentContactPhone);
+                System.out.println("PersonBB.refreshCurrentNoteHolder | refreshing phone");
+            } else if(currentNoteHolder instanceof Person){
+                refreshCurrentPerson();
+                System.out.println("PersonBB.refreshCurrentNoteHolder | refreshing person");
+            }  
+        }
     }
     
     
@@ -556,19 +925,6 @@ public class PersonBB extends BackingBeanUtils {
         this.currentContactEmailEditMode = currentContactEmailEditMode;
     }
 
-    /**
-     * @return the currentHumanListHolder
-     */
-    public IFace_humanListHolder getCurrentHumanListHolder() {
-        return currentHumanListHolder;
-    }
-
-    /**
-     * @param currentHumanListHolder the currentHumanListHolder to set
-     */
-    public void setCurrentHumanListHolder(IFace_humanListHolder currentHumanListHolder) {
-        this.currentHumanListHolder = currentHumanListHolder;
-    }
 
     /**
      * @return the currentPerson
@@ -652,6 +1008,194 @@ public class PersonBB extends BackingBeanUtils {
      */
     public void setCurrentHumanLink(HumanLink currentHumanLink) {
         this.currentHumanLink = currentHumanLink;
+    }
+
+    /**
+     * @return the formHumanLinkNotes
+     */
+    public String getFormHumanLinkNotes() {
+        return formHumanLinkNotes;
+    }
+
+    /**
+     * @param formHumanLinkNotes the formHumanLinkNotes to set
+     */
+    public void setFormHumanLinkNotes(String formHumanLinkNotes) {
+        this.formHumanLinkNotes = formHumanLinkNotes;
+    }
+
+
+    /**
+     * @return the selecetedLinkedObjetRole
+     */
+    public LinkedObjectRole getSelecetedLinkedObjetRole() {
+        return selecetedLinkedObjetRole;
+    }
+
+    /**
+     * @param selecetedLinkedObjetRole the selecetedLinkedObjetRole to set
+     */
+    public void setSelecetedLinkedObjetRole(LinkedObjectRole selecetedLinkedObjetRole) {
+        this.selecetedLinkedObjetRole = selecetedLinkedObjetRole;
+    }
+
+    /**
+     * @return the linkRoleCandidateList
+     */
+    public List<LinkedObjectRole> getLinkRoleCandidateList() {
+        try {
+            loadLinkedObjectRoleListUsingSessionHLH();
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
+        return linkRoleCandidateList;
+    }
+
+    /**
+     * @param linkRoleCandidateList the linkRoleCandidateList to set
+     */
+    public void setLinkRoleCandidateList(List<LinkedObjectRole> linkRoleCandidateList) {
+        this.linkRoleCandidateList = linkRoleCandidateList;
+    }
+
+    /**
+     * @return the querySelected
+     */
+    public QueryPerson getQuerySelected() {
+        return querySelected;
+    }
+
+    /**
+     * @return the queryList
+     */
+    public List<QueryPerson> getQueryList() {
+        return queryList;
+    }
+
+    /**
+     * @return the paramsSelected
+     */
+    public SearchParamsPerson getParamsSelected() {
+        return paramsSelected;
+    }
+
+    /**
+     * @return the queryLog
+     */
+    public String getQueryLog() {
+        return queryLog;
+    }
+
+    /**
+     * @return the filteredPersonList
+     */
+    public List<Person> getFilteredPersonList() {
+        return filteredPersonList;
+    }
+
+    /**
+     * @return the appendResultsToList
+     */
+    public boolean isAppendResultsToList() {
+        return appendResultsToList;
+    }
+
+    /**
+     * @param querySelected the querySelected to set
+     */
+    public void setQuerySelected(QueryPerson querySelected) {
+        this.querySelected = querySelected;
+    }
+
+    /**
+     * @param queryList the queryList to set
+     */
+    public void setQueryList(List<QueryPerson> queryList) {
+        this.queryList = queryList;
+    }
+
+    /**
+     * @param paramsSelected the paramsSelected to set
+     */
+    public void setParamsSelected(SearchParamsPerson paramsSelected) {
+        this.paramsSelected = paramsSelected;
+    }
+
+    /**
+     * @param queryLog the queryLog to set
+     */
+    public void setQueryLog(String queryLog) {
+        this.queryLog = queryLog;
+    }
+
+    /**
+     * @param filteredPersonList the filteredPersonList to set
+     */
+    public void setFilteredPersonList(List<Person> filteredPersonList) {
+        this.filteredPersonList = filteredPersonList;
+    }
+
+    /**
+     * @param appendResultsToList the appendResultsToList to set
+     */
+    public void setAppendResultsToList(boolean appendResultsToList) {
+        this.appendResultsToList = appendResultsToList;
+    }
+
+    /**
+     * @return the personList
+     */
+    public List<Person> getPersonList() {
+        return personList;
+    }
+
+    /**
+     * @param personList the personList to set
+     */
+    public void setPersonList(List<Person> personList) {
+        this.personList = personList;
+    }
+
+    /**
+     * @return the currentNoteHolder
+     */
+    public IFace_noteHolder getCurrentNoteHolder() {
+        return currentNoteHolder;
+    }
+
+    /**
+     * @param currentNoteHolder the currentNoteHolder to set
+     */
+    public void setCurrentNoteHolder(IFace_noteHolder currentNoteHolder) {
+        this.currentNoteHolder = currentNoteHolder;
+    }
+
+    /**
+     * @return the formNewNoteUniversal
+     */
+    public String getFormNewNoteUniversal() {
+        return formNewNoteUniversal;
+    }
+
+    /**
+     * @param formNewNoteUniversal the formNewNoteUniversal to set
+     */
+    public void setFormNewNoteUniversal(String formNewNoteUniversal) {
+        this.formNewNoteUniversal = formNewNoteUniversal;
+    }
+
+    /**
+     * @return the pageComponentToUpdateAfterNoteCommit
+     */
+    public String getPageComponentToUpdateAfterNoteCommit() {
+        return pageComponentToUpdateAfterNoteCommit;
+    }
+
+    /**
+     * @param pageComponentToUpdateAfterNoteCommit the pageComponentToUpdateAfterNoteCommit to set
+     */
+    public void setPageComponentToUpdateAfterNoteCommit(String pageComponentToUpdateAfterNoteCommit) {
+        this.pageComponentToUpdateAfterNoteCommit = pageComponentToUpdateAfterNoteCommit;
     }
     
      

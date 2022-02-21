@@ -97,7 +97,7 @@ public class UserConfigBB extends BackingBeanUtils{
         System.out.println("UserConfigBB.initBean()");
         UserCoordinator uc = getUserCoordinator();
         setSelectedMuni(getSessionBean().getSessMuni());
-        SearchCoordinator searchCoord = getSearchCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
         MunicipalityCoordinator mc = getMuniCoordinator();
         
         setPageModes(new ArrayList<PageModeEnum>());
@@ -138,13 +138,9 @@ public class UserConfigBB extends BackingBeanUtils{
             System.out.println(ex);
         }
         
-         // user our fancy specialized query to get all Persons who are delcared to 
-        // be user types
-        QueryPerson qp = searchCoord.initQuery(QueryPersonEnum.USER_PERSONS, getSessionBean().getSessUser().getMyCredential());
         try {
-            qp = searchCoord.runQuery(qp);
-            userPersonList = qp.getResults();
-        } catch (SearchException ex) {
+            userPersonList = pc.getHumansMappedToUsers();
+        } catch ( IntegrationException ex) {
             System.out.println(ex);
         }
     }

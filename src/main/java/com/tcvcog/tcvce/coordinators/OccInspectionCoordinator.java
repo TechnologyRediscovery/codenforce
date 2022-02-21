@@ -197,7 +197,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         OccInspectedSpaceElement inspectedElement = new OccInspectedSpaceElement(element);
 
             switch (initialStatus) {
-                case FAIL:
+                case VIOLATION:
                     inspectionAction_configureElementForInspectionNoCompliance( 
                                         inspectedElement, 
                                         user, 
@@ -403,7 +403,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         if (inspection != null) {
             for (OccInspectedSpace inSpace : inspection.getInspectedSpaceList()) {
                 configureOccInspectedSpace(inSpace);
-                if (inSpace.getStatus().getStatusEnum() == OccInspectionStatusEnum.FAIL
+                if (inSpace.getStatus().getStatusEnum() == OccInspectionStatusEnum.VIOLATION
                         || inSpace.getStatus().getStatusEnum() == OccInspectionStatusEnum.NOTINSPECTED) {
                     allSpacesPassed = false;
                 }
@@ -432,15 +432,15 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         
         Map<OccInspectionStatusEnum, List<OccInspectedSpaceElement>> elbsm = new HashMap<>();
         elbsm.put(OccInspectionStatusEnum.PASS, new ArrayList<>());
-        elbsm.put(OccInspectionStatusEnum.FAIL, new ArrayList<>());
+        elbsm.put(OccInspectionStatusEnum.VIOLATION, new ArrayList<>());
         elbsm.put(OccInspectionStatusEnum.NOTINSPECTED, new ArrayList<>());
               
         for (OccInspectedSpaceElement inSpaceEle : inSpace.getInspectedElementList()) {
             configureOccInspectedSpaceElement(inSpaceEle);
             switch(inSpaceEle.getStatusEnum()){
-                case FAIL:
+                case VIOLATION:
                     allElementsPass = false;
-                    elbsm.get(OccInspectionStatusEnum.FAIL).add(inSpaceEle);
+                    elbsm.get(OccInspectionStatusEnum.VIOLATION).add(inSpaceEle);
                     atLeastOneElementInspected = true;
                     break;
                 case NOTINSPECTED:
@@ -467,11 +467,11 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 
             } else if (atLeastOneElementInspected && !allElementsPass) {
 
-                inSpace.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.FAIL));
+                inSpace.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.VIOLATION));
                 iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString(OccInspectionStatusEnum.FAIL.getIconPropertyLookup()));
+                        .getString(OccInspectionStatusEnum.VIOLATION.getIconPropertyLookup()));
                 inSpace.getStatus().setIcon(si.getIcon(iconID));
-//                System.out.println("OccupancyCoordinator.configureOccInspectedSpace | FAIL inspectedSpaceID: " + inSpace.getInspectedSpaceID());
+//                System.out.println("OccupancyCoordinator.configureOccInspectedSpace | VIOLATION inspectedSpaceID: " + inSpace.getInspectedSpaceID());
 
             } else {
 
@@ -555,12 +555,12 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             
             if (inSpaceEle.getLastInspectedBy() != null && inSpaceEle.getComplianceGrantedTS() == null) {
 
-                inSpaceEle.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.FAIL));
+                inSpaceEle.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.VIOLATION));
                 iconID = Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString(OccInspectionStatusEnum.FAIL.getIconPropertyLookup()));
+                        .getString(OccInspectionStatusEnum.VIOLATION.getIconPropertyLookup()));
                 inSpaceEle.getStatus().setIcon(si.getIcon(iconID));
 
-//                System.out.println("OccupancyCoordinator.configureOccInspectedSpaceEleement | FAIL inspectedSpaceElementID: " + inSpaceEle.getInspectedSpaceID());
+//                System.out.println("OccupancyCoordinator.configureOccInspectedSpaceEleement | VIOLATION inspectedSpaceElementID: " + inSpaceEle.getInspectedSpaceID());
             } else if (inSpaceEle.getLastInspectedBy() != null && inSpaceEle.getComplianceGrantedTS() != null) {
 
                 inSpaceEle.setStatus(new OccInspectableStatus(OccInspectionStatusEnum.PASS));
@@ -629,7 +629,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             case NOTINSPECTED:
                 inspectionAction_configureElementForNotInspected(oise, ua, oi);
                 break;
-            case FAIL:
+            case VIOLATION:
                 inspectionAction_configureElementForInspectionNoCompliance(oise, ua, oi, useDefFindOnFail);
                 break;
             case PASS:
@@ -669,7 +669,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                     case NOTINSPECTED:
                         inspectionAction_configureElementForNotInspected(ele, ua, oi);
                         break;
-                    case FAIL:
+                    case VIOLATION:
                         inspectionAction_configureElementForInspectionNoCompliance(ele, ua, oi, useDefFindOnFail);
                         break;
                     case PASS:

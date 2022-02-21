@@ -32,7 +32,13 @@
                                         <div class="publi-login-container">
 
                                             <div class="publi-login-title">
-                                                HI, WELCOME TO <span style="float:right"><span style="color: #DEE461">CODE</span><span style="color:#00B4ED">NFORCE</span> ! </span> 
+                                                WELCOME TO <span style="float:right"><span style="color: #DEE461">CODE</span><span style="color:#00B4ED">NFORCE</span> !</span> 
+                                            </div>
+
+                                            <div class="publi-login-title">
+                                                <p>
+                                                    ALPHA TESTING DEPLOYMENT
+                                                </p>
                                             </div>
 
                                             <div class="public-login-button">
@@ -42,9 +48,17 @@
                                                                  style="width: 100%"/>
                                             </div>
                                             <div class="public-login-text">
+                                                <p style="color:darkred;">
+                                                    This deployment is for TESTING only and no data writes made in this version will migrate or be migrated to the stable deployment unless you coordinate specifically to maintain alpha testing data writes.
+                                                </p>
                                                 <p>
-                                                    TCVCOG staff, code enforcement officials, and other authorized users access tools
-                                                    via mission control
+                                                    Patch String: <h:outputText value="#{loginBB.patchRecord}" />
+                                                </p>
+                                                <p>
+                                                    Data source String: <h:outputText value="#{loginBB.ds}" />
+                                                </p>
+                                                <p>
+                                                    Release ID: <h:outputText value="#{loginBB.releaseID}" />
                                                 </p>
                                             </div>
                                            
