@@ -21,6 +21,8 @@ CREATE TABLE public.occinspectiondispatch
 	retrievalts			TIMESTAMP WITH TIME ZONE,
 	retrievedby_userid	INTEGER CONSTRAINT occinspectiondispatch_retrievedby_userid_fk REFERENCES login (userid),
 	synchronizationts 	TIMESTAMP WITH TIME ZONE,
-	synchronizationnotes TEXT
+	synchronizationnotes TEXT,
+	municipality_municode 	INTEGER NOT NULL CONSTRAINT occinspectiondispatch_municode_fk REFERENCES municipality (municode),
+	municipalityname	TEXT
 );
 
