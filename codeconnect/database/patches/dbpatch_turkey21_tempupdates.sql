@@ -99,20 +99,25 @@ DROP TABLE public.ceactionrequestpdfdoc;
 DROP TABLE public.codeviolationpdfdoc;
 DROP TABLE public.parcelpdfdoc;
 
-CREATE SEQUENCE IF NOT EXISTS occceelementmigrationlog_migrationid_seq
-    START WITH 1000
+
+
+
+CREATE SEQUENCE IF NOT EXISTS occinspectiondispatch_dispatchid_seq
+    START WITH 100
     INCREMENT BY 1
-    MINVALUE 1000
+    MINVALUE 100
     NO MAXVALUE
     CACHE 1;
 
-CREATE TABLE public.occceelementmigrationlog
+CREATE TABLE public.occinspectiondispatch
 (
-	migrationid 						INTEGER PRIMARY KEY DEFAULT nextval('occceelementmigrationlog_migrationid_seq'),
-	inspectionitem_ocsteleid			INTEGER NOT NULL CONSTRAINT occceelementmigrationlog_ocstelid_fk REFERENCES occchecklistspacetypeelement (spacelementid),
-	codeviolation_codeviolatoinid		INTEGER NOT NULL CONSTRAINT occceelementmigrationlog_violationid_fk REFERENCES codeviolatoin (violationid),
-	createdby_userid					INTEGER NOT NULL CONSTRAINT occceelementmigrationlog_createdbyuserid_fk REFERENCES login (userid),
-	createdts							TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
-	batchid								INTEGER NOT NULL,
-	deactivatedts						TIMESTAMP WITH TIME ZONE
+	dispatchid 			INTEGER PRIMARY KEY DEFAULT nextval('occinspectiondispatch_dispatchid_seq'),
+	createdby_userid	INTEGER NOT NULL CONSTRAINT occinspectiondispatch_createdby_userid_fk REFERENCES login (userid),
+	creationts 			TIMESTAMP WITH TIME ZONE NOT NULL,
+	dispatchnotes		TEXT,
+	inspection_inspectionID INTEGER NOT NULL CONSTRAINT occinspectiondispatch_occinspectionid_fk REFERENCES occinspection (inspeectionid),
+	retrievalts			TIMESTAMP WITH TIME ZONE,
+	retrievedby_userid	INTEGER CONSTRAINT occinspectiondispatch_retrievedby_userid_fk REFERENCES login (userid),
+	synchronizationts 	TIMESTAMP WITH TIME ZONE,
+	synchronizationnotes TEXT
 );

@@ -268,6 +268,16 @@ public class PersonBB extends BackingBeanUtils {
     /************** REFRESHING  *******************************/
     /**********************************************************/
     
+    
+    /**
+     * Listener for user wanting to view the current person
+     * @param ev 
+     */
+    public void onViewCurrentPersonLinkClick(ActionEvent ev){
+        refreshCurrentPerson();
+        
+    }
+    
     /**
      * Refreshes the current person
      */
@@ -402,15 +412,22 @@ public class PersonBB extends BackingBeanUtils {
     public void togglePhoneEditMode(){
         System.out.println("PersonBB.togglePhoneEditMode: toggle mode " + currentContactPhoneEditMode);
         if(currentContactPhoneEditMode){
-            PersonCoordinator pc = getPersonCoordinator();
+            if(currentContactPhone != null && currentContactPhoneDisconnected){
+                currentContactPhone.setDisconnectRecordedBy(getSessionBean().getSessUser());
+                currentContactPhone.setDisconnectTS(LocalDateTime.now());
+            } else {
+                currentContactPhone.setDisconnectRecordedBy(null);
+                currentContactPhone.setDisconnectTS(null);
+            }
             if(currentContactPhone != null && currentContactPhone.getPhoneID() == 0){
                 onPhoneAddCommitButtonChange();
                 System.out.println("PersonBB.togglePhoneEditMode: added new phone");
             } else {
                 onPhoneEditCommitButtonChange();
                 System.out.println("PersonBB.togglePhoneEditMode: edited phone");
-            }
+           }
         }
+        
         currentContactPhoneEditMode = !currentContactPhoneEditMode;
         
     }
@@ -419,9 +436,10 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to start adding a new phone number
      * @param ev 
      */
-    public void onPhoneAddInitButtonChange(){
+    public void onPhoneAddInitButtonChange(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
         currentContactPhone = pc.createContactPhoneSkeleton();
+        currentContactPhoneEditMode = true;
         System.out.println("PersonBB.onPhoneAddInitButtonChange");
         
         
@@ -429,15 +447,15 @@ public class PersonBB extends BackingBeanUtils {
     
     /**
      * Listener for user requests to finalize a new phone number
-     * @param ev 
      */
     public void onPhoneAddCommitButtonChange(){
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            currentContactPhone = pc.contactPhoneAdd(currentContactPhone, getSessionBean().getSessUser());
+            currentContactPhone = pc.contactPhoneAdd(currentContactPhone, currentPerson, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Succesfully inserted new phone number with ID " + currentContactPhone.getPhoneID(), ""));
+            refreshCurrentPerson();
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -454,13 +472,13 @@ public class PersonBB extends BackingBeanUtils {
     public void onPhoneEditInitButtonChange(ContactPhone ph){
         if(ph != null){
             currentContactPhone = ph;
+            currentContactPhoneDisconnected = ph.getDisconnectTS() != null;
         }
         currentContactPhoneEditMode = true;
     }
     
     /**
      * Listener for user requests to finalize the phone edit operation
-     * @param ev 
      */
     public void onPhoneEditCommitButtonChange(){
          PersonCoordinator pc = getPersonCoordinator();
@@ -479,6 +497,7 @@ public class PersonBB extends BackingBeanUtils {
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Succesfully Updated new phone number with ID " + currentContactPhone.getPhoneID(), ""));
+            refreshCurrentPerson();
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -497,6 +516,56 @@ public class PersonBB extends BackingBeanUtils {
                  new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Aborted; no changes made!", ""));
         
+
+    }
+
+    /**
+     * Listener for user requests to start the phone removal process
+     * @param ev 
+     */
+    public void onPhoneRemoveInitLinkClick(ActionEvent ev){
+        System.out.println("PersonBB.onPhoneRemoveInitLinkClick");
+        
+    }
+    
+    /**
+     * Listener for user requests to confirm phone removal
+     * @param ev 
+     */
+    public void onPhoneRemoveCommitButtonPress(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        try {
+            pc.contactPhoneDeactivate(currentContactPhone, getSessionBean().getSessUser());
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Succesfully removed phone ID: " + currentContactPhone.getPhoneID(), ""));
+            StringBuilder sb = new StringBuilder();
+            sb.append("Phone ID: ");
+            sb.append(currentContactPhone.getPhoneID());
+            sb.append(" | Phone number: ");
+            sb.append(currentContactPhone.getPhoneNumber());
+            
+            
+            MessageBuilderParams mbp = new MessageBuilderParams(
+                    currentPerson.getNotes(), 
+                    "Phone Removal", 
+                    "The following phone number was removed from this person record: ", 
+                    sb.toString(), 
+                    getSessionBean().getSessUser(), null);
+            currentPerson.setNotes(sc.appendNoteBlock(mbp));
+            sc.writeNotes(currentPerson, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Appended note to Person ID: " + currentPerson.getHumanID() , ""));
+             refreshCurrentPerson();
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Phone removal fatal error: " + ex.getMessage() , ""));
+        } 
+        
     }
     
     
@@ -506,9 +575,9 @@ public class PersonBB extends BackingBeanUtils {
     
     /**
      * Listener for user clicks of the edit button for emails
-     * @param p
+     * @param ev
      */
-    public void toggleEmailEditMode(){
+    public void toggleEmailEditMode(ActionEvent ev){
         System.out.println("PersonBB.toggleEmailEditMode | toggle mode: " + currentContactEmailEditMode);
         if(currentContactEmailEditMode){
             if(currentContactEmail != null && currentContactEmail.getEmailID() == 0){
@@ -527,7 +596,7 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to start adding a new email 
      * @param ev 
      */
-    public void onEmailAddInitButtonChange(){
+    public void onEmailAddInitButtonChange(ActionEvent ev){
         System.out.println("PersonPP.onEmailAddInitButtonChange");
         PersonCoordinator pc = getPersonCoordinator();
         currentContactEmail = pc.createContactEmailSkeleton();
@@ -538,16 +607,16 @@ public class PersonBB extends BackingBeanUtils {
     
     /**
      * Listener for user requests to finalize a new email 
-     * @param ev 
      */
     public void onEmailAddCommitButtonChange(){
           PersonCoordinator pc = getPersonCoordinator();
         try {
-            currentContactEmail = pc.contactEmailAdd(currentContactEmail, getSessionBean().getSessUser());
+            currentContactEmail = pc.contactEmailAdd(currentContactEmail, currentPerson, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Succesfully updated " + currentContactEmail.getEmailaddress()+ ", id " + currentPerson.getHumanID(), ""));
-        } catch (IntegrationException ex) {
+            refreshCurrentPerson();
+        } catch (IntegrationException |  BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -567,14 +636,63 @@ public class PersonBB extends BackingBeanUtils {
     }
     
     /**
-     * Listener for user requests to finalize the email edit operation
+     * Listener for user requests to start the removal process
      * @param ev 
+     */
+    public void onEmailRemoveInitButtonChange(ActionEvent ev){
+        System.out.println("PersonBB.onEmailRemoveInitButtonChange");
+    }
+    
+    /**
+     * Listener for user confirmation to remove an email
+     * @param ev 
+     */
+    public void onEmailRemoveCommitButtonChange(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        try {
+            pc.contactEmailDeactivate(currentContactEmail, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully removed email ID: " + currentContactEmail.getEmailID() , ""));
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("Email ID: ");
+            sb.append(currentContactEmail.getEmailID());
+            sb.append(" | Email address: ");
+            sb.append(currentContactEmail.getEmailaddress());
+            
+            
+            MessageBuilderParams mbp = new MessageBuilderParams(
+                    currentPerson.getNotes(), 
+                    "Email Removal", 
+                    "The following email address was removed from this person record: ", 
+                    sb.toString(), 
+                    getSessionBean().getSessUser(), null);
+            currentPerson.setNotes(sc.appendNoteBlock(mbp));
+            sc.writeNotes(currentPerson, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Appended note to Person ID: " + currentPerson.getHumanID() , ""));
+            refreshCurrentPerson();
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Email removal fatal error: " + ex.getMessage() , ""));
+            
+        }
+    }
+    
+    /**
+     * Listener for user requests to finalize the email edit operation
      */
     public void onEmailEditCommitButtonChange(){
           PersonCoordinator pc = getPersonCoordinator();
         try {
             pc.contactEmailUpdate(currentContactEmail, getSessionBean().getSessUser());
             currentContactEmail = pc.getContactEmail(currentContactEmail);
+            refreshCurrentPerson();
               getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Succesfully updated " + currentPerson.getName() + ", id " + currentPerson.getHumanID(), ""));

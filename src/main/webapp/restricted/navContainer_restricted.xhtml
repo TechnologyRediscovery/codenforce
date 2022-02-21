@@ -364,6 +364,8 @@
 
                                                         <p:commandLink  id="activebob-persontools-cb"
                                                                         value="person tools"
+                                                                        ajax="true"
+                                                                        actionListener="#{personBB.onViewCurrentPersonLinkClick}"
                                                                         oncomplete="PF('person-profile-dialog-var').show();"/>
                                                     </div>
                                                 </div>

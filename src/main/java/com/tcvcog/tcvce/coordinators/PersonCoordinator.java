@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.tcvcog.tcvce.entities.LinkedObjectFamilyEnum;
 import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
+import java.time.LocalDateTime;
 
 /**
  * The master controller class for Humans and their Java incarnation called
@@ -468,6 +469,12 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         }
     }
     
+    /**
+     * Extracts a phone by ID from the DB
+     * @param phid
+     * @return
+     * @throws IntegrationException 
+     */
     public ContactPhone getContactPhone(int phid) throws IntegrationException{
         if(phid != 0){
             PersonIntegrator pi = getPersonIntegrator();
@@ -493,21 +500,54 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * Logic intermediary for updating phone numbers
      * @param phone
      * @param ua 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public void contactPhoneUpdate(ContactPhone phone, UserAuthorized ua) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
+        if(phone == null || ua == null){
+            throw new BObStatusException("Cannot update phone witn null phone or user");
+        }
+        phone.setLastUpdatedBy(ua);
         pi.updateContactPhone(phone);
+    }
+    
+    /**
+     * Logic block for deactivating a phone number record
+     * @param phone to deactivate
+     * @param ua doing the deactivation
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void contactPhoneDeactivate(ContactPhone phone, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(phone == null || ua == null){
+            throw new BObStatusException("Cannot deactivate phone with null phone or user");
+        }
+        PersonIntegrator pi = getPersonIntegrator();
+        phone.setDeactivatedBy(ua);
+        phone.setDeactivatedTS(LocalDateTime.now());
+        phone.setLastUpdatedBy(ua);
+        pi.updateContactPhone(phone);
+        
+        
     }
     
     
     /**
      * Logic intermediary for adding a new phone number to the DB
      * @param phone
+     * @param p
      * @param ua
      * @return 
      */
-    public ContactPhone contactPhoneAdd(ContactPhone phone, UserAuthorized ua) throws IntegrationException, BObStatusException{
+    public ContactPhone contactPhoneAdd(ContactPhone phone, Person p, UserAuthorized ua) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
+        if(phone == null || p == null || ua == null){
+            throw new BObStatusException("Cannot insert phone with null phone, person, or user");
+        }
+        phone.setCreatedBy(ua);
+        phone.setLastUpdatedBy(ua);
+        phone.setHumanID(p.getHumanID());
         return getContactPhone(pi.insertContactPhone(phone));
         
     }
@@ -528,6 +568,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * from the database, all configured and ready for injection into a Person!
      * @param emids
      * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
     public List<ContactEmail> getContactEmailList(List<Integer> emids) throws IntegrationException{
         List<ContactEmail> emailList = new ArrayList<>();
@@ -579,9 +620,15 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * Logic intermediary for updating email records 
      * @param em
      * @param ua 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public void contactEmailUpdate(ContactEmail em, UserAuthorized ua) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
+        if(em == null || ua == null){
+            throw new BObStatusException("Cannot update email with null email, or user");
+        }
+        em.setLastUpdatedBy(ua);
         pi.updateContactEmail(em);
         
     }
@@ -589,15 +636,42 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Logic intermediary for adding new emaiil addresses to the DB
      * @param em
+     * @param p
      * @param ua 
      * @return the new ContactEmail with a DB key
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public ContactEmail contactEmailAdd(ContactEmail em, UserAuthorized ua) throws IntegrationException{
+    public ContactEmail contactEmailAdd(ContactEmail em, Person p, UserAuthorized ua) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
+        if(em == null || p == null || ua == null){
+            throw new BObStatusException("Cannot write new email with null email, person, or user");
+        }
+        em.setCreatedBy(ua);
+        em.setLastUpdatedBy(ua);
+        em.setHumanID(p.getPersonID());
+        
         return getContactEmail(pi.insertContactEmail(em));
     }
     
+    /**
+     * Logic block for deactivating an email
+     * @param em to deac
+     * @param ua doing the deactivation
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void contactEmailDeactivate(ContactEmail em, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(em == null || ua == null){
+            throw new BObStatusException("Cannot Deac an email with null email or user");
+        }
+        PersonIntegrator pi = getPersonIntegrator();
+        em.setDeactivatedBy(ua);
+        em.setDeactivatedTS(LocalDateTime.now());
+        em.setLastUpdatedBy(ua);
+        pi.updateContactEmail(em);
+        
+        
+    }
     
    
     

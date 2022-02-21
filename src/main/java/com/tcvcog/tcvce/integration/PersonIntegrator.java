@@ -237,7 +237,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      */
     private Human generateHuman(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         SystemIntegrator si = getSystemIntegrator();
-        
+        UserCoordinator uc = getUserCoordinator();
         Human h = new Human();
         
         h.setHumanID(rs.getInt("humanid"));
@@ -253,6 +253,16 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         if(rs.getInt("source_sourceid") != 0){
             si.getBOBSource(rs.getInt("source_sourceid"));
         }
+        
+        h.setNotes(rs.getString("notes"));
+        if(rs.getDate("deceaseddate") != null){
+            h.setDeceasedDate(rs.getDate("deceaseddate").toLocalDate());
+        }
+        if(rs.getInt("deceasedby_userid") != 0){
+            h.setDeceasedBy(uc.user_getUser(rs.getInt("deceasedby_userid")));
+        }
+        
+        h.setCloneOfHumanID(rs.getInt("cloneof_humanid"));
         
         // Ship to our SystemIntegrator for standard fields
         si.populateTrackedFields(h, rs, true);
@@ -776,7 +786,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             
-            String s =  "SELECT phoneid FROM contactphone WHERE human_humanid=? ";
+            String s =  "SELECT phoneid FROM contactphone WHERE human_humanid=? AND deactivatedts IS NULL; ";
             
             stmt = con.prepareStatement(s);
             stmt.setInt(1, humanID);
@@ -818,7 +828,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             
-            String s =  "SELECT emailid FROM contactemail WHERE human_humanid=?; ";
+            String s =  "SELECT emailid FROM contactemail WHERE human_humanid=? AND deactivatedts IS NULL; ";
             
             stmt = con.prepareStatement(s);
             stmt.setInt(1, humanID);
@@ -863,7 +873,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             if(rs.getTimestamp("bouncets") != null){
                 em.setBounceTS(rs.getTimestamp("bouncets").toLocalDateTime());
             }
-            
+            em.setNotes(rs.getString("notes"));
             si.populateTrackedFields(em, rs, true);
             
             return em;
@@ -891,8 +901,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         try {
             
             String s =  "UPDATE public.contactemail\n" +
-                        "   SET human_humanid=?, emailaddress=?,\n" +
-                        "       lastupdatedts=now(), lastupdatedby_userid=?, \n" +
+                        "   SET human_humanid=?, emailaddress=?, \n" +
+                        "       lastupdatedts=now(), lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?, bouncets=?  \n" +
                         " WHERE emailid=?;";
             
             stmt = con.prepareStatement(s);
@@ -905,8 +915,26 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
+            
+            if(em.getDeactivatedTS()!= null){
+                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(em.getDeactivatedTS()));
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+             if(em.getDeactivatedBy()!= null){
+                stmt.setInt(5, em.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+             if(em.getBounceTS() != null){
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(em.getBounceTS()));
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
 
-            stmt.setInt(4, em.getEmailID());
+            stmt.setInt(7, em.getEmailID());
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
@@ -920,42 +948,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-    /**
-     * Updates a record in the contactemail table
-     * @param em with all fields ready for insertion
-     * @throws IntegrationException 
-     */
-    public void updateContactEmailForBounce(ContactEmail em) throws IntegrationException {
-
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-
-        try {
-            
-            String s =  "UPDATE public.contactemail\n" +
-                        "   SET bouncets=now(), \n" +
-                        "       lastupdatedts=now(), lastupdatedby_userid=?, \n" +
-                        "       notes=?\n" +
-                        " WHERE emailid=?;";
-            
-            stmt = con.prepareStatement(s);
-            if(em.getLastUpdatedBy() != null){
-                stmt.setInt(1, em.getLastUpdatedBy().getUserID());
-            } else {
-                stmt.setNull(1, java.sql.Types.NULL);
-            }
-                  
-            stmt.setInt(2, em.getEmailID());
-
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator ...", ex);
-        } finally {
-           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
+ 
     
     /**
      * Creates a new record in the contactemail table
@@ -974,9 +967,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             String s =  "INSERT INTO public.contactemail(\n" +
                         "            emailid, human_humanid, emailaddress, createdts, createdby_userid, \n" +
-                        "            lastupdatedts, lastupdatedby_userid \n" +
+                        "            lastupdatedts, lastupdatedby_userid) \n" +
                         "    VALUES (DEFAULT, ?, ?, now(), ?, \n" +
-                        "            now(), ?)";
+                        "            now(), ?);";
             
             stmt = con.prepareStatement(s);
              if(em.getHumanID() != 0){
@@ -1109,7 +1102,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             String s =  "UPDATE public.contactphone\n" +
                         "   SET human_humanid=?, phonenumber=?, phoneext=?, phonetype_typeid=?, \n" +
                         "       disconnectts=?, disconnect_userid=?, \n" +
-                        "       lastupdatedts=now(), lastupdatedby_userid=? \n" +
+                        "       lastupdatedts=now(), lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=? \n" +
                         " WHERE phoneid=? ;";
             
             stmt = con.prepareStatement(s);
@@ -1152,7 +1145,20 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(7, java.sql.Types.NULL);
             }
             
-            stmt.setInt(8, phone.getPhoneID());
+            if(phone.getDeactivatedTS()!= null){
+                stmt.setTimestamp(8, java.sql.Timestamp.valueOf(phone.getDeactivatedTS()));
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            
+            if(phone.getDeactivatedBy()!= null){
+                stmt.setInt(9, phone.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            
+            
+            stmt.setInt(10, phone.getPhoneID());
 
             stmt.executeUpdate();
 
@@ -1186,8 +1192,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             String s =  "INSERT INTO public.contactphone(\n" +
                         "            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, \n" +
                         "            createdts, createdby_userid, \n" +
-                        "            lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
-                        "            notes)\n" +
+                        "            lastupdatedts, lastupdatedby_userid )\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
                         "            now(), ?, \n" +
                         "            now(), ?);";

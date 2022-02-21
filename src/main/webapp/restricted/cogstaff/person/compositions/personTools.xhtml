@@ -11,9 +11,6 @@
                  />
     </h:form>
 
-
-
-
     <p:dialog   id="human-search-dialog"
                 height="700" width="1200"
                 widgetVar="human-search-dialog-var"
@@ -127,9 +124,7 @@
                                     <h:message for="pers-filter-name-first-val" showDetail="true" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </h:panelGroup>
-
                             </h:panelGrid>
-
 
                             <h:panelGrid columns="2" cellpadding="10" footerClass="gridFooter"
                                          columnClasses="gridTd-solid-back, gridTd-solid-back">
@@ -151,7 +146,6 @@
                                                  disabled="#{!personBB.paramsSelected.bobID_ctl}"/>
                                     <h:message for="filter-bobid-val" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
                                 </h:panelGroup>
                             </h:panelGrid>
                         </h:panelGrid>
@@ -172,14 +166,11 @@
                                           value="#{personBB.querySelected.queryLog}" 
                                           escape="false"/>
                         </div>
-
                     </h:form>
                 </p:panel>
-
             </div>
 
             <div class="p-col">
-
                 <p:panel    id="pers-search-results-panel"
                             toggleable="true"
                             widgetVar="pers-search-results-panel-var"
@@ -217,14 +208,11 @@
 
                                 </div>
                             </div>
-
                         </div>
 
                         <h:outputText value="list contains #{personBB.querySelected.results.size()} persons" 
                                       styleClass="italic"/>
                         <p:spacer height="5px" />
-
-                        <p:spacer height="2px"/>
 
                         <p:dataTable
                             id="personTable"
@@ -507,19 +495,16 @@
                         </div>
                     </h:form>
                 </p:panel>
-
             </div>
             <div class="p-col">
-
                 <p:panel id="person-adresses-panel"
                          toggleable="true"
                          collapsed="false"
                          header="Addresses">
-
                     <h:form id="person-profile-addresses-form">
-
                         <p:commandButton      id="addresses-add-cb"
                                               ajax="true"
+                                              icon="fa fa-link"
                                               actionListener="#{addressBB.onMailingAddressAddInitButtonChange}"
                                               oncomplete="PF('address-dialog-var').show()"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
@@ -597,11 +582,13 @@
 
                         <p:commandButton     id="phones-add-cb"
                                              ajax="true"
+                                             icon="fa fa-phone-square"
                                              actionListener="#{personBB.onPhoneAddInitButtonChange}"
                                              oncomplete="PF('phone-dialog-var').show()"
                                              rendered="true"
                                              value="Add phone number" 
-                                             update="@form:@parent:phone-info-form"/>
+                                             update="@form:@parent:phone-info-form
+                                             phone-dialog"/>
 
 
                         <p:spacer height="5px"/>
@@ -626,6 +613,15 @@
                                     <h:outputText value="Number"/>
                                 </f:facet>
                                 <h:outputText value="#{ph.phoneNumber}" />
+                                <p:spacer height="3px"
+                                          rendered="#{!empty ph.disconnectTS}" />
+                                <h:outputText   rendered="#{!empty ph.disconnectTS}"
+                                                    style="color:red;"
+                                                    value="#{!empty ph.disconnectTS ? 'Flagged as disonnected on: ': ''}" />
+                                <h:outputText   rendered="#{!empty ph.disconnectTS}"
+                                                    style="color:red;"
+                                                    value="#{!empty ph.disconnectTS ? personBB.getPrettyDate(ph.disconnectTS) : ''}" />
+                                
                             </p:column>
 
                             <p:column width="25%">
@@ -664,6 +660,7 @@
 
                         <p:commandButton      id="email-add-cb"
                                               ajax="true"
+                                              icon="fa fa-envelope-open"
                                               actionListener="#{personBB.onEmailAddInitButtonChange}"
                                               oncomplete="PF('email-dialog-var').show()"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
@@ -693,6 +690,14 @@
                                     <h:outputText value="Address"/>
                                 </f:facet>
                                 <h:outputText value="#{ea.emailaddress}" />
+                                <p:spacer height="3px"
+                                          rendered="#{!empty ea.bounceTS}" />
+                                    <h:outputText   rendered="#{!empty ea.bounceTS}"
+                                                    style="color:red;"
+                                                    value="#{!empty ea.bounceTS ? 'Bounced on: ': ''}" />
+                                    <h:outputText   rendered="#{!empty ea.bounceTS}"
+                                                    style="color:red;"
+                                                    value="#{!empty ea.bounceTS ? personBB.getPrettyDate(ea.bounceTS) : ''}" />
                             </p:column>
 
                             <p:column width="25%">
@@ -840,10 +845,7 @@
                 </p:panel>
             </div>
         </div>
-
-
     </p:dialog>
-
 
     <p:dialog   id="human-createlink-dialog"
                 height="400" width="400"
@@ -858,7 +860,6 @@
                 >
 
         <h:form id="human-createlink-form">
-
 
             <h:outputText value="#{personBB.currentPerson.name} (ID:#{personBB.currentPerson.humanID})" />
             <p:spacer height="5px"/>
@@ -939,12 +940,8 @@
                              oncomplete="PF('humanlink-note-dialog-var').hide()"
                              update="person-links-form
                              persontools-growl-form"/>
-
-
         </h:form>
-
     </p:dialog>
-
 
     <p:dialog   id="humanlink-changetarget-dialog"
                 height="600" width="600"
@@ -1011,7 +1008,6 @@
         </h:form>
     </p:dialog>
 
-
     <p:dialog   id="humanlink-deactivate-dialog"
                 height="400" width="400"
                 widgetVar="humanlink-deactivate-dialog-var"
@@ -1036,12 +1032,8 @@
                              oncomplete="PF('humanlink-deactivate-dialog-var').hide()"
                              update="person-links-form
                              persontools-growl-form"/>
-
-
         </h:form>
-
     </p:dialog>
-
 
     <p:dialog   id="phone-dialog"
                 height="700" width="600"
@@ -1070,6 +1062,7 @@
                                  actionListener="#{personBB.togglePhoneEditMode}"
                                  oncomplete="PF('phone-dialog-var').show()"
                                  update="@form
+                                 person-profile-phones-form
                                  persontools-growl-form"/>
 
 
@@ -1080,7 +1073,7 @@
                                         rendered="#{personBB.currentContactPhoneEditMode}"
                                         value="Abort edit"
                                         actionListener="#{personBB.onPhoneOperationAbortButtonChange}"
-                                        oncomplete="PF('person-profile-dialog-var').show()"
+                                        oncomplete="PF('phone-dialog-var').show()"
                                         update="@form
                                         persontools-growl-form"
                                         icon="fa fa-stop" />
@@ -1153,17 +1146,22 @@
                     <div class="p-col-6">
                         <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
                                         value="#{empty personBB.currentContactPhone.disconnectTS ? 'No' : 'Yes'}" />
+                        <p:spacer height="3px" 
+                                  rendered="#{!empty personBB.currentContactPhone.disconnectTS and !personBB.currentContactPhoneEditMode}"/>
 
-                        <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
+                        <h:outputText   rendered="#{!empty personBB.currentContactPhone.disconnectTS and !personBB.currentContactPhoneEditMode}"
                                         value="#{!empty personBB.currentContactPhone.disconnectTS ? 'Recorded by ' : ''}" />
 
-                        <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
+                        <h:outputText   rendered="#{!empty personBB.currentContactPhone.disconnectTS and !personBB.currentContactPhoneEditMode}"
                                         value="#{!empty personBB.currentContactPhone.disconnectRecordedBy ? personBB.currentContactPhone.disconnectRecordedBy.human.name : ''}" />
 
-                        <p:spacer height="5px" />
+                        <p:spacer height="3px" 
+                                  rendered="#{!empty personBB.currentContactPhone.disconnectTS and !personBB.currentContactPhoneEditMode}"/>
 
-                        <h:outputText   rendered="#{!personBB.currentContactPhoneEditMode}"
+                        <h:outputText   rendered="#{!empty personBB.currentContactPhone.disconnectTS and !personBB.currentContactPhoneEditMode}"
                                         value="#{!empty personBB.currentContactPhone.disconnectTS ? 'on ' : ''}" />
+                        <h:outputText   rendered="#{!empty personBB.currentContactPhone.disconnectTS and !personBB.currentContactPhoneEditMode}"
+                                        value="#{!empty personBB.currentContactPhone.disconnectTS ? personBB.getPrettyDate(personBB.currentContactPhone.disconnectTS) : ''}" />
 
                         <p:selectBooleanCheckbox rendered="#{personBB.currentContactPhoneEditMode}"
                                                  value="#{personBB.currentContactPhoneDisconnected}" />
@@ -1185,7 +1183,22 @@
                                         value="by #{personBB.currentContactPhone.lastUpdatedBy.username}" />
                     </div>
 
-                    <div class="p-col-6">Record status</div>
+                    <div class="p-col-6">Record status
+                     <p:spacer height="3px" />
+                        <p:commandLink      id="phone-deac-init-cl"
+                                            ajax="true"
+                                            actionListener="#{personBB.onPhoneRemoveInitLinkClick}"
+                                            style="color:blue;"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                            disabled="#{personBB.currentContactPhoneEditMode}"
+                                            oncomplete="PF('phone-deactivate-dialog-var').show()"
+                                            update="phone-deactivate-form
+                                            phone-deactivate-dialog"
+                                            value="remove record" >
+                            
+                        </p:commandLink>
+                    
+                    </div>
                     <div class="p-col-6">
                         <h:outputText value="#{empty personBB.currentContactPhone.deactivatedTS ? 'active' : 'deactivated on'}" />
                         <p:spacer height="2px" />
@@ -1215,13 +1228,10 @@
                         <h:outputText value="#{personBB.currentContactPhone.notes}" 
                                       escape="false"/>
                     </div>
-
-
                 </div>
             </h:form>
         </p:panel>
     </p:dialog>
-
 
 
     <p:dialog   id="email-dialog"
@@ -1249,7 +1259,9 @@
                                  icon="fa #{personBB.currentContactEmailEditMode ? 'fa-check' : 'fa-pencil'}"
                                  actionListener="#{personBB.toggleEmailEditMode}"
                                  oncomplete="PF('email-dialog-var').show()"
-                                 update="email-info-form"/>
+                                 update="email-info-form
+                                 person-profile-emails-form
+                                 persontools-growl-form"/>
 
 
                 <div class="restrict-main-contents-io-button gray_button">
@@ -1258,13 +1270,11 @@
                                         ajax="true"
                                         rendered="#{personBB.currentContactEmailEditMode}"
                                         value="Abort edit"
-                                        process="@none"
-                                        immediate="true"
                                         actionListener="#{personBB.onEmailOperationAbortButtonChange}"
                                         oncomplete="PF('person-profile-dialog-var').show()"
-                                        update="email-info-form"
+                                        update="email-info-form
+                                        persontools-growl-form"
                                         icon="fa fa-stop" />
-
                 </div>
 
                 <p:spacer height="5px"/>    
@@ -1276,14 +1286,14 @@
                         <h:outputText rendered="#{!personBB.currentContactEmailEditMode}" 
                                       value="#{personBB.currentContactEmail.emailID eq 0 ? 'new record' : personBB.currentContactEmail.emailID}"/>
 
-                        <p:inputMask    id="email-inputmask"
+                        <p:inputText    id="email-inputmask"
                                         rendered="#{personBB.currentContactEmailEditMode}"
                                         value="#{personBB.currentContactEmail.emailaddress}"
-                                        mask="a*@a*.a*" 
-                                        validateMask="true"
                                         validatorMessage="Enter email in format address@domain.com/org/etc"
                                         requiredMessage="An email address is required to complete the form"
-                                        required="true"/>
+                                        required="true">
+                              <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                        </p:inputText>
                     </div>
 
                     <div class="p-col-6">Address</div>
@@ -1300,7 +1310,10 @@
                                         value="#{empty personBB.currentContactEmail.bounceTS ? 'No' : 'Yes'}" />
 
                         <h:outputText   rendered="#{!personBB.currentContactEmailEditMode}"
-                                        value="#{!empty personBB.currentContactEmail.bounceTS ? 'Bounce on ' : ''}" />
+                                        value="#{!empty personBB.currentContactEmail.bounceTS ? 'Bounce recorded ' : ''}" />
+                        
+                        <h:outputText   rendered="#{!personBB.currentContactEmailEditMode}"
+                                        value="#{!empty personBB.currentContactEmail.bounceTS ? personBB.getPrettyDate(personBB.currentContactEmail.bounceTS) : ''}" />
 
                         <p:calendar id="email-bounce-cal"  
                                     rendered="#{personBB.currentContactEmailEditMode}" 
@@ -1332,7 +1345,22 @@
                                         value="by #{personBB.currentContactEmail.lastUpdatedBy.username}" />
                     </div>
 
-                    <div class="p-col-6">Record status</div>
+                    <div class="p-col-6">Record status
+                        <p:spacer height="3px" />
+                        <p:commandLink      id="email-deac-init-cl"
+                                            ajax="true"
+                                            actionListener="#{personBB.onEmailRemoveInitButtonChange}"
+                                            style="color:blue;"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                            disabled="#{personBB.currentContactEmailEditMode}"
+                                            oncomplete="PF('email-deactivate-dialog-var').show()"
+                                            update="email-deactivate-form
+                                            email-deactivate-dialog"
+                                            value="remove record" >
+                            
+                        </p:commandLink>
+                    
+                    </div>
                     <div class="p-col-6">
                         <h:outputText value="#{empty personBB.currentContactEmail.deactivatedTS ? 'active' : 'deactivated on'}" />
                         <p:spacer height="2px" />
@@ -1367,8 +1395,62 @@
             </h:form>
         </p:panel>
     </p:dialog>
+    
+    <p:dialog   id="phone-deactivate-dialog"
+                height="400" width="400"
+                widgetVar="phone-deactivate-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Remove phone number #{personBB.currentContactPhone.phoneNumber}"
+                rendered="true"
+                >
 
+        <h:form id="phone-deactivate-form">
+            <h:outputText value="Remove a phone number is irreversible!" />
 
+            <p:commandButton id="phone-deactivate-confirm-button"
+                             value="Remove phone number ID: #{personBB.currentContactPhone.phoneID}"
+                             rendered="true"
+                             icon="fa fa-trash"
+                             ajax="true"
+                             actionListener="#{personBB.onPhoneRemoveCommitButtonPress}"
+                             oncomplete="PF('phone-deactivate-dialog-var').hide(); PF('phone-dialog-var').hide();"
+                             update="person-info-form
+                             person-profile-phones-form
+                             persontools-growl-form"/>
+        </h:form>
+    </p:dialog>
+    
+    <p:dialog   id="email-deactivate-dialog"
+                height="400" width="400"
+                widgetVar="email-deactivate-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Remove email address #{personBB.currentContactEmail.emailaddress}"
+                rendered="true"
+                >
+
+        <h:form id="email-deactivate-form">
+            <h:outputText value="Removing an email address is irreversible!" />
+
+            <p:commandButton id="email-deactivate-confirm-button"
+                             value="Remove email address  ID: #{personBB.currentContactEmail.emailID}"
+                             rendered="true"
+                             icon="fa fa-trash"
+                             ajax="true"
+                             actionListener="#{personBB.onEmailRemoveCommitButtonChange}"
+                             oncomplete="PF('email-deactivate-dialog-var').hide(); PF('email-dialog-var').hide();"
+                             update="person-info-form
+                             person-profile-emails-form
+                             persontools-growl-form"/>
+        </h:form>
+    </p:dialog>
 
     <p:dialog   id="universal-note-dialog"
                 height="400" width="400"
@@ -1404,12 +1486,6 @@
                              oncomplete="PF('universal-note-dialog-var').hide()"
                              update="#{personBB.pageComponentToUpdateAfterNoteCommit}
                              persontools-growl-form"/>
-
-
         </h:form>
-
     </p:dialog>
-
-
-
 </ui:composition>
