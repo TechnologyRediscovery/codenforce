@@ -17,7 +17,7 @@ CREATE TABLE public.occinspectiondispatch
 	createdby_userid	INTEGER NOT NULL CONSTRAINT occinspectiondispatch_createdby_userid_fk REFERENCES login (userid),
 	creationts 			TIMESTAMP WITH TIME ZONE NOT NULL,
 	dispatchnotes		TEXT,
-	inspection_inspectionID INTEGER NOT NULL CONSTRAINT occinspectiondispatch_occinspectionid_fk REFERENCES occinspection (inspeectionid),
+	inspection_inspectionID INTEGER NOT NULL CONSTRAINT occinspectiondispatch_occinspectionid_fk REFERENCES occinspection (inspectionid),
 	retrievalts			TIMESTAMP WITH TIME ZONE,
 	retrievedby_userid	INTEGER CONSTRAINT occinspectiondispatch_retrievedby_userid_fk REFERENCES login (userid),
 	synchronizationts 	TIMESTAMP WITH TIME ZONE,
