@@ -22,8 +22,10 @@ import java.time.LocalDateTime;
  * Represents a single street
  * @author Ellen Bascomb of 31Y
  */
-public class MailingStreet extends TrackedEntity{
-    
+public  class   MailingStreet 
+        extends TrackedEntity
+        implements IFace_noteHolder{
+   
     private int streetID;
     private String name;
     private MailingCityStateZip cityStateZip;
@@ -59,6 +61,7 @@ public class MailingStreet extends TrackedEntity{
     /**
      * @return the notes
      */
+    @Override
     public String getNotes() {
         return notes;
     }
@@ -96,6 +99,7 @@ public class MailingStreet extends TrackedEntity{
     /**
      * @param notes the notes to set
      */
+    @Override
     public void setNotes(String notes) {
         this.notes = notes;
     }
@@ -122,6 +126,12 @@ public class MailingStreet extends TrackedEntity{
     @Override
     public String getDBTableName() {
        return TABLE_NAME;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return "Mailing Street";
+        
     }
     
 }

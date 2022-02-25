@@ -653,9 +653,13 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @param addrID record key
      * @return populated Objectified mailingaddress
      * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public MailingAddress getMailingAddress(int addrID) throws IntegrationException, BObStatusException{
-        
+        if(addrID == 0){
+            throw new BObStatusException("cannot fetch address of ID 0!");
+            
+        }
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -731,7 +735,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public List<ParcelMailingAddressLink> getMailingAddressListByParcel(int parcelID) 
+    public List<ParcelMailingAddressLink> getMailingAddressLinkListByParcel(int parcelID) 
             throws IntegrationException, BObStatusException{
         
         List<ParcelMailingAddressLink> pmall = new ArrayList<>();
@@ -989,8 +993,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public void updateMailingStreet(MailingStreet ms) throws BObStatusException, IntegrationException{
-          if(ms == null || ms.getStreetID() != 0 || ms.getCityStateZip() == null || ms.getCityStateZip().getCityStateZipID() == 0){
-            throw new BObStatusException("Cannot insert street with null street or ID != 0, or zip of null or id = 0");
+          if(ms == null || ms.getStreetID() == 0 || ms.getCityStateZip() == null || ms.getCityStateZip().getCityStateZipID() == 0){
+            throw new BObStatusException("Cannot insert street with null street or ID == 0, or zip of null or id = 0");
         }
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1118,7 +1122,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
      * Primary entry point for queries against the mailingcitystatezip
      * table. 
      * 
-     * 
      * @param params
      * @return List MailingCityState records
      * @throws IntegrationException 
@@ -1138,15 +1141,12 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         // **    FILTER COM-4 OBJECT ID     **
         // ***********************************
          if (!params.isBobID_ctl()) {
-           
-
             //**************************************
            // **   FILTER CSZ-1   ZIP            **
            // **************************************
             if (params.isZip_ctl()) {
                 params.appendSQL("AND zip_code ILIKE ? ");
             }
-
             //***************************************
            // **   FILTER CSZ-2:  STATE **
            // ***************************************
@@ -1154,40 +1154,30 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 params.appendSQL("AND state_abbr ILIKE ? ");
             }
 
-            
             //***************************************
            // **   FILTER CSZ-3:  CITY **
            // ***************************************
             if (params.isCity_ctl()) {
                 params.appendSQL("AND city ILIKE ? ");
             }
-            
             //***************************************
            // **   FILTER CSZ-4:  RECORD TYPE **
            // ***************************************
             if (params.isRecordType_ctl()) {
                 params.appendSQL("AND list_type=? ");
             }
-            
-            
             //***************************************
            // **   FILTER CSZ-5:  DEFAULT TYPE **
            // ***************************************
             if (params.isDefaultType_ctl()) {
                 params.appendSQL("AND default_type=?");
             }
-            
-            
-            
             //***************************************
            // **   FILTER CSZ-6:  DEFAULT CITY**
            // ***************************************
             if (params.isDefaultCity_ctl()) {
                 params.appendSQL("AND default_city ILIKE ?");
             }
-            
-            
-           
         // ****************************
         // ** COM-4  OBJECT ID       **
         // **************************** 
@@ -1242,8 +1232,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                   str.append("%");
                   stmt.setString(++paramCounter, str.toString());
                 }
-                
-
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());
             }

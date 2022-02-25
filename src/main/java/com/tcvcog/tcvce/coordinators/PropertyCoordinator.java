@@ -74,6 +74,28 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     
     
     /**
+     * Getter for MailingAddress objects
+     * @param addressid the ID of the requested address, cannot be zero
+     * @return the object
+     */
+    public MailingAddress getMailingAddress(int addressid) throws IntegrationException, BObStatusException {
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.getMailingAddress(addressid);
+        
+    }
+    
+    /**
+     * Getter for Streets
+     * @param streetid the street ID
+     * @return the object
+     */
+    public MailingStreet getMailingStreet(int streetid) throws IntegrationException, BObStatusException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.getMailingStreet(streetid);
+        
+    }
+    
+    /**
      * Factory for MailingStreet objects
      * @param csz to be injected into the new street, can be null
      * @return the empty MailingStreet with id = 0
@@ -125,7 +147,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public void updateMailingStreet(MailingStreet street, UserAuthorized ua) throws BObStatusException, IntegrationException{
         if(street == null || street.getCityStateZip() == null || ua == null){
-            throw new BObStatusException("Cannot insert street with null street, zip, or user");
+            throw new BObStatusException("Cannot update street with null street, zip, or user");
         }
         
         PropertyIntegrator pi = getPropertyIntegrator();
@@ -137,14 +159,24 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     
     /**
      * Logic container for deactivating a street record
-     * @param street
-     * @param ua
+     * I will also deactivate all addresses linked to this 
+     * street and all the links to those addresses!
+     * @param street to deactivate
+     * @param ua doing the deactivating
      * @throws BObStatusException
      * @throws IntegrationException 
      */
     public void deactivateMailingStreet(MailingStreet street, UserAuthorized ua) throws BObStatusException, IntegrationException{
         if(street == null || street.getCityStateZip() == null || ua == null){
-            throw new BObStatusException("Cannot insert street with null street, zip, or user");
+            throw new BObStatusException("Cannot deactivate street with null street, zip, or user");
+        }
+        // start by deactivating the addresses on this street
+        
+        List<MailingAddress> mal = getMailingAddressListByStreet(street);
+        if(mal != null && !mal.isEmpty()){
+            for(MailingAddress ma: mal){
+                deactivateMailingAddress(ma, ua);
+            }
         }
         
         PropertyIntegrator pi = getPropertyIntegrator();
@@ -202,10 +234,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * Logic stop for inserts of MailingAddress objects
      * @param addr to update; i'll inject the last updated by
      * @param ua doing the updating
+     * @return the object ID of the freshly inserted record
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void insertMailingAddress(MailingAddress addr, UserAuthorized ua) 
+    public int insertMailingAddress(MailingAddress addr, UserAuthorized ua) 
             throws BObStatusException, IntegrationException{
         if(addr == null || ua == null){
             throw new BObStatusException("Cannot update address with null incoming address or user");
@@ -217,7 +250,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyIntegrator pi = getPropertyIntegrator();
         addr.setCreatedBy(ua);
         addr.setLastUpdatedBy(ua);
-        pi.updateMailingAddress(addr);
+        return pi.insertMailingAddress(addr);
     }
     
     /**
@@ -250,15 +283,15 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             throw new BObStatusException("Cannot update address with null incoming address or user");
         }
         PropertyIntegrator pi = getPropertyIntegrator();
+        // deactivate links to this mailing address first
+        
+        
+        
         addr.setDeactivatedBy(ua);
         addr.setLastUpdatedBy(ua);
         addr.setDeactivatedTS(LocalDateTime.now());
         pi.updateMailingAddress(addr);
     }
-    
-    
-    
-    
     
      /**
      * Extracts the house number and street name from the address field
@@ -529,12 +562,14 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      *
      * @param p
      * @return
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public Property configureProperty(Property p) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         
         p.setUnitList(pi.getPropertyUnitList(p));
-        p.setAddresses(pi.getMailingAddressListByParcel(p.getParcelKey()));
+        p.setAddresses(pi.getMailingAddressLinkListByParcel(p.getParcelKey()));
         
         // Don't need this for humanization
 //        parseAddress(p);

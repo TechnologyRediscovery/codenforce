@@ -222,6 +222,27 @@
                                 <h:outputText   rendered="#{!empty addressBB.currentAddress.deactivatedBy}"
                                                 value="by #{addressBB.currentAddress.deactivatedBy.username}" />
                             </div>
+                            <div class="p-col-6">
+                                Notes
+                                <p:spacer height="3px" />
+                            
+                                <p:commandLink  id="address-notes-init-clink"
+                                                ajax="true"
+                                                style="color:blue;"
+                                                oncomplete="PF('address-note-dialog-var').show()"
+                                                rendered="#{!addressBB.editModeCurrentAddress}"
+                                                update="address-note-dialog
+                                                address-note-form"
+                                                value="Attach note"
+                                                actionListener="#{addressBB.onMailingAddressNoteInitButtonChange}">
+
+                                </p:commandLink>
+                            
+                            </div>
+                            <div class="p-col-6">
+                                <h:outputText value="#{addressBB.currentAddress.notes}"
+                                              escape="false" />
+                            </div>
                         </div>
                     </h:form>
                 </p:panel>
@@ -521,6 +542,7 @@
                                                 rendered="true"
                                                 actionListener="#{addressBB.onStreetViewEditLinkClick(street)}"
                                                 ajax="true"
+                                                oncomplete="PF('street-infoedit-dialog-var').show();"
                                                 update="street-infoedit-dialog
                                                 street-infoedit-form"
                                                 />
@@ -651,7 +673,7 @@
                              actionListener="#{addressBB.onToggleStreetEditModeButtonChange}"
                              oncomplete="PF('street-infoedit-dialog-var').show()"
                              update="@form
-                             "/>
+                             street-infoedit-dialog"/>
 
             <div class="gray_button">
 
@@ -660,10 +682,9 @@
                                  styleClass="gray-button"
                                  rendered="#{addressBB.editModeCurrentStreet}"
                                  icon="fa fa-stop"
-                                 process="@none"
-                                 immediate="true"
+                                 ajax="true"
                                  actionListener="#{addressBB.onMailingStreetEditAbort}"
-                                 oncomplete="PF('street-infoedit-dialog-var').hide()"
+                                 update="street-infoedit-form"
                                  />
             </div>
 
@@ -718,10 +739,7 @@
                 </div>
                 <div class="p-col-6">
                     Active
-                </div>
-                <div class="p-col-6">
-                    <h:outputText value="#{addressBB.currentStreet.active ? 'Active' : 'Deactivated'}" />
-
+                    <p:spacer height="3px" />
 
                     <p:commandLink  id="street-deactivate-clink"
                                     ajax="true"
@@ -734,6 +752,29 @@
                                     actionListener="#{addressBB.onMailingStreetDeactivateInitLinkClick}">
 
                     </p:commandLink>
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.currentStreet.active ? 'Active' : 'Deactivated'}" />
+
+                </div>
+                <div class="p-col-6">
+                    Notes
+                    <p:spacer height="3px" />
+                    <p:commandLink  id="street-notes-init-clink"
+                                    ajax="true"
+                                    style="color:blue;"
+                                    oncomplete="PF('street-note-dialog-var').show()"
+                                    rendered="#{!addressBB.editModeCurrentStreet}"
+                                    update="street-note-dialog
+                                    street-note-form"
+                                    value="Attach note"
+                                    actionListener="#{addressBB.onMailingStreetNoteInitButtonChange}">
+
+                    </p:commandLink>
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.currentStreet.notes}" 
+                                  escape="false"/>
                 </div>
             </div>
         </h:form>
@@ -749,8 +790,8 @@
                      responsive="true">
 
         <h:form id="remove-street-confirm-form">
-
-
+            <h:outputText value="DEACTIVATOR BEWEARE! Deactivating a street will deactivate all addresses on this street and all links to all those addresses!" />
+            <p:spacer height="5px" />
             <p:commandButton  id="street-remove-commit-button"
                               ajax="true"
                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
@@ -758,8 +799,6 @@
                               value="Confirm removal of street #{addressBB.currentStreet.name} (ID: #{addressBB.currentStreet.streetID})"
                               actionListener="#{addressBB.onMailingStreetDeactivateCommit}" 
                               oncomplete="PF('remove-street-confirm-dialog-var').hide()">
-
-
             </p:commandButton>
 
             <p:spacer height="5px" />
@@ -778,4 +817,117 @@
             </div>
         </h:form>
     </p:confirmDialog>
+
+
+    <p:confirmDialog id="remove-address-confirm-dialog"
+                     widgetVar="remove-address-confirm-dialog-var"
+                     header="Confirm deactivation of address?"
+                     closeOnEscape="true"
+                     closable="true"
+                     responsive="true">
+
+        <h:form id="remove-address-confirm-form">
+            <h:outputText value="DEACTIVATOR BEWEARE! Deactivating an address will deactivate all links to this address!" />
+            <p:spacer height="5px" />
+            <p:commandButton  id="address-remove-commit-button"
+                              ajax="true"
+                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                              update="addresses-growl-form"
+                              value="Confirm removal of address #{addressBB.currentAddress.buildingNo} (ID: #{addressBB.currentAddress.addressID})"
+                              actionListener="#{addressBB.onMailingStreetDeactivateCommit}" 
+                              oncomplete="PF('remove-address-confirm-dialog-var').hide()">
+            </p:commandButton>
+
+            <p:spacer height="5px" />
+
+            <div class="gray_button">
+
+                <p:commandButton id="remove-address-abort-button"
+                                 value="Cancel"
+                                 styleClass="gray-button"
+                                 rendered="true"
+                                 icon="fa fa-stop"
+                                 process="@none"
+                                 immediate="true"
+                                 actionListener="#{addressBB.onMailingAddressAbortOperationButtonChange}"
+                                 oncomplete="PF('remove-address-confirm-dialog-var').hide()" />
+            </div>
+        </h:form>
+    </p:confirmDialog>
+    
+    <p:dialog   id="address-note-dialog"
+                height="400" width="400"
+                widgetVar="address-note-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Append note Current Address ID:#{addressBB.currentAddress.addressID}"
+                rendered="true"
+                >
+
+        <h:form id="address-note-form">
+            <h:outputText value="Note content:" />
+
+            <p:spacer height="5px" />
+
+            <p:inputTextarea value="#{addressBB.formNotesAddress}"
+                             cols="40"
+                             rows="5" />
+
+            <p:spacer height="3px" />
+            <h:outputText value="(your username and the date/time will be automatically included)" />
+            <p:spacer height="5px" />
+
+            <p:commandButton id="address-note-commit-button" 
+                             value="Save note"
+                             rendered="true"
+                             icon="fa fa-sticky-note"
+                             ajax="true"
+                             actionListener="#{addressBB.onMailingAddressNoteCommitButtonChage}"
+                             oncomplete="PF('address-note-dialog-var').hide()"
+                             update="address-info-form
+                             addresses-growl-form"/>
+        </h:form>
+    </p:dialog>
+    
+    <p:dialog   id="street-note-dialog"
+                height="400" width="400"
+                widgetVar="street-note-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Append note to current street ID:#{addressBB.currentStreet.streetID}"
+                rendered="true"
+                >
+
+        <h:form id="street-note-form">
+            <h:outputText value="Note content:" />
+
+            <p:spacer height="5px" />
+
+            <p:inputTextarea value="#{addressBB.formNotesStreet}"
+                             cols="40"
+                             rows="5" />
+
+            <p:spacer height="3px" />
+            <h:outputText value="(your username and the date/time will be automatically included)" />
+            <p:spacer height="5px" />
+
+            <p:commandButton id="street-note-commit-button" 
+                             value="Save note"
+                             rendered="true"
+                             icon="fa fa-sticky-note"
+                             ajax="true"
+                             actionListener="#{addressBB.onMailingStreetNoteCommitButtonChage}"
+                             oncomplete="PF('street-note-dialog-var').hide()"
+                             update="addresses-growl-form
+                             street-infoedit-form"/>
+        </h:form>
+    </p:dialog>
+    
+    
 </ui:composition>

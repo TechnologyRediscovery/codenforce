@@ -16,6 +16,8 @@ import com.tcvcog.tcvce.entities.MailingAddress;
 import com.tcvcog.tcvce.entities.MailingCityStateZip;
 import com.tcvcog.tcvce.entities.MailingStreet;
 import com.tcvcog.tcvce.entities.search.QueryMailingCityStateZip;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -50,6 +52,9 @@ public  class   AddressBB
     private boolean formAddressVerified;
     private String formCity;
     private String formZip;
+    private String formNotesAddress;
+    private String formNotesStreet;
+    
     
     private List<BOBSource> addressSourceList;
     
@@ -271,7 +276,6 @@ public  class   AddressBB
             } 
         }
         editModeCurrentStreet = !editModeCurrentStreet;
-        
     }
     
     
@@ -291,6 +295,7 @@ public  class   AddressBB
      */
     public void onMailingStreetEditAbort(ActionEvent ev){
         System.out.println("AddressBB.onMailingStreetEditAbort");
+        editModeCurrentStreet = false;
     }
     
     /**
@@ -336,6 +341,7 @@ public  class   AddressBB
      */
     public void onMailingAddressViewEditLinkClick(MailingAddress ma){
         currentAddress = ma;
+        formAddressVerified = currentAddress.getVerifiedTS() != null;
         getSessionBean().setSessMailingAddress(currentAddress);
     }
     
@@ -354,18 +360,24 @@ public  class   AddressBB
         PropertyCoordinator pc = getPropertyCoordinator();
         System.out.println("AddressBB.toggleMailingAddressEditMode");
         if(isEditModeCurrentAddress()){
-            
+            int freshID;
             try {
+                if(formAddressVerified && currentAddress != null){
+                    currentAddress.setVerifiedBy(getSessionBean().getSessUser());
+                    currentAddress.setVerifiedTS(LocalDateTime.now());
+                }
                 if(currentAddress.getAddressID() == 0){
-                    pc.insertMailingAddress(currentAddress, getSessionBean().getSessUser());
+                    freshID = pc.insertMailingAddress(currentAddress, getSessionBean().getSessUser());
                     getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Address Insert successful",""));
+                    currentAddress = pc.getMailingAddress(freshID);
                 } else {
                     pc.updateMailingAddress(currentAddress, getSessionBean().getSessUser());
                     getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Address update successful",""));
+                    currentAddress = pc.getMailingAddress(currentAddress.getAddressID());
                 }
             } catch (BObStatusException | IntegrationException ex) {
                 System.out.println(ex);
@@ -375,7 +387,6 @@ public  class   AddressBB
             } 
         }
         setEditModeCurrentAddress(!isEditModeCurrentAddress());
-        
     }
     
     
@@ -386,6 +397,10 @@ public  class   AddressBB
     public void onMailingAddressAddInitButtonChange(ActionEvent ev){
         PropertyCoordinator pc = getPropertyCoordinator();
         currentAddress = pc.getMailingAddressSkeleton();
+        if(currentStreet != null){
+            currentStreet.setCityStateZip(currentCityStateZip);
+            currentAddress.setStreet(currentStreet);
+        }
         editModeCurrentAddress = true;
         
     }
@@ -398,6 +413,105 @@ public  class   AddressBB
         editModeCurrentAddress = false;
     }
     
+    /**
+     * Listener for user requests to start the address deactivation process
+     * @param ev 
+     */
+    public void onMailingAddressDeactivateInitLinkClick(ActionEvent ev){
+        
+    }
+    
+    /**
+     * 
+     * Listener for user requests to commit the deactivation operation
+     * @param ev 
+     */
+    public void onMailingAddressDeactivateConfirmButtonChange(ActionEvent ev){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.deactivateMailingAddress(currentAddress, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Address deactivation successful! ",""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println("ex");
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could deactivate address: " + ex.getMessage(),""));
+        } 
+    }
+    
+    /**
+     * Listener for user requests to start the note process on a 
+     * mailing address
+     * @param ev
+     */
+    public void onMailingAddressNoteInitButtonChange(ActionEvent ev){
+        formNotesAddress = "";
+    }
+    
+    /**
+     * user requests to commit a note to a mailin address
+     * @param ev
+     */
+    public void onMailingAddressNoteCommitButtonChage(ActionEvent ev){
+        SystemCoordinator sc = getSystemCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(currentAddress != null){
+            MessageBuilderParams mbp = new MessageBuilderParams(currentAddress.getNotes(), null, null, formNotesAddress, getSessionBean().getSessUser(), null);
+            currentAddress.setNotes(sc.appendNoteBlock(mbp));
+            try {
+                sc.writeNotes(currentAddress, getSessionBean().getSessUser());
+                currentAddress = pc.getMailingAddress(currentAddress.getAddressID());
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Note write successful! Woot woot!",""));
+                
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Fatal note error: " + ex.getMessage(),""));
+            } 
+            formNotesAddress = "";
+        }
+    }
+    
+    /**
+     * Listener for user requests to start the note 
+     * process on a street
+     * @param ev
+     */
+    public void onMailingStreetNoteInitButtonChange(ActionEvent ev){
+        formNotesStreet = "";
+    }
+    
+    /**
+     * Listener for user Requests to commit notes to the 
+     * currentStreet
+     * @param ev
+     */
+    public void onMailingStreetNoteCommitButtonChage(ActionEvent ev){
+        SystemCoordinator sc = getSystemCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(currentStreet != null){
+            MessageBuilderParams mbp = new MessageBuilderParams(currentStreet.getNotes(), null, null, formNotesStreet, getSessionBean().getSessUser(), null);
+            currentStreet.setNotes(sc.appendNoteBlock(mbp));
+            try {
+                sc.writeNotes(currentStreet, getSessionBean().getSessUser());
+                currentStreet = pc.getMailingStreet(currentStreet.getStreetID());
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Note write successful! Woot woot!",""));
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Fatal note error: " + ex.getMessage(),""));
+            } 
+            formNotesAddress = "";
+        }
+    }
     
     
     /************************************************************/
@@ -684,6 +798,34 @@ public  class   AddressBB
      */
     public void setFormAddressVerified(boolean formAddressVerified) {
         this.formAddressVerified = formAddressVerified;
+    }
+
+    /**
+     * @return the formNotesAddress
+     */
+    public String getFormNotesAddress() {
+        return formNotesAddress;
+    }
+
+    /**
+     * @return the formNotesStreet
+     */
+    public String getFormNotesStreet() {
+        return formNotesStreet;
+    }
+
+    /**
+     * @param formNotesAddress the formNotesAddress to set
+     */
+    public void setFormNotesAddress(String formNotesAddress) {
+        this.formNotesAddress = formNotesAddress;
+    }
+
+    /**
+     * @param formNotesStreet the formNotesStreet to set
+     */
+    public void setFormNotesStreet(String formNotesStreet) {
+        this.formNotesStreet = formNotesStreet;
     }
     
     
