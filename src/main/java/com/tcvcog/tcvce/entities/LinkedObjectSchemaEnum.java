@@ -25,7 +25,7 @@ package com.tcvcog.tcvce.entities;
 public enum LinkedObjectSchemaEnum {
     
     OccApplicationHuman (   
-                            "Occupancy Application - Person",
+                            "Occupancy Application",
                             "public.occpermitapplicationhuman",
                             "OccApplicationHuman", 
                             "???", 
@@ -36,7 +36,7 @@ public enum LinkedObjectSchemaEnum {
                         ),  // for Jurplel to update
     
     CECaseHuman         (   
-                            "Code Enf. Case - Person",
+                            "Code Enf. Case",
                             "public.humancecase", 
                             "CECaseHuman", 
                             "linkid", 
@@ -48,7 +48,7 @@ public enum LinkedObjectSchemaEnum {
                         ), 
     
     OccPeriodHuman      (
-                            "Occupancy Period - Person",
+                            "Occupancy Period",
                             "public.humanoccperiod",
                             "OccPeriodHuman", 
                             "linkid", 
@@ -59,7 +59,7 @@ public enum LinkedObjectSchemaEnum {
                         ), 
     
     ParcelHuman         (   
-                            "Parcel - Person",
+                            "Parcel",
                             "public.humanparcel",
                             "ParcelHuman", 
                             "linkid", 
@@ -70,7 +70,7 @@ public enum LinkedObjectSchemaEnum {
                         ), 
     
     ParcelUnitHuman     (   
-                            "Parcel Unit - Person",
+                            "Parcel Unit",
                             "public.humanparcelunit",
                             "ParcelUnitHuman", 
                             "linkid", 
@@ -81,7 +81,7 @@ public enum LinkedObjectSchemaEnum {
                         ),
     
     CitationHuman       (
-                            "Citation - Person",
+                            "Citation",
                             "public.citationhuman",
                             "CitationHuman", 
                             "linkid", 
@@ -92,7 +92,7 @@ public enum LinkedObjectSchemaEnum {
                         ), 
     
     CitationDocketHuman       (
-                            "Citation Docket - Person",
+                            "Citation Docket",
                             "public.citationdockethuman",
                             "CitationDocketHuman", 
                             "linkid", 
@@ -103,7 +103,7 @@ public enum LinkedObjectSchemaEnum {
                         ), 
     
     EventHuman          (
-                            "Event - Person",
+                            "Event",
                             "public.eventhuman",
                             "EventHuman", 
                             "linkid", 
@@ -114,7 +114,7 @@ public enum LinkedObjectSchemaEnum {
                         ), 
     
     MuniHuman           (
-                            "Municipality - Person",
+                            "Municipality",
                             "public.humanmuni",
                             "MuniHuman",
                             "linkid", 
@@ -125,7 +125,7 @@ public enum LinkedObjectSchemaEnum {
                         ),
     
     MailingaddressHuman (   
-                            "Mailing Address - Person",
+                            "Mailing Address",
                             "humanmailingaddress",
                             "MailingaddressHuman", 
                             "linkid",
@@ -135,7 +135,7 @@ public enum LinkedObjectSchemaEnum {
                             true
                         ), 
     ParcelMailingaddress  (
-                            "Parcel - Mailing Address",
+                            "Parcel",
                             "parcelmailingaddress",
                             "ParcelMailingaddress", 
                             "", 
@@ -145,7 +145,7 @@ public enum LinkedObjectSchemaEnum {
                             true
                         ),
     CITATION_CODEVIOLATION  (
-                            "Citation - Code Violation",
+                            "Citation",
                             "citationviolation",
                             "", 
                             "citationviolationid", 

@@ -262,20 +262,29 @@
                                                                        value="change"
                                                                        oncomplete="PF('activebob-proplist-overlay-var').show();"/>
                                                     </div>
-                                                    <div class="restrict-main-contents-io-link link-button">
-
-                                                        <p:commandLink id="activebob-addresses-cb"
-                                                                       value="addresses"
-                                                                       ajax="true"
-                                                                       actionListener="#{navigationBB.onAddressManagerViewLinkClick}"
-                                                                       oncomplete="PF('address-mngr-var').show();"/>
-                                                    </div>
                                                     
                                                     <p:spacer height="5px" />
                                                     
-                                                    <h:outputText value="Session address: #{sessionBean.sessMailingAddress.buildingNo} #{sessionBean.sessMailingAddress.street.name}" />
+                                                    <h:outputText value="Session address: "/>
+                                                    <p:spacer height="2px" />
+                                                        <p:commandLink id="activebob-viewaddresses-cb"
+                                                                       value="#{sessionBean.sessMailingAddress.buildingNo} #{sessionBean.sessMailingAddress.street.name}" 
+                                                                       ajax="true"
+                                                                       actionListener="#{addressBB.onMailingAddressViewCurrentAddress}"
+                                                                       oncomplete="PF('address-dialog-var').show();">
+                                                        </p:commandLink>
                                                     <p:spacer height="2px" />
                                                     <h:outputText value="#{sessionBean.sessMailingAddress.street.cityStateZip.city}, #{sessionBean.sessMailingAddress.street.cityStateZip.state} #{sessionBean.sessMailingAddress.street.cityStateZip.zipCode}" />
+                                                    <p:spacer height="2px" />
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink id="activebob-searchaddresses-cb"
+                                                                       value="address search"
+                                                                       ajax="true"
+                                                                       actionListener="#{navigationBB.onAddressManagerViewLinkClick}"
+                                                                       oncomplete="PF('address-search-dialog-var').show();"/>
+                                                    </div>
+                                                    <p:spacer height="2px" />
 
                                                     <p:overlayPanel id="activebob-proplist-overlay"
                                                                     widgetVar="activebob-proplist-overlay-var"

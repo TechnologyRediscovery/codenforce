@@ -25,9 +25,6 @@
 
         <div class="p-grid">
             <div class="p-col">
-
-
-
                 <p:panel id="address-info-panel"
                          toggleable="true"
                          collapsed="false"
@@ -47,10 +44,8 @@
                                          value="Search for Zip, City, and State"
                                          rendered="true"
                                          icon="fa fa-address-book"
-                                         oncomplete="PF('address-mngr-var').show()"
+                                         oncomplete="PF('address-search-dialog-var').show()"
                                          />
-
-
                         <div class="restrict-main-contents-io-button gray_button">
 
                             <p:commandButton    id="address-edit-abort-button"
@@ -61,7 +56,6 @@
                                                 oncomplete="PF('address-dialog-var').show()"
                                                 update="address-info-form"
                                                 icon="fa fa-stop" />
-
                         </div>
 
                         <p:spacer height="5px"/>    
@@ -72,7 +66,6 @@
                             <div class="p-col-6">
                                 <h:outputText rendered="#{!addressBB.addressEditMode}" 
                                               value="#{addressBB.currentAddress.addressID eq 0 ? 'new record' : addressBB.currentAddress.addressID}"/>
-
                             </div>
 
                             <div class="p-col-6">Building Number</div>
@@ -83,42 +76,58 @@
                                 <p:inputText rendered="#{addressBB.addressEditMode}"
                                              value="#{addressBB.currentAddress.buildingNo}" />
                             </div>
-                            <div class="p-col-6">PO Box</div>
+                            <div class="p-col-6">
+                                PO Box
+                            </div>
+                            
                             <div class="p-col-6">
                                 <h:outputText rendered="#{!addressBB.addressEditMode}" 
                                               value="#{addressBB.currentAddress.poBox}"/>
-
-                                <p:inputText rendered="#{addressBB.addressEditMode}"
-                                             value="#{addressBB.currentAddress.poBox}" />
+                                
+                                <p:selectBooleanCheckbox    id="address-pobox-sbcb"
+                                                            rendered="#{addressBB.addressEditMode}"
+                                                            value="#{addressBB.formPOBox}" >
+                                    <p:ajax process="address-pobox-sbcb"
+                                            update="address-pobox-it" />
+                                
+                                </p:selectBooleanCheckbox>
+                                
+                                <p:inputText    id="address-pobox-it"
+                                                rendered="#{addressBB.addressEditMode}"
+                                                disabled="#{!addressBB.formPOBox}"
+                                                value="#{addressBB.currentAddress.poBox}" />
                             </div>
-                            <div class="p-col-6">Street</div>
+                            
                             <div class="p-col-6">
-                                <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                Street
+                            </div>
+                            
+                            <div class="p-col-6">
+                                <h:outputText rendered="true" 
                                               value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.name : ''}"/>
-
-                                <p:inputText rendered="#{addressBB.addressEditMode}"
-                                             value="#{addressBB.currentAddress.street}" />
+                                <h:outputText rendered="true" 
+                                              value=" (ID:#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.streetID : ''})"/>
                             </div>
 
-                            <div class="p-col-6">City</div>
                             <div class="p-col-6">
-                                <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                City, State, ZIP Code
+                            </div>
+                            
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!empty addressBB.currentAddress.street}" 
                                               value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.cityStateZip.city : ''}"/>
-                            </div>
-
-                            <div class="p-col-6">State</div>
-                            <div class="p-col-6">
-                                <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                
+                                <h:outputText   rendered="#{!empty addressBB.currentAddress.street}" 
+                                                value=", " />
+                                
+                                <h:outputText rendered="#{!empty addressBB.currentAddress.street}" 
                                               value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.cityStateZip.state : ''}"/>
-                            </div>
-
-                            <div class="p-col-6">ZIP Code</div>
-                            <div class="p-col-6">
-                                <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                
+                                <h:outputText   rendered="#{!empty addressBB.currentAddress.street}" 
+                                                value=" " />
+                                
+                                <h:outputText rendered="#{!empty addressBB.currentAddress.street}" 
                                               value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.cityStateZip.zipCode : ''}"/>
-
-                                <p:inputText rendered="#{addressBB.addressEditMode}"
-                                             value="#{addressBB.formZip}" />
                             </div>
 
 
@@ -160,8 +169,13 @@
                                                 value="#{!empty addressBB.currentAddress.verifiedBy ? addressBB.currentAddress.verifiedBy.username : ''}" />
 
 
-                                <p:selectBooleanCheckbox rendered="#{addressBB.addressEditMode}"
-                                                         value="#{addressBB.getPrettyDateNoTime(addressBB.currentAddress.verifiedTS)}" />
+                                <p:selectBooleanCheckbox    id="address-verified-sbcb"
+                                                            rendered="#{addressBB.addressEditMode}"
+                                                            value="#{addressBB.formAddressVerified}" >
+                                
+                                    <p:ajax process="address-verified-sbcb" 
+                                            update="address-ver-source-som"/>
+                                </p:selectBooleanCheckbox>
                             </div>
 
                             <div class="p-col-6">Verification Source</div>
@@ -171,6 +185,7 @@
 
                                 <p:selectOneMenu id="address-ver-source-som"
                                                  required="false"
+                                                 disabled="#{!addressBB.formAddressVerified}"
                                                  rendered="#{addressBB.addressEditMode}" 
                                                  value="#{addressBB.currentAddress.verifiedSource}">
                                     <f:converter converterId="bobSourceConverter"/>
@@ -235,9 +250,9 @@
         </div>
     </p:dialog>
 
-    <p:dialog   id="address-mngr"
+    <p:dialog   id="address-search-dialog"
                 height="600" width="1200"
-                widgetVar="address-mngr-var"
+                widgetVar="address-search-dialog-var"
                 responsive="true"
                 resizable="true"
                 closable="true"
@@ -288,15 +303,12 @@
                                          rendered="true"
                                          icon="fa fa-search"
                                          actionListener="#{addressBB.onQueryCSZExecuteButtonChange}"
-                                         oncomplete="PF('address-mngr-var').show()"
+                                         oncomplete="PF('address-search-dialog-var').show()"
                                          update="   csz-search-form
                                          addresses-growl-form"/>
 
 
                         <div class="restrict-main-contents-io-button gray_button">
-
-
-
 
                             <p:commandButton    id="csz-search-clear-button"
                                                 ajax="true"
@@ -306,7 +318,6 @@
                                                 update="addresses-growl-form
                                                 @form"
                                                 icon="fa fa-eraser" />
-
                         </div>
 
                         <p:spacer height="5px"/>    
@@ -443,6 +454,7 @@
                         <p:commandButton id="street-create-init-button"
                                          value="New street"
                                          icon="fa fa-plus"
+                                         disabled="#{empty addressBB.currentCityStateZip}"
                                          oncomplete="PF('street-infoedit-dialog-var').show()"
                                          actionListener="#{addressBB.onMailingStreetCreateInitButtonChange}"
                                          update="street-infoedit-dialog
@@ -460,7 +472,7 @@
                                         scrollRows="5"
                                         rowKey="#{street.streetID}"
                                         tableStyleClass="primeDataTable"
-                                        draggableRows="true" 
+                                        draggableRows="false" 
                                         tabindex="6">
 
 
@@ -610,7 +622,7 @@
                                                 rendered="true"
                                                 actionListener="#{addressBB.onMailingAddressViewEditLinkClick(addr)}"
                                                 ajax="true"
-                                                oncomplete="PF('address-mngr-var').hide();"
+                                                oncomplete="PF('address-search-dialog-var').hide();"
                                                 update="topnav-prop-form"
                                                 />
                             </p:column>

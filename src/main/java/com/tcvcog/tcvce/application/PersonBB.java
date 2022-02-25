@@ -89,10 +89,6 @@ public class PersonBB extends BackingBeanUtils {
     private List<Person> filteredPersonList;
     private boolean appendResultsToList;
     
-    
-    
-    
-    
     /**
      * Creates a new instance of PersonBB
      */
@@ -130,6 +126,9 @@ public class PersonBB extends BackingBeanUtils {
         SystemCoordinator sc = getSystemCoordinator();
         if(getSessionBean().getSessHumanListHolder() != null){
             linkRoleCandidateList = sc.assembleLinkedObjectRolesBySchema(getSessionBean().getSessHumanListHolder().getHUMAN_LINK_SCHEMA_ENUM());
+            if(linkRoleCandidateList != null){
+                System.out.println("PersonBB.loadLinkedObjectRoleListUsingSessionHLH | roleListSize = " + linkRoleCandidateList.size());
+            }
         }
         
     }
@@ -832,6 +831,32 @@ public class PersonBB extends BackingBeanUtils {
         
     }
     
+    /**
+     * Listener to user requests to start the creation process
+     * for a new human link. Checks to make sure the session
+     * has a HumanLinkHolder. If it doesn't, inject the current CECase, 
+     * if that's null, inject the current session OccPeriod
+     * @param ev 
+     */
+    public void onHumanLinkAddInitButtonChange(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        currentHumanLink = pc.createHumanLinkSkeleton(currentPerson);
+        
+        if(getSessionBean().getSessHumanListHolder() == null){
+            if(getSessionBean().getSessCECase() != null){
+                getSessionBean().setSessHumanListHolder(getSessionBean().getSessCECase() );
+            } else if(getSessionBean().getSessOccPeriod() != null){
+                getSessionBean().setSessHumanListHolder(getSessionBean().getSessOccPeriod() );
+            }
+        }
+        
+         try {
+            loadLinkedObjectRoleListUsingSessionHLH();
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
+    }
+    
     
     /**
      * Listener for user requests to link the current IFace_HumanListHolder
@@ -841,6 +866,8 @@ public class PersonBB extends BackingBeanUtils {
     public void onHumanLinkCreateCommitButtonChange(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
         try {
+            currentHumanLink.setLinkRole(selecetedLinkedObjetRole);
+            
             pc.linkHuman(getSessionBean().getSessHumanListHolder(), currentHumanLink, getSessionBean().getSessUser());
             refreshCurrentPerson();
             onLoadHumanLinks(null);
@@ -851,14 +878,21 @@ public class PersonBB extends BackingBeanUtils {
           
           getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Fatal: Could not deactivate human link: " + ex.getMessage(), ""));
+                        "Fatal: Could not create human link: " + ex.getMessage(), ""));
         } 
         
         
     }
     
     
-    
+      /**
+       *
+     * @return the linkRoleCandidateList
+     */
+    public List<LinkedObjectRole> getLinkRoleCandidateList() {
+       
+        return linkRoleCandidateList;
+    }
     
     
     
@@ -1157,17 +1191,7 @@ public class PersonBB extends BackingBeanUtils {
         this.selecetedLinkedObjetRole = selecetedLinkedObjetRole;
     }
 
-    /**
-     * @return the linkRoleCandidateList
-     */
-    public List<LinkedObjectRole> getLinkRoleCandidateList() {
-        try {
-            loadLinkedObjectRoleListUsingSessionHLH();
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-        } 
-        return linkRoleCandidateList;
-    }
+  
 
     /**
      * @param linkRoleCandidateList the linkRoleCandidateList to set

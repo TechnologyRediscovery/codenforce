@@ -138,13 +138,17 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     public int linkHuman(IFace_humanListHolder hlh, HumanLink hum, UserAuthorized ua) throws BObStatusException, IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
-        
+        SystemCoordinator sc = getSystemCoordinator();
         if(hlh == null || hum == null || ua == null){
             throw new BObStatusException("Cannot link human with null human or human holder or null user");
         }
         
-        hum.setCreatedBy(ua);
+        hum.setLinkCreatedByUserID(ua.getUserID());
         hum.setLinkLastUpdatedByUserID(ua.getUserID());
+        if(hum.getLinkSource() == null){
+            hum.setLinkSource(sc.getBObSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                .getString("bobSourceHumanLinkDefault"))));
+        }
         
         return pi.insertHumanLink(hlh, hum);
     }
@@ -165,8 +169,8 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         if(ua == null || hl == null){
             throw new BObStatusException("Cannot deactivate human link with null user or link");
         }
-        hl.setLastUpdatedBy(ua);
-        hl.setDeactivatedBy(ua);
+        hl.setLinkLastUpdatedByUserID(ua.getUserID());
+        hl.setLinkDeactivatedByUserID(ua.getUserID());
         pi.deactivateHumanLink(hl);
     }
     
@@ -634,7 +638,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Logic intermediary for adding new emaiil addresses to the DB
+     * Logic intermediary for adding new email addresses to the DB
      * @param em
      * @param p
      * @param ua 

@@ -506,7 +506,7 @@
                                               ajax="true"
                                               icon="fa fa-link"
                                               actionListener="#{addressBB.onMailingAddressAddInitButtonChange}"
-                                              oncomplete="PF('address-dialog-var').show()"
+                                              oncomplete="PF('address-search-dialog-var').show()"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                               value="Connect Address" />
 
@@ -561,11 +561,12 @@
 
                                 <p:commandLink      id="address-actions-cl"
                                                     ajax="true"
-                                                    actionListener="#{addressBB.onMailingAddressEditInitButtonChange(hmal)}"
+                                                    actionListener="#{addressBB.onMailingAddressViewEditLinkClick(hmal)}"
                                                     style="color:blue;"
-                                                    oncomplete="PF('address-dialog-var).show()"
+                                                    oncomplete="PF('address-dialog-var').show()"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                    update="address-form"
+                                                    update="address-info-form
+                                                    address-links-form"
                                                     value="view/edit" />
 
                             </p:column>
@@ -730,7 +731,20 @@
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                               update="person-links-table
                                               persontools-growl-form"
+                                              style="margin-right:5px;"
+                                              icon="fa fa-link"
                                               value="Load object connections for #{personBB.currentPerson.name}" />
+                        
+                        <p:commandButton      id="new-personlinks-button"
+                                              ajax="true"
+                                              icon="fa fa-plus"
+                                              actionListener="#{personBB.onHumanLinkAddInitButtonChange}"
+                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                              oncomplete="PF('human-createlink-dialog-var').show();"
+                                              update="human-createlink-dialog
+                                              human-createlink-form
+                                              persontools-growl-form"
+                                              value="Create new object link to this person" />
 
                         <p:spacer height="5px" />
 
@@ -752,8 +766,8 @@
                                     <h:outputText value="Object"/>
                                 </f:facet>
                                 <h:outputText value="#{personBB.currentPersonLinkHeavy.name}" />
-                                <h:outputText value="(ID:#{personBB.currentPersonLinkHeavy.humanID})" />
-                                <h:outputText value=" " />
+                                <h:outputText value=" (ID:#{personBB.currentPersonLinkHeavy.humanID})" />
+                                <h:outputText value=" is " />
                                 <h:outputText value="#{hl.linkedObjectRole.title}" />
                                 <h:outputText value=" " />
                                 <p:commandLink      id="link-loadtarget-cl"
@@ -761,7 +775,7 @@
                                                     actionListener="#{personBB.onHumanLinkTargetIDLinkClick(hl)}"
                                                     style="color:blue;"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                    value="#{hl.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME}(ID:#{hl.parentObjectID})" />
+                                                    value="#{hl.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME} (ID:#{hl.parentObjectID})" />
                             </p:column>
 
 
@@ -772,6 +786,12 @@
                                     </div>
                                     <div class="p-col-8">
                                         <h:outputText value="#{hl.linkID}" />
+                                    </div>
+                                    <div class="p-col-4">
+                                        Linking table
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{hl.linkedObjectRole.schema.linkingTableName}" />
                                     </div>
                                     <div class="p-col-4">
                                         Parent field &amp; ID
@@ -867,9 +887,10 @@
             <p:selectOneMenu id="person-link-role-som" 
                              value="#{personBB.selecetedLinkedObjetRole}" 
                              converter="linkedObjectRoleConverter" 
-                             required="true">
+                             required="true"
+                             requiredMessage="Oops, please select an association type">
 
-                <f:selectItem itemLabel="Choose a relationship" 
+                <f:selectItem itemLabel="Choose an association type" 
                               itemDisabled="true"
                               noSelectionOption="true"/>
 

@@ -934,7 +934,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             String s =  "INSERT INTO public.mailingstreet(\n" +
                         "            streetid, name, namevariantsarr, citystatezip_cszipid, notes, \n" +
-                        "            pobox, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
+                        "            pobox, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid) \n" +
                         "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
                         "            ?, now(), ?, now(), ?);";
             
@@ -1341,7 +1341,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             String s =  "UPDATE public.mailingaddress\n" +
                         "   SET bldgno=?, street_streetid=?, verifiedts=?, verifiedby_userid=?, \n" +
-                        "       verifiedsource_sourceid=?, source_sourceid=?, createdby=?, \n" +
+                        "       verifiedsource_sourceid=?, source_sourceid=?, createdby_userid=?, \n" +
                         "       lastupdatedts=now(), lastupdatedby_userid=?, \n" +
                         "       notes=?, deactivatedts=?, deactivatedby_userid=? " +
                         "       WHERE addressid=?;";

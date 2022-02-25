@@ -99,7 +99,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             sb.append(" WHERE ");
             sb.append(hlh.getHUMAN_LINK_SCHEMA_ENUM().getTargetTableFKField());
             sb.append("=?");
-            sb.append(";");
+            sb.append(" AND deactivatedts IS NULL;");
             
             stmt = con.prepareStatement(sb.toString());
             stmt.setInt(1, hlh.getHostPK());
@@ -155,7 +155,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             sb.append(" WHERE ");
             sb.append("human_humanid");
             sb.append("=?");
-            sb.append(";");
+            sb.append(" AND deactivatedts IS NULL;");
             
             stmt = con.prepareStatement(sb.toString());
             stmt.setInt(1, hum.getHumanID());
@@ -333,13 +333,13 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.setInt(1, hl.getHumanID());
             stmt.setInt(2, humanziedBOb.getHostPK());
-            if(hl.getCreatedBy() != null){
-                stmt.setInt(3, hl.getCreatedBy().getUserID() );
+            if(hl.getLinkCreatedByUserID() != 0){
+                stmt.setInt(3, hl.getLinkCreatedByUserID() );
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
             
-            if(hl.getLastUpdatedBy()!= null){
+            if(hl.getLinkLastUpdatedByUserID() != 0){
                 stmt.setInt(4, hl.getLinkLastUpdatedByUserID());
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
@@ -351,8 +351,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
             
-            if(hl.getSource() != null){
-                stmt.setInt(6, hl.getSource().getSourceid());
+            if(hl.getLinkSource() != null){
+                stmt.setInt(6, hl.getLinkSource().getSourceid());
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
@@ -475,13 +475,13 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(sb.toString());
             
             
-            if(hl.getLastUpdatedBy()!= null){
+            if(hl.getLinkLastUpdatedByUserID() != 0){
                 stmt.setInt(1, hl.getLinkLastUpdatedByUserID());
             } else {
                 stmt.setNull(1, java.sql.Types.NULL);
             }
             
-            if(hl.getDeactivatedBy()!= null){
+            if(hl.getLinkDeactivatedByUserID() != 0){
                 stmt.setInt(2, hl.getLinkDeactivatedByUserID());
             } else {
                 stmt.setNull(2, java.sql.Types.NULL);

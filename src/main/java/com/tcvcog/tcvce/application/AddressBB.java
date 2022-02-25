@@ -47,6 +47,7 @@ public  class   AddressBB
     private String formBuildingNo;
     private String formStreet;
     private boolean formPOBox;
+    private boolean formAddressVerified;
     private String formCity;
     private String formZip;
     
@@ -255,7 +256,7 @@ public  class   AddressBB
                     pc.insertMailingStreet(currentStreet, getSessionBean().getSessUser());
                     getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                               "StreetInsert successful",""));
+                               "Street Insert successful",""));
                 } else {
                     pc.updateMailingStreet(currentStreet, getSessionBean().getSessUser());
                     getFacesContext().addMessage(null,
@@ -316,6 +317,16 @@ public  class   AddressBB
                new FacesMessage(FacesMessage.SEVERITY_ERROR,
                        "Could not remove this street",""));
         } 
+        
+    }
+    
+
+    /**
+     * Listener for user requests to view the current address
+     * @param ev 
+     */
+    public void onMailingAddressViewCurrentAddress(ActionEvent ev){
+        getSessionBean().setSessMailingAddress(currentAddress);
         
     }
     
@@ -659,6 +670,20 @@ public  class   AddressBB
      */
     public void setCityStateZipListFiltered(List<MailingCityStateZip> cityStateZipListFiltered) {
         this.cityStateZipListFiltered = cityStateZipListFiltered;
+    }
+
+    /**
+     * @return the formAddressVerified
+     */
+    public boolean isFormAddressVerified() {
+        return formAddressVerified;
+    }
+
+    /**
+     * @param formAddressVerified the formAddressVerified to set
+     */
+    public void setFormAddressVerified(boolean formAddressVerified) {
+        this.formAddressVerified = formAddressVerified;
     }
     
     
