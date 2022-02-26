@@ -310,12 +310,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         QueryProperty qp = null;
 
         try {
-            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.auth_getPublicUserAuthorized().getMyCredential());
+            qp = sc.initQuery(QueryPropertyEnum.ADDRESS_BLDG_NUM_ONLY, uc.auth_getPublicUserAuthorized().getMyCredential());
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsProperty spp = qp.getPrimaryParams();
-                spp.setAddress_ctl(true);
-                spp.setAddress_val(houseNum + " " + streetName);
+                spp.setAddress_bldgNum_ctl(true);
+                spp.setAddress_bldgNum_val(houseNum + " " + streetName);
                 spp.setMuni_ctl(true);
                 spp.setMuni_val(selectedMuni);
                 spp.setLimitResultCount_ctl(true);

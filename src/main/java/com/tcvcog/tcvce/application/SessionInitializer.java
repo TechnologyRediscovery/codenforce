@@ -524,12 +524,7 @@ public  class       SessionInitializer
 //                sessBean.setSessProperty(pc.assemblePropertyDataHeavy(sessBean.getSessPropertyList().get(0), cred));
             }
             sessBean.setSessPropertyList(pc.assemblePropertyHistoryList(ua.getKeyCard()));
-            sessBean.setQueryPropertyList(sc.buildQueryPropertyList(ua.getKeyCard()));
-            
-            if(!sessBean.getQueryPropertyList().isEmpty()){
-                sessBean.setQueryProperty(sessBean.getQueryPropertyList().get(0));
-            }            
-        } catch (IntegrationException |  BObStatusException ex) {
+        } catch ( BObStatusException ex) {
             System.out.println(ex);
             throw new SessionException( "Error setting proerty query list", 
                                         ex, ss, 

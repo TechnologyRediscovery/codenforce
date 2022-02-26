@@ -54,9 +54,12 @@ import java.util.regex.Pattern;
  */
 public class PropertyCoordinator extends BackingBeanUtils implements Serializable {
 
-    private final String DEFAULTUNITNUMBER = "-1";
-    private final boolean DEFAULTRENTAL = false;
-
+    final String DEFAULTUNITNUMBER = "-1";
+    final boolean DEFAULTRENTAL = false;
+    final static String SPACE = " ";
+    final static String COMMA_SPACE = ", ";
+    final static String HTML_BR = "<br /> ";
+    final static String SEMICOLON_SPACE = "; ";
      /**
      * Creates a new instance of PropertyUnitCoordinator
      */
@@ -567,13 +570,58 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public Property configureProperty(Property p) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
+        if(p != null){
+            p.setUnitList(pi.getPropertyUnitList(p));
+            p.setAddresses(pi.getMailingAddressLinkListByParcel(p.getParcelKey()));
+            p.setAddressPretty1Line(buildPropertyAddressStrings(p, false));
+            p.setAddressPretty2LineEscapeFalse(buildPropertyAddressStrings(p, true));
+        }
         
-        p.setUnitList(pi.getPropertyUnitList(p));
-        p.setAddresses(pi.getMailingAddressLinkListByParcel(p.getParcelKey()));
         
         // Don't need this for humanization
 //        parseAddress(p);
         return p;
+    }
+    
+    
+
+    
+    /**
+     * Assembles an address for pretty printing
+     * @param pr for which to generate the address 
+     * @param use2Lines if true, a <br /> will be inserted for double line 
+     * conventional address printing
+     * @return the String for injection into the property
+     */
+    private String buildPropertyAddressStrings(Property pr, boolean use2Lines){
+        StringBuilder addrStr = new StringBuilder();
+        if(pr != null){
+            if(pr.getAddresses() != null && !pr.getAddresses().isEmpty()){
+                MailingAddress adr1 = pr.getAddresses().get(0);
+                addrStr.append(adr1.getBuildingNo());
+                if(adr1.getStreet() != null){
+                    addrStr.append(SPACE);
+                    addrStr.append(adr1.getStreet().getName());
+                    if(adr1.getStreet().getCityStateZip() != null){
+                        if(use2Lines){
+                            addrStr.append(HTML_BR);
+                        } else {
+                            addrStr.append(SEMICOLON_SPACE);
+                        }
+                        addrStr.append(adr1.getStreet().getCityStateZip().getCity());
+                        addrStr.append(COMMA_SPACE);
+                        addrStr.append(adr1.getStreet().getCityStateZip().getState());
+                        addrStr.append(SPACE);
+                        addrStr.append(adr1.getStreet().getCityStateZip().getZipCode());
+                    }
+                }
+            } else {
+                addrStr.append("[MT address]");
+            }
+        } else {
+            addrStr.append("no property");
+        }
+        return addrStr.toString();
     }
     
    

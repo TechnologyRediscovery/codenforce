@@ -25,6 +25,10 @@ public class        Property
     protected List<PropertyUnit> unitList;
     
     protected List<ParcelMailingAddressLink> addresses;
+    private String addressPretty2LineEscapeFalse;
+    private String addressPretty1Line;
+    
+   
     
     
     /**
@@ -42,7 +46,7 @@ public class        Property
         this.addresses = prop.addresses;
     }
 
-
+ 
     /**
      * For compatability - builds an address String
      * from building No and street   
@@ -50,20 +54,21 @@ public class        Property
      */
 
     public String getAddressString(){
-        if(addresses != null && !addresses.isEmpty()){
-            return addresses.get(0).buildingNo + " " + addresses.get(0).getStreet();
-        } else {
-            return "[No Address]";
-        }
-        
+       return "Don't use me--useAddressPretty 1 or 2 line";
+       
     }
     
  
+    /**
+     * Extracts the address from this property's address list
+     * with index 0 or null if none is in the list
+     * @return 
+     */
     public MailingAddress getAddress(){
         if(addresses != null && !addresses.isEmpty()){
             return addresses.get(0);
         } else {
-            return new MailingAddress();
+            return null;
         }
         
     }
@@ -120,5 +125,33 @@ public class        Property
      */
     public void setAddresses(List<ParcelMailingAddressLink> addresses) {
         this.addresses = addresses;
+    }
+
+    /**
+     * @return the addressPretty2LineEscapeFalse
+     */
+    public String getAddressPretty2LineEscapeFalse() {
+        return addressPretty2LineEscapeFalse;
+    }
+
+    /**
+     * @return the addressPretty1Line
+     */
+    public String getAddressPretty1Line() {
+        return addressPretty1Line;
+    }
+
+    /**
+     * @param addressPretty2LineEscapeFalse the addressPretty2LineEscapeFalse to set
+     */
+    public void setAddressPretty2LineEscapeFalse(String addressPretty2LineEscapeFalse) {
+        this.addressPretty2LineEscapeFalse = addressPretty2LineEscapeFalse;
+    }
+
+    /**
+     * @param addressPretty1Line the addressPretty1Line to set
+     */
+    public void setAddressPretty1Line(String addressPretty1Line) {
+        this.addressPretty1Line = addressPretty1Line;
     }
 }

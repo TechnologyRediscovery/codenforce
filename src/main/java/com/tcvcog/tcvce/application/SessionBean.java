@@ -104,10 +104,9 @@ public class    SessionBean
     /* >>>                   III Property                                 <<< */
     /* >>> -------------------------------------------------------------- <<< */
     private PropertyDataHeavy sessProperty;
-    private ActivatableRouteEnum sessPropertyRoute;
     
     private List<Property> sessPropertyList;
-    private ActivatableRouteEnum sessPropertyListRoute;
+    private ActivatableRouteEnum sessPropertyRoute;
 
     private PropertyUnit sessPropertyUnit;
     
@@ -118,7 +117,6 @@ public class    SessionBean
     
     /* >>> QUERY PROPERTY <<< */
     private QueryProperty queryProperty;
-    private List<QueryProperty> queryPropertyList;
     
     /**
      * Convenience method for setting the session property and
@@ -510,19 +508,7 @@ public class    SessionBean
                 // if not, figure out a property to associate with this Person and make it the sessionProperty
                 if(sessProperty != null && sessProperty.getHumanLinkList()!= null && !sessProperty.getHumanLinkList().isEmpty()){
                     // TODO: figure out checking a Person against a list of humanLink objects
-                    if(!sessProperty.getHumanLinkList().contains(sessPerson)){
-                        QueryProperty qp = searchC.initQuery(QueryPropertyEnum.PERSONS, sessUser.getKeyCard());
-                        if(qp.getParamsList() != null && !qp.getParamsList().isEmpty()){
-                            qp.getParamsList().get(0).setPerson_ctl(true);
-                            qp.getParamsList().get(0).setPerson_val(pers);
-                            searchC.runQuery(qp);
-                            sessPropertyList = qp.getBOBResultList();
-                            if(sessPropertyList != null && !sessPropertyList.isEmpty()){
-                                sessProperty = pc.assemblePropertyDataHeavy(sessPropertyList.get(0),sessUser);
-                            }
-                            
-                        }
-                    }
+                   // DELETED on HUMANIZATION__THIS IS A FUCKING MESS
                 } // close property and property list configuration
                 
                 if(sessProperty != null && sessProperty.getCeCaseList() != null && !sessProperty.getCeCaseList().isEmpty()){
@@ -1499,19 +1485,7 @@ public class    SessionBean
         setSessOccPeriod(occPeriodHeavy);
     }
 
-    /**
-     * @return the queryPropertyList
-     */
-    public List<QueryProperty> getQueryPropertyList() {
-        return queryPropertyList;
-    }
-
-    /**
-     * @param queryPropertyList the queryPropertyList to set
-     */
-    public void setQueryPropertyList(List<QueryProperty> queryPropertyList) {
-        this.queryPropertyList = queryPropertyList;
-    }
+   
 
     /**
      * @return the queryPersonList

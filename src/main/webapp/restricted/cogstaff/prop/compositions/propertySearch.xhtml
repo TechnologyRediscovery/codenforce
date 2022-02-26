@@ -1,0 +1,679 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="prop-search-messages-form">
+        <p:growl id="prop-search-growl"
+                 globalOnly="false" 
+                 />
+    </h:form>
+
+    <p:dialog   id="prop-search-dialog"
+                height="700" width="1200"
+                widgetVar="prop-search-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Search for properties"
+                rendered="true"
+                >
+
+        <div class="p-grid">
+            <div class="p-col">
+                <p:panel id="prop-search-query-panel"
+                         toggleable="true"
+                         widgetVar="prop-search-query-panel-var"
+                         collapsed="false"
+                         style="width:100%;"
+                         header="Search Criteria"
+                         rendered="true">
+
+                    <h:form id="prop-search-query-select-form">
+                        <div class="p-grid">
+                            <div class="p-col-3">
+                                <h:outputText value="Query" />
+                            </div>
+                            <div class="p-col-9">
+                                <p:selectOneMenu id="prop-search-query-som"
+                                                 tabindex="1"
+                                                 value="#{propertySearchBB.querySelected}"
+                                                 style="width: 100%"
+                                                 >
+                                    <f:converter converterId="bOBQueryConverter"/>
+
+                                    <f:selectItem itemLabel="select a query..."
+                                                  noSelectionOption="true"
+                                                  itemDisabled="true"
+                                                  />
+                                    <f:selectItems id="prop-search-query-si"
+                                                   value="#{propertySearchBB.queryList}"
+                                                   var="ql"
+                                                   itemValue="#{ql}"
+                                                   itemLabel="#{ql.queryTitle}" 
+                                                   />
+                                    <p:ajax update="prop-search-params-form
+                                            query-selected-description
+                                            prop-search-messages-form"
+                                            listener="#{propertySearchBB.changeQuerySelected}"
+                                            />
+                                </p:selectOneMenu>
+                                <p:spacer height="3px" />
+                                <h:outputText id="query-selected-description"
+                                              style="font-style: italic;"
+                                              value="#{propertySearchBB.querySelected.queryName.desc}" />
+                            </div>
+                        </div>
+                    </h:form>
+
+                    <h:form id="prop-search-params-form">
+                        <f:subview id="prop-search-param-lob-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.lotblock_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Lot and block" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-lob-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.lotblock_ctl}" >
+                                        <p:ajax update="param-lob-num1-it
+                                                param-lob-letter-it
+                                                param-lob-num2-it" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:inputText id="param-lob-num1-it"
+                                                 disabled="#{!propertySearchBB.querySelected.primaryParams.lotblock_ctl}"
+                                                 size="6"
+                                                 value="#{propertySearchBB.querySelected.primaryParams.lotblock_val_num1}" 
+                                                 required="false"/>
+                                    <h:outputText value=" - " />
+                                    <p:inputText id="param-lob-letter-it"
+                                                 disabled="#{!propertySearchBB.querySelected.primaryParams.lotblock_ctl}"
+                                                 size="6"
+                                                 value="#{propertySearchBB.querySelected.primaryParams.lotblock_val_letter}" />
+                                    <h:outputText value=" - " />
+                                    <p:inputText id="param-lob-num2-it"
+                                                 disabled="#{!propertySearchBB.querySelected.primaryParams.lotblock_ctl}"
+                                                 size="6"
+                                                 value="#{propertySearchBB.querySelected.primaryParams.lotblock_val_num2}" />
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="prop-search-param-bobsource-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.bobSource_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Parcel record source" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-bobsource-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.bobID_ctl}" >
+                                        <p:ajax update="param-bobsource-val-som" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:selectOneMenu id="param-bobsource-val-som"
+                                                     required="false"
+                                                     disabled="#{!propertySearchBB.querySelected.primaryParams.bobID_ctl}"
+                                                     value="#{propertySearchBB.querySelected.primaryParams.bobSource_val}">
+                                        <f:converter converterId="bobSourceConverter"/>
+                                        <f:selectItems value="#{propertySearchBB.sourceList}"
+                                                       var="bs" 
+                                                       itemValue="#{bs}" 
+                                                       itemLabel="#{bs.title} (ID:#{bs.sourceid})"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="prop-search-param-parcelid-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.parcelid_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Parcel ID" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-parcelid-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.parcelid_ctl}" >
+                                        <p:ajax update="param-parcelid-it" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:inputText id="param-parcelid-it"
+                                                 disabled="#{!propertySearchBB.querySelected.primaryParams.parcelid_ctl}"
+                                                 size="15"
+                                                 value="#{propertySearchBB.querySelected.primaryParams.parcelid_val}" 
+                                                 required="false"/>
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="prop-search-param-addr-bldg-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.address_bldgNum_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Building Number" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-bldg-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.address_bldgNum_ctl}" >
+                                        <p:ajax update="param-bldg-it" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:inputText id="param-bldg-it"
+                                                 disabled="#{!propertySearchBB.querySelected.primaryParams.address_bldgNum_ctl}"
+                                                 size="15"
+                                                 value="#{propertySearchBB.querySelected.primaryParams.address_bldgNum_val}" 
+                                                 required="false"/>
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="prop-search-param-addr-stname-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.addressStreetName_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Street name" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-stname-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.addressStreetName_ctl}" >
+                                        <p:ajax update="param-stname-it" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:inputText id="param-stname-it"
+                                                 disabled="#{!propertySearchBB.querySelected.primaryParams.addressStreetName_ctl}"
+                                                 size="15"
+                                                 value="#{propertySearchBB.querySelected.primaryParams.addressStreetName_val}" 
+                                                 required="false"/>
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="prop-search-param-condition-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.condition_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Property condition" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-condition-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.condition_ctl}" >
+                                        <p:ajax update="param-condition-val-som" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:selectOneMenu id="param-condition-val-som"
+                                                     required="false"
+                                                     disabled="#{!propertySearchBB.querySelected.primaryParams.condition_ctl}"
+                                                     value="#{propertySearchBB.querySelected.primaryParams.condition_intensityClass_val}">
+                                        <f:converter converterId="intensityClassConverter"/>
+                                        <f:selectItems value="#{propertySearchBB.conditionIntensityList}"
+                                                       var="cond" 
+                                                       itemValue="#{cond}" 
+                                                       itemLabel="#{cond.title}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="prop-search-param-landbankprospect-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.landbankprospect_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Property landbankprospect" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-landbankprospect-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.landbankprospect_ctl}" >
+                                        <p:ajax update="param-landbankprospect-val-som" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:selectOneMenu id="param-landbankprospect-val-som"
+                                                     required="false"
+                                                     disabled="#{!propertySearchBB.querySelected.primaryParams.landbankprospect_ctl}"
+                                                     value="#{propertySearchBB.querySelected.primaryParams.landbankprospect_intensityClass_val}">
+                                        <f:converter converterId="intensityClassConverter"/>
+                                        <f:selectItems value="#{propertySearchBB.landBankProspectIntensityList}"
+                                                       var="intensity" 
+                                                       itemValue="#{intensity}" 
+                                                       itemLabel="#{intensity.title}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="prop-search-param-landbankheld-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.landbankheld_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Held by Tri-COG Land Bank" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-lbheld-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.landbankheld_ctl}" >
+                                        <p:ajax update="param-lbheld-val-sbb" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:selectBooleanButton          id="param-lbheld-val-sbb"
+                                                                    onLabel="Yes,TCLB held"
+                                                                    offLabel="No, not TCLB held"
+                                                                    disabled="#{!propertySearchBB.querySelected.primaryParams.landbankheld_ctl}"
+                                                                    value="#{propertySearchBB.querySelected.primaryParams.landbankheld_val}" />
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="prop-search-param-nonaddressable-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.nonaddressable_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Non-addressable parcel" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-nonaddr-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.nonaddressable_ctl}" >
+                                        <p:ajax update="param-nonaddr-val-sbb" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:selectBooleanButton          id="param-nonaddr-val-sbb"
+                                                                    onLabel="Yes, non-addressable"
+                                                                    offLabel="No, not non-addressable"
+                                                                    disabled="#{!propertySearchBB.querySelected.primaryParams.nonaddressable_ctl}"
+                                                                    value="#{propertySearchBB.querySelected.primaryParams.nonaddressable_val}" />
+                                </div>
+                            </div>
+                        </f:subview>
+
+
+                        <f:subview id="prop-search-param-usetype-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.useType_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Use Type" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-usetype-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.useType_ctl}" >
+                                        <p:ajax update="param-usetype-val-som" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+
+                                    <p:selectOneMenu    id="param-usetype-val-som"
+                                                        style="width: 100%"
+                                                        value="#{propertySearchBB.querySelected.primaryParams.useType_val}"
+                                                        disabled="#{!propertySearchBB.querySelected.primaryParams.useType_ctl}">
+                                        <f:converter    converterId="propertyUseTypeConverter"/>
+                                        <f:selectItem   itemLabel="select a use type..." noSelectionOption="true" itemDisabled="true"/>
+                                        <f:selectItems  id="prop-search-filter-usetype-items"
+                                                        value="#{propertySearchBB.putList}"
+                                                        var="put" itemValue="#{put}" itemLabel="#{put.name}" />
+                                    </p:selectOneMenu>
+
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="prop-search-param-bobid-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.bobID_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Parcel ID (Internal)" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-bobid-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.bobID_ctl}" >
+                                        <p:ajax update="param-bobid-it" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:inputText id="param-bobid-it"
+                                                 disabled="#{!propertySearchBB.querySelected.primaryParams.bobID_ctl}"
+                                                 size="10"
+                                                 value="#{propertySearchBB.querySelected.primaryParams.bobID_val}" 
+                                                 required="false"/>
+                                </div>
+                            </div>
+                        </f:subview>
+
+
+                        <f:subview id="prop-search-param-active-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.active_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Active parcel record" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-active-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.active_ctl}" >
+                                        <p:ajax update="param-active-val-sbb" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:selectBooleanButton          id="param-active-val-sbb"
+                                                                    onLabel="Yes, active"
+                                                                    offLabel="No, deactivated"
+                                                                    disabled="#{!propertySearchBB.querySelected.primaryParams.active_ctl}"
+                                                                    value="#{propertySearchBB.querySelected.primaryParams.active_val}" />
+
+
+                                </div>
+                            </div>
+                        </f:subview>
+
+
+
+
+                        <f:subview id="prop-search-param-user-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.user_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="User field" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-user-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.user_ctl}" >
+                                        <p:ajax update="prop-search-filter-user-som" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <p:selectOneMenu id="prop-search-filter-user-som"
+                                                     style="width: 100%"
+                                                     required="false"
+                                                     value="#{propertySearchBB.querySelected.primaryParams.user_val}"
+                                                     disabled="#{!propertySearchBB.querySelected.primaryParams.user_ctl}">
+                                        <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
+                                        <f:selectItems value="#{systemServicesBB.userListForSearch}"  
+                                                       var="u" 
+                                                       itemValue="#{u}"
+                                                       itemLabel="#{u.human.name} (username:#{u.username}, ID:#{u.userID})"/>
+                                        <f:converter converterId="userConverter"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>
+
+
+
+                        <f:subview id="prop-search-param-date-subview"
+                                   rendered="#{propertySearchBB.querySelected.primaryParams.date_startEnd_ctl or propertySearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid nested-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Date field" />
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="param-date-ctl-sbcb"
+                                                             value="#{propertySearchBB.querySelected.primaryParams.date_startEnd_ctl}" >
+                                        <p:ajax update="prop-search-date-field-val
+                                                prop-search-date-start-val
+                                                prop-search-date-end-val
+                                                prop-search-date-relative-ctl" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+
+                                <div class="p-col-8">
+                                    <div class="p-grid">
+                                        <div class="p-col-12">
+
+                                            <p:selectOneMenu  id="prop-search-date-field-val"
+                                                              style="width: 100%"
+                                                              value="#{propertySearchBB.querySelected.primaryParams.date_field}"
+                                                              disabled="#{!propertySearchBB.querySelected.primaryParams.date_startEnd_ctl}">
+                                                <f:selectItem itemLabel="select a date field..."
+                                                              noSelectionOption="true"
+                                                              itemDisabled="true"/>
+                                                <f:selectItems id="prop-search-date-field-val-items"
+                                                               value="#{propertySearchBB.querySelected.primaryParams.dateFieldList}"
+                                                               var="f" itemValue="#{f}" itemLabel="#{f.title}" />
+                                            </p:selectOneMenu>
+
+                                        </div>
+                                        <div class="p-col-12">
+                                            <p:outputLabel for="prop-search-date-relative-ctl"
+                                                           value="Filter by Relative Date"
+                                                           />
+                                            <p:selectBooleanCheckbox class="checkbox"
+                                                                     id="prop-search-date-relative-ctl"
+                                                                     value="#{propertySearchBB.querySelected.primaryParams.date_relativeDates_ctl}"
+                                                                     disabled="#{!propertySearchBB.querySelected.primaryParams.date_startEnd_ctl}">
+                                                <p:ajax update="prop-search-date-end-val
+                                                        prop-search-date-start-val
+                                                        prop-search-date-end-val
+                                                        prop-search-date-relative-start-val
+                                                        prop-search-date-relative-end-val" />
+                                            </p:selectBooleanCheckbox>
+
+
+                                        </div>
+
+
+                                        <div class="p-col-6">
+
+
+                                            <p:outputLabel for="prop-search-date-start-val"
+                                                           value="Start Date"/>
+                                            <p:calendar id="prop-search-date-start-val"
+                                                        value="#{propertySearchBB.querySelected.primaryParams.startDate_val_utilDate}"
+                                                        disabled="#{(!propertySearchBB.querySelected.primaryParams.date_startEnd_ctl) or propertySearchBB.querySelected.primaryParams.date_relativeDates_ctl}"
+                                                        mode="popup"
+                                                        showOn="button"
+                                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                        navigator="true"
+                                                        tabindex="16"
+                                                        timeInput="true"
+                                                        showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                        showButtonPanel="true"
+                                                        showTodayButton="true"
+                                                        required="false"
+                                                        style="width: 100%"/>
+
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:outputLabel for="prop-search-date-end-val"
+                                                           value="End Date"/>
+
+                                            <p:calendar id="prop-search-date-end-val"
+                                                        value="#{propertySearchBB.querySelected.primaryParams.endDate_val_utilDate}"
+                                                        disabled="#{(!propertySearchBB.querySelected.primaryParams.date_startEnd_ctl) or propertySearchBB.querySelected.primaryParams.date_relativeDates_ctl}"
+                                                        mode="popup"
+                                                        showOn="button"
+                                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                                        navigator="true"
+                                                        tabindex="16"
+                                                        timeInput="true"
+                                                        showHour="true" showMinute="false" showSecond="false" showMillisec="false"
+                                                        showButtonPanel="true"
+                                                        showTodayButton="true"
+                                                        required="false"
+                                                        style="width: 100%"/>
+
+
+
+                                        </div>
+                                        <div class="p-col-6">
+
+
+                                            <p:outputLabel for="prop-search-date-relative-start-val"
+                                                           value="Start Days from today"
+                                                           />
+
+                                            <p:inputText id="prop-search-date-relative-start-val"
+                                                         value="#{propertySearchBB.querySelected.primaryParams.date_relativeDates_start_val}"
+                                                         disabled="#{!(propertySearchBB.querySelected.primaryParams.date_startEnd_ctl and propertySearchBB.querySelected.primaryParams.date_relativeDates_ctl)}" />
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:outputLabel for="prop-search-date-relative-end-val"
+                                                           value="End Days from today"
+                                                           />
+
+                                            <p:inputText id="prop-search-date-relative-end-val"
+                                                         value="#{propertySearchBB.querySelected.primaryParams.date_realtiveDates_end_val}"
+                                                         disabled="#{!(propertySearchBB.querySelected.primaryParams.date_startEnd_ctl and propertySearchBB.querySelected.primaryParams.date_relativeDates_ctl)}" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <div class="p-grid">
+                            <div class="p-grid-6">
+                                <p:commandButton id="prop-search-exec-cb-0"
+                                                 ajax="true"
+                                                 actionListener="#{propertySearchBB.executeQuery}"
+                                                 icon="fa fa-search"
+                                                 value="Search"
+                                                 style="width: 100%"
+                                                 disabled="#{propertySearchBB.querySelected.queryExecuted}"
+                                                 update=" 
+                                                 @form
+                                                 prop-search-messages-form
+                                                 prop-search-log-form
+                                                 prop-search-results-panel
+                                                 prop-search-query-select-form"/>
+
+                            </div>
+
+
+                            <div class="p-grid-6">
+
+
+                                <div class="restrict-main-contents-io-button gray_button">
+                                    <p:commandButton id="prop-search-clear-cb-0"
+                                                     ajax="true"
+                                                     actionListener="#{propertySearchBB.resetQuery}"
+                                                     icon="fa fa-eraser"
+                                                     value="Clear search"
+                                                     style="width: 100%"
+                                                     disabled="#{!propertySearchBB.querySelected.queryExecuted}"
+                                                     update=" 
+                                                     @form
+                                                     prop-search-messages-form
+                                                     prop-search-log-form
+                                                     prop-search-results-panel
+                                                     prop-search-query-select-form"/>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </h:form>
+                </p:panel>
+
+
+                <p:panel  id="prop-search-log-panel"
+                          toggleable="true"
+                          widgetVar="prop-search-log-panel-var"
+                          collapsed="true"
+                          style="width:100%;"
+                          header="Property Query log"
+                          rendered="true">
+
+                    <h:form id="prop-search-log-form">
+                        <div class='search-query-desc'>
+                            <h:outputText id="prop-search-log-ot"
+                                          value="#{propertySearchBB.querySelected.queryLog}"
+                                          escape="false"/>
+                        </div>
+                    </h:form>
+                </p:panel>
+            </div>
+
+
+            <div class="p-col">
+
+                <!-- PANEL CONTAINER -->
+                <p:panel id="prop-search-results-panel"
+                         toggleable="true"
+                         widgetVar="prop-search-query-panel-var"
+                         collapsed="false"
+                         style="width:100%;"
+                         header="Property Search Results"
+                         rendered="true">
+
+
+                    <h:form id="prop-search-results-form">
+                        <div class="p-grid">
+                            <div class="p-col-6">
+                                <p:selectBooleanCheckbox class="checkbox"
+                                                         id="prop-search-appendresults-chkbox-0"
+                                                         value="#{propertySearchBB.appendResultsToList}"
+                                                         disabled="false" >
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
+
+                                <p:outputLabel for="prop-search-appendresults-chkbox-0"
+                                               value="Add to results below"
+                                               />
+                            </div>
+
+                        </div>
+                        <p:commandButton id="prop-search-results-clear"
+                                         ajax="true"
+                                         actionListener="#{propertySearchBB.clearPropertyList}"
+                                         icon="fa fa-eraser"
+                                         style="width: 100%"
+                                         value="Clear Results "
+                                         update=" prop-search-messages-form
+                                         prop-search-results-form"/>
+
+                        <p:spacer height="5px" />
+
+                        <p:dataTable id="prop-search-results-table"
+                                     var="prop"
+                                     value="#{propertySearchBB.propListMaster}"
+                                     rowKey="#{prop.parcelKey}"
+                                     tableStyleClass="primeDataTable"
+                                     draggableRows="false"
+                                     draggableColumns="true"
+                                     tabindex="6"
+                                     >
+
+                            <p:column width="10%;" style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="ID"/>
+                                </f:facet>
+                                <h:outputText value="#{prop.parcelKey}" />
+                            </p:column>
+
+                            <p:column width="70%" style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Address"/>
+                                </f:facet>
+                                <h:outputText value="#{prop.addressPretty2LineEscapeFalse}" 
+                                              escape="false"/>
+                                <p:spacer height="2px" />
+                                <h:outputText value="#{prop.countyParcelID}" />
+
+                            </p:column>
+
+                            <p:column width="20%" style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+
+                                <p:commandLink  id="prop-view-cl"
+                                                ajax="false"
+                                                style="color:blue;"
+                                                rendered="true"
+                                                value="view property"
+                                                actionListener="#{propertySearchBB.exploreProperty(prop)}" />
+
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+            </div>
+        </div>
+    </p:dialog>
+</ui:composition>

@@ -259,8 +259,8 @@
                                                     <div class="restrict-main-contents-io-link link-button">
 
                                                         <p:commandLink id="activebob-proplist-cb"
-                                                                       value="change"
-                                                                       oncomplete="PF('activebob-proplist-overlay-var').show();"/>
+                                                                       value="property search"
+                                                                       oncomplete="PF('prop-search-dialog-var').show();"/>
                                                     </div>
                                                     
                                                     <p:spacer height="5px" />
@@ -315,6 +315,7 @@
                                             </h:form>
                                             
                                             <ui:include src="/restricted/cogstaff/prop/compositions/addresses.xhtml"/>
+                                            <ui:include src="/restricted/cogstaff/prop/compositions/propertySearch.xhtml"/>
 
                                         </div>
 

@@ -7,39 +7,41 @@ package com.tcvcog.tcvce.entities.search;
 
 import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.IntensityClass;
-import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyUseType;
-import java.io.Serializable;
 import java.util.HashMap;
 
 /**
- *
+ * Represents all the fields you can search parcels by
+ * Updated FEB 2022 for parcelization
+ * 
  * @author marosco and ellen bascomb
  */
 public  class       SearchParamsProperty 
         extends     SearchParams {
     
-   public static final String MUNI_DBFIELD = "property.municipality_municode";
+   public static final String MUNI_DBFIELD = "parcel.muni_municode";
     
-   // filter PROP-1
-   private boolean zip_ctl;
-   private String zip_val;
-    
-   // filter #PROP-2
+   // filter #PROP-1
    private boolean lotblock_ctl;
-   private String lotblock_val;
+   private String lotblock_val_num1;
+   private String lotblock_val_letter;
+   private String lotblock_val_num2;
    
-   // filter #PROP-3
+   // filter #PROP-2
    private boolean bobSource_ctl;
    private BOBSource bobSource_val;
    
-   // filter #PROP-4
+   // filter #PROP-3
    private boolean parcelid_ctl;
    private String parcelid_val;
    
+   // filter #PROP-4
+   private boolean addressBldgNum_ctl; 
+   private String addressBldgNum_val;
+   
    // filter #PROP-5
-   private boolean address_ctl; 
-   private String address_val;
+   private boolean addressStreetName_ctl;
+   private String addressStreetName_val;
    
    // filter #PROP-6
    private boolean condition_ctl;
@@ -61,28 +63,6 @@ public  class       SearchParamsProperty
    private boolean useType_ctl;
    private PropertyUseType useType_val;
    
-   // filter #PROP-11
-   private boolean zoneClass_ctl;
-   private String zoneClass_val;
-   
-   // filter #PROP-12
-   private boolean taxStatus_ctl;
-   private int taxStatus_val;
-   
-   // filter #PROP-13
-   private boolean propValue_ctl;
-   private int propValue_min_val;
-   private int propValue_max_val;
-   
-   // filter #PROP-14
-   private boolean constructionYear_ctl;
-   private int constructionYear_min_val;
-   private int constructionYear_max_val;
-   
-   // filter #PROP-15 person
-   private boolean person_ctl;
-   private Person person_val;
-   
    
    public SearchParamsPropertyDateFieldsEnum[] getDateFieldList(){
        SearchParamsPropertyDateFieldsEnum[] fields = SearchParamsPropertyDateFieldsEnum.values();
@@ -102,10 +82,10 @@ public  class       SearchParamsProperty
     }
 
     /**
-     * @return the lotblock_val
+     * @return the lotblock_val_num1
      */
-    public String getLotblock_val() {
-        return lotblock_val;
+    public String getLotblock_val_num1() {
+        return lotblock_val_num1;
     }
 
     /**
@@ -123,17 +103,17 @@ public  class       SearchParamsProperty
     }
 
     /**
-     * @return the address_ctl
+     * @return the addressBldgNum_ctl
      */
-    public boolean isAddress_ctl() {
-        return address_ctl;
+    public boolean isAddress_bldgNum_ctl() {
+        return addressBldgNum_ctl;
     }
 
     /**
-     * @return the address_val
+     * @return the addressBldgNum_val
      */
-    public String getAddress_val() {
-        return address_val;
+    public String getAddress_bldgNum_val() {
+        return addressBldgNum_val;
     }
 
 
@@ -146,10 +126,10 @@ public  class       SearchParamsProperty
     }
 
     /**
-     * @param lotblock_val the lotblock_val to set
+     * @param lotblock_val the lotblock_val_num1 to set
      */
-    public void setLotblock_val(String lotblock_val) {
-        this.lotblock_val = lotblock_val;
+    public void setLotblock_val_num1(String lotblock_val) {
+        this.lotblock_val_num1 = lotblock_val;
     }
 
     /**
@@ -167,33 +147,19 @@ public  class       SearchParamsProperty
     }
 
     /**
-     * @param address_ctl the address_ctl to set
+     * @param address_ctl the addressBldgNum_ctl to set
      */
-    public void setAddress_ctl(boolean address_ctl) {
-        this.address_ctl = address_ctl;
+    public void setAddress_bldgNum_ctl(boolean address_ctl) {
+        this.addressBldgNum_ctl = address_ctl;
     }
 
     /**
-     * @param address_val the address_val to set
+     * @param address_val the addressBldgNum_val to set
      */
-    public void setAddress_val(String address_val) {
-        this.address_val = address_val;
+    public void setAddress_bldgNum_val(String address_val) {
+        this.addressBldgNum_val = address_val;
     }
 
-
-    /**
-     * @return the zip_ctl
-     */
-    public boolean isZip_ctl() {
-        return zip_ctl;
-    }
-
-    /**
-     * @return the zip_val
-     */
-    public String getZip_val() {
-        return zip_val;
-    }
 
     /**
      * @return the bobSource_ctl
@@ -257,62 +223,6 @@ public  class       SearchParamsProperty
 
 
     /**
-     * @return the zoneClass_ctl
-     */
-    public boolean isZoneClass_ctl() {
-        return zoneClass_ctl;
-    }
-
-    /**
-     * @return the zoneClass_val
-     */
-    public String getZoneClass_val() {
-        return zoneClass_val;
-    }
-
-    /**
-     * @return the propValue_ctl
-     */
-    public boolean isPropValue_ctl() {
-        return propValue_ctl;
-    }
-
-    /**
-     * @return the propValue_min_val
-     */
-    public int getPropValue_min_val() {
-        return propValue_min_val;
-    }
-
-    /**
-     * @return the constructionYear_ctl
-     */
-    public boolean isConstructionYear_ctl() {
-        return constructionYear_ctl;
-    }
-
-    /**
-     * @return the constructionYear_min_val
-     */
-    public int getConstructionYear_min_val() {
-        return constructionYear_min_val;
-    }
-
-    /**
-     * @param zip_ctl the zip_ctl to set
-     */
-    public void setZip_ctl(boolean zip_ctl) {
-        this.zip_ctl = zip_ctl;
-    }
-
-    /**
-     * @param zip_val the zip_val to set
-     */
-    public void setZip_val(String zip_val) {
-        this.zip_val = zip_val;
-    }
-
-    /**
      * @param bobSource_ctl the bobSource_ctl to set
      */
     public void setBobSource_ctl(boolean bobSource_ctl) {
@@ -373,76 +283,7 @@ public  class       SearchParamsProperty
     }
 
 
-    /**
-     * @param zoneClass_ctl the zoneClass_ctl to set
-     */
-    public void setZoneClass_ctl(boolean zoneClass_ctl) {
-        this.zoneClass_ctl = zoneClass_ctl;
-    }
-
-    /**
-     * @param zoneClass_val the zoneClass_val to set
-     */
-    public void setZoneClass_val(String zoneClass_val) {
-        this.zoneClass_val = zoneClass_val;
-    }
-
-    /**
-     * @param propValue_ctl the propValue_ctl to set
-     */
-    public void setPropValue_ctl(boolean propValue_ctl) {
-        this.propValue_ctl = propValue_ctl;
-    }
-
-    /**
-     * @param propValue_min_val the propValue_min_val to set
-     */
-    public void setPropValue_min_val(int propValue_min_val) {
-        this.propValue_min_val = propValue_min_val;
-    }
-
-    /**
-     * @param constructionYear_ctl the constructionYear_ctl to set
-     */
-    public void setConstructionYear_ctl(boolean constructionYear_ctl) {
-        this.constructionYear_ctl = constructionYear_ctl;
-    }
-
-    /**
-     * @param constructionYear_min_val the constructionYear_min_val to set
-     */
-    public void setConstructionYear_min_val(int constructionYear_min_val) {
-        this.constructionYear_min_val = constructionYear_min_val;
-    }
-
-    /**
-     * @return the propValue_max_val
-     */
-    public int getPropValue_max_val() {
-        return propValue_max_val;
-    }
-
-    /**
-     * @param propValue_max_val the propValue_max_val to set
-     */
-    public void setPropValue_max_val(int propValue_max_val) {
-        this.propValue_max_val = propValue_max_val;
-    }
-
-    /**
-     * @return the constructionYear_max_val
-     */
-    public int getConstructionYear_max_val() {
-        return constructionYear_max_val;
-    }
-
-    /**
-     * @param constructionYear_max_val the constructionYear_max_val to set
-     */
-    public void setConstructionYear_max_val(int constructionYear_max_val) {
-        this.constructionYear_max_val = constructionYear_max_val;
-    }
-
+  
    
     /**
      *
@@ -450,8 +291,7 @@ public  class       SearchParamsProperty
      */
     public HashMap getParams(){
         HashMap m = new HashMap();
-        m.put("Fil by Address Part:", this.isAddress_ctl());
-        m.put("Fil by Assessed Value:", this.isPropValue_ctl());
+        m.put("Fil by Address Part:", this.isAddress_bldgNum_ctl());
         m.put("Fil by Bob Source:", this.isBobSource_ctl());
         m.put("Fil by Condition:", this.isCondition_ctl());
         m.put("Fil by Land Bank Held:", this.isLandbankheld_ctl());
@@ -464,9 +304,6 @@ public  class       SearchParamsProperty
         m.put("Fil by Start End Date:", this.isDate_startEnd_ctl());
         m.put("Fil by Use Type:", this.isUseType_ctl());
         m.put("Fil by User Field:", this.isUser_ctl());
-        m.put("Fil by Year Built:", this.isConstructionYear_ctl());
-        m.put("Fil by Zip:", this.isZip_ctl());
-        m.put("Fil by Zone Class:", this.isZoneClass_ctl());
     
         return m;
         
@@ -500,34 +337,7 @@ public  class       SearchParamsProperty
         this.bobSource_val = bobSource_val;
     }
 
-    /**
-     * @return the taxStatus_ctl
-     */
-    public boolean isTaxStatus_ctl() {
-        return taxStatus_ctl;
-    }
-
-    /**
-     * @param taxStatus_ctl the taxStatus_ctl to set
-     */
-    public void setTaxStatus_ctl(boolean taxStatus_ctl) {
-        this.taxStatus_ctl = taxStatus_ctl;
-    }
-
-    /**
-     * @return the taxStatus_val
-     */
-    public int getTaxStatus_val() {
-        return taxStatus_val;
-    }
-
-    /**
-     * @param taxStatus_val the taxStatus_val to set
-     */
-    public void setTaxStatus_val(int taxStatus_val) {
-        this.taxStatus_val = taxStatus_val;
-    }
-
+  
     /**
      * @return the condition_intensityClass_val
      */
@@ -556,32 +366,61 @@ public  class       SearchParamsProperty
         this.landbankprospect_intensityClass_val = landbankprospect_intensityClass_val;
     }
 
+  
     /**
-     * @return the person_val
+     * @return the addressStreetName_ctl
      */
-    public Person getPerson_val() {
-        return person_val;
+    public boolean isAddressStreetName_ctl() {
+        return addressStreetName_ctl;
     }
 
     /**
-     * @param person_val the person_val to set
+     * @return the addressStreetName_val
      */
-    public void setPerson_val(Person person_val) {
-        this.person_val = person_val;
+    public String getAddressStreetName_val() {
+        return addressStreetName_val;
     }
 
     /**
-     * @return the person_ctl
+     * @param addressStreetName_ctl the addressStreetName_ctl to set
      */
-    public boolean isPerson_ctl() {
-        return person_ctl;
+    public void setAddressStreetName_ctl(boolean addressStreetName_ctl) {
+        this.addressStreetName_ctl = addressStreetName_ctl;
     }
 
     /**
-     * @param person_ctl the person_ctl to set
+     * @param addressStreetName_val the addressStreetName_val to set
      */
-    public void setPerson_ctl(boolean person_ctl) {
-        this.person_ctl = person_ctl;
+    public void setAddressStreetName_val(String addressStreetName_val) {
+        this.addressStreetName_val = addressStreetName_val;
+    }
+
+    /**
+     * @return the lotblock_val_letter
+     */
+    public String getLotblock_val_letter() {
+        return lotblock_val_letter;
+    }
+
+    /**
+     * @return the lotblock_val_num2
+     */
+    public String getLotblock_val_num2() {
+        return lotblock_val_num2;
+    }
+
+    /**
+     * @param lotblock_val_letter the lotblock_val_letter to set
+     */
+    public void setLotblock_val_letter(String lotblock_val_letter) {
+        this.lotblock_val_letter = lotblock_val_letter;
+    }
+
+    /**
+     * @param lotblock_val_num2 the lotblock_val_num2 to set
+     */
+    public void setLotblock_val_num2(String lotblock_val_num2) {
+        this.lotblock_val_num2 = lotblock_val_num2;
     }
 
    

@@ -218,7 +218,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 + "INNER JOIN public.occchecklistspacetypeelement ON (occchecklistspacetypeelement_elementid = spaceelementid) \n"
                 + "WHERE inspectedspaceelementid=?;";
 
-        System.out.println("getInspectedSpaceElement grabbing OccInspectedSpaceElement w/ ID: " + eleID);
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -297,7 +296,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             } catch(BlobException ex){
                 throw new IntegrationException("An error occurred while trying to retrieve blobs for a OccInspectedSpaceElement", ex);
             }
-            System.out.println("Returning element with ID of: " + rs.getInt("occchecklistspacetypeelement_elementid"));
         } catch(BObStatusException ex){
             System.out.println(ex);
         }

@@ -20,8 +20,6 @@ import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.MailingCityStateZip;
 import com.tcvcog.tcvce.entities.MailingCityStateZipDefaultTypeEnum;
 import com.tcvcog.tcvce.entities.MailingCityStateZipRecordTypeEnum;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -35,12 +33,9 @@ import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -564,9 +559,16 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             // ****************************
             // **         ACTIVE         **
             // **************************** 
+            
             if(params.isActive_ctl()){
                 params.appendSQL("AND ");
                 boolean tsnull = false;
+            // later database tables used a timestamp for deactivation
+            // as the method of marking a record as not active
+            // but earlier tables just used a boolean active flag
+            // so this logic adapts to both versions of the tables
+            // simply by examining the name of the active field as
+            // reported by the integrator method sending in the params
                 if(activeField != null){
                     tsnull = activeField.contains("ts");
                 }
@@ -621,7 +623,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 
             if(params instanceof SearchParamsProperty){
 //                SearchParamsProperty temp = (SearchParamsProperty) params;
-//                temp.setAddress_val(temp.getAddress_val().replaceAll(" ", "%"));
+//                temp.setAddress_bldgNum_val(temp.getAddress_bldgNum_val().replaceAll(" ", "%"));
 //                params = temp;
                 
             }
@@ -772,16 +774,38 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          
          
          switch(qName){
-            case OPENCECASES_OCCPERIODSINPROCESS:
+            case ADDRESS_BLDG_NUM_ONLY:
+                paramsList.add(genParams_property_address_bldgOnly(params, cred));
+                break;
+            case ADDRESS_STREET_ONLY:
+                paramsList.add(genParams_property_address_streetOnly(params, cred));
+                break;
+            case ADDRESS_BLDGANDSTREET:
+                paramsList.add(genParams_property_address_streetAndBldgNum(params, cred));
+                break;
+            case PARCELID:
+                paramsList.add(genParams_property_parcelID(params, cred));
+                break;
+            case LOTANDBLOCK:
+                paramsList.add(genParams_property_lotAndBlock(params, cred));
+                break;
+            case RECORD_SOURCE:
+                paramsList.add(genParams_property_recordSource(params, cred));
+                break;
+            case LAND_BANK_HELD:
+                paramsList.add(genParams_property_landBankHeld(params, cred));
+                break;
+            case NON_ADDRESSABLE:
+                paramsList.add(genParams_property_nonAddressable(params, cred));
+                break;
+            case UPDATED_PAST_MONTH:
                 paramsList.add(genParams_property_recentlyUpdated(params, cred));
                 break;
-            case HOUSESTREETNUM:
-                paramsList.add(genParams_property_address(params, cred));
-                break;
-            case PERSONS:
-                paramsList.add(genParams_property_persons(params, cred));
+            case PARCELINTERNALID:
+                paramsList.add(genParams_property_internalID(params, cred));
                 break;
             case CUSTOM:
+                paramsList.add(genParams_property_custom(params, cred));
                 break;
          }
          query = new QueryProperty(qName, paramsList, cred);
@@ -1382,6 +1406,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setLimitResultCount_val(RESULT_COUNT_LIMIT_DEFAULT);
 
         // Shared param #7
+        // we by default only want active records
         params.setActive_rtMin(RoleType.MuniStaff);
         params.setActive_ctl(true);
         params.setActive_val(true);
@@ -1411,25 +1436,25 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         // ********* PROPERTY-SPECIFIC PARAMETERS *********
         // ------------------------------------------------
         
-        // Param #PROP-1
-        params.setZip_ctl(false);
-        params.setZip_val(null);
-        
-        // Param #PROP-2
+        // Param #PROP-1: LOB
         params.setLotblock_ctl(false);
-        params.setLotblock_val(null);
+        params.setLotblock_val_num1(null);
         
-        // Param #PROP-3
+        // Param #PROP-2: SOURCE
         params.setBobID_ctl(false);
         params.setBobSource_val(null);
         
-        // Param #PROP-4
+        // Param #PROP-3: parcel ID
         params.setParcelid_ctl(false);
         params.setParcelid_val(null);
         
-        // Param #PROP-5
-        params.setAddress_ctl(false);
-        params.setAddress_val(null);
+        // Param #Prop-4: building number
+        params.setAddress_bldgNum_ctl(false);
+        params.setAddress_bldgNum_val(null);
+        
+        // Param #PROP-5: street name
+        params.setAddressStreetName_ctl(false);
+        params.setAddressStreetName_val(null);
         
         // Param #PROP-6
         params.setCondition_ctl(false);
@@ -1451,47 +1476,141 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setUseType_ctl(false);
         params.setUseType_val(null);
         
-        // Param #PROP-11
-        params.setZoneClass_ctl(false);
-        params.setZoneClass_val(null);
-        
-        // Param #PROP-12
-        params.setTaxStatus_ctl(false);
-        params.setTaxStatus_val(0);
-        
-        // Param #PROP-13
-        params.setPropValue_ctl(false);
-        params.setPropValue_max_val(FILTER_OFF_DEFVALUE_INT);
-        params.setPropValue_min_val(FILTER_OFF_DEFVALUE_INT);
-        
-        // Param #PROP-14
-        params.setConstructionYear_ctl(false);
-        params.setConstructionYear_min_val(FILTER_OFF_DEFVALUE_INT);
-        params.setConstructionYear_max_val(FILTER_OFF_DEFVALUE_INT);
-        
-        // Param #PROP-15
-        params.setPerson_ctl(false);
-        params.setPerson_val(null);
-        
         return params;
     }
     
-    private SearchParamsProperty genParams_property_persons(SearchParamsProperty params, Credential cred){
-        params.setPerson_ctl(true);
-        // downstream injects Person
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_address_bldgOnly(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by building number only");
+        params.setFilterDescription("");
+        params.setAddress_bldgNum_ctl(true);
+        // user enter building number string
+            
         return params;
     }
     
     
-    private SearchParamsProperty genParams_property_address(SearchParamsProperty params, Credential cred){
-        params.setFilterName("Lead parameter bundle for property search by address");
-        params.setFilterDescription("search by address");
-        params.setAddress_ctl(true);
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_address_streetOnly(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by street name only");
+        params.setFilterDescription("");
+        params.setAddressStreetName_ctl(true);
+        // user enters street name String
 
         return params;
-        
     }
     
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_address_streetAndBldgNum(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by building number and street name");
+        params.setFilterDescription("Both bldg number and street name");
+        params.setAddressStreetName_ctl(true);
+        // user enters street name String
+        params.setAddress_bldgNum_ctl(true);
+        // user enters building number
+
+        return params;
+    }
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_parcelID(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by parcel ID");
+        params.setFilterDescription("Parcel ID query");
+        params.setParcelid_ctl(true);
+        // user enters parcelID string
+
+        return params;
+    }
+    
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_lotAndBlock(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by lot and block");
+        params.setFilterDescription("Enter lot number 1, then the letter, then the second number in separate fields");
+        params.setLotblock_ctl(true);
+        // user enters three String fields
+
+        return params;
+    }
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_recordSource(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by where the parcel record came from");
+        params.setFilterDescription("Select a record source from the drop down box");
+        params.setBobSource_ctl(true);
+        // user enters three String fields
+
+        return params;
+    }
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_landBankHeld(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Query for a list of all Land bank held properties");
+        params.setFilterDescription("Only land bank held properties will be returned");
+        params.setLandbankheld_ctl(true);
+        params.setLandbankheld_val(true);
+        
+        return params;
+    }
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_nonAddressable(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Query for a list of properties marked nonaddressable");
+        params.setFilterDescription("Only nonaddressable properties returned");
+        params.setNonaddressable_ctl(true);
+        params.setNonaddressable_val(true);
+        
+        return params;
+    }
+    
+    
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
     private SearchParamsProperty genParams_property_recentlyUpdated(SearchParamsProperty params, Credential cred){
         params.setFilterName("Properties updated in the past month");
         params.setFilterDescription("Applies to properties with any field updated");
@@ -1505,6 +1624,41 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return params;
         
     }
+    
+        /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_internalID(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Searches by the internal parcel ID, not county parcel ID");
+        params.setFilterDescription("INTERNAL identifier");
+        params.setBobID_ctl(true);
+        // user enters the internal ID
+        return params;
+    }
+    
+    
+   
+    
+        /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_custom(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Custom search; all param fields available");
+        params.setFilterDescription("Turn on a parameter, and enter a value");
+        // let user turn stuff on and off.
+        
+        return params;
+    }
+    
+    
+   
+    
 
     
     // END V PROPERTY
