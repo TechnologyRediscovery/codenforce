@@ -1,0 +1,932 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="units-growl-form">
+
+        <p:growl id="units-growl"
+                 globalOnly="false" 
+                 />
+    </h:form>
+
+    <p:panel    id="prop-units-panel"
+                toggleable="true"
+                widgetVar="prop-events-panel-var"
+                collapsed="false"
+                header="Units"
+                rendered="true">
+        <h:form id="prop-units-panel-form">
+
+
+            <p:commandButton    id="prop-units-explore-button"
+                                ajax="false"
+                                value="Configure Units"
+                                styleClass="noFill button-size-small"
+                                action="#{propertyProfileBB.onPropUnitExploreButtonChange}"
+                                icon="fa fa-hotel"
+                                />
+
+            <p:spacer height="5px" />
+
+            <p:dataTable id="prop-units-table"
+                         var="unit"
+                         value="#{propertyProfileBB.currentProperty.unitWithListsList}"
+                         tableStyleClass="primeDataTable"
+                         rowKey="#{unit.unitID}"
+                         >
+
+                <p:column headerText="Number"
+                          styleClass="centeredColumnContent">
+
+                    <h:outputText value="#{unit.unitNumber}"/>
+
+                </p:column>
+
+                <p:column headerText="# Occ Periods"
+                          styleClass="centeredColumnContent">
+
+                    <h:outputText value="#{unit.periodList.size()}"/>
+
+                </p:column>
+
+
+                <p:column headerText="Rent start"
+                          styleClass="centeredColumnContent">
+
+                    <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
+
+                </p:column>
+
+                <p:column headerText="Rent stop"
+                          styleClass="centeredColumnContent">
+
+                    <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
+
+                </p:column>
+
+                <p:column headerText="Last updated"
+                          styleClass="centeredColumnContent">
+
+                    <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.lastUpdatedTS)}"/>
+
+                </p:column>
+
+                <p:column headerText="Sys ID"
+                          styleClass="centeredColumnContent">
+                    <h:outputText value="#{unit.unitID}"/>
+
+
+                </p:column>
+
+                <p:column headerText="Options"
+                          styleClass="centeredColumnContent">
+
+                    <p:commandButton   id="prop-unit-newperiod-button"
+                                       ajax="true"
+                                       actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
+                                       oncomplete="PF('prop-addperiod-dialog-var').show()"
+                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                       value="New Occ Period"
+                                       icon="fa fa-id-card-o"
+                                       />
+
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+    </p:panel>
+    <p:panel    id="prop-units-list-panel"
+                toggleable="true"
+                widgetVar="prop-units-list-panel-var"
+                collapsed="false"
+                header="Unit list">
+
+        <h:form id="select-view-option-form">
+
+            <p:outputLabel value="What units would you like to edit?   "/>
+
+            <p:selectOneMenu style="width: 300px;" 
+                             id="prop-unit-list-viewoptions" 
+                             value="#{propertyUnitsBB.currentViewOption}"
+                             >
+                <p:ajax update="form-unitedit
+                        prop-units-list-form"/>
+                <f:selectItems  id="select-view-option-items"
+                                value="#{propertyUnitsBB.allViewOptions}"
+                                var="vo"
+                                itemValue="#{vo}"
+                                itemLabel="#{vo.label}"/>
+            </p:selectOneMenu>
+
+            <p:spacer height="5px" />
+
+        </h:form>
+
+        <h:form id="prop-units-list-form" >
+            <p:commandButton       id="button-editunits"
+                                   ajax="true" 
+                                   actionListener="#{propertyUnitsBB.beginPropertyUnitUpdates}"
+                                   oncomplete="PF('dialog-widvar-unitedit').show()"
+                                   rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
+                                   value="Edit unit list"  
+                                   icon="fa fa-edit"
+                                   update="form-unitedit"
+                                   />
+            <p:spacer height="5px" />
+
+            <p:dataScroller
+                id="datascroller-propunits" 
+                var="unit"
+                rowIndexVar="#{unit.unitID}"
+                value="#{propertyUnitsBB.heavyDisplayList}"
+                widgetVar="events-requiredactions-ds"
+                >
+
+                <div class="outlinedBox event-ds-box"> 
+                    <h3>
+                        <h:outputText value="Unit Number: " />
+                        <h:outputText value="#{unit.unitNumber.equalsIgnoreCase('-1')? 'Single unit structure' : unit.unitNumber}" />
+                    </h3>
+
+                    <p:spacer height="5px" />
+
+                    <h:outputText value="Rental notes: " />
+                    <h:outputText value="#{unit.rentalNotes}" />
+
+                    <p:spacer height="5px" />
+
+                    <h:outputText value="Rental intent: " />
+                    <h:outputText value="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
+
+                    <p:spacer height="5px" />
+
+                    <h:outputText value="Rental Intent Dates: " rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+                    <h:outputText value="#{unit.rentalIntentDateStart} - #{unit.rentalIntentDateStart}" rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+
+                    <p:spacer height="5px" rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+
+                    <h:outputText value="Unit Description: " />
+                    <h:outputText value="#{unit.notes}" />
+
+                    <p:spacer height="5px" />
+
+                    <h:outputText value="Other known address: " />
+                    <h:outputText value="#{unit.otherKnownAddress}" />
+
+                    <p:spacer height="5px" />
+
+                    <h:outputText value="Active? " />
+                    <h:outputText value="#{unit.active ? 'Yes' : 'No'}" />
+
+                    <h4>Occupancy periods</h4>
+
+                    <p:commandButton       id="properties-occperiods-button-addnewperiod"
+                                           ajax="true" 
+                                           actionListener="#{propertyOccPeriodsBB.initiateNewOccPeriodCreation(unit)}"
+                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                           disabled="#{!propertyUnitsBB.currProp.active}"
+                                           oncomplete="PF('dialog-addoccperiod-var').show()"
+                                           value="Add new occupancy period" 
+                                           update="dialog-addoccperiod-form"
+                                           icon="fa fa-plus"/>
+
+                    <p:spacer height="5px" />
+
+
+                    <p:dataScroller
+                        id="scroller-periodlist"
+                        widgetVar="var-scroller-periodlist"
+                        rowIndexVar="#{period.periodID}"
+                        var="period"
+                        value="#{unit.periodList}"
+                        >                                         
+
+                        <div style="datum">
+
+
+                            <h:outputText value="Start Date: " 
+                                          styleClass="ui-label-inline" />
+
+                            <h:outputText value="#{PropertyUnitsBB.getPrettyDate(period.startDate)}" 
+                                          styleClass="data-text"/>
+                        </div>
+
+                        <div style="datum">
+                            <h:outputText value="End Date: " 
+                                          styleClass="ui-label-inline" />
+
+                            <h:outputText value="#{PropertyUnitsBB.getPrettyDate(period.endDate)}" 
+                                          styleClass="data-text"/>
+                        </div>
+                        <div style="datum">
+                            <h:outputText value="Type: " 
+                                          styleClass="ui-label-inline" />
+                            <h:outputText value="#{period.type.title}" 
+                                          styleClass="data-text"/>
+                        </div>
+                        <div style="datum">
+                            <h:outputText value="Authorization" 
+                                          styleClass="ui-label-inline" />
+                            <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : PropertyUnitsBB.getPrettyDate(period.authorizedTS)}" />
+                        </div>
+                        <p:commandButton       id="button-occperiodtable-editperiod"
+                                               ajax="false" 
+                                               action="#{propertyUnitsBB.manageOccPeriod(period)}"
+                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                               value="manage occupancy period"  
+                                               icon="fa fa-edit"/>
+                    </p:dataScroller>
+                </div>
+            </p:dataScroller>
+        </h:form>
+
+    </p:panel>
+
+
+    <p:dialog   id="unit-dialog"
+                height="700" width="1300"
+                widgetVar="unit-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Manage Property Unit: #{propertyProfileBB.currentPropertyUnit.unitNumber} (ID: #{propertyProfileBB.currentPropertyUnit.unitID})"
+                rendered="true"
+                >
+
+        <div class="p-grid nested-grid">
+
+            <div class="p-col" >
+
+
+                <p:panel    id="unit-info-panel"
+                            toggleable="true"
+                            widgetVar="unit-info-panel-var"
+                            collapsed="false"
+                            header="Property Unit Information">
+
+                    <div class="p-grid">
+                        <div class="p-col-4">
+                            <h:outputText value="Unit ID (Internal)" />
+                        </div>
+
+                        <div class="p-col-8">
+                            <h:outputText value="#{propertyProfileBB.currentPropertyUnit.unitID}"
+                                          />
+                        </div>
+
+                        <div class="p-col-4">
+                            <h:outputText value="Unit Number" />
+                        </div>
+
+                        <div class="p-col-8">
+                            <h:outputText value="#{propertyProfileBB.currentPropertyUnit.unitNumber}"
+                                          />
+                        </div>
+
+                        <div class="p-col-4">
+                            <h:outputText value="Attached to parcel ID" />
+                        </div>
+
+                        <div class="p-col-8">
+                            <h:outputText value="#{propertyProfileBB.currentPropertyUnit.parcelKey}"/>
+                        </div>
+
+                        <div class="p-col-4">
+                            <h:outputText value="Mailing address" />
+                        </div>
+
+                        <div class="p-col-8">
+                            <h:outputText value="#{propertyProfileBB.currentPropertyUnit.parcelMailing.addressPretty2LineEscapeFalse}"
+                                          escape="false"/>
+                        </div>
+
+                        <div class="p-col-4">
+                            <h:outputText value="Intent to rent (start)" />
+                        </div>
+
+                        <div class="p-col-8">
+                            <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentPropertyUnit.rentalIntentDateStart)}"
+                                          />
+                        </div>
+
+                        <div class="p-col-4">
+                            <h:outputText value="Intent to rent (stop)" />
+                        </div>
+                        <div class="p-col-8">
+                            <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(propertyProfileBB.currentPropertyUnit.rentalIntentDateStop)}"
+                                          />
+                        </div>
+                        <div class="p-col-4">
+                            <h:outputText value="Record status" />
+                        </div>
+                        <div class="p-col-8">
+                            <h:outputText value="#{propertyProfileBB.currentPropertyUnit.active ? 'Active':'Inactive'}"
+                                          />
+                        </div>
+
+
+                    </div>
+
+                </p:panel>
+
+                <p:panel    id="unit-persons-panel"
+                            toggleable="true"
+                            widgetVar="unit-persons-panel-var"
+                            collapsed="false"
+                            header="Persons">
+
+
+                    <p:dataTable
+                        id="unit-persons-table"
+                        var="per"
+                        value="#{propertyProfileBB.currentPropertyUnit.humanLinkList}"
+                        rowKey="#{per.humanID}"
+                        tableStyleClass="primeDataTable"
+                        rowExpandMode="single"
+                        resizableColumns="true"
+                        expandedRow="false"
+                        widgetVar="personSelectListTable">
+
+                        <p:column width="10%">
+                            <f:facet name="header">
+                                <h:outputText value="ID" />
+                            </f:facet>
+                            <h:outputText value="#{per.humanID}"/>
+                        </p:column>
+
+                        <p:column width="40%" sortBy="#{per.name}"
+                                  filterBy="#{per.name}">
+                            <f:facet name="header">
+                                <h:outputText value="Name" />
+                            </f:facet>
+                            <h:outputText value="#{per.name}"/>
+                        </p:column>
+
+                        <p:column width="10%" >
+                            <f:facet name="header">
+                                <h:outputText value="Actions" />
+                            </f:facet>
+                            <p:commandLink  id="person-view-commandlink"
+                                            ajax="true" 
+                                            value="view"
+                                            actionListener="#{personBB.explorePerson(per)}"
+                                            oncomplete="PF('person-profile-dialog-var').show();"
+                                            update="person-info-form
+                                            person-profile-addresses-form
+                                            person-profile-phones-form
+                                            person-profile-emails-form
+                                            person-links-form
+                                            person-profile-dialog"
+                                            />
+                        </p:column>
+                    </p:dataTable>
+
+
+                </p:panel>
+            </div>
+            <div class="p-col" >
+
+                <p:panel    id="unit-periods-panel"
+                            toggleable="true"
+                            widgetVar="unit-periods-panel-var"
+                            collapsed="false"
+                            header="Occupancy Periods">
+
+
+                </p:panel>
+
+                <p:panel    id="unit-cecases-panel"
+                            toggleable="true"
+                            widgetVar="unit-cecases-panel-var"
+                            collapsed="false"
+                            header="Code Enforcement Cases">
+
+
+                </p:panel>
+            </div>
+        </div>
+    </p:dialog>
+
+
+    <p:dialog    id="dialog-unitedit"
+                 height="650" width="900"
+                 widgetVar="dialog-widvar-unitedit"
+                 closable="true" >
+        <h2>Edit property units</h2>
+
+        <h:form id="form-unitedit">
+
+
+            <p:commandButton ajax="true"                                                   
+                             actionListener="#{propertyUnitsBB.addUnitToNewPropUnits}" 
+                             update="table-unitedit"
+                             icon="fa fa-plus"
+                             tabindex="1"
+                             value="Add unit"/>
+
+            <p:spacer height="5px" />
+            <p:dataTable
+                id="table-unitedit"
+                widgetVar="datatable"
+                rowIndexVar="rowIndex"
+                var="unit"
+                value="#{propertyUnitsBB.unitDisplayList}"
+                tabindex="2"
+                rowKey="#{unit.unitID}"
+                editable="true">
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Unit Number" />
+                    </f:facet>
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{unit.unitNumber}" /></f:facet>
+                        <f:facet name="input">
+                            <p:inputText value="#{unit.unitNumber}"
+                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Rental Intent Date Start:" />
+                    </f:facet>
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{unit.rentalIntentDateStart}" />
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:calendar
+                                value="#{unit.rentalIntentDateStartUtil}"
+                                mode="popup"
+                                showOn="button"
+                                pattern="EEE, dd MMM, yyyy"
+                                navigator="true"
+                                showButtonPanel="true"
+                                showTodayButton="true"
+                                required="false"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Unit Intent Date End:" />
+                    </f:facet>
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{unit.rentalIntentDateStop}" />
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:calendar
+                                value="#{unit.rentalIntentDateStopUtil}"
+                                mode="popup"
+                                showOn="button"
+                                pattern="EEE, dd MMM, yyyy"
+                                navigator="true"
+                                showButtonPanel="true"
+                                showTodayButton="true"
+                                required="false"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Rental Notes:" />
+                    </f:facet>
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{unit.rentalNotes}" />
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText value="#{unit.rentalNotes}" 
+                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Unit Description" />
+                    </f:facet>
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{unit.notes}" />
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText value="#{unit.notes}" 
+                                         onkeydown="PF('datatable').onKeyDown(event)"
+                                         onkeyup="PF('datatable').onKeyUp(event, #{rowIndex})"/>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column style="width:40px">
+                    <f:facet name="header">
+                        <h:outputText value="Edit?" />
+                    </f:facet>
+                    <p:rowEditor/>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Remove?" />
+                    </f:facet>
+                    <ui:remove>
+                        <p:commandButton    id="button-editunits-removeunit"
+                                            ajax="true" 
+                                            value="Remove" 
+                                            disabled="#{!(unit.unitID==0)}"
+                                            action="#{propertyUnitsBB.removePropertyUnitFromEditTable(unit)}"
+                                            update="#{p:component('table-unitedit')}
+                                            units-growl-form"/> 
+                    </ui:remove>
+
+                    <p:selectBooleanButton onLabel="Active" offLabel="Deactivated" id="button-editunits-deactivateunit" 
+                                           value="#{unit.active}" 
+                                           disabled="#{unit.unitID==0}"
+                                           />                                      
+                </p:column>
+
+            </p:dataTable>
+
+
+            <script type="text/javascript">
+
+                $(function () {
+                    $.extend(PF("datatable"), {
+                        onKeyDown: function (e) {
+                            var key = e.which,
+                                    keyCode = $.ui.keyCode;
+
+                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                e.preventDefault();
+                            }
+                        },
+
+                        onKeyUp: function (e, rowIndex) {
+                            var key = e.which,
+                                    keyCode = $.ui.keyCode;
+                            //.ui-row-editor-check .ui-icon-check .ui-c
+                            if ((key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
+                                this.tbody
+                                        .find('.ui-row-editor .ui-icon-check')
+                                        .eq(rowIndex)
+                                        .click();
+                            }
+
+                            if (key === keyCode.ESCAPE) {
+                                this.tbody
+                                        .find('.ui-row-editor .ui-icon-close')
+                                        .eq(rowIndex)
+                                        .click();
+                            }
+                        }
+                    });
+                });
+
+            </script>
+
+            <p:spacer height="10px"/>
+
+            <p:commandButton ajax="true" 
+                             value="Cancel" icon="fa fa-stop" 
+                             onclick="PF('dialog-widvar-unitedit').hide()"
+                             tabindex="4"/>
+
+
+            <p:commandButton ajax="true"
+                             actionListener="#{propertyUnitsBB.finalizeUnitList()}"
+                             oncomplete="PF('dialog-widvar-unitedit').hide()"
+                             icon="fa fa-thumbs-o-up"
+                             update="   units-growl-form
+                             prop-units-list-form"
+                             value="Save unit list" 
+                             tabindex="3"/>
+        </h:form>
+    </p:dialog>
+
+
+
+    <p:dialog    id="dialog-addoccperiod"
+                 height="400" width="600"
+                 widgetVar="dialog-addoccperiod-var"
+                 closable="true" >
+
+        <h2>Create new occupancy period</h2>
+
+        <h:form id="dialog-addoccperiod-form">
+
+
+            <h:outputLabel styleClass="ui-label" for="som-occperiodtype" value="Occupancy type" />
+
+            <p:selectOneMenu
+                id="som-occperiodtype" tabindex="1" required="true"
+                value="#{propertyOccPeriodsBB.selectedOccPeriodType}">
+                <f:converter converterId="occPeriodTypeConverter"/>
+                <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
+                <f:selectItems id="si-typelist" 
+                               value="#{propertyOccPeriodsBB.occPeriodTypeList}" 
+                               var ="opt" 
+                               itemValue="#{opt}" 
+                               itemLabel="#{opt.title}" />
+            </p:selectOneMenu>
+
+            <p:spacer height="5px" />
+
+            <p:commandButton ajax="true" 
+                             value="Cancel" icon="fa fa-stop" 
+                             onclick="PF('dialog-addoccperiod-var').hide()"
+                             tabindex="4"/>
+
+
+            <p:commandButton ajax="false"
+                             action="#{propertyOccPeriodsBB.addNewOccPeriod}"
+                             icon="fa fa-plus-square"
+                             styleClass="inline-button"
+                             value="Create new period" 
+                             tabindex="3"/>
+
+        </h:form>
+    </p:dialog>
+
+
+    <p:dialog    id="unit-changes-dialog"
+                 height="600" 
+                 width="1200"
+                 widgetVar="unit-changes-dialog-var"
+                 closable="true" 
+                 closeOnEscape="true">
+
+
+        <p:panel    id="unit-changes-list-panel"
+                    toggleable="true"
+                    widgetVar="unit-changes-list-panel-var"
+                    collapsed="false"
+                    header="Change list">
+
+            <h:form id="select-view-option-form">
+
+                <p:commandButton rendered="#{propertyUnitChangesBB.wasRedirected()}"
+                                 value="Finish and return"
+                                 action="#{propertyUnitChangesBB.goBack()}"
+                                 />
+
+                <p:spacer height="10px"/>
+
+                <p:outputLabel value="What changes would you like to edit?"/>
+
+                <p:selectOneMenu style="width: 300px;" 
+                                 id="unit-changes-list-viewoptions" 
+                                 value="#{propertyUnitChangesBB.currentViewOption}"
+                                 >
+
+                    <p:ajax update="form-unitedit
+                            unit-changes-list-form"/>
+
+                    <f:selectItems  id="select-view-option-items"
+                                    value="#{propertyUnitChangesBB.allViewOptions}"
+                                    var="vo"
+                                    itemValue="#{vo}"
+                                    itemLabel="#{vo.label}"/>
+                </p:selectOneMenu>
+
+                <p:spacer height="5px" />
+
+
+            </h:form>
+
+
+            <h:form id="unit-changes-list-form" >
+
+
+                <p:commandButton       id="button-editunits"
+                                       action="#{propertyUnitChangesBB.goToPropertyUnits()}"
+                                       rendered="#{sessionBean.sessUser.keyCard.hasMuniStaffPermissions}"
+                                       value="Edit unit list"  
+                                       icon="fa fa-edit"
+                                       />
+
+                <p:spacer height="5px" />
+
+                <p:dataScroller
+                    id="datascroller-unit-changes"
+                    var="unit"
+                    rowIndexVar="#{unit.unitID}"
+                    value="#{propertyUnitChangesBB.heavyDisplayList}"
+                    widgetVar="unit-changes-ds"
+                    >
+
+                    <div class="outlinedBox event-ds-box"> 
+                        <h3>
+                            <h:outputText value="Unit ID: #{unit.unitID}" />
+                        </h3>
+
+                        <p:spacer height="5px" />
+
+                        <h:outputText value="Unit Number: #{unit.unitNumber.equalsIgnoreCase('-1')? 'Single unit structure' : unit.unitNumber}" />
+
+                        <p:spacer height="5px" />
+
+                        <h:outputText value="Rental notes: #{unit.rentalNotes}" />
+
+                        <p:spacer height="5px" />
+
+                        <h:outputText value="Rental intent: #{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop? 'Yes' : 'No'}" />
+
+                        <p:spacer height="5px" />
+
+                        <h:outputText value="Rental Intent Dates: " rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+                        <h:outputText value="#{unit.rentalIntentDateStart} - #{unit.rentalIntentDateStart}" rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+
+                        <p:spacer height="5px" rendered="#{!empty unit.rentalIntentDateStart and empty unit.rentalIntentDateStop}"/>
+
+                        <h:outputText value="Unit Description: #{unit.notes}" />
+
+                        <p:spacer height="5px" />
+
+                        <h:outputText value="Other known address: #{unit.otherKnownAddress}" />
+
+                        <p:spacer height="5px" />
+
+                        <h:outputText value="Active? #{unit.active ? 'Yes' : 'No'}" />
+
+                        <h4>Proposed changes</h4>
+
+
+                        <p:dataScroller
+                            id="scroller-changelist"
+                            widgetVar="var-scroller-changelist"
+                            rowIndexVar="#{change.unitChangeID}"
+                            var="change"
+                            value="#{unit.changeOrderList}"
+                            >                                         
+
+                            <div style="datum">
+                                <h:outputText value="Change # #{change.unitChangeID}" />
+                            </div>
+
+                            <div style="datum">
+                                <h:outputText value="Active? #{change.active}" />
+                            </div>
+
+                            <div style="datum">
+                                <h:outputText value="Approved? #{propertyUnitChangesBB.approvedByWho(change)}" />
+                            </div>
+
+                            <div style="datum">
+                                <h:outputText rendered="#{not empty change.unitNumber}" 
+                                              value="Proposed unit number: #{change.unitNumber}" />
+                            </div>
+
+                            <div style="datum">
+                                <h:outputText rendered="#{not empty change.rentalNotes}" 
+                                              value="Proposed rental notes: #{change.rentalNotes}" />
+                            </div>
+
+                            <div style="datum">
+                                <h:outputText rendered="#{not empty change.notes}" 
+                                              value="Proposed unit description: #{change.notes}" />
+                            </div>
+
+                            <div style="datum">
+                                <h:outputText rendered="#{not empty change.otherKnownAddress}" 
+                                              value="Proposed other known address: #{change.otherKnownAddress}" />
+                            </div>
+
+                            <div style="datum">
+                                <h:outputText value="Did the user want to add this unit? #{change.added ? 'Yes' : 'No'}" />
+                            </div>
+
+                            <div style="datum">
+                                <h:outputText value="Did user want to remove (deactivate) this unit? #{change.removed ? 'Yes' : 'No'}" />
+                            </div>
+                            <p:commandButton       id="button-compare-change-order"
+                                                   ajax="true" 
+                                                   update="form-unitedit"
+                                                   actionListener="#{propertyUnitChangesBB.initializeChangeComparison(unit, change)}"
+                                                   oncomplete="PF('dialog-widvar-change-edit').show()"
+                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                   disabled="#{not change.active}"
+                                                   value="Compare and manage change order"  
+                                                   icon="fa fa-edit"/>
+                        </p:dataScroller>
+                    </div>
+                </p:dataScroller>
+
+                <p:outputLabel 
+                    rendered="#{propertyUnitChangesBB.heavyDisplayList.isEmpty()}"
+                    value="No changes matching the criteria were found on this property!"/>
+
+            </h:form>
+
+        </p:panel>
+    </p:dialog>
+
+
+
+
+
+    <p:dialog    id="dialog-compare-changes"
+                 height="300" width="600"
+                 widgetVar="dialog-widvar-change-edit"
+                 closable="true" >
+        <h2>Compare and Manage a change order</h2>
+
+        <h:form id="form-unitedit">
+
+            <h:outputText value="Did the user want to add this unit? " />
+            <h:outputText value="#{propertyUnitChangesBB.currChangeOrder.added ? 'Yes' : 'No'}" />
+
+            <p:spacer height="5px" />
+
+            <h:outputText value="Did user want to remove (deactivate) this unit? " />
+            <h:outputText value="#{propertyUnitChangesBB.currChangeOrder.removed ? 'Yes' : 'No'}" />
+
+            <h:panelGrid columns="2">
+
+                <h:panelGroup>
+
+                    <h:outputText value="Unit Number: " />
+                    <h:outputText value="#{propertyUnitChangesBB.currPropUnit.unitNumber}" />
+
+                    <p:spacer height="5px" />
+
+                    <h:outputText value="Rental notes: " />
+                    <h:outputText value="#{propertyUnitChangesBB.currPropUnit.rentalNotes}" />
+
+                    <p:spacer height="5px" />
+
+                    <h:outputText value="Unit Description: " />
+                    <h:outputText value="#{propertyUnitChangesBB.currPropUnit.notes}" />
+
+                    <p:spacer height="5px" />
+
+                    <h:outputText value="Other known address: " />
+                    <h:outputText value="#{propertyUnitChangesBB.currPropUnit.otherKnownAddress}" />
+
+                </h:panelGroup>
+
+                <h:panelGroup>
+
+                    <h:outputText value="Proposed unit number: " />
+                    <h:outputText value="#{not empty propertyUnitChangesBB.currChangeOrder.unitNumber ? propertyUnitChangesBB.currChangeOrder.unitNumber : 'None'}" />
+
+                    <p:spacer height="5px" />
+
+                    <h:outputText value="Proposed rental notes: " />
+                    <h:outputText value="#{not empty propertyUnitChangesBB.currChangeOrder.rentalNotes ? propertyUnitChangesBB.currChangeOrder.rentalNotes : 'None'}" />
+
+                    <p:spacer height="5px" />
+
+                    <h:outputText value="Proposed unit description: " />
+                    <h:outputText value="#{not empty propertyUnitChangesBB.currChangeOrder.notes ? propertyUnitChangesBB.currChangeOrder.notes : 'None'}" />
+
+                    <p:spacer height="5px" />
+
+                    <h:outputText value="Proposed other known address: " />
+                    <h:outputText value="#{not empty propertyUnitChangesBB.currChangeOrder.otherKnownAddress ? propertyUnitChangesBB.currChangeOrder.otherKnownAddress : 'None'}" />
+
+                </h:panelGroup>
+
+            </h:panelGrid>
+
+            <p:spacer height="5px" />
+
+
+            <p:commandButton ajax="true" 
+                             value="Cancel" icon="fa fa-stop" 
+                             onclick="PF('dialog-widvar-change-edit').hide()"
+                             tabindex="4"/>
+
+            <p:commandButton ajax="true"
+                             actionListener="#{propertyUnitChangesBB.rejectChangeOrder()}"
+                             oncomplete="PF('dialog-widvar-change-edit').hide()"
+                             icon="fa fa-thumbs-o-up"
+                             update="units-growl-form
+                             unit-changes-list-form"
+                             value="Reject (Deactivate) Change Order" 
+                             tabindex="3"/>
+
+            <p:commandButton ajax="true"
+                             actionListener="#{propertyUnitChangesBB.applyChangeOrder()}"
+                             oncomplete="PF('dialog-widvar-change-edit').hide()"
+                             icon="fa fa-thumbs-o-up"
+                             update="units-growl-form
+                             unit-changes-list-form"
+                             value="Apply Change Order" 
+                             tabindex="3"/>
+        </h:form>
+    </p:dialog>
+
+
+
+</ui:composition>

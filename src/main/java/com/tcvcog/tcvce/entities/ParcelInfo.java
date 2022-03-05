@@ -78,6 +78,8 @@ public class ParcelInfo
     protected boolean taxStatus;
     protected int taxYear;
     
+    protected String notes;
+    
 
     /**
      * @return the parcelInfoID
@@ -554,6 +556,20 @@ public class ParcelInfo
     @Override
     public String getDBTableName() {
         return PARCELINFOTABLE;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
    

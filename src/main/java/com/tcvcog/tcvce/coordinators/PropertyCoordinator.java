@@ -18,32 +18,18 @@
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.BlobException;
-import com.tcvcog.tcvce.domain.BlobTypeException;
-import com.tcvcog.tcvce.domain.EventException;
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.domain.*;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
-import com.tcvcog.tcvce.entities.search.QueryPerson;
-import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,8 +69,19 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public MailingAddress getMailingAddress(int addressid) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
-        return pi.getMailingAddress(addressid);
+        return configureMailingAddress(pi.getMailingAddress(addressid));
         
+    }
+    
+    /**
+     * Internal logic for setting up fields on a mailing address
+     * @param addr to configure
+     * @return ref to the configured object
+     */
+    private MailingAddress configureMailingAddress(MailingAddress addr){
+        addr.setAddressPretty1Line(buildPropertyAddressStrings(addr, false));
+        addr.setAddressPretty2LineEscapeFalse(buildPropertyAddressStrings(addr, true));
+        return addr;
     }
     
     /**
@@ -325,7 +322,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     /**
      *  ***************************************************
      *  ***************************************************
-     *  ************* PROPERTY OTHER **********************
+     *  ************* PROPERTY GENERAL ********************
      *  ***************************************************
      *  ***************************************************
      */
@@ -403,8 +400,10 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    pdh.setHumanLinkList(pc.assembleLinkedHumanLinks(pdh));
 
                    pdh.setBlobList(bc.getBlobLightList(bi.getBlobIDs(prop)));
-                   // external data
-                   pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getParcelKey())));
+                   // external data\
+                   // PARCEL INFO NOW LIVES on the parcel itself and uses the parcelinfo table
+                   
+//                   pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getParcelKey())));
 
                } catch (EventException | AuthorizationException | BObStatusException | BlobException | IntegrationException | SearchException ex) {
                    System.out.println(ex);
@@ -571,10 +570,10 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     public Property configureProperty(Property p) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         if(p != null){
+            
             p.setUnitList(pi.getPropertyUnitList(p));
             p.setAddresses(pi.getMailingAddressLinkListByParcel(p.getParcelKey()));
-            p.setAddressPretty1Line(buildPropertyAddressStrings(p, false));
-            p.setAddressPretty2LineEscapeFalse(buildPropertyAddressStrings(p, true));
+          
         }
         
         
@@ -588,38 +587,34 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     
     /**
      * Assembles an address for pretty printing
-     * @param pr for which to generate the address 
+     * @param addr for which to generate the address 
      * @param use2Lines if true, a <br /> will be inserted for double line 
      * conventional address printing
      * @return the String for injection into the property
      */
-    private String buildPropertyAddressStrings(Property pr, boolean use2Lines){
+    private String buildPropertyAddressStrings(MailingAddress addr, boolean use2Lines){
         StringBuilder addrStr = new StringBuilder();
-        if(pr != null){
-            if(pr.getAddresses() != null && !pr.getAddresses().isEmpty()){
-                MailingAddress adr1 = pr.getAddresses().get(0);
-                addrStr.append(adr1.getBuildingNo());
-                if(adr1.getStreet() != null){
-                    addrStr.append(SPACE);
-                    addrStr.append(adr1.getStreet().getName());
-                    if(adr1.getStreet().getCityStateZip() != null){
-                        if(use2Lines){
-                            addrStr.append(HTML_BR);
-                        } else {
-                            addrStr.append(SEMICOLON_SPACE);
-                        }
-                        addrStr.append(adr1.getStreet().getCityStateZip().getCity());
-                        addrStr.append(COMMA_SPACE);
-                        addrStr.append(adr1.getStreet().getCityStateZip().getState());
-                        addrStr.append(SPACE);
-                        addrStr.append(adr1.getStreet().getCityStateZip().getZipCode());
+        if(addr != null){
+            MailingAddress adr1 = addr;
+            addrStr.append(adr1.getBuildingNo());
+            if(adr1.getStreet() != null){
+                addrStr.append(SPACE);
+                addrStr.append(adr1.getStreet().getName());
+                if(adr1.getStreet().getCityStateZip() != null){
+                    if(use2Lines){
+                        addrStr.append(HTML_BR);
+                    } else {
+                        addrStr.append(SEMICOLON_SPACE);
                     }
+                    addrStr.append(adr1.getStreet().getCityStateZip().getCity());
+                    addrStr.append(COMMA_SPACE);
+                    addrStr.append(adr1.getStreet().getCityStateZip().getState());
+                    addrStr.append(SPACE);
+                    addrStr.append(adr1.getStreet().getCityStateZip().getZipCode());
                 }
-            } else {
-                addrStr.append("[MT address]");
             }
         } else {
-            addrStr.append("no property");
+            addrStr.append("no address");
         }
         return addrStr.toString();
     }
@@ -778,6 +773,20 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         pi.updateParcel(pcl);
 
     }
+    
+    
+    
+    
+    public int insertParcelInfoRecord(ParcelInfo info, UserAuthorized ua){
+    
+        return 0;
+    }
+    
+    public void updateParcelInfoRecord(ParcelInfo info, UserAuthorized ua){
+        
+        
+        
+    }
 
     
     public boolean checkAllDates(Property prop) {
@@ -856,13 +865,25 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * Updated to reflect parcelization in which there's no "propertyID" but 
      * rather a parcel ID that's internal to codeNforce and a countyParID
      * 
+     * NOTE: we only have support for one parcel info record--we take the most recent record
+     * in the DB ordered by last updated timestamp and inject that one into the parcel
+     * 
      * @param parcelID
      * @return
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public Property getProperty(int parcelID) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         Parcel par = pi.getParcel(parcelID);
+        List<Integer> infoIDL = pi.getParcelInfoByParcel(par);
+        if(infoIDL != null && !infoIDL.isEmpty()){
+            
+            par.setParcelInfo(pi.getParcelInfo(infoIDL.get(0)));
+        } else {
+            // inject an empty object if we have none to avoid null pointers
+            par.setParcelInfo(new ParcelInfo());
+        }
         Property p = new Property(par);
         
         return configureProperty(p);

@@ -297,6 +297,20 @@ public class PersonBB extends BackingBeanUtils {
     /************** HUMANS INFRASTRUCTURE *********************/
     /**********************************************************/ 
     
+    
+    /**
+     * Listener for user requests to view a human
+     * @param h 
+     */
+    public void onHumanViewLinkClick(Human h){
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            currentPerson = pc.getPerson(h);
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
+    }
+    
     /**
      * Listener for user clicks of the human edit button
      * @param ev

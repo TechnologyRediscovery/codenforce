@@ -44,23 +44,14 @@ public  class   MailingAddress
     protected String notes;
     
     
+        
+    private String addressPretty2LineEscapeFalse;
+    private String addressPretty1Line;
+    
     
     public String getAddressString(){
-        StringBuilder sb  = new StringBuilder();
-        sb.append(buildingNo);
-        if(street != null){
-            sb.append(" ");
-            sb.append(street.getName());
-            sb.append("<br />");
-            if(street.getCityStateZip() != null){
-                sb.append(street.getCityStateZip().getCity());
-                sb.append(", ");
-                sb.append(street.getCityStateZip().getState());
-                sb.append(" ");
-                sb.append(street.getCityStateZip().getZipCode());
-            }
-        }
-        return sb.toString();
+        return "Use addressPretty2LineEscapeFalse or addressPretty1Line";
+        
     }
     
     /**
@@ -241,6 +232,34 @@ public  class   MailingAddress
     @Override
     public String getNoteHolderFriendlyName() {
         return HF_NAME;
+    }
+
+    /**
+     * @return the addressPretty2LineEscapeFalse
+     */
+    public String getAddressPretty2LineEscapeFalse() {
+        return addressPretty2LineEscapeFalse;
+    }
+
+    /**
+     * @return the addressPretty1Line
+     */
+    public String getAddressPretty1Line() {
+        return addressPretty1Line;
+    }
+
+    /**
+     * @param addressPretty2LineEscapeFalse the addressPretty2LineEscapeFalse to set
+     */
+    public void setAddressPretty2LineEscapeFalse(String addressPretty2LineEscapeFalse) {
+        this.addressPretty2LineEscapeFalse = addressPretty2LineEscapeFalse;
+    }
+
+    /**
+     * @param addressPretty1Line the addressPretty1Line to set
+     */
+    public void setAddressPretty1Line(String addressPretty1Line) {
+        this.addressPretty1Line = addressPretty1Line;
     }
 
     

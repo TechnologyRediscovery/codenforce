@@ -16,39 +16,13 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.BlobCoordinator;
-import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.EventException;
-import com.tcvcog.tcvce.domain.InspectionException;
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobLight;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.IntensityClass;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyDataHeavy;
-import com.tcvcog.tcvce.entities.PropertyExtData;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUseType;
-import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.coordinators.*;
+import com.tcvcog.tcvce.domain.*;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
-import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.util.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.time.LocalDateTime;
@@ -73,16 +47,18 @@ import javax.faces.event.ActionEvent;
 public class PropertyProfileBB 
         extends BackingBeanUtils{
 
-    private PropertyDataHeavy currentPropertyDH;
-    private Property currentProperty;
+    private PropertyDataHeavy currentProperty;
+    private boolean currentPropertyEditMode;
+    private boolean currentParcelInfoEditMode;
+    
     private List<PropertyUseType> putList;
-    private PropertyUnit currentPropertyUnit;
+    private PropertyUnitDataHeavy currentPropertyUnit;
     
     private OccPeriod currentOccPeriod;
     private OccPeriodType selectedOccPeriodType;
     private List<OccPeriodType> occPeriodTypeList;
     
-      private Municipality muniSelected;
+    private Municipality muniSelected;
     
     private ViewOptionsActiveHiddenListsEnum eventViewOptionSelected;
     private List<ViewOptionsActiveHiddenListsEnum> eventViewOptions;
@@ -108,12 +84,6 @@ public class PropertyProfileBB
     // BLOBS
     
     private BlobLight currentBlob;
-    
-    
-    
-    
-    
-    
     /**
      * Creates a new instance of PropertyCreateBB
      */
@@ -121,20 +91,21 @@ public class PropertyProfileBB
         
     }
     
-    
-    
      
     @PostConstruct
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
-        currentPropertyDH = getSessionBean().getSessProperty();
+        currentProperty = getSessionBean().getSessProperty();
          try {
              setPutList(pi.getPropertyUseTypeList());
          } catch (IntegrationException ex) {
              System.out.println(ex);
          }
          
-           currentPropertyDH = getSessionBean().getSessProperty();
+        currentProperty = getSessionBean().getSessProperty();
+        currentParcelInfoEditMode = false;
+        currentPropertyEditMode = false;
+         
         setOccPeriodTypeList(getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList());
           
         setPersonToAddList(new ArrayList<>());
@@ -155,7 +126,7 @@ public class PropertyProfileBB
             if(getSelectedOccPeriodType() != null){
                 System.out.println("PropertyProfileBB.initateNewOccPeriod | selectedType: " + getSelectedOccPeriodType().getTypeID());
                 currentOccPeriod = oc.initOccPeriod(
-                        getCurrentPropertyDH(), 
+                        getCurrentProperty(), 
                         getCurrentPropertyUnit(), 
                         getSelectedOccPeriodType(), 
                         getSessionBean().getSessUser(), 
@@ -201,14 +172,24 @@ public class PropertyProfileBB
      * @param pu 
      */
     public void initiateNewOccPeriodCreation(PropertyUnit pu){
+        PropertyCoordinator pc = getPropertyCoordinator();
         selectedOccPeriodType = null;
-        currentPropertyUnit = pu;
+        try {
+            currentPropertyUnit = pc.getPropertyUnitWithLists(pu, getSessionBean().getSessUser().getKeyCard());
+        } catch (IntegrationException | AuthorizationException | BObStatusException | EventException  ex) {
+            System.out.println(ex);
+        } 
     }
     
     
     public void initiatePropertyCreation(ActionEvent ev){
+        
         PropertyCoordinator pc = getPropertyCoordinator();
-        currentProperty = pc.generatePropertySkeleton(getSessionBean().getSessMuni());
+        try {
+            currentProperty = pc.assemblePropertyDataHeavy(pc.generatePropertySkeleton(getSessionBean().getSessMuni()),getSessionBean().getSessUser());
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            System.out.println(ex);
+        } 
     }
     
     
@@ -219,7 +200,7 @@ public class PropertyProfileBB
         int freshID = 0;
         try {
             freshID = pc.addParcel(currentProperty, ua);
-            currentProperty = pc.getProperty(freshID); 
+            currentProperty = pc.getPropertyDataHeavy(freshID, getSessionBean().getSessUser()); 
             getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(currentProperty, ua));
             sc.logObjectView(ua, currentProperty);
             getFacesContext().addMessage(null,
@@ -228,7 +209,7 @@ public class PropertyProfileBB
                                 + ", which is now your 'active property'", ""));
             
             
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException | AuthorizationException | EventException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -263,6 +244,116 @@ public class PropertyProfileBB
         }
         
     }
+    
+    
+    /**
+     * Listener for user requests to toggle edit mode of parcel level 
+     * data
+     * @param ev 
+     */
+    public void onPropertyEditModeToggleButtonChange(ActionEvent ev){
+        System.out.println("PropertyProfileBB.onPropertyEditModeToggleButtonChange | edit mode start:" + currentPropertyEditMode);
+        if(currentPropertyEditMode && currentProperty != null){
+            
+            if(currentProperty.getParcelKey() == 0){
+                // we have a new property 
+                onPropertyAddCommit();
+            } else {
+                // we have an existing property
+                onPropertyUpdateCommit();
+            }
+            
+            
+        }
+        currentPropertyEditMode = !currentPropertyEditMode;
+    }
+    
+    
+    /**
+     * Listener for user requests to toggle edit mode of a parcel info record
+     * @param ev 
+     */
+    public void onParcelInfoEditModeToggleButtonChange(ActionEvent ev){
+        System.out.println("PropertyProfileBB.onParcelInfoEditModeToggleButtonChange | edit mode start:" + currentParcelInfoEditMode);
+        
+        if(currentParcelInfoEditMode && currentProperty != null && currentProperty.getParcelInfo() != null){
+            if(currentProperty.getParcelInfo().getParcelInfoID() == 0){
+                 onParcelInfoAddCommit();
+            } else {
+                onParcelInfoUpdateCommit();
+            }
+                    
+        }
+        currentParcelInfoEditMode = !currentParcelInfoEditMode;
+        
+    }
+    
+    
+     /**
+     * Liases with coordinator to insert a new property object
+     */
+    public void onPropertyAddCommit() {
+        PropertyCoordinator pc = getPropertyCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        int newID;
+        try {
+            newID = pc.addParcel(currentProperty, getSessionBean().getSessUser());
+            currentProperty = pc.getPropertyDataHeavy(newID, getSessionBean().getSessUser());
+            getSessionBean().setSessProperty(currentProperty);
+            sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully added property with ID: " + currentProperty.getParcelKey()
+                            + ", which is now your 'active property'", ""));
+        } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update property, sorries!" + ex.getClass().toString(), ""));
+        }
+    }
+
+    /**
+     * Listener for user requests to commit property updates
+     */
+    public void onPropertyUpdateCommit() {
+        PropertyCoordinator pc = getPropertyCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        try {
+//            currentProperty.setAbandonedDateStart(pc.configureDateTime(currentProperty.getAbandonedDateStart().to));
+            pc.updateParcel(currentProperty, getSessionBean().getSessUser());
+            reloadCurrentPropertyDataHeavy();
+            sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully updated property with ID " + getCurrentProperty().getParcelKey()
+                            + ", which is now your 'active property'", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not update property, sorries! " + ex.toString(), ""));
+        }
+
+    }
+    
+    /**
+     * Writes new parcel info record to the DB
+     */
+    public void onParcelInfoAddCommit(){
+        
+        
+    }
+    
+    /**
+     * Writes changes to current parcel info record to the DB
+     */
+    public void onParcelInfoUpdateCommit(){
+        
+        
+    }
+
+    
 
     /**
      * Listener for when the user aborts a property add operation;
@@ -282,7 +373,7 @@ public class PropertyProfileBB
         EventCoordinator ec = getEventCoordinator();
 
         try {
-            EventCnF ev = ec.initEvent(currentPropertyDH.getPropInfoCaseList().get(0),
+            EventCnF ev = ec.initEvent(currentProperty.getPropInfoCaseList().get(0),
                     ec.getEventCategory(Integer.parseInt(
                             getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                     .getString("propertyinfoeventcatid"))));
@@ -349,8 +440,8 @@ public class PropertyProfileBB
     public String onInfoCaseListButtonChange() throws BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
 
-        if (currentProperty != null && currentPropertyDH.getPropInfoCaseList() != null) {
-            getSessionBean().setSessCECaseListWithDowncastAndLookup(currentPropertyDH.getPropInfoCaseList());
+        if (currentProperty != null && currentProperty.getPropInfoCaseList() != null) {
+            getSessionBean().setSessCECaseListWithDowncastAndLookup(currentProperty.getPropInfoCaseList());
         }
 
         return "ceCaseSearch";
@@ -381,7 +472,7 @@ public class PropertyProfileBB
                 Person checkPer = null;
                 checkPer = persc.getPerson(persc.getHuman(getHumanIDToLink()));
                 if (checkPer != null && checkPer.getHumanID() != 0) {
-                    pc.connectPersonToProperty(currentPropertyDH, checkPer);
+                    pc.connectPersonToProperty(currentProperty, checkPer);
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Connected " + checkPer.getLastName() + " to property ID " + currentProperty.getParcelKey(), ""));
                 } else {
@@ -392,7 +483,7 @@ public class PropertyProfileBB
 
             } else {
                 if (getPersonSelected() != null) {
-                    pc.connectPersonToProperty(currentPropertyDH, getPersonSelected());
+                    pc.connectPersonToProperty(currentProperty, getPersonSelected());
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Connected " + getPersonSelected().getLastName() + " to property ID " + currentProperty.getParcelKey(), ""));
                 } else {
@@ -480,81 +571,7 @@ public class PropertyProfileBB
         }
     }
 
-    /**
-     * Liases with coordinator to insert a new property object
-     * @return 
-     */
-    public String onPropertyAddCommit() {
-        PropertyCoordinator pc = getPropertyCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
-        int newID;
-        try {
-            newID = pc.addParcel(currentProperty, getSessionBean().getSessUser());
-            getSessionBean().setSessProperty(pc.getPropertyDataHeavy(newID, getSessionBean().getSessUser()));
-            sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully added property with ID: " + currentProperty.getParcelKey()
-                            + ", which is now your 'active property'", ""));
-        } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not update property, sorries!" + ex.getClass().toString(), ""));
-        }
-        return "propertySearch";
-        
-
-    }
-
-    /**
-     * Listener for user requests to commit property updates
-     * @return 
-     */
-    public String onPropertyUpdateCommit() {
-        PropertyCoordinator pc = getPropertyCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
-        try {
-//            currentProperty.setAbandonedDateStart(pc.configureDateTime(currentProperty.getAbandonedDateStart().to));
-            pc.updateParcel(currentProperty, getSessionBean().getSessUser());
-            getSessionBean().setSessProperty(currentProperty);
-            sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated property with ID " + getCurrentProperty().getParcelKey()
-                            + ", which is now your 'active property'", ""));
-        } catch (BObStatusException | IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not update property, sorries! " + ex.toString(), ""));
-        }
-        return "propertySearch";
-        
-
-    }
-
-    /**
-     * Listener for requests from the user to view a Person's profile
-     *
-     * @param p
-     * @return
-     */
-    public String onViewPersonProfileButtonChange(Person p) {
-        PersonCoordinator pc = getPersonCoordinator();
-        if (p != null) {
-            getSessionBean().getSessPersonList().add(0, p);
-            try {
-                getSessionBean().setSessPerson(pc.getPerson(p));
-            } catch (IntegrationException |  BObStatusException ex) {
-                System.out.println(ex);
-            }
-            return "personInfo";
-
-        }
-        return "";
-
-    }
+   
 
     public String onCreateNewCaseButtonChange() {
         getSessionBean().setSessProperty(currentProperty);
@@ -603,6 +620,19 @@ public class PropertyProfileBB
     public void deQueuePersonFromEvent(Person p) {
         // TODO Finish my guts
     }
+    
+    /**
+     * Listener for user requests to link a new address to the 
+     * current parcel
+     * 
+     * @param ev 
+     */
+    public void onLinkNewAddressToParcelButtonChange(ActionEvent ev){
+        System.out.println("PropertyProfileBB.linkNewAddressToParcel");
+        
+        
+    }
+    
     
     // ********************************************************
     // *********************BLOBS******************************
@@ -694,18 +724,24 @@ public class PropertyProfileBB
     }
 
     
+    
+    // ********************************************************
+    // **********   GETTERS AND SETTERS ***********************
+    // ********************************************************
+    
+    
 
     /**
      * @return the currentProperty
      */
-    public Property getCurrentProperty() {
+    public PropertyDataHeavy getCurrentProperty() {
         return currentProperty;
     }
 
     /**
      * @param currentProperty the currentProperty to set
      */
-    public void setCurrentProperty(Property currentProperty) {
+    public void setCurrentProperty(PropertyDataHeavy currentProperty) {
         this.currentProperty = currentProperty;
     }
 
@@ -723,20 +759,7 @@ public class PropertyProfileBB
         this.putList = putList;
     }
 
-    /**
-     * @return the currentPropertyDH
-     */
-    public PropertyDataHeavy getCurrentPropertyDH() {
-        return currentPropertyDH;
-    }
-
-    /**
-     * @param currentPropertyDH the currentPropertyDH to set
-     */
-    public void setCurrentPropertyDH(PropertyDataHeavy currentPropertyDH) {
-        this.currentPropertyDH = currentPropertyDH;
-    }
-
+  
     /**
      * @return the selectedOccPeriodType
      */
@@ -992,15 +1015,43 @@ public class PropertyProfileBB
     /**
      * @return the currentPropertyUnit
      */
-    public PropertyUnit getCurrentPropertyUnit() {
+    public PropertyUnitDataHeavy getCurrentPropertyUnit() {
         return currentPropertyUnit;
     }
 
     /**
      * @param currentPropertyUnit the currentPropertyUnit to set
      */
-    public void setCurrentPropertyUnit(PropertyUnit currentPropertyUnit) {
+    public void setCurrentPropertyUnit(PropertyUnitDataHeavy currentPropertyUnit) {
         this.currentPropertyUnit = currentPropertyUnit;
+    }
+
+    /**
+     * @return the currentPropertyEditMode
+     */
+    public boolean isCurrentPropertyEditMode() {
+        return currentPropertyEditMode;
+    }
+
+    /**
+     * @return the currentParcelInfoEditMode
+     */
+    public boolean isCurrentParcelInfoEditMode() {
+        return currentParcelInfoEditMode;
+    }
+
+    /**
+     * @param currentPropertyEditMode the currentPropertyEditMode to set
+     */
+    public void setCurrentPropertyEditMode(boolean currentPropertyEditMode) {
+        this.currentPropertyEditMode = currentPropertyEditMode;
+    }
+
+    /**
+     * @param currentParcelInfoEditMode the currentParcelInfoEditMode to set
+     */
+    public void setCurrentParcelInfoEditMode(boolean currentParcelInfoEditMode) {
+        this.currentParcelInfoEditMode = currentParcelInfoEditMode;
     }
     
     
