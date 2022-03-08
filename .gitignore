@@ -42,6 +42,7 @@ develop-eggs/
 dist/
 downloads/
 eggs/
+### Python ###
 .eggs/
 lib/
 lib64/
@@ -103,6 +104,10 @@ dmypy.json
 # Script specific files
 *_parcelids.json
 
+# Virtural enviroments
+*.venv/
+
+### OTHER ###
 # Docker run files
 db/pg-data
 
@@ -111,7 +116,7 @@ db/pg-data
 nb-configuration.xml
 
 # IntelliJ IDE files
-.idea/
+*.idea/
 *.iml
 
 # Eclipse IDE files
