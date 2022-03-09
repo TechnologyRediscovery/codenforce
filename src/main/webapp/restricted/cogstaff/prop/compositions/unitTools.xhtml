@@ -103,7 +103,7 @@
                 collapsed="false"
                 header="Unit list">
 
-        <h:form id="select-view-option-form">
+        <h:form id="property-units-edit-form">
 
             <p:outputLabel value="What units would you like to edit?   "/>
 
@@ -267,6 +267,8 @@
                             widgetVar="unit-info-panel-var"
                             collapsed="false"
                             header="Property Unit Information">
+                    <h:form id="unit-info-form">
+                        
 
                     <div class="p-grid">
                         <div class="p-col-4">
@@ -330,6 +332,8 @@
 
 
                     </div>
+                    </h:form>
+
 
                 </p:panel>
 
@@ -338,7 +342,8 @@
                             widgetVar="unit-persons-panel-var"
                             collapsed="false"
                             header="Persons">
-
+                    <h:form id="unit-persons-form" >
+                        
 
                     <p:dataTable
                         id="unit-persons-table"
@@ -384,6 +389,7 @@
                                             />
                         </p:column>
                     </p:dataTable>
+                    </h:form>
 
 
                 </p:panel>
@@ -395,7 +401,10 @@
                             widgetVar="unit-periods-panel-var"
                             collapsed="false"
                             header="Occupancy Periods">
-
+                    <h:form id="unit-periods-form">
+                        
+                        
+                    </h:form>
 
                 </p:panel>
 
@@ -404,8 +413,11 @@
                             widgetVar="unit-cecases-panel-var"
                             collapsed="false"
                             header="Code Enforcement Cases">
-
-
+                    <h:form id="unit-cecases-form">
+                        
+                        
+                        
+                    </h:form>
                 </p:panel>
             </div>
         </div>
@@ -616,48 +628,55 @@
 
 
 
-    <p:dialog    id="dialog-addoccperiod"
-                 height="400" width="600"
-                 widgetVar="dialog-addoccperiod-var"
-                 closable="true" >
 
-        <h2>Create new occupancy period</h2>
+    <p:dialog    id="prop-addperiod-dialog"
+                 height="400" width="600"
+                 widgetVar="prop-addperiod-dialog-var"
+                 closable="true"
+                 header="Add New Occupancy Period">
+
 
         <h:form id="dialog-addoccperiod-form">
+            <h:messages id="prop-occperiods-addop-messages"
+                        globalOnly="true" showDetail="true" showSummary="true"
+                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+            </h:messages>
 
 
-            <h:outputLabel styleClass="ui-label" for="som-occperiodtype" value="Occupancy type" />
+            <h:outputLabel styleClass="ui-label" 
+                           for="som-occperiodtype" 
+                           value="Occupancy type" />
 
             <p:selectOneMenu
                 id="som-occperiodtype" tabindex="1" required="true"
-                value="#{propertyOccPeriodsBB.selectedOccPeriodType}">
+                value="#{propertyProfileBB.selectedOccPeriodType}">
+
                 <f:converter converterId="occPeriodTypeConverter"/>
                 <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
-                <f:selectItems id="si-typelist" 
-                               value="#{propertyOccPeriodsBB.occPeriodTypeList}" 
-                               var ="opt" 
-                               itemValue="#{opt}" 
+                <f:selectItems id="si-typelist"
+                               value="#{propertyProfileBB.occPeriodTypeList}"
+                               var ="opt"
+                               itemValue="#{opt}"
                                itemLabel="#{opt.title}" />
             </p:selectOneMenu>
 
             <p:spacer height="5px" />
 
-            <p:commandButton ajax="true" 
-                             value="Cancel" icon="fa fa-stop" 
+            <p:commandButton ajax="true"
+                             value="Cancel" icon="fa fa-stop"
                              onclick="PF('dialog-addoccperiod-var').hide()"
                              tabindex="4"/>
 
 
             <p:commandButton ajax="false"
-                             action="#{propertyOccPeriodsBB.addNewOccPeriod}"
+                             action="#{propertyProfileBB.onAddOccperiodCommitButtonChange}"
                              icon="fa fa-plus-square"
                              styleClass="inline-button"
-                             value="Create new period" 
+                             value="Create new period and goto profile"
                              tabindex="3"/>
 
         </h:form>
     </p:dialog>
-
 
     <p:dialog    id="unit-changes-dialog"
                  height="600" 
@@ -825,9 +844,7 @@
                 <p:outputLabel 
                     rendered="#{propertyUnitChangesBB.heavyDisplayList.isEmpty()}"
                     value="No changes matching the criteria were found on this property!"/>
-
             </h:form>
-
         </p:panel>
     </p:dialog>
 
@@ -841,7 +858,7 @@
                  closable="true" >
         <h2>Compare and Manage a change order</h2>
 
-        <h:form id="form-unitedit">
+        <h:form id="unit-compare-form">
 
             <h:outputText value="Did the user want to add this unit? " />
             <h:outputText value="#{propertyUnitChangesBB.currChangeOrder.added ? 'Yes' : 'No'}" />

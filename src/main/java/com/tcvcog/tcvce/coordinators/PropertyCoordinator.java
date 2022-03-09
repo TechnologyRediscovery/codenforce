@@ -329,6 +329,10 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     
     
     
+
+    
+    
+    
     /**
      * Pass through for getting a property count by municode
      * @param muniCode
@@ -595,22 +599,22 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     private String buildPropertyAddressStrings(MailingAddress addr, boolean use2Lines){
         StringBuilder addrStr = new StringBuilder();
         if(addr != null){
-            MailingAddress adr1 = addr;
-            addrStr.append(adr1.getBuildingNo());
-            if(adr1.getStreet() != null){
+            
+            addrStr.append(addr.getBuildingNo());
+            if(addr.getStreet() != null){
                 addrStr.append(SPACE);
-                addrStr.append(adr1.getStreet().getName());
-                if(adr1.getStreet().getCityStateZip() != null){
+                addrStr.append(addr.getStreet().getName());
+                if(addr.getStreet().getCityStateZip() != null){
                     if(use2Lines){
                         addrStr.append(HTML_BR);
                     } else {
                         addrStr.append(SEMICOLON_SPACE);
                     }
-                    addrStr.append(adr1.getStreet().getCityStateZip().getCity());
+                    addrStr.append(addr.getStreet().getCityStateZip().getCity());
                     addrStr.append(COMMA_SPACE);
-                    addrStr.append(adr1.getStreet().getCityStateZip().getState());
+                    addrStr.append(addr.getStreet().getCityStateZip().getState());
                     addrStr.append(SPACE);
-                    addrStr.append(adr1.getStreet().getCityStateZip().getZipCode());
+                    addrStr.append(addr.getStreet().getCityStateZip().getZipCode());
                 }
             }
         } else {
@@ -720,7 +724,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                     cse.setPropertyInfoCase(true);
                     cse.setNotes("This is a Case object that contains information and events attached to " + p.getAddressString() + ". "
                             + "This case does not represent an actual code enforcement case.");
-                    cse.setCaseID(cc.cecase_insertNewCECase(cse, ua, null));
+                    cse.setCaseID(cc.cecase_insertNewCECase(cse, ua, null, null));
                     csehv = cc.cecase_assembleCECaseDataHeavy(cse, ua);
 
                 } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
@@ -741,11 +745,19 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @return
      * @throws IntegrationException
      */
-    public int addParcel(Parcel pcl, UserAuthorized ua) throws IntegrationException {
+    public int addParcel(Parcel pcl, UserAuthorized ua) throws IntegrationException, BObStatusException {
+        if(pcl == null || ua == null || pcl.getParcelInfo() == null){
+            throw new BObStatusException("Cannot insert new parcel with null parcel or user");
+        }
         PropertyIntegrator pi = getPropertyIntegrator();
         SystemIntegrator si = getSystemIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
-
+        
+        if(pcl.getParcelInfo().isNonAddressable()){
+            pcl.setCountyParcelID(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                        .getString("nonaddressable_parcelid"));
+        }
+        
         pcl.setCreatedBy(ua);
         pcl.setLastUpdatedBy(ua);
         pcl.setSource(si.getBOBSource(
@@ -774,20 +786,60 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
 
     }
     
-    
-    
-    
-    public int insertParcelInfoRecord(ParcelInfo info, UserAuthorized ua){
-    
-        return 0;
+    /**
+     * Logic passthrough for insertions into the parcelinfo table
+     * @param info
+     * @param ua
+     * @return the ID of the fresh record
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public int insertParcelInfoRecord(ParcelInfo info, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        PropertyIntegrator pi =getPropertyIntegrator();
+        if(info == null || ua == null){
+            throw new BObStatusException("cannot insert a parcel info record with null info or UA");
+        }
+        info.setCreatedBy(ua);
+        info.setLastUpdatedBy(ua);
+        
+        return pi.insertParcelInfo(info);
     }
     
-    public void updateParcelInfoRecord(ParcelInfo info, UserAuthorized ua){
-        
-        
+    /**
+     * Logic pass through for updates to the parcelinfo table
+     * @param info
+     * @param ua doing the updating
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void updateParcelInfoRecord(ParcelInfo info, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        if(info == null || ua == null){
+            throw new BObStatusException("cannot insert a parcel info record with null info or UA");
+        }
+        info.setLastUpdatedBy(ua);
+        pi.updateParcelInfo(info);
         
     }
-
+    
+    /**
+     * Deactivates a record in the parcelinfo table
+     * @param info
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void deactivateParcelInfo(ParcelInfo info, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        
+        PropertyIntegrator pi = getPropertyIntegrator();
+        if(info == null || ua == null){
+            throw new BObStatusException("cannot insert a parcel info record with null info or UA");
+        }
+        info.setDeactivatedBy(ua);
+        info.setDeactivatedTS(LocalDateTime.now());
+        info.setLastUpdatedBy(ua);
+        pi.updateParcelInfo(info);
+    }
     
     public boolean checkAllDates(Property prop) {
         boolean unfit, vacant, abandoned;
@@ -1002,6 +1054,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public Property generatePropertySkeleton(Municipality muni) {
         Property prop = new Property(new Parcel());
+        prop.setParcelInfo(new ParcelInfo());
+        prop.getParcelInfo().setNonAddressable(false);
         prop.setParcelKey(0);
         prop.setMuni(muni);
         return prop;

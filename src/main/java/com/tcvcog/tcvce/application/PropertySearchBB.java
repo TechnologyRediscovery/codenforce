@@ -259,6 +259,63 @@ public class PropertySearchBB extends BackingBeanUtils{
         
     }
     
+     /**
+     * Loads a skeleton property into which we inject values from the form
+     */
+    public void onPropertyAddInit() {
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            currentProperty = (pc.assemblePropertyDataHeavy(pc.generatePropertySkeleton(getSessionBean().getSessMuni()),getSessionBean().getSessUser()));
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            System.out.println(ex);
+        }
+    }
+    
+    /**
+     * Listener for user toggling non-addressable on new property
+     
+     */
+    public void onPropertyCreateNonAddressableSliderActuation(){
+        System.out.println("PropertySearchBB.onPropertyCreateNonAddressableSliderActuation | nonaddressable? " + currentProperty.getParcelInfo().isNonAddressable());
+    }
+    
+      /**
+     * Liases with coordinator to insert a new property object
+     * @return jumps to property profile page
+     */
+    public String onPropertyAddCommit() {
+        PropertyCoordinator pc = getPropertyCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        int newID;
+        MessageBuilderParams mbp = new MessageBuilderParams(null, 
+                "Property creation notes", 
+                "At the time of record creation", 
+                currentProperty.getNotes(), 
+                getSessionBean().getSessUser(), 
+                null);
+        currentProperty.setNotes(sc.appendNoteBlock(mbp));
+        
+        try {
+            newID = pc.addParcel(currentProperty, getSessionBean().getSessUser());
+            currentProperty = pc.getPropertyDataHeavy(newID, getSessionBean().getSessUser());
+            getSessionBean().setSessProperty(currentProperty);
+            sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully added property with ID: " + currentProperty.getParcelKey()
+                            + ", which is now your 'active property'", ""));
+            return "propertyInfo";
+            
+        } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not add new property, sorries!" + ex.getClass().toString(), ""));
+        }
+        return "";
+    }
+
+    
     /**
      * @return the searchParamsSelected
      */

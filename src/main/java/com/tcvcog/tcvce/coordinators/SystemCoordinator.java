@@ -24,19 +24,7 @@ import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.IFace_noteHolder;
-import com.tcvcog.tcvce.entities.IntensityClass;
-import com.tcvcog.tcvce.entities.IntensitySchema;
-import com.tcvcog.tcvce.entities.LinkedObjectFamilyEnum;
-import com.tcvcog.tcvce.entities.LinkedObjectRole;
-import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
-import com.tcvcog.tcvce.entities.NavigationItem;
-import com.tcvcog.tcvce.entities.NavigationSubItem;
-import com.tcvcog.tcvce.entities.PrintStyle;
-import com.tcvcog.tcvce.entities.RoleType;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -374,7 +362,10 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         if (idl != null && !idl.isEmpty()) {
             for (Integer i : idl) {
                 try {
-                    sourceList.add(si.getBOBSource(i));
+                    BOBSource s = si.getBOBSource(i);
+                    if(s.isUserattributable()){
+                        sourceList.add(s);
+                    }
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                 }

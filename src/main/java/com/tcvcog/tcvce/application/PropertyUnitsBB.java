@@ -68,7 +68,9 @@ public class PropertyUnitsBB
 
         if (currentViewOption == null) {
 
-            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ALL);
+            // TODO: fix my null pointers with skeleton like properties
+            
+//            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ALL);
 
         }
 
@@ -222,74 +224,76 @@ public class PropertyUnitsBB
     }
 
     public void setCurrentViewOption(ViewOptionsActiveListsEnum input) {
+        if(currProp != null){
+            
+            currentViewOption = input;
 
-        currentViewOption = input;
+            unitDisplayList = new ArrayList<>();
 
-        unitDisplayList = new ArrayList<>();
+            heavyDisplayList = new ArrayList<>();
 
-        heavyDisplayList = new ArrayList<>();
+            if (null == currentViewOption) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "An error occurred while trying to set the current view option. Returning to default.", ""));
+                currentViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
+            } else {
+                switch (currentViewOption) {
+                    case VIEW_ALL:
+                        unitDisplayList.addAll(currProp.getUnitList());
+                        heavyDisplayList.addAll(currProp.getUnitWithListsList());
+                        break;
 
-        if (null == currentViewOption) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to set the current view option. Returning to default.", ""));
-            currentViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
-        } else {
-            switch (currentViewOption) {
-                case VIEW_ALL:
-                    unitDisplayList.addAll(currProp.getUnitList());
-                    heavyDisplayList.addAll(currProp.getUnitWithListsList());
-                    break;
-
-                case VIEW_ACTIVE:
-                    for (PropertyUnit unit : currProp.getUnitList()) {
-                        if (unit.isActive()) {
-                            unitDisplayList.add(unit);
+                    case VIEW_ACTIVE:
+                        for (PropertyUnit unit : currProp.getUnitList()) {
+                            if (unit.isActive()) {
+                                unitDisplayList.add(unit);
+                            }
                         }
+
+                        for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()) {
+                            if (unit.isActive()) {
+                                heavyDisplayList.add(unit);
+                            }
+                        }
+
+                        break;
+
+                    case VIEW_INACTIVE:
+                        for (PropertyUnit unit : currProp.getUnitList()) {
+                            if (!unit.isActive()) {
+                                unitDisplayList.add(unit);
+                            }
+                        }
+
+                        for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()) {
+                            if (unit.isActive()) {
+                                heavyDisplayList.add(unit);
+                            }
+                        }
+
+                        break;
+                }
+
+                Collections.sort(heavyDisplayList, new Comparator<PropertyUnitDataHeavy>() {
+                    @Override
+                    public int compare(PropertyUnitDataHeavy unit1, PropertyUnitDataHeavy unit2) {
+
+                        return Boolean.compare(unit2.isActive(), unit1.isActive());
                     }
 
-                    for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()) {
-                        if (unit.isActive()) {
-                            heavyDisplayList.add(unit);
-                        }
-                    }
-
-                    break;
-
-                case VIEW_INACTIVE:
-                    for (PropertyUnit unit : currProp.getUnitList()) {
-                        if (!unit.isActive()) {
-                            unitDisplayList.add(unit);
-                        }
-                    }
-
-                    for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()) {
-                        if (unit.isActive()) {
-                            heavyDisplayList.add(unit);
-                        }
-                    }
-
-                    break;
+                });
             }
 
-            Collections.sort(heavyDisplayList, new Comparator<PropertyUnitDataHeavy>() {
-                @Override
-                public int compare(PropertyUnitDataHeavy unit1, PropertyUnitDataHeavy unit2) {
+            Collections.sort(unitDisplayList, new Comparator<PropertyUnit>() {
+                    @Override
+                    public int compare(PropertyUnit unit1, PropertyUnit unit2) {
 
-                    return Boolean.compare(unit2.isActive(), unit1.isActive());
-                }
+                        return Boolean.compare(unit2.isActive(), unit1.isActive());
+                    }
 
-            });
+                });
         }
-        
-        Collections.sort(unitDisplayList, new Comparator<PropertyUnit>() {
-                @Override
-                public int compare(PropertyUnit unit1, PropertyUnit unit2) {
-
-                    return Boolean.compare(unit2.isActive(), unit1.isActive());
-                }
-
-            });
 
     }
 

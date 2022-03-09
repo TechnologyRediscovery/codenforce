@@ -844,7 +844,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
           List<Integer> sidl = new ArrayList<>();
           BOBSource bs = null;
           
-          String query =    " SELECT sourceid FROM public.bobsource;";
+          String query =  " SELECT sourceid FROM public.bobsource WHERE active = TRUE;";
         
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -908,7 +908,8 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         BOBSource bs = new BOBSource();
         bs.setSourceid(rs.getInt("sourceid"));
-        bs.setTitle(rs.getString("title"));;
+        bs.setTitle(rs.getString("title"));
+        bs.setUserattributable(rs.getBoolean("userattributable"));
         bs.setDescription(rs.getString("description"));
         // beware of inifinte loops
         bs.setCreatorUserID(rs.getInt("creator"));

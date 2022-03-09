@@ -56,6 +56,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -212,7 +213,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setInt(1, parcel.getParcelKey());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                infoIDL.add(rs.getInt("parcelinfid"));
+                infoIDL.add(rs.getInt("parcelinfoid"));
                 
             }
         } catch (SQLException ex) {
@@ -329,12 +330,12 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
                     
             if(info.getUnfitDateStart() != null){
-                stmt.setTimestamp(10, java.sql.Timestamp.valueOf(info.getUnfitDateStart()));
+                stmt.setTimestamp(10, java.sql.Timestamp.valueOf(info.getUnfitDateStart().atStartOfDay()));
             } else {
                 stmt.setNull(10, java.sql.Types.NULL);
             }
             if(info.getUnfitDateStop() != null){
-                stmt.setTimestamp(11, java.sql.Timestamp.valueOf(info.getUnfitDateStop()));
+                stmt.setTimestamp(11, java.sql.Timestamp.valueOf(info.getUnfitDateStop().atStartOfDay()));
             } else {
                 stmt.setNull(11, java.sql.Types.NULL);
             }
@@ -346,12 +347,12 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                    
                     
             if(info.getAbandonedDateStart() != null){
-                stmt.setTimestamp(13, java.sql.Timestamp.valueOf(info.getAbandonedDateStart()));
+                stmt.setTimestamp(13, java.sql.Timestamp.valueOf(info.getAbandonedDateStart().atStartOfDay()));
             } else {
                 stmt.setNull(13, java.sql.Types.NULL);
             }
             if(info.getAbandonedDateStop() != null){
-                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(info.getAbandonedDateStop()));
+                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(info.getAbandonedDateStop().atStartOfDay()));
             } else {
                 stmt.setNull(14, java.sql.Types.NULL);
             }
@@ -362,12 +363,12 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
                    
             if(info.getVacantDateStart() != null){
-                stmt.setTimestamp(16, java.sql.Timestamp.valueOf(info.getVacantDateStart()));
+                stmt.setTimestamp(16, java.sql.Timestamp.valueOf(info.getVacantDateStart().atStartOfDay()));
             } else {
                 stmt.setNull(16, java.sql.Types.NULL);
             }
             if(info.getVacantDateStop() != null){
-                stmt.setTimestamp(17, java.sql.Timestamp.valueOf(info.getVacantDateStop()));
+                stmt.setTimestamp(17, java.sql.Timestamp.valueOf(info.getVacantDateStop().atStartOfDay()));
             } else {
                 stmt.setNull(17, java.sql.Types.NULL);
             }
@@ -432,12 +433,153 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     }
     
     
-    
-    public void updateParcelInfo(ParcelInfo info) throws BObStatusException{
+    /**
+     * Updates a record in the parcelinfo table
+     * @param info
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void updateParcelInfo(ParcelInfo info) throws BObStatusException, IntegrationException{
         if(info == null){
             throw new BObStatusException("Cannot update parcel info with null info input!");
         }
-        
+           Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int freshID = 0;
+
+        try {
+            
+            String s =  "UPDATE public.parcelinfo\n" +
+                        "   SET parcel_parcelkey=?, usegroup=?, constructiontype=?, \n" +
+                        "       countycode=?, notes=?, ownercode=?, propclass=?, locationdescription=?, \n" +
+                        "       bobsource_sourceid=?, unfitdatestart=?, unfitdatestop=?, unfitby_userid=?, \n" +
+                        "       abandoneddatestart=?, abandoneddatestop=?, abandonedby_userid=?, \n" +
+                        "       vacantdatestart=?, vacantdatestop=?, vacantby_userid=?, condition_intensityclassid=?, \n" +
+                        "       landbankprospect_intensityclassid=?, landbankheld=?, nonaddressable=?, \n" +
+                        "       usetype_typeid=?, lastupdatedts=now(), \n" +
+                        "       lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?\n" +
+                        " WHERE parcelinfoid=?;";
+            
+            stmt = con.prepareStatement(s);
+            
+            stmt.setInt(1, info.getParcelInternalID());
+            stmt.setString(2, info.getUseGroup());
+            stmt.setString(3, info.getConstructionType());
+            stmt.setString(4, info.getCountyCode());
+            
+            stmt.setString(5, info.getNotes());
+            stmt.setString(6, info.getOwnerCode());
+            stmt.setString(7, info.getPropClass());
+            if(info.getLocationDescriptor() != null){
+                stmt.setInt(8, info.getLocationDescriptor().getLocationID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            if(info.getBobSource() != null){
+                stmt.setInt(9, info.getBobSource().getSourceid());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+                    
+            if(info.getUnfitDateStart() != null){
+                
+                stmt.setTimestamp(10, java.sql.Timestamp.valueOf(info.getUnfitDateStart().atStartOfDay()));
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
+            }
+            if(info.getUnfitDateStop() != null){
+                stmt.setTimestamp(11, java.sql.Timestamp.valueOf(info.getUnfitDateStop().atStartOfDay()));
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
+            if(info.getUnfitBy() != null){
+                stmt.setInt(12, info.getUnfitBy().getUserID());
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL);
+            }
+                   
+                    
+            if(info.getAbandonedDateStart() != null){
+                stmt.setTimestamp(13, java.sql.Timestamp.valueOf(info.getAbandonedDateStart().atStartOfDay()));
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            if(info.getAbandonedDateStop() != null){
+                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(info.getAbandonedDateStop().atStartOfDay()));
+            } else {
+                stmt.setNull(14, java.sql.Types.NULL);
+            }
+            if(info.getAbandonedBy() != null){
+                stmt.setInt(15, info.getAbandonedBy().getUserID());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
+                   
+            if(info.getVacantDateStart() != null){
+                stmt.setTimestamp(16, java.sql.Timestamp.valueOf(info.getVacantDateStart().atStartOfDay()));
+            } else {
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
+            if(info.getVacantDateStop() != null){
+                stmt.setTimestamp(17, java.sql.Timestamp.valueOf(info.getVacantDateStop().atStartOfDay()));
+            } else {
+                stmt.setNull(17, java.sql.Types.NULL);
+            }
+            if(info.getVacantBy() != null){
+                stmt.setInt(18, info.getVacantBy().getUserID());
+            } else {
+                stmt.setNull(18, java.sql.Types.NULL);
+            }
+            
+            if(info.getCondition() != null){
+                stmt.setInt(19, info.getCondition().getClassID());
+            } else {
+                stmt.setNull(19, java.sql.Types.NULL);
+            }
+            if(info.getLandBankProspect() != null){
+                stmt.setInt(20, info.getLandBankProspect().getClassID());
+            } else {
+                stmt.setInt(20, java.sql.Types.NULL);
+            }
+            
+            stmt.setBoolean(21, info.isLandBankHeld());
+            stmt.setBoolean(22, info.isNonAddressable());
+            
+            if(info.getUseType() != null){
+                stmt.setInt(23, info.getUseType().getTypeID());
+            } else {
+                stmt.setNull(23, java.sql.Types.NULL);
+            }
+            
+            if(info.getLastUpdatedBy() != null){
+                stmt.setInt(24, info.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(24, java.sql.Types.NULL);
+            }
+            
+            if(info.getDeactivatedBy() != null){
+                stmt.setInt(25, info.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(25, java.sql.Types.NULL);
+            }
+            
+            if(info.getDeactivatedTS() != null){
+                stmt.setTimestamp(26, java.sql.Timestamp.valueOf(info.getDeactivatedTS()));
+            } else {
+                stmt.setNull(26, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(27, info.getParcelInfoID());
+            stmt.execute();
+            
+        } catch (SQLException ex){
+            throw new IntegrationException("cannot update parcel info");
+            
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }    
+        }
     }
     
     
@@ -461,8 +603,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         ParcelInfo pi = new ParcelInfo();
 
         try {
-
+            pi.setParcelInfoID(rs.getInt("parcelinfoid"));
+            pi.setParcelInternalID(rs.getInt("parcel_parcelkey"));
             pi.setUseGroup(rs.getString("usegroup"));
+            
             pi.setConstructionType(rs.getString("constructiontype"));
             pi.setCountyCode(rs.getString("countycode"));
             pi.setOwnerCode(rs.getString("ownercode"));  // for legacy compat
@@ -477,11 +621,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
             
             if(rs.getTimestamp("unfitdatestart") != null){
-                pi.setUnfitDateStart(rs.getTimestamp("unfitdatestart").toLocalDateTime());
+                pi.setUnfitDateStart(LocalDate.from(rs.getTimestamp("unfitdatestart").toLocalDateTime()));
             }
             
             if(rs.getTimestamp("unfitdatestop") != null){
-                pi.setUnfitDateStop(rs.getTimestamp("unfitdatestop").toLocalDateTime());
+                pi.setUnfitDateStop(LocalDate.from(rs.getTimestamp("unfitdatestop").toLocalDateTime()));
             }
             
             if(rs.getInt("unfitby_userid") != 0){
@@ -489,11 +633,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
                 
             if(rs.getTimestamp("abandoneddatestart") != null){
-                pi.setAbandonedDateStart(rs.getTimestamp("abandoneddatestart").toLocalDateTime());
+                pi.setAbandonedDateStart(LocalDate.from(rs.getTimestamp("abandoneddatestart").toLocalDateTime()));
             }
             
             if(rs.getTimestamp("abandoneddatestop") != null){
-                pi.setAbandonedDateStop(rs.getTimestamp("abandoneddatestop").toLocalDateTime());
+                pi.setAbandonedDateStop(LocalDate.from(rs.getTimestamp("abandoneddatestop").toLocalDateTime()));
             }
             
             if(rs.getInt("abandonedby_userid") != 0){
@@ -501,11 +645,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
             
             if(rs.getTimestamp("vacantdatestart") != null){
-                pi.setVacantDateStart(rs.getTimestamp("vacantdatestart").toLocalDateTime());
+                pi.setVacantDateStart(LocalDate.from(rs.getTimestamp("vacantdatestart").toLocalDateTime()));
             }
             
             if(rs.getTimestamp("vacantdatestop") != null){
-                pi.setVacantDateStop(rs.getTimestamp("vacantdatestop").toLocalDateTime());
+                pi.setVacantDateStop(LocalDate.from(rs.getTimestamp("vacantdatestop").toLocalDateTime()));
             }
             
             if(rs.getInt("vacantby_userid") != 0){
@@ -521,7 +665,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
             
             pi.setLandBankHeld(rs.getBoolean("landbankheld"));
-            pi.setActive(rs.getBoolean("active"));
             pi.setNonAddressable(rs.getBoolean("nonaddressable"));
             
             if(rs.getInt("usetype_typeid") != 0){
@@ -630,9 +773,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             String s =  "UPDATE public.parcel\n" +
                         "   SET parcelidcnty=?, source_sourceid=?, \n" +
                         "       lastupdatedts=now(), lastupdatedby_userid=?, \n" +
-                        "       notes=?, muni_municode=?, \n" +
-                        "       lotandblock=?\n" +
-                        " WHERE parcelkey=?, ;";
+                        "       notes=?, muni_municode=? " +
+                        " WHERE parcelkey=?;";
             
             stmt = con.prepareStatement(s);
             
@@ -657,14 +799,13 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
-            stmt.setString(6, pcl.getLotAndBlock());
-            stmt.setInt(7, pcl.getParcelKey());
+            stmt.setInt(6, pcl.getParcelKey());
             
             stmt.execute();
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to insert Parcel into DB, sorry!", ex);
+            throw new IntegrationException("Unable to updaet Parcel info in DB, sorry!", ex);
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -997,8 +1138,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     private ParcelMailingAddressLink generateParcelMailingAddressLink(ResultSet rs) 
             throws SQLException, IntegrationException, BObStatusException{
         SystemIntegrator si = getSystemIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         
-        MailingAddress ma = getMailingAddress(rs.getInt("mailingparcel_mailingid"));
+        MailingAddress ma = pc.getMailingAddress(rs.getInt("mailingparcel_mailingid"));
         ParcelMailingAddressLink pmal = new ParcelMailingAddressLink(ma);
         
         // populate nonstandard fields:
@@ -1068,6 +1210,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         if(street == null || street.getStreetID() == 0){
             throw new BObStatusException("Cannot query addresses by street with null street or streetid = 0");
         }
+        PropertyCoordinator pc = getPropertyCoordinator();
         
         List<MailingAddress> mal = new ArrayList<>();
         
@@ -1084,7 +1227,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                mal.add(getMailingAddress(rs.getInt("addressid")));
+                mal.add(pc.getMailingAddress(rs.getInt("addressid")));
             }
 
         } catch (SQLException ex) {
@@ -1110,8 +1253,9 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     private HumanMailingAddressLink generateHumanMailingAddressLink(ResultSet rs) 
             throws SQLException, IntegrationException, BObStatusException{
         SystemIntegrator si = getSystemIntegrator();
-       
-        MailingAddress ma = getMailingAddress(rs.getInt("humanmailing_addressid"));
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        MailingAddress ma = pc.getMailingAddress(rs.getInt("humanmailing_addressid"));
         HumanMailingAddressLink hmal = new HumanMailingAddressLink(ma);
         hmal.setLinkID(rs.getInt("linkid"));
         

@@ -670,14 +670,7 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ --> 
   
     
-    <navigation-rule>
-        <from-view-id>*</from-view-id>
-        <navigation-case>
-            <from-outcome>addNewCase</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
+   
         
     <navigation-rule>
         <from-view-id>*</from-view-id>
@@ -1088,11 +1081,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>ceCaseAddBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseAddBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>    
+ 
     
     <managed-bean>
         <managed-bean-name>noticeOfViolationBB</managed-bean-name>
@@ -1105,15 +1094,7 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules code enforcement ~~~~~~~~~~~~~~~~ --> 
 
 
-    <navigation-rule>
-        <from-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</from-view-id>
-        <navigation-case>
-            <from-action>#{caseAddBB.addNewCase}</from-action>
-            <from-outcome>caseAdd</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
+   
 
     <navigation-rule>
         <from-view-id>/restricted/cogstaff/ce/violationSelectElement.xhtml</from-view-id>
@@ -1164,14 +1145,7 @@
         </navigation-case>
     </navigation-rule>
 
-    <navigation-rule>
-        <from-view-id>*</from-view-id>
-        <navigation-case>
-            <from-outcome>addNewCase</from-outcome>
-            <to-view-id>/restricted/cogstaff/ce/caseAdd.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
+ 
     
     <navigation-rule>
         <from-view-id>*</from-view-id>

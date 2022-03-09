@@ -751,7 +751,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.IntegrationException If an error occurs while generating a control code
      */
     public CECase cecase_initCECase(Property p, UserAuthorized ua) throws IntegrationException {
-        UserCoordinator uc = getUserCoordinator();
         CECase newCase = new CECase();
 
         // removed inputted muni here
@@ -762,6 +761,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         newCase.setPublicControlCode(casePCC);
         newCase.setParcelKey(p.getParcelKey());
         newCase.setCaseManager(ua);
+        newCase.setOriginationDate(LocalDateTime.now());
 
         return newCase;
     }
@@ -798,7 +798,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param freshCase
      * @param ua
-     * @param cear
+     * @param origEvent describing the reason for the new case
+     * @param cear 
      * @return 
      * @throws IntegrationException
      * @throws BObStatusException
@@ -806,7 +807,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.EventException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public int cecase_insertNewCECase(CECase freshCase, UserAuthorized ua, CEActionRequest cear) 
+    public int cecase_insertNewCECase(
+            CECase freshCase, 
+            UserAuthorized ua,
+            EventCnF origEvent,
+            CEActionRequest cear) 
             throws IntegrationException, 
             BObStatusException, 
             ViolationException, 

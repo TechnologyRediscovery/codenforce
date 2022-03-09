@@ -24,6 +24,15 @@ public class DateTimeUtil {
         }
         return formattedDateTime;
     }
+    
+    public static String getPrettyLocalDateNoTime(LocalDate input){
+        String formattedDateTime = "";
+        if(input != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE dd MMM yyyy");
+            formattedDateTime = input.format(formatter);
+        }
+        return formattedDateTime;
+    }
 
     /**
      * Converts a date from LocalDateTime to a string using DateTimeFormatter while omitting the time, returns null if

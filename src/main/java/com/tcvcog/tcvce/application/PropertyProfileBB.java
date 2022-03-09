@@ -26,9 +26,12 @@ import com.tcvcog.tcvce.util.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -53,6 +56,12 @@ public class PropertyProfileBB
     
     private List<PropertyUseType> putList;
     private PropertyUnitDataHeavy currentPropertyUnit;
+    
+    private CECase currentCECase;
+    private EventCnF ceCaseOriginationEventSelected;
+    private List<EventCategory> ceCaseOriginiationEventCandidateList;
+    private boolean ceCaseUnitAssociated;
+    private PropertyUnit ceCaseUnitAssociation;
     
     private OccPeriod currentOccPeriod;
     private OccPeriodType selectedOccPeriodType;
@@ -80,9 +89,7 @@ public class PropertyProfileBB
 
     private ViewOptionsProposalsEnum selectedPropViewOption;
     
-    
     // BLOBS
-    
     private BlobLight currentBlob;
     /**
      * Creates a new instance of PropertyCreateBB
@@ -95,31 +102,47 @@ public class PropertyProfileBB
     @PostConstruct
     public void initBean(){
         PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
         currentProperty = getSessionBean().getSessProperty();
+        if(currentProperty != null){
+            System.out.println("PropertyProfileBB.initBean() | Current Property: " + currentProperty.getParcelKey());
+        } else {
+            System.out.println("PropertyProfileBB.initBean() | Current Property null ");
+            
+        }
+        reloadCurrentPropertyDataHeavy();
          try {
              setPutList(pi.getPropertyUseTypeList());
          } catch (IntegrationException ex) {
              System.out.println(ex);
          }
          
-        currentProperty = getSessionBean().getSessProperty();
         currentParcelInfoEditMode = false;
         currentPropertyEditMode = false;
+        try {
+            setConditionIntensityList(sc.getIntensitySchemaWithClasses(
+                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_propertycondition"))
+                    .getClassList());
+            setLandBankProspectIntensityList(sc.getIntensitySchemaWithClasses(
+                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_landbankprospect"))
+                    .getClassList());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
          
-        setOccPeriodTypeList(getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList());
-          
-        setPersonToAddList(new ArrayList<>());
-        setEventViewOptions(Arrays.asList(ViewOptionsActiveHiddenListsEnum.values()));
-        setEventViewOptionSelected(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN);
-
+        occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
+        sourceList = sc.getBobSourceListComplete();
+        personToAddList = new ArrayList<>();
+        eventViewOptions = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
+        eventViewOptionSelected = ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN;
     }
-    
     
       /**
      * Final step in creating a new occ period
      * @return 
      */
-    public String addNewOccPeriod(){
+    public String onAddOccperiodCommitButtonChange(){
         
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
@@ -218,7 +241,6 @@ public class PropertyProfileBB
         }
     }
     
-    
        /**
      * ********************************************************
      * ************* PROPERTY PROFILE/INFO METHODS ************
@@ -234,17 +256,14 @@ public class PropertyProfileBB
             setCurrentProperty(pc.assemblePropertyDataHeavy(currentProperty, getSessionBean().getSessUser()));
              getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Reloaded property at " + currentProperty.getAddressString(), ""));
+                                "Reloaded property id " + currentProperty.getPropertyID(), ""));
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Fatal error reloading property; apologies!", ""));
-            
+                                "Fatal error reloading property; sorries!", ""));
         }
-        
     }
-    
     
     /**
      * Listener for user requests to toggle edit mode of parcel level 
@@ -257,17 +276,35 @@ public class PropertyProfileBB
             
             if(currentProperty.getParcelKey() == 0){
                 // we have a new property 
-                onPropertyAddCommit();
+             
+                // this page will never have a new property. If we do, throw error
+                System.out.println("PropertyProfileBB.onPropertyEditModeToggleButtonChange | found property without ID on property profile page!! ERROR!");
+                
             } else {
                 // we have an existing property
                 onPropertyUpdateCommit();
             }
-            
-            
         }
         currentPropertyEditMode = !currentPropertyEditMode;
     }
     
+    /**
+     * Listener for user requests to abandon a parcel info edit operation
+     * 
+     * @param ev 
+     */
+    public void onPropertyEditModeOperationAbortButtonChange(ActionEvent ev){
+        System.out.println("PropertyProfileBB.abortPropertyEditmode");
+    }
+    
+    /**
+     * Listener for user requests to abandon a parcel info edit operation
+     * 
+     * @param ev 
+     */
+    public void onParcelInfoEditModeOperationAbortButtonChange(ActionEvent ev){
+        System.out.println("PropertyProfileBB.abortParcelInfoEditmode");
+    }
     
     /**
      * Listener for user requests to toggle edit mode of a parcel info record
@@ -279,40 +316,15 @@ public class PropertyProfileBB
         if(currentParcelInfoEditMode && currentProperty != null && currentProperty.getParcelInfo() != null){
             if(currentProperty.getParcelInfo().getParcelInfoID() == 0){
                  onParcelInfoAddCommit();
+                  
             } else {
                 onParcelInfoUpdateCommit();
             }
-                    
         }
         currentParcelInfoEditMode = !currentParcelInfoEditMode;
-        
     }
     
-    
-     /**
-     * Liases with coordinator to insert a new property object
-     */
-    public void onPropertyAddCommit() {
-        PropertyCoordinator pc = getPropertyCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
-        int newID;
-        try {
-            newID = pc.addParcel(currentProperty, getSessionBean().getSessUser());
-            currentProperty = pc.getPropertyDataHeavy(newID, getSessionBean().getSessUser());
-            getSessionBean().setSessProperty(currentProperty);
-            sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully added property with ID: " + currentProperty.getParcelKey()
-                            + ", which is now your 'active property'", ""));
-        } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not update property, sorries!" + ex.getClass().toString(), ""));
-        }
-    }
-
+   
     /**
      * Listener for user requests to commit property updates
      */
@@ -341,7 +353,19 @@ public class PropertyProfileBB
      * Writes new parcel info record to the DB
      */
     public void onParcelInfoAddCommit(){
-        
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.insertParcelInfoRecord(currentProperty.getParcelInfo(), getSessionBean().getSessUser());
+            reloadCurrentPropertyDataHeavy();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully inserted a new property info record", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "FATAL: Could not insert parcel info! " + ex.toString(), ""));
+        }
         
     }
     
@@ -349,7 +373,20 @@ public class PropertyProfileBB
      * Writes changes to current parcel info record to the DB
      */
     public void onParcelInfoUpdateCommit(){
-        
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.updateParcelInfoRecord(currentProperty.getParcelInfo(), getSessionBean().getSessUser());
+            reloadCurrentPropertyDataHeavy();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully updated parcel info record ID: " + currentProperty.getParcelInfo().getParcelInfoID(), ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "FATAL: Could not update parcel info! " + ex.toString(), ""));
+        }
+
         
     }
 
@@ -559,17 +596,7 @@ public class PropertyProfileBB
     public void onPropertyUpdateInit() {
         // nothing to do here yet
     }
-    /**
-     * Loads a skeleton property into which we inject values from the form
-     */
-    public void onPropertyAddInit() {
-        PropertyCoordinator pc = getPropertyCoordinator();
-        try {
-            setCurrentProperty(pc.assemblePropertyDataHeavy(pc.generatePropertySkeleton(getSessionBean().getSessMuni()),getSessionBean().getSessUser()));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
-            System.out.println(ex);
-        }
-    }
+   
 
    
 
@@ -632,6 +659,97 @@ public class PropertyProfileBB
         
         
     }
+    
+    
+    // ********************************************************
+    // ********************* CECASE ***************************
+    // ********************************************************
+    
+    /**
+     * Listener for user requests to start the ce case creation process;
+     * I also build a list of eligible event categories for origination
+     */
+    public void onCECaseAddInitButtonChange(){
+        CaseCoordinator cc = getCaseCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        ceCaseOriginiationEventCandidateList = ec.determinePermittedEventCategories(EventType.Origination, getSessionBean().getSessUser());
+        try {
+            currentCECase = cc.cecase_initCECase(currentProperty, getSessionBean().getSessUser());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            
+        }
+        
+    }
+    
+    
+     /**
+     * Listener method for creation of a new case
+     * @return routing string: case profile
+     */
+    public String onAddNewCaseCommitButtonChange(){
+        CaseCoordinator cc = getCaseCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        // check to see if we have an action request that needs to be connected
+        // to this new case
+        CEActionRequest cear = getSessionBean().getSessCEAR();
+        
+        try {
+            if(currentCECase == null){
+                throw new BObStatusException("Cannot init new case with null case");
+            }
+            if(currentCECase.getNotes() != null){
+                MessageBuilderParams mbp = new MessageBuilderParams(
+                        null, 
+                        "Case Origination Note", 
+                        null, 
+                        currentCECase.getNotes(), 
+                        getSessionBean().getSessUser(), 
+                        null);
+                currentCECase.setNotes(sc.appendNoteBlock(mbp));
+                        
+            }
+            
+            if(ceCaseUnitAssociated && ceCaseUnitAssociation != null){
+                currentCECase.setPropertyUnitID(ceCaseUnitAssociation.getUnitID());
+            }
+            
+            int freshID = cc.cecase_insertNewCECase(
+                    currentCECase, 
+                    getSessionBean().getSessUser(),
+                    ceCaseOriginationEventSelected,
+                    cear);
+            getSessionBean().setSessCECase(cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(freshID), getSessionBean().getSessUser()));
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Successfully added case to property! Access the case from the list below.", ""));
+            //Send them back to the last page!
+            return "ceCaseProfile";
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Integration Module error: Unable to add case to current property.",
+                            "Best try again or note the error and complain to Eric."));
+        } catch (BObStatusException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "A code enf action request was found in queue to be attached to this case. "
+                            + "I couldn't do that, though, sorry..",
+                            "Best try again or note the error and complain to Eric."));
+            System.out.println(ex);
+
+        } catch (ViolationException | EventException | SearchException ex) {
+            System.out.println(ex);
+        }
+
+        //reload page on error
+        return "";
+    }
+    
+    
+    
+    
     
     
     // ********************************************************
@@ -1052,6 +1170,76 @@ public class PropertyProfileBB
      */
     public void setCurrentParcelInfoEditMode(boolean currentParcelInfoEditMode) {
         this.currentParcelInfoEditMode = currentParcelInfoEditMode;
+    }
+
+    /**
+     * @return the currentCECase
+     */
+    public CECase getCurrentCECase() {
+        return currentCECase;
+    }
+
+    /**
+     * @return the ceCaseOriginiationEventCandidateList
+     */
+    public List<EventCategory> getCeCaseOriginiationEventCandidateList() {
+        return ceCaseOriginiationEventCandidateList;
+    }
+
+    /**
+     * @param currentCECase the currentCECase to set
+     */
+    public void setCurrentCECase(CECase currentCECase) {
+        this.currentCECase = currentCECase;
+    }
+
+    /**
+     * @param ceCaseOriginiationEventCandidateList the ceCaseOriginiationEventCandidateList to set
+     */
+    public void setCeCaseOriginiationEventCandidateList(List<EventCategory> ceCaseOriginiationEventCandidateList) {
+        this.ceCaseOriginiationEventCandidateList = ceCaseOriginiationEventCandidateList;
+    }
+
+    /**
+     * @return the ceCaseOriginationEventSelected
+     */
+    public EventCnF getCeCaseOriginationEventSelected() {
+        return ceCaseOriginationEventSelected;
+    }
+
+    /**
+     * @param ceCaseOriginationEventSelected the ceCaseOriginationEventSelected to set
+     */
+    public void setCeCaseOriginationEventSelected(EventCnF ceCaseOriginationEventSelected) {
+        this.ceCaseOriginationEventSelected = ceCaseOriginationEventSelected;
+    }
+
+    /**
+     * @return the ceCaseUnitAssociated
+     */
+    public boolean isCeCaseUnitAssociated() {
+        return ceCaseUnitAssociated;
+    }
+
+    /**
+     * @param ceCaseUnitAssociated the ceCaseUnitAssociated to set
+     */
+    public void setCeCaseUnitAssociated(boolean ceCaseUnitAssociated) {
+        this.ceCaseUnitAssociated = ceCaseUnitAssociated;
+    }
+
+    /**
+     * @return the ceCaseUnitAssociation
+     */
+    public PropertyUnit getCeCaseUnitAssociation() {
+        return ceCaseUnitAssociation;
+    }
+
+    /**
+     * @param ceCaseUnitAssociation the ceCaseUnitAssociation to set
+     */
+    public void setCeCaseUnitAssociation(PropertyUnit ceCaseUnitAssociation) {
+        this.ceCaseUnitAssociation = ceCaseUnitAssociation;
     }
     
     

@@ -45,8 +45,8 @@ public  class   MailingAddress
     
     
         
-    private String addressPretty2LineEscapeFalse;
-    private String addressPretty1Line;
+    protected String addressPretty2LineEscapeFalse;
+    protected String addressPretty1Line;
     
     
     public String getAddressString(){

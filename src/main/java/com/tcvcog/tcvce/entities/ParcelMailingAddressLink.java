@@ -52,6 +52,8 @@ public class ParcelMailingAddressLink
         this.verifiedTS = ma.verifiedTS;
         this.source = ma.source;
         this.notes = ma.notes;
+        this.addressPretty1Line = ma.getAddressPretty1Line();
+        this.addressPretty2LineEscapeFalse = ma.getAddressPretty2LineEscapeFalse();
 
         // Abstract TrackedEntity Class Fields
         this.createdTS = ma.createdTS;

@@ -59,6 +59,7 @@ import com.tcvcog.tcvce.util.DateTimeUtil;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -505,6 +506,10 @@ public class        BackingBeanUtils
     
     public String getPrettyDate(LocalDateTime d) {
         return DateTimeUtil.getPrettyDate(d);
+    }
+    
+    public String getPrettyLocalDateOnlyNoTime(LocalDate d){
+        return DateTimeUtil.getPrettyLocalDateNoTime(d);
     }
     
     
