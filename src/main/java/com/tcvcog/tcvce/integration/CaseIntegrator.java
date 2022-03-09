@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -1808,7 +1809,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                         "       recipient_humanid=?, recipient_mailing=?, \n" +                          // 3-4
                         "       fixedrecipientxferts=now(), fixedrecipientname=?, fixedrecipientbldgno=?, \n" + // 5-6
                         "       fixedrecipientstreet=?, fixedrecipientcity=?, fixedrecipientstate=?, \n" +  // 7-9
-                        "       fixedrecipientzip=? " + // 10
+                        "       fixedrecipientzip=?,  fixednotifyingofficername=?, fixednotifyingofficertitle=?, \n" +
+                        "       fixednotifyingofficerphone=?, fixednotifyingofficeremail=?" + // 10
                         "   WHERE noticeid=?;"; //11
         // note that original time stamp is not altered on an update
 
@@ -1822,7 +1824,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setInt(2, nov.getLockedAndQueuedBy().getUserID());
             
             stmt.setInt(3, nov.getRecipient().getHumanID());
-            stmt.setInt(4, nov.getMailingLink().getLinkID());
+            stmt.setInt(4, nov.getRecipientMailingLink().getLinkID());
             
             stmt.setString(5, nov.getFixedRecipientName());
             stmt.setString(6, nov.getFixedRecipientBldgNo());
@@ -1831,7 +1833,12 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setString(9, nov.getFixedRecipientState());
             stmt.setString(10, nov.getFixedRecipientZip());
             
-            stmt.setInt(11, nov.getNoticeID());
+            stmt.setString(11, nov.getFixedNotifyingOfficerName());
+            stmt.setString(12, nov.getFixedNotifyingOfficerTitle());
+            stmt.setString(13, nov.getFixedNotifyingOfficerPhone());
+            stmt.setString(14, nov.getFixedNotifyingOfficerEmail());
+            
+            stmt.setInt(15, nov.getNoticeID());
 
             stmt.execute();
         } catch (SQLException ex) {
@@ -1945,9 +1952,10 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      */
     public void novUpdateNotice(NoticeOfViolation notice) throws IntegrationException {
         String query = "UPDATE public.noticeofviolation\n"
-                + "   SET lettertextbeforeviolations=?, \n" +
-                "       dateofrecord=?, personid_recipient=?, \n" +
-                "       lettertextafterviolations=?, notifyingofficer_userid=?"
+                + "   SET   lettertextbeforeviolations=?, \n"
+                + "         dateofrecord=?, lettertextafterviolations=?, "
+                + "         recipient_humanid=?, recipient_mailing=?, "
+                + "         notifyingofficer_userid=?, notifyingofficer_humanid=?  "
                 + " WHERE noticeid=?;";
         // note that original time stamp is not altered on an update
 
@@ -1959,14 +1967,30 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             
             stmt.setString(1, notice.getNoticeTextBeforeViolations());
             stmt.setTimestamp(2, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
-            stmt.setInt(3, notice.getRecipient().getHumanID());
-            stmt.setString(4, notice.getNoticeTextAfterViolations());
-            if(notice.getNotifyingOfficer() != null){
-                stmt.setInt(5, notice.getNotifyingOfficer().getUserID());
+            stmt.setString(3, notice.getNoticeTextAfterViolations());
+            if(notice.getRecipient() != null){
+                stmt.setInt(4, notice.getRecipient().getHumanID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            if(notice.getRecipientMailingLink()!= null){
+                stmt.setInt(5, notice.getRecipientMailingLink().getLinkID());
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
-            stmt.setInt(6, notice.getNoticeID());
+            if(notice.getNotifyingOfficer() != null){
+                stmt.setInt(6, notice.getNotifyingOfficer().getUserID());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
+            if(notice.getNotifyingOfficerPerson()!= null){
+                stmt.setInt(7, notice.getNotifyingOfficerPerson().getHumanID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(8, notice.getNoticeID());
 
             stmt.executeUpdate();
             
@@ -2090,7 +2114,12 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
-                        "       returnedby, notes, creationby, printstyle_styleid, active, followupevent_eventid, notifyingofficer_userid \n" +
+                        "       returnedby, notes, creationby, printstyle_styleid, active, followupevent_eventid, notifyingofficer_userid, " +
+                        "       recipient_humanid, recipient_mailing, \n" +
+                        "       fixedrecipientxferts, fixedrecipientname, fixedrecipientbldgno, \n" +
+                        "       fixedrecipientstreet, fixedrecipientcity, fixedrecipientstate, \n" +
+                        "       fixedrecipientzip, fixednotifyingofficername, fixednotifyingofficertitle, \n" +
+                        "       fixednotifyingofficerphone, fixednotifyingofficeremail \n" +
                         "  FROM public.noticeofviolation WHERE noticeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -2104,7 +2133,6 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
             while (rs.next()) {
                 notice = novGenerate(rs);
-
             }
 
         } catch (SQLException ex) {
@@ -2201,22 +2229,18 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             throws SQLException, 
             IntegrationException,
             BObStatusException {
-//SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, 
-//       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, 
-//       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, 
-//       returnedby, notes
-//  FROM public.noticeofviolation;
 
         UserCoordinator uc = getUserCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         EventCoordinator ec = getEventCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
+        PropertyIntegrator pi = getPropertyIntegrator();
         
         // the magical moment of notice instantiation
         NoticeOfViolation notice = new NoticeOfViolation();
 
         notice.setNoticeID(rs.getInt("noticeid"));
-        notice.setRecipient(pc.getPerson(pc.getHuman(rs.getInt("personid_recipient"))));
+        
         notice.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());
 
         notice.setNoticeTextBeforeViolations(rs.getString("lettertextbeforeviolations"));
@@ -2242,17 +2266,36 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         } 
         
         notice.setStyle(si.getPrintStyle(rs.getInt("printstyle_styleid")));
-        
         notice.setNotes(rs.getString("notes"));
         if(rs.getInt("followupevent_eventid") != 0){
             notice.setFollowupEvent(ec.getEvent(rs.getInt("followupevent_eventid")));
         }
-        
         notice.setActive(rs.getBoolean("active"));
         
         if(rs.getInt("notifyingofficer_userid") != 0){
             notice.setNotifyingOfficer(uc.user_getUser(rs.getInt("notifyingofficer_userid")));
         }
+        if(rs.getInt("recipient_humanid") != 0){
+            notice.setRecipient(pc.getPersonByHumanID(rs.getInt("recipient_humanid")));
+        }
+        if(rs.getInt("recipient_mailing") != 0){
+            notice.setRecipientMailingLink(pi.getHumanMailingAddressLinkByHMALinkID(rs.getInt("recipient_mailing")));
+        }
+        if(rs.getTimestamp("fixedrecipientxferts") != null){
+            notice.setFixedAddrXferTS(rs.getTimestamp("fixedrecipientxferts").toLocalDateTime());
+        }
+        
+        notice.setFixedRecipientName(rs.getString("fixedrecipientname"));
+        notice.setFixedRecipientBldgNo(rs.getString("fixedrecipientbldgno"));
+        notice.setFixedRecipientStreet(rs.getString("fixedrecipientstreet"));
+        notice.setFixedRecipientCity(rs.getString("fixedrecipientcity"));
+        notice.setFixedRecipientState(rs.getString("fixedrecipientstate"));
+        notice.setFixedRecipientZip(rs.getString("fixedrecipientzip"));
+        
+        notice.setFixedNotifyingOfficerName(rs.getString("fixednotifyingofficername"));
+        notice.setFixedNotifyingOfficerTitle(rs.getString("fixednotifyingofficertitle"));
+        notice.setFixedNotifyingOfficerPhone(rs.getString("fixednotifyingofficerphone"));
+        notice.setFixedNotifyingOfficerEmail(rs.getString("fixednotifyingofficeremail"));
 
         return notice;
 

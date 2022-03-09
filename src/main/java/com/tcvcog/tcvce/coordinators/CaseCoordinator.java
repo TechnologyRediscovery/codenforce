@@ -23,34 +23,12 @@ import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.LegendItem;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
-import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.BlobException;
-import com.tcvcog.tcvce.domain.BlobTypeException;
-import com.tcvcog.tcvce.domain.EventException;
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.domain.ViolationException;
+import com.tcvcog.tcvce.domain.*;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.ReportCECaseListCatEnum;
 import com.tcvcog.tcvce.entities.reports.ReportCECaseListStreetCECaseContainer;
-import com.tcvcog.tcvce.entities.search.QueryCEAR;
-import com.tcvcog.tcvce.entities.search.QueryCEAREnum;
-import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
-import com.tcvcog.tcvce.entities.search.QueryEvent;
-import com.tcvcog.tcvce.entities.search.QueryEventEnum;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECaseDateFieldsEnum;
-import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
-import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
-import com.tcvcog.tcvce.integration.EventIntegrator;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.SystemIntegrator;
+import com.tcvcog.tcvce.entities.search.*;
+import com.tcvcog.tcvce.integration.*;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.DateTimeUtil;
@@ -60,15 +38,7 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.model.charts.ChartData;
@@ -760,7 +730,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // no closing date, by design of case flow
         newCase.setPublicControlCode(casePCC);
         newCase.setParcelKey(p.getParcelKey());
-        newCase.setCaseManager(ua);
+        if(ua.getKeyCard().getGoverningAuthPeriod().getOathTS() != null){
+            newCase.setCaseManager(ua);
+        }
         newCase.setOriginationDate(LocalDateTime.now());
 
         return newCase;
@@ -785,7 +757,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 }
             }
         }
-
     }
 
     /**
@@ -798,7 +769,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param freshCase
      * @param ua
-     * @param origEvent describing the reason for the new case
+     * @param origEventCat
      * @param cear 
      * @return 
      * @throws IntegrationException
@@ -807,11 +778,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.EventException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public int cecase_insertNewCECase(
-            CECase freshCase, 
-            UserAuthorized ua,
-            EventCnF origEvent,
-            CEActionRequest cear) 
+    public int cecase_insertNewCECase(  CECase freshCase, 
+                                        UserAuthorized ua,
+                                        EventCategory origEventCat,
+                                        CEActionRequest cear) 
             throws IntegrationException, 
             BObStatusException, 
             ViolationException, 
@@ -827,6 +797,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         freshCase.setActive(true);
         freshCase.setLastUpdatedBy(ua);
+        
 
         if (freshCase.getCaseManager() == null) {
             freshCase.setCaseManager(ua);
@@ -837,6 +808,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // the integrator returns to us a CECaseDataHeavy with the correct ID after it has
         // been written into the DB
         int freshID = ci.insertNewCECase(freshCase);
+        freshCase = cecase_getCECase(freshID);
         CECaseDataHeavy cedh = cecase_assembleCECaseDataHeavy(freshCase, ua);
 
         // If we were passed in an action request, connect it to the new case we just made
@@ -852,11 +824,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             // This is a property info case, it originated to store info
             originationCategory = ec.initEventCategory(
                     Integer.parseInt(getResourceBundle(
-                            Constants.EVENT_CATEGORY_BUNDLE).getString("originiationByObservation")));
+                            Constants.EVENT_CATEGORY_BUNDLE).getString("originationAsPropertyInfoCase")));
             originationEvent = ec.initEvent(cedh, originationCategory);
             StringBuilder sb = new StringBuilder();
             sb.append("This case was created to contain information pertaining to a property");
-        } else {
+        } else if(origEventCat != null) {
+            originationCategory = origEventCat;
+            originationEvent = ec.initEvent(cedh, originationCategory);
+            
+        }else {
+            
             // since there's no action request, the assumed method is called "observation"
             originationCategory = ec.initEventCategory(
                     Integer.parseInt(getResourceBundle(
@@ -868,9 +845,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         }
         originationEvent.setUserCreator(uc.user_getUser(ua.getUserID()));
-
-        cedh.setCaseID(freshID);
-
+        originationEvent.setTimeStart(cedh.getOriginationDate());
+        // logic in our event coordinator will set the end time based on the event cat
         ec.addEvent(originationEvent, cedh, ua);
         
         return freshID;
@@ -1944,10 +1920,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         nov.setCreationBy(ua);
         nov.setNotifyingOfficer(ua);
         
-        
-        
         return nov;
-
     }
 
     /**
@@ -1970,9 +1943,19 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                                  UserAuthorized ua)
             throws BObStatusException, IntegrationException, EventException, ViolationException {
 
-        if(c == null || nov == null || ua == null || addr == null || h == null){
+        if(c == null || nov == null || ua == null || addr == null || h == null ){
             throw new BObStatusException("Cannot lock notice with null case, nov, or user");
         }
+        if(nov.getNotifyingOfficerPerson() == null 
+                || nov.getNotifyingOfficerPerson().getEmailList() == null
+                || nov.getNotifyingOfficerPerson().getEmailList().isEmpty()
+                || nov.getNotifyingOfficerPerson().getPhoneList() == null
+                || nov.getNotifyingOfficerPerson().getPhoneList().isEmpty()
+                || nov.getNotifyingOfficerPerson().getAddressList() == null 
+                || nov.getNotifyingOfficerPerson().getAddressList().isEmpty() ){
+            throw new BObStatusException("Cannot lock notice with null notifying officer person or empty address list inside said person");
+        }
+        
         CaseIntegrator ci = getCaseIntegrator();
 
         if (nov.getLockedAndqueuedTS() == null) {
@@ -1985,13 +1968,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             // and inject into permament NOV fields for record keeping
             
             nov.setFixedAddrXferTS(LocalDateTime.now());
-            nov.setRecipHuman(h);
-            nov.setMailingLink(addr);
+            nov.setRecipientMailingLink(addr);
             nov.setFixedRecipientName(h.getName());
             nov.setFixedRecipientBldgNo(addr.getBuildingNo());
             nov.setFixedRecipientStreet(addr.getStreet().getName());
             nov.setFixedRecipientState(addr.getStreet().getCityStateZip().getState());
             nov.setFixedRecipientZip(addr.getStreet().getCityStateZip().getZipCode());
+            
+            nov.setFixedNotifyingOfficerName(nov.getNotifyingOfficerPerson().getName());
+            nov.setFixedNotifyingOfficerTitle(nov.getNotifyingOfficerPerson().getJobTitle());
+            nov.setFixedNotifyingOfficerPhone(nov.getNotifyingOfficerPerson().getPhoneList().get(0).getPhoneNumber());
+            nov.setFixedNotifyingOfficerEmail(nov.getNotifyingOfficerPerson().getEmailList().get(0).getEmailaddress());
             
             ci.novLockAndQueueForMailing(nov);
             
@@ -2000,8 +1987,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         } else {
             throw new BObStatusException("Notice is already locked and queued for sending");
         }
-     
-        
     }
     
     

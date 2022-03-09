@@ -56,12 +56,14 @@ public class PropertyProfileBB
     
     private List<PropertyUseType> putList;
     private PropertyUnitDataHeavy currentPropertyUnit;
+    private List<User> officerUserList;
     
     private CECase currentCECase;
-    private EventCnF ceCaseOriginationEventSelected;
+    private EventCategory ceCaseOriginationEventSelected;
     private List<EventCategory> ceCaseOriginiationEventCandidateList;
     private boolean ceCaseUnitAssociated;
     private PropertyUnit ceCaseUnitAssociation;
+    
     
     private OccPeriod currentOccPeriod;
     private OccPeriodType selectedOccPeriodType;
@@ -127,7 +129,7 @@ public class PropertyProfileBB
             setLandBankProspectIntensityList(sc.getIntensitySchemaWithClasses(
                     getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_landbankprospect"))
                     .getClassList());
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException  ex) {
             System.out.println(ex);
         }
          
@@ -136,6 +138,7 @@ public class PropertyProfileBB
         personToAddList = new ArrayList<>();
         eventViewOptions = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
         eventViewOptionSelected = ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN;
+        
     }
     
       /**
@@ -1203,14 +1206,14 @@ public class PropertyProfileBB
     /**
      * @return the ceCaseOriginationEventSelected
      */
-    public EventCnF getCeCaseOriginationEventSelected() {
+    public EventCategory getCeCaseOriginationEventSelected() {
         return ceCaseOriginationEventSelected;
     }
 
     /**
      * @param ceCaseOriginationEventSelected the ceCaseOriginationEventSelected to set
      */
-    public void setCeCaseOriginationEventSelected(EventCnF ceCaseOriginationEventSelected) {
+    public void setCeCaseOriginationEventSelected(EventCategory ceCaseOriginationEventSelected) {
         this.ceCaseOriginationEventSelected = ceCaseOriginationEventSelected;
     }
 
@@ -1241,6 +1244,7 @@ public class PropertyProfileBB
     public void setCeCaseUnitAssociation(PropertyUnit ceCaseUnitAssociation) {
         this.ceCaseUnitAssociation = ceCaseUnitAssociation;
     }
-    
+
+  
     
 }

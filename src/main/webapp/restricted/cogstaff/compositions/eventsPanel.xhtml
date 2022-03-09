@@ -54,7 +54,7 @@
                 <p:column headerText="Date"
                           sortBy="#{event.timeStart}"
                           styleClass="centeredColumnContent">
-                    <h:outputText value="#{empty event.timeStart ? eventsBB.getPrettyDate(event.creationTS) : eventsBB.getPrettyDate(event.timeStart) }"/>
+                    <h:outputText value="#{empty event.timeStart ? eventsBB.getPrettyDate(event.creationts) : eventsBB.getPrettyDate(event.timeStart) }"/>
                 </p:column>
 
                 <p:column headerText="Category"

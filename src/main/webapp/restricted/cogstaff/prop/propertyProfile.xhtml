@@ -1074,6 +1074,7 @@
                               closeOnEscape="true"
                               responsive="true"
                               resizable="true"
+                              dynamic="true"
                               header="Create code enforcement case at #{propertyProfileBB.currentProperty.address.addressPretty1Line}, Parcel ID: #{propertyProfileBB.currentProperty.countyParcelID}"
                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                               >
@@ -1099,19 +1100,33 @@
                                 </div>
                                 <div class="p-col-8">
                                     <p:datePicker       value="#{propertyProfileBB.currentCECase.originationDate}" 
-                                                        tabindex="3"
                                                         id="cecase-add-origdate-picker"
                                                         showButtonBar="true"
-                                                        pattern="MM/dd/yyyy"
                                                         monthNavigator="true"
-                                                        showTime="false"
+                                                        timeInput="true"
                                                         yearNavigator="true"
-                                                        mask="true"
+                                                        mask="false"
                                                         tabindex="16" >
-                                        <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                     
                                     </p:datePicker>
                                 </div>
-                                
+                                <div class="p-col-4">
+                                    <h:outputLabel value="Case manager" />
+                                </div>
+                                <div class="p-col-8">
+                                    
+                                    <p:selectOneMenu rendered="true"
+                                                     value="#{propertyProfileBB.currentCECase.caseManager}"
+                                                     converter="userConverter">
+                                        <f:selectItem itemLabel="select a case manager"
+                                                          noSelectionOption="true" 
+                                                          itemDisabled="true"/>
+                                        <f:selectItems value="#{systemServicesBB.bbSessionMuni.swornOfficerList}" 
+                                                       var="user"
+                                                       itemLabel="#{user.human.name} (#{user.username})"
+                                                       itemValue="#{user}"/>
+                                    </p:selectOneMenu>
+                                </div>
                                 <div class="p-col-4">
                                     <h:outputLabel value="Origination category" 
                                                    for="cecase-add-origevent-som"/>

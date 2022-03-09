@@ -326,7 +326,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         PersonIntegrator pi = getPersonIntegrator();
         PropertyIntegrator propi = getPropertyIntegrator();
         
-        p.setAddressList(propi.getMailingAddressListByHuman(p.getHumanID()));
+        p.setAddressList(propi.getMailingAddressLinksByHuman(p.getHumanID()));
         p.setPhoneList(pi.getContactPhoneList(p.getHumanID()));
         p.setEmailList(pi.getContactEmailList(p.getHumanID()));
         

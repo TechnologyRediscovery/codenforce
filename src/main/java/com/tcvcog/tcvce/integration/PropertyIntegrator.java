@@ -16,52 +16,24 @@
  */
 package com.tcvcog.tcvce.integration;
 
-import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
-import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
-import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
-import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
+import com.tcvcog.tcvce.coordinators.*;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.ContactEmail;
-import com.tcvcog.tcvce.entities.Credential;
-import com.tcvcog.tcvce.entities.HumanMailingAddressLink;
-import com.tcvcog.tcvce.entities.MailingAddress;
-import com.tcvcog.tcvce.entities.MailingCityStateZip;
-import com.tcvcog.tcvce.entities.MailingCityStateZipDefaultTypeEnum;
-import com.tcvcog.tcvce.entities.MailingCityStateZipRecordTypeEnum;
-import com.tcvcog.tcvce.entities.MailingStreet;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.Parcel;
-import com.tcvcog.tcvce.entities.ParcelInfo;
-import com.tcvcog.tcvce.entities.ParcelMailingAddressLink;
-import com.tcvcog.tcvce.entities.PropertyExtData;
-import com.tcvcog.tcvce.entities.PropertyUseType;
-import com.tcvcog.tcvce.entities.TaxStatus;
 import com.tcvcog.tcvce.entities.search.SearchParamsMailingCityStateZip;
+import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
-import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Inserts, retrieves, updates, and deactivates property-related fields and tables
@@ -1155,13 +1127,57 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     }
     
     /**
+     * Extracts a single human mailing address link given a human
+     * @param hmalid
+     * @return 
+     */
+    public HumanMailingAddressLink getHumanMailingAddressLinkByHMALinkID(int hmalid) throws BObStatusException, IntegrationException{
+        if(hmalid == 0){
+            throw new BObStatusException("cannot extract a human mailing address link with an id of 0");
+        }
+        
+        HumanMailingAddressLink hmalink = null;
+           
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            String s =  "SELECT humanmailing_humanid, humanmailing_addressid, source_sourceid, \n" +
+                        "       createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
+                        "       deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid" +
+                        "  FROM public.humanmailingaddress WHERE linkid=?";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, hmalid);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                hmalink = generateHumanMailingAddressLink(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return hmalink;
+    }
+    
+    
+    /**
      * Extracts all mailing addresses associated with a given human
      * @param humanID
      * @return the list of address objects
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public List<HumanMailingAddressLink> getMailingAddressListByHuman(int humanID) 
+    public List<HumanMailingAddressLink> getMailingAddressLinksByHuman(int humanID) 
             throws IntegrationException, BObStatusException{
         
         List<HumanMailingAddressLink> hmal = new ArrayList<>();
@@ -1232,7 +1248,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("PersonIntegrator ...", ex);
+            throw new IntegrationException("PropertyIntegrator.getMailingAddressListByStreet: Just kidding! I Cannot fetch mailing by street.", ex);
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

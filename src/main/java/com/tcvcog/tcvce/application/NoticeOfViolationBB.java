@@ -17,58 +17,17 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.BlobCoordinator;
-import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.BlobException;
-import com.tcvcog.tcvce.domain.BlobTypeException;
-import com.tcvcog.tcvce.domain.EventException;
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.Human;
-import com.tcvcog.tcvce.entities.HumanLink;
-import com.tcvcog.tcvce.entities.HumanMailingAddressLink;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
-import com.tcvcog.tcvce.entities.PageModeEnum;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PrintStyle;
-import com.tcvcog.tcvce.entities.PropertyDataHeavy;
-import com.tcvcog.tcvce.entities.TextBlock;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.util.DateTimeUtil;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.coordinators.*;
+import com.tcvcog.tcvce.domain.*;
+import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.integration.*;
+import com.tcvcog.tcvce.util.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
-import java.io.IOException;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
-import org.primefaces.event.FileUploadEvent;
 
 /**
  *
@@ -159,19 +118,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         showTextBlocksAllMuni = false;
         useManualTextBlockMode = false;
 
-//        setPageModes(new ArrayList<PageModeEnum>());
-//        getPageModes().add(PageModeEnum.LOOKUP);
-//        getPageModes().add(PageModeEnum.INSERT);
-//        getPageModes().add(PageModeEnum.UPDATE);
-//        getPageModes().add(PageModeEnum.REMOVE);
-//        if (getSessionBean().getCeCaseNoticesPageModeRequest() != null) {
-//            setCurrentMode(getSessionBean().getCeCaseNoticesPageModeRequest());
-//        } else {
-//            setCurrentMode(PageModeEnum.LOOKUP);
-//        }
-
-//        viewOptionList = Arrays.asList(ViewOptionsActiveListsEnum.values());
-//        selectedViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
         Municipality m = getSessionBean().getSessMuni();
         
         try {
@@ -356,81 +302,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         return categoryList;
     }
 
-    /**
-     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE,
-     * REMOVE
-     *
-     * @param mode
-     */
-    public void setCurrentMode(PageModeEnum mode) {
-
-        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
-        PageModeEnum tempCurMode = this.getCurrentMode();
-        //reset default setting every time the Mode has been selected 
-//        loadDefaultPageConfig();
-        //check the currentMode == null or not
-        if (mode == null) {
-            this.currentMode = tempCurMode;
-        } else {
-            this.currentMode = mode;
-        }
-        switch (currentMode) {
-            case LOOKUP:
-                onModeLookupInit();
-                break;
-            case INSERT:
-//                onModeInsertInit();
-                break;
-            case UPDATE:
-                onModeUpdateInit();
-                break;
-            case REMOVE:
-                onModeRemoveInit();
-                break;
-            default:
-                break;
-        }
-    }
-
-    //check if current mode == Lookup
-    public boolean getActiveLookupMode() {
-        // hard-wired on since there's always a property loaded
-        return PageModeEnum.LOOKUP.equals(currentMode);
-    }
-
-    /**
-     * Provide UI elements a boolean true if the mode is UPDATE
-     *
-     * @return
-     */
-    public boolean getActiveUpdateMode() {
-        return PageModeEnum.UPDATE.equals(currentMode);
-    }
-
-    public boolean getActiveViewMode() {
-        if (PageModeEnum.LOOKUP.equals(currentMode) || PageModeEnum.VIEW.equals(currentMode)) {
-            if (currentNotice != null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //check if current mode == Insert
-    public boolean getActiveInsertUpdateMode() {
-        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
-    }
-
-    //check if current mode == Insert
-    public boolean getActiveInsertMode() {
-        return PageModeEnum.INSERT.equals(getCurrentMode());
-    }
-
-    //check if current mode == Remove
-    public boolean getActiveRemoveMode() {
-        return PageModeEnum.REMOVE.equals(getCurrentMode());
-    }
-
+ 
     
     /**
      * Listener for user requests to go back to case
@@ -460,11 +332,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     }
 
-    /**
-     * Internal logic container for changes to page mode: Lookup
-     */
-    private void onModeLookupInit() {
-    }
     
     public void markNoticeOfViolationAsSentInit(NoticeOfViolation nov){
         currentNotice = nov;
@@ -591,12 +458,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
         }
         return "";
-        
-
     }
-    
-    
-    
     
     public void lockNoticeAndQueueForMailing(NoticeOfViolation nov) {
         CaseCoordinator caseCoord = getCaseCoordinator();
@@ -623,7 +485,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                             "Unable to queue notice of violatio. "
                             + "Please create an event manually which logs this letter being queued for mailing", ""));
         }
-
     }
     
     /**
@@ -649,7 +510,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             nov.setCreationBy(getSessionBean().getSessUser());
             currentNotice = nov;
             getSessionBean().setSessNotice(currentNotice);
-            setCurrentMode(PageModeEnum.INSERT);
         } catch (AuthorizationException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Database error", ""));
@@ -662,47 +522,12 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "No unresolved violations exist for building a letter.", ""));
         }
-//        if(currentCase.getViolationList() == null || currentCase.getViolationList().isEmpty()){
-//                getFacesContext().addMessage(null,
-//                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                                "This case has no violations; start by adding a code violation: Click Code Enf >> Violations ", ""));
-//        } else{
-//            
-//            try {
-//                currentNotice = cc.nov_GetNewNOVSkeleton(currentCase, getSessionBean().getSessMuni());
-//                getFacesContext().addMessage(null,
-//                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-//                                "Loaded notice skeleton.", ""));
-//            } catch (AuthorizationException ex) {
-//                System.out.println(ex);
-//                getFacesContext().addMessage(null,
-//                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                                ex.getMessage(), ""));
-//            }
-//
-//        }
     }
 
-
-    
     public void onNOVEditTextInitButtonChange(ActionEvent ev) {
 
     }
 
-    /**
-     * Listener for beginning of update process
-     */
-    public void onModeUpdateInit() {
-        // nothign to do here yet since the user is selected
-    }
-
-    /**
-     * Listener for the start of the case remove process
-     */
-    public void onModeRemoveInit() {
-
-    }
-    
     public void onBuildNOVUsingBlocks(){
         CaseCoordinator cc = getCaseCoordinator();
         if(currentNotice != null && selectedBlockTemplate != null){
@@ -754,9 +579,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                        "Unable to build notice from template.", ""));
             System.out.println(ex);
         }
-        
-        
-        
     }
     
     /**
@@ -1023,10 +845,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to delete template", ""));
         }
-        
     }
-    
-  
     
     /**
      * Listener for user reuqests to manage templates
@@ -1035,7 +854,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void onTemplateManageInitButtonChange(ActionEvent ev){
         CaseCoordinator cc = getCaseCoordinator();
         // only load the a block automatically if not selected
-        
         formTemplateBlockText = currentTemplateBlock.getTextBlockText();
     }
     
@@ -1053,8 +871,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "New Template block created", ""));
     }
-    
-    
     
     /**
      * Listener for user requests to add a new template block
@@ -1083,8 +899,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not insert new text block", ""));
         }
-
-        
     }
     
     /**
@@ -1105,12 +919,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not insert new text block", ""));
         }
-
-        
     }
-    
-    
-  
     
     /**
      * Listener for user requests to bring up the choose person dialog
@@ -1127,13 +936,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      * @return
      */
     public String onAbortOperationButtonChange() {
-
         getSessionBean().setCeCaseNoticesPageModeRequest(PageModeEnum.VIEW);
-
         return "ceCaseNotices";
     }
-
-
 
     /**
      * Listener for commencement of note writing process
@@ -1142,7 +947,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void onNoteInitButtonChange(ActionEvent ev) {
         setFormNoteText(null);
-
     }
 
     /**
@@ -1194,8 +998,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void setCurrentNotice(NoticeOfViolation currentNotice) {
         this.currentNotice = currentNotice;
     }
-
-  
 
     /**
      * @param textBlockListByMuni the textBlockListByMuni to set

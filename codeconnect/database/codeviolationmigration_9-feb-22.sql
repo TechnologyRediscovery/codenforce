@@ -24,8 +24,16 @@ SELECT codesetelement_elementid, cecase_caseid, dateofrecord,
 
 
 -- step 2: Update copied violations
+
 BEGIN;
-
 UPDATE codeviolation set cecase_caseid = 59637, entrytimestamp=now(), stipulatedcompliancedate='2022-03-09'  WHERE violationid >= 7412 and violationid <= 7419;
-
 COMMIT;
+
+
+--step 3: nullify violations on origination case after migration
+BEGIN;
+UPDATE codeviolation set nullifiedts=now(), nullifiedby=100  WHERE cecase_caseid=58558 AND actualcompliancedate IS NULL;
+COMMIT;
+
+-- step 4: notes made of migration
+UPDATE codeviolation set notes='Nullified upon migration of these violations to cecase 59704 after change of owner by ECD per SG;'  WHERE cecase_caseid=58558 AND actualcompliancedate IS NULL;
