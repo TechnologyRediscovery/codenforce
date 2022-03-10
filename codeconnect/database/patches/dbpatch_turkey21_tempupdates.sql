@@ -79,7 +79,8 @@ ALTER TABLE linkedobjectrole RENAME COLUMN lorschema_schemaid TO lorschema;
 
 
 
--- RUN LOCALLY TO HERE
+
+
 
 --RUN ALONE
 ALTER TYPE linkedobjectroleschema ADD VALUE 'CitationDocketHuman';
@@ -88,12 +89,24 @@ ALTER TABLE occinspectiondetermination ADD COLUMN domain systemdomain;
 ALTER TABLE occinspectiondetermination ADD COLUMN requiremigrationtoce BOOLEAN;
 
 
+ALTER TABLE noticeofviolation ADD COLUMN fixednotifyingofficername text;
+ALTER TABLE noticeofviolation ADD COLUMN fixednotifyingofficertitle text;
+ALTER TABLE noticeofviolation ADD COLUMN fixednotifyingofficerphone text;
+ALTER TABLE noticeofviolation ADD COLUMN fixednotifyingofficeremail text;
+ALTER TABLE noticeofviolation ADD COLUMN notifyingofficer_humanid integer 
+    CONSTRAINT nov_notifyingofficer_humanid_fk 
+    REFERENCES public.human (humanid) ;
 
+ALTER TABLE contactemail ADD COLUMN priority INTEGER DEFAULT 1;
+ALTER TABLE contactphone ADD COLUMN priority INTEGER DEFAULT 1;
+ALTER TABLE humanmailingaddress ADD COLUMN priority INTEGER DEFAULT 1;
+ALTER TABLE parcelmailingaddress ADD COLUMN priority INTEGER DEFAULT 1;
+
+
+
+-- RUN LOCALLY TO HERE
 
 -- don't need these since photodoc has a type assocaited with it that can be any file type
-
-
-
 
 DROP TABLE public.ceactionrequestpdfdoc;
 DROP TABLE public.codeviolationpdfdoc;

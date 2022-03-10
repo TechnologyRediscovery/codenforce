@@ -45,7 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                         <h:form id="cecaselists-launcher">
                             <h1>
                                 <h:outputText id="header-type-ot" value="#{ceCaseSearchProfileBB.currentCase.caseName} @ "/> 
-                                <h:outputText id="header-addr-ot" value="#{ceCaseSearchProfileBB.currentCase.property.addressString} "/>  
+                                <h:outputText id="header-addr-ot" value="#{ceCaseSearchProfileBB.currentCase.property.address.addressPretty1Line} "/>  
                                 <h:outputText id="header-muni-ot" value="(#{ceCaseSearchProfileBB.currentCase.property.muni.muniName})"/>  
                             </h1>
 
@@ -285,7 +285,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                 actionListener="#{ceCaseSearchProfileBB.onCaseForceCloseInitButtonChange}"
                                                                                 oncomplete="PF('case-forceclose-dialog-var').show()"
                                                                                 disabled="false"
-                                                                                style="color:blue;"
                                                                                 value="close case"/>
 
                                                         </div>
