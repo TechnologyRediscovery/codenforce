@@ -127,11 +127,13 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return hll;
     }
     
+   
     
     /**
      * Grand staircase entrance for connecting a human holder to a human
      * @param hlh
-     * @param hum
+     * @param hum if all you have is a human (or Person subclass), use the 
+     * convenience method createHumanLink method
      * @param ua the user doing the linking
      * @return the link ID for the freshly inserted link
      * @throws BObStatusException 
@@ -149,7 +151,6 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             hum.setLinkSource(sc.getBObSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                 .getString("bobSourceHumanLinkDefault"))));
         }
-        
         return pi.insertHumanLink(hlh, hum);
     }
     

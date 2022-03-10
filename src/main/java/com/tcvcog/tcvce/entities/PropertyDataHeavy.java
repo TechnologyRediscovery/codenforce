@@ -32,7 +32,7 @@ public  class       PropertyDataHeavy
         implements  IFace_CredentialSigned,
                     IFace_humanListHolder{
     
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUIM = LinkedObjectSchemaEnum.CECaseHuman;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUIM = LinkedObjectSchemaEnum.ParcelHuman;
     protected List<HumanLink> humanLinkList;
     protected List<Person> personList;
     

@@ -18,28 +18,21 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.ContactEmail;
 import com.tcvcog.tcvce.entities.ContactPhone;
 import com.tcvcog.tcvce.entities.ContactPhoneType;
-import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
 import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
-import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonChangeOrder;
-import com.tcvcog.tcvce.entities.PersonType;
-import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
-import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -49,10 +42,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Connects Person objects to the data store
@@ -369,7 +359,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             while(rs.next()){
                 linkid = rs.getInt(1);
-            }
+            } 
+            System.out.println("PersonIntegrator.insertHumanLink | linked human new LinkID = " + linkid);
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -746,7 +737,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             String s =  "SELECT emailid, human_humanid, emailaddress, bouncets, createdts, createdby_userid, \n" +
                         "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
-                        "       notes\n" +
+                        "       notes, priority \n" +
                         "  FROM public.contactemail WHERE emailid=?;";
             
             stmt = con.prepareStatement(s);
@@ -874,6 +865,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 em.setBounceTS(rs.getTimestamp("bouncets").toLocalDateTime());
             }
             em.setNotes(rs.getString("notes"));
+            em.setPriority(rs.getInt("priority"));
             si.populateTrackedFields(em, rs, true);
             
             return em;
@@ -902,7 +894,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             String s =  "UPDATE public.contactemail\n" +
                         "   SET human_humanid=?, emailaddress=?, \n" +
-                        "       lastupdatedts=now(), lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?, bouncets=?  \n" +
+                        "       lastupdatedts=now(), lastupdatedby_userid=?, "
+                    +   "       deactivatedts=?, deactivatedby_userid=?, bouncets=?, priority=?  \n" +
                         " WHERE emailid=?;";
             
             stmt = con.prepareStatement(s);
@@ -932,9 +925,11 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
+             
             
+            stmt.setInt(7, em.getPriority());
 
-            stmt.setInt(7, em.getEmailID());
+            stmt.setInt(8, em.getEmailID());
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
@@ -967,9 +962,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             
             String s =  "INSERT INTO public.contactemail(\n" +
                         "            emailid, human_humanid, emailaddress, createdts, createdby_userid, \n" +
-                        "            lastupdatedts, lastupdatedby_userid) \n" +
+                        "            lastupdatedts, lastupdatedby_userid, priority) \n" +
                         "    VALUES (DEFAULT, ?, ?, now(), ?, \n" +
-                        "            now(), ?);";
+                        "            now(), ?, ?);";
             
             stmt = con.prepareStatement(s);
              if(em.getHumanID() != 0){
@@ -986,6 +981,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
+            
+            stmt.setInt(5, em.getPriority());
+            
 
             stmt.execute();
             
@@ -1025,7 +1023,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             String s =  "SELECT phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, \n" +
                         "       disconnectts, disconnect_userid, createdts, createdby_userid, \n" +
                         "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
-                        "       notes\n" +
+                        "       notes, priority \n" +
                         "  FROM public.contactphone WHERE phoneid=?;";
             
             stmt = con.prepareStatement(s);
@@ -1074,9 +1072,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 phone.setDisconnectTS(rs.getTimestamp("disconnectts").toLocalDateTime());
             }
             phone.setDisconnectRecordedBy(uc.user_getUser(rs.getInt("disconnect_userid")));
+            phone.setNotes(rs.getString("notes"));
+            phone.setPriority(rs.getInt("priority"));
             
             si.populateTrackedFields(phone, rs, true);
-            phone.setNotes(rs.getString("notes"));
             
             return phone;
         } catch (BObStatusException ex) {
@@ -1102,7 +1101,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             String s =  "UPDATE public.contactphone\n" +
                         "   SET human_humanid=?, phonenumber=?, phoneext=?, phonetype_typeid=?, \n" +
                         "       disconnectts=?, disconnect_userid=?, \n" +
-                        "       lastupdatedts=now(), lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=? \n" +
+                        "       lastupdatedts=now(), lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?, priority=? \n" +
                         " WHERE phoneid=? ;";
             
             stmt = con.prepareStatement(s);
@@ -1157,8 +1156,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(9, java.sql.Types.NULL);
             }
             
+            stmt.setInt(10, phone.getPriority());
             
-            stmt.setInt(10, phone.getPhoneID());
+            
+            stmt.setInt(11, phone.getPhoneID());
 
             stmt.executeUpdate();
 
@@ -1192,10 +1193,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             String s =  "INSERT INTO public.contactphone(\n" +
                         "            phoneid, human_humanid, phonenumber, phoneext, phonetype_typeid, \n" +
                         "            createdts, createdby_userid, \n" +
-                        "            lastupdatedts, lastupdatedby_userid )\n" +
+                        "            lastupdatedts, lastupdatedby_userid, priority )\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
                         "            now(), ?, \n" +
-                        "            now(), ?);";
+                        "            now(), ?, ?);";
             
             stmt = con.prepareStatement(s);
             if(phone.getHumanID() != 0){
@@ -1230,6 +1231,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
+            
+            stmt.setInt(7, phone.getPriority());
+            
 
             stmt.execute();
             

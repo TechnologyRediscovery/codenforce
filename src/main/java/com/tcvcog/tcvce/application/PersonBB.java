@@ -89,6 +89,10 @@ public class PersonBB extends BackingBeanUtils {
     private List<Person> filteredPersonList;
     private boolean appendResultsToList;
     
+    private List<Person> personsSelectedList;
+    private String personListComponentIDToUpdatePostLinkingOperation; 
+    
+    
     /**
      * Creates a new instance of PersonBB
      */
@@ -115,6 +119,7 @@ public class PersonBB extends BackingBeanUtils {
             System.out.println(ex);
         }
         setupQueryInfrastructure();
+        personsSelectedList = new ArrayList<>();
     }
     
     /**
@@ -981,6 +986,155 @@ public class PersonBB extends BackingBeanUtils {
         }
     }
     
+       
+    /***********************************************************/
+    /********************* FANCY LINK MANAGEMENT STUFF *********/
+    /***********************************************************/
+    
+    /**
+     * Big cheese listener for user requests to start the process
+     * of linking humans to a human list holder. I basically
+     * inject the HLH into the session and keep a record of the 
+     * name of the component I should update when the
+     * linking is done
+     * 
+     * @param hlh to which we should start linking persons
+     */
+    public void onSelectAndLinkPersonsInit(IFace_humanListHolder hlh){
+        
+        getSessionBean().setSessHumanListHolder(hlh);
+        
+        personListComponentIDToUpdatePostLinkingOperation = 
+                FacesContext.getCurrentInstance()
+                        .getExternalContext()
+                        .getRequestParameterMap()
+                        .get("person-list-component-to-update");
+         getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Commencing linking of Persons to " + hlh.getHUMAN_LINK_SCHEMA_ENUM().getTARGET_OBJECT_FRIENDLY_NAME() + " ID: " + hlh.getHostPK(), ""));
+        System.out.println("PersonBB.onSelectAndLinkPersonsInit | " + hlh.getHUMAN_LINK_SCHEMA_ENUM().getTARGET_OBJECT_FRIENDLY_NAME()  + " |  PK: " +hlh.getHostPK());
+        System.out.println("PersonBB.onSelectAndLinkPersonsInit | sending component ID: " +personListComponentIDToUpdatePostLinkingOperation);
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to load person on the current property, 
+     * which is a human list holder
+     * @param ev 
+     */
+    public void onLoadPersonListOnSessionPropertyLinkClick(ActionEvent ev){
+        System.out.println("PersonBB.loadPersonListOnSessionProperty");
+        PersonCoordinator pc =getPersonCoordinator();
+        if(personList != null && !personList.isEmpty()){
+            if(getSessionBean().getSessProperty() != null && getSessionBean().getSessProperty().getHumanLinkList() != null){
+                if(!getSessionBean().getSessProperty().getHumanLinkList().isEmpty()){
+                    personList.clear();
+                    try {
+                        personList.addAll(pc.getPersonListFromHumanLinkList(getSessionBean().getSessProperty().getHumanLinkList()));
+                        getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Loaded " + personList.size() + " persons from the current property!", ""));
+                    } catch (IntegrationException | BObStatusException ex) {
+                        System.out.println(ex);
+                        getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Error converting human links into persons for display", ""));
+                    }
+                } else {
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Session property has a person list but that list is sans persons", ""));
+                }
+            } else {
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Session property does not contain a list of persons", ""));
+            }
+        } else {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                "Fatal error: Person search list improperly setup", ""));
+        }
+    }
+    
+    /**
+     * Listener for user requests to add a person from the person search to the 
+     * list of selected humans ready to be linked to the session humanListHolder
+     * @param per 
+     */
+    public void onAddPersonToSelectedList(Person per){
+        personsSelectedList.add(per);
+        getFacesContext().addMessage(null,
+            new FacesMessage(FacesMessage.SEVERITY_INFO,
+            "Added " + per.getName() + " to selected list.", ""));
+    }
+    
+    /**
+     * Listener for user requests to remove a person from the
+     * session list of selected persons
+     * @param per
+     */
+    public void onRemovePersonFromSelectedList(Person per){
+        personsSelectedList.remove(per);
+        getFacesContext().addMessage(null,
+            new FacesMessage(FacesMessage.SEVERITY_INFO,
+            "Removed" + per.getName() + " to selected list.", ""));
+        
+        
+    }
+    
+    /**
+     * listener for user requests to undertake the linking
+     * operation of the selected humans to the session's 
+     * humanlisthold
+     * 
+     * @param ev 
+     */
+    public void onLinkSelectedPersonsToPersonHolder(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        if(personsSelectedList != null && !personsSelectedList.isEmpty()){
+            for(Person p: personsSelectedList){
+                try {
+                    pc.linkHuman(getSessionBean().getSessHumanListHolder(),
+                            pc.createHumanLinkSkeleton(p), 
+                            getSessionBean().getSessUser());
+                    System.out.println("PersonBB.onLinkSelectedPersonsToPersonHolder | linked p " + p.getName());
+                    
+                     getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Linked " + p.getName() + " to Object ID " + getSessionBean().getSessHumanListHolder().getHostPK(), ""));
+                } catch (BObStatusException | IntegrationException ex) {
+                    System.out.println(ex);
+                     getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Error linking persons: " + ex.getMessage(), ""));
+                } 
+            }
+        }
+    }
+    
+    /**
+     * Listener for user requests to remove the given human
+     * from the session's human list holder permanently
+     * @param hl 
+     */
+    public void onRemoveHumanFromSessionHumanListHolder(HumanLink hl){
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            pc.deactivateHumanLink(hl, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                       "Successfully deactivated person link " + hl.getLinkID(), ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Error removing person link: " + ex.getMessage(), ""));
+        } 
+        
+    }
+    
     
     
     
@@ -1352,6 +1506,34 @@ public class PersonBB extends BackingBeanUtils {
      */
     public void setPageComponentToUpdateAfterNoteCommit(String pageComponentToUpdateAfterNoteCommit) {
         this.pageComponentToUpdateAfterNoteCommit = pageComponentToUpdateAfterNoteCommit;
+    }
+
+    /**
+     * @return the personsSelectedList
+     */
+    public List<Person> getPersonsSelectedList() {
+        return personsSelectedList;
+    }
+
+    /**
+     * @param personsSelectedList the personsSelectedList to set
+     */
+    public void setPersonsSelectedList(List<Person> personsSelectedList) {
+        this.personsSelectedList = personsSelectedList;
+    }
+
+    /**
+     * @return the personListComponentIDToUpdatePostLinkingOperation
+     */
+    public String getPersonListComponentIDToUpdatePostLinkingOperation() {
+        return personListComponentIDToUpdatePostLinkingOperation;
+    }
+
+    /**
+     * @param personListComponentIDToUpdatePostLinkingOperation the personListComponentIDToUpdatePostLinkingOperation to set
+     */
+    public void setPersonListComponentIDToUpdatePostLinkingOperation(String personListComponentIDToUpdatePostLinkingOperation) {
+        this.personListComponentIDToUpdatePostLinkingOperation = personListComponentIDToUpdatePostLinkingOperation;
     }
     
      

@@ -39,6 +39,8 @@ public  class   ContactPhone
     protected LocalDateTime disconnectTS;
     protected User disconnectRecordedBy;
     
+    protected int priority;
+    
     public ContactPhone(){
         
     }
@@ -171,6 +173,20 @@ public  class   ContactPhone
     @Override
     public String getNoteHolderFriendlyName() {
         return HF_NAME;
+    }
+
+    /**
+     * @return the priority
+     */
+    public int getPriority() {
+        return priority;
+    }
+
+    /**
+     * @param priority the priority to set
+     */
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
     
 }

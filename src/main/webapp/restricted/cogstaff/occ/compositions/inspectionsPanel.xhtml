@@ -233,6 +233,7 @@
               widgetVar="inspections-selectchecklist-var"
               header="Choose Checklist"
               modal="true"
+              dynamic="true"
               resizable="true">
         <h:form id="inspections-selectchecklist-form">
             <p:dataTable id="inspections-selectchecklist-dt"
@@ -291,6 +292,7 @@
               widgetVar="inspections-selecttype-var"
               header="Select Space Type"
               modal="true"
+              dynamic="true"
               resizable="true">
         <h:form id="inspections-selecttype-form">
 
@@ -369,6 +371,7 @@
               width="800"
               widgetVar="inspections-selectspace-var"
               header="Identify location of space type: #{occInspectionsBB.selectedSpaceType.spaceTypeTitle}"
+              dynamic="true"
               modal="true"
               resizable="true">
         <h:form id="inspections-selectspace-form">
@@ -443,6 +446,7 @@
               height="600"
               widgetVar="inspections-inspectiondetails-var"
               header="Inspection Details #{occInspectionsBB.selectedInspection.inspectionID}"
+              dynamic="true"
               modal="true"
               resizable="true">
         <h:form id="inspections-inspectiondetails-form">
@@ -805,6 +809,7 @@
     <p:dialog id="inspections-editspace"
               widgetVar="inspections-editspace-var"
               header="Edit Space"
+              dynamic="true"
               modal="true"
               closable="false"
               resizable="true">
@@ -830,6 +835,7 @@
     <p:dialog id="inspections-addlocdesc"
               widgetVar="inspections-addlocdesc-var"
               header="Add Location Descriptor"
+              dynamic="true"
               modal="true"
               closable="true"
               closeOnEscape="true"
@@ -869,6 +875,7 @@
               height="600" width="1000"
               widgetVar="inspections-entryscreen-var"
               header="Inspect ordiances in #{occInspectionsBB.selectedInspectedSpace.type.spaceTypeTitle} (ID: #{occInspectionsBB.selectedInspectedSpace.inspectedSpaceID})"
+              dynamic="true"
               modal="true"
               resizable="true"
               closable="true"
@@ -1147,6 +1154,7 @@
               header="Full ordinance text"
               closable="true"
               closeOnEscape="true"
+              dynamic="true"
               modal="true"
               height="400"
               width="500"
@@ -1192,6 +1200,7 @@
               widgetVar="codeelement-metadata-dialog-var"
               closable="true"
               closeOnEscape="true"
+              dynamic="true"
               modal="true"
               height="400"
               width="500"
@@ -1239,6 +1248,7 @@
               header="Finalize inspection ID: #{occInspectionsBB.selectedInspection.inspectionID}"
               closable="true"
               closeOnEscape="true"
+              dynamic="true"
               modal="true"
               height="400"
               width="500"
@@ -1293,6 +1303,7 @@
               header="Configure report of field inspection ID: #{occInspectionsBB.selectedInspection.inspectionID}"
               closable="true"
               closeOnEscape="true"
+              dynamic="true"
               modal="true"
               height="600"
               width="600"

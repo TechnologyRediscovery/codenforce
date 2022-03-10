@@ -43,6 +43,8 @@ public class ParcelMailingAddressLink
     
     protected String linkNotes;
     
+    protected int priority;
+    
     public ParcelMailingAddressLink(MailingAddress ma){
         
         this.addressID = ma.addressID;
@@ -246,6 +248,20 @@ public class ParcelMailingAddressLink
     @Override
     public int getParentObjectID() {
         return addressID;
+    }
+
+    /**
+     * @return the priority
+     */
+    public int getPriority() {
+        return priority;
+    }
+
+    /**
+     * @param priority the priority to set
+     */
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
    

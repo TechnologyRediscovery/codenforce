@@ -35,6 +35,8 @@ public  class   ContactEmail
     protected String emailaddress;
     protected LocalDateTime bounceTS;
     protected String notes;
+    
+    protected int priority;
 
     public ContactEmail(){
         
@@ -131,6 +133,20 @@ public  class   ContactEmail
     @Override
     public String getNoteHolderFriendlyName() {
         return HFNAME;
+    }
+
+    /**
+     * @return the priority
+     */
+    public int getPriority() {
+        return priority;
+    }
+
+    /**
+     * @param priority the priority to set
+     */
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
     
 }

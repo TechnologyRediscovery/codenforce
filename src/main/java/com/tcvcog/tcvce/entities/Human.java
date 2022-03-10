@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.entities;
 
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * The root object of the humanization system that replaces person records
@@ -287,7 +288,44 @@ public  class   Human
         return HFNAME;
     }
 
-        
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 29 * hash + this.humanID;
+        hash = 29 * hash + Objects.hashCode(this.name);
+        hash = 29 * hash + Objects.hashCode(this.dob);
+        hash = 29 * hash + (this.under18 ? 1 : 0);
+        hash = 29 * hash + Objects.hashCode(this.jobTitle);
+        hash = 29 * hash + (this.businessEntity ? 1 : 0);
+        hash = 29 * hash + (this.multiHuman ? 1 : 0);
+        hash = 29 * hash + Objects.hashCode(this.source);
+        hash = 29 * hash + Objects.hashCode(this.deceasedDate);
+        hash = 29 * hash + Objects.hashCode(this.deceasedBy);
+        hash = 29 * hash + this.cloneOfHumanID;
+        hash = 29 * hash + Objects.hashCode(this.notes);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Human other = (Human) obj;
+        if (this.humanID != other.humanID) {
+            return false;
+        }
+        return true;
+    }
+
+    
+    
     
     
 }

@@ -26,12 +26,9 @@ import com.tcvcog.tcvce.util.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -56,7 +53,7 @@ public class PropertyProfileBB
     
     private List<PropertyUseType> putList;
     private PropertyUnitDataHeavy currentPropertyUnit;
-    private List<User> officerUserList;
+    private boolean reloadPropertyOnCurrentPropertyGetterCall;
     
     private CECase currentCECase;
     private EventCategory ceCaseOriginationEventSelected;
@@ -490,15 +487,20 @@ public class PropertyProfileBB
    
     /**
      * Listener for the user's commencement of the person link process
+     * Most importantly, I toggle the reload trigger to true, 
+     * causing the next call to the getCurrentProperty() method to
+     * also get a fresh copy of the object from the DB, with all the
+     * new goodies inside
      *
-     * @param ev
      */
-    public void onPersonConnectInitButtonChange(ActionEvent ev) {
-
+    public void onManagePropertyPersonLinksButtonChange() {
+        reloadPropertyOnCurrentPropertyGetterCall = true;
+        System.out.println("PropertyProfileBB.onPersonConnectInitButtonChange : "+ reloadPropertyOnCurrentPropertyGetterCall);
     }
 
     /**
      * Listener for the user signaling their desire to connect a person
+     * @deprecated all this logic is now in PersonBB
      *
      * @return
      */
@@ -544,7 +546,7 @@ public class PropertyProfileBB
     /**
      * Listener for user requests to remove a link between property and person
      * TODO: Fix during parcelization
-     * 
+     * @deprecated replaced by shared logic on PersonBB
      * @param p
      * @return 
      */
@@ -641,16 +643,7 @@ public class PropertyProfileBB
         return "ceCaseProfile";
     }
 
-    /**
-     * Listener for requests to remove a potential new person link to the
-     * current Property
-     *
-     * @param p
-     */
-    public void deQueuePersonFromEvent(Person p) {
-        // TODO Finish my guts
-    }
-    
+  
     /**
      * Listener for user requests to link a new address to the 
      * current parcel
@@ -853,9 +846,19 @@ public class PropertyProfileBB
     
 
     /**
+     * The exception to the "no logic in getters and setters" rule: 
+     * this getter monitors the object
+     * reload trigger so we can see changes made by
+     * multi-use components such as the person linker or blob linker
+     * 
      * @return the currentProperty
      */
     public PropertyDataHeavy getCurrentProperty() {
+        if(reloadPropertyOnCurrentPropertyGetterCall){
+            reloadCurrentPropertyDataHeavy();
+            reloadPropertyOnCurrentPropertyGetterCall = false;
+            System.out.println("PropertyProfileBB.getCurrentProperty | reloaded, toggled trigger to false");
+        }
         return currentProperty;
     }
 
@@ -1243,6 +1246,20 @@ public class PropertyProfileBB
      */
     public void setCeCaseUnitAssociation(PropertyUnit ceCaseUnitAssociation) {
         this.ceCaseUnitAssociation = ceCaseUnitAssociation;
+    }
+
+    /**
+     * @return the reloadPropertyOnCurrentPropertyGetterCall
+     */
+    public boolean isReloadPropertyOnCurrentPropertyGetterCall() {
+        return reloadPropertyOnCurrentPropertyGetterCall;
+    }
+
+    /**
+     * @param reloadPropertyOnCurrentPropertyGetterCall the reloadPropertyOnCurrentPropertyGetterCall to set
+     */
+    public void setReloadPropertyOnCurrentPropertyGetterCall(boolean reloadPropertyOnCurrentPropertyGetterCall) {
+        this.reloadPropertyOnCurrentPropertyGetterCall = reloadPropertyOnCurrentPropertyGetterCall;
     }
 
   

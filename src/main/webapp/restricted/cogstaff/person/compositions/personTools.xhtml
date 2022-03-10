@@ -12,12 +12,13 @@
     </h:form>
 
     <p:dialog   id="human-search-dialog"
-                height="700" width="1200"
+                height="700" width="1400"
                 widgetVar="human-search-dialog-var"
                 responsive="true"
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
+                dynamic="true"
                 modal="true"
                 header="Search for persons"
                 rendered="true"
@@ -25,7 +26,7 @@
 
 
         <div class="p-grid">
-            <div class="p-col">
+            <div class="p-col-4">
 
                 <p:panel    id="pers-search-query-panel"
                             toggleable="true"
@@ -35,6 +36,19 @@
 
                     <h:form id="search-query-form">
 
+                        <h:outputLabel styleClass="bold" value="Load persons currently linked to "  />
+                        <p:spacer height="5px" />
+                            <p:commandLink     id="loadpersonsonsessionproperty-link"
+                                               actionListener="#{personBB.onLoadPersonListOnSessionPropertyLinkClick}"
+                                                ajax="true"
+                                                style="color: blue;"
+                                                value="current property at #{sessionBean.sessProperty.address.addressPretty1Line}"
+                                                update="pers-search-results-form
+                                                        persontools-growl-form"
+                                                />
+                        
+                        <p:spacer height="5px" />
+                        
                         <h:outputLabel styleClass="bold" value="Available queries" for="search-query-som" />
 
                         <p:spacer height="5px" />
@@ -170,7 +184,7 @@
                 </p:panel>
             </div>
 
-            <div class="p-col">
+            <div class="p-col-4">
                 <p:panel    id="pers-search-results-panel"
                             toggleable="true"
                             widgetVar="pers-search-results-panel-var"
@@ -226,22 +240,17 @@
                             filteredValue="#{personBB.filteredPersonList}"
                             widgetVar="personSelectListTable">
 
-                            <p:column width="10%">
-                                <f:facet name="header">
-                                    <h:outputText value="ID" />
-                                </f:facet>
-                                <h:outputText value="#{per.humanID}"/>
-                            </p:column>
-
-                            <p:column width="40%" sortBy="#{per.name}"
+                            <p:column width="80%" sortBy="#{per.name}"
                                       filterBy="#{per.name}">
                                 <f:facet name="header">
                                     <h:outputText value="Name" />
                                 </f:facet>
                                 <h:outputText value="#{per.name}"/>
+                                <p:spacer height="3px" />
+                                <h:outputText value="(ID: #{per.humanID})"/>
                             </p:column>
 
-                            <p:column width="10%" >
+                            <p:column width="20%" >
                                 <f:facet name="header">
                                     <h:outputText value="Actions" />
                                 </f:facet>
@@ -263,6 +272,159 @@
                                                             person-links-form
                                                             person-profile-dialog"
                                                             />
+
+                                            <p:spacer height="3px" />
+                                            <p:commandLink  id="person-addtolist-commandlink"
+                                                            ajax="true" 
+                                                            value="add"
+                                                            actionListener="#{personBB.onAddPersonToSelectedList(per)}"
+                                                            update="pers-selected-panel
+                                                            pers-selected-form"
+                                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+            </div>
+            
+            <div class="p-col-4">
+                <p:panel     id="pers-selected-panel"
+                             toggleable="true"
+                             widgetVar="pers-selected-panel-var"
+                             collapsed="false"
+                             header="Selected persons">
+                    <h:form id="pers-selected-form">
+                          <p:commandButton   id="selected-persons-connect-button" 
+                                           ajax="true" 
+                                           actionListener="#{personBB.onLinkSelectedPersonsToPersonHolder}"
+                                           icon="fa fa-link" 
+                                           styleClass="button"
+                                           value="Link these persons to #{sessionBean.sessHumanListHolder.HUMAN_LINK_SCHEMA_ENUM.TARGET_OBJECT_FRIENDLY_NAME} (ID:#{sessionBean.sessHumanListHolder.hostPK})" 
+                                           disabled="#{empty sessionBean.sessHumanListHolder}"
+                                           oncomplete="PF('human-search-dialog-var').hide();"
+                                           update="#{personBB.personListComponentIDToUpdatePostLinkingOperation}"/>
+                          
+                          <p:spacer height="5px" />
+                        
+                          <p:dataTable
+                            id="pers-selected-table"
+                            var="selper"
+                            value="#{personBB.personsSelectedList}"
+                            rowKey="#{selper.humanID}"
+                            tableStyleClass="primeDataTable"
+                            rowExpandMode="single"
+                            resizableColumns="true"
+                            expandedRow="false"
+                            widgetVar="pers-selected-table-var">
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="ID" />
+                                </f:facet>
+                                <h:outputText value="#{selper.humanID}"/>
+                            </p:column>
+
+                            <p:column width="40%" sortBy="#{selper.name}"
+                                      filterBy="#{selper.name}">
+                                <f:facet name="header">
+                                    <h:outputText value="Name" />
+                                </f:facet>
+                                <h:outputText value="#{selper.name}"/>
+                            </p:column>
+
+                            <p:column width="10%" >
+                                <f:facet name="header">
+                                    <h:outputText value="Actions" />
+                                </f:facet>
+
+                                <div class="ui-g data_container_nested_restrict">
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                        <div class="restrict-main-contents-io-link">
+
+                                            <p:commandLink  id="selperson-view-commandlink"
+                                                            ajax="true" 
+                                                            value="view"
+                                                            actionListener="#{personBB.explorePerson(selper)}"
+                                                            oncomplete="PF('person-profile-dialog-var').show();"
+                                                            update="person-info-form
+                                                            person-profile-addresses-form
+                                                            person-profile-phones-form
+                                                            person-profile-emails-form
+                                                            person-links-form
+                                                            person-profile-dialog"
+                                                            />
+                                            
+                                            <h:outputText value=" | " />
+                                            
+                                            <p:commandLink  id="selperson-remove-commandlink"
+                                                            ajax="true" 
+                                                            value="remove"
+                                                            actionListener="#{personBB.onRemovePersonFromSelectedList(selper)}"
+                                                            update="@form"
+                                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+                
+                  <p:panel     id="hlh-humlist-panel"
+                             toggleable="true"
+                             widgetVar="hlh-humlist-panel-var"
+                             collapsed="false"
+                             header="Persons currently linked to #{sessionBean.sessHumanListHolder.HUMAN_LINK_SCHEMA_ENUM.TARGET_OBJECT_FRIENDLY_NAME} (ID:#{sessionBean.sessHumanListHolder.hostPK})">
+                    <h:form id="hlh-humlist-form">
+                        
+                          <p:dataTable
+                            id="hlh-table"
+                            var="hum"
+                            value="#{sessionBean.sessHumanListHolder.humanLinkList}"
+                            rowKey="#{hum.humanID}"
+                            tableStyleClass="primeDataTable"
+                            rowExpandMode="single"
+                            resizableColumns="true"
+                            expandedRow="false"
+                            widgetVar="hlh-table-var">
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="ID" />
+                                </f:facet>
+                                <h:outputText value="#{hum.humanID}"/>
+                            </p:column>
+
+                            <p:column width="40%" sortBy="#{hum.name}"
+                                      filterBy="#{hum.name}">
+                                <f:facet name="header">
+                                    <h:outputText value="Name" />
+                                </f:facet>
+                                <h:outputText value="#{hum.name}"/>
+                            </p:column>
+
+                            <p:column width="10%" >
+                                <f:facet name="header">
+                                    <h:outputText value="Actions" />
+                                </f:facet>
+
+                                <div class="ui-g data_container_nested_restrict">
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                        <div class="restrict-main-contents-io-link">
+
+                                            <p:commandLink  id="hlh-removelink-link"
+                                                            ajax="true" 
+                                                            value="remove link"
+                                                            actionListener="#{personBB.onRemoveHumanFromSessionHumanListHolder(hum)}"
+                                                            update="@form"
+                                                            />
+                                            
+                                       
                                         </div>
                                     </div>
                                 </div>
@@ -281,6 +443,7 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
+                dynamic="true"
                 modal="true"
                 header="#{personBB.currentPerson.name} (ID: #{personBB.currentPerson.humanID}) Profile"
                 rendered="true"
@@ -625,11 +788,18 @@
                                 
                             </p:column>
 
-                            <p:column width="25%">
+                            <p:column width="17%">
                                 <f:facet name="header">
                                     <h:outputText value="Type"/>
                                 </f:facet>
                                 <h:outputText value="#{ph.phoneType.title}" />
+                            </p:column>
+                            <p:column width="8%"
+                                      sortBy="#{ph.priority}">
+                                <f:facet name="header">
+                                    <h:outputText value="Priority"/>
+                                </f:facet>
+                                <h:outputText value="#{ph.priority}" />
                             </p:column>
 
                             <p:column width="25%">
@@ -700,8 +870,16 @@
                                                     style="color:red;"
                                                     value="#{!empty ea.bounceTS ? personBB.getPrettyDate(ea.bounceTS) : ''}" />
                             </p:column>
+                            
+                             <p:column width="8%"
+                                      sortBy="#{ea.priority}">
+                                <f:facet name="header">
+                                    <h:outputText value="Priority"/>
+                                </f:facet>
+                                <h:outputText value="#{ea.priority}" />
+                            </p:column>
 
-                            <p:column width="25%">
+                            <p:column width="17%">
                                 <f:facet name="header">
                                     <h:outputText value="Actions"/>
                                 </f:facet>
@@ -874,6 +1052,7 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
+                dynamic="true"
                 modal="true"
                 header="Connect #{personBB.currentPerson.name} to #{sessionBean.sessHumanListHolder.HUMAN_LINK_SCHEMA_ENUM.TARGET_OBJECT_FRIENDLY_NAME} (ID:#{sessionBean.sessHumanListHolder.hostPK}) "
                 rendered="true"
@@ -934,6 +1113,7 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
+                dynamic="true"
                 modal="true"
                 header="Append note to Person Link ID: #{personBB.currentHumanLink.linkID}"
                 rendered="true"
@@ -971,6 +1151,7 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
+                dynamic="true"
                 modal="true"
                 header="Choose new link target of #{personBB.currentPerson.name}"
                 rendered="true"
@@ -1036,6 +1217,7 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
+                dynamic="true"
                 modal="true"
                 header="Deactivate Person Link ID: #{personBB.currentHumanLink.linkID}"
                 rendered="true"
@@ -1063,6 +1245,7 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
+                dynamic="true"
                 modal="true"
                 header="#{personBB.currentContactPhone.phoneID eq 0 ? 'Create new phone number' : 'View/Edit phone number'}"
                 rendered="true"
@@ -1160,6 +1343,19 @@
                                        minValue="0"
                                        maxValue="99999999" 
                                        required="false"/>
+
+                    </div>
+                    <div class="p-col-6">Priority</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!personBB.currentContactPhoneEditMode}" 
+                                      value="#{personBB.currentContactPhone.priority}"/>
+
+                        <p:inputNumber rendered="#{personBB.currentContactPhoneEditMode}"
+                                       value="#{personBB.currentContactPhone.priority}"
+                                       decimalPlaces="0"
+                                       minValue="0"
+                                       maxValue="100" 
+                                       required="true"/>
 
                     </div>
 
@@ -1262,6 +1458,7 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
+                dynamic="true"
                 modal="true"
                 header="#{personBB.currentContactEmail.emailID eq 0 ? 'Create new email address' : 'View/Edit email address'}"
                 rendered="true"
@@ -1323,7 +1520,19 @@
                                       value="#{personBB.currentContactEmail.emailaddress}"/>
 
                     </div>
+                    <div class="p-col-6">Priority</div>
+                    <div class="p-col-6">
+                        <h:outputText rendered="#{!personBB.currentContactEmailEditMode}" 
+                                      value="#{personBB.currentContactEmail.priority}"/>
 
+                        <p:inputNumber rendered="#{personBB.currentContactEmailEditMode}"
+                                       value="#{personBB.currentContactEmail.priority}"
+                                       decimalPlaces="0"
+                                       minValue="0"
+                                       maxValue="100" 
+                                       required="true"/>
+
+                    </div>
 
                     <div class="p-col-6">Bounce?</div>
                     <div class="p-col-6">
@@ -1424,6 +1633,7 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
+                dynamic="true"
                 modal="true"
                 header="Remove phone number #{personBB.currentContactPhone.phoneNumber}"
                 rendered="true"
@@ -1452,6 +1662,7 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
+                dynamic="true"
                 modal="true"
                 header="Remove email address #{personBB.currentContactEmail.emailaddress}"
                 rendered="true"
@@ -1480,6 +1691,7 @@
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
+                dynamic="true"
                 modal="true"
                 header="Append note"
                 rendered="true"
