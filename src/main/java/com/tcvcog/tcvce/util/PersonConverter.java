@@ -17,7 +17,6 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.Person;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;

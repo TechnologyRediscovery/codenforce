@@ -457,13 +457,11 @@
                     </div>
 
                     <div class="restrict-main-contents-io-content">
-                        <p:inputText id="event-add-descr-it"
-                                     value="#{eventsBB.skeletonEvent.description}"
-                                     style="width: 100%;"
-                                     tabindex="3"
-                                     required="false">
-                            <p:ajax/>
-                        </p:inputText>
+                         <p:inputTextarea  id="event-add-descr-it" 
+                                                      value="#{ceCaseSearchProfileBB.currentEvent.description}" 
+                                                      style="width: 100%; height: 150px;" 
+                                                      tabindex="3" 
+                                                      required="false" />
                     </div>
                 </div>
 

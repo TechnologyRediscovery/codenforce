@@ -63,6 +63,8 @@ public  class       CodeViolation
     protected List<Integer> citationIDList;
     protected List<Integer> noticeIDList;
     
+    protected boolean makeFindingsDefault;
+    
     // compliance fields
     protected LocalDateTime stipulatedComplianceDate;
     protected LocalDateTime actualComplianceDate;
@@ -521,6 +523,10 @@ public  class       CodeViolation
         if (this.violationID != other.violationID) {
             return false;
         }
+        if(other.getCodeViolated().getCodeSetElementID() != this.getCodeViolated().getCodeSetElementID()){
+            return false;
+        }
+
         return true;
     }
 
@@ -840,6 +846,20 @@ public  class       CodeViolation
      */
     public void setNullifiedUser(User nullifiedUser) {
         this.nullifiedUser = nullifiedUser;
+    }
+
+    /**
+     * @return the makeFindingsDefault
+     */
+    public boolean isMakeFindingsDefault() {
+        return makeFindingsDefault;
+    }
+
+    /**
+     * @param makeFindingsDefault the makeFindingsDefault to set
+     */
+    public void setMakeFindingsDefault(boolean makeFindingsDefault) {
+        this.makeFindingsDefault = makeFindingsDefault;
     }
 
    

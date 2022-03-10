@@ -118,11 +118,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
            {
 
         Credential cred = null;
-        if (ua != null && c != null) {
+        if (ua != null && c != null && c.getCaseID() != 0) {
             cred = ua.getKeyCard();
 
         } else {
-            throw new BObStatusException("Cannot construct cecaseDH with null case input");
+            throw new BObStatusException("CaseCoordinator.cecase_assembleCECaseDataHeavy | Cannot construct cecaseDH with null case input or case ID = 0");
         }
         SearchCoordinator sc = getSearchCoordinator();
         WorkflowCoordinator wc = getWorkflowCoordinator();
@@ -469,28 +469,27 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             statusBundle.setPhase(CasePhaseEnum.Closed);
             // jump right to court-based phase assignment if we have at least 1 elegible citation
         } else if (!cecase_buildCitationListForPhaseAssignment(cse).isEmpty()){
-            statusBundle.setPhase(cecase_determineAndSetPhase_stageCITATION(cse));
-        } else {
+            // Use catch all for citation at any stage of the process
+            statusBundle.setPhase(CasePhaseEnum.Cited);
+            // TODO: fix complex logic on citation phase stuff
+//            statusBundle.setPhase(cecase_determineAndSetPhase_stageCITATION(cse));
 
+        } else {
             // find overriding factors to have a closed 
             if (cse.getViolationList().isEmpty()) {
                 // Open case, no violations yet: only one mapping
-
                 statusBundle.setPhase(CasePhaseEnum.PrelimInvestigationPending);
-
                 // we have at least one violation attached  
             } else {
-
                 // If we don't have a mailed notice, then we're in Notice Delivery phase
                 if (!cecase_determineIfNoticeHasBeenMailed(cse)) {
                     statusBundle.setPhase(CasePhaseEnum.IssueNotice);
-
                     // notice has been sent so we're in CaseStageEnum.Enforcement or beyond
                 } else {
                     int maxVStage = violation_determineMaxViolationStatus(cse.getViolationList());
                     switch (maxVStage) {
                         case 0:  // all violations resolved
-                            statusBundle.setPhase(CasePhaseEnum.Closed);
+                            statusBundle.setPhase(CasePhaseEnum.FinalReview);
                             break;
                         case 1: // all violations within compliance window
                             statusBundle.setPhase(CasePhaseEnum.InsideComplianceWindow);
@@ -548,7 +547,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * Assesses the list of events and citations on the case to determine the 
      * appropriate post-hearing related case phase
      * 
-     * 
+     * NOTE AS OF 29-NOV-2020: Let's just do: citation status, minus event processing
      *
      * @param cse
      * @return
@@ -3089,7 +3088,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws BObStatusException 
      */
-    public CodeViolation violation_injectOrdinance(CECase cse, CodeViolation cv, EnforcableCodeElement ece, MunicipalityDataHeavy mdh ) throws BObStatusException{
+    public CodeViolation    violation_injectOrdinance(  CECase cse, 
+                                                        CodeViolation cv, 
+                                                        EnforcableCodeElement ece, 
+                                                        MunicipalityDataHeavy mdh ) 
+                            throws BObStatusException{
 
         if(cse != null && cv != null && ece != null){
             List<CodeViolation> vlst = new ArrayList<>();
@@ -3367,7 +3370,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         cv.setLastUpdatedUser(u);
 
         ci.updateCodeViolationCompliance(cv);
-        violation_checkForFullComplianceAndCloseCaseIfTriggered(cse, u);
+        // Based on user feedback, we are suspending auto-closing of case
+        // upon all violation coming into compliance
+        // as of 2-DEC-2021
+       
+//        violation_checkForFullComplianceAndCloseCaseIfTriggered(cse, u);
+
     }
 
     /**

@@ -181,9 +181,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     </div>
                                                     <!--NESTED DATA VALUE INLINE -->
                                                     <div class="restrict-data-field-value-inline" >
-                                                        <div class="#{ceCaseSearchProfileBB.currentCase.statusBundle.phaseIcon.styleClass}">
-                                                            <i class="material-icons status-display-icon-i"><h:outputText value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phaseIcon.materialIcon}"/></i>
-                                                        </div>
+                                                        <ui:remove>
+                                                            <div class="#{ceCaseSearchProfileBB.currentCase.statusBundle.phaseIcon.styleClass}">
+                                                                <i class="material-icons status-display-icon-i"><h:outputText value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phaseIcon.materialIcon}"/></i>
+                                                            </div>
+                                                        </ui:remove>
                                                         <h:outputText id="case-phase-ot" 
                                                                       value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phase.label}"/>
                                                     </div>
@@ -277,13 +279,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <h:outputLabel value="Closing date"/>
                                                         <div class="restrict-main-contents-io-link link-button">
 
-                                                            <p:commandLink      id="cecase-forceclose-init-cb" 
+                                                            <p:commandButton      id="cecase-forceclose-init-cb" 
                                                                                 ajax="true" 
+                                                                                icon="fa fa-close"
                                                                                 actionListener="#{ceCaseSearchProfileBB.onCaseForceCloseInitButtonChange}"
                                                                                 oncomplete="PF('case-forceclose-dialog-var').show()"
                                                                                 disabled="false"
                                                                                 style="color:blue;"
-                                                                                value="force close"/>
+                                                                                value="close case"/>
 
                                                         </div>
 
@@ -407,7 +410,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                           sortBy="#{eventfuture.category.eventCategoryTitle}"
                                                           styleClass="centeredColumnContent">
                                                     <div class="#{eventfuture.category.icon.styleClass}">
-                                                        <i class="material-icons status-display-icon-i"><h:outputText value="#{eventfuture.category.icon.materialIcon}"/></i>
+                                                        <i class="material-icons status-display-icon-i">
+                                                            <h:outputText value="#{eventfuture.category.icon.materialIcon}" />
+                                                        </i>
                                                     </div>
                                                     <h:outputText value="#{eventfuture.category.eventType.label}:" />
                                                     <p:spacer height="1px" />

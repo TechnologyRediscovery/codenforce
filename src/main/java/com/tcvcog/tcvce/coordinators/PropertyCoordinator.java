@@ -724,8 +724,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                     cse.setPropertyInfoCase(true);
                     cse.setNotes("This is a Case object that contains information and events attached to " + p.getAddressString() + ". "
                             + "This case does not represent an actual code enforcement case.");
-                    cse.setCaseID(cc.cecase_insertNewCECase(cse, ua, null, null));
-                    csehv = cc.cecase_assembleCECaseDataHeavy(cse, ua);
+                    int freshid = cc.cecase_insertNewCECase(cse, ua, null, null);
+                    csehv = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(freshid), ua);
 
                 } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
                     System.out.println(ex);

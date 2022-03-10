@@ -513,7 +513,7 @@ public class    SessionBean
                 
                 if(sessProperty != null && sessProperty.getCeCaseList() != null && !sessProperty.getCeCaseList().isEmpty()){
                     sessCECase = cc.cecase_assembleCECaseDataHeavy(sessProperty.getCeCaseList().get(0), sessUser);
-                    sessCECaseList = sessProperty.getCeCaseList();
+//                    sessCECaseList = sessProperty.getCeCaseList();
                 }
                 return "personSearchProfile";
                 
@@ -527,7 +527,8 @@ public class    SessionBean
                 
                 sessProperty = pc.assemblePropertyDataHeavy(pc.getProperty(cse.getParcelKey()), ua);
                 sessPropertyList = pc.assemblePropertyHistoryList(ua.getKeyCard());
-                sessCECaseList = sessProperty.getCeCaseList();
+                // Turned off to avoid the case list getting set to zero
+//                sessCECaseList = sessProperty.getCeCaseList();
                 
                 sessPersonList = perc.getPersonListFromHumanLinkList(sessProperty.getHumanLinkList());
                 

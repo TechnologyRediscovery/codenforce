@@ -68,6 +68,7 @@ public  class       CodeViolationPropCECaseHeavy
     this.nullifiedTS = cv.nullifiedTS;
     this.nullifiedUser = cv.nullifiedUser;
     this.leagacyImport = cv.leagacyImport;
+    this.makeFindingsDefault = cv.makeFindingsDefault;
     // TODO: address from NADGIT
 //    this.photoList = cv.photoList;
 //    this.blobIDList = cv.blobIDList;

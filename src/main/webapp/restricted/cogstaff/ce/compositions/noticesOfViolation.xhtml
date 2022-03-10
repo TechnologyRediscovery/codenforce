@@ -147,11 +147,11 @@
 
                 <p:commandButton   id="nov-managetemplates-init-button"
                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                   value="Manage templates"
+                                   value="Manage NOV templates"
                                    icon="fa fa-paragraph"
                                    ajax="true"
                                    actionListener="#{noticeOfViolationBB.onTemplateManageInitButtonChange}"
-                                   update="nov-template-form"
+                                   update="@form:@parent:nov-template-form"
                                    oncomplete="PF('nov-templatemanage-dialog-var').show()"
                                    />
             </div>
@@ -531,7 +531,9 @@
                                      icon="fa fa-edit"
                                      ajax="true"
                                      actionListener="#{noticeOfViolationBB.onTemplateEditButtonChange(template)}"
-                                     update="nov-template-form"
+                                     update="@form:@parent:nov-template-form
+                                                     nov-template-form"
+
                                      oncomplete="PF('nov-templatemanage-dialog-var').show()"/>
                 </p:column>
             </p:dataTable>
@@ -1064,6 +1066,9 @@
                          rowExpandMode="multiple"
                          expandedRow="false"
                          widgetVar="textBlockTableWidgetVar"
+                         selection="#{noticeOfViolationBB.currentTemplateBlock}"
+                         selectionMode="single"
+
                          >
 
 
@@ -1087,12 +1092,7 @@
                     <f:facet name="header">
                         <h:outputText value="Actions"/>
                     </f:facet>
-                    <p:commandButton id="viewtemplate-cb"
-                                     value="Edit"
-                                     icon="fa fa-search"
-                                     ajax="true"
-                                     actionListener="#{noticeOfViolationBB.onTemplateBlockViewChange(template)}"
-                                     update="nov-template-form"/>
+                  
 
 
                     <p:commandButton id="removetemplate-cb"
@@ -1106,6 +1106,15 @@
                 </p:column>
 
             </p:dataTable>
+            <p:commandButton    id="viewselectedtemplate-cb"
+                                value="Edit Selected Template"
+                                icon="fa fa-search"
+                                ajax="true" 
+                                style="margin-right: 5px;"
+                                actionListener="#{noticeOfViolationBB.onTemplateViewSelectedButtonChange}"
+                                update="nov-template-form
+                                           nov-templatemanage-dialog"
+                                oncomplete="PF('nov-templatemanage-dialog-var').show()"/>
 
 
             <p:commandButton
@@ -1115,14 +1124,15 @@
                 icon="fa fa-plus"
                 styleClass="buttonOwnLine"
                 tabindex="6"
-                update="nov-template-form
+                update="@form:@parent:nov-template-form
                 messages-global-form
                 "
                 actionListener="#{noticeOfViolationBB.onTemplateCreateButton}"/>
         </h:form>
+        <hr />
 
         <h:form id="nov-template-form">
-
+            <h2>NOV Template Editor</h2>
 
             <p:spacer height="5px" />
             <p:outputLabel id="tempblockID-ol">
@@ -1133,7 +1143,7 @@
                 <h:outputText value="Template Name"/>
             </p:outputLabel>
             <p:inputText id="tempblockNameIT" value="#{noticeOfViolationBB.currentTemplateBlock.textBlockName}"
-                         style="width: 20%;" tabindex="4" required="true" styleClass="inputText"/>
+                         style="width: 80%;" tabindex="4" required="true" styleClass="inputText"/>
             <h:message for="tempblockNameIT" showDetail="false" showSummary="true"
                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
@@ -1142,7 +1152,7 @@
             </p>
 
             <p:textEditor  id="nov-template-editor"
-                           value="#{noticeOfViolationBB.formTemplateBlockText}"
+                           value="#{noticeOfViolationBB.currentTemplateBlock.textBlockText}"
                            secure="false"
                            height="700"/>
 

@@ -105,36 +105,40 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
         currentUser = getSessionBean().getSessUser();
         try {
             userList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
-            CaseCoordinator cc = getCaseCoordinator();
-            SearchCoordinator sc = getSearchCoordinator();
-
-            SessionBean sb = getSessionBean();
-            QueryCECase cseQ = sc.initQuery(QueryCECaseEnum.OPENCASES, getSessionBean().getSessUser().getKeyCard());
-            cseQ = sc.runQuery(cseQ);
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+        }
+        CaseCoordinator cc = getCaseCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
+        
+        SessionBean sb = getSessionBean();
+//        QueryCECase cseQ = sc.initQuery(QueryCECaseEnum.OPENCASES, getSessionBean().getSessUser().getKeyCard());
+//        try {
+//            cseQ = sc.runQuery(cseQ);
             
 //            List<CECase> hist = cc.cecase_getCECaseHistory(ua);
             // NEXT LINE: YUCK!!!!!!!!
-            sb.setSessCECaseList(cc.cecase_assembleCECasePropertyUnitHeavyList(cseQ.getBOBResultList()));
+//            sb.setSessCECaseList(cc.cecase_assembleCECasePropertyUnitHeavyList(cseQ.getBOBResultList()));
+//            
+//            if(sb.getSessCECaseList().isEmpty()){
+//                sb.setSessCECase(cc.cecase_assembleCECaseDataHeavy(cc.cecase_selectDefaultCECase(sb.getSessUser()), sb.getSessUser()));
+//            } else {
+//                sb.setSessCECase(cc.cecase_assembleCECaseDataHeavy(sb.getSessCECaseList().get(0), sb.getSessUser()));
+//            }
             
-            if(sb.getSessCECaseList().isEmpty()){
-                sb.setSessCECase(cc.cecase_assembleCECaseDataHeavy(cc.cecase_selectDefaultCECase(sb.getSessUser()), sb.getSessUser()));
-            } else {
-                sb.setSessCECase(cc.cecase_assembleCECaseDataHeavy(sb.getSessCECaseList().get(0), sb.getSessUser()));
-            }
             
             
-            
-        } catch (SearchException | BObStatusException | IntegrationException ex) {
-            System.out.println(ex);
-            
-        } 
-        
+//        } catch (SearchException | BObStatusException | IntegrationException ex) {
+//            System.out.println(ex);
+//            
+//        } 
+//        
         filteredCaseList = null;
 
         generateMainDash();
-        initPieProperty();
-        initPieCasePhase();
-        initPieEvents();
+//        initPieProperty();
+//        initPieCasePhase();
+//        initPieEvents();
     }
     
       private void initPieProperty(){
