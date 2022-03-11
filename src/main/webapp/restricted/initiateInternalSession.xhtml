@@ -106,9 +106,9 @@
                                             </p:column>
                                             <p:column>
                                                 <f:facet name="header">
-                                                    <h:outputText value="Assignment rank" />
+                                                    <h:outputText value="Code Officer Oath?" />
                                                 </f:facet>
-                                                <h:outputText value="#{period.assignmentRelativeOrder}"/>
+                                                <h:outputText value="#{empty period.oathTS ? 'No':'Yes'}"/>
                                             </p:column>
 
                                             <p:column>

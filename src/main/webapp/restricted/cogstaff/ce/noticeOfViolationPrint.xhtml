@@ -48,13 +48,10 @@
 
                             <h:outputText  value="RE: " />
 
-                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.primaryAddressLink.buildingNo} " />
-                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.primaryAddressLink.street} " />
-                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.primaryAddressLink.city}, " />
-                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.primaryAddressLink.state} " />
-                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.primaryAddressLink.zipCode}" />
+                            <h:outputText id="nov-prop-address" value="#{noticeOfViolationBB.currentCase.property.primaryAddressLink.addressPretty2LineEscapeFalse} " 
+                                          escape="false"/>
 
-                            <h:outputText id="nov-prop-muni" value=" | Lot and block: #{noticeOfViolationBB.currentCase.property.lotAndBlock}" />
+                            <h:outputText id="nov-prop-muni" value=" | Lot and block: #{noticeOfViolationBB.currentCase.property.countyParcelID}" />
                             <h:outputText id="nov-prop-muni" value=" | Case ID: #{noticeOfViolationBB.currentCase.caseID}" />
                         </div>
                     </div>
@@ -82,23 +79,8 @@
 
                                     <h:outputLabel styleClass="bold" value="Ordinance: "  />
 
-                                    <h:outputLabel  value="#{v.violatedEnfElement.source.sourceName} 
-                                                    (#{v.violatedEnfElement.source.sourceYear}) " />
-                                    <p:spacer height="2px" />
-                                    
-                                    <h:outputText    value="Ch. #{v.violatedEnfElement.ordchapterNo}:" />
-                                    <h:outputText    value="#{v.violatedEnfElement.ordchapterTitle}" />
-                                    
-                                    <h:outputText value=" | " />
-                                    
-                                    <h:outputText    value="&#167;#{v.violatedEnfElement.ordSecNum} " />
-                                    <h:outputText    value="#{v.violatedEnfElement.ordSecTitle}" />
-
-                                    <h:outputText value=" | " />
-
-                                    <h:outputText    value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
-                                    <h:outputText    value="#{v.violatedEnfElement.ordSubSecTitle}" />
-
+                                    <h:outputLabel  value="#{v.violatedEnfElement.headerString}"
+                                                    escape="false" />
                                 </h:panelGroup>
                                 
                                 <h:panelGroup>
@@ -138,15 +120,13 @@
                     </div>
 
                     <div class="signature">
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.human.firstName}" />
-                        <h:outputText value=" " />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.human.lastName}" />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerName}" />
                         <br />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.pehumanobTitle}" />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerTitle}" />
                         <br />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.phumanphoneWork}" />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerPhone}" />
                         <br />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.phumanemail}" />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerEmail}" />
                     </div>
 
                 </div>

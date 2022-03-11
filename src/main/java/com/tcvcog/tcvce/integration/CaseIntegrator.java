@@ -1609,17 +1609,15 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @return the id assigned the new notice by the database
      * @throws IntegrationException 
      */
-    public int novInsert(CECaseDataHeavy c, NoticeOfViolation notice) throws IntegrationException {
+    public int novInsert(CECaseDataHeavy c, NoticeOfViolation notice) throws IntegrationException, BObStatusException {
 
         String query =  "INSERT INTO public.noticeofviolation(\n" +
                         "            noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
-                        "            dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
-                        "            lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
-                        "            returnedby, notes, creationby, printstyle_styleid, notifyingofficer_userid)\n" +
+                        "            dateofrecord, recipient_humanid, recipient_mailing, lettertextafterviolations, \n" +
+                        "            notes, creationby, printstyle_styleid, notifyingofficer_userid)\n" +
                         "    VALUES (DEFAULT, ?, ?, now(), \n" +
-                        "            ?, NULL, NULL, ?, ?, \n" +
-                        "            NULL, NULL, NULL, \n" +
-                        "            NULL, ?, ?, ?, ?);";
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1632,20 +1630,30 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setInt(1, c.getCaseID());
             stmt.setString(2, notice.getNoticeTextBeforeViolations());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
-            stmt.setInt(4, notice.getRecipient().getHumanID());
-            stmt.setString(5, notice.getNoticeTextAfterViolations());
-            stmt.setString(6, notice.getNotes());
-            stmt.setInt(7, notice.getCreationBy().getUserID());
-            if(notice.getStyle() != null){
-                stmt.setInt(8, notice.getStyle().getStyleID());
+            
+            if(notice.getRecipient() != null){
+                stmt.setInt(4, notice.getRecipient().getHumanID());
             } else {
-                stmt.setNull(8, java.sql.Types.NULL);
+                throw new BObStatusException("Cannot write notice without a person recipient");
+            }
+            if(notice.getRecipientMailingAddress() != null){
+                stmt.setInt(5, notice.getRecipientMailingAddress().getAddressID());
+            } else {
+                throw new BObStatusException("Cannot write notice without an address");
+            }
+            stmt.setString(6, notice.getNoticeTextAfterViolations());
+            stmt.setString(7, notice.getNotes());
+            stmt.setInt(8, notice.getCreationBy().getUserID());
+            if(notice.getStyle() != null){
+                stmt.setInt(9, notice.getStyle().getStyleID());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
             }
             
              if(notice.getNotifyingOfficer() != null){
-                stmt.setInt(9, notice.getNotifyingOfficer().getUserID());
+                stmt.setInt(10, notice.getNotifyingOfficer().getUserID());
             } else {
-                stmt.setNull(9, java.sql.Types.NULL);
+                throw new BObStatusException("Cannot write notice without a notifying officer");
             }
                     
             stmt.execute();
@@ -1658,8 +1666,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             }
             
             notice.setNoticeID(insertedNOVId);
-            System.out.println("ViolationIntegrator.novInsert | noticeid " + notice.getNoticeID());
-            System.out.println("ViolationIntegrator.novInsert | retrievedid " + insertedNOVId);
+            System.out.println("CaseIntetgrator.novInsert | noticeid " + notice.getNoticeID());
+            System.out.println("CaseIntegrator.novInsert | retrievedid " + insertedNOVId);
             
             List<CodeViolationDisplayable> cvList = notice.getViolationList();
             Iterator<CodeViolationDisplayable> iter = cvList.iterator();
@@ -1824,7 +1832,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setInt(2, nov.getLockedAndQueuedBy().getUserID());
             
             stmt.setInt(3, nov.getRecipient().getHumanID());
-            stmt.setInt(4, nov.getRecipientMailingLink().getLinkID());
+            stmt.setInt(4, nov.getRecipientMailingAddress().getAddressID());
             
             stmt.setString(5, nov.getFixedRecipientName());
             stmt.setString(6, nov.getFixedRecipientBldgNo());
@@ -1973,8 +1981,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
-            if(notice.getRecipientMailingLink()!= null){
-                stmt.setInt(5, notice.getRecipientMailingLink().getLinkID());
+            if(notice.getRecipientMailingAddress() != null){
+                stmt.setInt(5, notice.getRecipientMailingAddress().getAddressID());
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
@@ -2275,11 +2283,15 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         if(rs.getInt("notifyingofficer_userid") != 0){
             notice.setNotifyingOfficer(uc.user_getUser(rs.getInt("notifyingofficer_userid")));
         }
+        if(notice.getNotifyingOfficer() != null && notice.getNotifyingOfficer().getPersonID() != 0){
+            notice.setNotifyingOfficerPerson(pc.getPersonByHumanID(notice.getNotifyingOfficer().getPersonID()));
+        }
+        
         if(rs.getInt("recipient_humanid") != 0){
             notice.setRecipient(pc.getPersonByHumanID(rs.getInt("recipient_humanid")));
         }
         if(rs.getInt("recipient_mailing") != 0){
-            notice.setRecipientMailingLink(pi.getHumanMailingAddressLinkByHMALinkID(rs.getInt("recipient_mailing")));
+            notice.setRecipientMailingAddress(pi.getMailingAddress(rs.getInt("recipient_mailing")));
         }
         if(rs.getTimestamp("fixedrecipientxferts") != null){
             notice.setFixedAddrXferTS(rs.getTimestamp("fixedrecipientxferts").toLocalDateTime());

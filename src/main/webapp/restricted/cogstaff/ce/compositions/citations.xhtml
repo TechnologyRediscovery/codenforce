@@ -515,7 +515,7 @@
     </p:dialog>
 
     <p:dialog   id="citation-add-dialog"
-                height="800" width="800"
+                height="600" width="900"
                 widgetVar="citation-add-dialog-var"
                 responsive="true"
                 resizable="true"
@@ -533,7 +533,7 @@
             <p:spacer height="15px"/>
 
             <h2>Outstanding code violations on Case ID <h:outputText value="#{sessionBean.sessCECase.caseID}" />
-                at <h:outputText value="#{sessionBean.sessCECase.property.addressString}" /></h2>
+                at <h:outputText value="#{sessionBean.sessCECase.property.address.addressPretty1Line}" /></h2>
 
             <p:dataTable
                 id="citation-violations-table"
@@ -551,11 +551,8 @@
                         <h:outputText value="Code Element" />
                     </f:facet>
                     <div class="rowExpansion">
-                        <h:outputLabel value="#{citv.violatedEnfElement.ordchapterTitle}:
-                                       #{citv.violatedEnfElement.ordSecNum}
-                                       #{citv.violatedEnfElement.ordSecTitle}:
-                                       #{citv.violatedEnfElement.ordSubSecNum}
-                                       #{citv.violatedEnfElement.ordSubSecTitle}"/>
+                        <h:outputLabel value="#{citv.codeViolated.headerString}"
+                                       escape="false"/>
                     </div>
                 </p:column>
 
@@ -659,16 +656,15 @@
                 <div class="p-col-6">Issuing Officer</div>
                 <div class="p-col-6">
                     <p:selectOneMenu id="citation-add-issuingofficer-som"
-                                     rendered="#{citationBB.citationInfoEditMode}" 
-                                     required="false"
+                                     rendered="true" 
+                                     required="true"
                                      value="#{citationBB.currentCitation.filingOfficer}">
                         <f:converter converterId="userConverter"/>
-                        <f:selectItems value="#{citationBB.filingOfficerCandidateList}"
-                                       var="iouser" itemValue="#{iouser}" itemLabel="#{iouser.phumanname}"/>
+                        <f:selectItems value="#{systemServicesBB.bbSessionMuni.swornOfficerList}"
+                                       var="iouser" itemValue="#{iouser}" itemLabel="#{iouser.human.name}"/>
                     </p:selectOneMenu>
                 </div>
             </div>
-            <f:facet name="footer">
 
 
 
@@ -692,7 +688,6 @@
                                         icon="fa fa-gavel" />
 
                 </div>
-            </f:facet>
 
         </h:form>
     </p:dialog>

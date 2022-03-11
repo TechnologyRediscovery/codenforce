@@ -25,6 +25,8 @@ import com.tcvcog.tcvce.util.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.Serializable;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -61,10 +63,10 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private String selectedBlockTemplate;
 
     private List<HumanLink> personCandidateList;
-    private List<Person> manualRetrievedPersonList;
+    private List<Person> recipientPersonCandidateList;
 
-    private Human selectedRecipHuman;
-    private HumanMailingAddressLink selectedRecipAddr;
+    private Person selectedRecipientPerson;
+    private MailingAddress selectedRecipAddr;
     
     private List<User> notifyingOfficerCandidateList;
     private User notifyingOfficerCandidateChosen;
@@ -113,7 +115,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
        
         refreshCurrentCase();
 
-        manualRetrievedPersonList = new ArrayList<>();
+        recipientPersonCandidateList = new ArrayList<>();
         showTextBlocksAllMuni = false;
         useManualTextBlockMode = false;
 
@@ -462,7 +464,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         CaseCoordinator caseCoord = getCaseCoordinator();
 
         try {
-            caseCoord.nov_LockAndQueue(currentCase, nov, selectedRecipAddr,selectedRecipHuman, getSessionBean().getSessUser());
+            caseCoord.nov_LockAndQueue(currentCase, nov, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice is locked and ready to be mailed!", ""));
@@ -566,8 +568,28 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void onTemplateViewSelectedButtonChange(ActionEvent ev){
         System.out.println("NOVBB.onTemplateViewSelectedButtonChange | currentTemplateBlock " + currentTemplateBlock.getBlockID());
      }
+    
+    /**
+     * Listener for user requests to bring up the choose person dialog
+     *
+     * @param ev
+     */
+    public void onChoosePersonInitButtonChange(ActionEvent ev) {
+        prepareRecipientPersonList();
+    }
 
-
+    /**
+     * Converts the session property's human link list to a person list with addresses
+     */
+    private void prepareRecipientPersonList(){
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            System.out.println("NoticeOfViolationBB.prepareRecipientPersonList | property person link size: " + getSessionBean().getSessProperty().getHumanLinkList().size());
+            recipientPersonCandidateList = pc.getPersonListFromHumanLinkList(pc.assembleLinkedHumanLinks(getSessionBean().getSessProperty()));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
+    }
 
     /**
      * Listener for user requests to build NOV with template
@@ -578,6 +600,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         currentTemplateBlock = temp;
         try {
             currentNotice = cc.nov_assembleNOVFromTemplate(currentNotice, currentTemplateBlock, currentCase);
+            prepareRecipientPersonList();
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO,
                        "Assembled block using template", ""));
@@ -644,27 +667,73 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                         "Done: violation ID " + viol.getViolationID() + "will not be included in letter.", ""));
     }
 
-    public void storeRecipient(Person pers) {
-        System.out.println("Store Recipient: " + pers);
-        if (currentNotice != null) {
-            currentNotice.setRecipient(pers);
-            getSessionBean().setSessNotice(currentNotice);
+  
+    
+    /**
+     * listener for user requests to complete the selection process of address and addressee
+     * @param ev 
+     */
+    public void onCompleteRecipientAndAddressSelection(ActionEvent ev){
+        if(currentNotice != null){
+            if(selectedRecipientPerson != null){
+                currentNotice.setRecipient(selectedRecipientPerson);
+            } else {
+                getFacesContext().addMessage(null,
+                      new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                      "Recipient missing! Please select a notice recipient", ""));
+            }   
+            if(getSelectedRecipAddr() != null){
+                currentNotice.setRecipientMailingAddress(selectedRecipAddr);
+            } else {
+                      getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Address missing! Please select an address to continue", ""));
+            }
+            
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Notice recipient is now Person: " + pers.getLastName(), ""));
+                  new FacesMessage(FacesMessage.SEVERITY_INFO,
+                  "Recipient and Address chosen!", ""));
         } else {
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Notice is null, sorry!", ""));
-
+                  new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                  "Fatal NOV setup fault. sorry!", ""));
         }
+    }
+      /**
+     * Listener for user choice of a recipient person
+     * @param pers 
+     */
+    public void storeRecipient(Person pers) {
+        System.out.println("Store Recipient: " + pers);
+        selectedRecipientPerson = pers;
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Notice recipient is now Person: " + pers.getLastName(), ""));
+
+    }
+    
+    
+    /**
+     * Listener for user requests to store a recipient's mailing address
+     * @param ma
+     */
+    public void storeRecipientAddress(MailingAddress ma){
+        if(ma != null){
+            System.out.println("NoticeOfViolationBB.storeRecipientAddress | address ID " + ma.getAddressID());
+            selectedRecipAddr = ma;
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice will be sent to " + ma.getAddressPretty1Line(), ""));
+        }
+        
+        
     }
 
     public void checkNOVRecipient(ActionEvent ev) {
         PersonCoordinator pc = getPersonCoordinator();
         if (recipientPersonID != 0) {
             try {
-                manualRetrievedPersonList.add(pc.getPerson(pc.getHuman(recipientPersonID)));
+                recipientPersonCandidateList.add(pc.getPerson(pc.getHuman(recipientPersonID)));
                 System.out.println("NoticeOfViolationBB.checkNOVRecipient | looked up person: " + getRetrievedManualLookupPerson());
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Search complete", ""));
@@ -677,50 +746,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
     }
 
-    /**
-     * Old NOV builder method using blocks
-     * @deprecated 
-     * @return 
-     */
-    public String assembleNotice() {
-
-        if (currentNotice != null && currentNotice.getRecipient() != null) {
-            CaseCoordinator cc = getCaseCoordinator();
-            int newNoticeId = 0;
-
-            StringBuilder sb = new StringBuilder();
-            Iterator<TextBlock> it = currentNotice.getBlocksBeforeViolations().iterator();
-            while (it.hasNext()) {
-                appendTextBlockAsPara(it.next(), sb);
-            }
-            currentNotice.setNoticeTextBeforeViolations(sb.toString());
-
-            sb = new StringBuilder();
-            it = currentNotice.getBlocksAfterViolations().iterator();
-            while (it.hasNext()) {
-                appendTextBlockAsPara(it.next(), sb);
-            }
-
-            currentNotice.setNoticeTextAfterViolations(sb.toString());
-
-            try {
-                newNoticeId = cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
-            } catch (IntegrationException ex) {
-                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-                System.out.println(ex);
-            }
-            currentNotice.setNoticeID(newNoticeId);
-            getSessionBean().setSessNotice(currentNotice);
-            return "ceCaseNotices";
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "nonselected recipient or null current notice", ""));
-
-            return "";
-        }
-    }
-    
+  
       /**
      * Second gen listener for finalization of notices
      * @return 
@@ -730,7 +756,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         try {
             cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
             
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -757,19 +783,13 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public String onInsertNewNoticeButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-                if(currentNotice.getRecipient() == null){
-                      getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select a notice recipient to save draft", ""));
-                } else {
-                    cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
-                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Notice saved", ""));
-                    
-                }
+                
+                cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Notice saved", ""));
             // make sure our person list is up to date
 //            currentCase = getSessionBean().getSessCECase();
 //            refreshCurrentCase();
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
             return "";
@@ -924,15 +944,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
     }
     
-    /**
-     * Listener for user requests to bring up the choose person dialog
-     *
-     * @param ev
-     */
-    public void onChoosePersonInitButtonChange(ActionEvent ev) {
-
-    }
-
+   
     /**
      * Listener for calls to abort a change operation
      *
@@ -1084,17 +1096,17 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
 
     /**
-     * @return the manualRetrievedPersonList
+     * @return the recipientPersonCandidateList
      */
-    public List<Person> getManualRetrievedPersonList() {
-        return manualRetrievedPersonList;
+    public List<Person> getRecipientPersonCandidateList() {
+        return recipientPersonCandidateList;
     }
 
     /**
-     * @param manualRetrievedPersonList the manualRetrievedPersonList to set
+     * @param recipientPersonCandidateList the recipientPersonCandidateList to set
      */
-    public void setManualRetrievedPersonList(List<Person> manualRetrievedPersonList) {
-        this.manualRetrievedPersonList = manualRetrievedPersonList;
+    public void setRecipientPersonCandidateList(List<Person> recipientPersonCandidateList) {
+        this.recipientPersonCandidateList = recipientPersonCandidateList;
     }
 
     /**
@@ -1453,31 +1465,42 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         this.notifyingOfficerCandidateChosen = notifyingOfficerCandidateChosen;
     }
 
-    /**
-     * @return the selectedRecipHuman
-     */
-    public Human getSelectedRecipHuman() {
-        return selectedRecipHuman;
-    }
+   
 
-    /**
-     * @return the selectedRecipAddr
-     */
-    public HumanMailingAddressLink getSelectedRecipAddr() {
-        return selectedRecipAddr;
-    }
-
-    /**
-     * @param selectedRecipHuman the selectedRecipHuman to set
-     */
-    public void setSelectedRecipHuman(Human selectedRecipHuman) {
-        this.selectedRecipHuman = selectedRecipHuman;
-    }
+   
 
     /**
      * @param selectedRecipAddr the selectedRecipAddr to set
      */
     public void setSelectedRecipAddr(HumanMailingAddressLink selectedRecipAddr) {
+        this.setSelectedRecipAddr(selectedRecipAddr);
+    }
+
+    /**
+     * @return the selectedRecipientPerson
+     */
+    public Person getSelectedRecipientPerson() {
+        return selectedRecipientPerson;
+    }
+
+    /**
+     * @param selectedRecipientPerson the selectedRecipientPerson to set
+     */
+    public void setSelectedRecipientPerson(Person selectedRecipientPerson) {
+        this.selectedRecipientPerson = selectedRecipientPerson;
+    }
+
+    /**
+     * @return the selectedRecipAddr
+     */
+    public MailingAddress getSelectedRecipAddr() {
+        return selectedRecipAddr;
+    }
+
+    /**
+     * @param selectedRecipAddr the selectedRecipAddr to set
+     */
+    public void setSelectedRecipAddr(MailingAddress selectedRecipAddr) {
         this.selectedRecipAddr = selectedRecipAddr;
     }
 

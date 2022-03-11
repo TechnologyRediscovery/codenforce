@@ -288,7 +288,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
 //            insertedPersonID = personIntegrator.insertPerson(p);
             System.out.println("CEActionReqeustSubmitBB.storeActionRequestorPerson | PersonID " + insertedPersonID);
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException  |  BObStatusException ex) {
             System.out.println(ex.toString());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -552,7 +552,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public String submitActionRequest() throws IntegrationException {
+    public String submitActionRequest()  {
 
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
         BlobIntegrator blobI = getBlobIntegrator();
@@ -570,38 +570,43 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // the person or the request bounces
         if (currentRequest.getRequestor().getHumanID() == 0) {
             
-            //The person is not in our database, prepared it for saving
-            if (getSessionBean().getSessUser() != null) {
-                currentRequest.getRequestor().setSource(
-                        si.getBOBSource(Integer.parseInt(
-                                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                                        .getString("actionRequestNewPersonByInternalUserPersonSourceID"))));
-            } else {
-                currentRequest.getRequestor().setSource(
-                        si.getBOBSource(Integer.parseInt(
-                                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                                        .getString("actionRequestPublicUserPersonSourceID"))));
+            try{
+                
+                //The person is not in our database, prepared it for saving
+                if (getSessionBean().getSessUser() != null) {
+                    currentRequest.getRequestor().setSource(
+                            si.getBOBSource(Integer.parseInt(
+                                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                            .getString("actionRequestNewPersonByInternalUserPersonSourceID"))));
+                } else {
+                    currentRequest.getRequestor().setSource(
+                            si.getBOBSource(Integer.parseInt(
+                                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                            .getString("actionRequestPublicUserPersonSourceID"))));
+                }
+
+                //insert it into the database.
+                personID = insertActionRequestorNewPerson(currentRequest.getRequestor());
+                    //We want to get the entry we just inserted into the database
+    //                currentRequest.setRequestor(pi.getPersonByHumanID(personID));
+            } catch (BObStatusException | IntegrationException ex ){
+                System.out.println(ex);
             }
-            
-            //insert it into the database.
-            personID = insertActionRequestorNewPerson(currentRequest.getRequestor());
-                //We want to get the entry we just inserted into the database
-//                currentRequest.setRequestor(pi.getPersonByHumanID(personID));
         } else {
 
             // do nothing, since we already have the person in the system
         }
 
-        //Generate a PACC for the user to access the CEAR
-        currentRequest.setRequestPublicCC(generateControlCodeFromTime(currentRequest.getMuniCode()));
-        // all requests now are required to be at a known address
-        currentRequest.setIsAtKnownAddress(true);
-        currentRequest.setActive(true);
-        currentRequest.setDateOfRecord(LocalDateTime.now(ZoneId.systemDefault()));
-        
-        // note that the time stamp is applied by the integration layer
-        // with a simple call to the backing bean getTimeStamp method
         try {
+            //Generate a PACC for the user to access the CEAR
+            currentRequest.setRequestPublicCC(generateControlCodeFromTime(currentRequest.getMuniCode()));
+            // all requests now are required to be at a known address
+            currentRequest.setIsAtKnownAddress(true);
+            currentRequest.setActive(true);
+            currentRequest.setDateOfRecord(LocalDateTime.now(ZoneId.systemDefault()));
+
+            // note that the time stamp is applied by the integration layer
+            // with a simple call to the backing bean getTimeStamp method
             // send the request into the DB
             submittedActionRequestID = ceari.submitCEActionRequest(currentRequest);
             

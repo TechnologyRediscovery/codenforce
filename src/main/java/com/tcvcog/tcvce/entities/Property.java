@@ -23,13 +23,8 @@ public class        Property
                     IFace_ActivatableBOB{
     
     protected List<PropertyUnit> unitList;
-    
     protected List<ParcelMailingAddressLink> addresses;
 
-    
-   
-    
-    
     /**
      * Creates a new instance of Property
      * @param par

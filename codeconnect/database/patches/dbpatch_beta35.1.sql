@@ -3,6 +3,7 @@
 
 -- ****************************************************************************
 -- RUN THIS CREATE TYPE BY ITSELF!
+-- this has asctually been deferred during SB 2022 upgrade
 -- CREATE TYPE occinspectionphototype AS ENUM ('PassDocumentation','FailDocumentation','GeneralDocumentation','Other','Unused');
 
 -- ****************************************************************************
@@ -63,8 +64,6 @@ ALTER TABLE public.occinspection
 ALTER TABLE public.occinspection 
 	ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE;
 
-ALTER TABLE public.occinspection 
-	ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE;
 
 ALTER TABLE public.occinspection 
 	ADD COLUMN deactivatedby_userid INTEGER 
@@ -208,12 +207,19 @@ CREATE TABLE public.occinspectionphotodoc
   		REFERENCES public.occphotorequirement (requirementid)
 );
 
-DROP TABLE public.occinspectedspaceelementpdfdoc;
+-- did not exist when run remotely on SB22
+--DROP TABLE public.occinspectedspaceelementpdfdoc;
 
-ALTER TABLE public.occinspectedspaceelementphotodoc ADD COLUMN phototype occinspectionphototype;
+-- not doing photo type SB22
+--ALTER TABLE public.occinspectedspaceelementphotodoc ADD COLUMN phototype occinspectionphototype;
 
 -- RUN LOCALLY UP TO HERE
 
 --IF datepublished IS NULL the patch is still open and receiving changes
+-- Run remotely on 10March22 SB22
+-- NOTICE:  drop cascades to constraint occinspectedspace_spaceid_fk on table occinspectedspace
+-- Query returned successfully with no result in 103 msec.
+
+
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (351, 'database/patches/dbpatch_beta35.1.sql', '07-19-2021', 'ecd', 'Occ refactor: collapse occspace and occspacetype, revise occinspection');
+    VALUES (351, 'database/patches/dbpatch_beta35.1.sql', '03-10-2022', 'ecd', 'Occ refactor: collapse occspace and occspacetype, revise occinspection');

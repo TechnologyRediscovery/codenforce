@@ -363,10 +363,10 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             for (Integer i : idl) {
                 try {
                     BOBSource s = si.getBOBSource(i);
-                    if(s.isUserattributable()){
+                    if(s != null && s.isUserattributable()){
                         sourceList.add(s);
                     }
-                } catch (IntegrationException ex) {
+                } catch (IntegrationException | BObStatusException ex) {
                     System.out.println(ex);
                 }
             }
@@ -381,7 +381,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      * @return
      * @throws IntegrationException 
      */
-   public BOBSource getBObSource(int sourceid) throws IntegrationException{
+   public BOBSource getBObSource(int sourceid) throws IntegrationException, BObStatusException{
        if(sourceid==0){
            return null;
        }

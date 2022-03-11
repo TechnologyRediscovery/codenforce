@@ -451,7 +451,9 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         bt.setContentTypeString(rs.getString("contenttypestring"));
         bt.setBrowserViewable(rs.getBoolean("browserviewable"));
         bt.setNotes(rs.getString("notes"));
-        bt.setFileExtensionsPermitted(Arrays.asList((String[]) rs.getArray("fileextensionsarr").getArray()));
+        if(rs.getArray("fileextensionsarr") != null){
+            bt.setFileExtensionsPermitted(Arrays.asList((String[]) rs.getArray("fileextensionsarr").getArray()));
+        }
         
         return bt;
     }

@@ -169,6 +169,7 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onPersonSearchInitLinkClick(ActionEvent ev){
+        getSessionBean().setSessHumanListHolder(getSessionBean().getSessProperty());
         System.out.println("Search for Persons INIT");
     }
     
@@ -278,17 +279,18 @@ public class PersonBB extends BackingBeanUtils {
      * @param ev 
      */
     public void onViewCurrentPersonLinkClick(ActionEvent ev){
-        refreshCurrentPerson();
+        refreshCurrentPersonAndUpdateSessionPerson();
         
     }
     
     /**
      * Refreshes the current person
      */
-    private void refreshCurrentPerson(){
+    private void refreshCurrentPersonAndUpdateSessionPerson(){
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.getPerson(currentPerson);
+            getSessionBean().setSessPerson(currentPerson);
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
@@ -325,16 +327,17 @@ public class PersonBB extends BackingBeanUtils {
         if(currentPersonHumanFieldsEditMode){
             if(currentPerson != null && currentPerson.getHumanID() == 0){
                 // we've got a new record, so commit our add to DB
-                onHumanAddCommitButtonChange(null);
+                onPersonAddCommit();
                 System.out.println("PersonBB.toggleHumanEditMode: new person; committed");
                    getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Editing person record: " + currentPerson.getHumanID(), ""));
+                            "Successfully added new person record: " + currentPerson.getHumanID(), ""));
             } else {
                 // we've got an existing human, so commit updates
                 onHumanEditCommitButtonChange(null);
                 System.out.println("PersonBB.toggleHumanEditMode: person edit done");
             }
+            refreshCurrentPersonAndUpdateSessionPerson();
         }
         currentPersonHumanFieldsEditMode = !currentPersonHumanFieldsEditMode;
     }
@@ -343,9 +346,10 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to add a human
      * @param ev
      */
-    public void onHumanAddInitButtonChange(ActionEvent ev){
+    public void onPersonCreateInitButtonChange(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
         currentPerson = pc.createPersonSkeleton(getSessionBean().getSessMuni());
+        currentPersonHumanFieldsEditMode = true;
         System.out.println("PersonBB.onHumanAddInitButtonChange");
     }
     
@@ -353,7 +357,7 @@ public class PersonBB extends BackingBeanUtils {
      * Listener for user requests to finalize human changes
      * @param ev 
      */
-    public void onHumanAddCommitButtonChange(ActionEvent ev){
+    private void onPersonAddCommit(){
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.insertHuman(currentPerson, getSessionBean().getSessUser());
@@ -390,7 +394,7 @@ public class PersonBB extends BackingBeanUtils {
         PersonCoordinator pc = getPersonCoordinator();
         try {
             pc.humanEdit(currentPerson, getSessionBean().getSessUser());
-            refreshCurrentPerson();
+            refreshCurrentPersonAndUpdateSessionPerson();
               getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Succesfully updated " + currentPerson.getName() + ", id " + currentPerson.getHumanID(), ""));
@@ -473,7 +477,7 @@ public class PersonBB extends BackingBeanUtils {
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Succesfully inserted new phone number with ID " + currentContactPhone.getPhoneID(), ""));
-            refreshCurrentPerson();
+            refreshCurrentPersonAndUpdateSessionPerson();
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -515,7 +519,7 @@ public class PersonBB extends BackingBeanUtils {
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Succesfully Updated new phone number with ID " + currentContactPhone.getPhoneID(), ""));
-            refreshCurrentPerson();
+            refreshCurrentPersonAndUpdateSessionPerson();
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -576,7 +580,7 @@ public class PersonBB extends BackingBeanUtils {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Appended note to Person ID: " + currentPerson.getHumanID() , ""));
-             refreshCurrentPerson();
+             refreshCurrentPersonAndUpdateSessionPerson();
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
@@ -633,7 +637,7 @@ public class PersonBB extends BackingBeanUtils {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Succesfully updated " + currentContactEmail.getEmailaddress()+ ", id " + currentPerson.getHumanID(), ""));
-            refreshCurrentPerson();
+            refreshCurrentPersonAndUpdateSessionPerson();
         } catch (IntegrationException |  BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -692,7 +696,7 @@ public class PersonBB extends BackingBeanUtils {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Appended note to Person ID: " + currentPerson.getHumanID() , ""));
-            refreshCurrentPerson();
+            refreshCurrentPersonAndUpdateSessionPerson();
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
@@ -710,7 +714,7 @@ public class PersonBB extends BackingBeanUtils {
         try {
             pc.contactEmailUpdate(currentContactEmail, getSessionBean().getSessUser());
             currentContactEmail = pc.getContactEmail(currentContactEmail);
-            refreshCurrentPerson();
+            refreshCurrentPersonAndUpdateSessionPerson();
               getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Succesfully updated " + currentPerson.getName() + ", id " + currentPerson.getHumanID(), ""));
@@ -888,7 +892,7 @@ public class PersonBB extends BackingBeanUtils {
             currentHumanLink.setLinkRole(selecetedLinkedObjetRole);
             
             pc.linkHuman(getSessionBean().getSessHumanListHolder(), currentHumanLink, getSessionBean().getSessUser());
-            refreshCurrentPerson();
+            refreshCurrentPersonAndUpdateSessionPerson();
             onLoadHumanLinks(null);
             getFacesContext().addMessage(null,
                   new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -980,7 +984,7 @@ public class PersonBB extends BackingBeanUtils {
                 currentContactPhone = pc.getContactPhone(currentContactPhone);
                 System.out.println("PersonBB.refreshCurrentNoteHolder | refreshing phone");
             } else if(currentNoteHolder instanceof Person){
-                refreshCurrentPerson();
+                refreshCurrentPersonAndUpdateSessionPerson();
                 System.out.println("PersonBB.refreshCurrentNoteHolder | refreshing person");
             }  
         }

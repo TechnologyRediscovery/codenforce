@@ -296,7 +296,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return the link ID of the freshly created link, 0 for incomplete links
      * @throws IntegrationException 
      */
-    public int insertHumanLink(IFace_humanListHolder humanziedBOb, HumanLink hl) throws IntegrationException{
+    public int insertHumanLink(IFace_humanListHolder humanziedBOb, HumanLink hl) throws IntegrationException, BObStatusException{
         if (humanziedBOb == null || hl == null || humanziedBOb.getHostPK() == 0){
             throw new IntegrationException("Cannot link a human and a list holder with null inputs or host PK of 0");
         }
@@ -338,7 +338,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             if(hl.getLinkedObjectRole() != null){
                 stmt.setInt(5, hl.getLinkedObjectRole().getRoleID());
             } else  { 
-                stmt.setNull(5, java.sql.Types.NULL);
+                throw new BObStatusException("PersonIntegrator.insertHumanLink | Cannot link human with null LinkedObjectRole");
             }
             
             if(hl.getLinkSource() != null){

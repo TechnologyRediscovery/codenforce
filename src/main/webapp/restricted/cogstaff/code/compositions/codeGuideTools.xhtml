@@ -15,7 +15,7 @@
               closeOnEscape="true"
               modal="true"
               height="500"
-              width="700"
+              width="1000"
               resizable="true"
               responsive="true">
 
@@ -69,14 +69,16 @@
                     <h:outputText value="#{cege.guideEntryID}"/>
                 </p:column>
 
-                <p:column width="15%">
+                <p:column width="15%"
+                          sortBy="#{cege.category}">
                     <f:facet name="header">
                         <h:outputText value="Category" />
                     </f:facet>
                     <h:outputText value="#{cege.category}"/>
                 </p:column>
 
-                <p:column width="15%">
+                <p:column width="15%"
+                          sortBy="#{cege.subCategory}">
                     <f:facet name="header">
                         <h:outputText value="Sub Category" />
                     </f:facet>
@@ -92,7 +94,8 @@
                     </div>
                 </p:column>
 
-                <p:column width="8%">
+                <p:column width="8%"
+                          sortBy="#{cege.priority}">
                     <f:facet name="header">
                         <h:outputText value="Priority?" />
                     </f:facet>

@@ -921,16 +921,19 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * in the DB ordered by last updated timestamp and inject that one into the parcel
      * 
      * @param parcelID
-     * @return
+     * @return always a parcel object, perhaps an empty one to avoid null pointers, meaning ID = 0
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public Property getProperty(int parcelID) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         Parcel par = pi.getParcel(parcelID);
+        if(par == null){
+            System.out.println("PropertyCoordinator.getProperty | NULL parcel from integrator | incoming parcelID: " + parcelID);
+            par = new Parcel();
+        }
         List<Integer> infoIDL = pi.getParcelInfoByParcel(par);
         if(infoIDL != null && !infoIDL.isEmpty()){
-            
             par.setParcelInfo(pi.getParcelInfo(infoIDL.get(0)));
         } else {
             // inject an empty object if we have none to avoid null pointers

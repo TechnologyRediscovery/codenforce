@@ -256,8 +256,5 @@ public class        HumanLink
     public void setParentObjectID(int pid){
         parentObjectID = pid;
     }
-  
-
-   
    
 }

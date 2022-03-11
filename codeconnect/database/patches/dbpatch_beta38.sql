@@ -1,3 +1,19 @@
+
+-- PUBLISHED and run on remote SB22
+-- DB Patch 38: Final clean up tweaks for alpha launch SB22
+
+--  >>>>>>>>>>>> UNCOMMENT AND RUN CREATE TYPE  ALONE <<<<<<<<<<<<<<
+--  >>>>>>>>>>>> UNCOMMENT AND RUN CREATE TYPE  ALONE <<<<<<<<<<<<<<
+-- ****************************************************************************
+-- RUN THIS CREATE TYPE BY ITSELF!
+-- Run on remote SB22
+--CREATE TYPE systemdomain AS ENUM ('CodeEnforcement','Occupancy','Universal');
+--ALTER TYPE linkedobjectroleschema ADD VALUE 'CitationDocketHuman';
+
+-- ****************************************************************************
+
+
+
 INSERT INTO public.icon(
             iconid, name, styleclass, fontawesome, materialicons)
     VALUES (33, 'final review', 'final-review', 'fa fa-clipboard', 'pending_actions');
@@ -23,11 +39,6 @@ ALTER TABLE loginmuniauthperiod ADD COLUMN oathcourtentity_entityid INTEGER
 
 
 
--- ****************************************************************************
--- RUN THIS CREATE TYPE BY ITSELF!
-CREATE TYPE systemdomain AS ENUM ('CodeEnforcement','Occupancy','Universal');
-
--- ****************************************************************************
 
 
 ALTER TABLE blobtype ADD COLUMN contenttypestring TEXT;
@@ -71,7 +82,7 @@ INSERT INTO public.blobtype(
 
 
 
-ALTER TABLE occchecklistspacetypeelement DROP COLUMN codeelement_elementid; -- replaced by FK to codesetelement!
+--ALTER TABLE occchecklistspacetypeelement DROP COLUMN codeelement_elementid; -- replaced by FK to codesetelement!
 
 
 
@@ -79,11 +90,6 @@ ALTER TABLE linkedobjectrole RENAME COLUMN lorschema_schemaid TO lorschema;
 
 
 
-
-
-
---RUN ALONE
-ALTER TYPE linkedobjectroleschema ADD VALUE 'CitationDocketHuman';
 
 ALTER TABLE occinspectiondetermination ADD COLUMN domain systemdomain;
 ALTER TABLE occinspectiondetermination ADD COLUMN requiremigrationtoce BOOLEAN;
@@ -108,8 +114,15 @@ ALTER TABLE parcelmailingaddress ADD COLUMN priority INTEGER DEFAULT 1;
 
 -- don't need these since photodoc has a type assocaited with it that can be any file type
 
-DROP TABLE public.ceactionrequestpdfdoc;
-DROP TABLE public.codeviolationpdfdoc;
-DROP TABLE public.parcelpdfdoc;
+-- DROP TABLE public.ceactionrequestpdfdoc;
+-- DROP TABLE public.codeviolationpdfdoc;
+-- DROP TABLE public.parcelpdfdoc;
 
 
+
+--IF datepublished IS NULL the patch is still open and receiving changes
+INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
+    VALUES (38, 'database/patches/dbpatch_beta38.sql','03-10-2022', 'ecd', 'Final cleanup stuff for DB upgrade for humanui SB22');
+
+-- Output on SB22 upgrade
+--Query returned successfully: one row affected, 82 msec execution time.

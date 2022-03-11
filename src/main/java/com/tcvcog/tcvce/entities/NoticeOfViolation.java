@@ -39,7 +39,7 @@ public  class NoticeOfViolation
      * Not deprecated with humanization
      */
     private Person recipient;
-    private HumanMailingAddressLink recipientMailingLink;
+    private MailingAddress recipientMailingAddress;
     /**
      * Records a timestamp for when the human and connected mailing address
      *  is transferred into these NOV-specific fields, such that we can always
@@ -593,15 +593,6 @@ public  class NoticeOfViolation
         this.notifyingOfficer = notifyingOfficer;
     }
 
-
-
-    /**
-     * @return the recipientMailingLink
-     */
-    public HumanMailingAddressLink getRecipientMailingLink() {
-        return recipientMailingLink;
-    }
-
     /**
      * @return the fixedAddrXferTS
      */
@@ -652,13 +643,6 @@ public  class NoticeOfViolation
     }
 
   
-
-    /**
-     * @param recipientMailingLink the recipientMailingLink to set
-     */
-    public void setRecipientMailingLink(HumanMailingAddressLink recipientMailingLink) {
-        this.recipientMailingLink = recipientMailingLink;
-    }
 
     /**
      * @param fixedAddrXferTS the fixedAddrXferTS to set
@@ -777,6 +761,20 @@ public  class NoticeOfViolation
      */
     public void setFixedNotifyingOfficerEmail(String fixedNotifyingOfficerEmail) {
         this.fixedNotifyingOfficerEmail = fixedNotifyingOfficerEmail;
+    }
+
+    /**
+     * @return the recipientMailingAddress
+     */
+    public MailingAddress getRecipientMailingAddress() {
+        return recipientMailingAddress;
+    }
+
+    /**
+     * @param recipientMailingAddress the recipientMailingAddress to set
+     */
+    public void setRecipientMailingAddress(MailingAddress recipientMailingAddress) {
+        this.recipientMailingAddress = recipientMailingAddress;
     }
 
    

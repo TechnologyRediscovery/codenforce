@@ -498,7 +498,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
     public Citation getCitation(int id) throws IntegrationException, BObStatusException{
 
         String query = "SELECT citationid, citationno, origin_courtentity_entityid, \n" +
-                        "       login_userid, dateofrecord, transtimestamp, isactive, notes, \n" +
+                        "       login_userid, dateofrecord, isactive, notes, \n" +
                         "       officialtext, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
                         "       deactivatedts, deactivatedby_userid, filingtype_typeid\n" +
                         "  FROM public.citation WHERE citationid=?;";

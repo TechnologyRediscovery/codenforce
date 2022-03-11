@@ -3,6 +3,12 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="nov-growl-form">
+        <p:growl id="nov-growl"
+                 globalOnly="false" />
+    </h:form>
+
     <p:panel id="cecase-notices-panel"
              toggleable="true"
              collapsed="false"
@@ -202,7 +208,7 @@
                         <h:outputText   id="nov-addressee"
                                         value="#{noticeOfViolationBB.currentNotice.recipient.name}"/>
                         <p:spacer height="3px" />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipientMailingLink.addressPretty2LineEscapeFalse}"
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipientMailingAddress.addressPretty2LineEscapeFalse}"
                                       escape="false" />
                     </div>
                 </div>
@@ -536,7 +542,7 @@
                                      ajax="true"
                                      actionListener="#{noticeOfViolationBB.onTemplateEditButtonChange(template)}"
                                      update="@form:@parent:nov-template-form
-                                                     nov-template-form"
+                                     nov-template-form"
 
                                      oncomplete="PF('nov-templatemanage-dialog-var').show()"/>
                 </p:column>
@@ -545,7 +551,7 @@
     </p:dialog>
 
     <p:dialog   id="nov-add-edit-dialog"
-                height="800" width="1600"
+                height="600" width="1100"
                 widgetVar="nov-add-edit-dialog-var"
                 closable="true"
                 dynamic="true"
@@ -596,19 +602,22 @@
                                        ajax="true"
                                        actionListener="#{noticeOfViolationBB.onChoosePersonInitButtonChange}"
                                        oncomplete="PF('nov-personchoose-dialog-var').show()"
-                                       update="nov-chooseperson-lookup-form
-                                       nov-chooseperson-list-form"/>
+                                       update="nov-chooseperson-list-form"/>
 
 
-                    <h3>Chosen notice recipient:</h3>
+                    <h3>Notice recipient:</h3>
 
                     <div class="nov-chosen-recipeint">
-                        
-                         <h:outputText   id="nov-addressee-chosen"
-                                        value="#{noticeOfViolationBB.currentNotice.recipient.name}"/>
+                        <h:outputText   id="recip-addressee-name-ot"
+                                        value="#{!empty noticeOfViolationBB.currentNotice.recipient
+                                                 ? noticeOfViolationBB.currentNotice.recipient.name
+                                                 :'No recipient selected'}" />
                         <p:spacer height="3px" />
-                        <h:outputText value="#{noticeOfViolationBB.currentNotice.recipientMailingLink.addressPretty2LineEscapeFalse}"
-                                      escape="false" />
+                        <h:outputText id="recip-address-ot"
+                                      value="#{!empty noticeOfViolationBB.currentNotice.recipientMailingAddress
+                                               ? noticeOfViolationBB.currentNotice.recipientMailingAddress.addressPretty2LineEscapeFalse
+                                               : 'No address selected'}"
+                                      escape="false"/>
                     </div>
                 </h:form>
             </div>
@@ -629,7 +638,7 @@
                         <p:spacer height="2px" />
                         <h:outputText   id="notifyingofficer-person-ot2"
                                         value="#{noticeOfViolationBB.currentNotice.notifyingOfficer.human.jobTitle}" />
-                        
+
                     </div>
 
 
@@ -661,9 +670,7 @@
                                      value="change notifying officer"
                                      update="notifyingofficer-person-ot1
                                      notifyingofficer-person-ot2"/>                                    
-
                 </h:form>
-
             </div>
         </div>
 
@@ -692,7 +699,7 @@
             <p:spacer height="3px" />
             <h4>Letter text before violations</h4>
             <p:textEditor value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
-                          height="400"
+                          height="200"
                           secure="false"
                           disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
                           />
@@ -867,7 +874,7 @@
             <p:spacer height="10px" />
             <h4>Letter text after violations</h4>
             <p:textEditor value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}"
-                          height="400"
+                          height="200"
                           secure="false"
                           disabled="#{!(empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"
                           />
@@ -922,7 +929,7 @@
 
 
     <p:dialog   id="nov-personchoose-dialog"
-                height="700" width="900"
+                height="700" width="1000"
                 widgetVar="nov-personchoose-dialog-var"
                 closable="true"
                 closeOnEscape="true"
@@ -934,29 +941,78 @@
                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                 >
 
-        <div    id="person-add-container-div"
-                class="ui-g data-container">
+        <h:form id="nov-chooseperson-list-form">
 
-            <div    id="prop-pers-personlink-chooselinkmethod-div"
-                    class="ui-g-12 ui-md-12 ui-lg-12 data_field">
 
-                <h:form id="nov-chooseperson-list-form">
+            <div class="p-grid">
+                <div class="p-col-6">
+                    <p:commandButton    id="nov-chooseaddressee-address-done"
+                                        ajax="true"
+                                        rendered="true"
+                                        tabindex="2"
+                                        actionListener="#{noticeOfViolationBB.onCompleteRecipientAndAddressSelection}"
+                                        value="Done! Return to NOV setup"
+                                        oncomplete="PF('nov-personchoose-dialog-var').hide(); PF('nov-add-edit-dialog-var').show(); "
+                                        update="nov-add-edit-dialog
+                                        chosen-recipient-form
+                                        nov-growl-form"
+                                        icon="fa fa-check"
+                                        />
 
+
+
+                </div>
+
+                <div class="p-col-6">
+                    <div style="border: solid black; padding: 10px;">
+                        
+                        <h2>Selected Recipient and Mailing Address</h2>
+                        <h:outputText   id="recip-addressee-name-ot"
+                                        value="#{!empty noticeOfViolationBB.selectedRecipientPerson
+                                                 ? noticeOfViolationBB.selectedRecipientPerson.name
+                                                 :''}" />
+                        <p:spacer height="3px" />
+                        <h:outputText id="recip-address-ot"
+                                      value="#{!empty noticeOfViolationBB.selectedRecipAddr
+                                               ? noticeOfViolationBB.selectedRecipAddr.addressPretty2LineEscapeFalse
+                                               : ''}"
+                                      escape="false"/>
+                    </div>
+
+
+
+                </div>
+                <div class="p-col-6">
                     <h2>Property-connected persons</h2>
 
                     <p>Table contains all Persons currently connected to this case's property:
-                        <h:outputText value="#{noticeOfViolationBB.currentCase.property.addressString}" />
-                        If your intended addressee is not in this table, navigate to the Persons manager and create a new
-                        Person on this property or connect an existing person to the property.</p>
+                        <h:outputText value="(Parcel ID: #{noticeOfViolationBB.currentCase.property.countyParcelID})" />
+                        If you don't see the persons you expect,  
 
+                        <p:commandLink  id="nov-propperson-manage-cl"
+                                        value="search for persons and link them to this property"
+                                        ajax="true"
+                                        style="color:blue;"
+                                        actionListener="#{personBB.onPersonSearchInitLinkClick}"
+                                        oncomplete="PF('human-search-dialog-var').show();"
+                                        update="human-search-dialog
+                                        search-query-form
+                                        log-form
+                                        person-list-quickloads-form
+                                        pers-search-results-form
+                                        pers-selected-form
+                                        hlh-humlist-form"/>
+                    </p>
+
+                    <p:spacer height="3px" />
                     <p:dataTable
                         id="newRecipientPersonTD"
-                        var="hl"
-                        rowKey="#{hl.humanID}"
-                        value="#{ceCaseSearchProfileBB.currentCasePropDataHeavy.humanLinkList}"
+                        var="recipers"
+                        rowKey="#{recipers.humanID}"
+                        value="#{noticeOfViolationBB.recipientPersonCandidateList}"
                         tableStyleClass="primeDataTable"
-                        expandedRow="false"
-                        rowExpandMode="single"
+                        expandedRow="true"
+                        rowExpandMode="multiple"
                         tabindex="1"
                         rowIndexVar="rowIndex">
 
@@ -968,78 +1024,78 @@
                             <f:facet name="header">
                                 <h:outputText value="Person" />
                             </f:facet>
-                            <h:outputText value="#{hl.name}"/>
+                            <h:outputText value="#{recipers.name}"/>
                         </p:column>
                         <p:column width="15%">
                             <p:commandButton id="use-person-from-table-cb1"
-                                             rendered="#{noticeOfViolationBB.currentNotice.noticeID!=0}"
                                              ajax="true"
-                                             value="Replace"
-                                             actionListener="#{noticeOfViolationBB.storeRecipient(person)}"
-                                             oncomplete="PF('nov-personchoose-dialog-var').hide()"
+                                             value="Select person"
+                                             actionListener="#{noticeOfViolationBB.storeRecipient(recipers)}"
                                              tabindex="2"
-                                             update="nov-add-edit-dialog
-                                             messages-global-form"
+                                             icon="fa fa-user-o"
+                                             update="@form
+                                             messages-global-form
+                                             nov-growl-form"
                                              />
-                            <p:commandButton id="use-person-from-table-cb2"
-                                             rendered="#{noticeOfViolationBB.currentNotice.noticeID==0}"
-                                             ajax="true"
-                                             value="Select"
-                                             tabindex="3"
-                                             actionListener="#{noticeOfViolationBB.storeRecipient(person)}"
-                                             oncomplete="PF('nov-personchoose-dialog-var').hide()"
-                                             update="chosen-recipient-form
-                                             messages-global-form"
-                                             />
+
                             <p:spacer height="3px" />
-                            <p:commandButton id="edit-person-from-lookup-cb-1"
-                                             ajax="false"
-                                             value="View or edit person"
-                                             action="#{ceCaseSearchProfileBB.onPersonViewButtonChange(person)}"
-                                             />
+                            <p:commandLink id="edit-person-from-lookup-cb-1"
+                                           ajax="true"
+                                           value="View/edit person"
+                                           oncomplete="PF('pers-selected-panel-var').show();"
+                                           update="person-info-form
+                                           person-profile-addresses-form
+                                           person-profile-phones-form
+                                           person-profile-emails-form
+                                           person-links-form
+                                           person-profile-dialog
+                                           nov-growl-form"
+                                           actionListener="#{personBB.onHumanViewLinkClick(recipers)}"
+                                           />
                         </p:column>
 
                         <p:rowExpansion>
-                            <p>expands to nothing!</p>
+                            <p:repeat   id="pers-address-repeater"
+                                        value="#{recipers.addressList}"
+                                        var="recipaddr">
+
+                                <h:outputText value="#{recipaddr.addressPretty2LineEscapeFalse}"
+                                              escape="false" />
+                                <p:spacer height="3px" />
+                                <p:commandLink id="recipient-address-select-link"
+                                               ajax="true"
+                                               style="color:blue;"
+                                               value="Mail to this address"
+                                               update="@form
+                                               nov-growl-form"
+                                               actionListener="#{noticeOfViolationBB.storeRecipientAddress(recipaddr)}"
+                                               />
+                            </p:repeat>
                         </p:rowExpansion>
                     </p:dataTable>
+                </div>
 
+                <div class="p-col-6">
 
-                    <h:message for="nov-person-som-userpersons" showDetail="false" showSummary="true"
-                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                </h:form>
-
+                    <h2>Addresses attached to current property</h2>
+                    <p:repeat   id="prop-addr-repeater"
+                                value="#{sessionBean.sessProperty.addresses}"
+                                var="propaddr">
+                        <h:outputText value="#{propaddr.addressPretty2LineEscapeFalse}"
+                                      escape="false" />
+                        <p:spacer height="3px" />
+                        <p:commandLink id="prop-address-select-link"
+                                       ajax="true"
+                                       style="color:blue;"
+                                       value="Mail NOV to this address"
+                                       update="@form
+                                       nov-growl-form"
+                                       actionListener="#{noticeOfViolationBB.storeRecipientAddress(propaddr)}"
+                                       />
+                    </p:repeat>
+                </div>
             </div>
-
-
-            <div    id="prop-pers-personlink-byid-div"
-                    class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-                
-            </div>
-
-
-            <div    id="prop-pers-personlink-byid-div"
-                    class="ui-g-12 ui-md-12 ui-lg-12 data_field">
-
-                <h:form id="nov-chooseperson-lookup-form">
-
-                </h:form>
-
-            </div>
-        </div>
-
-        <p:spacer height="5px" />
-
-        <h:form id="nov-chooseperson-abort-form">
-            <p:commandButton    id="nov-person-connect-abort"
-                                ajax="true"
-                                tabindex="2"
-                                oncomplete="PF('nov-personchoose-dialog-var').hide()"
-                                value="Cancel"
-                                icon="fa fa-stop"
-                                />
         </h:form>
-
     </p:dialog>
 
 
@@ -1099,7 +1155,7 @@
                     <f:facet name="header">
                         <h:outputText value="Actions"/>
                     </f:facet>
-                  
+
 
 
                     <p:commandButton id="removetemplate-cb"
@@ -1120,7 +1176,7 @@
                                 style="margin-right: 5px;"
                                 actionListener="#{noticeOfViolationBB.onTemplateViewSelectedButtonChange}"
                                 update="nov-template-form
-                                           nov-templatemanage-dialog"
+                                nov-templatemanage-dialog"
                                 oncomplete="PF('nov-templatemanage-dialog-var').show()"/>
 
 

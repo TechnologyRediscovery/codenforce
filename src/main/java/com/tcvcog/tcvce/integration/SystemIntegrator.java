@@ -424,6 +424,10 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             lor.setTitle((rs.getString("title")));
             
             try{
+                // this enum lookup makes all the code reuse possible since the
+                // enum contains table identifiers that allows for dynamic generation
+                // of the SQL necessary to retrieve, update, and deactivate human links to
+                // any other object in the system the is a humanListHolder
                 lor.setSchema(LinkedObjectSchemaEnum.valueOf(rs.getString("lorschema")));
             } catch (IllegalArgumentException ex){
                 System.out.println("SystemIntgrator.generateLinkedObjectRole | Could not match Linked Object Role with Schema!");
@@ -870,9 +874,16 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return sidl;
      }
       
-      public BOBSource getBOBSource(int sourceID) throws IntegrationException{
+     /**
+      * Getter for BOB source objects by id;
+      * @param sourceID
+      * @return
+      * @throws IntegrationException
+      * @throws BObStatusException 
+      */
+      public BOBSource getBOBSource(int sourceID) throws IntegrationException, BObStatusException{
           if(sourceID == 0){
-              return null;
+              throw new BObStatusException("SystemIntegrator.getBObSource | cannot get bob source with ID = 0;");
           }
           BOBSource bs = null;
           

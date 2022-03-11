@@ -480,7 +480,8 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="Property" />
                                                 </f:facet>
-                                                <h:outputText value="#{c.property.addressString} "/>
+                                                <h:outputText value="#{c.property.address.addressPretty2LineEscapeFalse} "
+                                                              escape="false"/>
                                                 <p:spacer height="2px"/>
                                                 <h:outputText value=" (#{c.property.muni.muniName})"/>
                                             </p:column>

@@ -185,14 +185,14 @@ public class CitationBB extends BackingBeanUtils {
      * @return page nav
      */
     public String onCitationAddCommitButtonChange() {
-        System.out.println("CitationBB.IssueCitation");
+        System.out.println("CitationBB.onCitationAddCommitButtonChange");
         CaseCoordinator cc = getCaseCoordinator();
         if(getCurrentCitation() != null){
 
                 Citation c = getCurrentCitation();
                 
                 try {
-                    cc.citation_insertCitation(c,getSessionBean().getSessUser(), getCitationIssuingOfficer());
+                    cc.citation_insertCitation(c,getSessionBean().getSessUser());
 
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,

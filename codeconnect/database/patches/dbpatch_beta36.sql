@@ -19,17 +19,13 @@ CREATE SEQUENCE IF NOT EXISTS parcelmailingaddressid_seq
     NO MAXVALUE
     CACHE 1;
 
-
-ALTER TABLE public.parcelmailingaddress ADD COLUMN parcelmailingid INTEGER 
-	DEFAULT nextval('parcelmailingaddressid_seq') 
-	CONSTRAINT parcelmailingaddressid_pk PRIMARY KEY;
+-- commenting out during SB22 run since later we'll make a linkid the PK
+-- ALTER TABLE public.parcelmailingaddress ADD COLUMN parcelmailingid INTEGER 
+-- 	DEFAULT nextval('parcelmailingaddressid_seq') 
+-- 	CONSTRAINT parcelmailingaddressid_pk PRIMARY KEY;
 
 ALTER TABLE public.parcel ADD COLUMN lotandblock TEXT;
 
-
-
-ALTER TABLE public.parcelunit ADD COLUMN address_parcelmailingid INTEGER
-	CONSTRAINT parcelunit_parcelmailing_fk REFERENCES parcelmailingaddress (parcelmailingid);
 
 
 
@@ -213,7 +209,7 @@ CREATE TABLE public.eventhuman
         notes                   TEXT
     );
 
-DROP TABLE CASCADE occpermitapplicationperson ;
+--DROP TABLE  occpermitapplicationperson CASCADE;
 
 
 
@@ -252,7 +248,7 @@ ALTER TABLE humancecase ADD COLUMN linkedobjectrole_lorid INTEGER
     CONSTRAINT humancecase_lorid_fk 
     REFERENCES linkedobjectrole (lorid);  
 
-ALTER TABLE humancecase ADD COLUMN source_sourceid
+ALTER TABLE humancecase ADD COLUMN source_sourceid INTEGER
     CONSTRAINT humancecase_sourceid_fk
     REFERENCES bobsource (sourceid);
 
@@ -347,13 +343,22 @@ ALTER TABLE parcelmailingaddress ADD COLUMN linkid INTEGER NOT NULL
     DEFAULT nextval('parcelmailing_linkid_seq');
   
 
-ALTER TABLE public.parcelmailingaddress DROP COLUMN parcelmailingid;
+-- not needed during run SB22; must have been dropped by itself earlier
+--ALTER TABLE public.parcelmailingaddress DROP COLUMN parcelmailingid;
 
 ALTER TABLE parcelmailingaddress ADD COLUMN linkedobjectrole_lorid INTEGER 
     CONSTRAINT parcelmailing_lorid_fk 
     REFERENCES linkedobjectrole (lorid);  
 
 
+
+
+ALTER TABLE public.parcelunit ADD COLUMN address_parcelmailingid INTEGER
+  CONSTRAINT parcelunit_parcelmailing_fk REFERENCES parcelmailingaddress (linkid);
+
+-- used for local system during run on remote SB22
+--ALTER TABLE public.parcelunit ADD 
+-- CONSTRAINT parcelunit_parcelmailingaddress_fk FOREIGN KEY (address_parcelmailingid) REFERENCES parcelmailingaddress (linkid);
 
 ALTER TABLE public.noticeofviolation ADD COLUMN recipient_humanid INTEGER CONSTRAINT nov_humanid_fk REFERENCES human (humanid);
 ALTER TABLE public.noticeofviolation ADD COLUMN recipient_mailing INTEGER CONSTRAINT nov_mailing_fk REFERENCES humanmailingaddress (linkid);
@@ -429,6 +434,6 @@ ALTER TABLE citation DROP COLUMN docketno;
 
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (36, 'database/patches/dbpatch_beta36.sql',NULL, 'ecd', 'Citatation facelift');
+    VALUES (36, 'database/patches/dbpatch_beta36.sql','10-03-2022', 'ecd', 'Citatation facelift; written long before SB22 but brought up to date on live system then');
 
 

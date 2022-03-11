@@ -21,10 +21,14 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Citation;
+import com.tcvcog.tcvce.entities.CitationDocketRecord;
 import com.tcvcog.tcvce.entities.ContactEmail;
 import com.tcvcog.tcvce.entities.ContactPhone;
 import com.tcvcog.tcvce.entities.ContactPhoneType;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
@@ -47,7 +51,13 @@ import java.util.ArrayList;
 import java.util.List;
 import com.tcvcog.tcvce.entities.LinkedObjectFamilyEnum;
 import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
+import com.tcvcog.tcvce.entities.MailingAddress;
+import com.tcvcog.tcvce.entities.Parcel;
+import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import java.time.LocalDateTime;
+import java.util.Collections;
 
 /**
  * The master controller class for Humans and their Java incarnation called
@@ -132,26 +142,102 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Grand staircase entrance for connecting a human holder to a human
      * @param hlh
-     * @param hum if all you have is a human (or Person subclass), use the 
+     * @param hlink if all you have is a human (or Person subclass), use the 
      * convenience method createHumanLink method
      * @param ua the user doing the linking
      * @return the link ID for the freshly inserted link
      * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public int linkHuman(IFace_humanListHolder hlh, HumanLink hum, UserAuthorized ua) throws BObStatusException, IntegrationException{
+    public int linkHuman(IFace_humanListHolder hlh, HumanLink hlink, UserAuthorized ua) throws BObStatusException, IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
-        if(hlh == null || hum == null || ua == null){
+        if(hlh == null || hlink == null || ua == null){
             throw new BObStatusException("Cannot link human with null human or human holder or null user");
         }
         
-        hum.setLinkCreatedByUserID(ua.getUserID());
-        hum.setLinkLastUpdatedByUserID(ua.getUserID());
-        if(hum.getLinkSource() == null){
-            hum.setLinkSource(sc.getBObSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+        hlink.setLinkCreatedByUserID(ua.getUserID());
+        hlink.setLinkLastUpdatedByUserID(ua.getUserID());
+        if(hlink.getLinkSource() == null){
+            hlink.setLinkSource(sc.getBObSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                 .getString("bobSourceHumanLinkDefault"))));
         }
-        return pi.insertHumanLink(hlh, hum);
+        if(hlink.getLinkedObjectRole() == null){
+            determineAndSetDefaultLinkedObjectRole(hlh, hlink);
+        }
+
+        return pi.insertHumanLink(hlh, hlink);
+    }
+    
+    
+    /**
+     * Uses instanceof to check what type of human holder we have and sets the default
+     * role code so the DB record is complete.
+     * @param hlink
+     * @return 
+     */
+    private HumanLink determineAndSetDefaultLinkedObjectRole(IFace_humanListHolder hlh, HumanLink hlink) throws BObStatusException, IntegrationException{
+        if(hlh == null || hlink == null){
+            throw new BObStatusException("Cannot determine default linked object role with null list holder or human linke");
+        }
+        
+        SystemIntegrator si = getSystemIntegrator();
+        
+        if(hlh instanceof OccPermitApplication){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_occapp"))));
+            
+        } else if (hlh instanceof CECase){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_cecase"))));
+        } else if (hlh instanceof OccPeriod){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_occperiod"))));
+            
+        } else if (hlh instanceof Parcel){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_parcel"))));
+            
+        } else if (hlh instanceof PropertyUnit){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_parcelunit"))));
+            
+        } else if (hlh instanceof Citation){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_citation"))));
+            
+        } else if (hlh instanceof CitationDocketRecord){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_docket"))));
+            
+        } else if (hlh instanceof EventCnF){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_event"))));
+            
+        } else if (hlh instanceof Municipality){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_muni"))));
+            
+        } else if (hlh instanceof MailingAddress){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_mailing"))));
+            
+        } else {
+            throw new BObStatusException("Cannot determine a default linked object role for given list holder");
+        }
+        
+        return hlink;
+        
     }
     
     
@@ -327,9 +413,21 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         PersonIntegrator pi = getPersonIntegrator();
         PropertyIntegrator propi = getPropertyIntegrator();
         
+        if(p == null){
+            throw new BObStatusException("Cannot configure null person");
+        }
+        
         p.setAddressList(propi.getMailingAddressLinksByHuman(p.getHumanID()));
-        p.setPhoneList(pi.getContactPhoneList(p.getHumanID()));
-        p.setEmailList(pi.getContactEmailList(p.getHumanID()));
+        List<ContactPhone> phl = pi.getContactPhoneList(p.getHumanID());
+        if(phl != null && phl.size() >= 2){
+            Collections.sort(phl);
+        }
+        p.setPhoneList(phl);
+        List<ContactEmail> eml = pi.getContactEmailList(p.getHumanID());
+        if(eml != null && eml.size() >= 2){
+            Collections.sort(eml);
+        }
+        p.setEmailList(eml);
         
         return p;
         
@@ -338,14 +436,17 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     
     /**
-     * Logic intermediary for Updates to the Person listing
+     * Logic intermediary for Updates to the human listing
      * @param h
      * @param u
      * @throws IntegrationException 
      */
     public void humanEdit(Human h, User u) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
-        pi.updateHuman(h);
+        if(h != null && u != null){
+            h.setLastUpdatedBy(u);
+            pi.updateHuman(h);
+        }
     }
     
     /**

@@ -352,32 +352,38 @@
                                                 <div class="aob-container aob-container-actions">
 
                                                     <div class="restrict-main-contents-io-link link-button">
-                                                        <p:commandLink id="activebob-person-view-cl"
-                                                                       ajax="false"
-                                                                       value="view"
-                                                                       action="#{sessionBean.navigateToPageCorrespondingToObject(sessionBean.sessPerson)}">
 
-                                                        </p:commandLink>
+                                                        <p:commandLink  id="activebob-persontools-cb"
+                                                                        value="view/edit"
+                                                                        ajax="true"
+                                                                        actionListener="#{personBB.onViewCurrentPersonLinkClick}"
+                                                                        update="person-info-form
+                                                                                person-profile-addresses-form
+                                                                                person-profile-phones-form
+                                                                                person-profile-emails-form
+                                                                                person-links-form
+                                                                                person-profile-dialog"
+                                                                        oncomplete="PF('person-profile-dialog-var').show();"/>
                                                     </div>
+
+                                                  
 
                                                     <div class="restrict-main-contents-io-link link-button">
 
                                                         <p:commandLink  id="activebob-perslist-cb"
-                                                                        value="search"
+                                                                        value="search/create"
                                                                         ajax="true"
                                                                         actionListener="#{personBB.onPersonSearchInitLinkClick}"
-                                                                        oncomplete="PF('human-search-dialog-var').show();"/>
+                                                                        oncomplete="PF('human-search-dialog-var').show();"
+                                                                        update="human-search-dialog
+                                                                        search-query-form
+                                                                        log-form
+                                                                        person-list-quickloads-form
+                                                                        pers-search-results-form
+                                                                        pers-selected-form
+                                                                        hlh-humlist-form"/>
                                                     </div>
 
-
-                                                    <div class="restrict-main-contents-io-link link-button">
-
-                                                        <p:commandLink  id="activebob-persontools-cb"
-                                                                        value="person tools"
-                                                                        ajax="true"
-                                                                        actionListener="#{personBB.onViewCurrentPersonLinkClick}"
-                                                                        oncomplete="PF('person-profile-dialog-var').show();"/>
-                                                    </div>
                                                 </div>
                                             </h:form>
                                         </div>

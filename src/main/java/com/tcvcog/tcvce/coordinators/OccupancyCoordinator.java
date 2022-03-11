@@ -507,7 +507,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                                    PropertyUnit pu,
                                    OccPeriodType perType,
                                    User u,
-                                   MunicipalityDataHeavy muni) throws IntegrationException {
+                                   MunicipalityDataHeavy muni) throws IntegrationException, BObStatusException {
 
 
         SystemIntegrator si = getSystemIntegrator();

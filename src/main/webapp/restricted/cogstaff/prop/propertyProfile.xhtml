@@ -15,12 +15,16 @@
                 <f:view id="prop-info-view">
 
                     <!-- GLOBAL MESSAGES -->
-                    <h:form id="form-messages-global">
+                    <h:form id="property-messages-global">
                         <p:growl id="messages-global" showDetail="false"/>
                     </h:form>
 
                     <div class="mainContainer">
 
+                        <h2>
+                            <h:outputText value="#{propertyProfileBB.currentProperty.address.addressPretty1Line} (Parcel ID: #{propertyProfileBB.currentProperty.countyParcelID})" />
+                        </h2>
+                        
                         <div class="page-links">
                             <div class="restrict-main-contents-io-link link-button">
                                 <a href="#propinfo-panel-info">property info</a>
@@ -110,7 +114,7 @@
                                                          icon="fa #{propertyProfileBB.currentPropertyEditMode ? 'fa-check' : 'fa-pencil'}"
                                                          actionListener="#{propertyProfileBB.onPropertyEditModeToggleButtonChange}"
                                                          update="@form
-                                                         form-messages-global"
+                                                         property-messages-global"
                                                          />
 
 
@@ -121,7 +125,7 @@
                                                                 rendered="#{propertyProfileBB.currentPropertyEditMode}"
                                                                 value="Abort edit"
                                                                 actionListener="#{propertyProfileBB.onPropertyEditModeOperationAbortButtonChange}"
-                                                                update="form-messages-global
+                                                                update="property-messages-global
                                                                 @form"
                                                                 icon="fa fa-stop" />
 
@@ -140,6 +144,18 @@
                                             <div class="p-col-8">
                                                 <h:outputText value="#{propertyProfileBB.currentProperty.countyParcelID} "
                                                               rendered="#{!propertyProfileBB.currentPropertyEditMode}" />
+                                                
+                                                <p:spacer height="3px" />
+                                                
+                                                <p>
+                                                    <a href="https://www2.alleghenycounty.us/RealEstate/GeneralInfo.aspx?ParcelID=#{propertyProfileBB.currentProperty.countyParcelID}"
+                                                       target="_blank"
+                                                       style="color:blue;">Visit county profile</a>
+                                                </p>
+                                                
+                                                <p:spacer height="3px" />
+                                                               
+                                                               
                                                 
                                                 <p:inputText value="#{propertyProfileBB.currentProperty.countyParcelID}"
                                                              rendered="#{propertyProfileBB.currentPropertyEditMode}" />
@@ -283,7 +299,7 @@
                                                          icon="fa #{propertyProfileBB.currentParcelInfoEditMode ? 'fa-check' : 'fa-pencil'}"
                                                          actionListener="#{propertyProfileBB.onParcelInfoEditModeToggleButtonChange}"
                                                          update="@form
-                                                         form-messages-global"
+                                                         property-messages-global"
                                                          />
 
                                         <div class="restrict-main-contents-io-button gray_button">
@@ -293,7 +309,7 @@
                                                                 rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
                                                                 value="Abort edit"
                                                                 actionListener="#{propertyProfileBB.onParcelInfoEditModeOperationAbortButtonChange}"
-                                                                update="form-messages-global
+                                                                update="property-messages-global
                                                                 @form"
                                                                 process="@none"
                                                                 immediate="true"
@@ -676,8 +692,9 @@
                                                            actionListener="#{personBB.onSelectAndLinkPersonsInit(propertyProfileBB.currentProperty)}"
                                                            oncomplete="PF('human-search-dialog-var').show()"
                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                           value="Link Persons to this Property"
+                                                           value="Manage property-person links"
                                                            update=" human-search-dialog
+                                                                    property-messages-global
                                                                     search-query-form
                                                                     pers-selected-form
                                                                     hlh-humlist-form"
@@ -699,12 +716,12 @@
 
                                             <p:column headerText="Name"
                                                       styleClass="centeredColumnContent">
-                                                <h:outputText value="#{human.name}"/>
-                                            </p:column>
-
-                                            <p:column headerText="ID"
-                                                      styleClass="centeredColumnContent">
-                                                <h:outputText value="#{human.humanID}"/>
+                                                <h:outputText value="#{human.name} is #{human.linkedObjectRole.title} this property"/>
+                                                <p:spacer height="3px" />
+                                                <h:outputText value="Link timestamp: #{propertyProfileBB.getPrettyDate(human.linkCreatedTS)}"/>
+                                                <p:spacer height="3px" />
+                                                <h:outputText value="(Human ID: #{human.humanID}; Link ID: #{human.linkID})"/>
+                                                
                                             </p:column>
 
                                             <p:column headerText="Actions"

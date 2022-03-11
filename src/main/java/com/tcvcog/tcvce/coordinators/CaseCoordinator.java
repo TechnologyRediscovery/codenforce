@@ -1927,8 +1927,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param c
      * @param nov
-     * @param addr
-     * @param h
      * @param ua
      * @throws BObStatusException
      * @throws IntegrationException
@@ -1937,21 +1935,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      */
     public void nov_LockAndQueue(CECaseDataHeavy c, 
                                  NoticeOfViolation nov, 
-                                 HumanMailingAddressLink addr,
-                                 Human h,
                                  UserAuthorized ua)
             throws BObStatusException, IntegrationException, EventException, ViolationException {
 
-        if(c == null || nov == null || ua == null || addr == null || h == null ){
-            throw new BObStatusException("Cannot lock notice with null case, nov, or user");
+        if(c == null || nov == null || ua == null || nov.getRecipient()== null || nov.getRecipientMailingAddress()== null ){
+            throw new BObStatusException("Cannot lock notice with null case, nov, or recipient Person or mailing or user");
         }
         if(nov.getNotifyingOfficerPerson() == null 
                 || nov.getNotifyingOfficerPerson().getEmailList() == null
                 || nov.getNotifyingOfficerPerson().getEmailList().isEmpty()
                 || nov.getNotifyingOfficerPerson().getPhoneList() == null
-                || nov.getNotifyingOfficerPerson().getPhoneList().isEmpty()
-                || nov.getNotifyingOfficerPerson().getAddressList() == null 
-                || nov.getNotifyingOfficerPerson().getAddressList().isEmpty() ){
+                || nov.getNotifyingOfficerPerson().getPhoneList().isEmpty() ){
             throw new BObStatusException("Cannot lock notice with null notifying officer person or empty address list inside said person");
         }
         
@@ -1967,12 +1961,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             // and inject into permament NOV fields for record keeping
             
             nov.setFixedAddrXferTS(LocalDateTime.now());
-            nov.setRecipientMailingLink(addr);
-            nov.setFixedRecipientName(h.getName());
-            nov.setFixedRecipientBldgNo(addr.getBuildingNo());
-            nov.setFixedRecipientStreet(addr.getStreet().getName());
-            nov.setFixedRecipientState(addr.getStreet().getCityStateZip().getState());
-            nov.setFixedRecipientZip(addr.getStreet().getCityStateZip().getZipCode());
+            nov.setFixedRecipientName(nov.getRecipient().getName());
+            
+            nov.setFixedRecipientBldgNo(nov.getRecipientMailingAddress().getBuildingNo());
+            nov.setFixedRecipientStreet(nov.getRecipientMailingAddress().getStreet().getName());
+            nov.setFixedRecipientCity(nov.getRecipientMailingAddress().getStreet().getCityStateZip().getCity());
+            nov.setFixedRecipientState(nov.getRecipientMailingAddress().getStreet().getCityStateZip().getState());
+            nov.setFixedRecipientZip(nov.getRecipientMailingAddress().getStreet().getCityStateZip().getZipCode());
             
             nov.setFixedNotifyingOfficerName(nov.getNotifyingOfficerPerson().getName());
             nov.setFixedNotifyingOfficerTitle(nov.getNotifyingOfficerPerson().getJobTitle());
@@ -2016,8 +2011,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException
      */
-    public int nov_InsertNotice(NoticeOfViolation nov, CECaseDataHeavy cse, User usr) throws IntegrationException {
+    public int nov_InsertNotice(NoticeOfViolation nov, CECaseDataHeavy cse, User usr) throws IntegrationException, BObStatusException {
         CaseIntegrator ci = getCaseIntegrator();
+        nov.setCreationBy(usr);
         System.out.println("CaseCoordinator.novInsertNotice");
         return ci.novInsert(cse, nov);
     }
@@ -2463,14 +2459,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @param c
      * @param creator
-     * @param issuingOfficer
      * @return 
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public int citation_insertCitation(    Citation c, 
-                                            UserAuthorized creator , 
-                                            User issuingOfficer) 
+                                            UserAuthorized creator) 
                                     throws  IntegrationException, 
                                             BObStatusException {
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
@@ -2478,17 +2472,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         int freshID = 0;
         if(     c == null 
                 || creator == null 
-                || issuingOfficer == null 
+                || c.getFilingOfficer() == null
                 || c.getViolationList() == null 
-                || !c.getViolationList().isEmpty()){
+                || c.getViolationList().isEmpty()){
             throw new BObStatusException("Cannot issue citation with null citation, creator, issuing officer, or violation list");
             
         }
         
-        
         c.setCreatedBy(creator);
+        c.setCreatedTS(LocalDateTime.now());
         c.setLastUpdatedBy(creator);
-        c.setFilingOfficer(issuingOfficer);
+        c.setLastUpdatedTS(LocalDateTime.now());
+        
         c.setViolationList(new ArrayList<>());
         
         // Create CitationCodeViolationLink objects to wrap each incoming CodeViolation
@@ -2504,7 +2499,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             
         }
         freshID = cei.insertCitation(c);
-        cei.linkViolationsToCitation(cei.getCitation(freshID));
+        c.setCitationID(freshID);
+        cei.linkViolationsToCitation(c);
         return freshID;
         
     }
@@ -2928,18 +2924,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public int violation_attachViolationToCase(CodeViolation cv, CECaseDataHeavy cse, UserAuthorized ua)
             throws IntegrationException, ViolationException, BObStatusException, EventException, SearchException {
 
-        if(cv == null || cse == null || ua == null) throw new BObStatusException("Cannot attach violation with null viol, case, or user");
-        
+        if(cv == null || cse == null || ua == null){
+            throw new BObStatusException("Cannot attach violation with null viol, case, or user");
+        }
         
         CaseIntegrator ci = getCaseIntegrator();
-        EventCoordinator ec = getEventCoordinator();
-        UserCoordinator uc = getUserCoordinator();
-        CaseCoordinator cc = getCaseCoordinator();
-        EventCnF tfEvent;
         PaymentCoordinator pc = getPaymentCoordinator();
         int insertedViolationID;
-        int eventID;
-        StringBuilder sb = new StringBuilder();
 
 //        EventCategory eventCat = ec.initEventCategory(
 //                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
@@ -2962,6 +2953,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 //        sb.append(cv.getViolatedEnfElement().getHeaderString());
 //        tfEvent.setDescription(sb.toString());
         violation_verifyCodeViolationAttributes(cse, cv);
+        cv.setLastUpdatedUser(ua);
         cv.setCreatedBy(ua);
         insertedViolationID = ci.insertCodeViolation(cv);
         pc.insertAutoAssignedFees(cse, cv);
@@ -3066,7 +3058,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws ViolationException
      */
     private void violation_verifyCodeViolationAttributes(CECaseDataHeavy cse, CodeViolation cv) throws ViolationException {
-        if(cse == null || cv == null) throw new ViolationException("Cannot verify code violation attributes with null case or violation");
+        if(cse == null || cv == null){
+            throw new ViolationException("Cannot verify code violation attributes with null case or violation");
+        }
         
         if (cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed) {
             throw new ViolationException("Cannot update code violations on closed cases!");
@@ -3074,7 +3068,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if (cv.getStipulatedComplianceDate().isBefore(cv.getDateOfRecord())) {
             throw new ViolationException("Stipulated compliance date cannot be before the violation's date of record");
         }
-        
         
     }
     
@@ -3098,14 +3091,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             List<CodeViolation> vlst = new ArrayList<>();
             vlst.addAll(cse.getViolationList());
             
-            if(!vlst.isEmpty()){
+            // AS OF Spring Break '22, officers want to add more than 1 instance of any given
+            // ordinanec to a CE case, so turn off this check, perhaps look up muni profile
+            // for settings at a later time?
+            
+            // ALLOW DUPLICATE INSTANCES OF VIOLATING A SINGLE ORDINANCE  (ECE)
+            
+//            if(!vlst.isEmpty()){
                 // check to make sure that particular ordinance isn't already on the case
-                for (CodeViolation tempCv : vlst) {
-                    if(tempCv.getViolatedEnfElement().getCodeSetElementID() == ece.getCodeSetElementID()){
-                        throw new BObStatusException("Duplicate Violation of ordiance with ID " + ece.getCodeSetElementID() + "Select a different ordinance, please!");
-                    }
-                }
-            }
+//                for (CodeViolation tempCv : vlst) {
+//                    if(tempCv.getViolatedEnfElement().getCodeSetElementID() == ece.getCodeSetElementID()){
+//                        throw new BObStatusException("Duplicate Violation of ordiance with ID " + ece.getCodeSetElementID() + "Select a different ordinance, please!");
+//                    }
+//                }
+//            }
             int daysInFuture;
             if(ece.getNormDaysToComply() != 0){
                 daysInFuture = ece.getNormDaysToComply();

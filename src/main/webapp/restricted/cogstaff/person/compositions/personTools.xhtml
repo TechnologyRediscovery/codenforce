@@ -36,18 +36,7 @@
 
                     <h:form id="search-query-form">
 
-                        <h:outputLabel styleClass="bold" value="Load persons currently linked to "  />
-                        <p:spacer height="5px" />
-                            <p:commandLink     id="loadpersonsonsessionproperty-link"
-                                               actionListener="#{personBB.onLoadPersonListOnSessionPropertyLinkClick}"
-                                                ajax="true"
-                                                style="color: blue;"
-                                                value="current property at #{sessionBean.sessProperty.address.addressPretty1Line}"
-                                                update="pers-search-results-form
-                                                        persontools-growl-form"
-                                                />
-                        
-                        <p:spacer height="5px" />
+                      
                         
                         <h:outputLabel styleClass="bold" value="Available queries" for="search-query-som" />
 
@@ -185,21 +174,68 @@
             </div>
 
             <div class="p-col-4">
+                <p:panel    id="pers-create-init-panel"
+                            toggleable="true"
+                            widgetVar="pers-create-init-panel-var"
+                            collapsed="false"
+                            header="Create new person">
+
+                    <h:form id="person-create-init-form">
+                        
+                          <p:commandButton   id="pers-create-init-cb" 
+                                           ajax="true" 
+                                           actionListener="#{personBB.onPersonCreateInitButtonChange}"
+                                           icon="fa fa-plus" 
+                                           styleClass="button"
+                                           value="Create new person" 
+                                           oncomplete="PF('human-search-dialog-var').hide(); PF('person-profile-dialog-var').show();"
+                                           disabled="false"
+                                           update=" person-info-form
+                                                    person-profile-addresses-form
+                                                    person-profile-phones-form
+                                                    person-profile-emails-form
+                                                    person-links-form
+                                                    person-profile-dialog
+                                                    persontools-growl-form"/>
+                        
+                    </h:form>
+                    
+                </p:panel>
+                        
                 <p:panel    id="pers-search-results-panel"
                             toggleable="true"
                             widgetVar="pers-search-results-panel-var"
                             collapsed="false"
-                            header="Person search results">
+                            header="Person list">
 
+                    <h:form id="person-list-quickloads-form">
+                        
+                      <h:outputLabel styleClass="bold" value="Load persons currently linked to "  />
+                        <p:spacer height="5px" />
+                            <p:commandLink     id="loadpersonsonsessionproperty-link"
+                                               actionListener="#{personBB.onLoadPersonListOnSessionPropertyLinkClick}"
+                                                ajax="true"
+                                                style="color: blue;"
+                                                value="current property at #{sessionBean.sessProperty.address.addressPretty1Line}"
+                                                update="pers-search-results-form
+                                                        persontools-growl-form"
+                                                />
+                        
+                        <p:spacer height="5px" />
+                        
+                    </h:form>
+                        
                     <h:form id="pers-search-results-form">
 
                         <div class="ui-g data_container_nested_restrict">
 
                             <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
+                                
                                 <div class="restrict-main-contents-io-link">
 
                                     <p:commandLink     id="load-history-cb"
                                                        ajax="true"
+                                                       rendered="false"
                                                        value="load person history"
                                                        update="pers-search-results-form
                                                        persontools-growl-form"
@@ -270,7 +306,8 @@
                                                             person-profile-phones-form
                                                             person-profile-emails-form
                                                             person-links-form
-                                                            person-profile-dialog"
+                                                            person-profile-dialog
+                                                            persontools-growl-form"
                                                             />
 
                                             <p:spacer height="3px" />
@@ -279,7 +316,8 @@
                                                             value="add"
                                                             actionListener="#{personBB.onAddPersonToSelectedList(per)}"
                                                             update="pers-selected-panel
-                                                            pers-selected-form"
+                                                            pers-selected-form
+                                                            persontools-growl-form"
                                                             />
                                         </div>
                                     </div>
@@ -305,7 +343,8 @@
                                            value="Link these persons to #{sessionBean.sessHumanListHolder.HUMAN_LINK_SCHEMA_ENUM.TARGET_OBJECT_FRIENDLY_NAME} (ID:#{sessionBean.sessHumanListHolder.hostPK})" 
                                            disabled="#{empty sessionBean.sessHumanListHolder}"
                                            oncomplete="PF('human-search-dialog-var').hide();"
-                                           update="#{personBB.personListComponentIDToUpdatePostLinkingOperation}"/>
+                                           update="#{personBB.personListComponentIDToUpdatePostLinkingOperation}
+                                           persontools-growl-form"/>
                           
                           <p:spacer height="5px" />
                         
@@ -466,7 +505,8 @@
                                          icon="fa #{personBB.currentPersonHumanFieldsEditMode ? 'fa-check' : 'fa-pencil'}"
                                          actionListener="#{personBB.toggleHumanEditMode}"
                                          update="@form
-                                         @form:@parent:persontools-growl-form"
+                                         @form:@parent:persontools-growl-form
+                                         topnav-pers-form"
                                          />
 
 

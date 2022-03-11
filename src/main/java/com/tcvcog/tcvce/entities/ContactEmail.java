@@ -23,7 +23,8 @@ import java.time.LocalDateTime;
  * @author sylvia
  */
 public  class   ContactEmail 
-        extends Contact{
+        extends Contact
+        implements Comparable<Object>{
     
     final static String TABLE_NAME = "contactemail";
     final static String PKFIELD = "emailid";
@@ -147,6 +148,15 @@ public  class   ContactEmail
      */
     public void setPriority(int priority) {
         this.priority = priority;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if(o instanceof ContactEmail){
+            ContactEmail ce = (ContactEmail) o;
+            return Integer.compare(this.priority, ce.priority);
+        }
+        return 0;
     }
     
 }

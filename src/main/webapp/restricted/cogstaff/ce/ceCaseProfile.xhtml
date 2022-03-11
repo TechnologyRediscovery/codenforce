@@ -281,10 +281,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                             <p:commandButton      id="cecase-forceclose-init-cb" 
                                                                                 ajax="true" 
-                                                                                icon="fa fa-close"
+                                                                                icon="fa fa-folder"
                                                                                 actionListener="#{ceCaseSearchProfileBB.onCaseForceCloseInitButtonChange}"
                                                                                 oncomplete="PF('case-forceclose-dialog-var').show()"
-                                                                                disabled="false"
+                                                                                disabled="#{!empty ceCaseSearchProfileBB.currentCase.closingDate}"
                                                                                 value="close case"/>
 
                                                         </div>
@@ -305,19 +305,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                                                     <hr/>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
-                                                    <div class="restrict-main-contents-io-button gray_button">
-
-                                                        <p:commandButton        id="view-property-cb" 
-                                                                                ajax="false" 
-                                                                                icon="fa fa-home"
-                                                                                action="#{ceCaseSearchProfileBB.exploreProperty}"
-                                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                                value="view property: #{ceCaseSearchProfileBB.currentCasePropDataHeavy.addressString}"/>
-
-
-                                                    </div>
-                                                </div>
+                                         
 
                                                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
                                                     <div class="restrict-main-contents-io-button gray_button">
@@ -455,7 +443,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             styleClass="noFill button-size-small"
                                                                             action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
                                                                             value="Update"
-                                                                            oncomplete="PF('event-update-dialog-var').show()"
+                                                                            oncomplete="PF('event-profile-dialog-var').show()"
                                                                             update="event-profile-dialog
                                                                             event-profile-form"
                                                                             />
@@ -474,18 +462,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             />
                                                     </div>
 
-                                                    <div class="restrict-main-contents-io-link link-button">
-
-                                                        <p:commandLink    id="event-shiftpast-button"
-                                                                          ajax="true"
-                                                                          styleClass="noFill button-size-small"
-                                                                          action="#{ceCaseSearchProfileBB.onEventViewButtonChange(eventfuture)}"
-                                                                          value="Shift to past"
-                                                                          oncomplete="PF('event-shiftpast-dialog-var').show()"
-                                                                          update="event-update-dialog
-                                                                          event-update-form"
-                                                                          />
-                                                    </div>
                                                 </p:column>
                                             </p:dataTable>
                                         </h:form>
@@ -956,7 +932,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         ajax="false"
                                                         value="Close case ID #{ceCaseSearchProfileBB.currentCase.caseID}"
                                                         action="#{ceCaseSearchProfileBB.onCaseForceCloseCommitButtonChnage}"
-                                                        icon="fa fa-logout"/>
+                                                        icon="fa fa-folder"/>
 
                                 </div>
 

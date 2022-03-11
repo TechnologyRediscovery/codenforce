@@ -4,11 +4,6 @@
 
 -- *************
 
-
-
-
-
-
 CREATE SEQUENCE IF NOT EXISTS mailingstreet_streetid_seq
     START WITH 100
     INCREMENT BY 1
@@ -16,19 +11,40 @@ CREATE SEQUENCE IF NOT EXISTS mailingstreet_streetid_seq
     NO MAXVALUE
     CACHE 1;
 
+-- the local version of mailingstreet on SB22 is this, since the one in the patch wasn't keyed to citystatezip
 CREATE TABLE public.mailingstreet
 (
-	streetid 		INTEGER DEFAULT nextval('mailingstreet_streetid_seq') PRIMARY KEY ,
-	name 			TEXT NOT NULL,
-	namevariantsarr TEXT[],
-	muni_municode   INTEGER CONSTRAINT mailingstreet_muni_fk REFERENCES municipality (municode),
-    city_cityid             INTEGER NOT NULL CONSTRAINT mailingstreet_cityid_fk REFERENCES mailingcity (cityid),
-    notes			TEXT
-	
-
+  streetid integer NOT NULL DEFAULT nextval('mailingstreet_streetid_seq'::regclass),
+  name text NOT NULL,
+  namevariantsarr text[],
+  citystatezip_cszipid integer NOT NULL,
+  notes text,
+  pobox boolean DEFAULT false,
+  createdts timestamp with time zone DEFAULT now(),
+  createdby_userid integer,
+  lastupdatedts timestamp with time zone,
+  lastupdatedby_userid integer,
+  deactivatedts timestamp with time zone,
+  deactivatedby_userid integer,
+  CONSTRAINT mailingstreet_pkey PRIMARY KEY (streetid),
+  CONSTRAINT docketno_createdby_userid_fk FOREIGN KEY (createdby_userid)
+      REFERENCES public.login (userid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT docketno_deactivatedby_userid_fk FOREIGN KEY (deactivatedby_userid)
+      REFERENCES public.login (userid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT docketno_lastupdatedby_userid_fk FOREIGN KEY (lastupdatedby_userid)
+      REFERENCES public.login (userid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT mailingstreet_citystatezip_fk FOREIGN KEY (citystatezip_cszipid)
+      REFERENCES public.mailingcitystatezip (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
 );
-
-ALTER TABLE mailingstreet ADD COLUMN createdts TIMESTAMP WITH TIME ZONE DEFAULT now();
+ALTER TABLE public.mailingstreet
+  OWNER TO sylvia;
 
 
 
@@ -449,11 +465,12 @@ CREATE TABLE public.personhumanmigrationlog
 );
 
 
-ALTER TABLE public.humanmailingaddress DROP COLUMN role_roleid;
+-- role_roleid didn't exist on live system
+--ALTER TABLE public.humanmailingaddress DROP COLUMN role_roleid;
 ALTER TABLE public.humanmailingaddress ADD COLUMN linkedobjectrole_lorid INTEGER 
 	CONSTRAINT humanmailingaddress_lorid_fk REFERENCES linkedobjectrole (lorid);
 
-DROP TABLE humanmailingrole;
+
 
 CREATE OR REPLACE FUNCTION public.migratepersontohuman(		creationrobotuser INTEGER,
 															defaultsource INTEGER,
@@ -862,6 +879,13 @@ $BODY$
 
 
 
+-- This puppy takes notices of violation that are sent to actual person records
+-- and extracts the person record data at the time of this function
+-- and writes them to static fields on the actual NOV record, allowing a perfect
+-- archive of who recieved the letter and to where that letter was mailed.
+-- the old version used so-called ghosts, which were copies of person records
+-- and then the NOV was keyed to the ghost, which, in theory, would never change
+-- since gosts are dead, and don't change after death.
 
 CREATE OR REPLACE FUNCTION public.cnf_injectstaticnovdata(targetmunicode INTEGER)
   	RETURNS INTEGER AS
@@ -919,7 +943,13 @@ ALTER TABLE citationcitationstatus ADD COLUMN courtentity_entityid INTEGER CONST
 
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (37, 'database/patches/dbpatch_beta37.sql',NULL, 'ecd', 'Human and Parcel migration');
+    VALUES (37, 'database/patches/dbpatch_beta37.sql','03-10-2022', 'ecd', 'Human and Parcel migration');
 
 
+-- output from live sysetm SB22
+-- NOTICE:  drop cascades to 3 other objects
+-- DETAIL:  drop cascades to constraint mailingparcel_mailingid_fk on table parcelmailingaddress
+-- drop cascades to constraint humanmailing_addressid_fk on table humanmailingaddress
+-- drop cascades to constraint mailingparcel_mailingid_fk on table mailingaddressparcel
+-- Query returned successfully: one row affected, 145 msec execution time.
 
