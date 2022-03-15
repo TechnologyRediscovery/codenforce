@@ -30,6 +30,7 @@ public enum LinkedObjectSchemaEnum {
                             "OccApplicationHuman", 
                             "???", 
                             "",
+                            null,
                             "???",
                             LinkedObjectFamilyEnum.HUMAN,
                             false
@@ -41,6 +42,7 @@ public enum LinkedObjectSchemaEnum {
                             "CECaseHuman", 
                             "linkid", 
                             "cecase_caseid",
+                            null,
                             "humancecase_linkid_seq",
                             LinkedObjectFamilyEnum.HUMAN,
                             true
@@ -53,6 +55,7 @@ public enum LinkedObjectSchemaEnum {
                             "OccPeriodHuman", 
                             "linkid", 
                             "occperiod_periodid",
+                            null,
                             "humanoccperiod_linkid_seq",
                             LinkedObjectFamilyEnum.HUMAN,
                             true
@@ -64,6 +67,7 @@ public enum LinkedObjectSchemaEnum {
                             "ParcelHuman", 
                             "linkid", 
                             "parcel_parcelkey",
+                            null,
                             "humanparcel_linkid_seq",
                             LinkedObjectFamilyEnum.HUMAN,
                             true
@@ -75,6 +79,7 @@ public enum LinkedObjectSchemaEnum {
                             "ParcelUnitHuman", 
                             "linkid", 
                             "parcelunit_unitid",
+                            null,
                             "parcelunithuman_linkid_seq",
                             LinkedObjectFamilyEnum.HUMAN,
                             true
@@ -86,6 +91,7 @@ public enum LinkedObjectSchemaEnum {
                             "CitationHuman", 
                             "linkid", 
                             "citation_citationid",
+                            null,
                             "citationhuman_seq",
                             LinkedObjectFamilyEnum.HUMAN,
                             true
@@ -97,6 +103,7 @@ public enum LinkedObjectSchemaEnum {
                             "CitationDocketHuman", 
                             "linkid", 
                             "docketno_docketid",
+                            null,
                             "citationdockethuman_linkid_seq",
                             LinkedObjectFamilyEnum.HUMAN,
                             false
@@ -108,6 +115,7 @@ public enum LinkedObjectSchemaEnum {
                             "EventHuman", 
                             "linkid", 
                             "event_eventid",
+                            null,
                             "eventhuman_linkid_seq",
                             LinkedObjectFamilyEnum.HUMAN,
                             true
@@ -119,6 +127,7 @@ public enum LinkedObjectSchemaEnum {
                             "MuniHuman",
                             "linkid", 
                             "muni_municode",
+                            null,
                             "humanmuni_linkid_seq",
                             LinkedObjectFamilyEnum.HUMAN,
                             true
@@ -129,6 +138,7 @@ public enum LinkedObjectSchemaEnum {
                             "humanmailingaddress",
                             "MailingaddressHuman", 
                             "linkid",
+                            "humanmailing_humanid",
                             "humanmailing_addressid",
                             "humanmailing_linkid_seq",
                             LinkedObjectFamilyEnum.MAILING,
@@ -138,9 +148,10 @@ public enum LinkedObjectSchemaEnum {
                             "Parcel",
                             "parcelmailingaddress",
                             "ParcelMailingaddress", 
-                            "", 
-                            "",
-                            "",
+                            "linkid", 
+                            "mailingparcel_parcelid",
+                            "mailingparcel_mailingid",
+                            "parcelmailing_linkid_seq",
                             LinkedObjectFamilyEnum.MAILING,
                             true
                         ),
@@ -150,6 +161,7 @@ public enum LinkedObjectSchemaEnum {
                             "", 
                             "citationviolationid", 
                             "codeviolation_violationid",
+                            null,
                             "citationviolation_cvid_seq",
                             LinkedObjectFamilyEnum.MAILING,
                             true
@@ -162,6 +174,7 @@ public enum LinkedObjectSchemaEnum {
     private final String LINK_ROLE_SCHEMA_TYPE_STRING;
     private final String LINKING_TABLE_PK_FIELD;
     private final String TARGET_TABLE_FK_FIELD;
+    private final String LINKED_OBJECT_FK_FIELD;
     private final String LINKING_TABLE_SEQ_ID;
     private final LinkedObjectFamilyEnum FAMILY;
     private final boolean ACTIVELINK;
@@ -172,6 +185,7 @@ public enum LinkedObjectSchemaEnum {
                                         String ts, 
                                         String ltpk, 
                                         String ttfk,
+                                        String lofk,
                                         String seqid,
                                         LinkedObjectFamilyEnum fam,
                                         boolean active
@@ -181,6 +195,7 @@ public enum LinkedObjectSchemaEnum {
         LINK_ROLE_SCHEMA_TYPE_STRING = ts;
         LINKING_TABLE_PK_FIELD = ltpk;
         TARGET_TABLE_FK_FIELD = ttfk;
+        LINKED_OBJECT_FK_FIELD = lofk;
         LINKING_TABLE_SEQ_ID = seqid;
         FAMILY = fam;
         ACTIVELINK = active;
@@ -222,6 +237,13 @@ public enum LinkedObjectSchemaEnum {
      */
     public boolean isACTIVELINK() {
         return ACTIVELINK;
+    }
+
+    /**
+     * @return the LINKED_OBJECT_FK_FIELD
+     */
+    public String getLINKED_OBJECT_FK_FIELD() {
+        return LINKED_OBJECT_FK_FIELD;
     }
     
 }

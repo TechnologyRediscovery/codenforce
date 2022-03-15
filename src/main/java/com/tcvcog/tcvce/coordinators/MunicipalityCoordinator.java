@@ -81,6 +81,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
                 mdh.setMuniPropertyDH(pc.assemblePropertyDataHeavy(pc.getProperty(mdh.getMuniOfficePropertyId()), ua));
                 mdh.setCourtEntities(cei.getCourtEntityList(mdh.getMuniCode()));
                 mdh.setSwornOfficerList(uc.user_assembleUserListOfficerOathRequired(mdh));
+                mdh.setZipList(pc.getZipListByMunicipality(mdh));
             } catch (SearchException ex) {
                 System.out.println(ex);
             }

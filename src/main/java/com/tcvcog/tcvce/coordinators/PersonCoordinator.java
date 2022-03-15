@@ -411,13 +411,14 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     private Person configurePerson(Person p) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
-        PropertyIntegrator propi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         
         if(p == null){
             throw new BObStatusException("Cannot configure null person");
         }
         
-        p.setAddressList(propi.getMailingAddressLinksByHuman(p.getHumanID()));
+        
+        p.setMailingAddressLinkList(pc.getMailingAddressLinkList(p));
         List<ContactPhone> phl = pi.getContactPhoneList(p.getHumanID());
         if(phl != null && phl.size() >= 2){
             Collections.sort(phl);

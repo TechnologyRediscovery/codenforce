@@ -8,11 +8,10 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import java.util.List;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
-import com.tcvcog.tcvce.util.DateTimeUtil;
 
 /**
  * Foundational entity for the system: Property
- * That is an extension of a parcel with mailing addresses and units
+ That is an extension of a parcel with mailing mailingAddressLinkList and units
  * 
  * @author Ellen Bascomb
  */
@@ -20,10 +19,13 @@ import com.tcvcog.tcvce.util.DateTimeUtil;
 public class        Property 
         extends     Parcel 
         implements  IFace_Loggable,
+                    IFace_addressListHolder,
                     IFace_ActivatableBOB{
     
+    final static LinkedObjectSchemaEnum PROPERTY_ADDRESS_LOSE = LinkedObjectSchemaEnum.ParcelMailingaddress;
+    
     protected List<PropertyUnit> unitList;
-    protected List<ParcelMailingAddressLink> addresses;
+    protected List<MailingAddressLink> mailingAddressLinkList;
 
     /**
      * Creates a new instance of Property
@@ -37,7 +39,7 @@ public class        Property
     public Property(Property prop){
         super(prop);
         this.unitList = prop.unitList;
-        this.addresses = prop.addresses;
+        this.mailingAddressLinkList = prop.mailingAddressLinkList;
     }
 
  
@@ -59,8 +61,8 @@ public class        Property
      * @return 
      */
     public MailingAddress getAddress(){
-        if(addresses != null && !addresses.isEmpty()){
-            return addresses.get(0);
+        if(mailingAddressLinkList != null && !mailingAddressLinkList.isEmpty()){
+            return mailingAddressLinkList.get(0);
         } else {
             return null;
         }
@@ -72,9 +74,9 @@ public class        Property
      * list of mailing address links
      * @return 
      */
-    public ParcelMailingAddressLink getPrimaryAddressLink(){
-        if(addresses != null && !addresses.isEmpty()){
-            return addresses.get(0);
+    public MailingAddressLink getPrimaryAddressLink(){
+        if(mailingAddressLinkList != null && !mailingAddressLinkList.isEmpty()){
+            return mailingAddressLinkList.get(0);
             
         }
         return null;
@@ -108,17 +110,29 @@ public class        Property
   
 
     /**
-     * @return the addresses
+     * @return the mailingAddressLinkList
      */
-    public List<ParcelMailingAddressLink> getAddresses() {
-        return addresses;
+    @Override
+    public List<MailingAddressLink> getMailingAddressLinkList() {
+        return mailingAddressLinkList;
     }
 
     /**
-     * @param addresses the addresses to set
+     * @param addresses the mailingAddressLinkList to set
      */
-    public void setAddresses(List<ParcelMailingAddressLink> addresses) {
-        this.addresses = addresses;
+    @Override
+    public void setMailingAddressLinkList(List<MailingAddressLink> addresses) {
+        this.mailingAddressLinkList = addresses;
+    }
+
+    @Override
+    public LinkedObjectSchemaEnum getLinkedObjectSchemaEnum() {
+           return PROPERTY_ADDRESS_LOSE;
+    }
+
+    @Override
+    public int getTargetObjectPK() {
+        return parcelKey;
     }
 
   

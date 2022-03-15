@@ -16,10 +16,20 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.util.List;
+
 /**
  * Declares a setter and getter for a List of AddressLinks
+ * And LinkedObjectRoles objects for building SQL to work with
+ * links in the correct tables.
+ * 
  * @author Ellen Bascomb of Apartment 31Y
  */
 public interface IFace_addressListHolder {
+    public List<MailingAddressLink> getMailingAddressLinkList();
+    public void setMailingAddressLinkList(List<MailingAddressLink> ll);
+    public LinkedObjectSchemaEnum getLinkedObjectSchemaEnum();
+    public int getTargetObjectPK();
+    
     
 }

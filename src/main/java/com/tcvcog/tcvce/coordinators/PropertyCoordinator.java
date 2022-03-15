@@ -63,6 +63,104 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     
     
     /**
+     * Extracts linked MailingAddresses by implementer of the IFace_addressListHolder
+     * which in March 2022 were Property and Person only
+     * @param adlh
+     * @return the MailingAddressLink list for injection
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<MailingAddressLink> getMailingAddressLinkList(IFace_addressListHolder adlh) throws BObStatusException, IntegrationException{
+        if(adlh == null || adlh.getLinkedObjectSchemaEnum() == null){
+            throw new BObStatusException("Cannot get AddressLinks with null list holder or schema");
+        }
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        return pi.getMailingAddressLinks(adlh);
+    }
+    
+    
+    /**
+     * Creates a new link between an implementer of our interface for addressLists
+     * and any old Mailing address. Will inject a default role if null.
+     * @param adlh target of link
+     * @param mad to link
+     * @param ua
+     * @param lor
+     * @return the linkID of the fresh link. You should also be able to get this link
+     * just by calling getMailingAddressLinkList
+     */
+    public int linkToMailingAddress(IFace_addressListHolder adlh, MailingAddress mad, UserAuthorized ua, LinkedObjectRole lor) throws BObStatusException, IntegrationException{
+        if(adlh == null || mad == null || ua == null){
+            throw new BObStatusException("Cannot deactivate a mailing link with null link or UA or address");
+        }
+        PropertyIntegrator pi = getPropertyIntegrator();
+        SystemIntegrator si =getSystemIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        MailingAddressLink madLink = new MailingAddressLink(mad);
+        
+        if(lor == null){
+            
+            if(adlh instanceof Property){
+                madLink.setLinkRole(si.getLinkedObjectRole(
+                        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                .getString("default_linkedobjectrole_parcel_mailing"))));
+            } else if (adlh instanceof Person){
+                madLink.setLinkRole(si.getLinkedObjectRole(
+                        Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                .getString("default_linkedobjectrole_human_mailing"))));
+            }
+        } else {
+            madLink.setLinkedObjectRole(lor);
+        }
+        
+        madLink.setSource(sc.getBObSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("bobsourcePropertyInternal"))));
+        
+        madLink.setLinkCreatedByUserID(ua.getUserID());
+        madLink.setLinkLastUpdatedByUserID(ua.getUserID());
+        
+        return pi.linkMailingAddress(adlh, madLink);
+        
+    }
+    
+    
+    
+    public void deactivateLinkToMailingAddress(MailingAddressLink madLink, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(madLink == null || ua == null){
+            throw new BObStatusException("Cannot deactivate a mailing link with null link or UA");
+        }
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        madLink.setLinkDeactivatedByUserID(ua.getUserID());
+        madLink.setDeactivatedTS(LocalDateTime.now());
+        madLink.setLinkLastUpdatedByUserID(ua.getUserID());
+        
+        pi.updateMailingAddressLink(madLink);
+    }
+    
+    
+    /**
+     * Extracts the official ZIP codes for a given municipality
+     * @param muni
+     * @return the list of official Zips
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public List<MailingCityStateZip> getZipListByMunicipality(Municipality muni) throws IntegrationException, BObStatusException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        List<Integer> zipIDList = pi.getMailingCityStateZipListByMuni(muni);
+        List<MailingCityStateZip> zipObList = new ArrayList<>();
+        if(zipIDList != null && !zipIDList.isEmpty()){
+            for(Integer i: zipIDList){
+                zipObList.add(getMailingCityStateZip(i));
+            }
+        }
+        return zipObList;
+    }
+    
+    
+    /**
      * Getter for MailingAddress objects
      * @param addressid the ID of the requested address, cannot be zero
      * @return the object
@@ -576,7 +674,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         if(p != null){
             
             p.setUnitList(pi.getPropertyUnitList(p));
-            p.setAddresses(pi.getMailingAddressLinkListByParcel(p.getParcelKey()));
+            p.setMailingAddressLinkList(getMailingAddressLinkList(p));
           
         }
         
@@ -625,36 +723,6 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     
    
     
-
-    /**
-     * Logic container for checking requests to connect a person to a property
-     * using a linkage table. The actual DB interaction is delegated to the
-     * PersonCoordinator who may check their own stuff
-     *
-     * @param pdh
-     * @param pers
-     * @throws IntegrationException
-     * @throws BObStatusException
-     */
-    public void connectPersonToProperty(PropertyDataHeavy pdh, Person pers) throws IntegrationException, BObStatusException {
-        // TODO: fix for humanization upgrade
-//        boolean proceedWithConnect = true;
-//        PersonCoordinator pc = getPersonCoordinator();
-//        if (pdh != null && pers != null) {
-//            for (Person p : pdh.getPersonList()) {
-//                if (p.getHumanID() == pers.getHumanID()) {
-//                    proceedWithConnect = false;
-//                }
-//            }
-//            if (proceedWithConnect) {
-//                pc.connectPersonToProperty(pers, pdh);
-//            } else {
-//                throw new BObStatusException("Person Link Already Exists");
-//            }
-//        }
-
-    }
-
    
 
     public LocalDateTime configureDateTime(Date date) {

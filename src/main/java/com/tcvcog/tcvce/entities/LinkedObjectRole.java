@@ -31,7 +31,7 @@ import java.util.Objects;
 public class LinkedObjectRole implements Serializable {
     
     
-    protected String linkingTableName;
+    
     protected LinkedObjectSchemaEnum schema;
     protected int roleID;
     protected String title;
@@ -49,7 +49,6 @@ public class LinkedObjectRole implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + Objects.hashCode(this.linkingTableName);
         hash = 97 * hash + Objects.hashCode(this.schema);
         hash = 97 * hash + this.roleID;
         hash = 97 * hash + Objects.hashCode(this.title);
@@ -176,12 +175,7 @@ public class LinkedObjectRole implements Serializable {
         this.notes = notes;
     }
 
-    /**
-     * @return the linkingTableName
-     */
-    public String getLinkingTableName() {
-        return linkingTableName;
-    }
+   
 
     /**
      * @return the schema

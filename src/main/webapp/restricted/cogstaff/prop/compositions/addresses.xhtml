@@ -12,7 +12,7 @@
     </h:form>
 
     <p:dialog   id="address-dialog"
-                height="700" width="1300"
+                height="700" width="1200"
                 widgetVar="address-dialog-var"
                 responsive="true"
                 resizable="true"
@@ -82,7 +82,7 @@
                             
                             <div class="p-col-6">
                                 <h:outputText rendered="#{!addressBB.addressEditMode}" 
-                                              value="#{addressBB.currentAddress.poBox}"/>
+                                              value="#{addressBB.currentAddress.poBox eq 0 ? '' : addressBB.currentAddress.poBox}"/>
                                 
                                 <p:selectBooleanCheckbox    id="address-pobox-sbcb"
                                                             rendered="#{addressBB.addressEditMode}"
@@ -95,7 +95,8 @@
                                 <p:inputText    id="address-pobox-it"
                                                 rendered="#{addressBB.addressEditMode}"
                                                 disabled="#{!addressBB.formPOBox}"
-                                                value="#{addressBB.currentAddress.poBox}" />
+                                                value="#{addressBB.currentAddress.poBox}"
+                                                type="number"/>
                             </div>
                             
                             <div class="p-col-6">
@@ -272,19 +273,19 @@
     </p:dialog>
 
     <p:dialog   id="address-search-dialog"
-                height="600" width="1200"
+                height="600" width="1400"
                 widgetVar="address-search-dialog-var"
                 responsive="true"
                 resizable="true"
                 closable="true"
                 closeOnEscape="true"
                 modal="true"
-                header="Address Manager"
+                header="Address Search"
                 rendered="true"
                 >
 
         <div class="p-grid">
-            <div class="p-col">
+            <div class="p-col-4">
                 <p:panel id="csz-search-panel"
                          toggleable="true"
                          collapsed="false"
@@ -420,6 +421,7 @@
                                                 actionListener="#{addressBB.selectCityStateZip(csz)}"
                                                 ajax="true"
                                                 update="address-dialog
+                                                street-panel
                                                 address-info-form
                                                 street-search-form
                                                 addresses-growl-form"
@@ -459,21 +461,39 @@
                 </p:panel>  
             </div>
 
-            <div class="p-col">
+            <div class="p-col-4">
 
                 <p:panel id="street-panel"
                          toggleable="true"
                          collapsed="false"
-                         header="Street">
+                         header="Streets in ZIP Code: #{addressBB.currentCityStateZip.zipCode} (#{addressBB.currentCityStateZip.defaultCity}, #{addressBB.currentCityStateZip.state})">
 
                     <h:form id="street-search-form">
 
-                        <h3>
-                            <h:outputText value="Viewing all streets in ZIP Code: #{addressBB.currentCityStateZip.zipCode} (#{addressBB.currentCityStateZip.defaultCity}, #{addressBB.currentCityStateZip.state})" />
-                        </h3>
-
+                        <h:outputText value="Quick load: ZIP Codes in #{systemServicesBB.bbSessionMuni.muniName}: " />
+                        
+                        <ui:repeat id="muni-zip-uir"
+                                   value="#{systemServicesBB.bbSessionMuni.zipList}"
+                                   var="zip">
+                              <p:commandLink  id="csz-quick-select"
+                                              value="#{zip.zipCode}"
+                                                style="color:blue;"
+                                                rendered="true"
+                                                actionListener="#{addressBB.selectCityStateZip(zip)}"
+                                                ajax="true"
+                                                update="address-dialog
+                                                street-panel
+                                                address-info-form
+                                                street-search-form
+                                                addresses-growl-form"
+                                                />
+                              <h:outputText value=" " />
+                        </ui:repeat>
+                        
+                        <p:spacer height="5px"/>
+                        
                         <p:commandButton id="street-create-init-button"
-                                         value="New street"
+                                         value="New steet in #{addressBB.currentCityStateZip.zipCode}"
                                          icon="fa fa-plus"
                                          disabled="#{empty addressBB.currentCityStateZip}"
                                          oncomplete="PF('street-infoedit-dialog-var').show()"
@@ -497,12 +517,6 @@
                                         tabindex="6">
 
 
-                            <p:column width="10%">
-                                <f:facet name="header">
-                                    <h:outputText value="ID"/>
-                                </f:facet>
-                                <h:outputText value="#{street.streetID}" />
-                            </p:column>
 
                             <p:column width="40%"
                                       sortBy="#{street.name}"
@@ -530,7 +544,7 @@
                             </p:column>
 
 
-                            <p:column width="25%">
+                            <p:column width="35%">
                                 <f:facet name="header">
                                     <h:outputText value="Actions"/>
                                 </f:facet>
@@ -564,7 +578,8 @@
                         </p:dataTable>
                     </h:form>
                 </p:panel>
-
+            </div>
+            <div class="p-col-4">
                 <p:panel id="building-panel"
                          toggleable="true"
                          collapsed="false"

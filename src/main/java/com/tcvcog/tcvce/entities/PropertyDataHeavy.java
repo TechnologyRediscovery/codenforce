@@ -60,7 +60,7 @@ public  class       PropertyDataHeavy
         
         this.credentialSignature = cred.getSignature();
          
-        this.addresses = prop.getAddresses();
+        this.mailingAddressLinkList = prop.getMailingAddressLinkList();
         
         
     }

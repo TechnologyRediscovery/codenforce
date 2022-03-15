@@ -282,7 +282,6 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             ||  uap.getStartDate().isAfter(LocalDateTime.now())
             ||  uap.getStopDate().isBefore(LocalDateTime.now())
         ){
-            System.out.println("UserCoordinator.validateUserMuniAuthPeriod | declared invalid: " + uap.getUserMuniAuthPeriodID());
             return uap;
         }
         // since we have a valid period, git it the extra valid stamp

@@ -76,9 +76,8 @@ public  class       MunicipalityDataHeavy
     private List<Integer> photoDocList;
     private List<User> swornOfficerList;
     private List<BlobLight> blobList;
-    
-    
-    protected List<HumanLink> humanLinkList;
+    private List<HumanLink> humanLinkList;
+    private List<MailingCityStateZip> zipList;
     
     
     private int defaultOccPeriodID;
@@ -758,6 +757,20 @@ public  class       MunicipalityDataHeavy
     @Override
     public int getBlobUpstreamPoolEnumPoolFeederID() {
         return 0;
+    }
+
+    /**
+     * @return the zipList
+     */
+    public List<MailingCityStateZip> getZipList() {
+        return zipList;
+    }
+
+    /**
+     * @param zipList the zipList to set
+     */
+    public void setZipList(List<MailingCityStateZip> zipList) {
+        this.zipList = zipList;
     }
   
     

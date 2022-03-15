@@ -118,6 +118,7 @@
                                             <div class="aob-container aob-container-objectstring">
 
                                                 <h:outputText value="#{sessionBean.sessMuni.muniName}"/>
+                                                <h:outputText value=" (#{sessionBean.sessMuni.muniCode})"/>
 
                                             </div>
                                             <div class="aob-container aob-container-actions">
@@ -134,7 +135,7 @@
                                                     <div class="restrict-main-contents-io-link link-button">
 
                                                         <p:commandLink    id="aob-muni-change-cl" 
-                                                                          value="change"
+                                                                          value="change muni"
                                                                           action="#{missionControlBB.reauthenticate}" 
                                                                           ajax="false"/>
                                                     </div>

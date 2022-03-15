@@ -867,6 +867,50 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     }
     
     /**
+     * Queries the municitystatezip table for official ZIPs
+     * @param muni
+     * @return a list of CityStateZip IDs
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+     public List<Integer> getMailingCityStateZipListByMuni(Municipality muni) throws IntegrationException, BObStatusException{
+        if(muni == null){
+            throw new BObStatusException("cannot get zips with null muni");
+            
+        }
+         
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<Integer> idl = new ArrayList<>();
+        try {
+            
+            String s =  "SELECT muni_municode, citystatezip_id\n" +
+                        "  FROM public.municitystatezip WHERE muni_municode=?;";
+            
+            stmt = con.prepareStatement(s);
+            stmt.setInt(1, muni.getMuniCode());
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                idl.add(rs.getInt("citystatezip_id"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.getMailingAddress", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return idl;
+        
+    }
+    
+    
+    /**
      * Queries the master city state zip table by zip code
      * @param zip the five-digit zip
      * @return a list of matching records that are default or accepted, not not accepted
@@ -1126,6 +1170,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
     }
     
+    
+    
     /**
      * Extracts a single human mailing address link given a human
      * @param hmalid
@@ -1168,6 +1214,242 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         } // close finally
         return hmalink;
     }
+    
+    
+      /**
+     * Extracts all mailing addresses associated with a given human
+     * @param madHolder
+     * @return the list of address objects
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public List<MailingAddressLink> getMailingAddressLinks(IFace_addressListHolder madHolder) 
+            throws IntegrationException, BObStatusException{
+        
+        if(madHolder == null || madHolder.getLinkedObjectSchemaEnum() == null){
+            throw new BObStatusException("Cannot get addresses by interface with null holder or its schema enum");
+        }
+        
+        List<MailingAddressLink> madLinkList = new ArrayList<>();
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("SELECT source_sourceid, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n");
+            sb.append("deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid, priority, \n");
+            sb.append(madHolder.getLinkedObjectSchemaEnum().getLINKED_OBJECT_FK_FIELD());
+            sb.append(", ");
+            sb.append(madHolder.getLinkedObjectSchemaEnum().getTargetTableFKField());
+            sb.append(" FROM ");
+            sb.append(madHolder.getLinkedObjectSchemaEnum().getLinkingTableName());
+            sb.append(" WHERE ");
+            sb.append(madHolder.getLinkedObjectSchemaEnum().getTargetTableFKField());
+            sb.append("=? AND deactivatedts IS NULL;");
+            
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, madHolder.getTargetObjectPK());
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                madLinkList.add(generateHumanMailingAddressLink(rs, madHolder));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator ...", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return madLinkList;
+    }
+    
+    
+    /**
+     * Writes a new record in a table that links a mailing address to a target
+     * @param alh
+     * @param madLink
+     * @return
+     * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public int linkMailingAddress(IFace_addressListHolder alh, MailingAddressLink madLink) throws BObStatusException, IntegrationException{
+        if(alh == null 
+                || madLink == null 
+                || madLink.getLinkedObjectRole() == null 
+                || madLink.getLinkedObjectRole().getSchema() == null){
+            throw new BObStatusException("Cannot link a mailing address with null link, or role, or schema enum"); 
+        }        
+          
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int freshID = 0;
+
+        try {
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append("INSERT INTO public.");
+            sb.append(madLink.getLinkedObjectRole().getSchema().getLinkingTableName());
+            sb.append(" (");
+            sb.append(madLink.getLinkedObjectRole().getSchema().getTargetTableFKField());
+            sb.append(",");
+            sb.append(madLink.getLinkedObjectRole().getSchema().getLINKED_OBJECT_FK_FIELD());
+            sb.append(", source_sourceid, " );
+            sb.append("            createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, " );
+            sb.append("            deactivatedts, deactivatedby_userid, notes, linkid, linkedobjectrole_lorid," );
+            sb.append("            priority)" );
+            sb.append("    VALUES (?, ?, ?," );
+            sb.append("            now(), ?, now(), ?," );
+            sb.append("            NULL, NULL, ?, DEFAULT, ?," );
+            sb.append("            ?);");
+            stmt = con.prepareStatement(sb.toString());
+            
+            stmt.setInt(1, alh.getTargetObjectPK());
+            stmt.setInt(2, madLink.getAddressID());
+            
+            if(madLink.getSource() != null){
+                stmt.setInt(3, madLink.getSource().getSourceid());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            if(madLink.getLinkCreatedByUserID() != 0){
+                stmt.setInt(4, madLink.getLinkCreatedByUserID());
+            }else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            
+            if(madLink.getLinkLastUpdatedByUserID() != 0){
+                stmt.setInt(5, madLink.getLinkLastUpdatedByUserID());
+            }else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+            stmt.setString(6, madLink.getNotes());
+            
+            if(madLink.getLinkedObjectRole() != null){
+                stmt.setInt(7, madLink.getLinkedObjectRole().getRoleID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(8, madLink.getPriority());
+                       
+            
+            stmt.execute();
+            
+            sb = new StringBuilder("SELECT currval('");
+            sb.append(madLink.getLinkedObjectRole().getSchema().getLinkingTableSequenceID());
+            sb.append("');");
+            Statement st = con.createStatement();
+            rs = st.executeQuery(sb.toString());
+            rs.next();
+
+            while (rs.next()) {
+                freshID = rs.getInt("currval");
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PropertyIntegrator.linkAddress: Unable to write mailing link!", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return freshID;
+        
+    }
+    
+    
+    /**
+     * Updates a small subset of fields on a mailing address link
+     * @param madLink
+     * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateMailingAddressLink(MailingAddressLink madLink) throws BObStatusException, IntegrationException{
+        if(madLink == null || madLink.getLinkID() == 0){
+            throw new BObStatusException("Cannot update a link with null link or ID = 0");
+        }
+        
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.");
+        sb.append(madLink.getLinkedObjectRoleSchemaEnum().getLinkingTableName());
+        sb.append(" SET source_sourceid=?, lastupdatedts=now(), lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?,");
+        sb.append("notes=?, linkedobjectrole_lorid=?, priority=? ");
+        sb.append(" WHERE ");
+        sb.append(madLink.getLinkedObjectRole().getSchema().getLinkedTablePKField());
+        sb.append("=?;");
+                
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+               
+            if(madLink.getSource() != null){
+                stmt.setInt(1, madLink.getSource().getSourceid());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            
+            if(madLink.getLinkLastUpdatedByUserID() != 0){
+                stmt.setInt(2, madLink.getLinkLastUpdatedByUserID());
+            }else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            
+            if(madLink.getLinkDeactivatedByUserID() != 0){
+                stmt.setInt(3, madLink.getLinkDeactivatedByUserID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            if(madLink.getDeactivatedTS() != null){
+                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(madLink.getDeactivatedTS()));
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            stmt.setString(5, madLink.getNotes());
+            
+            if(madLink.getLinkedObjectRole() != null){
+                stmt.setInt(6, madLink.getLinkedObjectRole().getRoleID());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(7, madLink.getPriority());
+            
+            stmt.setInt(8, madLink.getLinkID());
+            
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Error updating address link", ex);
+            
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        
+        
+    }
+    
+    
     
     
     /**
@@ -1258,6 +1540,34 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     }
     
     
+      /**
+     * Populator of links to mailing addresses
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private MailingAddressLink generateHumanMailingAddressLink(ResultSet rs, IFace_addressListHolder adlh) 
+            throws SQLException, IntegrationException, BObStatusException{
+        SystemIntegrator si = getSystemIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        MailingAddress ma = pc.getMailingAddress(rs.getInt(adlh.getLinkedObjectSchemaEnum().getLINKED_OBJECT_FK_FIELD()));
+        MailingAddressLink madLink = new MailingAddressLink(ma);
+        madLink.setLinkID(rs.getInt("linkid"));
+        
+        madLink.setLinkRole(si.getLinkedObjectRole(rs.getInt("linkedobjectrole_lorid")));
+        
+        // populate nonstandard fields:
+        if(rs.getInt("source_sourceid") != 0){
+            madLink.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
+        }
+        // populate standard fields with common method in SI
+        si.populateTrackedLinkFields(madLink, rs);
+        
+        return madLink;
+        
+    }
     
     /**
      * Populator of link object between a human and a mailing address

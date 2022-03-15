@@ -434,50 +434,7 @@ public class PropertyProfileBB
         System.out.println("PropertyProfileBB.onPersonConnectInitButtonChange : "+ reloadPropertyOnCurrentPropertyGetterCall);
     }
 
-    /**
-     * Listener for the user signaling their desire to connect a person
-     * @deprecated all this logic is now in PersonBB
-     *
-     * @return
-     */
-    public String onPersonConnectCommitButtonChange() {
-        PropertyCoordinator pc = getPropertyCoordinator();
-        PersonCoordinator persc = getPersonCoordinator();
-        try {
-            // based on the user's boolean button choice, either 
-            // look up a person by ID or use the object
-            if (isPersonLinkUseID() && getHumanIDToLink() != 0) {
-                Person checkPer = null;
-                checkPer = persc.getPerson(persc.getHuman(getHumanIDToLink()));
-                if (checkPer != null && checkPer.getHumanID() != 0) {
-                    pc.connectPersonToProperty(currentProperty, checkPer);
-                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Connected " + checkPer.getLastName() + " to property ID " + currentProperty.getParcelKey(), ""));
-                } else {
-                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Could not find a Person with ID " + getHumanIDToLink(), ""));
-                    
-                }
-
-            } else {
-                if (getPersonSelected() != null) {
-                    pc.connectPersonToProperty(currentProperty, getPersonSelected());
-                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Connected " + getPersonSelected().getLastName() + " to property ID " + currentProperty.getParcelKey(), ""));
-                } else {
-                    
-                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Could not complete link to person, sorry!", ""));
-                }
-            }
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-            
-        }
-
-        return "propertySearch";
-    }
+   
     
     /**
      * Listener for user requests to remove a link between property and person
