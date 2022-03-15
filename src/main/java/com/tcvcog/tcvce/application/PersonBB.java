@@ -1007,6 +1007,7 @@ public class PersonBB extends BackingBeanUtils {
     public void onSelectAndLinkPersonsInit(IFace_humanListHolder hlh){
         
         getSessionBean().setSessHumanListHolder(hlh);
+        getSessionBean().setSessHumanListHolderRefreshTrigger(hlh);
         
         personListComponentIDToUpdatePostLinkingOperation = 
                 FacesContext.getCurrentInstance()
@@ -1112,9 +1113,10 @@ public class PersonBB extends BackingBeanUtils {
                     System.out.println(ex);
                      getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Error linking persons: " + ex.getMessage(), ""));
+                        "Error linking person: " + ex.getMessage(), ""));
                 } 
             }
+            personsSelectedList.clear();
         }
     }
     

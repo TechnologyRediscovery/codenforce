@@ -39,9 +39,6 @@
                 draggableColumns="true"
                 reflow="true">
 
-
-                <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
-
                 <p:column width="10%" sortBy="#{v.status.label}">
                     <f:facet name="header">
                         <h:outputText value="Status" />
@@ -52,21 +49,19 @@
 
                 </p:column>
 
-                <p:column width="10%"
+                <p:column width="30%"
                           styleClass="wrapText">
 
                     <f:facet name="header">
                         <h:outputText value="Ordinance" />
                     </f:facet>
 
-                    <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
-                    <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
-                    <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
-                    <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
+                    <h:outputText  value="#{v.violatedEnfElement.headerString}"
+                                   escape="false"/>
 
                 </p:column>
 
-                <p:column width="10%"
+                <p:column width="20%"
                           styleClass="wrapText">
                     <f:facet name="header">
                         <h:outputText value="Date" />
@@ -205,35 +200,13 @@
 
                                 <!--NESTED DATA LABEL INLINE -->
                                 <div class="restrict-data-field-label-inline" >
-                                    <h:outputLabel value="Ordinance Details: #{bcv.violatedEnfElement.ordSubSecNum}: #{bcv.violatedEnfElement.ordSubSecTitle} " style="font-size: 2em;"/>
+                                    <h:outputLabel value="Ordinance Details: #{bcv.violatedEnfElement.headerString}" 
+                                                   escape="false"
+                                                   style="font-size: 2em;"/>
                                 </div>
                                 <!--NESTED DATA VALUE INLINE -->
                                 <div class="restrict-data-field-value-inline" >
-                                    <h:outputText    id="violation-add-source-ot"
-                                                     value="Source: #{bcv.violatedEnfElement.source.sourceName} (#{bcv.violatedEnfElement.source.sourceYear})"/>
-
-                                    <p:spacer height="2px" />
-
-                                    <h:outputText    id="violation-add-chapter-ot"
-                                                     value="Chapter #{bcv.violatedEnfElement.ordchapterNo}: #{bcv.violatedEnfElement.ordchapterTitle}"/>
-
-                                    <p:spacer height="2px" />
-
-                                    <h:outputText    id="violation-add-section-ot"
-                                                     value="Section #{bcv.violatedEnfElement.ordSecNum}: #{bcv.violatedEnfElement.ordSecTitle}"/>
-
-                                    <h:outputText value=" | " />
-
-                                    <h:outputText    id="violation-add-subsection-ot"
-                                                     value="Sub-Sec #{bcv.violatedEnfElement.ordSubSecNum}: #{bcv.violatedEnfElement.ordSubSecTitle}"/>
-
-                                    <p:spacer height="2px" />
-
-                                    <h:outputText    id="violation-add-category-ot"
-                                                     value="Category: #{!(empty bcv.violatedEnfElement.guideEntry) ? bcv.violatedEnfElement.guideEntry.category :'' }"/>
-
-                                    <p:spacer height="2px" />
-
+                                 
                                     <h:outputText   id="violation-add-ord-text"
                                                     styleClass="monospace"
                                                     value="#{bcv.violatedEnfElement.ordTechnicalText}"
@@ -435,26 +408,9 @@
         <h:form id="violation-details-form">
 
             <h2>
-
                 <h:outputText    id="violation-add-chapter-ot"
-                                 value="ch #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordchapterNo}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordchapterTitle}"/>
-
-                <h:outputText value=" , " />
-
-                <h:outputText    id="violation-add-section-ot"
-                                 value="sec #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSecNum}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSecTitle}"/>
-
-                <h:outputText value=" , " />
-
-                <h:outputText    id="violation-add-subsection-ot"
-                                 value="sub-sec #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSecNum}: #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSecTitle}"/>
-
-                <h:outputText value=" , "
-                              rendered="#{!(empty ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSubSecNum)}"/>
-
-                <h:outputText    id="violation-add-subsubsection-ot"
-                                 value="sub sub sec #{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSubSecNum}"
-                                 rendered="#{!(empty ceCaseSearchProfileBB.currentViolation.violatedEnfElement.ordSubSubSecNum)}"/>
+                                 value="#{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.headerString}"
+                                 escape="false"/>
             </h2>
 
             <!-- Violation status; single line-->
@@ -467,6 +423,7 @@
                                        value="Ordinance technical text"
                                        style="color:blue;"
                                        type="button" />
+                        <p:spacer height="5px" />
 
                         <p:commandLink id="violation-nuke-init-cl"
                                        oncomplete="PF('violation-remove-dialog-var').show()"
@@ -501,7 +458,8 @@
                     <!--NESTED DATA VALUE INLINE -->
                     <div class="restrict-data-field-value-inline" >
                         <h:outputText id="violation-prop-ot"
-                                      value="#{ceCaseSearchProfileBB.currentCase.property.addressString}"
+                                      value="#{ceCaseSearchProfileBB.currentCase.property.address.addressPretty2LineEscapeFalse}"
+                                      escape="false"
                                       />
                         <h:outputText id="violation-prop1-ot"
                                       value=", #{ceCaseSearchProfileBB.currentCase.property.muni.muniName}"
@@ -843,7 +801,14 @@
                      closable="true"
                      responsive="true">
 
-        >
+        <h2>
+            
+
+                    <h:outputText   id="violation-details-title"
+                                    value="#{ceCaseSearchProfileBB.currentViolation.violatedEnfElement.headerString}"
+                                    escape="false" />
+        
+        </h2>
         <div class="ui-g data_container_nested_restrict">
             <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field" >
                 <div class="restrict-data-field-label-inline" >
@@ -1655,8 +1620,6 @@
                     <p:rowToggler/>
                 </p:column>
 
-
-
                 <p:column width="10%" sortBy="#{cse.source.sourceName}"
                           filterBy="#{cse.source.sourceName}">
                     <f:facet name="header">
@@ -1688,7 +1651,7 @@
                     <h:outputText value="#{cse.ordSecNum}"/>
                 </p:column>
 
-                <p:column width="15%" sortBy="#{cse.ordSecTitle}"
+                <p:column width="12%" sortBy="#{cse.ordSecTitle}"
                           filterBy="#{cse.ordSecTitle}">
                     <f:facet name="header">
                         <h:outputText value="Section" />
@@ -1705,11 +1668,19 @@
 
                 <p:column sortBy="#{cse.ordSubSecTitle}"
                           filterBy="#{cse.ordSubSecTitle}"
-                          width="15%">
+                          width="12%">
                     <f:facet name="header">
                         <h:outputText value="SubSec. Title" />
                     </f:facet>
                     <h:outputText value="#{cse.ordSubSecTitle}"/>
+                </p:column>
+                <p:column sortBy="#{cse.ordSubSubSecNum}"
+                          filterBy="#{cse.ordSubSubSecNum}"
+                          width="6%">
+                    <f:facet name="header">
+                        <h:outputText value="SubSub#" />
+                    </f:facet>
+                    <h:outputText value="#{cse.ordSubSubSecNum}"/>
                 </p:column>
 
                 <p:column width="10%" sortBy="#{cse.guideEntry.category}"
@@ -1718,6 +1689,8 @@
                         <h:outputText value="Category" />
                     </f:facet>
                     <h:outputText value="#{cse.guideEntry.category}"/>
+                    <p:spacer height="2px" />
+                    <h:outputText value="#{cse.guideEntry.subCategory}"/>
                 </p:column>
 
                 <p:rowExpansion>

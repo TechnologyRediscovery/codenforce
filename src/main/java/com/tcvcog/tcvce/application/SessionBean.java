@@ -166,6 +166,7 @@ public class    SessionBean
     private Person sessPerson;
     private ActivatableRouteEnum sessPersonRoute;
     private IFace_humanListHolder sessHumanListHolder;
+    private IFace_humanListHolder sessHumanListHolderRefreshTrigger;
     
     private Person sessPersonQueued;
     private List<Person> sessPersonList;
@@ -2059,6 +2060,20 @@ public class    SessionBean
      */
     public void setSessHumanListHolder(IFace_humanListHolder sessHumanListHolder) {
         this.sessHumanListHolder = sessHumanListHolder;
+    }
+
+    /**
+     * @return the sessHumanListHolderRefreshTrigger
+     */
+    public IFace_humanListHolder getSessHumanListHolderRefreshTrigger() {
+        return sessHumanListHolderRefreshTrigger;
+    }
+
+    /**
+     * @param sessHumanListHolderRefreshTrigger the sessHumanListHolderRefreshTrigger to set
+     */
+    public void setSessHumanListHolderRefreshTrigger(IFace_humanListHolder sessHumanListHolderRefreshTrigger) {
+        this.sessHumanListHolderRefreshTrigger = sessHumanListHolderRefreshTrigger;
     }
 
     

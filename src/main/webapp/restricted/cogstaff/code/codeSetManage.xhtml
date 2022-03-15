@@ -305,13 +305,7 @@
                                                     <h:outputText value="Category" />
                                                 </f:facet>
                                                 <h:outputText value="#{cse.guideEntry.category}"/>
-                                            </p:column>
-
-                                            <p:column width="10%" sortBy="#{cse.guideEntry.subCategory}"
-                                                      filterBy="#{cse.guideEntry.subCategory}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Sub Category" />
-                                                </f:facet>
+                                                <p:spacer height="3px" />
                                                 <h:outputText value="#{cse.guideEntry.subCategory}"/>
                                             </p:column>
 
@@ -360,8 +354,16 @@
                                                 </f:facet>
                                                 <h:outputText value="#{cse.ordSubSecTitle}"/>
                                             </p:column>
+                                            <p:column sortBy="#{cse.ordSubSubSecNum}" 
+                                                      filterBy="#{cse.ordSubSubSecNum}"
+                                                      width="10%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="SubSub#" />
+                                                </f:facet>
+                                                <h:outputText value="#{cse.ordSubSubSecNum}"/>
+                                            </p:column>
 
-                                            <p:column   width="15%"
+                                            <p:column   width="13%"
                                                         headerText="Actions"
                                                         styleClass="centeredColumnContent"
                                                         >
@@ -501,7 +503,10 @@
                                                 </div>
 
                                                 <div class="outlinedBox">
-                                                    <h2>Code Element Content</h2>
+                                                    <h2>
+                                                        Ordinance:<h:outputText value="#{cse.headerString}"
+                                                                                escape="false" />
+                                                    </h2>
 
                                                     <h:outputLabel styleClass="bold" value="Technical Text"/>
                                                     <p:spacer height="15px"/>

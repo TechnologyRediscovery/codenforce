@@ -230,8 +230,7 @@
                         </p:selectOneMenu>
                     </div>
                 </div>
-
-                <f:facet name="footer">
+                <p:spacer height="5px" />
 
                     <div class="restrict-main-contents-io-button">
                         <p:commandButton    id="citation-update-status-commit-button"
@@ -242,7 +241,6 @@
                                             icon="fa fa-edit"
                                             update="citation-info-form"/>
                     </div>
-                </f:facet>
 
 
 
@@ -408,15 +406,9 @@
                     var="citvv"
                     widgetVar="citation-violation-compactlist-widgetvar">
 
-                    <h:outputText  value="Ch. #{citvv.violatedEnfElement.ordchapterNo}:" />
-                    <h:outputText  value="#{citvv.violatedEnfElement.ordchapterTitle} | " />
-                    <h:outputText  value="&#167;#{citvv.violatedEnfElement.ordSecNum}:" />
-                    <h:outputText  value="#{citvv.violatedEnfElement.ordSecTitle} |  " />
-                    <h:outputText  value="&#167;&#167;#{citvv.violatedEnfElement.ordSubSecNum} " />
-                    <h:outputText  value="#{citvv.violatedEnfElement.ordSubSecTitle} " />
-                    <h:outputText id="v-source-name-compactlist-ot" value="(#{citvv.violatedEnfElement.source.sourceName}" />
-                    <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
-                    <h:outputText id="v-source-year-compactlist-ot" value="#{citvv.violatedEnfElement.source.sourceYear}) | "/>
+                    <h:outputText  value="#{citvv.violatedEnfElement.headerString}"
+                                   escape="false"/>
+                    <p:spacer height="3px" />
                     <h:outputText id="status-compactlist-line-ot" value="Status: #{citvv.status.label}"/>
 
                 </p:dataScroller>

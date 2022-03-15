@@ -168,16 +168,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
             // EVENT LIST
 
-
             QueryEvent qe = sc.initQuery(QueryEventEnum.OCCPERIOD, cred);
             if (!qe.getParamsList().isEmpty()) {
                 qe.getParamsList().get(0).setEventDomainPK_val(per.getPeriodID());
             }
-            // Model after CECase
-//            EventCoordinator evc = getEventCoordinator();
-            // Looks like this is useless 
-//            evc.getEventList(opdh);
-
+            qe = sc.runQuery(qe);
+            
             opdh.setEventList(ec.downcastEventCnFPropertyUnitHeavy(qe.getBOBResultList()));
 
             // PROPOSAL LIST

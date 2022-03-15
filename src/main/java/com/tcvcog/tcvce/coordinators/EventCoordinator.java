@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -376,12 +377,20 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     private EventCnF configureEvent(EventCnF ev) throws IntegrationException, EventException{
-        PersonIntegrator pi = getPersonIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
         
         if(ev == null){
             return null;
         }
+        //set duration
+        long lduration = 0;
+        if(ev.getTimeStart() != null && ev.getTimeEnd() != null){
+            if(ev.getTimeEnd().isAfter(ev.getTimeStart())){
+                long sec = ev.getTimeEnd().toEpochSecond(ZoneOffset.UTC) - ev.getTimeEnd().toEpochSecond(ZoneOffset.UTC);
+                lduration = (long) ((double) sec / 60.0);
+            }
+        }
+        ev.setDuration(lduration);
         
         // Declare this event as either in the CE or Occ domain with 
         // our hacky little enum thingy
@@ -396,7 +405,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
        
-        ev.setPersonList(pc.assembleLinkedHumanLinks(ev));
+        ev.setHumanLinkList(pc.assembleLinkedHumanLinks(ev));
         
         return ev;
     }
@@ -446,10 +455,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         ev.setLastUpdatedBy(ua);
         ev.setLastUpdatedTS(LocalDateTime.now());
         ei.updateEvent(ev);
-        if(ev.getPersonList() != null && !ev.getPersonList().isEmpty()){
-            // TODO: Finish event persons
-            
-        }
         
     }
     
@@ -545,7 +550,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if(ec != null){
             
             e.setCategory(ec);
-
             e.setTimeStart(LocalDateTime.now());
             e.setTimeEnd(e.getTimeStart().plusMinutes(ec.getDefaultDurationMins()));
         }

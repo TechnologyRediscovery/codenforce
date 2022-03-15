@@ -1035,7 +1035,7 @@ i.status-display-icon-i{
 .wrapText{
     white-space: normal;
     overflow-wrap: normal;
-    word-break: break-all;
+    word-break: normal;
 }
 
 .roomy-top-margin{

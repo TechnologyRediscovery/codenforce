@@ -108,7 +108,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     public OccInspectedSpace getInspectedSpace(int inspectedspaceID) throws IntegrationException {
         OccInspectedSpace inspectedSpace = null;
         if (inspectedspaceID == 0) {
-            System.out.println("OccInspectionIntegrator.getInspectedSpace | called with spaceid=0");
             return inspectedSpace;
         }
         String querySpace = "SELECT inspectedspaceid, occinspection_inspectionid, \n"
@@ -135,14 +134,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             }
             stmt = con.prepareStatement(queryElements);
             if (inspectedSpace != null) {
-                System.out.println("inspectedSpace.getInspectedSpaceID(): " + inspectedSpace.getInspectedSpaceID());
                 stmt.setInt(1, inspectedSpace.getInspectedSpaceID());
                 rs = stmt.executeQuery();
                 while (rs.next()) {
                     inspectedEleList.add(getInspectedSpaceElement(rs.getInt("inspectedspaceelementid")));
                 }
-            } else {
-                System.out.println("OccInspectionIntegrator.getInspectedSpace | Failure: inspected space is null");
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -826,8 +822,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
             while (rs.next()) {
                 inspecIDList.add(rs.getInt("inspectionid"));
-                System.out.println("Found inspection ID: " + rs.getInt("inspectionid"));
-                System.out.println("...with the period ID: " + op.getPeriodID());
             }
 
         } catch (SQLException ex) {

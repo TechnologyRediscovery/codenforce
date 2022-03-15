@@ -839,14 +839,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             ArrayList<PublicInfoBundlePerson> personHorde = new ArrayList<>();
 
-            if (input.getPersonList() != null) {
-/// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                                    
-//                for (Person skeleton : input.getPersonList()) {
-
-//                    personHorde.add(extractPublicInfo(skeleton));
-//
-//                }
-            }
+         
 
             pib.setPersonList(personHorde);
 

@@ -1834,14 +1834,18 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsEvent genParams_event_occperid(SearchParamsEvent params, Credential cred ){
         params.setEventDomain_ctl(true);
         params.setEventDomain_val(DomainEnum.OCCUPANCY);
-        params.setBobID_ctl(true);
+        params.setBobID_ctl(false);
+        params.setActive_ctl(true);
+        params.setActive_val(false);
         return params;
     }
     
     public SearchParamsEvent genParams_event_cecase(SearchParamsEvent params, Credential cred ){
         params.setEventDomain_ctl(true);
         params.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
-        params.setBobID_ctl(true);
+        params.setBobID_ctl(false);
+        params.setActive_ctl(true);
+        params.setActive_val(false);
         return params;
         
     }

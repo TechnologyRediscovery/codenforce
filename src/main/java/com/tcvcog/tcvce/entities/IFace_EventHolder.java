@@ -25,6 +25,7 @@ import java.util.List;
  */
 public interface IFace_EventHolder {
     
+    public DomainEnum getEventDomain();
     public void setEventList(List<EventCnF> evList);
     public List<EventCnF> getEventList(ViewOptionsActiveHiddenListsEnum evViewOpt);
     public List<EventCnF> getEventList();

@@ -34,6 +34,7 @@ public class        CECase
     final static String CASE_TABLE_NAME = "cecase";
     final static String CASE_PK_FIELD = "caseid";
     final static String CASE_FRIENDLY_NAME = "Code Enforcement Case";
+    final static DomainEnum CECASE_ENUM = DomainEnum.CODE_ENFORCEMENT;
     
     
     
@@ -793,6 +794,11 @@ public class        CECase
     @Override
     public String getNoteHolderFriendlyName() {
         return CASE_FRIENDLY_NAME;
+    }
+
+    @Override
+    public DomainEnum getEventDomain() {
+        return CECASE_ENUM;
     }
 
    

@@ -59,7 +59,6 @@ public class PublicInfoBundleEventCnF extends PublicInfoBundle{
         input.setLastUpdatedTS(LocalDateTime.MIN);
         
         input.setNotes("*****");
-        input.setPersonList(new ArrayList<>());
         
         bundledEvent = input;
     }

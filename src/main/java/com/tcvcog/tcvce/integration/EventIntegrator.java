@@ -525,7 +525,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
         params.appendSQL("SELECT DISTINCT eventid \n");
         params.appendSQL("FROM public.event INNER JOIN public.eventcategory ON (category_catid = categoryid) \n");
-        params.appendSQL("LEFT OUTER JOIN public.eventperson ON (ceevent_eventid = event.eventid) \n");
+        params.appendSQL("LEFT OUTER JOIN public.eventhuman ON (eventhuman.event_eventid = event.eventid) \n");
         // to get to property and hence municipality, we must traverse different key pathways
         // through the database for CE versus Occ. This is all backflippy crazy shit because
         // of the decision decision to maintain only one event tablef or both Occ events and CE events.
@@ -601,10 +601,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
            // *******************************
             if (params.isPerson_ctl()) {
                 if(params.getPerson_val() != null){
-                    params.appendSQL("AND eventperson.person_personid=? ");
+                    params.appendSQL("AND eventhuman.human_humanid=? ");
                 } else {
                     params.setPerson_ctl(false);
-                    params.appendToParamLog("EVENT PERSONS: No Person object specified; person filter disabled; | ");
+                    params.appendToParamLog("EVENT PERSONS: No human object specified; person filter disabled; | ");
                 }
             }
 

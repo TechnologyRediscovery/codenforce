@@ -43,6 +43,7 @@ public  class       OccPeriod
     final static String OCCPERIOD_TABLE_NAME = "occperiod";
     final static String OCCPERIOD_PK_FIELD = "periodid";
     final static String OCCPERIOD_HFNAME = "Occupancy Period";
+    final static DomainEnum OCC_DOMAIN = DomainEnum.OCCUPANCY;
     
     
     
@@ -632,5 +633,10 @@ public  class       OccPeriod
     @Override
     public String getNoteHolderFriendlyName() {
         return OCCPERIOD_HFNAME;
+    }
+
+    @Override
+    public DomainEnum getEventDomain() {
+        return OCC_DOMAIN;
     }
 }

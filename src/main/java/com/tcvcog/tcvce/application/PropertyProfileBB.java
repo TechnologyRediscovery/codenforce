@@ -401,73 +401,9 @@ public class PropertyProfileBB
 
     }
 
-    /**
-     * Listener for user requests to create a note event on this property
-     *
-     * @return redirection to the EventAdd page
-     */
-    public String onAddNoteEventButtonChange() {
-        EventCoordinator ec = getEventCoordinator();
-
-        try {
-            EventCnF ev = ec.initEvent(currentProperty.getPropInfoCaseList().get(0),
-                    ec.getEventCategory(Integer.parseInt(
-                            getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                                    .getString("propertyinfoeventcatid"))));
-            getSessionBean().setSessEvent(ev);
-        } catch (IntegrationException | BObStatusException | EventException ex) {
-            System.out.println(ex);
-        }
-
-        return "eventAdd";
-
-    }
+   
     
-    
-     /**
-     * Listener for commencement of note writing process
-     *
-     * @param ev
-     */
-    public void onNoteInitButtonChange(ActionEvent ev) {
-        setFormNoteText(new String());
-
-    }
-
-    /**
-     * Listener for user requests to commit new note content to the current
-     * Property
-     *
-     * @param ev
-     */
-    public void onNoteCommitButtonChange(ActionEvent ev) {
-        SystemCoordinator sc = getSystemCoordinator();
-        PropertyCoordinator pc = getPropertyCoordinator();
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
-        mbp.setExistingContent(currentProperty.getNotes());
-        mbp.setNewMessageContent(getFormNoteText());
-        mbp.setHeader("Property Note");
-        mbp.setUser(getSessionBean().getSessUser());
-        currentProperty.setNotes(sc.appendNoteBlock(mbp));
-        try {
-            currentProperty.setLastUpdatedTS(LocalDateTime.now());
-            pc.updateParcel(currentProperty, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Succesfully appended note!", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Fatal error appending note; apologies!", ""));
-
-        }
-
-        reloadCurrentPropertyDataHeavy();
-
-    }
-
+   
     /**
      * Listener for user requests to explore the property info cases on this
      * property

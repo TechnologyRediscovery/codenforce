@@ -16,66 +16,16 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.BlobCoordinator;
-import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.BlobException;
-import com.tcvcog.tcvce.domain.BlobTypeException;
-import com.tcvcog.tcvce.domain.EventException;
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobLight;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
-import com.tcvcog.tcvce.entities.CaseStageEnum;
-import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.CitationCodeViolationLink;
-import com.tcvcog.tcvce.entities.CitationFilingType;
-import com.tcvcog.tcvce.entities.CitationStatus;
-import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
-import com.tcvcog.tcvce.entities.CodeSet;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.CourtEntity;
-import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
-import com.tcvcog.tcvce.entities.DomainEnum;
-import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.Human;
-import com.tcvcog.tcvce.entities.HumanLink;
-import com.tcvcog.tcvce.entities.IntensityClass;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
-import com.tcvcog.tcvce.entities.PageModeEnum;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonLinkHeavy;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyDataHeavy;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.coordinators.*;
+import com.tcvcog.tcvce.domain.*;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
-import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.DateTimeUtil;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.util.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.IOException;
@@ -83,11 +33,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -1944,49 +1890,7 @@ public class CECaseSearchProfileBB
         }
     }
 
-    public void onEventRemoveInitButtonChange(ActionEvent ev){
-        // do nothing yet
-    }
-    
-    public String onEventRemoveCommitButtonChange(){
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            ec.removeEvent(getCurrentEvent(), getSessionBean().getSessUser());
-             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Removed event ID " + getCurrentEvent().getEventID(), ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                ex.getMessage(), ""));
-             return "";
-        }
-        
-        return "ceCaseProfile";
-        
-    }
-
-    
-    public String onEventReactivateCommitButtonChange(){
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            currentEvent.setActive(true);
-            ec.updateEvent(currentEvent, getSessionBean().getSessUser());
-             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Reactivated event ID " + getCurrentEvent().getEventID(), ""));
-        } catch (IntegrationException | BObStatusException | EventException ex) {
-            System.out.println(ex);
-             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                ex.getMessage(), ""));
-             return "";
-        }
-        
-        return "ceCaseProfile";
-        
-    }
+  
     
     /**
      * All Code Enforcement case events are funneled through this method which
@@ -2185,27 +2089,7 @@ public class CECaseSearchProfileBB
 
     }
 
-    /**
-     * Listener method for adding the selected person to a queue
-     * @param ev 
-     */
-    public void queueSelectedPerson(ActionEvent ev) {
-        PersonCoordinator pc = getPersonCoordinator();
-        if (eventHumanSelected != null) {
-            getCurrentEvent().getPersonList().add(pc.createHumanLinkSkeleton(eventHumanSelected));
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Please select one or more people to attach to this event",
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        }
-    }
-
-    public void deQueuePersonFromEvent(Person p) {
-        if (getCurrentEvent().getPersonList() != null) {
-            getCurrentEvent().getPersonList().remove(p);
-        }
-    }
+   
 
    
       /**

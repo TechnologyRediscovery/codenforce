@@ -60,7 +60,7 @@ public  class   EventCnFPropUnitCasePeriodHeavy
         this.hidden = ev.isHidden();
         
         this.notes = ev.getNotes();
-        this.personList = ev.getPersonList();
+        
     }
 
     public Property getProperty(){
