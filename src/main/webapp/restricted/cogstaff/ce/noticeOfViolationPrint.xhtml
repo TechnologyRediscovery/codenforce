@@ -25,7 +25,25 @@
                 </div>
                 
                 <div class="addressee" style="left: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_left}px; top: #{noticeOfViolationBB.currentNotice.style.nov_addressee_margin_top}px">
+            <h:outputText value="DRAFT NOTICE: Before printing, click 'finalize and lock' to remove this notice" 
+                          style="color:darkred; font-size: 2em; font-weight: bold;"
+                          rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}"/>
+            <p:spacer height="5px" />
+            <h:outputText value="[FYI: When you finalize and lock the notice, the recipient's name, address, and the officer contact information is copied into permament boxes in the DB so even if the records change, the notice history contains exactly the values used when the notice was sent.]" 
+                          style="color:darkblue; font-size: 0.8em; font-style: italic;"
+                          rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}"/>
+            <p:spacer height="5px" />
+            
 
+                    <h:outputText value="#{noticeOfViolationBB.currentNotice.recipient.name}"
+                                  rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}" />
+                    <p:spacer height="5px" />
+                    
+                    <h:outputText value="#{noticeOfViolationBB.currentNotice.recipientMailingAddress.addressPretty2LineEscapeFalse}"
+                                  escape="false"
+                                  rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}" />
+                    
+                     
                     <f:subview id="subview-addressee-normaladdress">
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedRecipientName}"/>
                         <br />
@@ -120,6 +138,19 @@
                     </div>
 
                     <div class="signature">
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficerPerson.name}"
+                                      rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}" />
+                        
+                        <br />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficerPerson.jobTitle}"
+                                      rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}" />
+                        <br />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficerPerson.primaryPhone.phoneNumber}"
+                                      rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}" />
+                        <br />
+                        <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficerPerson.primaryEmail.emailaddress}"
+                                      rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}" />
+                        
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerName}" />
                         <br />
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerTitle}" />

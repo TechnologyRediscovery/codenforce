@@ -24,11 +24,16 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -52,6 +57,9 @@ public class PropertyProfileBB
     private boolean currentParcelInfoEditMode;
     
     private List<PropertyUseType> putList;
+    
+    // UNIT STUFF
+    protected boolean unitEditMode;
     private PropertyUnitDataHeavy currentPropertyUnit;
     private boolean reloadPropertyOnCurrentPropertyGetterCall;
     
@@ -63,8 +71,8 @@ public class PropertyProfileBB
     
     
     private OccPeriod currentOccPeriod;
-    private OccPeriodType selectedOccPeriodType;
     private List<OccPeriodType> occPeriodTypeList;
+    private List<EventCategory> occPeriodOriginiationEventCandidateList;
     
     private Municipality muniSelected;
     
@@ -146,25 +154,9 @@ public class PropertyProfileBB
         
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            if(getSelectedOccPeriodType() != null){
-                System.out.println("PropertyProfileBB.initateNewOccPeriod | selectedType: " + getSelectedOccPeriodType().getTypeID());
-                currentOccPeriod = oc.initOccPeriod(
-                        getCurrentProperty(), 
-                        getCurrentPropertyUnit(), 
-                        getSelectedOccPeriodType(), 
-                        getSessionBean().getSessUser(), 
-                        getSessionBean().getSessMuni());
-                getCurrentOccPeriod().setType(getSelectedOccPeriodType());
-                int newID = 0;
-                newID = oc.addOccPeriod(getCurrentOccPeriod(), getSessionBean().getSessUser());
-                getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessUser().getMyCredential()));
-            } else {
-                getFacesContext().addMessage(null,
-                                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                            "Please select a period type" , ""));
-                return "";
-            }
-        } catch (EventException | AuthorizationException | ViolationException | IntegrationException | BObStatusException | InspectionException | SearchException ex) {
+            int newID = oc.insertOccPeriod(currentOccPeriod, currentProperty, getSessionBean().getSessUser());
+            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessUser().getMyCredential()));
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -175,6 +167,11 @@ public class PropertyProfileBB
     }
     
     
+    /**
+     * Listener to go and see occ period page
+     * @param op
+     * @return 
+     */
    public String exploreOccPeriod(OccPeriod op){
        OccupancyCoordinator oc = getOccupancyCoordinator();
        if(op != null){
@@ -194,9 +191,13 @@ public class PropertyProfileBB
      * Called when the user initiates new occ period creation
      * @param pu 
      */
-    public void initiateNewOccPeriodCreation(PropertyUnit pu){
+    public void onOccperiodCreateInitButtonChange(PropertyUnit pu){
         PropertyCoordinator pc = getPropertyCoordinator();
-        selectedOccPeriodType = null;
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        currentOccPeriod = oc.getOccPeriodSkeleton(pu, getSessionBean().getSessUser());
+        occPeriodOriginiationEventCandidateList = ec.determinePermittedEventCategories(EventType.Occupancy, getSessionBean().getSessUser());
+        
         try {
             currentPropertyUnit = pc.getPropertyUnitWithLists(pu, getSessionBean().getSessUser().getKeyCard());
         } catch (IntegrationException | AuthorizationException | BObStatusException | EventException  ex) {
@@ -205,6 +206,11 @@ public class PropertyProfileBB
     }
     
     
+    /**
+     * Listener for user requests to start property creation 
+     * process
+     * @param ev 
+     */
     public void initiatePropertyCreation(ActionEvent ev){
         
         PropertyCoordinator pc = getPropertyCoordinator();
@@ -215,7 +221,10 @@ public class PropertyProfileBB
         } 
     }
     
-    
+    /**
+     * Listener for user requests to insert a new property
+     * @param ev 
+     */
     public void insertProp(ActionEvent ev){
         PropertyCoordinator pc = getPropertyCoordinator();
         UserAuthorized ua = getSessionBean().getSessUser();
@@ -389,6 +398,23 @@ public class PropertyProfileBB
 
         
     }
+    
+      /**
+     * Special getter that checks the session for updates on just this person.
+     * @return 
+     */
+    public List<MailingAddressLink> getCurrentPropertyMADLinkList(){
+        if(currentProperty != null){
+            List<MailingAddressLink> sessLinkList = getSessionBean().getSessMailingAddressLinkRefreshedList();
+            if(sessLinkList != null){
+                currentProperty.setMailingAddressLinkList(sessLinkList);
+                getSessionBean().setSessMailingAddressLinkRefreshedList(null);
+            }
+            return currentProperty.getMailingAddressLinkList();
+        }
+        return new ArrayList<>();
+    }
+    
 
     
 
@@ -436,29 +462,7 @@ public class PropertyProfileBB
 
    
     
-    /**
-     * Listener for user requests to remove a link between property and person
-     * TODO: Fix during parcelization
-     * @deprecated replaced by shared logic on PersonBB
-     * @param p
-     * @return 
-     */
-    public String onPersonConnectRemoveButtonChange(Person p){
-        PropertyCoordinator pc = getPropertyCoordinator();
-//        try {
-//            pc.connectRemovePersonToProperty(currentProperty, p, getSessionBean().getSessUser());
-//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-//                            "Removed property-person link and created documentation note.", ""));
-//        } catch (IntegrationException | BObStatusException ex) {
-//            System.out.println(ex);
-//            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-//                            "Could not remove link from property to person, sorry!", ""));
-//        }
-        
-        
-        return "propertySearch";
-    }
-
+  
     
 
     /**
@@ -472,10 +476,14 @@ public class PropertyProfileBB
         return "";
     }
 
-    public String onPropUnitExploreButtonChange() {
+    /**
+     * Listener for user requests to manage units on a property
+     * @param ev 
+     */
+    public void onPropUnitExploreButtonChange(ActionEvent ev) {
 
-        getSessionBean().setSessProperty(currentProperty);
-        return "propertyUnits";
+        System.out.println("PropertyProfileBB.onPropUnitExploreButtonChange");
+        
     }
 
     /**
@@ -733,6 +741,132 @@ public class PropertyProfileBB
     
     
     // ********************************************************
+    // *******************   UNIT TOOLS ***********************
+    // ********************************************************
+    
+      public String manageOccPeriod(OccPeriod op) {
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+
+        try {
+            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessUser().getMyCredential()));
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not load occupancy period with data" + ex.getMessage(), ""));
+
+        }
+        return "occPeriodWorkflow";
+
+    }
+      
+      /**
+       * Listener for user requests to view or edit a property unit
+       * 
+       * @param pu 
+       */
+      public void onUnitViewEditLinkClick(PropertyUnit pu){
+          PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            currentPropertyUnit = pc.getPropertyUnitWithLists(pu, getSessionBean().getSessUser().getKeyCard());
+        } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
+            System.out.println(ex);
+        } 
+          
+      }
+
+      /**
+       * listener for user requests to start the unit add process
+       * @param ev 
+       */
+      public void onUnitAddInitButtonChange(ActionEvent ev){
+          PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            currentPropertyUnit = pc.getPropertyUnitWithLists(pc.getPropertyUnitSkeleton(currentProperty), getSessionBean().getSessUser().getKeyCard());
+            unitEditMode = true;
+        } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error starting unit creation: " + ex.getMessage(), ""));
+        } 
+          
+      }
+      
+      /**
+       * Listener for the press of the unit edit on/off mode
+       * @param ev 
+       */
+      public void onUnitEditToggleButtonChange(ActionEvent ev){
+          if(unitEditMode){
+              if(currentPropertyUnit != null){
+                  if(currentPropertyUnit.getUnitID() == 0){
+                      onUnitAddCommit();
+                  } else {
+                      onUnitUpdateCommit();
+                  }
+                  reloadCurrentPropertyDataHeavy();
+              }
+          }
+          unitEditMode = !unitEditMode;
+      }
+      
+      /**
+       * Listener for user request to abort the unit edit process
+       * @param ev 
+       */
+      public void onUnitEditModeAbortButtonChange(ActionEvent ev){
+          unitEditMode = !unitEditMode;
+          
+      }
+      
+      /**
+       * Internal caller to the coordinator for unit adds
+       */
+      private void onUnitAddCommit(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.insertPropertyUnit(currentPropertyUnit, currentProperty, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                  new FacesMessage(FacesMessage.SEVERITY_INFO,
+                          "Unit add success!", ""));
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error on unit insert: " + ex.getMessage(), ""));
+            
+        }
+          
+      }
+      
+      /**
+       * Internal caller to the coordinator for unit updates
+       */
+      private void onUnitUpdateCommit(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.updatePropertyUnit(currentPropertyUnit, currentProperty, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                  new FacesMessage(FacesMessage.SEVERITY_INFO,
+                          "Unit update success!", ""));
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error on unit update: " + ex.getMessage(), ""));
+            
+        }
+          
+          
+      }
+      
+      
+      
+     
+    
+    
+    
+    // ********************************************************
     // **********   GETTERS AND SETTERS ***********************
     // ********************************************************
     
@@ -777,13 +911,7 @@ public class PropertyProfileBB
     }
 
   
-    /**
-     * @return the selectedOccPeriodType
-     */
-    public OccPeriodType getSelectedOccPeriodType() {
-        return selectedOccPeriodType;
-    }
-
+ 
     /**
      * @return the occPeriodTypeList
      */
@@ -791,12 +919,7 @@ public class PropertyProfileBB
         return occPeriodTypeList;
     }
 
-    /**
-     * @param selectedOccPeriodType the selectedOccPeriodType to set
-     */
-    public void setSelectedOccPeriodType(OccPeriodType selectedOccPeriodType) {
-        this.selectedOccPeriodType = selectedOccPeriodType;
-    }
+   
 
     /**
      * @param occPeriodTypeList the occPeriodTypeList to set
@@ -1153,6 +1276,34 @@ public class PropertyProfileBB
      */
     public void setReloadPropertyOnCurrentPropertyGetterCall(boolean reloadPropertyOnCurrentPropertyGetterCall) {
         this.reloadPropertyOnCurrentPropertyGetterCall = reloadPropertyOnCurrentPropertyGetterCall;
+    }
+
+    /**
+     * @return the occPeriodOriginiationEventCandidateList
+     */
+    public List<EventCategory> getOccPeriodOriginiationEventCandidateList() {
+        return occPeriodOriginiationEventCandidateList;
+    }
+
+    /**
+     * @param occPeriodOriginiationEventCandidateList the occPeriodOriginiationEventCandidateList to set
+     */
+    public void setOccPeriodOriginiationEventCandidateList(List<EventCategory> occPeriodOriginiationEventCandidateList) {
+        this.occPeriodOriginiationEventCandidateList = occPeriodOriginiationEventCandidateList;
+    }
+
+    /**
+     * @return the unitEditMode
+     */
+    public boolean isUnitEditMode() {
+        return unitEditMode;
+    }
+
+    /**
+     * @param unitEditMode the unitEditMode to set
+     */
+    public void setUnitEditMode(boolean unitEditMode) {
+        this.unitEditMode = unitEditMode;
     }
 
   

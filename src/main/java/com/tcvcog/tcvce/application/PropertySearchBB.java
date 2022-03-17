@@ -229,13 +229,13 @@ public class PropertySearchBB extends BackingBeanUtils{
         SystemCoordinator sc = getSystemCoordinator();
         
         try {
-            getSessionBean().setSessProperty(pc.assemblePropertyDataHeavy(prop, getSessionBean().getSessUser()));
+            String outcome = getSessionBean().navigateToPageCorrespondingToObject(prop);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                                         "Managing property at " + prop.getAddressString() , ""));
             sc.logObjectView(getSessionBean().getSessUser(), prop);
-            return "propertyInfo";
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            return outcome;
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,

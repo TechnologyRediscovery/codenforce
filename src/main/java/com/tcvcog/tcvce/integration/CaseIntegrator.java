@@ -2242,7 +2242,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         SystemIntegrator si = getSystemIntegrator();
         EventCoordinator ec = getEventCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
-        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator propc = getPropertyCoordinator();
         
         // the magical moment of notice instantiation
         NoticeOfViolation notice = new NoticeOfViolation();
@@ -2291,7 +2291,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             notice.setRecipient(pc.getPersonByHumanID(rs.getInt("recipient_humanid")));
         }
         if(rs.getInt("recipient_mailing") != 0){
-            notice.setRecipientMailingAddress(pi.getMailingAddress(rs.getInt("recipient_mailing")));
+            notice.setRecipientMailingAddress(propc.getMailingAddress(rs.getInt("recipient_mailing")));
         }
         if(rs.getTimestamp("fixedrecipientxferts") != null){
             notice.setFixedAddrXferTS(rs.getTimestamp("fixedrecipientxferts").toLocalDateTime());

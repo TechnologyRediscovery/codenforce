@@ -460,11 +460,12 @@
                                             value="#{ceCaseSearchProfileBB.caseList}"
                                             tableStyleClass="primeDataTable">
 
-                                            <p:column width="5%" sortBy="#{c.caseID}">
+                                            <p:column width="10%" sortBy="#{c.caseManager.human.name}"
+                                                      filterBy="#{c.caseManager.human.name}">
                                                 <f:facet name="header">
-                                                    <h:outputText value="ID" />
+                                                    <h:outputText value="Manager" />
                                                 </f:facet>
-                                                <h:outputText value="#{c.caseID}"/>
+                                                <h:outputText value="#{c.caseManager.human.name}"/>
                                             </p:column>
                                             <p:column width="10%" sortBy="#{c.originationDate}">
                                                 <f:facet name="header">
@@ -476,7 +477,7 @@
                                                               style="font-style: italic"/>
 
                                             </p:column>
-                                            <p:column width="12%" sortBy="#{c.property.addressString}">
+                                            <p:column width="15%" sortBy="#{c.property.address.buildingNo}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Property" />
                                                 </f:facet>
@@ -513,6 +514,8 @@
                                                                         value="view"
                                                                         action="#{navigationBB.onCECaseListItemSelect(c)}"
                                                                         ajax="false"/>
+                                                        <p:spacer height="3px" />
+                                                        <h:outputText value="ID #{c.caseID}" />
 
                                                 </div>
                                             </p:column>

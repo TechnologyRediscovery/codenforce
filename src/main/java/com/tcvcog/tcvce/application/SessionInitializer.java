@@ -520,6 +520,9 @@ public  class       SessionInitializer
             
             if(sessBean.getSessPropertyList() == null || sessBean.getSessPropertyList().isEmpty()){
                 sessBean.setSessProperty(pc.selectDefaultProperty(ua));
+                if(sessBean.getSessProperty() != null && sessBean.getSessProperty().getAddress() != null){
+                    sessBean.setSessMailingAddress(sessBean.getSessProperty().getAddress());
+                }
             } else {
 //                sessBean.setSessProperty(pc.assemblePropertyDataHeavy(sessBean.getSessPropertyList().get(0), cred));
             }

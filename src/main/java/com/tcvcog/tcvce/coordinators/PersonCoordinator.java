@@ -417,7 +417,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             throw new BObStatusException("Cannot configure null person");
         }
         
-        
+        // sort our contacts.
         p.setMailingAddressLinkList(pc.getMailingAddressLinkList(p));
         List<ContactPhone> phl = pi.getContactPhoneList(p.getHumanID());
         if(phl != null && phl.size() >= 2){

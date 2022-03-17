@@ -987,21 +987,9 @@
 
                     <p>Table contains all Persons currently connected to this case's property:
                         <h:outputText value="(Parcel ID: #{noticeOfViolationBB.currentCase.property.countyParcelID})" />
-                        If you don't see the persons you expect,  
+                        If you don't see the persons you expect, navigate to the property profile and connect the person first.
 
-                        <p:commandLink  id="nov-propperson-manage-cl"
-                                        value="search for persons and link them to this property"
-                                        ajax="true"
-                                        style="color:blue;"
-                                        actionListener="#{personBB.onPersonSearchInitLinkClick}"
-                                        oncomplete="PF('human-search-dialog-var').show();"
-                                        update="human-search-dialog
-                                        search-query-form
-                                        log-form
-                                        person-list-quickloads-form
-                                        pers-search-results-form
-                                        pers-selected-form
-                                        hlh-humlist-form"/>
+                        
                     </p>
 
                     <p:spacer height="3px" />
@@ -1070,6 +1058,7 @@
                                                nov-growl-form"
                                                actionListener="#{noticeOfViolationBB.storeRecipientAddress(recipaddr)}"
                                                />
+                                <p:spacer height="3px" />
                             </p:repeat>
                         </p:rowExpansion>
                     </p:dataTable>
@@ -1079,7 +1068,7 @@
 
                     <h2>Addresses attached to current property</h2>
                     <p:repeat   id="prop-addr-repeater"
-                                value="#{sessionBean.sessProperty.addresses}"
+                                value="#{sessionBean.sessProperty.mailingAddressLinkList}"
                                 var="propaddr">
                         <h:outputText value="#{propaddr.addressPretty2LineEscapeFalse}"
                                       escape="false" />
@@ -1092,6 +1081,7 @@
                                        nov-growl-form"
                                        actionListener="#{noticeOfViolationBB.storeRecipientAddress(propaddr)}"
                                        />
+                        <p:spacer height="3px" />
                     </p:repeat>
                 </div>
             </div>

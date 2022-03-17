@@ -706,19 +706,23 @@
                          header="Addresses">
                     <h:form id="person-profile-addresses-form">
                         <p:commandButton      id="addresses-add-cb"
+                                              value="Connect person to session Address" 
                                               ajax="true"
                                               icon="fa fa-link"
-                                              actionListener="#{addressBB.onMailingAddressAddInitButtonChange}"
-                                              oncomplete="PF('address-search-dialog-var').show()"
+                                              actionListener="#{addressBB.onLinkToSessionMailingAddressInitButtonChange(personBB.currentPerson)}"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                              value="Connect Address" />
-
+                                              oncomplete="PF('address-link-dialog-var').show()"
+                                              update="address-link-dialog
+                                                    address-linking-form
+                                                    addresslink-list-growl-form">
+                            <f:param name="initiating-address-list-component-id" value="person-profile-addresses-form" />
+                        </p:commandButton>
 
 
                         <p:spacer height="5px"/>
 
                         <p:dataTable    id="person-addresses-table"
-                                        value="#{personBB.currentPerson.mailingAddressLinkList}"
+                                        value="#{personBB.currentPersonMADLinkList}"
                                         var="hmal"
                                         rowKey="#{hmal.addressID}"
                                         tableStyleClass="primeDataTable"
@@ -728,9 +732,9 @@
 
                             <p:column width="10%">
                                 <f:facet name="header">
-                                    <h:outputText value="ID"/>
+                                    <h:outputText value="Link ID"/>
                                 </f:facet>
-                                <h:outputText value="#{hmal.addressID}" />
+                                <h:outputText value="#{hmal.linkID}" />
                             </p:column>
 
                             <p:column width="50%">
@@ -738,23 +742,10 @@
                                     <h:outputText value="Address"/>
                                 </f:facet>
 
-                                <h:outputText   rendered="#{hmal.poBox != 0}"
-                                                value="#{hmal.poBox}" />
-
-                                <h:outputText   rendered="#{hmal.poBox eq 0}"
-                                                value="#{hmal.buildingNo}" />
-                                <h:outputText   rendered="#{hmal.poBox eq 0}"
-                                                value=" " />
-                                <h:outputText   rendered="#{hmal.poBox eq 0}"
-                                                value="#{hmal.street.name}" />
-
-                                <p:spacer height="2px" />
-
-                                <h:outputText value="#{hmal.street.cityStateZip.city}" />
-                                <h:outputText value=", " />
-                                <h:outputText value="#{hmal.street.cityStateZip.state}" />
-                                <h:outputText value=" " />
-                                <h:outputText value="#{hmal.street.cityStateZip.zipCode}" />
+                                <h:outputText value="#{hmal.addressPretty2LineEscapeFalse}"
+                                              escape="false" />
+                                <p:spacer height="3px" />
+                                <h:outputText value="(Addr ID: #{hmal.addressID})" />
                             </p:column>
 
                             <p:column width="25%">
@@ -764,13 +755,16 @@
 
                                 <p:commandLink      id="address-actions-cl"
                                                     ajax="true"
-                                                    actionListener="#{addressBB.onMailingAddressViewEditLinkClick(hmal)}"
+                                                    actionListener="#{addressBB.onMalingAddressLinkViewEditInit(hmal)}"
                                                     style="color:blue;"
-                                                    oncomplete="PF('address-dialog-var').show()"
+                                                    oncomplete="PF('address-link-dialog-var').show()"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                    update="address-info-form
-                                                    address-links-form"
-                                                    value="view/edit" />
+                                                    update="address-link-dialog
+                                                    address-linking-form
+                                                    addresslink-list-growl-form"
+                                                    value="view/edit" >
+                                    <f:param name="initiating-address-list-component-id" value="person-profile-addresses-form" />
+                                </p:commandLink>
 
                             </p:column>
                         </p:dataTable>

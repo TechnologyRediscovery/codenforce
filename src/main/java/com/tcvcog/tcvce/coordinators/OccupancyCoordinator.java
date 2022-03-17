@@ -285,7 +285,27 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return period;
 
     }
+    
+    /**
+     * Generator method for creating a new occ period skeleton for
+     * creation origination
+     * @param pu
+     * @param ua the current user, and if they have an officer swearing
+     * then they'll become the unit manager
+     * @return 
+     */
+    public OccPeriod getOccPeriodSkeleton(PropertyUnit pu, UserAuthorized ua){
+        OccPeriod per = new OccPeriod();
+        per.setPropertyUnitID(pu.getUnitID());
+        if(ua.getKeyCard().getGoverningAuthPeriod().getOathTS() != null 
+                || ua.getKeyCard().getGoverningAuthPeriod().getRole().getRank() == RoleType.Developer.getRank()){
+            per.setManager(ua);
+        }
+        
+        return per;
+    }
 
+    
     public List<OccPeriod> assembleOccPeriodHistoryList(Credential cred) {
         OccupancyIntegrator oi = getOccupancyIntegrator();
 
@@ -416,6 +436,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     }
 
+    
     /**
      * Logic intermediary for Location Descriptors
      * @param locid
@@ -425,8 +446,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public OccLocationDescriptor getOccLocationDescriptor(int locid) throws IntegrationException{
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         return oii.getLocationDescriptor(locid);
-        
-        
+       
     }
     
     /**
@@ -476,7 +496,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             }
         }
         try {
-            if (period.getGoverningInspection() != null) {
+            if (period.getGoverningInspection() != null && selIns != null) {
                 if (selIns.getInspectionID() != period.getGoverningInspection().getInspectionID()) {
                     activateOccInspection(selIns);
                 }
@@ -488,32 +508,28 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     }
 
     /**
-     * Initialization method for creating a skeleton of an OccPeriod with
+     * Initialization method for creating a of an OccPeriod with
      * sensible default values for first insertion into DB
      *
+     * @param period
      * @param p
-     * @param pu
-     * @param perType
-     * @param u
-     * @param muni
+     * @param ua
      * @return
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public OccPeriod initOccPeriod(Property p,
-                                   PropertyUnit pu,
-                                   OccPeriodType perType,
-                                   User u,
-                                   MunicipalityDataHeavy muni) throws IntegrationException, BObStatusException {
-
-
+    public int insertOccPeriod(   OccPeriod period,
+                                        Property p,
+                                        UserAuthorized ua) 
+            throws IntegrationException, BObStatusException {
         SystemIntegrator si = getSystemIntegrator();
-        OccPeriod period = new OccPeriod();
-
-        period.setPropertyUnitID(pu.getUnitID());
-        period.setType(perType);
-
-        period.setManager(u);
-        period.setCreatedBy(u);
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        
+        if(period == null || ua == null || ua == null){
+            throw new BObStatusException("cannot create new occ period with null period, user, or property");
+        }
+        
+        period.setCreatedBy(ua);
         period.setCreatedTS(LocalDateTime.now());
 
         period.setStartDate(LocalDateTime.now().plusDays(DEFAULT_OCC_PERIOD_START_DATE_OFFSET));
@@ -531,7 +547,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                         .getString("occPeriodNewInternalBOBSourceID"))));
 
         System.out.println("OccupancyCoordinator.intitializeNewOccPeriod | period: " + period);
-        return period;
+        return oi.insertOccPeriod(period);
     }
 
     /**
@@ -539,7 +555,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * DB The caller must already have an initialized OccPeriod object to insert
      *
      * @param op an initialized object which can be retrieved from the method
-     *           initOccPeriod in this class
+           insertOccPeriod in this class
      * @param u  the UserAuthorized requesting the new Period
      * @return the unique ID given to the fresh OccPeriod by the database
      * @throws IntegrationException
@@ -750,26 +766,27 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         Property prop = pri.getPropertyUnitWithProp(application.getApplicationPropertyUnit().getUnitID()).getProperty();
 
         MunicipalityDataHeavy muni = mc.assembleMuniDataHeavy(prop.getMuni(), user);
+//        TODO: FIX ME POST HUMANIZATION
+        
+//        OccPeriod connectedPeriod = insertOccPeriod(
+//                prop,
+//                application.getApplicationPropertyUnit(),
+//                application.getReason().getProposalPeriodType(),
+//                user,
+//                muni);
+//
+//        connectedPeriod.setNotes(sc.formatAndAppendNote(user, notes, connectedPeriod.getNotes()));
+//
+//        connectedPeriod.setSource(si.getBOBSource(
+//                Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+//                        .getString("occPeriodPublicUserBOBSourceID"))));
+//
+//        int newPeriodID = addOccPeriod(connectedPeriod, user);
+//
+//        //Now we need to update the Application with the fact that it was ttached
+//        connectedPeriod.setPeriodID(newPeriodID);
 
-        OccPeriod connectedPeriod = initOccPeriod(
-                prop,
-                application.getApplicationPropertyUnit(),
-                application.getReason().getProposalPeriodType(),
-                user,
-                muni);
-
-        connectedPeriod.setNotes(sc.formatAndAppendNote(user, notes, connectedPeriod.getNotes()));
-
-        connectedPeriod.setSource(si.getBOBSource(
-                Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                        .getString("occPeriodPublicUserBOBSourceID"))));
-
-        int newPeriodID = addOccPeriod(connectedPeriod, user);
-
-        //Now we need to update the Application with the fact that it was ttached
-        connectedPeriod.setPeriodID(newPeriodID);
-
-        application.setConnectedPeriod(connectedPeriod);
+//        application.setConnectedPeriod(connectedPeriod);
 
         MessageBuilderParams mcc = new MessageBuilderParams();
         mcc.setUser(getSessionBean().getSessUser());
@@ -788,7 +805,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         oi.updateOccPermitApplication(application);
 
-        return newPeriodID;
+        return 0;
 
     }
 

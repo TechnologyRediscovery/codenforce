@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.entities.IFace_noteHolder;
 import com.tcvcog.tcvce.entities.LinkedObjectRole;
 import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 import com.tcvcog.tcvce.entities.MailingAddress;
+import com.tcvcog.tcvce.entities.MailingAddressLink;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonLinkHeavy;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
@@ -1020,6 +1021,22 @@ public class PersonBB extends BackingBeanUtils {
         System.out.println("PersonBB.onSelectAndLinkPersonsInit | " + hlh.getHUMAN_LINK_SCHEMA_ENUM().getTARGET_OBJECT_FRIENDLY_NAME()  + " |  PK: " +hlh.getHostPK());
         System.out.println("PersonBB.onSelectAndLinkPersonsInit | sending component ID: " +personListComponentIDToUpdatePostLinkingOperation);
         
+    }
+    
+    /**
+     * Special getter that checks the session for updates on just this person.
+     * @return 
+     */
+    public List<MailingAddressLink> getCurrentPersonMADLinkList(){
+        if(currentPerson != null){
+            List<MailingAddressLink> sessLinkList = getSessionBean().getSessMailingAddressLinkRefreshedList();
+            if(sessLinkList != null){
+                currentPerson.setMailingAddressLinkList(sessLinkList);
+                getSessionBean().setSessMailingAddressLinkRefreshedList(null);
+            }
+            return currentPerson.getMailingAddressLinkList();
+        }
+        return new ArrayList<>();
     }
     
     

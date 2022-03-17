@@ -24,7 +24,7 @@
                         <h2>
                             <h:outputText value="#{propertyProfileBB.currentProperty.address.addressPretty1Line} (Parcel ID: #{propertyProfileBB.currentProperty.countyParcelID})" />
                         </h2>
-                        
+
                         <div class="page-links">
                             <div class="restrict-main-contents-io-link link-button">
                                 <a href="#propinfo-panel-info">property info</a>
@@ -95,7 +95,7 @@
                             <!-- OBJECT DATA CONTAINER --> 
                             <div class="p-col">
 
-                             
+
 
                                 <!-- OBJECT DATA PANEL--> 
                                 <p:panel id="parcel-id-panel"
@@ -144,22 +144,22 @@
                                             <div class="p-col-8">
                                                 <h:outputText value="#{propertyProfileBB.currentProperty.countyParcelID} "
                                                               rendered="#{!propertyProfileBB.currentPropertyEditMode}" />
-                                                
+
                                                 <p:spacer height="3px" />
-                                                
+
                                                 <p>
                                                     <a href="https://www2.alleghenycounty.us/RealEstate/GeneralInfo.aspx?ParcelID=#{propertyProfileBB.currentProperty.countyParcelID}"
                                                        target="_blank"
                                                        style="color:blue;">Visit county profile</a>
                                                 </p>
-                                                
+
                                                 <p:spacer height="3px" />
-                                                               
-                                                               
-                                                
+
+
+
                                                 <p:inputText value="#{propertyProfileBB.currentProperty.countyParcelID}"
                                                              rendered="#{propertyProfileBB.currentPropertyEditMode}" />
-                                                             
+
                                             </div>
 
 
@@ -183,15 +183,15 @@
                                             <div class="p-col-8">
                                                 <h:outputText value="#{propertyProfileBB.currentProperty.source.title} "
                                                               rendered="#{!propertyProfileBB.currentPropertyEditMode}" />
-                                                
-                                                   <h:selectOneMenu id="property-id-source-som"
-                                                                    value="#{propertyProfileBB.currentProperty.source}" style="width:175px;height:25px"
-                                                                  rendered="#{propertyProfileBB.currentPropertyEditMode}" >
-                                                    
-                                                       <f:converter converterId="bobSourceConverter"/>
-                                                    
+
+                                                <h:selectOneMenu id="property-id-source-som"
+                                                                 value="#{propertyProfileBB.currentProperty.source}" style="width:175px;height:25px"
+                                                                 rendered="#{propertyProfileBB.currentPropertyEditMode}" >
+
+                                                    <f:converter converterId="bobSourceConverter"/>
+
                                                     <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
-                                                    
+
                                                     <f:selectItems id="parcel-info-source-selitems"
                                                                    value="#{propertyProfileBB.sourceList}"
                                                                    var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
@@ -218,28 +218,31 @@
                                     </h:form>
                                 </p:panel>
 
-                                <p:panel id="parcel-addresses-panel"
+                                <p:panel id="property-adresses-panel"
                                          toggleable="true"
                                          collapsed="false"
-                                         header="Addresses on Parcel #{propertyProfileBB.currentProperty.countyParcelID} "
-                                         rendered="true"
-                                         >
+                                         header="Addresses links">
+                                    <h:form id="property-profile-addresses-form">
+                                        <p:commandButton      id="prop-addresses-add-cb"
+                                                              value="Connect property to session Address" 
+                                                              ajax="true"
+                                                              icon="fa fa-link"
+                                                              actionListener="#{addressBB.onLinkToSessionMailingAddressInitButtonChange(propertyProfileBB.currentProperty)}"
+                                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                              oncomplete="PF('address-link-dialog-var').show()"
+                                                              update="address-link-dialog
+                                                              address-linking-form
+                                                              addresslink-list-growl-form">
+                                            <f:param name="initiating-address-list-component-id" value="property-profile-addresses-form" />
+                                        </p:commandButton>
 
-                                    <h:form id="parcel-addresses-form">
 
-                                        <p:commandButton id="parcel-address-add-init-cb"
-                                                         ajax="true"
-                                                         value="Connect Address"
-                                                         icon="fa fa-plus"
-                                                         actionListener="#{propertyProfileBB.onLinkNewAddressToParcelButtonChange}"
-                                                         />
+                                        <p:spacer height="5px"/>
 
-                                        <p:spacer height="5px" />
-
-                                        <p:dataTable    id="parcel-addresses-table"
-                                                        value="#{propertyProfileBB.currentProperty.addresses}"
-                                                        var="pma"
-                                                        rowKey="#{pma.addressID}"
+                                        <p:dataTable    id="property-addresses-table"
+                                                        value="#{propertyProfileBB.currentPropertyMADLinkList}"
+                                                        var="pml"
+                                                        rowKey="#{pml.linkID}"
                                                         tableStyleClass="primeDataTable"
                                                         draggableRows="true" 
                                                         tabindex="6">
@@ -249,7 +252,7 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="ID"/>
                                                 </f:facet>
-                                                <h:outputText value="#{pma.addressID}" />
+                                                <h:outputText value="#{pml.addressID}" />
                                             </p:column>
 
                                             <p:column width="50%">
@@ -257,12 +260,8 @@
                                                     <h:outputText value="Address"/>
                                                 </f:facet>
 
-                                                <h:outputText value="#{pma.addressPretty2LineEscapeFalse}"
-                                                              escape="false"/>
-                                                
-                                                <p:spacer height="5px" />
-                                                
-                                                <h:outputText value="#{pma.addressPretty1Line}" />
+                                                <h:outputText value="#{pml.addressPretty2LineEscapeFalse}"
+                                                              escape="false" />
                                             </p:column>
 
                                             <p:column width="25%">
@@ -270,19 +269,24 @@
                                                     <h:outputText value="Actions"/>
                                                 </f:facet>
 
-                                                <p:commandLink      id="parcel-addr-actions-cl"
+                                                <p:commandLink      id="prop-address-actions-cl"
                                                                     ajax="true"
-                                                                    actionListener="#{addressBB.onMailingAddressViewEditLinkClick(hmal)}"
+                                                                    actionListener="#{addressBB.onMalingAddressLinkViewEditInit(pml)}"
                                                                     style="color:blue;"
-                                                                    oncomplete="PF('address-dialog-var').show()"
+                                                                    oncomplete="PF('address-link-dialog-var').show()"
                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                    update="address-info-form
-                                                                    address-links-form"
-                                                                    value="view/edit" />
+                                                                    update="address-link-dialog
+                                                                    address-linking-form
+                                                                    addresslink-list-growl-form"
+                                                                    value="view/edit" >
+                                                    <f:param name="initiating-address-list-component-id" value="property-profile-addresses-form" />
+                                                </p:commandLink>
+
                                             </p:column>
                                         </p:dataTable>
-                                    </h:form>
+                                    </h:form>          
                                 </p:panel>
+
 
                                 <p:panel id="parcel-info-panel"
                                          toggleable="true"
@@ -464,8 +468,8 @@
                                                               rendered="#{!propertyProfileBB.currentParcelInfoEditMode}" />
                                             </div>
 
-                                            
-                                            
+
+
                                             <div class="p-col-3" >
                                                 <h:outputText value="&nbsp;"
                                                               escape="false" />
@@ -473,43 +477,43 @@
                                             <div class="p-col-3" >
                                                 <h:outputLabel value="Unfitness of Occupancy"/>
                                             </div>
-                                            
+
                                             <div class="p-col-3" >
                                                 <h:outputLabel value="Vacancy"/>
                                             </div>
-                                            
+
                                             <div class="p-col-3" >
                                                 <h:outputLabel value="Abandonment"/>
                                             </div>
-                                            
-                                            
+
+
                                             <div class="p-col-3">
                                                 <h:outputLabel value="Start date" />
                                             </div>
-                                            
-                                            
-                                            
+
+
+
                                             <div class="p-col-3">
                                                 <h:outputText id="propinfo-ot-unfitstart-1"
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.unfitDateStart) 
                                                                        ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.unfitDateStart) 
                                                                        : ''}" 
                                                               rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
-                                                              
+
 
                                                 <p:datePicker id="prop-add-unfit-start-cal"
-                                                            value="#{propertyProfileBB.currentProperty.parcelInfo.unfitDateStart}"
-                                                            rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
-                                                            showButtonBar="true"
-                                                            pattern="MM/dd/yyyy"
-                                                            monthNavigator="true"
-                                                            showTime="false"
-                                                            yearNavigator="true"
-                                                            mask="true"
-                                                            tabindex="16" >
-                                                        <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.unfitDateStart}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              showTime="false"
+                                                              yearNavigator="true"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
-                                                
+
 
 
                                             </div>
@@ -521,42 +525,42 @@
                                                               rendered="#{!propertyProfileBB.currentParcelInfoEditMode}" />
 
                                                 <p:datePicker id="prop-add-vacant-start-cal"
-                                                            value="#{propertyProfileBB.currentProperty.parcelInfo.vacantDateStart}"
-                                                            rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
-                                                            showButtonBar="true"
-                                                            pattern="MM/dd/yyyy"
-                                                            monthNavigator="true"
-                                                            yearNavigator="true"
-                                                            showTime="false"
-                                                            mask="true"
-                                                            tabindex="16" >
-                                                        <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.vacantDateStart}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              yearNavigator="true"
+                                                              showTime="false"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
-                                                
+
 
                                             </div>
-                                            
+
                                             <div class="p-col-3">
                                                 <h:outputText id="propinfo-ot-abandonedstart-1"
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.abandonedDateStart) 
                                                                        ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.abandonedDateStart) 
                                                                        : ''}" 
                                                               rendered="#{!propertyProfileBB.currentParcelInfoEditMode}" />
-                                                
+
                                                 <p:datePicker id="prop-add-abandoned-start-cal"
-                                                            value="#{propertyProfileBB.currentProperty.parcelInfo.abandonedDateStart}"
-                                                            rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
-                                                            showButtonBar="true"
-                                                            pattern="MM/dd/yyyy"
-                                                            monthNavigator="true"
-                                                            yearNavigator="true"
-                                                            showTime="false"
-                                                            mask="true"
-                                                            tabindex="16"
-                                                           >
-                                                        <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.abandonedDateStart}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              yearNavigator="true"
+                                                              showTime="false"
+                                                              mask="true"
+                                                              tabindex="16"
+                                                              >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
-                                                
+
 
                                             </div>
 
@@ -572,42 +576,42 @@
                                                               rendered="#{!propertyProfileBB.currentParcelInfoEditMode}" />
 
                                                 <p:datePicker id="prop-add-unfit-end-cal"
-                                                            value="#{propertyProfileBB.currentProperty.parcelInfo.unfitDateStop}"
-                                                            rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
-                                                            showButtonBar="true"
-                                                            pattern="MM/dd/yyyy"
-                                                            monthNavigator="true"
-                                                            yearNavigator="true"
-                                                            showTime="false"
-                                                            mask="true"
-                                                            tabindex="16" >
-                                                        <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.unfitDateStop}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              yearNavigator="true"
+                                                              showTime="false"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
-                                                
+
                                             </div>
 
-                                          
+
                                             <div class="p-col-3">
                                                 <h:outputText id="propinfo-ot-vacantstop-1"
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.vacantDateStop) 
                                                                        ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.vacantDateStop) 
                                                                        : ''}" 
-                                                            rendered="#{!propertyProfileBB.currentParcelInfoEditMode}" />
-                                                
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}" />
+
                                                 <p:datePicker id="prop-add-vacant-stop-cal"
-                                                            value="#{propertyProfileBB.currentProperty.parcelInfo.vacantDateStop}"
-                                                            rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
-                                                            showButtonBar="true"
-                                                            pattern="MM/dd/yyyy"
-                                                            monthNavigator="true"
-                                                            yearNavigator="true"
-                                                            showTime="false"
-                                                            mask="true"
-                                                            tabindex="16"
-                                                            >
-                                                        <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.vacantDateStop}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              yearNavigator="true"
+                                                              showTime="false"
+                                                              mask="true"
+                                                              tabindex="16"
+                                                              >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
-                                                
+
 
                                             </div>
 
@@ -616,21 +620,21 @@
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.abandonedDateStop) 
                                                                        ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.abandonedDateStop) 
                                                                        : ''}" />
-                                                
+
                                                 <p:datePicker id="prop-add-abandoned-stop-cal"
-                                                            value="#{propertyProfileBB.currentProperty.parcelInfo.abandonedDateStop}"
-                                                            rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
-                                                            showButtonBar="true"
-                                                            pattern="MM/dd/yyyy"
-                                                            monthNavigator="true"
-                                                            yearNavigator="true"
-                                                            showTime="false"
-                                                            mask="true"
-                                                            tabindex="16"
-                                                           >
-                                                        <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.abandonedDateStop}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              yearNavigator="true"
+                                                              showTime="false"
+                                                              mask="true"
+                                                              tabindex="16"
+                                                              >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
-                                                
+
                                             </div>
                                         </div>
 
@@ -675,7 +679,7 @@
 
                                     </h:form>
                                 </p:panel>
-                             
+
                             </div>
 
                             <div class="p-col">
@@ -694,10 +698,10 @@
                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                            value="Manage property-person links"
                                                            update=" human-search-dialog
-                                                                    property-messages-global
-                                                                    search-query-form
-                                                                    pers-selected-form
-                                                                    hlh-humlist-form"
+                                                           property-messages-global
+                                                           search-query-form
+                                                           pers-selected-form
+                                                           hlh-humlist-form"
                                                            icon="fa fa-user-plus"
                                                            >
                                             <f:param name="person-list-component-to-update"
@@ -721,7 +725,7 @@
                                                 <h:outputText value="Link timestamp: #{propertyProfileBB.getPrettyDate(human.linkCreatedTS)}"/>
                                                 <p:spacer height="3px" />
                                                 <h:outputText value="(Human ID: #{human.humanID}; Link ID: #{human.linkID})"/>
-                                                
+
                                             </p:column>
 
                                             <p:column headerText="Actions"
@@ -895,7 +899,7 @@
                                                             ajax="true"
                                                             styleClass="noFill button-size-small"
                                                             actionListener="#{propertyProfileBB.onBlobAddButtonChange}"
-                                                            
+
                                                             value="Add Photos or Documents"
                                                             icon="fa fa-upload"
                                                             />
@@ -975,7 +979,7 @@
                                                                         styleClass="noFill button-size-small"
                                                                         action="#{propertyProfileBB.onBlobSelectButtonChange(blob)}"
                                                                         value="edit"
-                                                                       
+
                                                                         />
                                                 </div>
 
@@ -988,7 +992,7 @@
                                                                         styleClass="noFill button-size-small"
                                                                         action="#{propertyProfileBB.onBlobRemoveInitButtonChange(blob)}"
                                                                         value="remove"
-                                                                      
+
                                                                         />
                                                 </div>
                                             </p:column>
@@ -1085,9 +1089,9 @@
                               header="Create code enforcement case at #{propertyProfileBB.currentProperty.address.addressPretty1Line}, Parcel ID: #{propertyProfileBB.currentProperty.countyParcelID}"
                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                               >
-                     
+
                         <h:form id="cecase-add-form">
-                            
+
                             <div class="p-grid">
                                 <div class="p-col-4">
                                     <h:outputLabel value="Case Name" 
@@ -1100,7 +1104,7 @@
                                                     tabindex="1" 
                                                     required="false" />
                                 </div>
-                                
+
                                 <div class="p-col-4">
                                     <h:outputLabel value="Case Opening Date" 
                                                    for="formOpenDateCal"/>
@@ -1114,20 +1118,20 @@
                                                         yearNavigator="true"
                                                         mask="false"
                                                         tabindex="16" >
-                                     
+
                                     </p:datePicker>
                                 </div>
                                 <div class="p-col-4">
                                     <h:outputLabel value="Case manager" />
                                 </div>
                                 <div class="p-col-8">
-                                    
+
                                     <p:selectOneMenu rendered="true"
                                                      value="#{propertyProfileBB.currentCECase.caseManager}"
                                                      converter="userConverter">
                                         <f:selectItem itemLabel="select a case manager"
-                                                          noSelectionOption="true" 
-                                                          itemDisabled="true"/>
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
                                         <f:selectItems value="#{systemServicesBB.bbSessionMuni.swornOfficerList}" 
                                                        var="user"
                                                        itemLabel="#{user.human.name} (#{user.username})"
@@ -1139,50 +1143,50 @@
                                                    for="cecase-add-origevent-som"/>
                                 </div>
                                 <div class="p-col-8">
-                                     <h:selectOneMenu id="cecase-add-origevent-som"
-                                                      value="#{propertyProfileBB.ceCaseOriginationEventSelected}"
-                                                      required="true">
+                                    <h:selectOneMenu id="cecase-add-origevent-som"
+                                                     value="#{propertyProfileBB.ceCaseOriginationEventSelected}"
+                                                     required="true">
 
-                                            <f:converter converterId="eventCategoryConverter"/>
-                                            <f:selectItem itemLabel="select an event category"
-                                                          noSelectionOption="true" 
-                                                          itemDisabled="true"/>
-                                            <f:selectItems id="cecase-add-origevent-selectitems"
-                                                           value="#{propertyProfileBB.ceCaseOriginiationEventCandidateList}"
-                                                           var="ec" 
-                                                           itemValue="#{ec}" 
-                                                           itemLabel="#{ec.eventCategoryTitle}"/>
-                                        </h:selectOneMenu>
+                                        <f:converter converterId="eventCategoryConverter"/>
+                                        <f:selectItem itemLabel="select an event category"
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
+                                        <f:selectItems id="cecase-add-origevent-selectitems"
+                                                       value="#{propertyProfileBB.ceCaseOriginiationEventCandidateList}"
+                                                       var="ec" 
+                                                       itemValue="#{ec}" 
+                                                       itemLabel="#{ec.eventCategoryTitle}"/>
+                                    </h:selectOneMenu>
                                 </div>
-                                
+
                                 <div class="p-col-4">
                                     <h:outputLabel value="Associated with unit?" />
                                 </div>
                                 <div class="p-col-8">
-                                    
+
                                     <p:inputSwitch value="#{propertyProfileBB.ceCaseUnitAssociated}"
                                                    onLabel="Yes"
                                                    offLabel="No">
                                         <p:ajax update="cecase-unit-som" />
                                     </p:inputSwitch>
-                                    
-                                     <h:selectOneMenu id="cecase-unit-som"
-                                                      value="#{propertyProfileBB.ceCaseUnitAssociation}"
-                                                      required="false"
-                                                      disabled="#{!propertyProfileBB.ceCaseUnitAssociated}">
 
-                                            <f:converter converterId="propertyUnitConverter"/>
-                                            <f:selectItem itemLabel="select a unit on current property"
-                                                          noSelectionOption="true" 
-                                                          itemDisabled="true"/>
-                                            <f:selectItems id="cecase-unit-selectitems"
-                                                           value="#{propertyProfileBB.currentProperty.unitList}"
-                                                           var="pu" 
-                                                           itemValue="#{pu}" 
-                                                           itemLabel="#{pu.unitNumber} (ID:#{pu.unitID})"/>
-                                        </h:selectOneMenu>
+                                    <h:selectOneMenu id="cecase-unit-som"
+                                                     value="#{propertyProfileBB.ceCaseUnitAssociation}"
+                                                     required="false"
+                                                     disabled="#{!propertyProfileBB.ceCaseUnitAssociated}">
+
+                                        <f:converter converterId="propertyUnitConverter"/>
+                                        <f:selectItem itemLabel="select a unit on current property"
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
+                                        <f:selectItems id="cecase-unit-selectitems"
+                                                       value="#{propertyProfileBB.currentProperty.unitList}"
+                                                       var="pu" 
+                                                       itemValue="#{pu}" 
+                                                       itemLabel="#{pu.unitNumber} (ID:#{pu.unitID})"/>
+                                    </h:selectOneMenu>
                                 </div>
-                                
+
                                 <div class="p-col-4">
                                     <h:outputLabel value="Case opening notes" 
                                                    for="cecase-add-notes"/>
@@ -1193,22 +1197,22 @@
                                                         rows="5"
                                                         cols="30" />
                                     <p:spacer height="3px" />
-                                    
+
                                     <p style="font-style: italic">Your name and the date will be automatically included in the note.</p>
                                 </div>
                             </div>
 
                             <p:spacer height="5px" />
-                            
+
                             <p:commandButton ajax="false" 
                                              tabindex="5" 
                                              icon="fa fa-archive"
                                              value="Open Code Enforcement Case" 
                                              action="#{propertyProfileBB.onAddNewCaseCommitButtonChange}" />
-                            
+
                         </h:form>
                     </p:dialog>
-                    
+
 
                     <p:dialog id="prop-remove-dialog"
                               modal="true"

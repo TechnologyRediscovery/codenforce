@@ -81,25 +81,36 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     
     
     /**
+     * Factory for maling address links
+     * @param mad
+     * @return 
+     */
+    public MailingAddressLink getMailingAddressLinkSkeleton(MailingAddress mad){
+        
+        MailingAddressLink madLink = new MailingAddressLink(mad);
+        return madLink;
+    }
+    
+    
+    /**
      * Creates a new link between an implementer of our interface for addressLists
      * and any old Mailing address. Will inject a default role if null.
      * @param adlh target of link
-     * @param mad to link
+     * @param madLink to link
      * @param ua
-     * @param lor
      * @return the linkID of the fresh link. You should also be able to get this link
      * just by calling getMailingAddressLinkList
      */
-    public int linkToMailingAddress(IFace_addressListHolder adlh, MailingAddress mad, UserAuthorized ua, LinkedObjectRole lor) throws BObStatusException, IntegrationException{
-        if(adlh == null || mad == null || ua == null){
+    public int linkToMailingAddress(IFace_addressListHolder adlh, MailingAddressLink madLink, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(adlh == null || madLink == null || ua == null){
             throw new BObStatusException("Cannot deactivate a mailing link with null link or UA or address");
         }
         PropertyIntegrator pi = getPropertyIntegrator();
         SystemIntegrator si =getSystemIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
-        MailingAddressLink madLink = new MailingAddressLink(mad);
         
-        if(lor == null){
+        
+        if(madLink.getLinkedObjectRole() == null){
             
             if(adlh instanceof Property){
                 madLink.setLinkRole(si.getLinkedObjectRole(
@@ -110,9 +121,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                         Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                 .getString("default_linkedobjectrole_human_mailing"))));
             }
-        } else {
-            madLink.setLinkedObjectRole(lor);
-        }
+        } 
         
         madLink.setSource(sc.getBObSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                             .getString("bobsourcePropertyInternal"))));
@@ -121,6 +130,23 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         madLink.setLinkLastUpdatedByUserID(ua.getUserID());
         
         return pi.linkMailingAddress(adlh, madLink);
+        
+    }
+    
+    /**
+     * Logic intermediary for updates to a mailing address link
+     * @param madLink
+     * @param ua 
+     */
+    public void updateMailingAddressLink(MailingAddressLink madLink, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(madLink == null || ua == null){
+            throw new BObStatusException("Cannot deactivate a mailing link with null link or UA");
+        }
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        madLink.setLinkLastUpdatedByUserID(ua.getUserID());
+        
+        pi.updateMailingAddressLink(madLink);
         
     }
     
@@ -684,6 +710,18 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return p;
     }
     
+    public List<PropertyUnit> getPropertyUnitList(Property p){
+        PropertyIntegrator pi = getPropertyIntegrator();
+        List<PropertyUnit> ul = new ArrayList<>();
+        
+        
+        
+        
+        
+        
+    }
+    
+    
     
 
     
@@ -1133,6 +1171,15 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     }
 
     
+        
+    /**
+     *  ***************************************************
+     *  ***************************************************
+     *  ************* UNITS UNITS UNITS *******************
+     *  ***************************************************
+     *  ***************************************************
+     */
+    
     /**
      * This method generates a skeleton PropertyUnit with logical, preset
      * defaults, including empty lists.
@@ -1140,16 +1187,68 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param p
      * @return
      */
-    public PropertyUnit initPropertyUnit(Property p) {
+    public PropertyUnit getPropertyUnitSkeleton(Property p) {
         PropertyUnit propUnit = new PropertyUnit();
         propUnit.setParcelKey(p.getParcelKey());
         propUnit.setUnitNumber(Constants.TEMP_UNIT_NUM);
-        propUnit.setUnitNumber("");
-        propUnit.setRentalNotes("");
-        propUnit.setNotes("");
         propUnit.setActive(true);
         return propUnit;
     }
+    
+    /**
+     * Logic check for inserts of property units
+     * @param unit
+     * @param pdh
+     * @param ua
+     * @return the PK of the new unit
+     */
+    public int insertPropertyUnit(PropertyUnit unit, PropertyDataHeavy pdh, UserAuthorized ua) throws BObStatusException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        if(unit == null || pdh == null || ua == null){
+            throw new BObStatusException("Cannot insert unit with null unit, property, or user");
+        }
+        
+        
+        return 0;
+        
+    }
+    
+    /**
+     * Logic check for updates to a property unit
+     * @param unit
+     * @param ua 
+     */
+    public void updatePropertyUnit(PropertyUnit unit, PropertyDataHeavy pdh, UserAuthorized ua) throws BObStatusException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        if(unit == null || pdh == null || ua == null){
+            throw new BObStatusException("Cannot insert unit with null unit, property, or user");
+        }
+        
+        
+        
+        
+    }
+    
+    /**
+     * Logic block for deactivation requests on a property unit
+     * @param unit
+     * @param pdh
+     * @param ua 
+     */
+    public void deactivatePropertyUnit(PropertyUnit unit, PropertyDataHeavy pdh, UserAuthorized ua) throws BObStatusException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        
+        if(unit == null || pdh == null || ua == null){
+            throw new BObStatusException("Cannot insert unit with null unit, property, or user");
+        }
+        
+        
+        
+        
+    }
+    
 
     /**
      * A method that takes a unit list and compares it to the database and

@@ -1,0 +1,310 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="addresslink-list-growl-form">
+
+        <p:growl id="addresslink-list-growl"
+                 globalOnly="false" 
+                 />
+    </h:form>
+
+
+    <p:panel     id="addresslink-list-panel"
+                 toggleable="true"
+                 collapsed="false"
+                 rendered="false"
+                 header="Address Connections to #{addressBB.currentAddressListHolder.linkedObjectSchemaEnum.TARGET_OBJECT_FRIENDLY_NAME} (ID:#{addressBB.currentAddressListHolder.targetObjectPK})" >
+
+
+
+        <h:form id="addresslink-list-form">
+
+            <p:commandButton id="parcel-address-add-init-cb"
+                             ajax="true"
+                             value="Connect #{addressBB.currentAddressListHolder.linkedObjectSchemaEnum.TARGET_OBJECT_FRIENDLY_NAME} to the session address #{!empty sessionBean.sessMailingAddress ? sessionBean.sessMailingAddress.addressPretty1Line : ''}"
+                             icon="fa fa-link"
+                             actionListener="#{addressBB.onLinkToSessionMailingAddressInitButtonChange}"
+                             />
+
+            <p:spacer height="5px" />
+
+            <p:dataTable    id="address-link-table"
+                            value="#{addressBB.currentAddressListHolder.mailingAddressLinkList}"
+                            var="madlink"
+                            rowKey="#{madlink.linkID}"
+                            tableStyleClass="primeDataTable"
+                            draggableRows="true" 
+                            tabindex="6">
+
+                <p:column width="15%">
+                    <f:facet name="header">
+                        <h:outputText value="Priority"/>
+                    </f:facet>
+                </p:column>
+
+                <p:column width="50%">
+
+                    <h:outputText value="#{madlink.addressPretty2LineEscapeFalse}"
+                                  escape="false"/>
+
+
+                </p:column>
+
+                <p:column width="35%">
+                    <f:facet name="header">
+                        <h:outputText value="Actions"/>
+                    </f:facet>
+
+                    <p:commandLink      id="parcel-addr-actions-cl"
+                                        ajax="true"
+                                        actionListener="#{addressBB.onMalingAddressLinkViewEditInit(madlink)}"
+                                        style="color:blue;"
+                                        oncomplete="PF('address-link-dialog-var').show()"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                        update="address-link-dialog
+                                        addresslink-list-growl-form
+                                        address-linking-form"
+                                        value="view/edit" />
+                    <h:outputText value="(link ID: #{madlink.linkID})" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:panel>
+
+
+    <p:dialog   id="address-link-dialog"
+                height="600" width="400"
+                widgetVar="address-link-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Address Link ID:#{addressBB.currentMailingAddressLink.linkID eq 0 ? '(New Link)' : addressBB.currentMailingAddressLink.linkID}"
+                rendered="true"
+                >
+
+        <h:form id="address-linking-form">
+
+            <p:commandButton id="address-link-edit-toggle-button"
+                             value="#{addressBB.editModeCurrentAddressLink? 'Save changes' : 'Edit'}"
+                             rendered="true"
+                             ajax="true"
+                             style="margin-right:10px;"
+                             icon="fa #{addressBB.editModeCurrentAddressLink ? 'fa-check' : 'fa-pencil'}"
+                             actionListener="#{addressBB.onMailingAddressLinkEditToggleButtonChange}"
+                             update="@form
+                             addresslink-list-form
+                             addresslink-list-growl-form
+                             #{addressBB.addressListHolderComponentForUpdatePostMADLinkOperation}
+                             "
+                             />
+
+
+
+            <p:commandButton    id="address-link-edit-cancel-button"
+                                ajax="true"
+                                rendered="#{addressBB.editModeCurrentAddressLink}"
+                                value="Abort edit"
+                                process="@none"
+                                actionListener="#{addressBB.onMailingAddressLinkEditAbort}"
+                                update="@form
+                                addresslink-list-growl-form
+                                addresslink-list-form"
+                                icon="fa fa-stop" />
+
+
+            <p:spacer height="5px" />
+            <div class="p-grid">
+                <div class="p-col-4">
+                    <p:outputLabel for="addresslink-target-ot">
+                        <h:outputText value="Target"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+                    <h:outputText id="addresslink-target-ot"
+                                  value="#{addressBB.currentMailingAddressLink.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME} "
+                                  />
+                    <p:spacer height="3px" />
+                    <h:outputText id="addresslink-target-id"
+                                  value="(ID: #{addressBB.currentMailingAddressLink.targetObjectPK})"
+                                  />
+                </div>
+
+
+
+                <div class="p-col-4">
+                    <p:outputLabel for="address-link-role">
+                        <h:outputText value="Role"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+                    <h:outputText id="address-link-role"
+                                  value="#{!empty addressBB.currentMailingAddressLink.linkedObjectRole
+                                           ? addressBB.currentMailingAddressLink.linkedObjectRole.title
+                                           :'' } "
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"
+                                  />
+
+                    <p:selectOneMenu id="address-link-role-som" 
+                                     value="#{addressBB.currentMailingAddressLink.linkedObjectRole}" 
+                                     rendered="#{addressBB.editModeCurrentAddressLink}"
+                                     converter="linkedObjectRoleConverter" 
+                                     required="true"
+                                     requiredMessage="Oops, please select an association type">
+
+                        <f:selectItem itemLabel="Choose an association type" 
+                                      itemDisabled="true"
+                                      noSelectionOption="true"/>
+
+                        <f:selectItems id="rolelist-si" 
+                                       value="#{addressBB.mailingAddressLinkRoleCandidateList}" 
+                                       var="lr" 
+                                       itemValue="#{lr}" 
+                                       itemLabel="#{lr.title}"/>
+                    </p:selectOneMenu>
+                </div>
+                <div class="p-col-4">
+                    <p:outputLabel for="address-ot">
+                        <h:outputText value="Address"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+                    <h:outputText id="address-ot"
+                                  value="#{addressBB.currentMailingAddressLink.addressPretty2LineEscapeFalse} "
+                                  escape="false"/>
+                </div>
+
+                <div class="p-col-4">
+                    <p:outputLabel for="address-link-priority-ot">
+                        <h:outputText value="Priority"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+                    <h:outputText id="address-link-priority-ot"
+                                  value="#{addressBB.currentMailingAddressLink.priority}"
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"
+                                  />
+
+                    <p:inputNumber rendered="#{addressBB.editModeCurrentAddressLink}"
+                                   value="#{addressBB.currentMailingAddressLink.priority}"
+                                   decimalPlaces="0"
+                                   minValue="0"
+                                   maxValue="100" 
+                                   required="true"/>
+                </div>
+
+                <div class="p-col-4">
+                    <p:outputLabel for="addresslink-creationts">
+                        <h:outputText value="Creation"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+
+                    <h:outputText id="addresslink-creationts"
+                                  value="#{addressBB.getPrettyDate(addressBB.currentMailingAddressLink.linkCreatedTS)}"/>
+                    <p:spacer height="3px" />
+                    <h:outputText id="addresslink-creator-by"
+                                  value="#{addressBB.currentMailingAddressLink.linkCreatedByUserID}"/>
+
+                </div>
+                <div class="p-col-4">
+                    <p:outputLabel for="addresslink-lastupdatedts">
+                        <h:outputText value="Last update"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+
+                    <h:outputText id="addresslink-lastupdatedts"
+                                  value="#{addressBB.getPrettyDate(addressBB.currentMailingAddressLink.lastUpdatedTS)}"
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"/>
+                    <p:spacer height="3px"
+                              rendered="#{!addressBB.editModeCurrentAddressLink}"/>
+                    <h:outputText id="addresslink-lastupdator-by"
+                                  value="By User ID:#{addressBB.currentMailingAddressLink.linkLastUpdatedByUserID}"
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"/>
+
+                </div>
+                <div class="p-col-4">
+                    <p:outputLabel for="addresslink-active">
+                        <h:outputText value="Active"/>
+                    </p:outputLabel>
+                    <p:spacer height="5px" />
+                           <p:commandLink      id="address-link-deactivate-init-cl"
+                                        ajax="true"
+                                        actionListener="#{addressBB.onMailingAddressLinkDeactivateInitLinkClick}"
+                                        style="color:blue;"
+                                        oncomplete="PF('address-link-remove-dialog-var').show()"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                        disabled="#{addressBB.currentMailingAddressLink.linkID eq 0}"
+                                        update="address-link-remove-dialog
+                                        address-link-remove-form"
+                                        value="deactivate link" />
+                </div>
+                <div class="p-col-8">
+
+                    <h:outputText id="addresslink-active"
+                                  value="#{empty addressBB.currentMailingAddressLink.deactivatedTS ? 'Yes' : 'No-Inactive'}"
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"/>
+                </div>
+                <div class="p-col-4">
+                    <p:outputLabel for="address-link-notes">
+                        <h:outputText value="Notes"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+                    <h:outputText id="address-link-notes"
+                                  value="#{addressBB.currentMailingAddressLink.linkNotes} "
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"
+                                  escape="false"
+                                  />
+                    <p:inputTextarea id="address-link-notes-ita"
+                                     cols="50"
+                                     rows="5"
+                                     required="false"
+                                     value="#{addressBB.currentMailingAddressLink.linkNotes}"
+                                     rendered="#{addressBB.editModeCurrentAddressLink}" />
+                </div>
+
+            </div>
+        </h:form>
+    </p:dialog>
+    
+    
+    <p:dialog   id="address-link-remove-dialog"
+                height="400" width="400"
+                widgetVar="address-link-remove-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Remove Link to address: #{addressBB.currentMailingAddressLink.addressPretty1Line}"
+                rendered="true"
+                >
+        
+        <h:form id="address-link-remove-form">
+            <h:outputText value="Deactivating an address link is irreversible (by web users)." />
+
+            <p:commandButton id="address-link-deactivate-confirm-button"
+                             value="Deactivate address link ID: #{addressBB.currentMailingAddressLink.linkID}"
+                             rendered="true"
+                             icon="fa fa-trash"
+                             ajax="true"
+                             actionListener="#{addressBB.onMailingAddressLinkDeactivateCommitButtonChange}"
+                             oncomplete="PF('address-link--remove-dialog-var').hide(); PF('address-link-dialog-var').hide();"
+                             update="addresslink-list-growl-form
+                             #{addressBB.addressListHolderComponentForUpdatePostMADLinkOperation}"/>
+            
+            
+            
+        </h:form>
+    
+    
+    </p:dialog>
+
+
+</ui:composition>

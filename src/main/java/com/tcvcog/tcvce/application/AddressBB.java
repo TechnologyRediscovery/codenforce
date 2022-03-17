@@ -12,9 +12,17 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.Human;
+import com.tcvcog.tcvce.entities.IFace_addressListHolder;
+import com.tcvcog.tcvce.entities.LinkedObjectRole;
+import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 import com.tcvcog.tcvce.entities.MailingAddress;
+import com.tcvcog.tcvce.entities.MailingAddressLink;
 import com.tcvcog.tcvce.entities.MailingCityStateZip;
 import com.tcvcog.tcvce.entities.MailingStreet;
+import com.tcvcog.tcvce.entities.Parcel;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.search.QueryMailingCityStateZip;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.time.LocalDateTime;
@@ -24,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 /**
@@ -38,13 +47,19 @@ public  class   AddressBB
     private List<MailingStreet> streetListFiltered;
     private boolean editModeCurrentStreet;
     
-    private MailingAddress currentAddress;
+    private MailingAddress currentMailingAddress;
     private List<MailingAddress> mailingAddressList;
     private List<MailingAddress> mailingAddressListFiltered;
     
     private boolean editModeCurrentAddress;
     private MailingCityStateZip currentCityStateZip;
     private List<MailingCityStateZip> cityStateZipListFiltered;
+    
+    private boolean editModeCurrentAddressLink;
+    private MailingAddressLink currentMailingAddressLink;
+    private IFace_addressListHolder currentAddressListHolder;
+    private List<LinkedObjectRole> mailingAddressLinkRoleCandidateList;
+    private String addressListHolderComponentForUpdatePostMADLinkOperation;
     
     private String formBuildingNo;
     private String formStreet;
@@ -151,8 +166,8 @@ public  class   AddressBB
     public void selectCityStateZip(MailingCityStateZip mcsz){
         getSessionBean().setSessMailingCityStateZip(mcsz);
         currentCityStateZip = mcsz;
-        if(currentAddress != null && currentAddress.getStreet() != null){
-            currentAddress.getStreet().setCityStateZip(currentCityStateZip);
+        if(currentMailingAddress != null && currentMailingAddress.getStreet() != null){
+            currentMailingAddress.getStreet().setCityStateZip(currentCityStateZip);
         }
         
         searchForMailingStreet();
@@ -331,7 +346,7 @@ public  class   AddressBB
      * @param ev 
      */
     public void onMailingAddressViewCurrentAddress(ActionEvent ev){
-        getSessionBean().setSessMailingAddress(currentAddress);
+        getSessionBean().setSessMailingAddress(currentMailingAddress);
         
     }
     
@@ -340,9 +355,9 @@ public  class   AddressBB
      * @param ma 
      */
     public void onMailingAddressViewEditLinkClick(MailingAddress ma){
-        currentAddress = ma;
-        formAddressVerified = currentAddress.getVerifiedTS() != null;
-        getSessionBean().setSessMailingAddress(currentAddress);
+        currentMailingAddress = ma;
+        formAddressVerified = currentMailingAddress.getVerifiedTS() != null;
+        getSessionBean().setSessMailingAddress(currentMailingAddress);
     }
     
     /**
@@ -362,22 +377,22 @@ public  class   AddressBB
         if(isEditModeCurrentAddress()){
             int freshID;
             try {
-                if(formAddressVerified && currentAddress != null){
-                    currentAddress.setVerifiedBy(getSessionBean().getSessUser());
-                    currentAddress.setVerifiedTS(LocalDateTime.now());
+                if(formAddressVerified && currentMailingAddress != null){
+                    currentMailingAddress.setVerifiedBy(getSessionBean().getSessUser());
+                    currentMailingAddress.setVerifiedTS(LocalDateTime.now());
                 }
-                if(currentAddress.getAddressID() == 0){
-                    freshID = pc.insertMailingAddress(currentAddress, getSessionBean().getSessUser());
+                if(currentMailingAddress.getAddressID() == 0){
+                    freshID = pc.insertMailingAddress(currentMailingAddress, getSessionBean().getSessUser());
                     getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Address Insert successful",""));
-                    currentAddress = pc.getMailingAddress(freshID);
+                    currentMailingAddress = pc.getMailingAddress(freshID);
                 } else {
-                    pc.updateMailingAddress(currentAddress, getSessionBean().getSessUser());
+                    pc.updateMailingAddress(currentMailingAddress, getSessionBean().getSessUser());
                     getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Address update successful",""));
-                    currentAddress = pc.getMailingAddress(currentAddress.getAddressID());
+                    currentMailingAddress = pc.getMailingAddress(currentMailingAddress.getAddressID());
                 }
             } catch (BObStatusException | IntegrationException ex) {
                 System.out.println(ex);
@@ -396,10 +411,10 @@ public  class   AddressBB
      */
     public void onMailingAddressAddInitButtonChange(ActionEvent ev){
         PropertyCoordinator pc = getPropertyCoordinator();
-        currentAddress = pc.getMailingAddressSkeleton();
+        currentMailingAddress = pc.getMailingAddressSkeleton();
         if(currentStreet != null){
             currentStreet.setCityStateZip(currentCityStateZip);
-            currentAddress.setStreet(currentStreet);
+            currentMailingAddress.setStreet(currentStreet);
         }
         editModeCurrentAddress = true;
         
@@ -429,7 +444,7 @@ public  class   AddressBB
     public void onMailingAddressDeactivateConfirmButtonChange(ActionEvent ev){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            pc.deactivateMailingAddress(currentAddress, getSessionBean().getSessUser());
+            pc.deactivateMailingAddress(currentMailingAddress, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Address deactivation successful! ",""));
@@ -457,12 +472,12 @@ public  class   AddressBB
     public void onMailingAddressNoteCommitButtonChage(ActionEvent ev){
         SystemCoordinator sc = getSystemCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
-        if(currentAddress != null){
-            MessageBuilderParams mbp = new MessageBuilderParams(currentAddress.getNotes(), null, null, formNotesAddress, getSessionBean().getSessUser(), null);
-            currentAddress.setNotes(sc.appendNoteBlock(mbp));
+        if(currentMailingAddress != null){
+            MessageBuilderParams mbp = new MessageBuilderParams(currentMailingAddress.getNotes(), null, null, formNotesAddress, getSessionBean().getSessUser(), null);
+            currentMailingAddress.setNotes(sc.appendNoteBlock(mbp));
             try {
-                sc.writeNotes(currentAddress, getSessionBean().getSessUser());
-                currentAddress = pc.getMailingAddress(currentAddress.getAddressID());
+                sc.writeNotes(currentMailingAddress, getSessionBean().getSessUser());
+                currentMailingAddress = pc.getMailingAddress(currentMailingAddress.getAddressID());
                 getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Note write successful! Woot woot!",""));
@@ -514,6 +529,199 @@ public  class   AddressBB
     }
     
     
+    
+    
+    /************************************************************/
+    /************** LINK MANAGEMENT TOOLS  **********************/
+    /************************************************************/
+    
+    /**
+     * Listener for user requests to start the address linking process
+     * @param alholder
+     */
+    public void onLinkToSessionMailingAddressInitButtonChange(IFace_addressListHolder alholder){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        currentAddressListHolder = alholder;
+        
+        
+        configureAddressListHolderUpdateComponent();
+      
+        if(currentAddressListHolder != null && getSessionBean().getSessMailingAddress() != null){
+            getSessionBean().setSessAddressListHolder(currentAddressListHolder);
+            currentMailingAddress = getSessionBean().getSessMailingAddress();
+            currentMailingAddressLink = pc.getMailingAddressLinkSkeleton(getSessionBean().getSessMailingAddress());
+            if(currentAddressListHolder.getMailingAddressLinkList() != null){
+                currentMailingAddressLink.setPriority(currentAddressListHolder.getMailingAddressLinkList().size() + 1);
+            }
+            configureLinkedObjectRoleList(null);
+            editModeCurrentAddressLink = true;
+        } else {
+               getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Fatal error! Could not initiate the address linking process",""));
+        }
+    }
+    
+    private void configureAddressListHolderUpdateComponent(){
+          addressListHolderComponentForUpdatePostMADLinkOperation = 
+                FacesContext.getCurrentInstance()
+                        .getExternalContext()
+                        .getRequestParameterMap()
+                        .get("initiating-address-list-component-id");
+         getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Viewing address link", ""));
+        System.out.println("AddressBB.configureAddressListHolderUpdateComponent : " + addressListHolderComponentForUpdatePostMADLinkOperation);
+        
+    }
+    
+    /**
+     * Asks this bean's currentAddressList holder what type it is, and 
+     * sets the association candidate list appropriately
+     * for the dialog that's about to appear
+     * @param madLink if null, I'll make the list reflect the currentAddressListHolder
+     * otherwise, I'll make the list reflect our current link
+     */
+    public void configureLinkedObjectRoleList(MailingAddressLink madLink){
+        SystemCoordinator sc = getSystemCoordinator();
+        try {
+            if(madLink != null){
+                mailingAddressLinkRoleCandidateList = sc.assembleLinkedObjectRolesBySchema(madLink.getLinkedObjectRoleSchemaEnum());
+                return;
+            }
+            if(currentAddressListHolder != null){
+                if(currentAddressListHolder instanceof Human){
+                    mailingAddressLinkRoleCandidateList = sc.assembleLinkedObjectRolesBySchema(LinkedObjectSchemaEnum.MailingaddressHuman);
+
+                } else if (currentAddressListHolder instanceof Parcel){
+                    mailingAddressLinkRoleCandidateList = sc.assembleLinkedObjectRolesBySchema(LinkedObjectSchemaEnum.ParcelMailingaddress);
+                }
+            }
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                           "Fatak error! Could not setup linked object role list" + ex.getMessage(),""));
+        } 
+    }
+    
+    /**
+     * Finalizes the MailingAddres linking process
+     * @param ev 
+     */
+    public void onLinkToSessionMailingAddressCommit(ActionEvent ev){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.linkToMailingAddress(   currentAddressListHolder, currentMailingAddressLink, getSessionBean().getSessUser());
+            
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Fatal Address linking error: " + ex.getMessage(),""));
+        } 
+    }
+    
+    
+    /**
+     * Entry point for viewing/editing this mailing address link stuff
+     * @param madLink 
+     */
+    public void onMalingAddressLinkViewEditInit(MailingAddressLink madLink){
+        
+        currentMailingAddressLink = madLink;
+        configureAddressListHolderUpdateComponent();
+        configureLinkedObjectRoleList(madLink);
+        System.out.println("AddressBB.onMalingAddressLinkViewEditInit | madLink: linkid " + madLink.getLinkID());
+    }
+    
+    
+    /**
+     * Listener for user toggling of the edit/save mailing address record
+     * @param ev 
+     */
+    public void onMailingAddressLinkEditToggleButtonChange(ActionEvent ev){
+        if(editModeCurrentAddressLink){
+            if(currentMailingAddressLink != null){
+                if(currentMailingAddressLink.getLinkID() == 0){
+                    onLinkToSessionMailingAddressCommit(ev);
+                } else {
+                    updateCurrentMailingAddressLink();
+                }
+                refreshCurrentAddressListHolderLinks();
+            }
+        }
+        editModeCurrentAddressLink = !editModeCurrentAddressLink;
+    }
+    
+    
+    public void onMailingAddressLinkEditAbort(ActionEvent ev){
+        System.out.println("AddressBB.madLinkAbort");
+        editModeCurrentAddressLink = !editModeCurrentAddressLink;
+    }
+    
+    /**
+     * Internal caller to update a mad link
+     */
+    private void updateCurrentMailingAddressLink(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.updateMailingAddressLink(currentMailingAddressLink, getSessionBean().getSessUser());
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Fatal mailing address link update error: " + ex.getMessage(),""));
+        } 
+    }
+    
+    public void onMailingAddressLinkDeactivateInitLinkClick(ActionEvent ev){
+        System.out.println("AddressBB.onMailingAddressLinkDeactivateInitLinkClick | linkid "+ currentMailingAddressLink.getLinkID());
+    }
+    
+    /**
+     * listener for user finalization of the address link removal process
+     * @param ev 
+     */
+    public void onMailingAddressLinkDeactivateCommitButtonChange(ActionEvent ev){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.deactivateLinkToMailingAddress(currentMailingAddressLink, getSessionBean().getSessUser());
+            refreshCurrentAddressListHolderLinks();
+            getFacesContext().addMessage(null,
+                     new FacesMessage(FacesMessage.SEVERITY_INFO,
+                             "Tada! And it's gone! ",""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Fatal mailing address link deactivation error: " + ex.getMessage(),""));
+        } 
+    }
+    
+    
+    /**
+     * Internal method for getting a new copy of our AddressListHolder after updates
+     */
+    private void refreshCurrentAddressListHolderLinks() {
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(currentAddressListHolder != null){
+            try {
+                List<MailingAddressLink> madLinkList = pc.getMailingAddressLinkList(currentAddressListHolder);
+                currentAddressListHolder.setMailingAddressLinkList(madLinkList);
+                getSessionBean().setSessMailingAddressLinkRefreshedList(madLinkList);
+            } catch (BObStatusException | IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                           "Fatal object reload error: " + ex.getMessage(),""));
+            } 
+        }
+    }
+    
+    
+    
+    
+    
     /************************************************************/
     /************** GETTERS AND SETTERS    **********************/
     /************************************************************/
@@ -521,10 +729,10 @@ public  class   AddressBB
     
     
     /**
-     * @return the currentAddress
+     * @return the currentMailingAddress
      */
-    public MailingAddress getCurrentAddress() {
-        return currentAddress;
+    public MailingAddress getCurrentMailingAddress() {
+        return currentMailingAddress;
     }
 
     /**
@@ -570,10 +778,10 @@ public  class   AddressBB
     }
 
     /**
-     * @param currentAddress the currentAddress to set
+     * @param currentMailingAddress the currentMailingAddress to set
      */
-    public void setCurrentAddress(MailingAddress currentAddress) {
-        this.currentAddress = currentAddress;
+    public void setCurrentMailingAddress(MailingAddress currentMailingAddress) {
+        this.currentMailingAddress = currentMailingAddress;
     }
 
     /**
@@ -826,6 +1034,76 @@ public  class   AddressBB
      */
     public void setFormNotesStreet(String formNotesStreet) {
         this.formNotesStreet = formNotesStreet;
+    }
+
+    /**
+     * @return the mailingAddressLinkRoleCandidateList
+     */
+    public List<LinkedObjectRole> getMailingAddressLinkRoleCandidateList() {
+        return mailingAddressLinkRoleCandidateList;
+    }
+
+    /**
+     * @param mailingAddressLinkRoleCandidateList the mailingAddressLinkRoleCandidateList to set
+     */
+    public void setMailingAddressLinkRoleCandidateList(List<LinkedObjectRole> mailingAddressLinkRoleCandidateList) {
+        this.mailingAddressLinkRoleCandidateList = mailingAddressLinkRoleCandidateList;
+    }
+
+    /**
+     * @return the currentMailingAddressLink
+     */
+    public MailingAddressLink getCurrentMailingAddressLink() {
+        return currentMailingAddressLink;
+    }
+
+    /**
+     * @return the currentAddressListHolder
+     */
+    public IFace_addressListHolder getCurrentAddressListHolder() {
+        return currentAddressListHolder;
+    }
+
+    /**
+     * @param currentMailingAddressLink the currentMailingAddressLink to set
+     */
+    public void setCurrentMailingAddressLink(MailingAddressLink currentMailingAddressLink) {
+        this.currentMailingAddressLink = currentMailingAddressLink;
+    }
+
+    /**
+     * @param currentAddressListHolder the currentAddressListHolder to set
+     */
+    public void setCurrentAddressListHolder(IFace_addressListHolder currentAddressListHolder) {
+        this.currentAddressListHolder = currentAddressListHolder;
+    }
+
+    /**
+     * @return the editModeCurrentAddressLink
+     */
+    public boolean isEditModeCurrentAddressLink() {
+        return editModeCurrentAddressLink;
+    }
+
+    /**
+     * @param editModeCurrentAddressLink the editModeCurrentAddressLink to set
+     */
+    public void setEditModeCurrentAddressLink(boolean editModeCurrentAddressLink) {
+        this.editModeCurrentAddressLink = editModeCurrentAddressLink;
+    }
+
+    /**
+     * @return the addressListHolderComponentForUpdatePostMADLinkOperation
+     */
+    public String getAddressListHolderComponentForUpdatePostMADLinkOperation() {
+        return addressListHolderComponentForUpdatePostMADLinkOperation;
+    }
+
+    /**
+     * @param addressListHolderComponentForUpdatePostMADLinkOperation the addressListHolderComponentForUpdatePostMADLinkOperation to set
+     */
+    public void setAddressListHolderComponentForUpdatePostMADLinkOperation(String addressListHolderComponentForUpdatePostMADLinkOperation) {
+        this.addressListHolderComponentForUpdatePostMADLinkOperation = addressListHolderComponentForUpdatePostMADLinkOperation;
     }
     
     

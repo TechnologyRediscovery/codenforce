@@ -84,6 +84,9 @@ public  class       OccPeriod
 
     protected User lastUpdatedBy;
     protected LocalDateTime lastUpdatedTS;
+    
+    // Used during initiation to store the origination event
+    protected EventCategory originationEventCategory;
 
     public OccPeriod() {
     }
@@ -638,5 +641,19 @@ public  class       OccPeriod
     @Override
     public DomainEnum getEventDomain() {
         return OCC_DOMAIN;
+    }
+
+    /**
+     * @return the originationEventCategory
+     */
+    public EventCategory getOriginationEventCategory() {
+        return originationEventCategory;
+    }
+
+    /**
+     * @param originationEventCategory the originationEventCategory to set
+     */
+    public void setOriginationEventCategory(EventCategory originationEventCategory) {
+        this.originationEventCategory = originationEventCategory;
     }
 }

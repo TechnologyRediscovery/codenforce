@@ -134,7 +134,7 @@ public enum LinkedObjectSchemaEnum {
                         ),
     
     MailingaddressHuman (   
-                            "Mailing Address",
+                            "Person",
                             "humanmailingaddress",
                             "MailingaddressHuman", 
                             "linkid",

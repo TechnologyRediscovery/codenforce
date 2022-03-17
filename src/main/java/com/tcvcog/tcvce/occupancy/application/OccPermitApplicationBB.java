@@ -365,7 +365,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public void addUnitToNewPropUnits() {
         PropertyCoordinator pc = getPropertyCoordinator();
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
-        PropertyUnit newUnit = pc.initPropertyUnit(selectedProperty.getBundledProperty());
+        PropertyUnit newUnit = pc.getPropertyUnitSkeleton(selectedProperty.getBundledProperty());
         
         try {
             workingPropUnits.add(pic.extractPublicInfo(newUnit));

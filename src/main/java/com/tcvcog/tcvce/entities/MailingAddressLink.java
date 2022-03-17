@@ -45,6 +45,7 @@ public class MailingAddressLink
     protected String linkNotes;
     
     protected int priority;
+    protected int targetObjectPK;
     
     public MailingAddressLink(MailingAddress ma){
         
@@ -64,6 +65,8 @@ public class MailingAddressLink
         this.deactivatedTS = ma.deactivatedTS;
         this.deactivatedBy = ma.deactivatedBy;
         
+        this.addressPretty1Line = ma.addressPretty1Line;
+        this.addressPretty2LineEscapeFalse= ma.addressPretty2LineEscapeFalse;
     }
     
    
@@ -277,6 +280,20 @@ public class MailingAddressLink
      */
     public void setPriority(int priority) {
         this.priority = priority;
+    }
+
+    /**
+     * @return the targetObjectPK
+     */
+    public int getTargetObjectPK() {
+        return targetObjectPK;
+    }
+
+    /**
+     * @param targetObjectPK the targetObjectPK to set
+     */
+    public void setTargetObjectPK(int targetObjectPK) {
+        this.targetObjectPK = targetObjectPK;
     }
 
    

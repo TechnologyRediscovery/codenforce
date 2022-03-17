@@ -724,18 +724,20 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
     }
 
+    /**
+     * Insertion point for occupancy period objects
+     * @param period
+     * @return
+     * @throws IntegrationException 
+     */
     public int insertOccPeriod(OccPeriod period) throws IntegrationException {
         String query = " INSERT INTO public.occperiod(\n"
                 + "            periodid, source_sourceid, propertyunit_unitid, createdts, type_typeid, \n"
-                + "            typecertifiedby_userid, typecertifiedts, startdate, startdatecertifiedby_userid, \n"
-                + "            startdatecertifiedts, enddate, enddatecertifiedby_userid, enddatecterifiedts, \n"
-                + "            manager_userid, authorizationts, authorizedby_userid, overrideperiodtypeconfig, \n"
+                + "            startdate, enddate, manager_userid, \n"
                 + "            notes, createdby_userid, active, lastupdatedby_userid, lastupdatedts)\n"
                 + "    VALUES (DEFAULT, ?, ?, now(), ?, \n"
-                + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?, ?, \n"
-                + "            ?, ?, ?);";
+                + "            ?, ?, ?,"
+                + "            ?, ?, TRUE, ?, now());";
         ResultSet rs = null;
         Connection con = null;
         PreparedStatement stmt = null;
@@ -748,89 +750,51 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt = con.prepareStatement(query);
 
             // PARAMS LINE 1
-            stmt.setInt(1, 10);
+            if(period.getSource() != null){
+                stmt.setInt(1, period.getSource().getSourceid());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            
             stmt.setInt(2, period.getPropertyUnitID());
-            // timestamp set to now()
-            stmt.setInt(3, period.getType().getTypeID());
-
-            // PARAMS LINE 2
-            if (period.getPeriodTypeCertifiedBy() != null) {
-                stmt.setInt(4, period.getPeriodTypeCertifiedBy().getUserID());
+            
+            if(period.getType() != null){
+                stmt.setInt(3, period.getType().getTypeID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            if (period.getStartDate() != null) {
+                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(period.getStartDate()));
             } else {
                 stmt.setNull(4, java.sql.Types.NULL);
             }
-            if (period.getPeriodTypeCertifiedTS() != null) {
-                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(period.getPeriodTypeCertifiedTS()));
+
+            if (period.getEndDate() != null) {
+                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(period.getEndDate()));
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
-            if (period.getStartDate() != null) {
-                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(period.getStartDate()));
+
+            if (period.getManager() != null) {
+                stmt.setInt(6, period.getManager().getUserID());
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
-            // PARAMS LINE 3
-            if (period.getStartDateCertifiedBy() != null) {
-                stmt.setInt(7, period.getStartDateCertifiedBy().getUserID());
-            } else {
-                stmt.setNull(7, java.sql.Types.NULL);
-            }
-
-            if (period.getStartDateCertifiedTS() != null) {
-                stmt.setTimestamp(8, java.sql.Timestamp.valueOf(period.getStartDateCertifiedTS()));
+         
+            
+            stmt.setString(7, period.getNotes());
+            
+            if (period.getCreatedBy() != null) {
+                stmt.setInt(8, period.getCreatedBy().getUserID());
             } else {
                 stmt.setNull(8, java.sql.Types.NULL);
             }
 
-            if (period.getEndDate() != null) {
-                stmt.setTimestamp(9, java.sql.Timestamp.valueOf(period.getEndDate()));
+            if (period.getLastUpdatedBy() != null) {
+                stmt.setInt(9, period.getLastUpdatedBy().getUserID());
             } else {
                 stmt.setNull(9, java.sql.Types.NULL);
-            }
-            if (period.getEndDateCertifiedBy() != null) {
-                stmt.setInt(10, period.getEndDateCertifiedBy().getUserID());
-            } else {
-                stmt.setNull(10, java.sql.Types.NULL);
-            }
-
-            if (period.getEndDateCertifiedTS() != null) {
-                stmt.setTimestamp(11, java.sql.Timestamp.valueOf(period.getEndDateCertifiedTS()));
-            } else {
-                stmt.setNull(11, java.sql.Types.NULL);
-            }
-
-            // PARAMS LINE 4
-            if (period.getManager() != null) {
-                stmt.setInt(12, period.getManager().getUserID());
-            } else {
-                stmt.setNull(12, java.sql.Types.NULL);
-            }
-            if (period.getAuthorizedTS() != null) {
-                stmt.setTimestamp(13, java.sql.Timestamp.valueOf(period.getAuthorizedTS()));
-            } else {
-                stmt.setNull(13, java.sql.Types.NULL);
-            }
-            if (period.getAuthorizedBy() != null) {
-                stmt.setInt(14, period.getAuthorizedBy().getUserID());
-            } else {
-                stmt.setNull(14, java.sql.Types.NULL);
-            }
-            stmt.setBoolean(15, period.isOverrideTypeConfig());
-
-            // PARAMS LINE 5
-            stmt.setString(16, period.getNotes());
-            if (period.getCreatedBy() != null) {
-                stmt.setInt(17, period.getCreatedBy().getUserID());
-            } else {
-                stmt.setNull(17, java.sql.Types.NULL);
-            }
-            
-            stmt.setBoolean(18, period.isActive());
-
-            if (period.getLastUpdatedBy() != null) {
-                stmt.setInt(19, period.getLastUpdatedBy().getUserID());
-            } else {
-                stmt.setNull(19, java.sql.Types.NULL);
             }
 
             stmt.execute();
@@ -849,7 +813,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         } catch (SQLException ex) {
             throw new IntegrationException("OccupancyIntegrator.insertOccPermitApplication"
-                    + "| IntegrationError: unable to insert occupancy permit application ", ex);
+                    + "| IntegrationError: unable to insert occupancy period", ex);
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

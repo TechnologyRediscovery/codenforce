@@ -114,6 +114,11 @@ public class    SessionBean
     
     private MailingCityStateZip sessMailingCityStateZip;
     private MailingAddress sessMailingAddress;
+    private MailingAddressLink sessMailingAddressLink;
+    private IFace_addressListHolder sessAddressListHolder;
+    private List<MailingAddressLink> sessMailingAddressLinkRefreshedList;
+    
+    
     
     /* >>> QUERY PROPERTY <<< */
     private QueryProperty queryProperty;
@@ -414,10 +419,7 @@ public class    SessionBean
         PropertyCoordinator pc = getPropertyCoordinator();
         PersonCoordinator perc = getPersonCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
         EventCoordinator ec = getEventCoordinator();
-        SearchCoordinator searchC = getSearchCoordinator();
         
         UserAuthorized ua = sessUser;
         Credential cred = sessUser.getKeyCard();
@@ -442,6 +444,9 @@ public class    SessionBean
                 } else {
                     sessPersonRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
                     sessPersonListRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                }
+                if(sessProperty.getAddress() != null){
+                    sessMailingAddress = sessProperty.getAddress();
                 }
                 
               
@@ -496,7 +501,7 @@ public class    SessionBean
                     
                 }
                 
-                return "propertySearchProfile";
+                return "propertyInfo";
                 
                 
 
@@ -2075,6 +2080,50 @@ public class    SessionBean
     public void setSessHumanListHolderRefreshTrigger(IFace_humanListHolder sessHumanListHolderRefreshTrigger) {
         this.sessHumanListHolderRefreshTrigger = sessHumanListHolderRefreshTrigger;
     }
+
+    /**
+     * @return the sessMailingAddressLink
+     */
+    public MailingAddressLink getSessMailingAddressLink() {
+        return sessMailingAddressLink;
+    }
+
+    /**
+     * @param sessMailingAddressLink the sessMailingAddressLink to set
+     */
+    public void setSessMailingAddressLink(MailingAddressLink sessMailingAddressLink) {
+        this.sessMailingAddressLink = sessMailingAddressLink;
+    }
+
+    /**
+     * @return the sessAddressListHolder
+     */
+    public IFace_addressListHolder getSessAddressListHolder() {
+        return sessAddressListHolder;
+    }
+
+    /**
+     * @param sessAddressListHolder the sessAddressListHolder to set
+     */
+    public void setSessAddressListHolder(IFace_addressListHolder sessAddressListHolder) {
+        this.sessAddressListHolder = sessAddressListHolder;
+    }
+
+    /**
+     * @return the sessMailingAddressLinkRefreshedList
+     */
+    public List<MailingAddressLink> getSessMailingAddressLinkRefreshedList() {
+        return sessMailingAddressLinkRefreshedList;
+    }
+
+    /**
+     * @param sessMailingAddressLinkRefreshedList the sessMailingAddressLinkRefreshedList to set
+     */
+    public void setSessMailingAddressLinkRefreshedList(List<MailingAddressLink> sessMailingAddressLinkRefreshedList) {
+        this.sessMailingAddressLinkRefreshedList = sessMailingAddressLinkRefreshedList;
+    }
+
+    
 
     
 }

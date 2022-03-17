@@ -113,6 +113,7 @@
               resizable="true"
               closable="true"
               closeOnEscape="true"
+              dynamic="true"
               modal="true"
               header="Event (ID: #{eventsBB.currentEvent.eventID}) Profile">
 
@@ -133,7 +134,7 @@
                                          ajax="true"
                                          style="margin-right:10px;"
                                          icon="fa #{eventsBB.eventEditMode ? 'fa-check' : 'fa-pencil'}"
-                                         actionListener="#{eventsBB.onEventEditModeToggleButtonPress(ev)}"
+                                         actionListener="#{eventsBB.onEventEditModeToggleButtonPress}"
                                          update="@form
                                          events-growl-form"
                                          />
@@ -216,20 +217,20 @@
                                               value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.timeStart)}"
                                               rendered="#{!eventsBB.eventEditMode}"/>
 
-                                <p:calendar value="#{eventsBB.currentEvent.timeStart}"
+                                <p:datePicker value="#{eventsBB.currentEvent.timeStart}"
                                             id="event-edit-time-start-cal"
                                             rendered="#{eventsBB.eventEditMode}"
-                                            mode="popup"
                                             style="width: 100%;"
-                                            showOn="button"
-                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                            navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
-                                            showButtonPanel="true"
-                                            showTodayButton="true"
+                                            pattern="MM/dd/yyyy HH:mm"
+                                            disabled="false"
+                                            showButtonBar="true"
+                                            mask="true"
+                                            tabindex="16" 
+                                            timeInput="true" 
                                             required="true">
 
                                     <p:ajax update="event-edit-time-end-cal"/>
-                                </p:calendar>
+                                </p:datePicker>
 
                                 <p:spacer height="5px" />
                                 <h:outputLabel for="event-edit-time-start-cal"
@@ -259,20 +260,18 @@
                                 <h:outputText id="event-time-end-ot"
                                               value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.timeEnd)}"
                                               rendered="#{!eventsBB.eventEditMode}"/>
-                            
                                 
                                 
-                                <p:calendar value="#{eventsBB.currentEvent.timeEnd}"
+                                <p:datePicker value="#{eventsBB.currentEvent.timeEnd}"
                                             id="event-edit-time-end-cal"
                                             rendered="#{eventsBB.eventEditMode}"
-                                            mode="popup"
+                                            showButtonBar="true"
                                             style="width: 100%;"
                                             disabled="true"
-                                            showOn="button"
-                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                            navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
-                                            showButtonPanel="true"
-                                            showTodayButton="true"
+                                            mask="true"
+                                            pattern="MM/dd/yyyy HH:mm"
+                                            tabindex="16" 
+                                            timeInput="true" 
                                             required="true"/>
                             </div>
 
@@ -464,6 +463,7 @@
               resizable="true"
               closable="true"
               closeOnEscape="true"
+              dynamic="true"
               modal="true"
               header="Attaching new event to object with ID #{eventsBB.currentEventHolder.BObID}"
               rendered="true">
@@ -546,23 +546,24 @@
                         <h:outputLabel for="event-add-time-start-cal">
                             <h:outputText value="Start time"/>
                         </h:outputLabel>
+                        <p style="color:darkred; font-size: 0.7em;">NOTE: The time picker is unresponsive; click a date, then click anywhere to close the picker. (Until fixed, all events now will need to start at the current time.)</p>
                     </div>
 
                     <div class="restrict-main-contents-io-content">
                         <p:growl for="event-add-time-start-cal"/>
 
-                        <p:calendar value="#{eventsBB.skeletonEvent.timeStart}"
+                        <p:datePicker value="#{eventsBB.skeletonEvent.timeStart}"
                                     id="event-add-time-start-cal"
-                                    mode="popup"
-                                    showOn="button"
-                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                    navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true"
-                                    showSecond="false" showMillisec="false"
-                                    showButtonPanel="true"
-                                    showTodayButton="true"
+                                    pattern="MM/dd/yyyy HH:mm"
+                                    tabindex="16" 
+                                    timeInput="true" 
+                                    showButtonBar="false"
+                                    inline="false"
+                                    mask="true"
+                                    hourFormat="24"
                                     required="true">
                             <p:ajax update="event-add-time-end-cal" listener="#{eventsBB.recalculateEndTime}"/>
-                        </p:calendar>
+                        </p:datePicker>
                     </div>
                 </div>
 
@@ -591,16 +592,15 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:growl for="event-add-time-end-cal" />
-                        <p:calendar id="event-add-time-end-cal"
+                        <p:datePicker id="event-add-time-end-cal"
                                     value="#{eventsBB.skeletonEvent.timeEnd}"
-                                    mode="popup"
-                                    showOn="button"
                                     disabled="true"
-                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                    navigator="true" tabindex="16" timeInput="true" showHour="true" showMinute="true"
-                                    showSecond="false" showMillisec="false"
-                                    showButtonPanel="true"
-                                    showTodayButton="true"
+                                    showButtonBar="false"
+                                    mask="true"
+                                    pattern="MM/dd/yyyy HH:mm"
+                                    tabindex="16" 
+                                    timeInput="true" 
+                                    hourFormat="24"
                                     required="true"/>
                     </div>
                 </div>
@@ -651,6 +651,7 @@
               resizable="true"
               closable="true"
               closeOnEscape="true"
+              dynamic="true"
               modal="true"
               header="New note on event ID:#{eventsBB.currentEvent.eventID}">
 
@@ -697,6 +698,7 @@
               resizable="trie"
               closable="true"
               closeOnEscape="true"
+              dynamic="true"
               modal="true"
               header="Deactivate event id #{eventsBB.currentEvent.eventID}"
               rendered="true">

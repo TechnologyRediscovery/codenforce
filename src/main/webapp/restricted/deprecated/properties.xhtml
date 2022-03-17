@@ -506,7 +506,7 @@
                                         
                                         <p:commandButton       id="properties-occperiods-button-addnewperiod"
                                                                ajax="true" 
-                                                               actionListener="#{propertyProfileBB.initiateNewOccPeriodCreation(unit)}"
+                                                               actionListener="#{propertyProfileBB.onOccperiodCreateInitButtonChange(unit)}"
                                                                rendered="#{sessionBean.sessionUssessUserhasMuniStaffPermissions}"
                                                                disabled="#{!propertyProfileBB.currentProperty.active}"
                                                                oncomplete="PF('dialog-addoccperiod-var').show()"

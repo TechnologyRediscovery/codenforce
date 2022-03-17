@@ -721,6 +721,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         if(ma != null){
             System.out.println("NoticeOfViolationBB.storeRecipientAddress | address ID " + ma.getAddressID());
             selectedRecipAddr = ma;
+            currentNotice.setRecipientMailingAddress(selectedRecipAddr);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice will be sent to " + ma.getAddressPretty1Line(), ""));
@@ -1470,10 +1471,10 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
    
 
     /**
-     * @param selectedRecipAddr the selectedRecipAddr to set
+     * @param sr
      */
-    public void setSelectedRecipAddr(HumanMailingAddressLink selectedRecipAddr) {
-        this.setSelectedRecipAddr(selectedRecipAddr);
+    public void setSelectedRecipAddr(MailingAddressLink sr) {
+        this.selectedRecipAddr = sr;
     }
 
     /**

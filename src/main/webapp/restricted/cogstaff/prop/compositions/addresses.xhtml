@@ -19,7 +19,7 @@
                 closable="true"
                 closeOnEscape="true"
                 modal="true"
-                header="#{addressBB.currentAddress.addressID eq 0 ? 'Add new address' : 'Edit address'}"
+                header="#{addressBB.currentMailingAddress.addressID eq 0 ? 'Add new address' : 'Edit address'}"
                 rendered="true"
                 >
 
@@ -65,16 +65,16 @@
 
                             <div class="p-col-6">
                                 <h:outputText rendered="#{!addressBB.addressEditMode}" 
-                                              value="#{addressBB.currentAddress.addressID eq 0 ? 'new record' : addressBB.currentAddress.addressID}"/>
+                                              value="#{addressBB.currentMailingAddress.addressID eq 0 ? 'new record' : addressBB.currentMailingAddress.addressID}"/>
                             </div>
 
                             <div class="p-col-6">Building Number</div>
                             <div class="p-col-6">
                                 <h:outputText rendered="#{!addressBB.addressEditMode}" 
-                                              value="#{addressBB.currentAddress.buildingNo}"/>
+                                              value="#{addressBB.currentMailingAddress.buildingNo}"/>
 
                                 <p:inputText rendered="#{addressBB.addressEditMode}"
-                                             value="#{addressBB.currentAddress.buildingNo}" />
+                                             value="#{addressBB.currentMailingAddress.buildingNo}" />
                             </div>
                             <div class="p-col-6">
                                 PO Box
@@ -82,7 +82,7 @@
                             
                             <div class="p-col-6">
                                 <h:outputText rendered="#{!addressBB.addressEditMode}" 
-                                              value="#{addressBB.currentAddress.poBox eq 0 ? '' : addressBB.currentAddress.poBox}"/>
+                                              value="#{addressBB.currentMailingAddress.poBox eq 0 ? '' : addressBB.currentMailingAddress.poBox}"/>
                                 
                                 <p:selectBooleanCheckbox    id="address-pobox-sbcb"
                                                             rendered="#{addressBB.addressEditMode}"
@@ -95,7 +95,7 @@
                                 <p:inputText    id="address-pobox-it"
                                                 rendered="#{addressBB.addressEditMode}"
                                                 disabled="#{!addressBB.formPOBox}"
-                                                value="#{addressBB.currentAddress.poBox}"
+                                                value="#{addressBB.currentMailingAddress.poBox}"
                                                 type="number"/>
                             </div>
                             
@@ -105,9 +105,9 @@
                             
                             <div class="p-col-6">
                                 <h:outputText rendered="true" 
-                                              value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.name : ''}"/>
+                                              value="#{!empty addressBB.currentMailingAddress.street ? addressBB.currentMailingAddress.street.name : ''}"/>
                                 <h:outputText rendered="true" 
-                                              value=" (ID:#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.streetID : ''})"/>
+                                              value=" (ID:#{!empty addressBB.currentMailingAddress.street ? addressBB.currentMailingAddress.street.streetID : ''})"/>
                             </div>
 
                             <div class="p-col-6">
@@ -115,32 +115,32 @@
                             </div>
                             
                             <div class="p-col-6">
-                                <h:outputText rendered="#{!empty addressBB.currentAddress.street}" 
-                                              value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.cityStateZip.city : ''}"/>
+                                <h:outputText rendered="#{!empty addressBB.currentMailingAddress.street}" 
+                                              value="#{!empty addressBB.currentMailingAddress.street ? addressBB.currentMailingAddress.street.cityStateZip.city : ''}"/>
                                 
-                                <h:outputText   rendered="#{!empty addressBB.currentAddress.street}" 
+                                <h:outputText   rendered="#{!empty addressBB.currentMailingAddress.street}" 
                                                 value=", " />
                                 
-                                <h:outputText rendered="#{!empty addressBB.currentAddress.street}" 
-                                              value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.cityStateZip.state : ''}"/>
+                                <h:outputText rendered="#{!empty addressBB.currentMailingAddress.street}" 
+                                              value="#{!empty addressBB.currentMailingAddress.street ? addressBB.currentMailingAddress.street.cityStateZip.state : ''}"/>
                                 
-                                <h:outputText   rendered="#{!empty addressBB.currentAddress.street}" 
+                                <h:outputText   rendered="#{!empty addressBB.currentMailingAddress.street}" 
                                                 value=" " />
                                 
-                                <h:outputText rendered="#{!empty addressBB.currentAddress.street}" 
-                                              value="#{!empty addressBB.currentAddress.street ? addressBB.currentAddress.street.cityStateZip.zipCode : ''}"/>
+                                <h:outputText rendered="#{!empty addressBB.currentMailingAddress.street}" 
+                                              value="#{!empty addressBB.currentMailingAddress.street ? addressBB.currentMailingAddress.street.cityStateZip.zipCode : ''}"/>
                             </div>
 
 
                             <div class="p-col-6">Source</div>
                             <div class="p-col-6">
                                 <h:outputText rendered="#{!addressBB.addressEditMode}" 
-                                              value="#{addressBB.currentAddress.source.title}"/>
+                                              value="#{addressBB.currentMailingAddress.source.title}"/>
 
                                 <p:selectOneMenu id="address-source-som"
                                                  required="true"
                                                  rendered="#{addressBB.addressEditMode}" 
-                                                 value="#{addressBB.currentAddress.source}">
+                                                 value="#{addressBB.currentMailingAddress.source}">
                                     <f:converter converterId="bobSourceConverter"/>
                                     <f:selectItems value="#{addressBB.addressSourceList}"
                                                    var="bs" 
@@ -154,20 +154,20 @@
                             <div class="p-col-6">Verified?</div>
                             <div class="p-col-6">
                                 <h:outputText   rendered="#{!addressBB.addressEditMode}"
-                                                value="#{empty addressBB.currentAddress.verifiedTS ? 'No' : 'Yes'}" />
+                                                value="#{empty addressBB.currentMailingAddress.verifiedTS ? 'No' : 'Yes'}" />
 
                                 <p:spacer height="2px" />
 
                                 <h:outputText   rendered="#{!addressBB.addressEditMode}"
-                                                value="#{!empty addressBB.currentAddress.verifiedTS ? 'on ' : ''}" />
+                                                value="#{!empty addressBB.currentMailingAddress.verifiedTS ? 'on ' : ''}" />
 
                                 <p:spacer height="2px" />
 
                                 <h:outputText   rendered="#{!addressBB.addressEditMode}"
-                                                value="#{!empty addressBB.currentAddress.verifiedBy ? 'by ' : ''}" />
+                                                value="#{!empty addressBB.currentMailingAddress.verifiedBy ? 'by ' : ''}" />
 
                                 <h:outputText   rendered="#{!addressBB.addressEditMode}"
-                                                value="#{!empty addressBB.currentAddress.verifiedBy ? addressBB.currentAddress.verifiedBy.username : ''}" />
+                                                value="#{!empty addressBB.currentMailingAddress.verifiedBy ? addressBB.currentMailingAddress.verifiedBy.username : ''}" />
 
 
                                 <p:selectBooleanCheckbox    id="address-verified-sbcb"
@@ -182,13 +182,13 @@
                             <div class="p-col-6">Verification Source</div>
                             <div class="p-col-6">
                                 <h:outputText rendered="#{!addressBB.addressEditMode}" 
-                                              value="#{addressBB.currentAddress.verifiedSource.title}"/>
+                                              value="#{addressBB.currentMailingAddress.verifiedSource.title}"/>
 
                                 <p:selectOneMenu id="address-ver-source-som"
                                                  required="false"
                                                  disabled="#{!addressBB.formAddressVerified}"
                                                  rendered="#{addressBB.addressEditMode}" 
-                                                 value="#{addressBB.currentAddress.verifiedSource}">
+                                                 value="#{addressBB.currentMailingAddress.verifiedSource}">
                                     <f:converter converterId="bobSourceConverter"/>
                                     <f:selectItems value="#{addressBB.addressSourceList}"
                                                    var="bs" 
@@ -200,28 +200,28 @@
 
                             <div class="p-col-6">Creation</div>
                             <div class="p-col-6">
-                                <h:outputText value="#{addressBB.getPrettyDate(addressBB.currentAddress.createdTS)}" />
+                                <h:outputText value="#{addressBB.getPrettyDate(addressBB.currentMailingAddress.createdTS)}" />
                                 <p:spacer height="2px" />
-                                <h:outputText   rendered="#{!empty addressBB.currentAddress.createdBy}"
-                                                value="by #{addressBB.currentAddress.createdBy.username}" />
+                                <h:outputText   rendered="#{!empty addressBB.currentMailingAddress.createdBy}"
+                                                value="by #{addressBB.currentMailingAddress.createdBy.username}" />
                             </div>
 
                             <div class="p-col-6">Last update</div>
                             <div class="p-col-6">
-                                <h:outputText value="#{addressBB.getPrettyDate(addressBB.currentAddress.lastUpdatedTS)}" />
+                                <h:outputText value="#{addressBB.getPrettyDate(addressBB.currentMailingAddress.lastUpdatedTS)}" />
                                 <p:spacer height="2px" />
-                                <h:outputText   rendered="#{!empty addressBB.currentAddress.lastUpdatedBy}"
-                                                value="by #{addressBB.currentAddress.lastUpdatedBy.username}" />
+                                <h:outputText   rendered="#{!empty addressBB.currentMailingAddress.lastUpdatedBy}"
+                                                value="by #{addressBB.currentMailingAddress.lastUpdatedBy.username}" />
                             </div>
 
                             <div class="p-col-6">Record status</div>
                             <div class="p-col-6">
-                                <h:outputText value="#{empty addressBB.currentAddress.deactivatedTS ? 'active' : 'deactivated on'}" />
+                                <h:outputText value="#{empty addressBB.currentMailingAddress.deactivatedTS ? 'active' : 'deactivated on'}" />
                                 <p:spacer height="2px" />
-                                <h:outputText value="#{empty addressBB.currentAddress.deactivatedTS ? '' : addressBB.getPrettyDate(addressBB.currentAddress.deactivatedTS) }" />
+                                <h:outputText value="#{empty addressBB.currentMailingAddress.deactivatedTS ? '' : addressBB.getPrettyDate(addressBB.currentMailingAddress.deactivatedTS) }" />
                                 <p:spacer height="2px" />
-                                <h:outputText   rendered="#{!empty addressBB.currentAddress.deactivatedBy}"
-                                                value="by #{addressBB.currentAddress.deactivatedBy.username}" />
+                                <h:outputText   rendered="#{!empty addressBB.currentMailingAddress.deactivatedBy}"
+                                                value="by #{addressBB.currentMailingAddress.deactivatedBy.username}" />
                             </div>
                             <div class="p-col-6">
                                 Notes
@@ -241,7 +241,7 @@
                             
                             </div>
                             <div class="p-col-6">
-                                <h:outputText value="#{addressBB.currentAddress.notes}"
+                                <h:outputText value="#{addressBB.currentMailingAddress.notes}"
                                               escape="false" />
                             </div>
                         </div>
@@ -260,7 +260,7 @@
 
                     <h:form id="address-links-form">
 
-                        <h:outputText value="connections to #{addressBB.currentAddress.addressPretty2LineEscapeFalse}"
+                        <h:outputText value="connections to #{addressBB.currentMailingAddress.addressPretty2LineEscapeFalse}"
                                       escape="false" />
 
 
@@ -848,7 +848,7 @@
                               ajax="true"
                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                               update="addresses-growl-form"
-                              value="Confirm removal of address #{addressBB.currentAddress.buildingNo} (ID: #{addressBB.currentAddress.addressID})"
+                              value="Confirm removal of address #{addressBB.currentMailingAddress.buildingNo} (ID: #{addressBB.currentMailingAddress.addressID})"
                               actionListener="#{addressBB.onMailingStreetDeactivateCommit}" 
                               oncomplete="PF('remove-address-confirm-dialog-var').hide()">
             </p:commandButton>
@@ -878,7 +878,7 @@
                 closable="true"
                 closeOnEscape="true"
                 modal="true"
-                header="Append note Current Address ID:#{addressBB.currentAddress.addressID}"
+                header="Append note Current Address ID:#{addressBB.currentMailingAddress.addressID}"
                 rendered="true"
                 >
 

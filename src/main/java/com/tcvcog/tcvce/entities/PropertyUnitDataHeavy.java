@@ -54,15 +54,13 @@ public class        PropertyUnitDataHeavy
             this.unitNumber = prop.getUnitNumber();
 
             this.notes = prop.getNotes();
-            this.otherKnownAddress = prop.getOtherKnownAddress();
 
             this.rentalIntentDateStart = prop.getRentalIntentDateStart();
             this.rentalIntentDateStop = prop.getRentalIntentDateStop();
-            this.rentalIntentLastUpdatedBy = prop.getRentalIntentLastUpdatedBy();
             this.rentalNotes = prop.getRentalNotes();
-            this.active = prop.isActive();
             this.conditionIntensityClassID = prop.getConditionIntensityClassID();
             this.lastUpdatedTS = prop.getLastUpdatedTS();
+            this.source = prop.source;
 
         }
     }
