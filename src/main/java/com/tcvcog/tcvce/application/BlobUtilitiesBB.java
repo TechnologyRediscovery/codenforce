@@ -6,6 +6,7 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
@@ -17,11 +18,9 @@ import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
 
@@ -42,6 +41,8 @@ public class    BlobUtilitiesBB
     private List<BlobType> blobTypeList;
     private List<BlobLight> selectedBlobList;
     
+    private String blobListComponentToUpdateAfterChanges;
+    
     /**
      * Creates a new instance of BlobUtilitiesBB
      */
@@ -54,26 +55,126 @@ public class    BlobUtilitiesBB
     public void initBean() {
         BlobCoordinator bc = getBlobCoordinator();
         
-        getSessionBean().setBlobList(new ArrayList<Blob>());
+        getSessionBean().setBlobList(new ArrayList<>());
         currentBlobHolder = getSessionBean().getSessBlobHolder();
         editModeBlobMetadata = false;
-        
         try {
             blobTypeList = bc.getBlobTypeListComplete();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
-        
         selectedBlobList = new ArrayList<>();
-        
-        
-        
     }
 
-  
+    /**
+     * Takes in a BlobHolder and makes it both this bean's current BlobHolder
+     * and the session one
+     * @param holder 
+     */
+    public void onUploadBlobInitButtonChange(IFace_BlobHolder holder){
+        currentBlobHolder = holder;
+        extractAndStoreBlobListComponentToUpdate();
+        try {
+            getSessionBean().setAndRefreshSessionBlobHolderAndBuildUpstreamPool(holder);
+        } catch (BObStatusException | BlobException | IntegrationException ex) {
+            System.out.println(ex);
+        } 
+    }
 
-    public String navToLinkBlob() {
-        return "linkBlob";
+    
+    /**
+     * Internal organ for getting a new list of blobs after any kind of blob operation
+     * and sending that to the session; The caller of any blob method is responsible
+     * for asking the session bean for this list. If it's not null, then 
+     * the blob holder's BB needs to inject it into its current object
+     * and null out the session blight list for refresh.
+     */
+    private void sendUpdatedBlobListToSessionForSenderRefresh(){
+       BlobCoordinator blobc = getBlobCoordinator();
+       if(currentBlobHolder != null){
+           try {
+               getSessionBean().setSessBlobLightListForRefreshUptake(blobc.getBlobLightList(currentBlobHolder));
+           } catch (BObStatusException | BlobException | IntegrationException ex) {
+               System.out.println(ex);
+               
+           }
+       }
+    }
+    
+    /**
+     * Internal organ for exactracting the blob list component to update after
+     * this blob is done updating things
+     */
+    private void extractAndStoreBlobListComponentToUpdate(){
+        
+           blobListComponentToUpdateAfterChanges = 
+                FacesContext.getCurrentInstance()
+                        .getExternalContext()
+                        .getRequestParameterMap()
+                        .get("blob-list-component-to-update");
+           System.out.println("BlobUtilitiesBB.extractAndStoreBlobListComponentToUpdate | " + blobListComponentToUpdateAfterChanges);
+    }
+    
+    
+    /**
+     * Starts the deactivation process
+     * @param blight 
+     * @param holder 
+     */
+    public void onDeactivateBlobInitLinkClick(BlobLight blight, IFace_BlobHolder holder){
+        extractAndStoreBlobListComponentToUpdate();
+        currentBlobHolder = holder;
+        currentBlobLight = blight;
+    }
+    
+    
+    /**
+     * Deactivates blob
+     * @param ev
+     */
+    public void deactivateCurrentBlobLight(ActionEvent ev){
+        BlobCoordinator blobc = getBlobCoordinator();
+        try {
+            blobc.deactivateBlobLightAndAllLinks(currentBlobLight, getSessionBean().getSessUser());
+            sendUpdatedBlobListToSessionForSenderRefresh();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Deactivated photo/doc ID " + currentBlobLight.getPhotoDocID(), ""));
+        } catch (IntegrationException | AuthorizationException  | BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Error deactivating photo/doc: " + ex.getMessage() , ""));
+        } 
+    }
+
+    /**
+     * Asks the coordinator to remove only the links between the current
+     * blob holder and the current blob light
+     * 
+     * @param ev 
+     */
+    public void deactivateLinksBetweenCurrentBlobLightAndCurrentBlobHolder(ActionEvent ev){
+        BlobCoordinator bc = getBlobCoordinator();
+        if(currentBlobHolder != null && currentBlobLight != null){
+            try {
+                bc.deleteLinksToPhotoDocRecord(currentBlobLight, currentBlobHolder.getBlobLinkEnum());
+                sendUpdatedBlobListToSessionForSenderRefresh();
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Success! Removed links to photo/doc", ""));
+            } catch (IntegrationException | BObStatusException  ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Fatal error: cannot remove photo/doc links: " + ex.getMessage(), ""));
+            } 
+        } else {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error: cannot remove photo/doc links due to bean setup error.", ""));
+            
+        }
     }
     
     
@@ -91,7 +192,7 @@ public class    BlobUtilitiesBB
         
         currentBlobHolder = getSessionBean().getSessBlobHolder();
         System.out.println("BlobToolsUniversalBB.onBlobUploadCommitButtonChange | Beginning storage cycle!");
-        
+        extractAndStoreBlobListComponentToUpdate();
         if (currentBlobHolder != null && currentBlobHolder.getBlobLinkEnum() != null && ev != null && ev.getFile() != null) {
 
             try {
@@ -107,7 +208,7 @@ public class    BlobUtilitiesBB
                                                 currentBlobHolder, 
                                                 getSessionBean().getSessUser(), 
                                                 getSessionBean().getSessMuni());
-                // ship to coordinator for storage
+                
                 if (freshBlob != null) {
                     System.out.println("BlobUtilitiesBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getPhotoDocID());
                 
@@ -116,6 +217,7 @@ public class    BlobUtilitiesBB
                                 "Upload success! File " + ev.getFile().getFileName() + " Is stored with PhotoDoc ID: " + freshBlob.getPhotoDocID(), ""));
                 }
                 refreshCurrentBlobHolder();
+                sendUpdatedBlobListToSessionForSenderRefresh();
 
             } catch (IntegrationException | IOException | BlobException | BlobTypeException | BObStatusException ex) {
                 System.out.println("BlobUtilitiesBB.onBlobUploadCommitButtonChange | upload failed! " + ex);
@@ -159,10 +261,12 @@ public class    BlobUtilitiesBB
      * have the ID of the bytes which can be used
      * to extract all the bytes
      * @param bl 
+     * @param holder 
      */
-    public void onViewBlobLinkClick(BlobLight bl){
+    public void onViewBlobLinkClick(BlobLight bl, IFace_BlobHolder holder){
         System.out.println("BlobUtilitiesBB.onViewBlobLinkClick | viewing blob light ID " + bl.getPhotoDocID());
         currentBlobLight = bl;
+        currentBlobHolder = holder;
     }
     
     
@@ -173,7 +277,9 @@ public class    BlobUtilitiesBB
     public void toggleEditModeBlobMetadata(){
         System.out.println("BlobUtilitiesBB.toggleEditBlobMetadata : start of method " + editModeBlobMetadata);
         if(editModeBlobMetadata){
+            extractAndStoreBlobListComponentToUpdate();
             editBlobMetadata();
+            
         } else {
             // nothing to do -- we were in view mode
         }
@@ -188,10 +294,12 @@ public class    BlobUtilitiesBB
      */
     private void editBlobMetadata(){
         BlobCoordinator bc = getBlobCoordinator();
+        
         try {
             bc.updateBlobMetatdata(currentBlobLight, getSessionBean().getSessUser());
             refreshCurrentBlobLight();
             refreshCurrentBlobHolder();
+            sendUpdatedBlobListToSessionForSenderRefresh();
             getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Successfully updated metadata on photo/doc ID: " + currentBlobLight.getPhotoDocID(), ""));
@@ -207,9 +315,11 @@ public class    BlobUtilitiesBB
      * Listener for user request to edit a blob's meta data
      * @param bl 
      */
-    public void onBlobEditMetaDataLinkClick(BlobLight bl){
+    public void onBlobEditMetaDataInitLinkClick(BlobLight bl, IFace_BlobHolder holder){
         currentBlobLight = bl;
         editModeBlobMetadata = true;
+        currentBlobHolder = holder;
+        extractAndStoreBlobListComponentToUpdate();
         
     }
     
@@ -233,9 +343,11 @@ public class    BlobUtilitiesBB
     public void linkCurrentBlobHolderToPooledBlobs(ActionEvent ev){
         System.out.println("BlobUtilitiesBB.linkCurrentBlobHolderToPooledBlobs | selectedBlobList: " + selectedBlobList.size());        
         BlobCoordinator bc = getBlobCoordinator();
+        extractAndStoreBlobListComponentToUpdate();
         try {
             bc.linkBlobHolderToBlobList(currentBlobHolder, selectedBlobList);
             refreshCurrentBlobHolder();
+            sendUpdatedBlobListToSessionForSenderRefresh();
             getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Successfully linked current object to selected photos/documents: " , ""));
@@ -322,6 +434,20 @@ public class    BlobUtilitiesBB
      */
     public void setSelectedBlobList(List<BlobLight> selectedBlobList) {
         this.selectedBlobList = selectedBlobList;
+    }
+
+    /**
+     * @return the blobListComponentToUpdateAfterChanges
+     */
+    public String getBlobListComponentToUpdateAfterChanges() {
+        return blobListComponentToUpdateAfterChanges;
+    }
+
+    /**
+     * @param blobListComponentToUpdateAfterChanges the blobListComponentToUpdateAfterChanges to set
+     */
+    public void setBlobListComponentToUpdateAfterChanges(String blobListComponentToUpdateAfterChanges) {
+        this.blobListComponentToUpdateAfterChanges = blobListComponentToUpdateAfterChanges;
     }
 
     

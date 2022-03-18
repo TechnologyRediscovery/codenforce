@@ -25,13 +25,17 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * The premier container representing a violation of an ordinance
  * @author ellen bascomb of apt 31y
  */
 public  class       CodeViolation  
         extends     BOb
         implements  Serializable,
+                    IFace_BlobHolder,
                     Comparable<CodeViolation> {
+    
+    static final BlobLinkEnum VIOLATION_BLOB_LINK_ENUM = BlobLinkEnum.CODE_VIOLATION;
+    static final BlobLinkEnum VIOLATION_BLOB_LINK_ENUM_UPSTREAM_POOL = BlobLinkEnum.CE_CASE;
     
     protected int violationID;
     protected EnforcableCodeElement violatedEnfElement;
@@ -860,6 +864,26 @@ public  class       CodeViolation
      */
     public void setMakeFindingsDefault(boolean makeFindingsDefault) {
         this.makeFindingsDefault = makeFindingsDefault;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return VIOLATION_BLOB_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return violationID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return VIOLATION_BLOB_LINK_ENUM_UPSTREAM_POOL;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return ceCaseID;
     }
 
    

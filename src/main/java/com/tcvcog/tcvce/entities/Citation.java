@@ -31,11 +31,14 @@ import java.util.Objects;
  */
 public  class       Citation 
         extends     TrackedEntity
-        implements  IFace_humanListHolder{
+        implements  IFace_humanListHolder, 
+                    IFace_BlobHolder{
     
     final static String CITATION_TABLE = "citation";
     final static String CITATION_PKFIELD = "citationid";
     final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CitationHuman;
+    final static BlobLinkEnum CITATION_BLOB_LINK_ENUM = BlobLinkEnum.CITATION;
+    final static BlobLinkEnum CITATION_BLOB_LINK_UPSTREAM_POOL = BlobLinkEnum.CE_CASE;
     
     private int cecaseID;
     
@@ -373,6 +376,26 @@ public  class       Citation
      */
     public void setFilingType(CitationFilingType filingType) {
         this.filingType = filingType;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return CITATION_BLOB_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return citationID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return CITATION_BLOB_LINK_UPSTREAM_POOL;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return cecaseID;
     }
 
 }

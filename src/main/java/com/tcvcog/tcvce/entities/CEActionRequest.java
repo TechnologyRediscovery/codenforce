@@ -39,7 +39,7 @@ import com.tcvcog.tcvce.util.DateTimeUtil;
 
 public class        CEActionRequest 
         extends     BOb 
-        implements  Serializable, 
+        implements  Serializable,
                     IFace_BlobHolder{
     
     

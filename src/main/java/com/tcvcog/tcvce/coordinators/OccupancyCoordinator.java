@@ -142,7 +142,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
 
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        BlobIntegrator bi = getBlobIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
         PaymentIntegrator pai = getPaymentIntegrator();
         WorkflowCoordinator chc = getWorkflowCoordinator();
         SearchCoordinator sc = getSearchCoordinator();
@@ -196,7 +196,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             // PERMIT LIST
             opdh.setPermitList(oi.getOccPermitList(opdh));
             // BLOB LIST
-            opdh.setBlobIDList(bi.photosAttachedToOccPeriod(opdh.getPeriodID()));
+            opdh.setBlobList(bc.getBlobLightList(opdh));
 
             // Commented out 26-JAN-2022 here since we  aren't implementing rigid logic
             // on occ period permit generation based on inspection output data

@@ -33,7 +33,8 @@ public class BlobsterBB extends BackingBeanUtils{
         FacesContext fc = FacesContext.getCurrentInstance();
 
         // as of JAN 2022--getting a "response already committed error, so commenting out
-        //ec.responseReset(); // Some JSF component library or some Filter might have set some headers in the buffer beforehand. We want to get rid of them, else it may collide.
+        //ec.responseReset(); // Some JSF component library or some Filter might have set 
+        // some headers in the buffer beforehand. We want to get rid of them, else it may collide.
 
         BlobCoordinator bc = getBlobCoordinator();
         Blob blob = null;

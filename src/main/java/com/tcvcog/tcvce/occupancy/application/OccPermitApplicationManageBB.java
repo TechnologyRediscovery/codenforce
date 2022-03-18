@@ -552,7 +552,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
     public void addNewUnit() {
         PropertyUnit newUnit = new PropertyUnit();
         newUnit.setParcelKey(propertyForApplication.getParcelKey());
-        newUnit.setActive(true);
+        
         propertyForApplication.getUnitList().add(newUnit);
         setCurrentViewOption(currentViewOption);
     }

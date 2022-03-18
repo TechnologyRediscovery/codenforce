@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
@@ -56,6 +57,7 @@ import java.io.Serializable;
 import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -81,11 +83,10 @@ import org.w3c.dom.Node;
  * Business logic and coordination tools for photos and docs, called BLOBS, 
  * binary large objects
  * 
- * @author NADGIT
+ * @author NADGIT & Ellen Bascomb of Apartment 31Y
  */
 public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
-    private final DefaultStreamedContent defaultStream = new DefaultStreamedContent();
     private final int GIGABYTE = 1000000000;
 
     private List<BlobType> blobTypeListMaster;
@@ -112,6 +113,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * Retrieval point for a BlobType
      * @param typeid
      * @return the BlobType all ready to roll; null if id = 0;
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public BlobType getBlobType(int typeid) throws IntegrationException{
         
@@ -170,40 +172,6 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
    
 
-    /**
-     * The BlobCoordinator attempts to retrieve a PDF with a given Blob ID supplied by a JSF parameter. 
-     * If something were to go wrong, automatically retrieve the defaultStream for the interface.
-     *
-     * @return
-     * @throws BlobTypeException
-     * @throws com.tcvcog.tcvce.domain.BlobException
-     */
-    public StreamedContent getDocument() throws BlobTypeException, BlobException{
-        // should use EL to verify blob type,  but this will check it anyway
-        FacesContext context = FacesContext.getCurrentInstance();
-        DefaultStreamedContent sc = null;
-
-        if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-            sc = defaultStream;
-        } else {
-            
-            //Get the blob ID from the Faces context
-            int blobID = Integer.parseInt(context.getExternalContext().getRequestParameterMap().get("blobID"));
-            System.out.println("BlobCoordinator.getDocument: document ID " + blobID);
-            try {
-                Blob blob = getPDFBlob(blobID);
-                
-//                sc = new DefaultStreamedContent(new ByteArrayInputStream(blob.getBytes()));
-                
-            } catch (IntegrationException ex) {
-                System.out.println("BlobCoordinator.getDocument | " + ex);
-            }
-                
-        }
-        
-        return sc;
-    }
-    
     
     /**
      * Official pathway for writing both the bytes to the DB
@@ -241,6 +209,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         // ******** AUDIT BLOB AND INSERT *************
         blob.setBytesID(bi.insertBlobBytes(auditAndPrepareBlobForStorage(blob)));
         // we have bytes ID set, so the photodoc table can point to it
+        blob.setCreatedBy(ua);
+        blob.setLastUpdatedBy(ua);
         blob.setPhotoDocID(bi.insertPhotoDoc(blob));
         // then connect the metadata record to the parent business object
         bi.linkBlobHolderToBlobMetadata(bh, blob);
@@ -267,9 +237,10 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         //Test to see if the byte array is larger than a GIGABYTE
-        if (blob.getBytes().length > GIGABYTE) {
-            throw new BlobException("You cannot upload a file larger than 1 gigabyte.");
-        }
+        // commented out on 18-MAR-2022 when officers said they could not upload over 10mb
+//        if (blob.getBytes().length > GIGABYTE) {
+//            throw new BlobException("You cannot upload a file larger than 1 gigabyte.");
+//        }
 
         String filename = blob.getFilename();
         
@@ -329,23 +300,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
-    /**
-     * Logic container for linking blobs to properties
-     * 
-     * TODO: Don't duplicate links
-     * @param bl
-     * @param prop
-     * @return
-     * @throws IntegrationException 
-     */
-    public BlobLight linkBlobToProperty(BlobLight bl, Property prop) throws IntegrationException{
-        BlobIntegrator bi = getBlobIntegrator();
-        
-        bi.linkBlobToProperty(bl, prop);
-        return bl;
-    }
-    
-   
+  
     
     
     /**
@@ -367,18 +322,59 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * Sets the deactivated by and deactivatedts fields on the given blob light
      * @param bl
      * @param ua doing the deactivating
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public void deactivateBlobLight(BlobLight bl, UserAuthorized ua) throws IntegrationException{
+    public void deactivateBlobLightAndAllLinks(BlobLight bl, UserAuthorized ua) throws IntegrationException, AuthorizationException, BObStatusException{
         BlobIntegrator bi = getBlobIntegrator();
         
         if(bl != null && ua != null){
-            bl.setLastUpdatedBy(ua);
-            bl.setDeactivatedBy(ua);
-            bl.setDeactivatedTS(LocalDateTime.now());
-            bi.updateBlobLight(bl);
+            if(bl.getCreatedBy() != null){
+                if(bl.getCreatedBy().getUserID() == ua.getUserID() || ua.getKeyCard().isHasSysAdminPermissions()){
+                    System.out.println("BlobCoordinator.deactivateBlobLightAndAllLinks | Permission granted to deac photodoc record");
+                    bl.setLastUpdatedBy(ua);
+                    bl.setDeactivatedBy(ua);
+                    bl.setDeactivatedTS(LocalDateTime.now());
+                    bi.updateBlobLight(bl);
+                    deleteLinksToPhotoDocRecord(bl, BlobLinkEnum.PROPERTY);
+                } else {
+                    throw new AuthorizationException("cannot deactivate a blob unless you created that blob or have sys admin cred or better");
+                }
+            } else {
+                throw new AuthorizationException("cannot deactivate a blob unless you created that blob has a creator - permissions issue!");
+            }
+        } else {
+            throw new BObStatusException("cannot deactivate a blob with null blob light or user authorized");
         }
-        
-        
+    }
+    
+    
+    /**
+     * Iterates over all the linking tables that could connect to this
+     * given bloblight and actually deletes those entries.
+     * This is unusual, in that in CNF we rarely delete records, usually we deactivate
+     * them but blob linking at this level is rather abstract
+     * 
+     * @param bl to which all links should be removed
+     * @param blenum if null, i'll delete records from ALL linking tables!!
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public void deleteLinksToPhotoDocRecord(BlobLight bl, BlobLinkEnum blenum) throws IntegrationException, BObStatusException{
+        BlobIntegrator bi = getBlobIntegrator();
+        if(bl != null){
+            if(blenum != null){
+                List<BlobLinkEnum> blenumList = Arrays.asList(BlobLinkEnum.values());
+                if(blenumList != null && !blenumList.isEmpty()){
+                    for(BlobLinkEnum en: blenumList){
+                        bi.removeLinkToBlobLightByBlobLinkEnum(bl, en);
+                    }
+                }
+            } else {
+                bi.removeLinkToBlobLightByBlobLinkEnum(bl, blenum);
+            }
+        }
     }
     
     
@@ -428,32 +424,14 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
-    public Blob getPhotoBlob(int blobID) throws IntegrationException, BlobException {
-        BlobIntegrator bi = getBlobIntegrator();
-
-        Blob blob = new Blob(getBlobLight(blobID));
-
-//        blob.setBytes(bi.getBlobBytes(blob.getBytesID()));
-
-        return blob;
-    }
+ 
     
-    /**
-     * @param blobID
-     * @return
-     * @throws IntegrationException
-     * @throws BlobException 
-     */
-    public Blob getPDFBlob(int blobID) throws IntegrationException, BlobException {
-        BlobIntegrator bi = getBlobIntegrator();
-
-        Blob blob = new Blob(getPDFBlobLight(blobID));
-
-//        blob.setBytes(bi.getBlobBytes(blob.getBytesID()));
-
-        return blob;
-    }
-   
+   /**
+    * Primary pathway for getting the actual bytes assocaited with a given bloblight
+    * which represents a record in the photodoc table
+    * @param bl
+    * @return the actual Blob with bytes in its belly!
+    */
     public Blob getBlob(BlobLight bl){
         BlobIntegrator bi = getBlobIntegrator();
         return bi.getBlob(bl);
@@ -532,7 +510,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
 
                 bi.updateBlobBytes(patient);
 
-                bi.updateBlobMetadata(patient);
+//                bi.updateBlobMetadata(patient);
                 
                 } catch(IOException | BlobTypeException exTwo){
                     throw new BlobException(exTwo);
@@ -547,58 +525,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         return getBlobLight(blobID);
     }
     
-    /**
-     * IN PROCESS, probably to stay deprecated
-     * 
-     * A method for grabbing PDFBlobLights that's safe:
-     * if it encounters an entry that does not yet have a properly
-     * populated metadata column, it strips the metadata and saves it
-     * before returning the blob.
-     * @deprecated 
-     * @param blobID
-     * @return
-     * @throws IntegrationException
-     * @throws com.tcvcog.tcvce.domain.BlobException
-     */
-    public BlobLight getPDFBlobLight(int blobID) throws IntegrationException, BlobException {
-        
-        BlobIntegrator bi = getBlobIntegrator();
-        
-        try {
-        return bi.getPDFBlobLight(blobID);
-        } catch(MetadataException ex) {
-            
-            if(ex.isMapNullError()){
-                //The metadata column isn't properly populated.
-                //We'll grab the bytes, strip the metadata from them
-                //And save them in the metadata column before fetching
-                //The blob and returning it.
-
-                //time to operate
-                //grab the BlobLight without metadata so we don't get the same error
-                Blob patient = getBlobFromBlobLight(bi.getPDFBlobLightWithoutMetadata(blobID));
-                try {
-                patient = stripPDFMetadata(patient);
-
-                //Should be all ready, let's update the bytes and the metadata
-
-                bi.updateBlobBytes(patient);
-
-                bi.updateBlobMetadata(patient);
-                
-                } catch(IOException | BlobTypeException exTwo){
-                    throw new BlobException(exTwo);
-                }
-            } else {
-                throw new BlobException(ex);
-            }
-            
-        }
-    
-        //We are now clear to return the blob
-        return getPDFBlobLight(blobID);
-    }
-    
+  
     /**
      * Convenience method for getting a list of BlobLights in from a list of IDs
      * @param idList
@@ -708,53 +635,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
         
-     /**
-      * Logic pass through for removing links
-      * 
-      * @param bl
-      * @param prop 
-      * @throws com.tcvcog.tcvce.domain.BObStatusException 
-      */
-    public void removePropBlobRecord(BlobLight bl, Property prop) throws BObStatusException{
-        if(prop == null){
-            throw new BObStatusException("Cannot remove link with null prop or blob");
-        }
-        
-        try {
-            BlobIntegrator bi = getBlobIntegrator();
-            bi.removePropertyBlobLink(bl, prop);
-            bi.deletePhotoBlob(bl);
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println("manageBlobBB.removePropPhotoLink | ERROR: " + ex);
-        }
-        
-    }
-    
-        
-     /**
-      * Logic pass through for removing links
-      * 
-      * @param bl
-     * @param cse
-      * @throws com.tcvcog.tcvce.domain.BObStatusException 
-      */
-    public void removeCECaseBlobRecord(BlobLight bl, CECase cse) throws BObStatusException{
-        if(cse == null || bl == null){
-            throw new BObStatusException("Cannot remove link with null prop or blob");
-        }
-        
-        try {
-            BlobIntegrator bi = getBlobIntegrator();
-            bi.removeCECaseBlobLink(bl, cse);
-            bi.deletePhotoBlob(bl);
-            
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println("manageBlobBB.removeCECasePhotoLink | ERROR: " + ex);
-        }
-        
-    }
-    
-    
+   
     
     
     
@@ -833,23 +714,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         return input;
     }
     
-    /**
-     * Convenience method for getting a list of BlobLights in from a list of IDs
-     * @param idList
-     * @return
-     * @throws IntegrationException
-     * @throws BlobException 
-     */
-    public List<BlobLight> getPDFBlobLightList(List<Integer> idList) throws IntegrationException, BlobException{
-        
-        List<BlobLight> blobList = new ArrayList<>();
-        
-        for(int id : idList){
-            blobList.add(getPDFBlobLight(id));
-        }
-        return blobList;
-    }
-    
+   
     /**
      * Deletes a PDF from the database, but only if it is not connected to any BObs.
      * If, after deleting the pdfdoc entry, the bytes are not connected to any
@@ -1086,44 +951,44 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         if (true) {
 
             CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-            
-            for (Integer id : bi.requestsAttachedToPhoto(blobID)) {
-
-                objectList.add(ceari.getActionRequestByRequestID(id));
-                
-            }
-            
-            CaseIntegrator ci = getCaseIntegrator();
-            
-            for (Integer id : bi.violationsAttachedToPhoto(blobID)) {
-
-                objectList.add(ci.getCodeViolation(id));
-                
-            }
-            
-            MunicipalityIntegrator mi = getMunicipalityIntegrator();
-            
-            for(Integer id : bi.munisAttachedToPhoto(blobID)){
-                
-                objectList.add(mi.getMuni(id));
-                
-            }
-            
-            OccInspectionIntegrator occi = getOccInspectionIntegrator();
-            
-            for(Integer id : bi.elementsAttachedToPhoto(blobID)){
-                
-                objectList.add(occi.getInspectedSpaceElement(id));
-                
-            }
-            
-            OccupancyIntegrator oi = getOccupancyIntegrator();
-            
-            for(Integer id : bi.occPeriodsAttachedToPhoto(blobID)){
-                
-                objectList.add(oi.getOccPeriod(id));
-                
-            }
+//            
+//            for (Integer id : bi.requestsAttachedToPhoto(blobID)) {
+//
+//                objectList.add(ceari.getActionRequestByRequestID(id));
+//                
+//            }
+//            
+//            CaseIntegrator ci = getCaseIntegrator();
+//            
+//            for (Integer id : bi.violationsAttachedToPhoto(blobID)) {
+//
+//                objectList.add(ci.getCodeViolation(id));
+//                
+//            }
+//            
+//            MunicipalityIntegrator mi = getMunicipalityIntegrator();
+//            
+//            for(Integer id : bi.munisAttachedToPhoto(blobID)){
+//                
+//                objectList.add(mi.getMuni(id));
+//                
+//            }
+//            
+//            OccInspectionIntegrator occi = getOccInspectionIntegrator();
+//            
+//            for(Integer id : bi.elementsAttachedToPhoto(blobID)){
+//                
+//                objectList.add(occi.getInspectedSpaceElement(id));
+//                
+//            }
+//            
+//            OccupancyIntegrator oi = getOccupancyIntegrator();
+//            
+//            for(Integer id : bi.occPeriodsAttachedToPhoto(blobID)){
+//                
+//                objectList.add(oi.getOccPeriod(id));
+//                
+//            }
             
         } 
 
@@ -1180,13 +1045,13 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         for(Integer id : idList){
             
-            BlobLight result = getPDFBlobLight(id);
+//            BlobLight result = getPDFBlobLight(id);
             
-            if(result != null) {
-            
-                blobList.add(result);
-            
-            }
+//            if(result != null) {
+//            
+//                blobList.add(result);
+//            
+//            }
             
         }
         

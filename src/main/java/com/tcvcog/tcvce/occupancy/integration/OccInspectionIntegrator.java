@@ -257,7 +257,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     private OccInspectedSpaceElement generateInspectedSpaceElement(ResultSet rs) throws SQLException, IntegrationException {
             CodeIntegrator ci = getCodeIntegrator();
             UserIntegrator ui = getUserIntegrator();
-            BlobIntegrator bi = getBlobIntegrator();
+            
             BlobCoordinator bc = getBlobCoordinator();
             SystemIntegrator si = getSystemIntegrator();
             OccInspectedSpaceElement inspectedEle = null;
@@ -286,13 +286,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             
             inspectedEle.setMigrateToCaseOnFail(rs.getBoolean("migratetocecaseonfail"));
             
-            try {
-                List<Integer> idList = bi.photosAttachedToInspectedSpaceElement(inspectedEle.getInspectedSpaceElementID());
-                inspectedEle.setBlobList(bc.getBlobLightList(idList));
-            } catch(BlobException ex){
-                throw new IntegrationException("An error occurred while trying to retrieve blobs for a OccInspectedSpaceElement", ex);
-            }
-        } catch(BObStatusException ex){
+                inspectedEle.setBlobList(bc.getBlobLightList(inspectedEle));
+        } catch(BObStatusException | BlobException ex){
             System.out.println(ex);
         }
             return inspectedEle;

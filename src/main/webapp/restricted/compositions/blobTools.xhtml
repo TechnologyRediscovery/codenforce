@@ -14,6 +14,7 @@
                 height="600" width="800"
                 widgetVar="blob-upload-dialog-var"
                 responsive="true"
+                dynamic="true"
                 modal="true"
                 resizable="true"
                 closable="true"
@@ -38,12 +39,15 @@
                         listener="#{blobUtilitiesBB.onBlobUploadCommitButtonChange}"
                         multiple="true"
                         fileLimit="50"
-                        sizeLimit="99999999999" 
-                        allowTypes="/(\.|\/)(jpe?g|JPG|JPE?G|png|PNG|pdf|PDF)$/"
+                        sizeLimit="9999999999999" 
+                        allowTypes="/(\.|\/)(jpe?g|JPG|JPE?G|png|gif|GIF|PNG|pdf|PDF)$/"
                         rendered="true"
+                        maxChunkSize="1485760"
+                        invalidFileMessage="You have chosen to upload a file type that is not permitted."
                         update="blobs-growl-form
                         blobs-gallery-dialog
-                        gallery-form"
+                        gallery-form
+                        #{blobUtilitiesBB.blobListComponentToUpdateAfterChanges}"
                         oncomplete="PF('blob-upload-dialog-var').hide(); PF('blobs-gallery-dialog-var').show();"/>    
                 </h:form>
 
@@ -67,7 +71,8 @@
                                      oncomplete="PF('blob-upload-dialog-var').hide(); PF('blobs-gallery-dialog-var').show();"
                                      update="   blobs-growl-form
                                      blobs-gallery-dialog
-                                     gallery-form"/>
+                                     gallery-form
+                                     #{blobUtilitiesBB.blobListComponentToUpdateAfterChanges}"/>
 
                     <p:spacer height="5px" />
 
@@ -119,7 +124,7 @@
                         <p:column headerText="Actions"
                                   style="width:10%;">
                             <p:commandLink id="blob-viewblob-cl"
-                                           actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob)}"
+                                           actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob, blobUtilitiesBB.currentBlobHolder)}"
                                            value="view"
                                            style="color:blue;"
                                            update="blobs-viewblob-dialog
@@ -129,7 +134,7 @@
                             <h:outputText value=" | "/>
 
                             <p:commandLink id="blob-editblob-cl"
-                                           actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob)}"
+                                           actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob, blobUtilitiesBB.currentBlobHolder)}"
                                            value="edit"
                                            style="color:blue;"
                                            update="blob-veweditmetadata-form
@@ -148,6 +153,7 @@
                 height="800" width="1000"
                 widgetVar="blobs-gallery-dialog-var"
                 responsive="true"
+                dynamic="true"
                 modal="true"
                 resizable="true"
                 closable="true"
@@ -201,7 +207,7 @@
                 <p:column headerText="Actions"
                           style="width:15%;">
                     <p:commandLink id="blob-viewblob-cl"
-                                   actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob)}"
+                                   actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob, blobUtilitiesBB.currentBlobHolder)}"
                                    value="view"
                                    style="color:blue;"
                                    rendered="#{blob.type.browserViewable}"
@@ -212,7 +218,7 @@
                     <h:outputText value=" | "/>
 
                     <p:commandLink id="blob-editblob-cl"
-                                   actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob)}"
+                                   actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob, blobUtilitiesBB.currentBlobHolder)}"
                                    value="details"
                                    style="color:blue;"
                                    update="blob-veweditmetadata-form
@@ -243,6 +249,7 @@
                 height="800" width="800"
                 widgetVar="blobs-viewblob-dialog-var"
                 responsive="true"
+                dynamic="true"
                 modal="true"
                 resizable="true"
                 closable="true"
@@ -285,6 +292,7 @@
                 height="800" width="800"
                 widgetVar="blobs-vieweditmetadata-dialog-var"
                 responsive="true"
+                dynamic="true"
                 modal="true"
                 resizable="true"
                 closable="true"
@@ -302,8 +310,9 @@
                              actionListener="#{blobUtilitiesBB.toggleEditModeBlobMetadata}"
                              oncomplete="PF('blobs-vieweditmetadata-dialog-var').show();"
                              update="@form
-                             @form:@parent:blobs-growl-form
-                             @form:@parent:gallery-form"/>
+                             blobs-growl-form
+                             gallery-form
+                             #{blobUtilitiesBB.blobListComponentToUpdateAfterChanges}"/>
 
             <div class="gray_button">
 
@@ -314,6 +323,7 @@
                                  icon="fa fa-stop"
                                  actionListener="#{blobUtilitiesBB.onBlobEditMetadataAbortButtonClick}"
                                  oncomplete="PF('blobs-vieweditmetadata-dialog-var').hide();"
+                                 update="blobs-growl-form"
                                  />
             </div>
 
@@ -434,6 +444,74 @@
                     </div>
                 </div>
             </p:panel>
+        </h:form>
+    </p:dialog>
+    
+    <p:dialog   id="blob-deactivate-dialog"
+                height="400" width="800"
+                widgetVar="blobs-deactivate-dialog-var"
+                responsive="true"
+                dynamic="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                header="Deactivate Photo/Doc: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
+                rendered="true"
+                > 
+        <h:form id="blob-deactivate-form">
+            
+            <div class="p-grid">
+                <div class="p-col-6">
+                    <h2>Remove photo/doc link only</h2>
+                    <p:spacer height="5px" />
+                    <p:commandButton id="blob-deactivatelinks-button"
+                                     value="Remove links only to photo or document ID: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
+                                     disabled="false"
+                                     ajax="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                     icon="fa fa-unlink"
+                                     actionListener="#{blobUtilitiesBB.deactivateLinksBetweenCurrentBlobLightAndCurrentBlobHolder}"
+                                     oncomplete="PF('blobs-deactivate-dialog-var').hide();"
+                                     update="#{blobUtilitiesBB.blobListComponentToUpdateAfterChanges}
+                                     blobs-growl-form"/>
+                    
+                    <p:spacer height="5px" />
+                    <p>
+                        Use this option if you want to keep the photo/document ID:<h:outputText value="#{blobUtilitiesBB.currentBlobLight.photoDocID}" /> 
+                        but just don't want this particular <h:outputText value="#{blobUtilitiesBB.currentBlobHolder.blobLinkEnum.objectParentTitle}" />
+                        to maintain a connection to that photo/document. Note: Choosing this option is reversible only if you still have links to this photo/doc
+                        to some other object in the database.
+                    </p>
+                    
+                </div>
+                
+                <div class="p-col-6">
+                    <h2>Remove actual photo/doc and all links</h2>
+                    <p:spacer height="5px" />
+
+
+                    <p:commandButton id="blob-deactivate-button"
+                                     value="Remove photo or document ID: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
+                                     disabled="false"
+                                     ajax="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                     icon="fa fa-eraser"
+                                     style="background-color: darkred;"
+                                     actionListener="#{blobUtilitiesBB.deactivateCurrentBlobLight}"
+                                     oncomplete="PF('blobs-deactivate-dialog-var').hide();"
+                                     update="#{blobUtilitiesBB.blobListComponentToUpdateAfterChanges}
+                                     blobs-growl-form"/>
+                    
+                    <p:spacer height="5px" />
+                    <p>
+                        Use this option when you no longer want the
+                        actual photo/document ID: <h:outputText value="#{blobUtilitiesBB.currentBlobLight.photoDocID}" /> and
+                        don't want any cases, properties, violations, etc., to have links to it. Note: Deactivating a photo/document cannot be reversed by web users!
+                    </p>
+                    
+                </div>
+            </div>
         </h:form>
     </p:dialog>
 </ui:composition>

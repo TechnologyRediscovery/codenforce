@@ -65,7 +65,8 @@ import org.primefaces.event.FileUploadEvent;
  *
  * @author cedba
  */
-public class CEActionRequestSubmitBB extends BackingBeanUtils implements Serializable {
+public class CEActionRequestSubmitBB 
+        extends BackingBeanUtils implements Serializable {
 
     private CEActionRequest currentRequest; //the CEAR the user is filling out
 
@@ -555,8 +556,8 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
     public String submitActionRequest()  {
 
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        BlobIntegrator blobI = getBlobIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
         SessionBean sb = getSessionBean();
         SystemIntegrator si = getSystemIntegrator();
 
@@ -613,15 +614,10 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
             // get the request we just submitted to attach it to the files the user uploaded
             // before displaying the PACC
             sb.setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
-
-            for (BlobLight blob : currentRequest.getBlobList()) {
-                try {
-                    blobI.linkPhotoBlobToActionRequest(blob.getPhotoDocID(), sb.getSessCEAR().getRequestID());
-                } catch (IntegrationException ex) {
-                    System.out.println(ex);
-                }
-            }
-
+            
+            // BLOB linking needs to be done through the blob backing bean 
+            // BUT AFTER the CEAR submission--attaching stuff happens later
+          
             clearNavStack();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,

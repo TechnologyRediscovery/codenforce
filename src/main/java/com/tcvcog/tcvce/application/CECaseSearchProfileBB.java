@@ -722,92 +722,32 @@ public class CECaseSearchProfileBB
     /*******************************************************/
     /*******************************************************/
     
-    
-    
-    
     /**
-     * Listener for user requests to start the blob update process
-     * @param bl 
+     * Special getter wrapper around the CECase blob list
+     * that checks the session for a new blob list
+     * that may have been injected by the BlobUtilitiesBB
+     * 
+     * @return the CECases's updated blob list
      */
-  public void onBlobSelectButtonChange(BlobLight bl){
-      
-      currentBlob = bl;
-      System.out.println("CECaseSearchProfileBB.onBlobSelectButtonChange: current blob: " + currentBlob.getPhotoDocID());
-      
-  }
-    
-    
-    public String onBlobViewButtonChange(Blob blob){
-        return "blobs";
-        
-    }
-
-    /**
-     * Listener for user requests to start a file upload
-     * @param ev
-     */
-    public void onBlobAddButtonChange(ActionEvent ev){
-        // nothing to do here yet
-        System.out.println("CECaseSearchProfileBB.onBlobAddButtonChange");
-
-    }
-      /**
-     * Listener for user requests to update the current blob
-     * @param ev
-     */
-    public void onBlobUpdateMetadata(ActionEvent ev){
-          BlobCoordinator bc = getBlobCoordinator();
-        
-        try{
-            bc.updateBlobMetatdata(currentBlob, getSessionBean().getSessUser());
-            reloadCaseListener(ev);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated blob title and description!", ""));
-        } catch(IntegrationException ex){
-            System.out.println("manageBlobBB.updateBlobDescription() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to update the description!", ""));
-        }
-    }
-
-    public String onBlobConfirm() {
-        
-      
-        if(currentViolation.getBlobList() == null  ||  currentViolation.getBlobList().isEmpty()){
-            getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "No uploaded pdfs or photos to commit.", 
-                                "Use the 'Return to case home without commiting photos' button bellow if you have no photos to upload."));
-            return "";
-        }
-        
-        BlobIntegrator bi = getBlobIntegrator();
-        
-        for(BlobLight photo : currentViolation.getBlobList()){
-            
-            try { 
-                // commit and link
-                
-                bi.commitPhotograph(photo.getPhotoDocID());
-                bi.linkBlobToViolation(photo.getPhotoDocID(), currentViolation.getViolationID());
-                
-            } catch (IntegrationException ex) {
-                System.out.println(ex.toString());
-                    getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
-                                "Please call your municipal office and report your concern by phone."));
-                    return "";
+    public List<BlobLight> getBlobLightListFromCECase(){
+        List<BlobLight> sessBlobListForUpdate = getSessionBean().getSessBlobLightListForRefreshUptake();
+        if(sessBlobListForUpdate != null && currentCase != null){
+            System.out.println("CECaseSearchProfileBB.getBlobLightListFromCECase | found non-null session blob list for uptake: " + sessBlobListForUpdate.size());
+            getCurrentCase().setBlobList(sessBlobListForUpdate);
+            // clear session since we have the new list
+            getSessionBean().setSessBlobLightListForRefreshUptake(null);
+            return sessBlobListForUpdate;
+        } else {
+            if(currentCase.getBlobList() != null){
+                return currentCase.getBlobList();
+            } else {
+                return new ArrayList<>();
             }
         }
-        
-        return "ceCaseProfile";
-
     }
     
     
+   
     
     
 
@@ -1714,81 +1654,7 @@ public class CECaseSearchProfileBB
         
     }
     
-    
-    /********************************************** /
-    /***********BLOBS****************************** /
-    /********************************************** /
-
-
-
-    /**
-     * Listener for user requests to upload a file and attach to case
-     *
-     * @param ev
-     */
-    public void onBlobUploadCommitButtonChange(FileUploadEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        if (this.blobList == null) {
-            this.blobList = new ArrayList<>();
-        }
-        
-        try {
-            BlobCoordinator blobc = getBlobCoordinator();
-            
-            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
-            blob.setBytes(ev.getFile().getContent());
-            blob.setFilename(ev.getFile().getFileName());
-            blob.setMuni(getSessionBean().getSessMuni());
-            Blob freshBlob = cc.blob_ceCase_attachBlob(getSessionBean().getSessUser(), blob, currentCase);
-            // ship to coordinator for storage
-            if(freshBlob != null){
-                System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getPhotoDocID());
-            } 
-            
-            this.currentCase.getBlobList().add(freshBlob);
-            this.getBlobList().add(blob);
-        } catch (IntegrationException | IOException  | BlobException | BlobTypeException ex) {
-            System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | upload failed! " + ex);
-            System.out.println(ex);
-        } 
-    }
-
-    /**
-     * Listener for user request to remove photo on violation
-     *     
-     * @param bl
-     */
-    public void onBlobRemoveInitButtonChange(BlobLight bl) {
-        currentBlob = bl;
-        
-    }
-    
-    
-    /**
-     * Removes link between blob and cecase
-     * @param ev
-     */
-    public void onBlobRemoveCommitButtonChange(ActionEvent ev){
-        BlobCoordinator bc = getBlobCoordinator();
-        try {
-            bc.removeCECaseBlobRecord(currentBlob, currentCase);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success! Blob link removed.", ""));
-        } catch (BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Operation: Failed! Blob link not removed.", ""));
-            
-
-        }
-        
-        reloadCase();
-        
-    }
-    
-    
+   
   
     
     

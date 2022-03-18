@@ -510,15 +510,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <f:facet name="header">
                                                         <h:outputText value="View" />
                                                     </f:facet>
-                                                    <p:commandButton    id="ceacase-cears-view-button"
-                                                                        ajax="false"
-                                                                        action="#{ceCaseSearchProfileBB.onBlobAddButtonChange()}"
-                                                                        icon="fa fa-warning"
-                                                                        disabled="#{!(empty caseProfileBB.currentCase.closingDate)}"/>
+                                                 
                                                 </p:column>
                                             </p:dataTable>
                                         </h:form>
                                     </p:panel>
+                                    <ui:include src="/restricted/compositions/blobTools.xhtml" />
 
                                     <p:panel id="cecase-blobs-panel"
                                              toggleable="true"
@@ -532,19 +529,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:commandButton    id="cecase-blob-add-button"
                                                                 ajax="true"
                                                                 styleClass="noFill button-size-small"
-                                                                actionListener="#{ceCaseSearchProfileBB.onBlobAddButtonChange}"
-                                                                oncomplete="PF('case-blobs-dialog-var').show()"
-                                                                value="Add Photo or Document"
+                                                                actionListener="#{blobUtilitiesBB.onUploadBlobInitButtonChange(ceCaseSearchProfileBB.currentCase)}"
+                                                                oncomplete="PF('blob-upload-dialog-var').show()"
+                                                                update="blob-upload-dialog
+                                                                blob-uploadconnect-tabview"
+                                                                value="Upload photo or document"
                                                                 icon="fa fa-upload"
-                                                                />
+                                                                >
+                                                <f:param name="blob-list-component-to-update" value="cecase-blobs-form" />
+                                            </p:commandButton>
 
                                             <p:spacer height="5px" />
 
                                             <p:dataTable
                                                 id="cecase-blobs-table"
                                                 var="blob"
-                                                value="#{ceCaseSearchProfileBB.currentCase.blobList}"
-                                                rowKey="#{blob.blobID}"
+                                                value="#{ceCaseSearchProfileBB.blobLightListFromCECase}"
+                                                rowKey="#{blob.photoDocID}"
                                                 tableStyleClass="primeDataTable"
                                                 resizableColumns="true"
                                                 draggableRows="false" tabindex="6">
@@ -588,16 +589,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <h:outputText value="Actions"/>
                                                     </f:facet>
                                                     <p:commandButton 
-                                                        value="View in tab" 
-                                                        ajax="false"
-                                                        icon="fa fa-eye" 
-                                                        styleClass="ui-button-outlined">
-                                                        <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}"
-                                                                        contentDisposition="inline"
-                                                                        />
-                                                    </p:commandButton>
-                                                    <br/>
-                                                    <p:commandButton 
                                                         value="Download" 
                                                         ajax="false"
                                                         icon="fa fa-arrow-down" 
@@ -611,34 +602,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:commandLink      id="blob-update-button"
                                                                             ajax="true"
                                                                             styleClass="noFill button-size-small"
-                                                                            action="#{ceCaseSearchProfileBB.onBlobSelectButtonChange(blob)}"
-                                                                            value="edit"
-                                                                            oncomplete="PF('blob-edit-dialog-var').show()"
-                                                                            update="blob-edit-dialog
-                                                                            blob-edit-form"
+                                                                            action="#{blobUtilitiesBB.onViewBlobLinkClick(blob, ceCaseSearchProfileBB.currentCase)}"
+                                                                            value="view"
+                                                                            oncomplete="PF('blobs-viewblob-dialog-var').show()"
+                                                                            update="blobs-viewblob-dialog
+                                                                            blob-viewblob-form"
                                                                             />
-
-
-                                                    </div>
-
-                                                    <h:outputText value="&nbsp;&nbsp;|" />
-                                                    <div class="restrict-main-contents-io-link link-button">
-
+                                                        <p:spacer height="3px" />
+                                                        <p:commandLink      id="blob-edit-button"
+                                                                            ajax="true"
+                                                                            styleClass="noFill button-size-small"
+                                                                            action="#{blobUtilitiesBB.onBlobEditMetaDataInitLinkClick(blob, ceCaseSearchProfileBB.currentCase)}"
+                                                                            value="edit"
+                                                                            oncomplete="PF('blobs-vieweditmetadata-dialog-var').show()"
+                                                                            update="blob-vieweditmetadata-dialog
+                                                                            blob-veweditmetadata-form"
+                                                                            >
+                                                            <f:param name="blob-list-component-to-update" value="cecase-blobs-form" />
+                                                        </p:commandLink>
+                                                        <p:spacer height="3px" />
                                                         <p:commandLink      id="blob-remove-button"
                                                                             ajax="true"
                                                                             styleClass="noFill button-size-small"
-                                                                            action="#{ceCaseSearchProfileBB.onBlobRemoveInitButtonChange(blob)}"
+                                                                            action="#{blobUtilitiesBB.onDeactivateBlobInitLinkClick(blob, ceCaseSearchProfileBB.currentCase)}"
+                                                                            oncomplete="PF('blobs-deactivate-dialog-var').show();"
                                                                             value="remove"
-                                                                            oncomplete="PF('blob-remove-dialog-var').show()"
-                                                                            update="blob-remove-dialog
-                                                                            blob-remove-form"
-                                                                            />
-
-
+                                                                            update="blob-deactivate-dialog
+                                                                            blob-deactivate-form"
+                                                                            >
+                                                            <f:param name="blob-list-component-to-update" value="cecase-blobs-form" />
+                                                        </p:commandLink>
                                                     </div>
-
-
-
                                                 </p:column>
                                             </p:dataTable>
                                         </h:form>

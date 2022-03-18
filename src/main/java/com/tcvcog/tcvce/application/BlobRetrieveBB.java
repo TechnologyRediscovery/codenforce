@@ -95,40 +95,4 @@ public class BlobRetrieveBB extends BackingBeanUtils {
         return blobStream;
     }
     
-     /**
-     * Listener for client requests to stream blob bytes from a given blobLight
-     * @param b
-     * @return 
-     */
-    public StreamedContent retrieveBlobDEP(BlobLight b) {
-        
-       FacesContext fc = FacesContext.getCurrentInstance();
-       ExternalContext ec = fc.getExternalContext();
-
-       // as of JAN 2022--getting a "response already committed error, so commenting out
-       //ec.responseReset(); // Some JSF component library or some Filter might have set some headers in the buffer beforehand. We want to get rid of them, else it may collide.
-
-            
-            BlobCoordinator bc = getBlobCoordinator();
-            Blob blob = bc.getBlob(b);
-            if(blob != null && blob.getBytes() != null){
-                System.out.println("BobRetrieveBB.retrieveBlob: received BlobLight ID " + b.getPhotoDocID() );
-                System.out.println("BobRetrieveBB.retrieveBlob: extracted blob bytes ID " + blob.getBytesID() + " | bytea size: " + blob.getBytes().length);
-            
-            blobStream = DefaultStreamedContent.builder()
-                    .contentType("application/pdf")
-                    .name(blob.getFilename())
-                    .stream(() -> {
-                        return new ByteArrayInputStream(blob.getBytes());
-                    })
-                    .build();
-            } else {
-                System.out.println("BobRetrieveBB.retrieveBlob: extracted null blob from BlobLight ID " + b.getPhotoDocID() );
-                
-            }
-        fc.responseComplete(); 
-    
-        return blobStream;
-    }
-    
 }

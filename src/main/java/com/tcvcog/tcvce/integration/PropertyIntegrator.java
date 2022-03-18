@@ -2517,9 +2517,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         if(rs.getInt("source_sourceid") != 0){
             pu.setSource(sc.getBObSource(rs.getInt("source_sourceid")));
         }
-        
-       
-        
         pu.setNotes(rs.getString("notes"));
         
         si.populateTrackedFields(pu, rs, false);
@@ -2554,7 +2551,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt = con.prepareStatement(query);
             stmt.setString(1, pu.getUnitNumber());
             stmt.setInt(2, pu.getParcelKey());
-            stmt.setString(3, pu.getOtherKnownAddress());
+            
             stmt.setString(4, pu.getNotes());
             
             if(pu.getRentalIntentDateStart() != null){
@@ -2567,11 +2564,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
-            if(pu.getRentalIntentLastUpdatedBy() != null){
-                stmt.setInt(7, pu.getRentalIntentLastUpdatedBy().getUserID());
-            } else {
-                stmt.setNull(7, java.sql.Types.NULL);
-            }
+//            if(pu.getRentalIntentLastUpdatedBy() != null){
+//                stmt.setInt(7, pu.getRentalIntentLastUpdatedBy().getUserID());
+//            } else {
+//                stmt.setNull(7, java.sql.Types.NULL);
+//            }
             
             stmt.setString(8, pu.getRentalNotes());
             stmt.setBoolean(9, pu.isActive());
@@ -2622,7 +2619,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt = con.prepareStatement(sql);
             stmt.setString(1, pu.getUnitNumber());
             stmt.setInt(2, pu.getParcelKey());
-            stmt.setString(3, pu.getOtherKnownAddress());
+            
             stmt.setString(4, pu.getNotes());
             
              if(pu.getRentalIntentDateStart() != null){
@@ -2635,11 +2632,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
-            if(pu.getRentalIntentLastUpdatedBy() != null){
-                stmt.setInt(7, pu.getRentalIntentLastUpdatedBy().getUserID());
-            } else {
-                stmt.setNull(7, java.sql.Types.NULL);
-            }
+//            if(pu.getRentalIntentLastUpdatedBy() != null){
+//                stmt.setInt(7, pu.getRentalIntentLastUpdatedBy().getUserID());
+//            } else {
+//                stmt.setNull(7, java.sql.Types.NULL);
+//            }
             
             stmt.setString(8, pu.getRentalNotes());
             stmt.setBoolean(9, pu.isActive());

@@ -527,7 +527,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    // Person list
                    pdh.setHumanLinkList(pc.assembleLinkedHumanLinks(pdh));
 
-                   pdh.setBlobList(bc.getBlobLightList(bi.getBlobIDs(prop)));
+                   
+                   
+                   pdh.setBlobList(bc.getBlobLightList(pdh));
                    // external data\
                    // PARCEL INFO NOW LIVES on the parcel itself and uses the parcelinfo table
                    
@@ -699,7 +701,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyIntegrator pi = getPropertyIntegrator();
         if(p != null){
             
-            p.setUnitList(pi.getPropertyUnitList(p));
+            p.setUnitList(getPropertyUnitList(p));
             p.setMailingAddressLinkList(getMailingAddressLinkList(p));
           
         }
@@ -714,9 +716,10 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyIntegrator pi = getPropertyIntegrator();
         List<PropertyUnit> ul = new ArrayList<>();
         
+        // TODO: Finish me!!
         
         
-        
+        return ul;
         
         
     }
@@ -1191,7 +1194,6 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         PropertyUnit propUnit = new PropertyUnit();
         propUnit.setParcelKey(p.getParcelKey());
         propUnit.setUnitNumber(Constants.TEMP_UNIT_NUM);
-        propUnit.setActive(true);
         return propUnit;
     }
     
@@ -1286,14 +1288,14 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             }
         }
 
-        List<PropertyUnit> listTwo = pi.getPropertyUnitList(prop);
+//        List<PropertyUnit> listTwo = pi.getPropertyUnitList(prop);
 
-        prop.setUnitList(listTwo);
+//        prop.setUnitList(listTwo);
 
         // mark parent property as updated now
         updateParcel(prop, getSessionBean().getSessUser());
 
-        return listTwo;
+        return null;
 
     }
 
@@ -1315,7 +1317,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             PropertyUnit skeleton = getPropertyUnit(uc.getUnitID());
 
             if (uc.isRemoved()) {
-                skeleton.setActive(false); //just deactivate the unit.
+                skeleton.setDeactivatedTS(LocalDateTime.now()); //just deactivate the unit.
             } else {
                 if (uc.getUnitNumber() != null) {
                     skeleton.setUnitNumber(uc.getUnitNumber());
@@ -1327,9 +1329,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                 } else {
                     skeleton.setOtherKnownAddress("Updated");
                 }*/
-                if (uc.getOtherKnownAddress() != null) {
-                    skeleton.setOtherKnownAddress(uc.getOtherKnownAddress());
-                }
+                
 
                 if (uc.getNotes() != null) {
                     skeleton.setNotes(uc.getNotes());

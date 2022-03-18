@@ -30,11 +30,19 @@ import java.util.List;
 public  class       PropertyDataHeavy 
         extends     Property 
         implements  IFace_CredentialSigned,
-                    IFace_humanListHolder{
+                    IFace_humanListHolder,
+                    IFace_BlobHolder{
     
     final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUIM = LinkedObjectSchemaEnum.ParcelHuman;
+    final static BlobLinkEnum PROPDH_LINK_ENUM = BlobLinkEnum.PROPERTY;
+    /**
+     * A property is the highest level blob holder, so it has no upstream pool
+     */
+    final static BlobLinkEnum PROPDH_UPSTRREAM_BLOB_POOL = null;
+    
     protected List<HumanLink> humanLinkList;
     protected List<Person> personList;
+    
     
     
     private List<CECasePropertyUnitHeavy> ceCaseList;
@@ -251,6 +259,26 @@ public  class       PropertyDataHeavy
     @Override
     public int getHostPK() {
         return parcelKey;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return PROPDH_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return parcelKey;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return PROPDH_UPSTRREAM_BLOB_POOL;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return 0;
     }
 
    

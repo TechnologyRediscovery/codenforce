@@ -19,14 +19,13 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobTypeException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.MetadataException;
 import com.tcvcog.tcvce.entities.Blob;
 import com.tcvcog.tcvce.entities.BlobLight;
+import com.tcvcog.tcvce.entities.BlobLinkEnum;
 import com.tcvcog.tcvce.entities.BlobType;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
@@ -101,6 +100,57 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
         
         return blob;
+        
+    }
+    
+     /**
+     * Asks the inputted BlobHolder for its enum and uses that info
+     * to query the correct table in the DB
+     * 
+     * @param bh not null object and not null Info Enum
+     * @return the IDs of the blob light to be fetched
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<Integer> getBlobLightIDList(IFace_BlobHolder bh) throws BObStatusException, IntegrationException{
+        if(bh == null || bh.getBlobLinkEnum() == null){
+            throw new BObStatusException("Cannot retrieve BlobLight list with null holder or info enum");            
+        }
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT ");
+        sb.append(bh.getBlobLinkEnum().getBlobLinkTablePhotodocIDFieldName());
+        sb.append(" FROM ");
+        sb.append(bh.getBlobLinkEnum().getBlobLinkTableName());
+        sb.append(" WHERE ");
+        sb.append(bh.getBlobLinkEnum().getBlobLinkTableParentIDFieldName());
+        sb.append(" = ?;");
+        
+        PreparedStatement stmt = null;
+        
+        List<Integer> idList = new ArrayList<>();
+        
+        try {
+            
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, bh.getParentObjectID());
+            rs = stmt.executeQuery();
+            while(rs.next()){
+                 idList.add(rs.getInt(bh.getBlobLinkEnum().getBlobLinkTablePhotodocIDFieldName()));
+            }
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("BlobIntegrator.getBlobLightIDList: Could not get blob ID list. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+        return idList;
         
     }
     
@@ -201,140 +251,8 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         return blob;
     }
     
-    /**
-     * This method should only be used by the BlobCoordinator.
-     * If you need to grab a Blob anywhere else use the coordinator method
-     * @param blobID the blobID of the meta to be retrieved from db
-     * @return the meta pulled from the db
-     * @throws IntegrationException thrown instead of SQLException
-     * @throws com.tcvcog.tcvce.domain.MetadataException
-     */
-    public BlobLight getPDFBlobLight(int blobID) throws IntegrationException, MetadataException{
-        BlobLight blob = null;
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT pdfdocid, pdfdocdescription, pdfdoccommitted, blobbytes_bytesid, muni_municode, \n"
-                + "uploaddate, blobtype_typeid, uploadpersonid, filename, metadatamap\n"
-                + "FROM public.pdfdoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
-                + "WHERE pdfdocid = ?;";
-        
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                System.out.println("BlobIntegrator.getPDFBlobLight: | retrieving blobID "  + blobID);
-                blob = generatePDFBlobLight(rs);
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("BlobIntegrator.getPDFBlobLight: Error retrieving blob. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return blob;
-        
-    }
-    
-    /**
-     * Only used by the BlobCoordinator to get blobs with broken metadata.
-     * @param blobID the blobID of the blob to be retrieved from db
-     * @return the meta pulled from the db
-     * @throws IntegrationException thrown instead of SQLException
-     */
-    public BlobLight getPDFBlobLightWithoutMetadata(int blobID) throws IntegrationException {
-        BlobLight blob = null;
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT pdfdocid, pdfdocdescription, pdfdoccommitted, blobbytes_bytesid, muni_municode, \n"
-                + "uploaddate, blobtype_typeid, uploadpersonid, filename\n"
-                + "FROM public.pdfdoc LEFT JOIN blobbytes on blobbytes_bytesid = bytesid\n"
-                + "WHERE pdfdocid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                System.out.println("BlobIntegrator.getPDFBlobLightWithoutMetadata: | retrieving blobID "  + blobID);
-                blob = generatePDFBlobLightWithoutMetadata(rs);
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            //System.out.println(ex);
-            throw new IntegrationException("BlobIntegrator.getPDFBlobLightWithoutMetadata: Error retrieving blob. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return blob;
-        
-    }
-    
-    /**
-     * @param rs
-     * 
-     * @deprecated 
-     * @return
-     * @throws SQLException
-     * @throws MetadataException 
-     */
-    private BlobLight generatePDFBlobLight(ResultSet rs) throws SQLException, MetadataException{
-        BlobLight blob = new BlobLight();
-        
-        blob.setPhotoDocID(rs.getInt("photodocid"));
-        blob.setBytesID(rs.getInt("blobbytes_bytesid"));
-        blob.setDescription(rs.getString("pdfdocdescription"));
-        
-        Timestamp time = rs.getTimestamp("uploaddate");
-        if(time != null){
-            blob.setCreatedTS(time.toLocalDateTime());
-        }
-        
-        blob.setFilename(rs.getString("filename"));
-//        blob.setType(BlobTypeEnum.blobTypeFromInt(rs.getInt("blobtype_typeid")));
-//        blob.setFilename(rs.getString("filename"));
-//        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
-//        blob.setMunicode(rs.getInt("muni_municode"));
-        
-//        blob.setBlobMetadata(generateBlobMetadata(rs));
-        return blob;
-    }
-    
-    /**
-     * @deprecated 
-     * @param rs
-     * @return
-     * @throws SQLException 
-     */
-    private BlobLight generatePDFBlobLightWithoutMetadata(ResultSet rs) throws SQLException {
-        BlobLight blob = new BlobLight();
-        blob.setPhotoDocID(rs.getInt("pdfdocid"));
-        blob.setBytesID(rs.getInt("blobbytes_bytesid"));
-        blob.setDescription(rs.getString("pdfdocdescription"));
-        Timestamp time = rs.getTimestamp("uploaddate");
-        if(time != null){
-            blob.setCreatedTS(time.toLocalDateTime());
-        }
-//        blob.setType(BlobTypeEnum.blobTypeFromInt(rs.getInt("blobtype_typeid")));
-//        blob.setFilename(rs.getString("filename"));
-//        blob.setUploadPersonID(rs.getInt("uploadpersonid"));
-//        blob.setMunicode(rs.getInt("muni_municode"));
-        
-        return blob;
-    }
-    
+   
+ 
     /**
      * Gets the binary data of a file in the database
      * @param bl
@@ -372,7 +290,13 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         return blob;
         
     } 
-    
+    /**
+     * Generator for our basic blobs--actual binary data containers
+     * @param rs
+     * @param bl
+     * @return
+     * @throws SQLException 
+     */
     private Blob generateBlob(ResultSet rs, BlobLight bl) throws SQLException{
         Blob blob = new Blob(bl);
         blob.setFilename(rs.getString("filename"));
@@ -629,12 +553,12 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         int lastID = 0;
         Connection con = getPostgresCon();
         String query =  " INSERT INTO public.photodoc(\n" +
-"            photodocid, photodocdescription, blobbytes_bytesid, \n" +
-"            muni_municode, blobtype_typeid, metadatamap, title, createdby_userid, \n" +
-"            createdts, lastupdatedts, lastupdatedby_userid)\n" +
-"    VALUES (DEFAULT, ?, ?, \n" +
-"            ?, ?, ?, ?, ?, \n" +
-"            now(), now(), ?);";
+                        "            photodocid, photodocdescription, blobbytes_bytesid, \n" +
+                        "            muni_municode, blobtype_typeid, metadatamap, title, createdby_userid, \n" +
+                        "            createdts, lastupdatedts, lastupdatedby_userid)\n" +
+                        "    VALUES (DEFAULT, ?, ?, \n" +
+                        "            ?, ?, ?, ?, ?, \n" +
+                        "            now(), now(), ?);";
         
         PreparedStatement stmt = null;
         
@@ -673,14 +597,12 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             
             if(bl.getCreatedBy() != null){
                 stmt.setInt(7, bl.getCreatedBy().getUserID());
-                
             }else {
                 stmt.setNull(7, java.sql.Types.NULL);
             }
             
             if(bl.getLastUpdatedBy() != null){
                 stmt.setInt(8, bl.getLastUpdatedBy().getUserID());
-                
             }else {
                 stmt.setNull(8, java.sql.Types.NULL);
             }
@@ -744,58 +666,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    /**
-     * stores this pdfdoc in the db
-     * @param blob the meta to be stored
-     * @deprecated  replaced by unified doc and photo workflow
-     * @return the blobID of the newly stored meta
-     * @throws com.tcvcog.tcvce.domain.BlobTypeException
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     * @deprecated 
-     */
-    public Blob storePDFBlob(Blob blob) throws IntegrationException, BlobTypeException{
-        
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.pdfdoc(pdfdocid, pdfdocdescription, blobbytes_bytesid, muni_municode)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?);";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, blob.getDescription());
-            
-            int bytesID = insertBlobBytes(blob);
-            
-            stmt.setInt(2, bytesID);
-            
-//            stmt.setInt(3, blob.getMunicode());
-            
-            System.out.println("BlobIntegrator.storePDFBlob | Statement: " + stmt.toString());
-            stmt.execute();
-            
-            //We use the photodoc sequence for both PDFs and Photos so there aren't any collisions
-            String idNumQuery = "SELECT currval('photodoc_photodocid_seq');"; 
-            Statement s = con.createStatement();
-            ResultSet rs;
-            rs = s.executeQuery(idNumQuery);
-            rs.next();
-            int lastID = rs.getInt(1);
-            
-            //set the IDs so we can throw the blob back and they can access the blob and bytes
-            blob.setPhotoDocID(lastID);
-            blob.setBytesID(bytesID);
-            
-        } catch (SQLException | IOException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting blob. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        return blob;
-    }
+ 
     
     /**
      * Master byte input pathway!!!
@@ -1005,75 +876,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
-    /**
-     * Since many values in the Blob sphere shouldn't be changed after uploading,
-     * this method only updates the blob description
-     * @param blob the meta to be updated
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void updatePDFBlobDescription(BlobLight blob) throws  IntegrationException{
-        
-        Connection con = getPostgresCon();
-        String query = " UPDATE public.pdfdoc\n"
-                + " SET pdfdocdescription=?\n"
-                + " WHERE pdfdocid=?;\n\n";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setString(1, blob.getDescription());            
-            stmt.setInt(2, blob.getPhotoDocID());
-            
-            System.out.println("BlobIntegrator.updatePDFBlobDescription | Statement: " + stmt.toString());
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error updating blob. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    /**
-     * BROKEN!!!
-     * 
-     * Updates the metadata and filename of a blobbytes entry.
-     * @param blob the meta to be updated
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-    
-     */
-    public void updateBlobMetadata(BlobLight blob) throws  IntegrationException{
-        
-        Connection con = getPostgresCon();
-        String query = "UPDATE public.blobbytes\n"
-                + " SET filename=? "
-                + " WHERE bytesid=?;";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-//            stmt.setString(1, blob.getFilename());
-            stmt.setBytes(1, blob.getBlobMetadata().getMapBytes());
-            stmt.setInt(2, blob.getBytesID());
-            
-            System.out.println("BlobIntegrator.storeBlob | Statement: " + stmt.toString());
-            stmt.execute();
-            
-        } catch (SQLException | IOException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error updating blob. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
+  
     /**
      * Updates the bytes of a blob.
      * Should be used only to remove the metadata of blobs that were inserted
@@ -1300,95 +1103,42 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
     }
     
-    /**
-     * @param photoID
-     * @throws IntegrationException 
-     */
-    public void commitPDF(int photoID) throws IntegrationException{
-        Connection con = getPostgresCon();
-        String query =  " UPDATE public.pdfdoc\n" +
-                        " SET pdfdoccommitted = true\n" +
-                        " WHERE pdfdocid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, photoID);
-            
-            System.out.println("ImageServices.commitPDF | Statement: " + stmt.toString());
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error commiting pdf", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
+   
+
     
     /**
-     * Removes a link between property and blob, leaving the bytes record intact for later fishing out if needed
-     * 
+     * Removes a link between a given BLOB light and the requested Linking table
+     * represented in the enum. Any objects linked to the given bloblight will be deleted forever
      * @param bl
-     * @param prop
+     * @param blenum
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public void removePropertyBlobLink(BlobLight bl, Property prop) throws IntegrationException, BObStatusException {
+    public void removeLinkToBlobLightByBlobLinkEnum(BlobLight bl, BlobLinkEnum blenum) throws IntegrationException, BObStatusException {
 
-        if(bl == null || prop == null){
-            throw new BObStatusException("cannot remove property blob link with null blob or prop!");
+        if(bl == null || blenum == null){
+            throw new BObStatusException("cannot remove link to photodoc record with null bloblight or enum!");
         }
         //property linker table
-        String query = "DELETE"
-                + "  FROM public.propertyphotodoc WHERE photodoc_photodocid = ? AND property_propertyid = ?;";
-
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("DELETE FROM ");
+        sb.append(blenum.getBlobLinkTableName());
+        sb.append(" WHERE ");
+        sb.append(blenum.getBlobLinkTablePhotodocIDFieldName());
+        sb.append("=?;");
+        
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         
         try {
-            stmt = con.prepareStatement(query);
+            stmt = con.prepareStatement(sb.toString());
             stmt.setInt(1, bl.getPhotoDocID());
-            stmt.setInt(2, prop.getParcelKey());
-            stmt.executeUpdate();
+            
+            stmt.execute();
         } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.removePropertyBlobLink() | ERROR: "+ ex);
-            throw new IntegrationException("Error deleting link. Photo-Property", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-    }
-    /**
-     * Removes a link between case and blob, leaving the bytes record intact for later fishing out if needed
-     * 
-     * @param bl
-     * @param cse
-     * @throws IntegrationException 
-     */
-    public void removeCECaseBlobLink(BlobLight bl, CECase cse) throws IntegrationException, BObStatusException {
-
-        if(bl == null || cse == null){
-            throw new BObStatusException("cannot remove property blob link with null blob or prop!");
-        }
-        //property linker table
-        String query = "DELETE"
-                + "  FROM public.cecasephotodoc WHERE photodoc_photodocid = ? AND cecase_caseid = ?;";
-
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, bl.getPhotoDocID());
-            stmt.setInt(2, cse.getCaseID());
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.removeCECaseBlobLink() | ERROR: "+ ex);
-            throw new IntegrationException("Error deleting link. Photo-Property", ex);
+            System.out.println("BlobIntegrator.removeLinkToBlob | ERROR: "+ ex);
+            throw new IntegrationException("Error deleting blob link.", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -1396,227 +1146,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void removePhotoCEARLink(int blobID, int requestID) throws IntegrationException {
-
-        //property linker table
-        String query = "DELETE"
-                + "  FROM public.ceactionrequestphotodoc WHERE photodoc_photodocid = ? AND ceactionrequest_requestid = ?;";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, requestID);
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.removePhotoCEARLink() | ERROR: "+ ex);
-            throw new IntegrationException("Error deleting link. Photo-CEAR", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-    }
-    
-    public void removePhotoViolationsLink(int blobID, int violationID) throws IntegrationException {
-
-        //property linker table
-        String query = "DELETE"
-                + "  FROM public.codeviolationphotodoc WHERE photodoc_photodocid = ? AND codeviolation_violationid = ?;";
-
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, violationID);
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.removePhotoViolationsLink() | ERROR: "+ ex);
-            throw new IntegrationException("Error deleting link. Photo-Violation", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-    }
-    
-    public void removePhotoMuniLink(int blobID, int muniCode) throws IntegrationException {
-
-        //property linker table
-        String query = "DELETE"
-                + "  FROM public.muniphotodoc WHERE photodoc_photodocid = ? AND muni_municode = ?;";
-
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, muniCode);
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.removePhotoMuniLink() | ERROR: "+ ex);
-            throw new IntegrationException("Error deleting link. Photo-Muni", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-    }
-    
-    public void removePhotoInspectedSpaceElementLink(int blobID, int elementID) throws IntegrationException {
-
-        //property linker table
-        String query = "DELETE"
-                + "  FROM public.occinspectedspaceelementphotodoc WHERE photodoc_photodocid = ? AND inspectedspaceelement_elementid = ?;";
-
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, elementID);
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.removePhotoInspectedSpaceElementLink() | ERROR: "+ ex);
-            throw new IntegrationException("Error deleting link. Photo-Muni", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-    }
-    
-    public void removePhotoOccPeriodLink(int blobID, int periodID) throws IntegrationException {
-
-        //property linker table
-        String query = "DELETE"
-                + "  FROM public.occperiodphotodoc WHERE photodoc_photodocid = ? AND occperiod_periodid = ?;";
-
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, periodID);
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println("BlobIntegrator.removePhotoOccPeriodLink() | ERROR: "+ ex);
-            throw new IntegrationException("Error deleting link. Photo-Muni", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-    }
-    
-    public void linkPhotoBlobToActionRequest(int blobID, int requestID) throws IntegrationException{
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.ceactionrequestphotodoc(\n" +
-                        "            photodoc_photodocid, ceactionrequest_requestid)\n" +
-                        "    VALUES (?, ?);";
-        
-        PreparedStatement stmt = null;
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, requestID);
-            
-            stmt.execute();
-            System.out.println("BlobIntegrator.linkBlobToActionRequest | link succesful. ");
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error linking Blob to ActionRequest", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    public void linkPhotoBlobToCodeViolation(int blobID, int cvID) throws IntegrationException{
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.codeviolationphotodoc(\n" +
-                        "            photodoc_photodocid, codeviolation_violationid)\n" +
-                        "    VALUES (?, ?);";
-        
-        PreparedStatement stmt = null;
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, cvID);
-            stmt.execute();
-            System.out.println("BlobIntegrator.linkBlobToCodeViolation | link succesfull. ");
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error linking Blob to CodeViolation", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    public void linkBlobToProperty(BlobLight bl, Property prop) throws IntegrationException{
-        if(bl == null || prop == null){
-            throw new IntegrationException("Cannot link blob to property with null prop or blob");
-            
-        }
-        
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.propertyphotodoc(\n" +
-                        "            photodoc_photodocid, property_propertyid)\n" +
-                        "    VALUES (?, ?);";
-        
-        PreparedStatement stmt = null;
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, bl.getPhotoDocID());
-            stmt.setInt(2, prop.getParcelKey());
-            stmt.execute();
-            System.out.println("BlobIntegrator.linkBlobToProperty | link succesfull. ");
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error linking Blob to Property", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    public void linkPhotoBlobToPerson(int blobID, int personID) throws IntegrationException{
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.personphotodoc(\n" +
-                        "            photodoc_photodocid, person_personid)\n" +
-                        "    VALUES (?, ?);";
-        
-        PreparedStatement stmt = null;
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, personID);
-            stmt.execute();
-            System.out.println("BlobIntegrator.linkBlobToProperty | link succesfull. ");
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error linking Blob to Person", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
+   
     
     /**
      * TEMPORARY SEARCH METHOD FOR BLOBS.
@@ -1952,819 +1482,5 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         
     }
     
-    /**
-     * Get the IDs of requests attached to a given photodoc
-     * @param photodocID
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> requestsAttachedToPhoto(int photodocID) throws IntegrationException{
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT ceactionrequest_requestid FROM public.ceactionrequestphotodoc WHERE photodoc_photodocid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, photodocID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("ceactionrequest_requestid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    
-    /**
-     * Get the IDs of violations attached to a given photodoc
-     * @param photodocID
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> violationsAttachedToPhoto(int photodocID) throws IntegrationException{
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT codeviolation_violationid FROM public.codeviolationphotodoc WHERE photodoc_photodocid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, photodocID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("codeviolation_violationid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    
-    /**
-     * Get the IDs of municipalities attached to a given photodoc
-     * @param photodocID
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> munisAttachedToPhoto(int photodocID) throws IntegrationException{
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT muni_municode FROM public.muniphotodoc WHERE photodoc_photodocid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, photodocID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("muni_municode"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    
-    /**
-     * Get the IDs of OccInspectedSpaceElements attached to a given photodoc
-     * @param photodocID
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> elementsAttachedToPhoto(int photodocID) throws IntegrationException{
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT inspectedspaceelement_elementid FROM public.occinspectedspaceelementphotodoc WHERE photodoc_photodocid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, photodocID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("inspectedspaceelement_elementid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    
-    /**
-     * Get the IDs of OccPeriods attached to a given photodoc
-     * @param photodocID
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> occPeriodsAttachedToPhoto(int photodocID) throws IntegrationException{
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT occperiod_periodid FROM public.occperiodphotodoc WHERE photodoc_photodocid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, photodocID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("occperiod_periodid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    
-    /**
-     * Get the IDs of Properties attached to a given photodoc
-     * @param photodocID
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> propertiesAttachedToPhoto(int photodocID) throws IntegrationException{
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT property_propertyid FROM public.propertyphotodoc WHERE photodoc_photodocid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, photodocID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("property_propertyid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attachment IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    
-    /**
-     * @param blobID the ID of the blob to be linked
-     * @param target the ID of the property the blob will be linked to.
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void linkBlobToProperty(int blobID, int target) throws IntegrationException {
-        
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.propertyphotodoc(photodoc_photodocid, property_propertyid)\n" +
-                        "    VALUES (?, ?);";
-        
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, target);
-            
-            System.out.println("BlobIntegrator.linkBlobToProperty | Statement: " + stmt.toString());
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting blob-Property link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    /**
-     * @param blobID the ID of the blob to be linked
-     * @param target the ID of the CEAR the blob will be linked to.
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void linkBlobToActionRequest(int blobID, int target) throws IntegrationException {
-        
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.ceactionrequestphotodoc(photodoc_photodocid, ceactionrequest_requestid)\n" +
-                        "    VALUES (?, ?);";
-        
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, target);
-            
-            System.out.println("BlobIntegrator.linkBlobToActionRequest | Statement: " + stmt.toString());
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting blob-CEActionRequest link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    /**
-     * @param blobID the ID of the blob to be linked
-     * @param target the ID of the violation the blob will be linked to.
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void linkBlobToViolation(int blobID, int target) throws IntegrationException {
-        
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.codeviolationphotodoc(photodoc_photodocid, codeviolation_violationid)\n" +
-                        "    VALUES (?, ?);";
-        
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, target);
-            
-            System.out.println("BlobIntegrator.linkBlobToViolation | Statement: " + stmt.toString());
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting blob-CodeViolation link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    /**
-     * Connects a blob to a CECase
-     * 
-     * @param bl
-     * @param cse
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void linkBlobToCECase(BlobLight bl, CECase cse) throws IntegrationException {
-        
-        if(bl == null || bl.getPhotoDocID() == 0 || cse == null || cse.getCaseID() == 0){
-            throw new IntegrationException("Cannot link null or zero ID'd objects");
-        }
-        
-        Connection con = getPostgresCon();
-        String query =  "INSERT INTO public.cecasephotodoc(\n" +
-                        "            photodoc_photodocid, cecase_caseid)\n" +
-                        "    VALUES (?, ?);";
-        
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            
-            stmt.setInt(1, bl.getPhotoDocID());
-            stmt.setInt(2, cse.getCaseID());
-            
-            System.out.println("BlobIntegrator.linkBlobToCECase| Statement: " + stmt.toString());
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting blob-cecase link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    /**
-     * @param blobID the ID of the blob to be linked
-     * @param municode the code of the muni the blob will be linked to.
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void linkBlobToMuni(int blobID, int municode) throws IntegrationException {
-        
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.muniphotodoc(photodoc_photodocid, muni_municode)\n" +
-                        "    VALUES (?, ?);";
-        
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, municode);
-            
-            System.out.println("BlobIntegrator.linkBlobToMuni | Statement: " + stmt.toString());
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting blob-muni link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    /**
-     * @param blobID the ID of the blob to be linked
-     * @param target the ID of the Inspected Space Element the blob will be linked to.
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void linkBlobToInspectedSpaceElement(int blobID,  int target) throws IntegrationException {
-        
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.occinspectedspaceelementphotodoc(photodoc_photodocid, occinspectedspaceelementphotodoc)\n" +
-                        "    VALUES (?, ?);";
-        
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, target);
-            
-            System.out.println("BlobIntegrator.linkBlobToInspectedSpaceElement | Statement: " + stmt.toString());
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting blob-OccInspectedSpaceElement link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    /**
-     * NOTE: As of Jan 2022 we haven't activated the phot doc requirement, so that is null always
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void linkBlobToInspection(BlobLight bl,  OccInspection oi) throws IntegrationException, BObStatusException {
-        if(bl == null || oi == null){
-            throw new BObStatusException("Cannot link blob to inspection with null blob or null inspection");
-        }
-        
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.occinspectionphotodoc(\n" +
-"            photodoc_photodocid, inspection_inspectionid, photorequirement_requirementid)\n" +
-"    VALUES (?, ?, NULL);";
-        
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            
-            stmt.setInt(1, bl.getPhotoDocID());
-            stmt.setInt(2, oi.getInspectionID());
-            
-            System.out.println("BlobIntegrator.linkBlobToInspection| Statement: " + stmt.toString());
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting blob-occInspection link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    /**
-     * @param blobID the ID of the blob to be linked
-     * @param target the ID of the OccPeriod the blob will be linked to.
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public void linkBlobToOccPeriod(int blobID,  int target) throws IntegrationException {
-        
-        Connection con = getPostgresCon();
-        String query =  " INSERT INTO public.occperiodphotodoc(photodoc_photodocid, occperiodphotodoc__occperiod_fk)\n" +
-                        "    VALUES (?, ?);";
-        
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = con.prepareStatement(query);
-            
-            stmt.setInt(1, blobID);
-            stmt.setInt(2, target);
-            
-            System.out.println("BlobIntegrator.linkBlobToOccPeriod | Statement: " + stmt.toString());
-            stmt.execute();
-            
-        } catch (SQLException ex) {
-            System.out.println(ex);
-            throw new IntegrationException("Error inserting blob-linkBlobToOccPeriod link. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-    }
-    
-    /**
-     * Get the IDs of photos attached to a given request
-     * @param requestID
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> photosAttachedToRequest(int requestID) throws IntegrationException{
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT photodoc_photodocid FROM public.ceactionrequestphotodoc WHERE ceactionrequest_requestid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, requestID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("photodoc_photodocid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attached blob IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    
-    /**
-     * Get the IDs of photos attached to a given violation
-     * @param cse
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> getBlobIDs(CECase cse) throws IntegrationException{
-        
-        if(cse == null || cse.getCaseID() == 0){
-            throw new IntegrationException("Cannot fetch blobs by case with null case or id = 0");
-        }
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT photodoc_photodocid FROM public.cecasephotodoc WHERE cecase_caseid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, cse.getCaseID());
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("photodoc_photodocid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attached blob IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    /**
-     * Get the IDs of photos attached to a given violation
-     * @param violationID
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> getblobsByViolation(int violationID) throws IntegrationException{
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT photodoc_photodocid FROM public.codeviolationphotodoc WHERE codeviolation_violationid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, violationID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("photodoc_photodocid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attached blob IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-
-    /**
-     * Get the IDs of photos attached to a given muni
-     * @param municode
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> photosAttachedToMuni(int municode) throws IntegrationException{
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT photodoc_photodocid FROM public.muniphotodoc WHERE muni_municode = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, municode);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("photodoc_photodocid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attached blob IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-
-    /**
-     * Get the IDs of photos attached to a given inspected space element
-     * @param elementID
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> photosAttachedToInspectedSpaceElement(int elementID) throws IntegrationException{
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT photodoc_photodocid FROM public.occinspectedspaceelementphotodoc WHERE inspectedspaceelement_elementid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, elementID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("photodoc_photodocid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attached blob IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    
-    /**
-     * Get the IDs of photos attached to a given occ period
-     * @param periodID
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> photosAttachedToOccPeriod(int periodID) throws IntegrationException{
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT photodoc_photodocid FROM public.occperiodphotodoc WHERE occperiod_periodid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, periodID);
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("photodoc_photodocid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attached blob IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    
-    /**
-     * Asks the inputted BlobHolder for its enum and uses that info
-     * to query the correct table in the DB
-     * 
-     * @param bh not null object and not null Info Enum
-     * @return the IDs of the blob light to be fetched
-     * @throws com.tcvcog.tcvce.domain.BObStatusException
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public List<Integer> getBlobLightIDList(IFace_BlobHolder bh) throws BObStatusException, IntegrationException{
-        if(bh == null || bh.getBlobLinkEnum() == null){
-            throw new BObStatusException("Cannot retrieve BlobLight list with null holder or info enum");            
-        }
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT ");
-        sb.append(bh.getBlobLinkEnum().getBlobLinkTablePhotodocIDFieldName());
-        sb.append(" FROM ");
-        sb.append(bh.getBlobLinkEnum().getBlobLinkTableName());
-        sb.append(" WHERE ");
-        sb.append(bh.getBlobLinkEnum().getBlobLinkTableParentIDFieldName());
-        sb.append(" = ?;");
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, bh.getParentObjectID());
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt(bh.getBlobLinkEnum().getBlobLinkTablePhotodocIDFieldName()));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("BlobIntegrator.getBlobLightIDList: Could not get blob ID list. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    
-    
-        
-        
-    
-    
-    
-    /**
-     * Get the IDs of photos attached to a given property
-     * @param prop
-     * @return
-     * @throws IntegrationException 
-     */
-    public List<Integer> getBlobIDs(Property prop) throws IntegrationException, BObStatusException{
-        
-        if(prop == null){
-            throw new BObStatusException("Cannot get BlobIDs by property with null Prop");
-            
-        }
-        
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        String query = "SELECT photodoc_photodocid FROM public.propertyphotodoc WHERE property_propertyid = ?;";
-        
-        PreparedStatement stmt = null;
-        
-        List<Integer> idList = new ArrayList<>();
-        
-        try {
-            
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, prop.getParcelKey());
-            rs = stmt.executeQuery();
-            while(rs.next()){
-                 idList.add(rs.getInt("photodoc_photodocid"));
-            }
-            
-        } catch (SQLException ex) {
-            //System.out.println(ex);
-            throw new IntegrationException("Error retrieving attached blob IDs. ", ex);
-        } finally{
-             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-        } // close finally
-        
-        return idList;
-        
-    }
-    
+   
 }

@@ -26,11 +26,15 @@ public class CECaseDataHeavy
         IFace_Loggable,
         IFace_ActivatableBOB,
         IFace_PaymentHolder,
+        IFace_BlobHolder,
         IFace_humanListHolder{
 
     // accessed through methods specified in the interfaces
     final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CECaseHuman;
-
+    final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.CE_CASE;
+    final static BlobLinkEnum BLOB_LINK_UPSTREAM_POOL = BlobLinkEnum.PROPERTY;
+    
+    
     private Property property;
     private PropertyUnit propertyUnit;
     
@@ -401,6 +405,26 @@ public class CECaseDataHeavy
     @Override
     public int getHostPK() {
         return caseID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return BLOB_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return caseID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return BLOB_LINK_UPSTREAM_POOL;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return property.parcelKey;
     }
 
 }

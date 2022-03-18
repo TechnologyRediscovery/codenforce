@@ -331,6 +331,7 @@ public class    SessionBean
     
     private Blob sessBlob;
     private BlobLight sessBlobLight;
+    private List<BlobLight> sessBlobLightListForRefreshUptake;
     private IFace_BlobHolder sessBlobHolder;
     private BlobPool sessBlobHolderPool;
     private List<Blob> blobList;
@@ -2121,6 +2122,20 @@ public class    SessionBean
      */
     public void setSessMailingAddressLinkRefreshedList(List<MailingAddressLink> sessMailingAddressLinkRefreshedList) {
         this.sessMailingAddressLinkRefreshedList = sessMailingAddressLinkRefreshedList;
+    }
+
+    /**
+     * @return the sessBlobLightListForRefreshUptake
+     */
+    public List<BlobLight> getSessBlobLightListForRefreshUptake() {
+        return sessBlobLightListForRefreshUptake;
+    }
+
+    /**
+     * @param sessBlobLightListForRefreshUptake the sessBlobLightListForRefreshUptake to set
+     */
+    public void setSessBlobLightListForRefreshUptake(List<BlobLight> sessBlobLightListForRefreshUptake) {
+        this.sessBlobLightListForRefreshUptake = sessBlobLightListForRefreshUptake;
     }
 
     

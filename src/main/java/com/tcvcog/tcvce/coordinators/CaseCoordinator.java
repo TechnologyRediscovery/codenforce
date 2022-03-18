@@ -157,10 +157,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse.setCeActionRequestList(sc.runQuery(qcear).getBOBResultList());
             
             // BLOB
-            // TODO: Debug endless recursion
-            cse.setBlobList(bc.getBlobLightList(bi.getBlobIDs(c)));
+            cse.setBlobList(bc.getBlobLightList(cse));
 
-        } catch (SearchException | BlobException  ex) {
+        } catch (SearchException | BlobException | BObStatusException ex) {
             System.out.println(ex);
         }
 
@@ -2965,6 +2964,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param vid
      * @return
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public CodeViolation violation_getCodeViolation(int vid) 
             throws IntegrationException, BObStatusException {
@@ -2974,7 +2974,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     
-    
+    /**
+     * Unused as of March 2022--nice idea though
+     * @param vid
+     * @return
+     * @throws ViolationException
+     * @throws IntegrationException
+     * @throws SearchException
+     * @throws BObStatusException 
+     */
     public CodeViolationPropCECaseHeavy violation_getCodeViolationPropCECaseHeavy(int vid) throws ViolationException, IntegrationException, SearchException, BObStatusException{
         PropertyCoordinator pc = getPropertyCoordinator();
         CodeViolationPropCECaseHeavy cvpcdh = null;
