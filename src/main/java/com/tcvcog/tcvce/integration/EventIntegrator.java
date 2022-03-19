@@ -569,7 +569,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
            // *******************************
             if (params.isEventType_ctl() ) {
                 if(params.getEventType_val()!= null){
-                    params.appendSQL("AND public.eventcategory.categorytype = CAST(? AS eventType ");
+                    params.appendSQL("AND public.eventcategory.categorytype = CAST(? AS eventType) ");
                 } else {
                     params.setEventType_ctl(false);
                     params.appendToParamLog("EVENT TYPE: no object specified; event type filter disabled; | ");

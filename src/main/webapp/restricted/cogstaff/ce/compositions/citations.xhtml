@@ -88,7 +88,7 @@
     </p:panel>
 
     <p:dialog   id="citation-profile-dialog"
-                height="700" width="600"
+                height="600" width="1300"
                 widgetVar="citation-profile-dialog-var"
                 responsive="true"
                 resizable="true"
@@ -100,409 +100,546 @@
                 rendered="true"
                 >
 
-        <p:panel id="citation-profile-info-panel"
-                 toggleable="true"
-                 collapsed="false"
-                 header="Basic Info">
+        <div class="p-grid nested-grid">
+            <div class="p-col-6">
+                <p:panel id="citation-profile-info-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Basic Info">
 
-            <h:form id="citation-info-form">
+                    <h:form id="citation-info-form">
 
-                <p:commandButton id="citation-profile-info-edit-button"
-                                 value="#{citationBB.citationInfoEditMode ? 'Save changes' : 'Edit'}"
-                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                 icon="fa #{citationBB.citationInfoEditMode ? 'fa-check' : 'fa-pencil'}"
-                                 actionListener="#{citationBB.onCitationEditModeToggle}"
-                                 oncomplete="PF('citation-profile-dialog-var').show()"
-                                 update="citation-info-form"/>
-
-
-                <div class="restrict-main-contents-io-button gray_button">
-
-                    <p:commandButton    id="citation-profile-info-edit-abort-button"
-                                        ajax="true"
-                                        rendered="#{citationBB.citationInfoEditMode}"
-                                        value="Abort edit"
-                                        process="@none"
-                                        immediate="true"
-                                        actionListener="#{citationBB.onOperationCancelButtonChange}"
-                                        oncomplete="PF('citation-profile-dialog-var').show()"
-                                        update="citation-info-form"
-                                        icon="fa fa-stop" />
-
-                </div>
-
-                <p:spacer height="5px"/>    
-
-                <div class="p-grid">
-                    <div class="p-col-6">Internal ID</div>
-
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
-                                      value="#{citationBB.currentCitation.citationNo}"/>
-                        <p:inputText rendered="#{citationBB.citationInfoEditMode}" 
-                                     value="#{citationBB.currentCitation.citationNo}"
-                                     size=""/>
-                    </div>
-                    <div class="p-col-6">Filing type</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
-                                      value="#{citationBB.currentCitation.filingType.title}"/>
-
-                        <p:selectOneMenu id="citation-filingtype-som"
-                                         required="true"
-                                         rendered="#{citationBB.citationInfoEditMode}" 
-                                         value="#{citationBB.currentCitation.filingType}">
-                            <f:converter converterId="citationFilingTypeConverter"/>
-                            <f:selectItems value="#{citationBB.citationFilingTypeList}"
-                                           var="cft" itemValue="#{cft}" itemLabel="#{cft.title}"/>
-                        </p:selectOneMenu>
-
-                    </div>
-                    <div class="p-col-6">Date of Record</div>
-                    <div class="p-col-6">
-
-                        <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
-                                      value="#{citationBB.getPrettyDateNoTime(citationBB.currentCitation.dateOfRecord)}"/>
-
-                        <p:calendar id="citation-dor-it"
-                                    rendered="#{citationBB.citationInfoEditMode}" 
-                                    value="#{citationBB.currentCitation.dateOfRecord}"
-                                    mode="popup" tabindex="3"
-                                    showOn="button"
-                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                    navigator="true" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
-                                    showButtonPanel="true"
-                                    showTodayButton="true"
-                                    required="true"/>
-
-                        <h:message for="citation-dor-it" showDetail="false" showSummary="true"
-                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                    </div>
-                    <div class="p-col-6">Court Entity of Origin</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
-                                      value="#{!empty citationBB.currentCitation.origin_courtentity ? citationBB.currentCitation.origin_courtentity.courtEntityName : ''}"/>
-
-                        <p:selectOneMenu id="citation-court-som"
-                                         rendered="#{citationBB.citationInfoEditMode}" 
-                                         required="false"
-                                         value="#{citationBB.currentCitation.origin_courtentity}">
-                            <f:converter converterId="courtEntityConverter"/>
-                            <f:selectItems value="#{citationBB.courtEntityList}"
-                                           var="ce" itemValue="#{ce}" itemLabel="#{ce.courtEntityName}"/>
-                        </p:selectOneMenu>
-
-                        <h:message for="citation-court-som" showDetail="false" showSummary="true"
-                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                    </div>
-                    <div class="p-col-6">Official Text</div>
-                    <div class="p-col-6" >
-
-                        <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
-                                      value="#{citationBB.currentCitation.officialText}"/>
-
-                        <p:inputTextarea id="citation-text-it"
-                                         value="#{citationBB.currentCitation.officialText}"
-                                         rendered="#{citationBB.citationInfoEditMode}"
-                                         tabindex="15"
-                                         required="true"
-                                         styleClass="data_field_value"/>
-                        <h:message for="citation-text-it"
-                                   showDetail="false"
-                                   showSummary="true"
-                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                    </div>
-
-                    <div class="p-col-6">Issuing Officer</div>
-                    <div class="p-col-6">
-                        <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
-                                      value="#{citationBB.currentCitation.filingOfficer.username}"/>
+                        <p:commandButton id="citation-profile-info-edit-button"
+                                         value="#{citationBB.citationInfoEditMode ? 'Save changes' : 'Edit'}"
+                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                         icon="fa #{citationBB.citationInfoEditMode ? 'fa-check' : 'fa-pencil'}"
+                                         actionListener="#{citationBB.onCitationEditModeToggle}"
+                                         oncomplete="PF('citation-profile-dialog-var').show()"
+                                         update="citation-info-form"/>
 
 
-                        <p:selectOneMenu id="citation-issuingofficer-som"
-                                         rendered="#{citationBB.citationInfoEditMode}" 
-                                         required="true"
-                                         value="#{citationBB.currentCitation.filingOfficer}">
-                            <f:converter converterId="userConverter"/>
-                            <f:selectItems value="#{citationBB.filingOfficerCandidateList}"
-                                           var="iouser" itemValue="#{iouser}" itemLabel="#{iouser.human.name}"/>
-                        </p:selectOneMenu>
-                    </div>
-                </div>
-                <p:spacer height="5px" />
+                        <div class="restrict-main-contents-io-button gray_button">
 
-                    <div class="restrict-main-contents-io-button">
-                        <p:commandButton    id="citation-update-status-commit-button"
-                                            rendered="#{citationBB.citationStatusEditMode}"
+                            <p:commandButton    id="citation-profile-info-edit-abort-button"
+                                                ajax="true"
+                                                rendered="#{citationBB.citationInfoEditMode}"
+                                                value="Abort edit"
+                                                process="@none"
+                                                immediate="true"
+                                                actionListener="#{citationBB.onOperationCancelButtonChange}"
+                                                oncomplete="PF('citation-profile-dialog-var').show()"
+                                                update="citation-info-form"
+                                                icon="fa fa-stop" />
+
+                        </div>
+
+                        <p:spacer height="5px"/>    
+
+                        <div class="p-grid">
+                            <div class="p-col-6">Internal ID</div>
+
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
+                                              value="#{citationBB.currentCitation.citationNo}"/>
+                                <p:inputText rendered="#{citationBB.citationInfoEditMode}" 
+                                             value="#{citationBB.currentCitation.citationNo}"
+                                             size=""/>
+                            </div>
+                            <div class="p-col-6">Filing type</div>
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
+                                              value="#{citationBB.currentCitation.filingType.title}"/>
+
+                                <p:selectOneMenu id="citation-filingtype-som"
+                                                 required="true"
+                                                 rendered="#{citationBB.citationInfoEditMode}" 
+                                                 value="#{citationBB.currentCitation.filingType}">
+                                    <f:converter converterId="citationFilingTypeConverter"/>
+                                    <f:selectItems value="#{citationBB.citationFilingTypeList}"
+                                                   var="cft" itemValue="#{cft}" itemLabel="#{cft.title}"/>
+                                </p:selectOneMenu>
+
+                            </div>
+                            <div class="p-col-6">Date of Record</div>
+                            <div class="p-col-6">
+
+                                <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
+                                              value="#{citationBB.getPrettyDateNoTime(citationBB.currentCitation.dateOfRecord)}"/>
+
+                                <p:calendar id="citation-dor-it"
+                                            rendered="#{citationBB.citationInfoEditMode}" 
+                                            value="#{citationBB.currentCitation.dateOfRecord}"
+                                            mode="popup" tabindex="3"
+                                            showOn="button"
+                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                            navigator="true" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                            showButtonPanel="true"
+                                            showTodayButton="true"
+                                            required="true"/>
+
+                                <h:message for="citation-dor-it" showDetail="false" showSummary="true"
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </div>
+                            <div class="p-col-6">Court Entity of Origin</div>
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
+                                              value="#{!empty citationBB.currentCitation.origin_courtentity ? citationBB.currentCitation.origin_courtentity.courtEntityName : ''}"/>
+
+                                <p:selectOneMenu id="citation-court-som"
+                                                 rendered="#{citationBB.citationInfoEditMode}" 
+                                                 required="false"
+                                                 value="#{citationBB.currentCitation.origin_courtentity}">
+                                    <f:converter converterId="courtEntityConverter"/>
+                                    <f:selectItems value="#{citationBB.courtEntityList}"
+                                                   var="ce" itemValue="#{ce}" itemLabel="#{ce.courtEntityName}"/>
+                                </p:selectOneMenu>
+
+                                <h:message for="citation-court-som" showDetail="false" showSummary="true"
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                            </div>
+                            <div class="p-col-6">Official Text</div>
+                            <div class="p-col-6" >
+
+                                <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
+                                              value="#{citationBB.currentCitation.officialText}"/>
+
+                                <p:inputTextarea id="citation-text-it"
+                                                 value="#{citationBB.currentCitation.officialText}"
+                                                 rendered="#{citationBB.citationInfoEditMode}"
+                                                 tabindex="15"
+                                                 required="true"
+                                                 styleClass="data_field_value"/>
+                                <h:message for="citation-text-it"
+                                           showDetail="false"
+                                           showSummary="true"
+                                           warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                            </div>
+
+                            <div class="p-col-6">Issuing Officer</div>
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
+                                              value="#{citationBB.currentCitation.filingOfficer.username}"/>
+
+
+                                <p:selectOneMenu id="citation-issuingofficer-som"
+                                                 rendered="#{citationBB.citationInfoEditMode}" 
+                                                 required="true"
+                                                 value="#{citationBB.currentCitation.filingOfficer}">
+                                    <f:converter converterId="userConverter"/>
+                                    <f:selectItems value="#{citationBB.filingOfficerCandidateList}"
+                                                   var="iouser" itemValue="#{iouser}" itemLabel="#{iouser.human.name}"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        <p:spacer height="5px" />
+
+                        <div class="restrict-main-contents-io-button">
+                            <p:commandButton    id="citation-update-status-commit-button"
+                                                rendered="#{citationBB.citationStatusEditMode}"
+                                                ajax="true"
+                                                value="Save updates"
+                                                actionListener="#{citationBB.onCitationUpdateCommitButtonChange}"
+                                                icon="fa fa-edit"
+                                                update="citation-info-form"/>
+                        </div>
+
+
+
+                    </h:form>
+                </p:panel>
+
+
+                <p:panel id="citation-profile-dockets-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Dockets">
+
+                    <h:form id="citation-dockets-form">
+
+
+                        <p:commandButton    id="ctiation-dockets-adddocket-cb"
                                             ajax="true"
-                                            value="Save updates"
-                                            actionListener="#{citationBB.onCitationUpdateCommitButtonChange}"
-                                            icon="fa fa-edit"
-                                            update="citation-info-form"/>
-                    </div>
-
-
-
-            </h:form>
-        </p:panel>
-
-
-        <p:panel id="citation-profile-dockets-panel"
-                 toggleable="true"
-                 collapsed="false"
-                 header="Dockets">
-
-            <h:form id="citation-dockets-form">
-
-
-                <p:commandButton    id="ctiation-dockets-adddocket-cb"
-                                    ajax="true"
-                                    value="Add docket"
-                                    immediate="true"
-                                    oncomplete="PF('citation-docket-dialog-var').show()"
-                                    actionListener="#{citationBB.onDocketAddInitButtonChange}"
-                                    update="citation-docket-dialog
-                                    citation-docket-form"
-                                    icon="fa fa-plus" />
-                
-                <p:spacer height="5px" />
-
-                <p:dataTable    id="citation-dockets-table"
-                                value="#{citationBB.currentCitation.docketNos}"
-                                var="cdno"  
-                                rowKey="#{cdno.docketID}"
-                                tableStyleClass="primeDataTable"
-                                draggableRows="true" 
-                                tabindex="1">
-
-
-
-                    <p:column width="50">
-                        <f:facet name="header">
-                            <h:outputText value="Docket Number"/>
-                        </f:facet>
-                        <h:outputText value="#{cdno.docketNumber}" />
-                       
-                    </p:column>
-                   
-                    <p:column width="15%">
-                        <f:facet name="header">
-                            <h:outputText value="Filing Date"/>
-                        </f:facet>
-                        <h:outputText value="#{citationBB.getPrettyDateNoTime(cdno.dateOfRecord)}" />
-
-                    </p:column>
-
-                    <p:column width="25%">
-                        <f:facet name="header">
-                            <h:outputText value="Court"/>
-                        </f:facet>
-                        <h:outputText value="#{cdno.courtEntity.courtEntityName}" />
-
-                    </p:column>
-
-                    <p:column width="10%">
-                        <f:facet name="header">
-                            <h:outputText value="Actions"/>
-                        </f:facet>
-                        <p:commandLink      id="citation-docket-edit-cb"
-                                            ajax="true"
-                                            actionListener="#{citationBB.onDocketViewButtonChange(cdno)}"
+                                            value="Add docket"
+                                            immediate="true"
                                             oncomplete="PF('citation-docket-dialog-var').show()"
-                                            style="color:blue;"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                            actionListener="#{citationBB.onDocketAddInitButtonChange}"
                                             update="citation-docket-dialog
                                             citation-docket-form"
-                                            value="view/edit" />
-                    </p:column>
-                </p:dataTable>
-            </h:form>
-        </p:panel>
+                                            icon="fa fa-plus" />
 
-        <p:panel id="citation-profile-status-log-panel"
-                 toggleable="true"
-                 collapsed="false"
-                 header="Status Log">
+                        <p:spacer height="5px" />
 
-            <h:form id="citation-status-log-form">
-
-                <p:commandButton    id="citation-status-log-add-cb"
-                                    ajax="true"
-                                    value="Add status log"
-                                    immediate="true"
-                                    oncomplete="PF('citation-status-log-entry-dialog-var').show()"
-                                    actionListener="#{citationBB.onStatusLogEntryAddInitButtonChange}"
-                                    icon="fa fa-plus" />
-
-                <p:spacer height="5px" />
-
-                <p:dataTable    id="citation-status-log-table"
-                                value="#{citationBB.currentCitation.statusLog}"
-                                var="csle"
-                                rowKey="#{csle.logEntryID}"
-                                tableStyleClass="primeDataTable"
-                                draggableRows="true" 
-                                tabindex="6">
+                        <p:dataTable    id="citation-dockets-table"
+                                        value="#{citationBB.currentCitation.docketNos}"
+                                        var="cdno"  
+                                        rowKey="#{cdno.docketID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="true" 
+                                        tabindex="1">
 
 
-                    <p:column width="10%">
-                        <f:facet name="header">
-                            <h:outputText value="EntryID"/>
-                        </f:facet>
-                        <h:outputText value="#{csle.logEntryID}" />
-                    </p:column>
 
-                    <p:column width="30%" sortBy="#{csle.dateOfRecord}">
-                        <f:facet name="header">
-                            <h:outputText value="Date"/>
-                        </f:facet>
-                        <h:outputText value="#{citationBB.getPrettyDateNoTime(csle.dateOfRecord)}" />
-                    </p:column>
+                            <p:column width="50">
+                                <f:facet name="header">
+                                    <h:outputText value="Docket Number"/>
+                                </f:facet>
+                                <h:outputText value="#{cdno.docketNumber}" />
 
-                    <p:column width="45%">
-                        <f:facet name="header">
-                            <h:outputText value="Status"/>
-                        </f:facet>
-                        <h:outputText value="#{csle.status.statusTitle}" />
-                    </p:column>
+                            </p:column>
 
-                    <p:column width="10%">
-                        <f:facet name="header">
-                            <h:outputText value="Actions"/>
-                        </f:facet>
-                        <p:commandLink      id="citation-update-status-cb"
+                            <p:column width="15%">
+                                <f:facet name="header">
+                                    <h:outputText value="Filing Date"/>
+                                </f:facet>
+                                <h:outputText value="#{citationBB.getPrettyDateNoTime(cdno.dateOfRecord)}" />
+
+                            </p:column>
+
+                            <p:column width="25%">
+                                <f:facet name="header">
+                                    <h:outputText value="Court"/>
+                                </f:facet>
+                                <h:outputText value="#{cdno.courtEntity.courtEntityName}" />
+
+                            </p:column>
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+                                <p:commandLink      id="citation-docket-edit-cb"
+                                                    ajax="true"
+                                                    actionListener="#{citationBB.onDocketViewButtonChange(cdno)}"
+                                                    oncomplete="PF('citation-docket-dialog-var').show()"
+                                                    style="color:blue;"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                    update="citation-docket-dialog
+                                                    citation-docket-form"
+                                                    value="view/edit" />
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+
+                <p:panel id="citation-profile-status-log-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Status Log">
+
+                    <h:form id="citation-status-log-form">
+
+                        <p:commandButton    id="citation-status-log-add-cb"
                                             ajax="true"
-                                            actionListener="#{citationBB.onCitationStatusLogEntryViewButtonChange(csle)}"
+                                            value="Add status log"
+                                            immediate="true"
                                             oncomplete="PF('citation-status-log-entry-dialog-var').show()"
-                                            style="color:blue;"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                            update="@form:@parent:citation-status-log-entry-form"
-                                            value="edit" />
+                                            actionListener="#{citationBB.onStatusLogEntryAddInitButtonChange}"
+                                            icon="fa fa-plus" />
+
+                        <p:spacer height="5px" />
+
+                        <p:dataTable    id="citation-status-log-table"
+                                        value="#{citationBB.currentCitation.statusLog}"
+                                        var="csle"
+                                        rowKey="#{csle.logEntryID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="true" 
+                                        tabindex="6">
 
 
-                    </p:column>
-                </p:dataTable>
-            </h:form>
-        </p:panel>
-        
-        <p:panel    id="citation-violations-panel"
-                    toggleable="true"
-                    collapsed="false"
-                    header="Violations">
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="EntryID"/>
+                                </f:facet>
+                                <h:outputText value="#{csle.logEntryID}" />
+                            </p:column>
+
+                            <p:column width="30%" sortBy="#{csle.dateOfRecord}">
+                                <f:facet name="header">
+                                    <h:outputText value="Date"/>
+                                </f:facet>
+                                <h:outputText value="#{citationBB.getPrettyDateNoTime(csle.dateOfRecord)}" />
+                            </p:column>
+
+                            <p:column width="45%">
+                                <f:facet name="header">
+                                    <h:outputText value="Status"/>
+                                </f:facet>
+                                <h:outputText value="#{csle.status.statusTitle}" />
+                            </p:column>
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+                                <p:commandLink      id="citation-update-status-cb"
+                                                    ajax="true"
+                                                    actionListener="#{citationBB.onCitationStatusLogEntryViewButtonChange(csle)}"
+                                                    oncomplete="PF('citation-status-log-entry-dialog-var').show()"
+                                                    style="color:blue;"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                    update="@form:@parent:citation-status-log-entry-form"
+                                                    value="edit" />
 
 
-            <div    id="citation-violations-div"
-                    class="ui-g-12 ui-md-12 ui-lg-12 data_field"
-                    style="width: 100%; clear: both;">
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
 
-                <p:outputLabel for="citation-violations-datascroller"
-                               styleClass="data_field_label">
-                    <h:outputText value="Linked Violations"/>
-                </p:outputLabel>
-                <p:dataScroller
-                    id="citation-violations-datascroller"
-                    value="#{citationBB.currentCitation.violationList}"
-                    var="citvv"
-                    widgetVar="citation-violation-compactlist-widgetvar">
-
-                    <h:outputText  value="#{citvv.violatedEnfElement.headerString}"
-                                   escape="false"/>
-                    <p:spacer height="3px" />
-                    <h:outputText id="status-compactlist-line-ot" value="Status: #{citvv.status.label}"/>
-
-                </p:dataScroller>
             </div>
 
-        </p:panel>
-        
-        <p:panel    id="citation-notes-panel"
-                    toggleable="true"
-                    collapsed="false"
-                    header="Notes">
-              <h:form id="citations-notes-panel-form">
-                  
-                <p:commandButton    id="citation-note-add-cb"
-                                    ajax="true"
-                                    value="Create new note"
-                                    process="@none"
-                                    immediate="true"
-                                    oncomplete="PF('citation-notes-dialog-var').show()"
-                                    actionListener="#{citationBB.onCitationNoteInitButtonChange}"
-                                    icon="fa fa-plus" />
 
-                <p:spacer height="2px" />
-                
-                <h:outputText value="#{citationBB.currentCitation.notes}"
-                              escape="false" 
-                              class="wrapText"/>
+            <div class="p-col-6">
+                <p:panel    id="citation-violations-panel"
+                            toggleable="true"
+                            collapsed="false"
+                            header="Violations">
 
-              </h:form>
-              
-        </p:panel>
-        
-        
-        <p:panel    id="citation-persons-panel"
-                    toggleable="true"
-                    collapsed="false"
-                    header="Persons">
-            <h:form id="citation-persons-form">
 
-                    <div class="restrict-main-contents-io-link">
-                        <p:commandLink      id="citation-persons-add-cl"
-                                            ajax="true"
-                                            actionListener="#{citationBB.onDocketNoteInitButtonChange}"
-                                            oncomplete="PF('citation-status-log-note-dialog').show()"
-                                            style="color:blue;"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                            update="citation-status-log-note-form"
-                                            value="Connect person" />
+                    <div    id="citation-violations-div"
+                            class="ui-g-12 ui-md-12 ui-lg-12 data_field"
+                            style="width: 100%; clear: both;">
+
+                        <p:outputLabel for="citation-violations-datascroller"
+                                       styleClass="data_field_label">
+                            <h:outputText value="Linked Violations"/>
+                        </p:outputLabel>
+                        <p:dataScroller
+                            id="citation-violations-datascroller"
+                            value="#{citationBB.currentCitation.violationList}"
+                            var="citvv"
+                            widgetVar="citation-violation-compactlist-widgetvar">
+
+                            <h:outputText  value="#{citvv.violatedEnfElement.headerString}"
+                                           escape="false"/>
+                            <p:spacer height="3px" />
+                            <h:outputText id="status-compactlist-line-ot" value="Status: #{citvv.status.label}"/>
+
+                        </p:dataScroller>
                     </div>
-                
-                
-                    <p:spacer height="5px"/>
-                    
-                    
-                <p:dataTable    id="citation-docket-persons-table"
-                                value="#{citationBB.currentCitation.humanLinkList}"
-                                var="chl"
-                                rowKey="#{chl.humanID}"
-                                tableStyleClass="primeDataTable"
-                                draggableRows="true" 
-                                tabindex="6">
+
+                </p:panel>
 
 
-                    <p:column width="50%">
-                        <f:facet name="header">
-                            <h:outputText value="Name"/>
-                        </f:facet>
-                        <h:outputText value="#{chl.name}" />
-                    </p:column>
 
-                    <p:column width="25%">
-                        <f:facet name="header">
-                            <h:outputText value="Role"/>
-                        </f:facet>
-                        <h:outputText value="#{chl.linkedObjectRole.title}" />
-                    </p:column>
+                <p:panel    id="citation-persons-panel"
+                            toggleable="true"
+                            collapsed="false"
+                            header="Persons">
+                    <h:form id="citation-persons-form">
 
-                    <p:column width="25%">
-                        <f:facet name="header">
-                            <h:outputText value="Actions"/>
-                        </f:facet>
-                        
-                         <p:commandLink      id="citation-persons-link-remove"
+                        <div class="restrict-main-contents-io-link">
+                            <p:commandLink      id="citation-persons-add-cl"
+                                                ajax="true"
+                                                actionListener="#{citationBB.onDocketNoteInitButtonChange}"
+                                                oncomplete="PF('citation-status-log-note-dialog').show()"
+                                                style="color:blue;"
+                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                update="citation-status-log-note-form"
+                                                value="Connect person" />
+                        </div>
+
+
+                        <p:spacer height="5px"/>
+
+
+                        <p:dataTable    id="citation-docket-persons-table"
+                                        value="#{citationBB.currentCitation.humanLinkList}"
+                                        var="chl"
+                                        rowKey="#{chl.humanID}"
+                                        tableStyleClass="primeDataTable"
+                                        draggableRows="true" 
+                                        tabindex="6">
+
+
+                            <p:column width="50%">
+                                <f:facet name="header">
+                                    <h:outputText value="Name"/>
+                                </f:facet>
+                                <h:outputText value="#{chl.name}" />
+                            </p:column>
+
+                            <p:column width="25%">
+                                <f:facet name="header">
+                                    <h:outputText value="Role"/>
+                                </f:facet>
+                                <h:outputText value="#{chl.linkedObjectRole.title}" />
+                            </p:column>
+
+                            <p:column width="25%">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+
+                                <p:commandLink      id="citation-persons-link-remove"
+                                                    ajax="true"
+                                                    actionListener="#{citationBB.onDocketPersonRemoveButtonChange(dhl)}"
+                                                    style="color:blue;"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                    update="docket-persons-form"
+                                                    value="remove link" />
+
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+
+
+                <p:panel id="citation-blobs-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Files and Photos"
+                         rendered="true"
+                         >
+
+                    <h:form id="citation-blobs-form">
+
+                        <p:commandButton    id="citation-blob-add-button"
                                             ajax="true"
-                                            actionListener="#{citationBB.onDocketPersonRemoveButtonChange(dhl)}"
-                                            style="color:blue;"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                            update="docket-persons-form"
-                                            value="remove link" />
-                        
-                    </p:column>
-                </p:dataTable>
-            </h:form>
-        </p:panel>
+                                            styleClass="noFill button-size-small"
+                                            actionListener="#{blobUtilitiesBB.onUploadBlobInitButtonChange(citationBB.currentCitation)}"
+                                            oncomplete="PF('blob-upload-dialog-var').show()"
+                                            update="blob-upload-dialog
+                                            blob-uploadconnect-tabview"
+                                            value="Upload photo or document"
+                                            icon="fa fa-upload"
+                                            >
+                            <f:param name="blob-list-component-to-update" value="citation-blobs-form" />
+                        </p:commandButton>
+
+                        <p:spacer height="5px" />
+
+                        <p:dataTable
+                            id="citation-blobs-table"
+                            var="cblob"
+                            value="#{citationBB.citationBlobsAutoUpdated}"
+                            rowKey="#{ccblob.photoDocID}"
+                            tableStyleClass="primeDataTable"
+                            resizableColumns="true"
+                            draggableRows="false" tabindex="6">
+
+                            <p:column width="15%">
+                                <f:facet name="header">
+                                    <h:outputText value="File Type"/>
+                                </f:facet>
+                                <h:outputText value="#{cblob.type.title}"/>
+                                <!-- type icon here -->
+                            </p:column>
+
+                            <p:column width="15%">
+                                <f:facet name="header">
+                                    <h:outputText value="IDs"/>
+                                </f:facet>
+                                <h:outputText value="linkID: #{cblob.photoDocID}"/>
+                                <br/>
+                                <h:outputText value="bytesID: #{cblob.bytesID}"/>
+
+                            </p:column>
+
+                            <p:column width="45%">
+                                <f:facet name="header">
+                                    <h:outputText value="Info"/>
+                                </f:facet>
+                                <div class="rowExpansion">
+                                    <h:outputText value="title: #{cblob.title}"/>
+                                    <br/>
+                                    <h:outputText value="descr: #{cblob.description}"/>
+                                    <br/>
+                                    <h:outputText value="filename: #{cblob.filename}"/>
+                                    <br/>
+                                    <h:outputText value="created: #{ceCaseSearchProfileBB.getPrettyDateNoTime(cblob.createdTS)}"/>
+                                </div>
+                            </p:column>
+
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Actions"/>
+                                </f:facet>
+                                <p:commandButton 
+                                    value="Download" 
+                                    ajax="false"
+                                    icon="fa fa-arrow-down" 
+                                    styleClass="ui-button-outlined">
+                                    <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(cblob)}"
+                                                    />
+                                </p:commandButton>
+                                <br/>
+                                <div class="restrict-main-contents-io-link link-button">
+
+                                    <p:commandLink      id="blob-update-button"
+                                                        ajax="true"
+                                                        styleClass="noFill button-size-small"
+                                                        action="#{blobUtilitiesBB.onViewBlobLinkClick(cblob, citationBB.currentCitation)}"
+                                                        value="view"
+                                                        oncomplete="PF('blobs-viewblob-dialog-var').show()"
+                                                        update="blobs-viewblob-dialog
+                                                        blob-viewblob-form"
+                                                        />
+                                    <p:spacer height="3px" />
+                                    <p:commandLink      id="blob-edit-button"
+                                                        ajax="true"
+                                                        styleClass="noFill button-size-small"
+                                                        action="#{blobUtilitiesBB.onBlobEditMetaDataInitLinkClick(cblob, citationBB.currentCitation)}"
+                                                        value="edit"
+                                                        oncomplete="PF('blobs-vieweditmetadata-dialog-var').show()"
+                                                        update="blob-vieweditmetadata-dialog
+                                                        blob-veweditmetadata-form"
+                                                        >
+                                        <f:param name="blob-list-component-to-update" value="citation-blobs-form" />
+                                    </p:commandLink>
+                                    <p:spacer height="3px" />
+                                    <p:commandLink      id="blob-remove-button"
+                                                        ajax="true"
+                                                        styleClass="noFill button-size-small"
+                                                        action="#{blobUtilitiesBB.onDeactivateBlobInitLinkClick(cblob, citationBB.currentCitation)}"
+                                                        oncomplete="PF('blobs-deactivate-dialog-var').show();"
+                                                        value="remove"
+                                                        update="blob-deactivate-dialog
+                                                        blob-deactivate-form"
+                                                        >
+                                        <f:param name="blob-list-component-to-update" value="citation-blobs-form" />
+                                    </p:commandLink>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+
+                <p:panel    id="citation-notes-panel"
+                            toggleable="true"
+                            collapsed="false"
+                            header="Notes">
+                    <h:form id="citations-notes-panel-form">
+
+                        <p:commandButton    id="citation-note-add-cb"
+                                            ajax="true"
+                                            value="Create new note"
+                                            process="@none"
+                                            immediate="true"
+                                            oncomplete="PF('citation-notes-dialog-var').show()"
+                                            actionListener="#{citationBB.onCitationNoteInitButtonChange}"
+                                            icon="fa fa-plus" />
+
+                        <p:spacer height="2px" />
+
+                        <h:outputText value="#{citationBB.currentCitation.notes}"
+                                      escape="false" 
+                                      class="wrapText"/>
+
+                    </h:form>
+
+                </p:panel>
+
+
+            </div>
+
+
+        </div>
+
+
 
     </p:dialog>
 
@@ -524,139 +661,162 @@
 
             <p:spacer height="15px"/>
 
-            <h2>Outstanding code violations on Case ID <h:outputText value="#{sessionBean.sessCECase.caseID}" />
-                at <h:outputText value="#{sessionBean.sessCECase.property.address.addressPretty1Line}" /></h2>
 
-            <p:dataTable
-                id="citation-violations-table"
-                selectionMode="none"
-                value="#{citationBB.currentCitation.violationList}"
-                tableStyleClass="primeDataTable"
-                expandedRow="false"
-                rowExpandMode="multiple"
-                draggableColumns="true"
-                reflow="true"
-                var="citv"
-                rowKey="#{citv.violationID}">
-                <p:column>
-                    <f:facet name="header">
-                        <h:outputText value="Code Element" />
-                    </f:facet>
-                    <div class="rowExpansion">
-                        <h:outputLabel value="#{citv.codeViolated.headerString}"
-                                       escape="false"/>
+            <f:subview id="citviol-empty-subview"
+                       rendered="#{citationBB.currentCitation.violationList.size() eq 0}">
+                <h2 style="color: darkred;">This citation does not contain any violations and you cannot continue. Press escape. </h2>
+
+                <p>
+                    But I have violations on the case, you say! This can occur for a few reasons: 
+                </p>
+                <ol>
+                    <li>1) all violations on this case have been marked with compliance (or nullified) </li>
+                    <li>2) The outstanding violations are all within their compliance timeframe</li>
+                    <li>2) You just created the violations and will need to reload the case.</li>
+                </ol>
+                <p>
+                    (If you really need to add a citation now, and you've re-accessed the case from the dashboard,
+                    you could change the stipulated compliance dates for violations to be before today.)
+                </p>
+
+            </f:subview>
+
+            <f:subview id="citviol-present-subview"
+                       rendered="#{citationBB.currentCitation.violationList.size() ne 0}">
+
+                <h2>Outstanding code violations on Case ID <h:outputText value="#{sessionBean.sessCECase.caseID}" />
+                    at <h:outputText value="#{sessionBean.sessCECase.property.address.addressPretty1Line}" /></h2>
+
+                <p:dataTable
+                    id="citation-violations-table"
+                    selectionMode="none"
+                    value="#{citationBB.currentCitation.violationList}"
+                    tableStyleClass="primeDataTable"
+                    expandedRow="false"
+                    rowExpandMode="multiple"
+                    draggableColumns="true"
+                    reflow="true"
+                    var="citv"
+                    rowKey="#{citv.violationID}">
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Code Element" />
+                        </f:facet>
+                        <div class="rowExpansion">
+                            <h:outputLabel value="#{citv.codeViolated.headerString}"
+                                           escape="false"/>
+                        </div>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Stipulated Comp. Date" />
+                        </f:facet>
+                        <h:outputText value="#{citv.stipulatedComplianceDate}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Remove" />
+                        </f:facet>
+                        <p:commandButton id="remove-violation-from-violationtable-cb"
+                                         ajax="true"
+                                         actionListener="#{citationBB.onCitationViolationRemoveButtonChange(citv)}"
+                                         icon="fa fa-trash"
+                                         value="Remove"
+                                         immediate="true"
+                                         update="citation-violations-table">
+                        </p:commandButton>
+
+                    </p:column>
+                </p:dataTable>
+
+
+                <h2>Citation form fields</h2>
+
+
+                <div class="p-grid">
+                    <div class="p-col-6">Filing type</div>
+                    <div class="p-col-6">
+
+                        <p:selectOneMenu id="citation-filingstatus-som"
+                                         required="true"
+                                         value="#{citationBB.currentCitation.filingType}">
+                            <f:converter converterId="citationFilingTypeConverter"/>
+                            <f:selectItems value="#{citationBB.citationFilingTypeList}"
+                                           var="cft" itemValue="#{cft}" itemLabel="#{cft.title}"/>
+                        </p:selectOneMenu>
+
                     </div>
-                </p:column>
+                    <div class="p-col-6">Citation Number (internal only)</div>
+                    <div class="p-col-6">
 
-                <p:column>
-                    <f:facet name="header">
-                        <h:outputText value="Stipulated Comp. Date" />
-                    </f:facet>
-                    <h:outputText value="#{citv.stipulatedComplianceDate}"/>
-                </p:column>
-
-                <p:column>
-                    <f:facet name="header">
-                        <h:outputText value="Remove" />
-                    </f:facet>
-                    <p:commandButton id="remove-violation-from-violationtable-cb"
-                                     ajax="true"
-                                     actionListener="#{citationBB.onCitationViolationRemoveButtonChange(citv)}"
-                                     icon="fa fa-trash"
-                                     value="Remove"
-                                     immediate="true"
-                                     update="citation-violations-table">
-                    </p:commandButton>
-
-                </p:column>
-            </p:dataTable>
-
-
-            <h2>Citation form fields</h2>
-
-
-            <div class="p-grid">
-                <div class="p-col-6">Filing type</div>
-                <div class="p-col-6">
-
-                    <p:selectOneMenu id="citation-filingstatus-som"
-                                     required="true"
-                                     value="#{citationBB.currentCitation.filingType}">
-                        <f:converter converterId="citationFilingTypeConverter"/>
-                        <f:selectItems value="#{citationBB.citationFilingTypeList}"
-                                       var="cft" itemValue="#{cft}" itemLabel="#{cft.title}"/>
-                    </p:selectOneMenu>
-
-                </div>
-                <div class="p-col-6">Citation Number (internal only)</div>
-                <div class="p-col-6">
-
-                    <p:inputText id="citation-no-it"
-                                 value="#{citationBB.currentCitation.citationNo}"
-                                 tabindex="1"
-                                 required="false"
-                                 styleClass="data_field_value"/>
-
-                    <h:message for="citation-no-it" showDetail="false" showSummary="true"
-                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                </div>
-                <div class="p-col-6">Date of Record</div>
-                <div class="p-col-6">
-
-                    <p:calendar id="citation-dor-it"
-                                value="#{citationBB.currentCitation.dateOfRecord}"
-                                mode="popup" tabindex="3"
-                                showOn="button"
-                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                navigator="true" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
-                                showButtonPanel="true"
-                                showTodayButton="true"
-                                required="true"/>
-
-                    <h:message for="citation-dor-it" showDetail="false" showSummary="true"
-                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                </div>
-                <div class="p-col-6">Court Entity of Origin</div>
-                <div class="p-col-6">
-
-                    <p:selectOneMenu id="citation-court-som"
+                        <p:inputText id="citation-no-it"
+                                     value="#{citationBB.currentCitation.citationNo}"
+                                     tabindex="1"
                                      required="false"
-                                     value="#{citationBB.currentCitation.origin_courtentity}">
-                        <f:converter converterId="courtEntityConverter"/>
-                        <f:selectItems value="#{citationBB.courtEntityList}"
-                                       var="ce" itemValue="#{ce}" itemLabel="#{ce.courtEntityName}"/>
-                    </p:selectOneMenu>
-
-                    <h:message for="citation-court-som" showDetail="false" showSummary="true"
-                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-
-                </div>
-                <div class="p-col-6">Official Text</div>
-                <div class="p-col-6">
-
-                    <p:inputTextarea id="citation-text-it"
-                                     value="#{citationBB.currentCitation.officialText}"
-                                     tabindex="15"
-                                     required="true"
                                      styleClass="data_field_value"/>
-                    <h:message for="citation-text-it"
-                               showDetail="false"
-                               showSummary="true"
-                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                </div>
 
-                <div class="p-col-6">Issuing Officer</div>
-                <div class="p-col-6">
-                    <p:selectOneMenu id="citation-add-issuingofficer-som"
-                                     rendered="true" 
-                                     required="true"
-                                     value="#{citationBB.currentCitation.filingOfficer}">
-                        <f:converter converterId="userConverter"/>
-                        <f:selectItems value="#{systemServicesBB.bbSessionMuni.swornOfficerList}"
-                                       var="iouser" itemValue="#{iouser}" itemLabel="#{iouser.human.name}"/>
-                    </p:selectOneMenu>
+                        <h:message for="citation-no-it" showDetail="false" showSummary="true"
+                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                    </div>
+                    <div class="p-col-6">Date of Record</div>
+                    <div class="p-col-6">
+
+                        <p:calendar id="citation-dor-it"
+                                    value="#{citationBB.currentCitation.dateOfRecord}"
+                                    mode="popup" tabindex="3"
+                                    showOn="button"
+                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
+                                    navigator="true" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
+                                    showButtonPanel="true"
+                                    showTodayButton="true"
+                                    required="true"/>
+
+                        <h:message for="citation-dor-it" showDetail="false" showSummary="true"
+                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                    </div>
+                    <div class="p-col-6">Court Entity of Origin</div>
+                    <div class="p-col-6">
+
+                        <p:selectOneMenu id="citation-court-som"
+                                         required="false"
+                                         value="#{citationBB.currentCitation.origin_courtentity}">
+                            <f:converter converterId="courtEntityConverter"/>
+                            <f:selectItems value="#{citationBB.courtEntityList}"
+                                           var="ce" itemValue="#{ce}" itemLabel="#{ce.courtEntityName}"/>
+                        </p:selectOneMenu>
+
+                        <h:message for="citation-court-som" showDetail="false" showSummary="true"
+                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                    </div>
+                    <div class="p-col-6">Official Text</div>
+                    <div class="p-col-6">
+
+                        <p:inputTextarea id="citation-text-it"
+                                         value="#{citationBB.currentCitation.officialText}"
+                                         tabindex="15"
+                                         required="false"
+                                         styleClass="data_field_value"/>
+                        <h:message for="citation-text-it"
+                                   showDetail="false"
+                                   showSummary="true"
+                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                    </div>
+
+                    <div class="p-col-6">Issuing Officer</div>
+                    <div class="p-col-6">
+                        <p:selectOneMenu id="citation-add-issuingofficer-som"
+                                         rendered="true" 
+                                         required="true"
+                                         value="#{citationBB.currentCitation.filingOfficer}">
+                            <f:converter converterId="userConverter"/>
+                            <f:selectItems value="#{systemServicesBB.bbSessionMuni.swornOfficerList}"
+                                           var="iouser" itemValue="#{iouser}" itemLabel="#{iouser.human.name}"/>
+                        </p:selectOneMenu>
+                    </div>
                 </div>
-            </div>
 
 
 
@@ -664,22 +824,27 @@
 
                     <p:commandButton    id="citation-insert-abort-button"
                                         ajax="true"
-                                        value="Cancel Issue Citation"
+                                        value="Abort"
                                         process="@none"
                                         immediate="true"
                                         actionListener="#{citationBB.onOperationCancelButtonChange}"
-                                        icon="fa fa-stop" />
+                                        icon="fa fa-stop" 
+                                        oncomplete="PF('citation-add-dialog-var').hide();"/>
 
                 </div>
                 <div class="restrict-main-contents-io-button">
 
                     <p:commandButton    id="citation-insert-button"
-                                        ajax="false"
-                                        value="Issue Citation"
-                                        action="#{citationBB.onCitationAddCommitButtonChange}"
-                                        icon="fa fa-gavel" />
+                                        ajax="true"
+                                        value="Insert citation"
+                                        actionListener="#{citationBB.onCitationAddCommitButtonChange}"
+                                        icon="fa fa-gavel" 
+                                        oncomplete="PF('citation-add-dialog-var').hide();"
+                                        update="cecase-citations-panel
+                                        cecase-citations-form"/>
 
                 </div>
+            </f:subview>
 
         </h:form>
     </p:dialog>
@@ -784,7 +949,7 @@
                                   value="#{citationBB.currentCitationStatusLogEntry.notes}"/>
                 </div>
             </div>
-           
+
         </h:form>
     </p:dialog>
 
@@ -833,7 +998,7 @@
             </f:facet>
         </h:form>
     </p:dialog>
-    
+
 
     <p:dialog   id="citation-docket-dialog"
                 height="550" width="600"
@@ -858,7 +1023,7 @@
                              oncomplete="PF('citation-docket-dialog-var').show()"
                              update="citation-docket-form
                              citations-growl"/>
-            
+
             <div class="restrict-main-contents-io-button gray_button">
 
 
@@ -880,23 +1045,23 @@
                 <div class="p-col-6">
                     <h:outputText value="#{citationBB.currentCitationDocket.docketID}" />
                 </div>
-                
+
                 <div class="p-col-6">Docket Number</div>
                 <div class="p-col-6">
                     <h:outputText   rendered="#{!citationBB.citationDocketEditMode}"
                                     value="#{citationBB.currentCitationDocket.docketNumber}" />
-                    
+
                     <p:inputText    rendered="#{citationBB.citationDocketEditMode}"
                                     value="#{citationBB.currentCitationDocket.docketNumber}" />
                 </div>
-                
+
                 <div class="p-col-6">Court entity </div>
-                
+
                 <div class="p-col-6">
 
                     <h:outputText   rendered="#{!citationBB.citationDocketEditMode}"
                                     value="#{!empty citationBB.currentCitationDocket.courtEntity ? citationBB.currentCitationDocket.courtEntity.courtEntityName : ''}" />
-                    
+
                     <p:selectOneMenu id="citation-docket-court-som"
                                      rendered="#{citationBB.citationDocketEditMode}"
                                      required="false"
@@ -930,14 +1095,14 @@
                     <p:spacer height="2px" />
                     <h:outputText value="#{citationBB.currentCitationDocket.createdBy.username}" />
                 </div>
-                
+
                 <div class="p-col-6">Last update</div>
                 <div class="p-col-6">
                     <h:outputText value="#{citationBB.getPrettyDate(citationBB.currentCitationDocket.lastUpdatedTS)}" />
                     <p:spacer height="2px" />
                     <h:outputText value="#{citationBB.currentCitationDocket.lastUpdatedBy.username}" />
                 </div>
-                
+
                 <div class="p-col-6">Record status</div>
                 <div class="p-col-6">
                     <h:outputText value="#{empty citationBB.currentCitationDocket.deactivatedTS ? 'active' : 'deactivated on'}" />
@@ -946,28 +1111,28 @@
                 </div>
             </div>
         </h:form>
-        
+
         <p:panel    id="docket-persons-panel"
                     toggleable="true"
                     collapsed="false"
                     header="Persons">
             <h:form id="docket-persons-form">
 
-                    <div class="restrict-main-contents-io-link">
-                        <p:commandLink      id="citation-docket-person-add-cl"
-                                            ajax="true"
-                                            actionListener="#{citationBB.onDocketNoteInitButtonChange}"
-                                            oncomplete="PF('citation-status-log-note-dialog').show()"
-                                            style="color:blue;"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                            update="citation-status-log-note-form"
-                                            value="Connect person" />
-                    </div>
-                
-                
-                    <p:spacer height="5px"/>
-                    
-                    
+                <div class="restrict-main-contents-io-link">
+                    <p:commandLink      id="citation-docket-person-add-cl"
+                                        ajax="true"
+                                        actionListener="#{citationBB.onDocketNoteInitButtonChange}"
+                                        oncomplete="PF('citation-status-log-note-dialog').show()"
+                                        style="color:blue;"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                        update="citation-status-log-note-form"
+                                        value="Connect person" />
+                </div>
+
+
+                <p:spacer height="5px"/>
+
+
                 <p:dataTable    id="citation-docket-persons-table"
                                 value="#{citationBB.currentCitationDocket.humanLinkList}"
                                 var="dhl"
@@ -995,47 +1160,47 @@
                         <f:facet name="header">
                             <h:outputText value="Actions"/>
                         </f:facet>
-                        
-                         <p:commandLink      id="citation-docket-person-link-remove"
+
+                        <p:commandLink      id="citation-docket-person-link-remove"
                                             ajax="true"
                                             actionListener="#{citationBB.onDocketPersonRemoveButtonChange(dhl)}"
                                             style="color:blue;"
                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                             update="docket-persons-form"
                                             value="remove link" />
-                        
+
                     </p:column>
                 </p:dataTable>
             </h:form>
         </p:panel>
-        
-        
+
+
         <p:panel    id="docket-notes-panel"
                     toggleable="true"
                     collapsed="false"
                     header="Docket notes">
             <h:form id="docket-notes-form">
-                
-                        
 
-                    <div class="restrict-main-contents-io-link">
-                        <p:commandLink      id="citation-docket-note-add-cl"
-                                            ajax="true"
-                                            actionListener="#{citationBB.onDocketNoteInitButtonChange}"
-                                            oncomplete="PF('citation-status-log-note-dialog').show()"
-                                            style="color:blue;"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                            update="citation-status-log-note-form"
-                                            value="add note" />
-                    </div>
-                    <p:spacer height="5px"/>
-            
-                    <h:outputText styleClass="wrapText" 
-                                  value="#{!empty citationBB.currentCitationStatusLogEntry.notes ? citationBB.currentCitationStatusLogEntry.notes : 'no notes' }"/>
-            
+
+
+                <div class="restrict-main-contents-io-link">
+                    <p:commandLink      id="citation-docket-note-add-cl"
+                                        ajax="true"
+                                        actionListener="#{citationBB.onDocketNoteInitButtonChange}"
+                                        oncomplete="PF('citation-status-log-note-dialog').show()"
+                                        style="color:blue;"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                        update="citation-status-log-note-form"
+                                        value="add note" />
+                </div>
+                <p:spacer height="5px"/>
+
+                <h:outputText styleClass="wrapText" 
+                              value="#{!empty citationBB.currentCitationStatusLogEntry.notes ? citationBB.currentCitationStatusLogEntry.notes : 'no notes' }"/>
+
             </h:form>
         </p:panel>
-        
+
     </p:dialog>
 
     <p:dialog   id="citation-docket-note-dialog"

@@ -263,16 +263,11 @@ public  class       Citation
     }
 
 
-    /**
-     * @param citatonNo the citationNo to set
-     */
-    public void setCitatonNo(String citatonNo) {
-        this.citationNo = citatonNo;
-    }
-
+  
     /**
      * @return the blobList
      */
+    @Override
     public List<BlobLight> getBlobList() {
         return blobList;
     }
@@ -280,6 +275,7 @@ public  class       Citation
     /**
      * @param blobList the blobList to set
      */
+    @Override
     public void setBlobList(List<BlobLight> blobList) {
         this.blobList = blobList;
     }

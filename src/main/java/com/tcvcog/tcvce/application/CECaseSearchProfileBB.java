@@ -319,13 +319,7 @@ public class CECaseSearchProfileBB
     }
     
        
-    /**
-     * Listener for user requests to view a citation
-     * @param cit 
-     */
-    public void onCitationViewButtonChange(Citation cit){
-        getSessionBean().setSessCitation(cit);
-    }
+ 
     
     /**
      * Sets the session event

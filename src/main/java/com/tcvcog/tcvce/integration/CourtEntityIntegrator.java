@@ -407,7 +407,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
                             "            createdts, lastupdatedts, status, createdby_userid, \n" +
                             "            lastupdatedby_userid, notes, linksource)\n" +
                             "    VALUES (DEFAULT, ?, ?, \n" +
-                            "            now(), now(), ?, ?, \n" +
+                            "            now(), now(), CAST(? AS citationviolationstatus), ?, \n" +
                             "            ?, ?, ?);";
 
             Connection con = getPostgresCon();
@@ -423,16 +423,28 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
                     CitationCodeViolationLink ccvl = li.next();
                     stmt.setInt(1, cit.getCitationID());
                     stmt.setInt(2, ccvl.getViolationID());
-                    stmt.setString(3, ccvl.getCitVStatus().toString());
-                    stmt.setInt(4, cit.getCreatedBy().getUserID());
-                    stmt.setInt(5, cit.getLastUpdatedBy().getUserID());
+                    if(ccvl.getCitVStatus() != null){
+                        stmt.setString(3, ccvl.getCitVStatus().toString());
+                    } else {
+                        stmt.setNull(3, java.sql.Types.NULL);
+                    }
+                    if(cit.getCreatedBy() != null){
+                        stmt.setInt(4, cit.getCreatedBy().getUserID());
+                    } else {
+                        stmt.setNull(4, java.sql.Types.NULL);
+                    }
+                    if(cit.getLastUpdatedBy() != null){
+                        stmt.setInt(5, cit.getLastUpdatedBy().getUserID());
+                    } else {
+                        stmt.setNull(5, java.sql.Types.NULL);
+                    }
                     stmt.setString(6, ccvl.getNotes());
                     if(ccvl.getLinkSource() != null){
                         stmt.setInt(7, ccvl.getLinkSource().getSourceid());
                     } else {
                         stmt.setNull(7, java.sql.Types.NULL);
                     }
-                    
+                    System.out.println("CourtEntityIntegrator.linkcitation | about to write link violationID : " + ccvl.getViolationID() + " to citation " + cit.getCitationID() );
                     stmt.execute();
                 } // close while over citaiton violations
 

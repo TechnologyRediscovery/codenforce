@@ -13,6 +13,7 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CitationCodeViolationLink;
 import com.tcvcog.tcvce.entities.CitationDocketRecord;
@@ -68,7 +69,6 @@ public class CitationBB extends BackingBeanUtils {
     private CitationStatusLogEntry currentCitationStatusLogEntry;
     private List<CitationStatus> citationStatusList;
     private String statusNotesFormText;
-    
     
     private boolean citationInfoEditMode;
     
@@ -128,6 +128,29 @@ public class CitationBB extends BackingBeanUtils {
     /*******************************************************/
     /*******************************************************/
     
+    /**
+     * Special getter wrapper for citation blobs that responds to
+     * the bl ob tools update field
+     * @return 
+     */
+    public List<BlobLight> getCitationBlobsAutoUpdated(){
+       List<BlobLight> sessBlobListForUpdate = getSessionBean().getSessBlobLightListForRefreshUptake();
+        if(sessBlobListForUpdate != null && currentCitation != null){
+            System.out.println("CECaseSearchProfileBB.getBlobLightListFromCECase | found non-null session blob list for uptake: " + sessBlobListForUpdate.size());
+            getCurrentCitation().setBlobList(sessBlobListForUpdate);
+            // clear session since we have the new list
+            getSessionBean().setSessBlobLightListForRefreshUptake(null);
+            return sessBlobListForUpdate;
+        } else {
+            if(currentCitation.getBlobList() != null){
+                return currentCitation.getBlobList();
+            } else {
+                return new ArrayList<>();
+            }
+        }
+        
+    }
+    
     public void refreshCurrentCitation(){
         CaseCoordinator cc = getCaseCoordinator();
         try {
@@ -169,6 +192,7 @@ public class CitationBB extends BackingBeanUtils {
         
         try {
             currentCitation = cc.citation_getCitationSkeleton(getSessionBean().getSessCECase(), getSessionBean().getSessUser(), citationIssuingOfficer );
+           
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -182,34 +206,27 @@ public class CitationBB extends BackingBeanUtils {
       /**
      * Listener for user requests to issue a citation
      *
-     * @return page nav
+     * @param ev
      */
-    public String onCitationAddCommitButtonChange() {
+    public void onCitationAddCommitButtonChange(ActionEvent ev) {
         System.out.println("CitationBB.onCitationAddCommitButtonChange");
         CaseCoordinator cc = getCaseCoordinator();
-        if(getCurrentCitation() != null){
-
-                Citation c = getCurrentCitation();
-                
-                try {
-                    cc.citation_insertCitation(c,getSessionBean().getSessUser());
-
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                    "New citation added to database!", ""));
-                } catch (IntegrationException | BObStatusException ex) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Unable to issue citation due to a database integration error", ""));
-                    System.out.println(ex);
-                    return "";
-                }
-                return "ceCaseProfile";
+        if(currentCitation != null){
+            try {
+                cc.citation_insertCitation(currentCitation, getSessionBean().getSessUser());
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "New citation added to database!", ""));
+            } catch (IntegrationException | BObStatusException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Unable to issue citation due to a database integration error", ""));
+                System.out.println(ex);
+            }
         } else {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to issue citation due to page object error", ""));
-            return "";
         }
     }
     

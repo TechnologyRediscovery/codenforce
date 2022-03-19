@@ -2411,6 +2411,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
         cit.setCreatedBy(creator);
         cit.setFilingOfficer(citingOfficer);
+        cit.setCitationNo(generateInternalCitationID(cse));
         cit.setDateOfRecord(LocalDateTime.now());
         cit.setOrigin_courtentity(getSessionBean().getSessMuni().getCourtEntities().get(0));
         
@@ -2420,17 +2421,41 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // for user approval
         if (cse.getViolationList() != null && !cse.getViolationList().isEmpty()) {
             for (CodeViolation v : cse.getViolationList()) {
-                if (v.getActualComplianceDate() == null) {
+                if (v.getActualComplianceDate() == null && v.getStipulatedComplianceDate().isBefore(LocalDateTime.now())) {
                     cvlst.add(v);
                     System.out.println("CaseCoordinator.citation_getCitationSkeleton: Adding ViolID: " + v.getViolationID());
                 }
             }
         }
         cit.setViolationList(buildCitationCodeViolationLinkSkeletonList(cvlst));
-        
-
         return cit;
+    }
 
+    /**
+     * Generates a temporary internal citation number using the format 
+     * SEAN GRAMZ prefers: CIT-BLDGNO-DATE
+     * @param cse
+     * @return the proposed internal ID
+     */
+    private String generateInternalCitationID(CECase cse) throws BObStatusException, IntegrationException{
+        if(cse == null ){
+            throw new BObStatusException("cannot generate citation no with null case");
+        }
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        Property p = pc.getProperty(cse.getParcelKey());
+        StringBuilder sb = new StringBuilder();
+        sb.append("PCC-");
+        sb.append(p.getAddress().getBuildingNo());
+        LocalDateTime ldt = LocalDateTime.now();
+        sb.append("-");
+        sb.append(ldt.getMonthValue());
+        sb.append("-");
+        sb.append(ldt.getDayOfMonth());
+        sb.append("-");
+        sb.append(ldt.getYear());
+        return sb.toString();
+        
     }
     
     /**
@@ -2483,19 +2508,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         c.setLastUpdatedBy(creator);
         c.setLastUpdatedTS(LocalDateTime.now());
         
-        c.setViolationList(new ArrayList<>());
+        
         
         // Create CitationCodeViolationLink objects to wrap each incoming CodeViolation
         // with metadata
-        for(CodeViolation cv: c.getViolationList()){
-            CitationCodeViolationLink ccvl = new CitationCodeViolationLink(cv);
-            ccvl.setCreatedBy(creator);
-            ccvl.setLinkCreatedByUserID(creator.getUserID());
-            ccvl.setCitVStatus(getDefaultCitationViolationStatusEnumVal());
-            ccvl.setLinkSource(sc.getBObSource(Integer.parseInt(
-                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("bobsource_internalhuman"))));
-            c.getViolationList().add(ccvl);
-            
+        if(c.getViolationList() != null && !c.getViolationList().isEmpty()){
+            for(CodeViolation cv: c.getViolationList()){
+                CitationCodeViolationLink ccvl = new CitationCodeViolationLink(cv);
+                ccvl.setCreatedBy(creator);
+                ccvl.setLinkCreatedByUserID(creator.getUserID());
+                ccvl.setCitVStatus(getDefaultCitationViolationStatusEnumVal());
+                ccvl.setLinkSource(sc.getBObSource(Integer.parseInt(
+                        getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("bobsource_internalhuman"))));
+                c.getViolationList().add(ccvl);
+            }
         }
         freshID = cei.insertCitation(c);
         c.setCitationID(freshID);
