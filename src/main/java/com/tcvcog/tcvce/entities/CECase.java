@@ -295,7 +295,7 @@ public class        CECase
             System.out.println("CECase.assembleCitationListNonDraft: list size" + citationList.size());
             for(Citation cit: citationList){
                 // look for citations which are not in draft state
-                if(cit.getStatus().isNonStatusEditsForbidden()){
+                if(cit.getMostRecentStatusLogEntry().isNonStatusEditsForbidden()){
                     citl.add(cit);
                     System.out.println("CECase.assembleCitationListNonDraft: found non-draft citation ID " + cit.getCitationID());
                 }

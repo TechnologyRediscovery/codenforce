@@ -351,6 +351,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
                                             </div>
                                         </h:form>
+                                        <h:form id="case-refresh-trigger-form">
+                                            <h:outputText value="#{!empty ceCaseSearchProfileBB.reloadCECaseTrigger
+                                                                   ? ceCaseSearchProfileBB.getPrettyDate(ceCaseSearchProfileBB.reloadCECaseTrigger) 
+                                                                   : ''}" />
+                                            
+                                        </h:form>
                                     </p:panel>
 
 

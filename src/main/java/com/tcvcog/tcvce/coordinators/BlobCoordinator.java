@@ -357,7 +357,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * them but blob linking at this level is rather abstract
      * 
      * @param bl to which all links should be removed
-     * @param blenum if null, i'll delete records from ALL linking tables!!
+     * @param blenum if null, i'll delete records from ALL linking tables, otherwise I'll remove links
+     * to the given bloblight in the linking table specified by the given enum
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */

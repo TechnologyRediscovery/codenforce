@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import javax.annotation.PostConstruct;
@@ -317,7 +318,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
                 cse = cecase_configureCECaseStageAndPhase(cse);
             }
-        } catch (BObStatusException ex) {
+        } catch (BObStatusException | BlobException ex) {
             System.out.println(ex);
         }
 
@@ -1405,7 +1406,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             // COUNT BY Citation status
             if(!citl.isEmpty()){
                 for(Citation cit: citl){
-                    String statTitle = cit.getStatus().getStatus().getStatusTitle();
+                    String statTitle = cit.getMostRecentStatusLogEntry().getStatus().getStatusTitle();
                     if(citStatusMap.containsKey(statTitle)){
                         Integer statCount = citStatusMap.get(statTitle) + 1;
                         citStatusMap.put(statTitle, statCount);
@@ -2308,7 +2309,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return fully-baked citation objects
      * @throws IntegrationException 
      */
-    private List<Citation> citation_getCitationList(CECase cse) throws IntegrationException, BObStatusException{
+    private List<Citation> citation_getCitationList(CECase cse) throws IntegrationException, BObStatusException, BlobException{
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         List<Citation> citList = new ArrayList<>();
         if(cse!= null){
@@ -2326,11 +2327,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * Logic passthrough for acquiring a list of all possible citation statuses
      * that can be attached to a CitationStatusLogEntry
      * 
-     * @return 
+     * @return sorted status list
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
     public List<CitationStatus> citation_getCitationStatusList() throws IntegrationException{
        CourtEntityIntegrator cei = getCourtEntityIntegrator();
-       return cei.getCitationStatusList();
+       List<CitationStatus> statusList = cei.getCitationStatusList();
+       if(statusList != null && !statusList.isEmpty()){
+           Collections.sort(statusList);
+       }
+       return statusList;
         
         
     }
@@ -2354,8 +2360,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param citationID
      * @return
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public Citation citation_getCitation(int citationID) throws IntegrationException, BObStatusException {
+    public Citation citation_getCitation(int citationID) throws IntegrationException, BObStatusException, BlobException {
         if(citationID == 0){
             throw new BObStatusException("Cannot get citation with an ID of 0");
             
@@ -2372,15 +2379,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cit
      * @return 
      */
-    private Citation citation_configureCitation(Citation cit) throws IntegrationException, BObStatusException{
+    private Citation citation_configureCitation(Citation cit) throws IntegrationException, BObStatusException, BlobException{
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         PersonCoordinator pc = getPersonCoordinator();
+        BlobCoordinator bc = getBlobCoordinator();
 
         cit.setViolationList(cei.getCodeViolationsByCitation(cit));
-        cit.setStatusLog(cei.buildCitationStatusLog(cit));
+        cit.setStatusLog(citation_getCitationStatusLog(cit));
         cit.setHumanLinkList(pc.assembleLinkedHumanLinks(cit));
         cit.setDocketNos(cei.getCitationDocketRecords(cit));
-        
+        cit.setBlobList(bc.getBlobLightList(cit));
         // TODO: populate citation with events and blobs--but this can cycle, so be careful
      
        
@@ -2497,10 +2505,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if(     c == null 
                 || creator == null 
                 || c.getFilingOfficer() == null
-                || c.getViolationList() == null 
-                || c.getViolationList().isEmpty()){
-            throw new BObStatusException("Cannot issue citation with null citation, creator, issuing officer, or violation list");
-            
+                || c.getViolationList() == null){ 
+            throw new BObStatusException("Cannot issue citation with null citation, creator, issuing officer, or violation list.");
+        }
+        if(c.getViolationList().isEmpty()){
+            throw new BObStatusException("Citations must cite at least one code violation;");
         }
         
         c.setCreatedBy(creator);
@@ -2513,19 +2522,27 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // Create CitationCodeViolationLink objects to wrap each incoming CodeViolation
         // with metadata
         if(c.getViolationList() != null && !c.getViolationList().isEmpty()){
-            for(CodeViolation cv: c.getViolationList()){
-                CitationCodeViolationLink ccvl = new CitationCodeViolationLink(cv);
-                ccvl.setCreatedBy(creator);
-                ccvl.setLinkCreatedByUserID(creator.getUserID());
-                ccvl.setCitVStatus(getDefaultCitationViolationStatusEnumVal());
-                ccvl.setLinkSource(sc.getBObSource(Integer.parseInt(
+            for(CitationCodeViolationLink cv: c.getViolationList()){
+                cv.setLinkCreatedByUserID(creator.getUserID());
+                cv.setLinkLastUpdatedByUserID(creator.getUserID());
+                CitationViolationStatusEnum cvse = getDefaultCitationViolationStatusEnumVal();
+                StringBuilder sb = new StringBuilder();
+                sb.append("Citation-Violation status initially set to: ");
+                sb.append(cvse.getLabel());
+                sb.append(" on ");
+                sb.append(LocalDate.now().toString());
+                cv.setNotes(sb.toString());
+                cv.setCitVStatus(cvse);
+                
+                cv.setLinkSource(sc.getBObSource(Integer.parseInt(
                         getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("bobsource_internalhuman"))));
-                c.getViolationList().add(ccvl);
+                
             }
         }
         freshID = cei.insertCitation(c);
         c.setCitationID(freshID);
-        cei.linkViolationsToCitation(c);
+        cei.insertCitationCodeViolationLink(c);
+        
         return freshID;
         
     }
@@ -2549,13 +2566,51 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     
     /**
      * Factory method for citation status log entry objects
-     * @return 
+     * @return the factoried object
      */
-    public CitationStatusLogEntry citation_getStatusLogEntrySkeleton(){
+    public CitationStatusLogEntry citation_getStatusLogEntrySkeleton(Citation cit){
         CitationStatusLogEntry csle = new CitationStatusLogEntry();
         
         csle.setDateOfRecord(LocalDateTime.now());
+        if(cit != null && cit.getOrigin_courtentity() != null){
+            csle.setCourtEntity(cit.getOrigin_courtentity());
+        }
         return csle;
+    }
+    
+
+    /**
+     * Builds a complete citation status log
+     * @param cit
+     * @return 
+     */
+    public List<CitationStatusLogEntry> citation_getCitationStatusLog(Citation cit) throws BObStatusException, IntegrationException{
+        if(cit == null){
+            throw new BObStatusException("Cannot build citationlog with null citation");
+        }
+        
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        List<Integer> idl = cei.citation_getStatusLog(cit);
+        List<CitationStatusLogEntry> log = new ArrayList<>();
+        if(idl != null && !idl.isEmpty()){
+            for(Integer i: idl){
+                log.add(citation_getCitationStatusLogEntry(i));
+            }
+        }
+        Collections.sort(log);
+        Collections.reverse(log);
+        return log;
+    }
+    
+    /**
+     * Extracts a single citation status log entry from the db
+     * @param logid
+     * @return 
+     */
+    public CitationStatusLogEntry citation_getCitationStatusLogEntry(int logid) throws IntegrationException{
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        return cei.getCitationStatusLogEntry(logid);
+        
     }
     
     
@@ -2656,6 +2711,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
        }
        return null;
    }
+   
+   public CitationDocketRecord citation_getCitationDocketRecord(int docketID) throws BObStatusException, IntegrationException{
+       if(docketID == 0){
+           throw new BObStatusException("cannot get docket from ID = 0");
+       }
+       CourtEntityIntegrator cei = getCourtEntityIntegrator();
+       return cei.getCitationDocketRecord(docketID);
+       
+   }
     
     
     /**
@@ -2720,9 +2784,65 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         cei.updateCitation(c);
 
     }
+    
+    
+    /**
+     * Updates a record in the citationviolation table
+     * @param ccvl
+     * @param updateNotes
+     * @param ua
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void citation_updateCitationCodeViolationLink(CitationCodeViolationLink ccvl, String updateNotes, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(ccvl == null || ccvl.getCitationViolationID() == 0 || ua == null){
+            throw new BObStatusException("Cannot update codeviolationcitation link with null inputs");
+        }
+        SystemCoordinator sc = getSystemCoordinator();
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+
+        StringBuilder freshNote = new StringBuilder();
+        freshNote.append("Citation-Violation link ID ");
+        freshNote.append(ccvl.getCitationViolationID());
+        freshNote.append(" status updated to ");
+        freshNote.append(ccvl.getCitVStatus().getLabel());
+        freshNote.append("<br />");
+        freshNote.append("With notes: ");
+        freshNote.append("<br />");
+        freshNote.append(updateNotes);
+
+        MessageBuilderParams mbp = new MessageBuilderParams(ccvl.getLinkNotes(), 
+                null, null, freshNote.toString(), getSessionBean().getSessUser(), null);
+        
+        ccvl.setLinkNotes(sc.appendNoteBlock(mbp));
+        ccvl.setLinkLastUpdatedByUserID(ua.getUserID());
+        cei.updateCitationCodeViolationLink(ccvl);
+        
+    }
+    
+    /**
+     * Deactivates a record in the citationviolation table
+     * @param ccvl
+     * @param ua
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void citation_deactivateCitationCodeViolationLink(CitationCodeViolationLink ccvl, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(ccvl == null || ccvl.getCitationViolationID() == 0 || ua == null){
+            throw new BObStatusException("Cannot update codeviolationcitation link with null inputs");
+        }
+        
+        CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        ccvl.setLinkCreatedByUserID(ua.getUserID());
+        ccvl.setLinkDeactivatedByUserID(ua.getUserID());
+        cei.deactivateCitationCodeViolationLink(ccvl);
+        
+    }
 
     /**
      * Logic intermediary for updating fields on Citations in the DB
+     * and deactivating all associated objects: citation dockets, log records, 
+     * blob links, person links, and codeviolation links, and event links
      *
      * @param c
      * @param ua
@@ -2732,11 +2852,52 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public void citation_removeCitation(Citation c, UserAuthorized ua) throws IntegrationException, BObStatusException, AuthorizationException {
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         UserCoordinator uc = getUserCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
+        BlobCoordinator bc = getBlobCoordinator();
         
         if(c != null && ua != null){
             uc.auth_verifyUserAuthorizedRank_MeetOrExceed_SECURITYCRITICAL(ua, MIN_RANK_TO_ISSUE_CITATION);
             c.setDeactivatedBy(ua);
             cei.deactivateCitation(c);
+            System.out.println("CaseCoordinator.citation_removeCitation | deactivated citation ID: " + c.getCecaseID());
+            // deactivate associated objects: log entries
+            if(c.getStatusLog() != null && !c.getStatusLog().isEmpty()){
+                for(CitationStatusLogEntry csle: c.getStatusLog()){
+                    citation_deactivateCitationStatusLogEntry(csle, ua);
+                    System.out.println("CaseCoordinator.citation_removeCitation | deactivated status log ID: " + csle.getLogEntryID());
+                }
+            }
+            // deactivate associated objects: dockets
+            if(c.getDocketNos()!= null && !c.getDocketNos().isEmpty()){
+                for(CitationDocketRecord cdr: c.getDocketNos()){
+                    citation_deactivateDocketEntry(cdr, ua);
+                    System.out.println("CaseCoordinator.citation_removeCitation | deactivated docket ID: " + cdr.getDocketID());
+                }
+            }
+            // deactivate associated objects: citationviolations
+            if(c.getViolationList() != null && !c.getViolationList().isEmpty()){
+                for(CitationCodeViolationLink ccvl: c.getViolationList()){
+                    citation_deactivateCitationCodeViolationLink(ccvl, ua);
+                    System.out.println("CaseCoordinator.citation_removeCitation | deactivated citation violation link: " + ccvl.getCitationViolationID());
+                }
+            }
+            // deactivate associated objects: personlinks
+            if(c.getHumanLinkList() != null && !c.getHumanLinkList().isEmpty()){
+                for(HumanLink hl: c.getHumanLinkList()){
+                    pc.deactivateHumanLink(hl, ua);
+                    System.out.println("CaseCoordinator.citation_removeCitation | deactivated human link link: " + hl.getLinkID());
+                }
+            }
+            // deactivate associated objects: bloblinks
+            if(c.getBlobList() != null && !c.getBlobList().isEmpty()){
+                for(BlobLight bl: c.getBlobList()){
+                    bc.deleteLinksToPhotoDocRecord(bl, BlobLinkEnum.CITATION);
+                    System.out.println("CaseCoordinator.citation_removeCitation | deactivated links to blob light: " + bl.getPhotoDocID());
+                }
+            }
+            
+            // deactivate associated objects: related events
+            // Not sure until we write the events!
         }
     }
 
@@ -3429,23 +3590,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         return vl;
         
     }
-    
-    /**
-     * Utility method for grabbing a list of CodeViolations given a CECase
-     * TODO: Currently causes infinite recursion
-     * @param ceCase
-     * @return
-     * @throws IntegrationException
-     * @throws com.tcvcog.tcvce.domain.BObStatusException
-     */
-    public List<CodeViolation> violation_getCodeViolations(CECaseDataHeavy ceCase) throws IntegrationException, BObStatusException {
-        CaseIntegrator ci = getCaseIntegrator();
-        if (ceCase == null){
-            throw new BObStatusException("Cannot get violation list for a null case");
-        }
-        List<CodeViolation> vlist = violation_getCodeViolations(ceCase);
-              
-        return vlist;
-    }
+   
 
 } // close class

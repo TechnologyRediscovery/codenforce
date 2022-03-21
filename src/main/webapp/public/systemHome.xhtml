@@ -31,8 +31,9 @@
 
                                         <div class="publi-login-container">
 
-                                            <div class="publi-login-title">
-                                                WELCOME TO <span style="float:right"><span style="color: #DEE461">CODE</span><span style="color:#00B4ED">NFORCE</span> !</span> 
+                                            <div class="publi-login-title"
+                                                 style="margin-left: 20px; margin-right:auto;">
+                                                WELCOME TO <span style="color: #DEE461">CODE</span><span style="color:#00B4ED">NFORCE</span> ! 
                                             </div>
 
                                             <div class="public-login-button">
@@ -41,14 +42,32 @@
                                                                  action="#{loginBB.loginToMissionControl}"
                                                                  style="width: 100%"/>
                                             </div>
+                                            
                                             <div class="public-login-text">
-                                                <p>
-                                                    Release Alpha: 0.81 (0857h-15-MAR-2022)
-                                                </p>
-                                                <ul>
-                                                    <li>Events now can contain person links! After you create an event, then click view/edit in its display table, and then "Manage event-person connections "</li>
-                                                    <li>Mailing address linking is now active. You are always linking either a property or a person to the session's current address, which is displayed under the session Property session box. Manage property address connections in the property profile page and the person address connections in the person profile dialog, accessed with "person - view/edit" in the Person session box. </li>
-                                                </ul>
+                                             
+                                                <p:spacer height="20px" />
+                                                <h2>Release notes</h2>
+                                                <p:accordionPanel id="release-panel">
+                                                    <p:tab title="Release Alpha 0.82: Monday, 21-March-2022 @ 0623h">
+                                                        <ul>
+                                                            <li>Platinum Citations are now live for final testing. Viewing an old citation or creating a new citation on CECase profile now allows you to enter a docket number, record individual violation statuses, and create a date-stamped log of each phase of the citation life cycle. Photos/documents can be uploaded directly. Person links coming soon.</li>
+                                                            <li>File uploads on CE case are working again using our unified photo-doc interface. File size limit is still around 10mb, but the solution has been found for an upcoming release.</li>
+                                                        </ul>
+                                                        
+                                                        
+                                                    </p:tab>
+                                                    <p:tab title="Release Alpha: 0.81: 15-MAR-2022 @ 0857h" >
+                                                        <ul>
+                                                            <li>Events now can contain person links! After you create an event, then click view/edit in its display table, and then "Manage event-person connections "</li>
+                                                            <li>Mailing address linking is now active. You are always linking either a property or a person to the session's current address, which is displayed under the session Property session box. Manage property address connections in the property profile page and the person address connections in the person profile dialog, accessed with "person - view/edit" in the Person session box. </li>
+                                                        </ul>
+                                                        
+                                                        
+                                                    </p:tab>
+                                                          
+                                                    
+                                                </p:accordionPanel>
+                                                
                                             </div>
                                            
 

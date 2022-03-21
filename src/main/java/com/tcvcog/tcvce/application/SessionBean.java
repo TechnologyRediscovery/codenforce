@@ -43,6 +43,7 @@ import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -155,11 +156,7 @@ public class    SessionBean
             System.out.println(ex);
         }
 
-        try {
-            sessPropertyList = pc.assemblePropertyHistoryList(sessUser.getKeyCard());
-        } catch (BObStatusException ex) {
-            System.out.println(ex.getMessage());
-        }
+       
     }
     
     
@@ -239,6 +236,8 @@ public class    SessionBean
     private CECase sessCECaseQueued;
     private ActivatableRouteEnum sessCECaseListRoute;
     private List<CECasePropertyUnitHeavy> sessCECaseList;
+    
+    private LocalDateTime sessCECaseRefreshTrigger;
     
     private PageModeEnum ceCaseSearchProfilePageModeRequest;
     private PageModeEnum ceCaseViolationsPageModeRequest; 
@@ -533,7 +532,7 @@ public class    SessionBean
                 sessCECase = csedh;
                 
                 sessProperty = pc.assemblePropertyDataHeavy(pc.getProperty(cse.getParcelKey()), ua);
-                sessPropertyList = pc.assemblePropertyHistoryList(ua.getKeyCard());
+//                sessPropertyList = pc.assemblePropertyHistoryList(ua.getKeyCard());
                 // Turned off to avoid the case list getting set to zero
 //                sessCECaseList = sessProperty.getCeCaseList();
                 
@@ -2136,6 +2135,20 @@ public class    SessionBean
      */
     public void setSessBlobLightListForRefreshUptake(List<BlobLight> sessBlobLightListForRefreshUptake) {
         this.sessBlobLightListForRefreshUptake = sessBlobLightListForRefreshUptake;
+    }
+
+    /**
+     * @return the sessCECaseRefreshTrigger
+     */
+    public LocalDateTime getSessCECaseRefreshTrigger() {
+        return sessCECaseRefreshTrigger;
+    }
+
+    /**
+     * @param sessCECaseRefreshTrigger the sessCECaseRefreshTrigger to set
+     */
+    public void setSessCECaseRefreshTrigger(LocalDateTime sessCECaseRefreshTrigger) {
+        this.sessCECaseRefreshTrigger = sessCECaseRefreshTrigger;
     }
 
     

@@ -209,11 +209,15 @@ public  class       Citation
         this.statusLog = status;
     }
     
-    public CitationStatusLogEntry getStatus(){
+    /**
+     * Special getter that returns the first element in the sorted status log
+     * @return 
+     */
+    public CitationStatusLogEntry getMostRecentStatusLogEntry(){
         if(statusLog != null && !statusLog.isEmpty()){
             return statusLog.get(0); // return the first, most current status log entry
         } 
-        return null;
+        return new CitationStatusLogEntry();
     }
 
     /**

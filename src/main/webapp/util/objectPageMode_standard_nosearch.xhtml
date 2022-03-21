@@ -184,7 +184,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                         <h:outputText    id="citation-status-ot"
                                                                          styleClass="data_field_value"
-                                                                         value="#{citationBB.currentCitation.status.statusTitle}"/>
+                                                                         value="#{citationBB.currentCitation.mostRecentStatusLogEntry.statusTitle}"/>
                                                     </div>
 
                                                     <div    id="citation-dor-div"
@@ -531,7 +531,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                         <p:selectOneMenu id="citation-update-status-som" 
                                                                          required="false" 
-                                                                         value="#{citationBB.currentCitation.status}">
+                                                                         value="#{citationBB.currentCitation.mostRecentStatusLogEntry}">
                                                             <f:converter converterId="citationStatusConverter"/>
                                                             <f:selectItems value="#{citationBB.citationStatusList}"
                                                                            var="cs" itemValue="#{cs}" itemLabel="#{cs.statusTitle}"/>
@@ -567,7 +567,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                  toggleable="true"
                                                  collapsed="false"
                                                  header="Update Citation"
-                                                 rendered="#{citationBB.activeUpdateMode and !citationBB.currentCitation.status.nonStatusEditsForbidden}"
+                                                 rendered="#{citationBB.activeUpdateMode and !citationBB.currentCitation.mostRecentStatusLogEntry.nonStatusEditsForbidden}"
                                                  >
                                             <h:form id="citation-update-form">
 

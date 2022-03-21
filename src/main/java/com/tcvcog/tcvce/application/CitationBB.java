@@ -12,6 +12,7 @@ import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.Citation;
@@ -20,6 +21,7 @@ import com.tcvcog.tcvce.entities.CitationDocketRecord;
 import com.tcvcog.tcvce.entities.CitationFilingType;
 import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
+import com.tcvcog.tcvce.entities.CitationViolationStatusEnum;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.CourtEntity;
 import com.tcvcog.tcvce.entities.EventType;
@@ -27,7 +29,9 @@ import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,21 +46,23 @@ import javax.faces.event.ActionEvent;
 public class CitationBB extends BackingBeanUtils {
 
     private Citation currentCitation;
-        
     private List<User> filingOfficerCandidateList;
-    
     private String formNoteText;
-    
     private List<CitationFilingType> citationFilingTypeList;
 
     private boolean issueCitationDisabled;
     private boolean updateCitationDisabled;
     private String formNoteCitationText;
+    private User citationIssuingOfficer;
     
+    // CITATION - VIOLATION LINKS
     private List<CodeViolation> removedViolationList;
     private String citationEditEventDescription;
+    private CitationCodeViolationLink currentCitationViolationLink;
+    private String formCitationViolationLinkNotes;
+    private List<CitationViolationStatusEnum> citationViolationStatusEnumList;
     
-    private User citationIssuingOfficer;
+    
     
     //    DOCKETS 
     private boolean citationDocketEditMode;
@@ -104,7 +110,7 @@ public class CitationBB extends BackingBeanUtils {
         citationStatusEditMode = false;
         citationDocketEditMode = false;
         citationInfoEditMode = false;
-        
+        citationViolationStatusEnumList = Arrays.asList(CitationViolationStatusEnum.values());
         
     }
     
@@ -151,16 +157,28 @@ public class CitationBB extends BackingBeanUtils {
         
     }
     
+    /**
+     * Listener for requests to refresh the current citation
+     */
     public void refreshCurrentCitation(){
         CaseCoordinator cc = getCaseCoordinator();
         try {
             currentCitation = cc.citation_getCitation(currentCitation.getCitationID());
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | BlobException ex) {
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
         }
         
+    }
+    
+    
+    /**
+     * Internal method for telling the session bean that
+     * the cecase profile should refresh its cecase
+     */
+    private void triggerParentCECaseReload(){
+        getSessionBean().setSessCECaseRefreshTrigger(LocalDateTime.now());
     }
     
     /**
@@ -169,6 +187,7 @@ public class CitationBB extends BackingBeanUtils {
    public void onCitationEditModeToggle(){
         if(citationInfoEditMode){
             onCitationUpdateCommitButtonChange(null);
+            refreshCurrentCitation();
         }
         citationInfoEditMode = !citationInfoEditMode;
        System.out.println("CitationBB.onCitationEditModeToggle: End of method citationInfoEditMode is: " + citationInfoEditMode);
@@ -214,9 +233,15 @@ public class CitationBB extends BackingBeanUtils {
         if(currentCitation != null){
             try {
                 cc.citation_insertCitation(currentCitation, getSessionBean().getSessUser());
+                refreshCurrentCitation();
+                triggerParentCECaseReload();
+                onStatusLogEntryAddInitButtonChange(null);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "New citation added to database!", ""));
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Please make a citation status log entry now.", ""));
             } catch (IntegrationException | BObStatusException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -263,21 +288,24 @@ public class CitationBB extends BackingBeanUtils {
     
     /**
      * Listener for user requests to start the citation removal process
-     * @param cit 
+     * @param ev
      */
-    public void onCitationRemoveInitButtonChange(Citation cit){
-        setCurrentCitation(cit);
+    public void onCitationRemoveInitButtonChange(ActionEvent ev){
+        System.out.println("CitationBB.onCitationRemoveInitButtonChange");
     }
     
      /**
      * Listener for user requests to remove a citation
      *
-     * @return
+     * @param ev
      */
     public void onCitationRemoveCommitButtonChange(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.citation_removeCitation(getCurrentCitation(), getSessionBean().getSessUser());
+            cc.citation_removeCitation(currentCitation, getSessionBean().getSessUser());
+            refreshCurrentCitation();
+            triggerParentCECaseReload();
+                    
         } catch (IntegrationException | BObStatusException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -315,6 +343,7 @@ public class CitationBB extends BackingBeanUtils {
         try {
 
             cc.citation_updateNotes(mbp, getCurrentCitation());
+            refreshCurrentCitation();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Succesfully appended note!", ""));
@@ -327,11 +356,20 @@ public class CitationBB extends BackingBeanUtils {
         
     }
     
+    
+     
+   
+    
+    /* **********************************************/
+    /* ********** CITATION VIOLATION TOODL **********/
+    /* **********************************************/
+    
     /**
      * Listener for user requests to remove a violation from a citation
      * @param v 
      */
     public void onCitationViolationRemoveButtonChange(CitationCodeViolationLink v) {
+        System.out.println("CitationBB.onCitationViolationRemoveButtonChange | CITV ID: " + v.getCitationViolationID());
         getCurrentCitation().getViolationList().remove(v);
         getRemovedViolationList().add(v);
     }
@@ -341,11 +379,56 @@ public class CitationBB extends BackingBeanUtils {
      * @param v 
      */
     public void onCitationViolationRestoreButtonChange(CitationCodeViolationLink v) {
+        System.out.println("CitationBB.onCitationViolationRestoreButtonChange | CITV ID: " + v.getCitationViolationID());
         getCurrentCitation().getViolationList().add(v);
         getRemovedViolationList().remove(v);
     }
     
     
+    
+    /**
+     * Listener for user requests to start the status update for a citation
+     * violation 
+     * @param ccvl 
+     */
+    public void onCitationViolationStatusUpdateInit(CitationCodeViolationLink ccvl){
+        currentCitationViolationLink = ccvl;
+        formCitationViolationLinkNotes = "";
+        
+    }
+    
+    /**
+     * Listener for users who are done with updating a citation violation status
+     * and I'll automatically append the update and notes to the notes column
+     * @param ev 
+     */
+    public void onCitationViolationStatusUpdateCommit(ActionEvent ev){
+        SystemCoordinator sc = getSystemCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
+        if(currentCitationViolationLink != null){
+            try {
+                cc.citation_updateCitationCodeViolationLink(currentCitationViolationLink, formCitationViolationLinkNotes, getSessionBean().getSessUser());
+                refreshCurrentCitation();
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Updated citation violation status!", ""));
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error updating citation-violation link", ""));
+            } 
+        }
+    }
+    
+   /**
+    * Listener to view the history of the citation violation link
+    * @param ccvl 
+    */
+    public void onCitationViolationView(CitationCodeViolationLink ccvl){
+        currentCitationViolationLink = ccvl;
+        
+    }
    
      
    
@@ -364,19 +447,33 @@ public class CitationBB extends BackingBeanUtils {
     }
     
     /**
+     * Listener for user requests to view the citation status log entry
+     * @param csle 
+     */
+    public void onCitationStatusLogEntryEditButtonChange(CitationStatusLogEntry csle){
+        System.out.println("CitationBB.onCitationStatusLogEntryEditButtonChange | Viewing CSLE ID " + csle.getLogEntryID());
+        citationStatusEditMode = true;
+        currentCitationStatusLogEntry = csle;
+    }
+    
+    
+    /**
      * Listener for user requests to edit a citation's status record 
      */
    public void onCitationStatusLogEditModeToggle(){
         // clicking done means save edits
         if(citationStatusEditMode){
-            if(currentCitationStatusLogEntry != null && currentCitationStatusLogEntry.getLogEntryID() == 0){
-                onStatusLogEntryAddCommitButtonChange(null);
-                System.out.println("citationBB.onStatusLogEntryAddCommitButtonChange | called on status edit mode toggle");
-            } else {
-                onStatusLogEntryEditCommitButtonChange(null);
-                System.out.println("citationBB.onStatusLogEntryEditCommitButtonChange | called on status edit mode toggle");
+            if(currentCitationStatusLogEntry != null){
+                if(currentCitationStatusLogEntry.getLogEntryID() == 0){
+                    onStatusLogEntryAddCommitButtonChange(null);
+                    System.out.println("citationBB.onStatusLogEntryAddCommitButtonChange | called on status edit mode toggle");
+                } else {
+                    onStatusLogEntryEditCommitButtonChange(null);
+                    System.out.println("citationBB.onStatusLogEntryEditCommitButtonChange | called on status edit mode toggle");
+                }
+                refreshCurrentCitation();
+                triggerParentCECaseReload();
             }
-            refreshCurrentCitation();
         }
         citationStatusEditMode = !citationStatusEditMode;
         System.out.println("CitationBB.onCitationStatusLogEditModeToggle | citationStatusEditMode val is " + citationStatusEditMode);
@@ -396,7 +493,7 @@ public class CitationBB extends BackingBeanUtils {
     */
    public void onStatusLogEntryAddInitButtonChange(ActionEvent ev){
        CaseCoordinator cc = getCaseCoordinator();
-       currentCitationStatusLogEntry = cc.citation_getStatusLogEntrySkeleton();
+       currentCitationStatusLogEntry = cc.citation_getStatusLogEntrySkeleton(currentCitation);
        citationStatusEditMode = true;
    }
    
@@ -411,7 +508,8 @@ public class CitationBB extends BackingBeanUtils {
        
         try {
             int freshID = cc.citation_insertCitationStatusLogEntry(currentCitation, currentCitationStatusLogEntry, getSessionBean().getSessUser());
-             getFacesContext().addMessage(null,
+            currentCitationStatusLogEntry =cc.citation_getCitationStatusLogEntry(freshID);
+            getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Created log entry with ID " + freshID, ""));
         } catch (BObStatusException | IntegrationException ex) {
@@ -423,16 +521,7 @@ public class CitationBB extends BackingBeanUtils {
        
    }
    
-    
-   /**
-    * Listener for user requests to start the edit operation
-    * @param ev 
-    */
-   public void onStatusLogEntryEditInitButtonChange(ActionEvent ev){
-       // Nothing to do here yet
        
-   }
-   
     /**
      * Listener for user requests to commit edits to the current log entry
      * @param ev 
@@ -441,6 +530,7 @@ public class CitationBB extends BackingBeanUtils {
         CaseCoordinator cc = getCaseCoordinator();
         try {
             cc.citation_updateCitationStatusLogEntry(currentCitation, currentCitationStatusLogEntry, getSessionBean().getSessUser());
+            currentCitationStatusLogEntry = cc.citation_getCitationStatusLogEntry(currentCitationStatusLogEntry.getLogEntryID());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Updated log entry ID: " + currentCitationStatusLogEntry.getLogEntryID(), ""));
@@ -471,6 +561,8 @@ public class CitationBB extends BackingBeanUtils {
         CaseCoordinator cc = getCaseCoordinator();
         try {
             cc.citation_deactivateCitationStatusLogEntry(currentCitationStatusLogEntry, getSessionBean().getSessUser());
+            refreshCurrentCitation();
+            triggerParentCECaseReload();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                            "Success! Removed citation status log entry ID " + currentCitationStatusLogEntry.getLogEntryID(), ""));
@@ -507,7 +599,7 @@ public class CitationBB extends BackingBeanUtils {
         
         currentCitationStatusLogEntry.setNotes(sc.appendNoteBlock(mbp));
         try {
-            sc.writeNotes(currentCitationDocket, getSessionBean().getSessUser());
+            sc.writeNotes(currentCitationStatusLogEntry, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Added note to Status Log ID " + currentCitationStatusLogEntry.getLogEntryID(),""));
@@ -534,6 +626,16 @@ public class CitationBB extends BackingBeanUtils {
     
     
     /**
+     * Listener to view a docket
+     * @param cdr 
+     */
+    public void onDocketEditButtonChange(CitationDocketRecord cdr){
+        currentCitationDocket = cdr;
+        citationDocketEditMode = true;
+    }
+    
+    
+    /**
      * Listener for user requests to edit a citation docket record info
      */
    public void onCitationDocketEditModeToggle(){
@@ -542,6 +644,7 @@ public class CitationBB extends BackingBeanUtils {
                onDocketAddCommitButtonChange();
            } else {
                onDocketEditCommitButtonChange(null);
+               
            }
            refreshCurrentCitation();
        }
@@ -549,6 +652,16 @@ public class CitationBB extends BackingBeanUtils {
         
         System.out.println("CitationBB.onCitationDocketEditModeToggle | citationDocketEditMode val is " + citationDocketEditMode);
    } 
+   
+   /**
+    * Internal refresher of dockets!
+    * @throws BObStatusException
+    * @throws IntegrationException 
+    */
+   private void refreshCurrentDocket() throws BObStatusException, IntegrationException{
+       CaseCoordinator cc = getCaseCoordinator();
+       currentCitationDocket = cc.citation_getCitationDocketRecord(currentCitationDocket.getHostPK());
+   }
     
    
    /**
@@ -569,11 +682,13 @@ public class CitationBB extends BackingBeanUtils {
    public void onDocketAddCommitButtonChange(){
        CaseCoordinator cc = getCaseCoordinator();
         try {
-            cc.citation_insertDocketEntry(currentCitationDocket, getSessionBean().getSessUser());
+            int freshID = cc.citation_insertDocketEntry(currentCitationDocket, getSessionBean().getSessUser());
+            currentCitationDocket = cc.citation_getCitationDocketRecord(freshID);
+            
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Docket added to citation.", ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
@@ -588,10 +703,11 @@ public class CitationBB extends BackingBeanUtils {
         CaseCoordinator cc = getCaseCoordinator();
         try {
             cc.citation_updateDocketEntry(currentCitationDocket, getSessionBean().getSessUser());
+            refreshCurrentDocket();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Updated docket Number: " + currentCitationDocket.getDocketNumber(), ""));
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -615,6 +731,9 @@ public class CitationBB extends BackingBeanUtils {
         CaseCoordinator cc = getCaseCoordinator();
         try {
             cc.citation_deactivateDocketEntry(currentCitationDocket, getSessionBean().getSessUser());
+            refreshCurrentCitation();
+            triggerParentCECaseReload();
+            
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Removed Docket ID: " + currentCitationDocket.getDocketID(), ""));
@@ -651,6 +770,8 @@ public class CitationBB extends BackingBeanUtils {
         currentCitationDocket.setNotes(sc.appendNoteBlock(mbp));
         try {
             sc.writeNotes(currentCitationDocket, getSessionBean().getSessUser());
+            refreshCurrentCitation();
+            refreshCurrentDocket();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Added note to Docket ID " + currentCitationDocket.getDocketID(),""));
@@ -988,6 +1109,51 @@ public class CitationBB extends BackingBeanUtils {
     public void setStatusNotesFormText(String statusNotesFormText) {
         this.statusNotesFormText = statusNotesFormText;
     }
+
+    /**
+     * @return the currentCitationViolationLink
+     */
+    public CitationCodeViolationLink getCurrentCitationViolationLink() {
+        return currentCitationViolationLink;
+    }
+
+    /**
+     * @param currentCitationViolationLink the currentCitationViolationLink to set
+     */
+    public void setCurrentCitationViolationLink(CitationCodeViolationLink currentCitationViolationLink) {
+        this.currentCitationViolationLink = currentCitationViolationLink;
+    }
+
+    /**
+     * @return the formCitationViolationLinkNotes
+     */
+    public String getFormCitationViolationLinkNotes() {
+        return formCitationViolationLinkNotes;
+    }
+
+    /**
+     * @param formCitationViolationLinkNotes the formCitationViolationLinkNotes to set
+     */
+    public void setFormCitationViolationLinkNotes(String formCitationViolationLinkNotes) {
+        this.formCitationViolationLinkNotes = formCitationViolationLinkNotes;
+    }
+
+    /**
+     * @return the citationViolationStatusEnumList
+     */
+    public List<CitationViolationStatusEnum> getCitationViolationStatusEnumList() {
+        return citationViolationStatusEnumList;
+    }
+
+    /**
+     * @param citationViolationStatusEnumList the citationViolationStatusEnumList to set
+     */
+    public void setCitationViolationStatusEnumList(List<CitationViolationStatusEnum> citationViolationStatusEnumList) {
+        this.citationViolationStatusEnumList = citationViolationStatusEnumList;
+    }
+
+    
+  
     
    
 }

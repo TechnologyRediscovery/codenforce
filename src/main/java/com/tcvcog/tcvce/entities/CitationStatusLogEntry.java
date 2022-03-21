@@ -29,7 +29,8 @@ import java.time.LocalDateTime;
  */
 public class    CitationStatusLogEntry 
         extends TrackedEntity
-        implements IFace_noteHolder{
+        implements IFace_noteHolder,
+        Comparable<Object>{
     
     final static String CITATION_STATUS_TABLE = "citationcitationstatus";
     final static String CITATION_STATUS_PKFIELD = "citationstatusid";
@@ -188,6 +189,17 @@ public class    CitationStatusLogEntry
     @Override
     public String getNoteHolderFriendlyName() {
         return HF_NAME;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if(o instanceof CitationStatusLogEntry){
+            CitationStatusLogEntry csle = (CitationStatusLogEntry) o;
+            if(this.getDateOfRecord() != null && csle.getDateOfRecord() != null){
+                return this.getDateOfRecord().compareTo(((CitationStatusLogEntry) o).getDateOfRecord());
+            }
+        }
+        return 0;
     }
     
 }

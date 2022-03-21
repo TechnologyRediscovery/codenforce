@@ -53,15 +53,37 @@ ALTER TABLE public.citationdocketno
 
 ALTER TABLE occchecklistspacetypeelement ADD COLUMN notes text;
 
+--ALTER TYPE linkedobjectroleschema ADD VALUE 'CitationDocketHuman';
 
 
+ALTER TYPE citationviolationstatus ADD VALUE 'FILED';
+ALTER TYPE citationviolationstatus ADD VALUE 'AWAITING_PLEA';
+ALTER TYPE citationviolationstatus ADD VALUE 'CONTINUED';
+ALTER TYPE citationviolationstatus ADD VALUE 'GUILTY';
+ALTER TYPE citationviolationstatus ADD VALUE 'NO_CONTEST';
+ALTER TYPE citationviolationstatus ADD VALUE 'DISMISSED';
+ALTER TYPE citationviolationstatus ADD VALUE 'COMPLIANCE';
+ALTER TYPE citationviolationstatus ADD VALUE 'INVALID';
+ALTER TYPE citationviolationstatus ADD VALUE 'WITHDRAWN';
+ALTER TYPE citationviolationstatus ADD VALUE 'NOT_GUILTY';
+ALTER TYPE citationviolationstatus ADD VALUE 'OTHER';
+
+
+
+UPDATE noticeofviolation SET notifyingofficer_userid = creationby WHERE notifyingofficer_userid IS NULL;
+ALTER TABLE citationstatus ADD COLUMN displayorder INTEGER DEFAULT 1;
+ALTER TABLE public.parcelunit ADD COLUMN location_occlocationdescriptor integer;
+
+ALTER TABLE public.parcelunit
+  ADD CONSTRAINT parcelunit_loc_locationdescriptionid_fk FOREIGN KEY (location_occlocationdescriptor)
+      REFERENCES public.occlocationdescriptor (locationdescriptionid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 -- *******************************
 -- run on remote system up to here
 -- *******************************
-UPDATE noticeofviolation SET notifyingofficer_userid = creationby WHERE notifyingofficer_userid IS NULL;
 
-
+ALTER TABLE citation DROP COLUMN active;
 
 
 CREATE OR REPLACE FUNCTION public.cnf_nov_udpatestaticsendersigfields(targetmunicode INTEGER)

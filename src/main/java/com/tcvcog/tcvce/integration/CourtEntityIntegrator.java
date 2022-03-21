@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -28,6 +29,7 @@ import com.tcvcog.tcvce.entities.CitationDocketRecord;
 import com.tcvcog.tcvce.entities.CitationFilingType;
 import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
+import com.tcvcog.tcvce.entities.CitationViolationStatusEnum;
 import com.tcvcog.tcvce.entities.CourtEntity;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.ViolationStatusEnum;
@@ -396,16 +398,15 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
      * Second half of the citation insert process: linking violations to their
      * parent citation
      * @param cit 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public void linkViolationsToCitation(Citation cit) throws IntegrationException{
+    public void insertCitationCodeViolationLink(Citation cit) throws IntegrationException{
         
         if(cit != null){
-            
-
             String queryCitationViolationTable = "INSERT INTO public.citationviolation(\n" +
                             "            citationviolationid, citation_citationid, codeviolation_violationid, \n" +
                             "            createdts, lastupdatedts, status, createdby_userid, \n" +
-                            "            lastupdatedby_userid, notes, linksource)\n" +
+                            "            lastupdatedby_userid, notes, source_sourceid)\n" +
                             "    VALUES (DEFAULT, ?, ?, \n" +
                             "            now(), now(), CAST(? AS citationviolationstatus), ?, \n" +
                             "            ?, ?, ?);";
@@ -428,17 +429,18 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
                     } else {
                         stmt.setNull(3, java.sql.Types.NULL);
                     }
-                    if(cit.getCreatedBy() != null){
-                        stmt.setInt(4, cit.getCreatedBy().getUserID());
+                    
+                    if(ccvl.getLinkCreatedByUserID() != 0){
+                        stmt.setInt(4, ccvl.getLinkCreatedByUserID());
                     } else {
                         stmt.setNull(4, java.sql.Types.NULL);
                     }
-                    if(cit.getLastUpdatedBy() != null){
-                        stmt.setInt(5, cit.getLastUpdatedBy().getUserID());
+                    if(ccvl.getLinkLastUpdatedByUserID() != 0){
+                        stmt.setInt(5, ccvl.getLinkLastUpdatedByUserID());
                     } else {
                         stmt.setNull(5, java.sql.Types.NULL);
                     }
-                    stmt.setString(6, ccvl.getNotes());
+                    stmt.setString(6, ccvl.getLinkNotes());
                     if(ccvl.getLinkSource() != null){
                         stmt.setInt(7, ccvl.getLinkSource().getSourceid());
                     } else {
@@ -458,9 +460,116 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             } // close finally
         } else {
             throw new IntegrationException("Cannot link violations to a citation NULL citation");
-            
+        }
+    }
+    
+    /**
+     * Updates a record in the citationviolation table
+     * @param ccvl
+     * @throws IntegrationException 
+     */
+     public void updateCitationCodeViolationLink(CitationCodeViolationLink ccvl) throws IntegrationException, BObStatusException{
+        
+        if(ccvl == null){
+           throw new BObStatusException("Cannot update citation violation with null input");
         }
         
+        String queryCitationViolationTable = "UPDATE public.citationviolation\n" +
+        "   SET lastupdatedts=now(), status=CAST(? AS citationviolationstatus), lastupdatedby_userid=?, notes=?, source_sourceid=? \n" +
+        " WHERE citationviolationid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(queryCitationViolationTable);
+
+            if(ccvl.getCitVStatus() != null){
+                stmt.setString(1, ccvl.getCitVStatus().toString());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            
+            if(ccvl.getLinkLastUpdatedByUserID() != 0){
+                stmt.setInt(2, ccvl.getLinkLastUpdatedByUserID());
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            stmt.setString(3, ccvl.getLinkNotes());
+            
+            if(ccvl.getLinkSource() != null){
+                stmt.setInt(4, ccvl.getLinkSource().getSourceid());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(5, ccvl.getCitationViolationID());
+            
+            
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update citation code violation record, sorry.", ex);
+
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
+    }
+    /**
+     * Deactivates a record in the citationviolation table; I only check for a non-zero 
+     * deactivator and I'll set deacTS to now()
+     * 
+     * @param ccvl
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+     public void deactivateCitationCodeViolationLink(CitationCodeViolationLink ccvl) throws IntegrationException, BObStatusException{
+        
+        if(ccvl == null){
+           throw new BObStatusException("Cannot update citation violation with null input");
+        }
+        
+        String queryCitationViolationTable = "UPDATE public.citationviolation\n" +
+        "   SET lastupdatedts=now(), lastupdatedby_userid=?, deactivatedts=now(), deactivatedby_userid=? \n" +
+        " WHERE citationviolationid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+
+            stmt = con.prepareStatement(queryCitationViolationTable);
+
+            
+            if(ccvl.getLinkLastUpdatedByUserID()!= 0){
+                stmt.setInt(1, ccvl.getLinkLastUpdatedByUserID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            
+            if(ccvl.getLinkDeactivatedByUserID() != 0){
+                stmt.setInt(2, ccvl.getLinkDeactivatedByUserID());
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(3, ccvl.getCitationViolationID());
+            
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update citation code violation record, sorry.", ex);
+
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+
     }
 
     
@@ -913,7 +1022,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
                         "	INNER JOIN public.citation ON citation.citationid = citationviolation.citation_citationid\n" +
                         "	INNER JOIN public.codeviolation on codeviolation.violationid = citationviolation.codeviolation_violationid\n" +
                         "	INNER JOIN public.cecase ON cecase.caseid = codeviolation.cecase_caseID\n" +
-                        "	WHERE codeviolation.cecase_caseID=? AND citation.isactive=TRUE;";
+                        "	WHERE codeviolation.cecase_caseID=? AND citation.deactivatedts IS NULL;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -991,12 +1100,17 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
         try {
             CaseCoordinator cc = getCaseCoordinator();
             SystemIntegrator si = getSystemIntegrator();
+            SystemCoordinator sc = getSystemCoordinator();
             CitationCodeViolationLink cvl = new CitationCodeViolationLink(cc.violation_getCodeViolation(rs.getInt("codeviolation_violationid")));
             
             si.populateTrackedLinkFields(cvl, rs);
             cvl.setCitationViolationID(rs.getInt("citationviolationid"));
+            cvl.setLinkNotes(rs.getString("notes"));
+            if(rs.getInt("source_sourceid") != 0){
+                cvl.setLinkSource(sc.getBObSource(rs.getInt("source_sourceid")));
+            }
             if(rs.getString("status") != null){
-                cvl.setStatus(ViolationStatusEnum.valueOf(rs.getString("status")));
+                cvl.setCitVStatus(CitationViolationStatusEnum.valueOf(rs.getString("status")));
             }
             
             return cvl;
@@ -1126,7 +1240,6 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
      * Writes a new record into the citationcitationstatus table to track
      * the movement a given citation through the court process
      * 
-     * @param cit to which the log entry should be attached
      * @param csle the populated lot entry
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
@@ -1194,7 +1307,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
         }
         
         String query =  "UPDATE public.citationcitationstatus\n" +
-                        "   SET  lastupdatedts=now(), lastupdatedby_userid=?"
+                        "   SET  lastupdatedts=now(), lastupdatedby_userid=?,"
                 + "         deactivatedts=now(), deactivatedby_userid=? " +
                         " WHERE citationstatusid=?;";
         Connection con = getPostgresCon();
@@ -1239,17 +1352,14 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
      * @return 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public List<CitationStatusLogEntry> buildCitationStatusLog(Citation cit) throws IntegrationException{
-           String query =  "SELECT citationstatusid, citation_citationid, citationstatus_statusid, \n" +
-                            "       dateofrecord, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
-                            "       deactivatedts, deactivatedby_userid, notes, citationcitationstatus.courtentity_entityid AS ccs_ceid, statusid, statusname, description, icon_iconid, editsforbidden, \n" +
-                            "       eventrule_ruleid\n" +
+    public List<Integer> citation_getStatusLog(Citation cit) throws IntegrationException{
+           String query =  "SELECT citationstatusid \n" +
                             "  FROM public.citationcitationstatus JOIN public.citationstatus ON citationcitationstatus.citationstatus_statusid = statusid\n" +
                             "  WHERE citation_citationid=? AND deactivatedts IS NULL ORDER BY dateofrecord ASC;	";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        List<CitationStatusLogEntry> statusLog = new ArrayList<>();
+        List<Integer> statusLogIDList = new ArrayList<>();
         
         try {
             stmt = con.prepareStatement(query);
@@ -1257,7 +1367,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                statusLog.add(generateCitationStatusLogEntry(rs));
+                statusLogIDList.add(rs.getInt("citationstatusid"));
                 
             }
             
@@ -1270,8 +1380,48 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return statusLog;           
+        return statusLogIDList;           
     }
+    
+    /**
+     * Extracts a single citation status log entry from the DB
+     * @param logRecID
+     * @return
+     * @throws IntegrationException 
+     */
+    public CitationStatusLogEntry getCitationStatusLogEntry(int logRecID) throws IntegrationException{
+        String query =  "SELECT citationstatusid, citation_citationid, citationstatus_statusid, \n" +
+                        "       dateofrecord, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
+                        "       deactivatedts, deactivatedby_userid, notes, courtentity_entityid\n" +
+                        "  FROM public.citationcitationstatus WHERE citationstatusid = ?;";
+                
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        CitationStatusLogEntry statusLog = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, logRecID);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                statusLog = generateCitationStatusLogEntry(rs);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot generate citation status log entry, sorry", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return statusLog;   
+        
+        
+   }
     
     /**
      * Generator method for CitationStatusLog Entries
@@ -1285,7 +1435,8 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             CitationStatusLogEntry csle = new CitationStatusLogEntry();
             
             csle.setLogEntryID(rs.getInt("citationstatusid"));
-            csle.setStatus(generateCitationStatus(rs));
+            csle.setCitationID(rs.getInt("citation_citationid"));
+            csle.setStatus(getCitationStatus(rs.getInt("citationstatus_statusid")));
             
             if(rs.getTimestamp("dateofrecord") != null){
                 csle.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());
@@ -1293,7 +1444,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             
             csle.setNotes(rs.getString("notes"));
             
-            csle.setCourtEntity(getCourtEntity(rs.getInt("ccs_ceid")));
+            csle.setCourtEntity(getCourtEntity(rs.getInt("courtentity_entityid")));
             
             si.populateTrackedFields(csle, rs, false);
             
@@ -1431,7 +1582,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
     public CitationStatus getCitationStatus(int statusID) throws IntegrationException{
             
         String query =  "SELECT statusid, statusname, description, icon_iconid, editsforbidden, \n" +
-                        "       eventrule_ruleid "
+                        "       eventrule_ruleid, displayorder "
                         + "FROM citationStatus WHERE statusid=?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1516,6 +1667,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             cs.setDescription(rs.getString("description"));
             cs.setIcon(si.getIcon(rs.getInt("icon_iconid")));
             cs.setEditsForbidden(rs.getBoolean("editsforbidden"));
+            cs.setDisplayOrder(rs.getInt("displayorder"));
             cs.setEventRuleAbstract(wi.rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
         
         } catch (SQLException | BObStatusException ex) {

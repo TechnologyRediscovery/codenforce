@@ -40,7 +40,7 @@ public enum CitationViolationStatusEnum {
         label = lab;
     }
     
-    public String getLable(){
+    public String getLabel(){
         return label;
     }
     

@@ -311,6 +311,10 @@ i.material-icons{
 
 /* ------------LINKS ------------------------- */
 
+.command-link-text{
+    color: blue;
+    font-weight: bold;
+}
 
 a:link{
     /*text-decoration: none;*/
@@ -2654,7 +2658,7 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
     padding-bottom: 30px;;
     font-size: 2em;
     width: 100%;
-    text-align: justify;
+    text-align: left;
     font-weight: bold;
     display: inline-block;
 }
@@ -2666,7 +2670,7 @@ body .ui-datatable .ui-datatable-header, body .ui-datatable .ui-datatable-footer
 }
 
 .public-login-text{
-    text-align: justify;
+    text-align: left;
     width: 100%;
 }
 

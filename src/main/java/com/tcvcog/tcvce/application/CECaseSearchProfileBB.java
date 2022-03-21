@@ -356,6 +356,37 @@ public class CECaseSearchProfileBB
         
     }
     
+    /**
+     * Special getter that tells this bean to check the session for a refresh 
+     * trigger timestamp.
+     * @return 
+     */
+    public LocalDateTime getReloadCECaseTrigger(){
+        LocalDateTime trigger = getSessionBean().getSessCECaseRefreshTrigger();
+        if(trigger != null){
+            reloadCase();
+            System.out.println("CECaseSearchProfileBB.getReloadCECaseTrigger: "+ getPrettyDateNoTime(trigger));
+            trigger = null;
+            getSessionBean().setSessCECaseRefreshTrigger(trigger);
+        }
+        return trigger;
+        
+    }
+    
+    /**
+     * provides the ID of the component for accessory UIs to refresh so the CE case is
+     * refreshed. Updating this component will call getReloadCECaseTrigger which, if not null
+     * triggers a reload.
+     * @return 
+     */
+    public String getReloadCECaseComponentIDToUpdate(){
+        return "case-refresh-trigger-form";
+    }
+    
+    
+    /**
+     * Gets a new cecase data heavy
+     */
     public void reloadCase(){
         CaseCoordinator cc = getCaseCoordinator();
         try {

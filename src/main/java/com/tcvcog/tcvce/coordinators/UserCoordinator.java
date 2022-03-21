@@ -373,7 +373,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("Cannot verify rank (meet or exceed) with null User or Role");
             
         }
-        if(ua.getKeyCard().getGoverningAuthPeriod().getRole() != rt){
+        if(ua.getKeyCard().getGoverningAuthPeriod().getRole().getRank() < rt.getRank()){
             StringBuilder sb = new StringBuilder();
             sb.append("User with rank: ");
             sb.append(ua.getKeyCard().getGoverningAuthPeriod().getRole().getLabel());

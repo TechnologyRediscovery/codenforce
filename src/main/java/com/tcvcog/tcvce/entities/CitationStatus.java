@@ -22,11 +22,13 @@ package com.tcvcog.tcvce.entities;
  * 
  * @author Ellen Bascomb of Apartment 31Y
  */
-public class CitationStatus 
-        extends Status{
+public class CitationStatus
+        extends Status
+implements Comparable<Object>{
     
     protected boolean editsForbidden;
     private EventRuleAbstract eventRuleAbstract;
+    protected int displayOrder;
 
     /**
      * @return the editsForbidden
@@ -56,6 +58,35 @@ public class CitationStatus
      */
     public void setEventRuleAbstract(EventRuleAbstract eventRuleAbstract) {
         this.eventRuleAbstract = eventRuleAbstract;
+    }
+
+    /**
+     * @return the displayOrder
+     */
+    public int getDisplayOrder() {
+        return displayOrder;
+    }
+
+    /**
+     * @param displayOrder the displayOrder to set
+     */
+    public void setDisplayOrder(int displayOrder) {
+        this.displayOrder = displayOrder;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if(o instanceof CitationStatus){
+            CitationStatus st = (CitationStatus) o;
+            if(this.displayOrder > st.displayOrder){
+                return 1;
+            } else if (this.displayOrder == st.displayOrder){
+                return 0;
+            } else {
+                return -1;
+            }
+        }
+        else return 0;
     }
     
 }

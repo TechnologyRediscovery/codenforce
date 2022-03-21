@@ -269,7 +269,7 @@
 
                                         <p:spacer height="5px" />
                                         <h:outputText styleClass="bold" value="Status: " />
-                                        <h:outputText value="#{citation.status.statusTitle}"/>
+                                        <h:outputText value="#{citation.mostRecentStatusLogEntry.statusTitle}"/>
 
                                         <p:spacer height="5px" />
 
@@ -303,7 +303,7 @@
                                             <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
                                             <h:outputText id="v-source-year-compactlist-ot" value="#{citv.violatedEnfElement.source.sourceYear})"/>
                                             <h:outputText id="sep-compactlist-line-ot" value=" | "/>
-                                            <h:outputText id="status-compactlist-line-ot" value="#{citv.status.label}"/>
+                                            <h:outputText id="status-compactlist-line-ot" value="#{citv.mostRecentStatusLogEntry.label}"/>
                                         </p:dataScroller>
                                     </h:panelGroup>
                                 </h:panelGrid>

@@ -451,7 +451,7 @@
                                         <h:outputText value="#{citation.dateOfRecordPretty}"/>
                                         <p:spacer height="5px" />
                                         <h:outputText value="Status: " />
-                                        <h:outputText value="#{citation.status.statusTitle}"/>
+                                        <h:outputText value="#{citation.mostRecentStatusLogEntry.statusTitle}"/>
                                         <p:spacer height="5px" />
                                         <h:outputText value="Issued by: " />
                                         <h:outputText value="#{citation.userOwner.person.lastName}"/>
@@ -495,7 +495,7 @@
                                                 <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
                                                 <h:outputText id="v-source-year-compactlist-ot" value="#{citv.violatedEnfElement.source.sourceYear})"/>
                                                 <h:outputText id="sep-compactlist-line-ot" value=" | "/>
-                                                <h:outputText id="status-compactlist-line-ot" value="#{citv.status.label}"/>
+                                                <h:outputText id="status-compactlist-line-ot" value="#{citv.mostRecentStatusLogEntry.label}"/>
                                             </p:dataScroller>
                                         </div>
                                     </f:facet>
