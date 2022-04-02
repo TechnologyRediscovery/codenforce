@@ -70,6 +70,8 @@ ALTER TYPE citationviolationstatus ADD VALUE 'OTHER';
 
 
 
+
+
 UPDATE noticeofviolation SET notifyingofficer_userid = creationby WHERE notifyingofficer_userid IS NULL;
 ALTER TABLE citationstatus ADD COLUMN displayorder INTEGER DEFAULT 1;
 ALTER TABLE public.parcelunit ADD COLUMN location_occlocationdescriptor integer;
@@ -79,13 +81,101 @@ ALTER TABLE public.parcelunit
       REFERENCES public.occlocationdescriptor (locationdescriptionid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION;
 
--- *******************************
--- run on remote system up to here
--- *******************************
+ALTER TABLE public.occperiod ADD COLUMN parcelunit_unitid INTEGER 
+    CONSTRAINT occperiod_parcelunitid_fk REFERENCES parcelunit (unitid);
+
+
+
+
+
+
+
+-- DOES NOT RUN ON LIVE SYSTEM, dropping all occ periods insteaad
+-- UPDATE pubic.occperiod SET parcelunit_unitid = propertyunit_unitid;
+
+DELETE FROM occinspectedspaceelementphotodoc;
+DELETE FROM occinspectedspaceelement;
+DELETE FROM occinspectedspace;
+DELETE FROM occinspectionphotodoc;
+DELETE FROM occinspection;
+DELETE FROM occperiodeventrule;
+DELETE FROM choiceproposal WHERE occperiod_periodid IS NOT NULL;
+DELETE FROM loginobjecthistory WHERE occperiod_periodid IS NOT NULL;
+DELETE FROM eventhuman WHERE event_eventid IN (SELECT eventid FROM event WHERE occperiod_periodid IS NOT NULL);
+DELETE FROM public.event WHERE occperiod_periodid IS NOT NULL;
+DELETE FROM occpermitapplication;
+DELETE FROM occperiodphotodoc;
+DELETE FROM occperiod;
+
+ALTER TABLE public.occperiod DROP COLUMN propertyunit_unitid;
+
+
+ALTER TABLE public.occperiod ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occperiod ADD COLUMN deactivatedby_userid INTEGER 
+    CONSTRAINT occperiod_deactivatedby_fk REFERENCES login (userid);
+
+ALTER TABLE public.occperiod
+   ALTER COLUMN parcelunit_unitid SET NOT NULL;
+
+ALTER TABLE public.occperiod DROP COLUMN active;
+
+ALTER TABLE public.parcelmailingaddress ADD CONSTRAINT parcelmailingaddress_mailingaddressid_fk
+    FOREIGN KEY (mailingparcel_mailingid) REFERENCES mailingaddress (addressid);
+
+ALTER TABLE public.parcelmailingaddress RENAME COLUMN mailingparcel_parcelid TO parcel_parcelkey;
+ALTER TABLE public.parcelmailingaddress RENAME COLUMN mailingparcel_mailingid TO mailingaddress_addressid;
+
+ALTER TABLE public.cecase ADD COLUMN parcel_parcelkey INTEGER
+    CONSTRAINT cecase_parcelkey_fk REFERENCES parcel (parcelkey);
+
+ALTER TABLE public.ceactionrequest ADD COLUMN parcel_parcelkey INTEGER
+    CONSTRAINT cecase_parcelkey_fk REFERENCES parcel (parcelkey);
+
+-- now copy the propertyid into the parcelID column as long as it exists in parcel. What to do with the nulls?
+UPDATE public.cecase SET parcel_parcelkey = property_propertyid
+WHERE property_propertyid IN (SELECT parcelkey from parcel);
+
+ALTER TABLE public.cecase
+   ALTER COLUMN property_propertyid DROP NOT NULL;
+
+ALTER TABLE public.cecase ADD COLUMN parcelunit_unitid INTEGER 
+    CONSTRAINT cecase_parcelunitid_fk REFERENCES parcelunit (unitid);
+
+ALTER TABLE public.cecase DROP COLUMN propertyunit_unitid;
+
+
+
+ALTER TABLE public.parcelunit
+   ALTER COLUMN unitnumber SET DEFAULT 'DEFAULT';
+
+-- make all the default units by parcel
+INSERT INTO public.parcelunit (parcel_parcelkey)
+    SELECT parcelkey FROM public.parcel;
+
+UPDATE public.parcelunit SET createdts = now(), lastupdatedts = now(), createdby_userid=99, lastupdatedby_userid=99;
+UPDATE public.parcelunit SET source_sourceid=8;
+
 
 ALTER TABLE citation DROP COLUMN active;
 
+-- CROSS-APPLICABILITY OF OCC INSPECTIONS with CE case side
 
+ALTER TABLE occinspection ADD COLUMN cecase_caseid INTEGER 
+    CONSTRAINT occinspection_cecaseid_fk REFERENCES cecase (caseid);
+
+ALTER TABLE public.occinspection
+   ALTER COLUMN occperiod_periodid DROP NOT NULL;
+
+-- ******************************* run on REMOTE system up to here *******************************
+
+-- ******************************* run on LOCAL TEST system up to here *******************************
+
+
+
+
+
+
+-- EXTRA STUFF 
 CREATE OR REPLACE FUNCTION public.cnf_nov_udpatestaticsendersigfields(targetmunicode INTEGER)
     RETURNS INTEGER AS
 $BODY$

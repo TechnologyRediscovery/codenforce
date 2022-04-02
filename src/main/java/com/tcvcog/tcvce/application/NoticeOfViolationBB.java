@@ -999,6 +999,27 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     }
 
+     /**
+      * Special getter for person links--I check the session beean's
+      * PersonLinkList to see if there is a new list to send to the UI
+      * 
+     * @return the recipientPersonCandidateList
+     */
+    public List<Person> getRecipientPersonCandidateList() {
+        if(getSessionBean().getSessHumanListRefreshedList() != null){
+            PersonCoordinator pc = getPersonCoordinator();
+            try {
+                recipientPersonCandidateList = pc.getPersonListFromHumanLinkList(getSessionBean().getSessHumanListRefreshedList());
+                getSessionBean().setSessHumanListRefreshedList(null);
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+            } 
+        }
+        return recipientPersonCandidateList;
+    }
+    
+    
+    
     /**
      * @return the currentNotice
      */
@@ -1096,12 +1117,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         this.recipientPersonID = recipientPersonID;
     }
 
-    /**
-     * @return the recipientPersonCandidateList
-     */
-    public List<Person> getRecipientPersonCandidateList() {
-        return recipientPersonCandidateList;
-    }
+   
 
     /**
      * @param recipientPersonCandidateList the recipientPersonCandidateList to set

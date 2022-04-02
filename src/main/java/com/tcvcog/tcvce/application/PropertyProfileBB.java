@@ -68,6 +68,7 @@ public class PropertyProfileBB
     private List<EventCategory> ceCaseOriginiationEventCandidateList;
     private boolean ceCaseUnitAssociated;
     private PropertyUnit ceCaseUnitAssociation;
+    private String formUnitNoteText;
     
     
     private OccPeriod currentOccPeriod;
@@ -85,7 +86,6 @@ public class PropertyProfileBB
     private List<IntensityClass> landBankProspectIntensityList;
     private List<BOBSource> sourceList;
 
-    private List<PropertyExtData> propExtDataListFiltered;
 
     private String formNoteText;
 
@@ -154,9 +154,9 @@ public class PropertyProfileBB
         
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            int newID = oc.insertOccPeriod(currentOccPeriod, currentProperty, getSessionBean().getSessUser());
+            int newID = oc.insertOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
             getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessUser().getMyCredential()));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+        } catch (IntegrationException | BObStatusException | EventException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -195,7 +195,15 @@ public class PropertyProfileBB
         PropertyCoordinator pc = getPropertyCoordinator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
         EventCoordinator ec = getEventCoordinator();
-        currentOccPeriod = oc.getOccPeriodSkeleton(pu, getSessionBean().getSessUser());
+        try {
+            currentOccPeriod = oc.getOccPeriodSkeleton(pu, getSessionBean().getSessUser());
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Unable to start occ period creation process, sorry. ", 
+                        ""));
+        }
         occPeriodOriginiationEventCandidateList = ec.determinePermittedEventCategories(EventType.Occupancy, getSessionBean().getSessUser());
         
         try {
@@ -262,7 +270,7 @@ public class PropertyProfileBB
     public void reloadCurrentPropertyDataHeavy(){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            setCurrentProperty(pc.assemblePropertyDataHeavy(currentProperty, getSessionBean().getSessUser()));
+            currentProperty = pc.assemblePropertyDataHeavy(currentProperty, getSessionBean().getSessUser());
              getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Reloaded property id " + currentProperty.getPropertyID(), ""));
@@ -285,7 +293,7 @@ public class PropertyProfileBB
             
             if(currentProperty.getParcelKey() == 0){
                 // we have a new property 
-             
+                
                 // this page will never have a new property. If we do, throw error
                 System.out.println("PropertyProfileBB.onPropertyEditModeToggleButtonChange | found property without ID on property profile page!! ERROR!");
                 
@@ -332,7 +340,6 @@ public class PropertyProfileBB
         }
         currentParcelInfoEditMode = !currentParcelInfoEditMode;
     }
-    
    
     /**
      * Listener for user requests to commit property updates
@@ -355,7 +362,6 @@ public class PropertyProfileBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not update property, sorries! " + ex.toString(), ""));
         }
-
     }
     
     /**
@@ -375,7 +381,6 @@ public class PropertyProfileBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "FATAL: Could not insert parcel info! " + ex.toString(), ""));
         }
-        
     }
     
     /**
@@ -395,8 +400,6 @@ public class PropertyProfileBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "FATAL: Could not update parcel info! " + ex.toString(), ""));
         }
-
-        
     }
     
       /**
@@ -407,6 +410,7 @@ public class PropertyProfileBB
         if(currentProperty != null){
             List<MailingAddressLink> sessLinkList = getSessionBean().getSessMailingAddressLinkRefreshedList();
             if(sessLinkList != null){
+                System.out.println("PropertyProfileBB.currentPropertyMADLinkList | sessLinkListSize: " + sessLinkList.size());
                 currentProperty.setMailingAddressLinkList(sessLinkList);
                 getSessionBean().setSessMailingAddressLinkRefreshedList(null);
             }
@@ -415,9 +419,6 @@ public class PropertyProfileBB
         return new ArrayList<>();
     }
     
-
-    
-
     /**
      * Listener for when the user aborts a property add operation;
      *
@@ -427,9 +428,6 @@ public class PropertyProfileBB
 
     }
 
-   
-    
-   
     /**
      * Listener for user requests to explore the property info cases on this
      * property
@@ -442,10 +440,8 @@ public class PropertyProfileBB
         if (currentProperty != null && currentProperty.getPropInfoCaseList() != null) {
             getSessionBean().setSessCECaseListWithDowncastAndLookup(currentProperty.getPropInfoCaseList());
         }
-
         return "ceCaseSearch";
     }
-
    
     /**
      * Listener for the user's commencement of the person link process
@@ -459,11 +455,6 @@ public class PropertyProfileBB
         reloadPropertyOnCurrentPropertyGetterCall = true;
         System.out.println("PropertyProfileBB.onPersonConnectInitButtonChange : "+ reloadPropertyOnCurrentPropertyGetterCall);
     }
-
-   
-    
-  
-    
 
     /**
      * Listener for user requests to remove the currently selected ERA;
@@ -481,9 +472,7 @@ public class PropertyProfileBB
      * @param ev 
      */
     public void onPropUnitExploreButtonChange(ActionEvent ev) {
-
         System.out.println("PropertyProfileBB.onPropUnitExploreButtonChange");
-        
     }
 
     /**
@@ -494,7 +483,6 @@ public class PropertyProfileBB
     public void onAdvancedSearchButtonChange(ActionEvent ev) {
 
     }
-
    
     /**
      * Listener for user requests to start the update process
@@ -502,9 +490,6 @@ public class PropertyProfileBB
     public void onPropertyUpdateInit() {
         // nothing to do here yet
     }
-   
-
-   
 
     public String onCreateNewCaseButtonChange() {
         getSessionBean().setSessProperty(currentProperty);
@@ -525,7 +510,19 @@ public class PropertyProfileBB
             return "eventAddEdit";
         }
         return "";
-
+    }
+    
+    /**
+     * Listener for user requests to view an occ period
+     * @param op
+     * @return 
+     */
+    public String onViewOccPeriodButtonChange(OccPeriod op){
+        if(op != null){
+            getSessionBean().setSessOccPeriodFromPeriodBase(op);
+            return "occPeriodWorkflow";
+        }
+        return "";
     }
 
     /**
@@ -543,7 +540,6 @@ public class PropertyProfileBB
         }
         return "ceCaseProfile";
     }
-
   
     /**
      * Listener for user requests to link a new address to the 
@@ -553,10 +549,7 @@ public class PropertyProfileBB
      */
     public void onLinkNewAddressToParcelButtonChange(ActionEvent ev){
         System.out.println("PropertyProfileBB.linkNewAddressToParcel");
-        
-        
     }
-    
     
     // ********************************************************
     // ********************* CECASE ***************************
@@ -578,7 +571,6 @@ public class PropertyProfileBB
         }
         
     }
-    
     
      /**
      * Listener method for creation of a new case
@@ -644,30 +636,10 @@ public class PropertyProfileBB
         return "";
     }
     
-    
-    
-    
-    
-    
     // ********************************************************
     // *******************   UNIT TOOLS ***********************
     // ********************************************************
     
-      public String manageOccPeriod(OccPeriod op) {
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-
-        try {
-            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessUser().getMyCredential()));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not load occupancy period with data" + ex.getMessage(), ""));
-
-        }
-        return "occPeriodWorkflow";
-
-    }
-      
       /**
        * Listener for user requests to view or edit a property unit
        * 
@@ -679,8 +651,10 @@ public class PropertyProfileBB
             currentPropertyUnit = pc.getPropertyUnitWithLists(pu, getSessionBean().getSessUser().getKeyCard());
         } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
             System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not load property unit with lists" + ex.getMessage(), ""));
         } 
-          
       }
 
       /**
@@ -698,7 +672,6 @@ public class PropertyProfileBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Fatal error starting unit creation: " + ex.getMessage(), ""));
         } 
-          
       }
       
       /**
@@ -725,7 +698,6 @@ public class PropertyProfileBB
        */
       public void onUnitEditModeAbortButtonChange(ActionEvent ev){
           unitEditMode = !unitEditMode;
-          
       }
       
       /**
@@ -734,16 +706,54 @@ public class PropertyProfileBB
       private void onUnitAddCommit(){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            pc.insertPropertyUnit(currentPropertyUnit, currentProperty, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                  new FacesMessage(FacesMessage.SEVERITY_INFO,
-                          "Unit add success!", ""));
-        } catch (BObStatusException ex) {
+            int freshID = pc.insertPropertyUnit(currentPropertyUnit, currentProperty, getSessionBean().getSessUser());
+            if(freshID != 0){
+
+                currentPropertyUnit = pc.getPropertyUnitWithLists(pc.getPropertyUnit(freshID), getSessionBean().getSessUser().getKeyCard());
+
+                getFacesContext().addMessage(null,
+                      new FacesMessage(FacesMessage.SEVERITY_INFO,
+                              "Unit add success!", ""));
+            } else {
+                throw new IntegrationException("could not get a non-zero New Unit ID");
+                
+            }
+        } catch (BObStatusException | AuthorizationException | EventException | IntegrationException ex) {
             System.out.println(ex);
               getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Fatal error on unit insert: " + ex.getMessage(), ""));
-            
+        }
+      }
+      
+      /**
+       * Listener for user requests to start the note on unit process
+       * @param ev 
+       */
+      public void onUnitNoteAddInitButtonChange(ActionEvent ev){
+          formUnitNoteText = "";
+      }
+      
+      /**
+       * Listener for user requests to commit a note to a unit
+       * @param ev 
+       */
+      public void onUnitNoteAddCommitButtonChange(ActionEvent ev){
+          SystemCoordinator sc = getSystemCoordinator();
+          PropertyCoordinator pc = getPropertyCoordinator();
+          MessageBuilderParams mbp = new MessageBuilderParams(currentPropertyUnit.getNotes(), null, null , formUnitNoteText, getSessionBean().getSessUser(), null);
+          currentPropertyUnit.setNotes(sc.appendNoteBlock(mbp));
+        try {
+            pc.updatePropertyUnit(currentPropertyUnit, getSessionBean().getSessUser());
+            currentPropertyUnit = pc.getPropertyUnitWithLists(currentPropertyUnit, getSessionBean().getSessUser().getKeyCard());
+            getFacesContext().addMessage(null,
+                  new FacesMessage(FacesMessage.SEVERITY_INFO,
+                          "Unit note update succses! Great work!", ""));
+        } catch (BObStatusException | AuthorizationException  | EventException | IntegrationException  ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                  new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                          "Unit  note write failiure.", ""));
         }
           
       }
@@ -754,32 +764,22 @@ public class PropertyProfileBB
       private void onUnitUpdateCommit(){
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            pc.updatePropertyUnit(currentPropertyUnit, currentProperty, getSessionBean().getSessUser());
+            pc.updatePropertyUnit(currentPropertyUnit,getSessionBean().getSessUser());
+            currentPropertyUnit = pc.getPropertyUnitWithLists(pc.getPropertyUnit(currentPropertyUnit.getUnitID()), getSessionBean().getSessUser().getKeyCard());
             getFacesContext().addMessage(null,
                   new FacesMessage(FacesMessage.SEVERITY_INFO,
                           "Unit update success!", ""));
-        } catch (BObStatusException ex) {
+        } catch (BObStatusException | AuthorizationException | EventException | IntegrationException ex) {
             System.out.println(ex);
               getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Fatal error on unit update: " + ex.getMessage(), ""));
-            
         }
-          
-          
       }
-      
-      
-      
-     
-    
-    
     
     // ********************************************************
     // **********   GETTERS AND SETTERS ***********************
     // ********************************************************
-    
-    
 
     /**
      * The exception to the "no logic in getters and setters" rule: 
@@ -900,12 +900,7 @@ public class PropertyProfileBB
         return sourceList;
     }
 
-    /**
-     * @return the propExtDataListFiltered
-     */
-    public List<PropertyExtData> getPropExtDataListFiltered() {
-        return propExtDataListFiltered;
-    }
+  
 
     /**
      * @return the formNoteText
@@ -1005,12 +1000,7 @@ public class PropertyProfileBB
         this.sourceList = sourceList;
     }
 
-    /**
-     * @param propExtDataListFiltered the propExtDataListFiltered to set
-     */
-    public void setPropExtDataListFiltered(List<PropertyExtData> propExtDataListFiltered) {
-        this.propExtDataListFiltered = propExtDataListFiltered;
-    }
+   
 
     /**
      * @param formNoteText the formNoteText to set
@@ -1213,6 +1203,20 @@ public class PropertyProfileBB
      */
     public void setUnitEditMode(boolean unitEditMode) {
         this.unitEditMode = unitEditMode;
+    }
+
+    /**
+     * @return the formUnitNoteText
+     */
+    public String getFormUnitNoteText() {
+        return formUnitNoteText;
+    }
+
+    /**
+     * @param formUnitNoteText the formUnitNoteText to set
+     */
+    public void setFormUnitNoteText(String formUnitNoteText) {
+        this.formUnitNoteText = formUnitNoteText;
     }
 
   

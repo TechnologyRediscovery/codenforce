@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -52,7 +53,7 @@ import javax.faces.event.ActionEvent;
  * Backer for the OccPeriod
  * @author Ellen Bascomb, JURPLEL
  */
-public class OccPeriodSearchWorkflowBB
+public class OccPeriodBB
         extends BackingBeanUtils {
 
     private OccPeriod lastSavedOccPeriod;
@@ -72,27 +73,11 @@ public class OccPeriodSearchWorkflowBB
     private User selectedManager;
 
 
-//  *******************************
-//  ************ SEARCH ***********
-//  *******************************
-    private List<OccPeriodType> search_occPeriodTypeList;
-
-    private List<QueryOccPeriod> occPeriodQueryList;
-    private QueryOccPeriod occPeriodQuerySelected;
-
-    private List<Property> search_propList;
-    protected List<Person> search_personList;
-
-    private List<OccPeriodPropertyUnitHeavy> occPeriodList;
-    private List<OccPeriodPropertyUnitHeavy> occPeriodListFiltered;
-    private boolean appendResultsToList;
-
-    private SearchParamsOccPeriod searchParamsSelected;
 
     /**
      * Creates a new instance of OccPeriodSearchWorkflowBB
      */
-    public OccPeriodSearchWorkflowBB() {
+    public OccPeriodBB() {
     }
 
     /**
@@ -105,50 +90,19 @@ public class OccPeriodSearchWorkflowBB
         SessionBean sb = getSessionBean();
 
         currentOccPeriod = sb.getSessOccPeriod();
-        
-        setLastSavedOccPeriod(new OccPeriod(currentOccPeriod));
-        PropertyIntegrator pi = getPropertyIntegrator();
+        if(currentOccPeriod != null){
+            occPeriodTypeList = sb.getSessMuni().getProfile().getOccPeriodTypeList();
+            setLastSavedOccPeriod(new OccPeriod(currentOccPeriod));
+            PropertyIntegrator pi = getPropertyIntegrator();
 
-        setOccPeriodTypeList(sb.getSessMuni().getProfile().getOccPeriodTypeList());
+            setOccPeriodTypeList(sb.getSessMuni().getProfile().getOccPeriodTypeList());
 
-        try {
-            currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
-            setPropertyUnitCandidateList(sb.getSessProperty().getUnitList());
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-        }
-
-
-        search_occPeriodTypeList = sb.getSessMuni().getProfile().getOccPeriodTypeList();
-        occPeriodList = sb.getSessOccPeriodList();
-
-        if (occPeriodList != null && occPeriodList.isEmpty()) {
-            occPeriodList = new ArrayList();
-        }
-        appendResultsToList = false;
-        occPeriodQueryList = sb.getQueryOccPeriodList();
-        if (occPeriodQueryList != null && !occPeriodQueryList.isEmpty()) {
-            occPeriodQuerySelected = occPeriodQueryList.get(0);
-        }
-        search_propList = sb.getSessPropertyList();
-        search_personList = sb.getSessPersonList();
-
-        configureParameters();
-    }
-
-    /**
-     * Sets up search fields
-     */
-    private void configureParameters() {
-        if (occPeriodQuerySelected != null
-                &&
-                occPeriodQuerySelected.getParamsList() != null
-                &&
-                !occPeriodQuerySelected.getParamsList().isEmpty()) {
-
-            searchParamsSelected = occPeriodQuerySelected.getParamsList().get(0);
-        } else {
-            searchParamsSelected = null;
+            try {
+                currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+                setPropertyUnitCandidateList(sb.getSessProperty().getUnitList());
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+            }
         }
     }
 
@@ -175,14 +129,6 @@ public class OccPeriodSearchWorkflowBB
     }
 
 
-    public int getPeriodListSize() {
-        int s = 0;
-        if (occPeriodList != null && !occPeriodList.isEmpty()) {
-            s = occPeriodList.size();
-        }
-        return s;
-    }
-
 
     /**
      * Listener for user requests to certify a field on the OccPeriod
@@ -192,7 +138,7 @@ public class OccPeriodSearchWorkflowBB
         FacesContext context = getFacesContext();
         String field = context.getExternalContext().getRequestParameterMap().get("fieldtocertify");
 
-        System.out.println("OccPeriodSearchWorkflowBB.certifyOccPeriodField | field: " + field);
+        System.out.println("occPeriodBB.certifyOccPeriodField | field: " + field);
 
         UserAuthorized u = getSessionBean().getSessUser();
         LocalDateTime now = LocalDateTime.now();
@@ -279,14 +225,14 @@ public class OccPeriodSearchWorkflowBB
             oc.editOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Save successful on OccPeriod ID: " + currentOccPeriod.getPeriodID(), ""));
-            System.out.println("OccPeriodSearchWorkflowBB.saveOccPeriodChanges successful");
+            System.out.println("occPeriodBB.saveOccPeriodChanges successful");
 
             // Set backup copy in case of failure if saving to database succeeds
             setLastSavedOccPeriod(new OccPeriod(currentOccPeriod));
         } catch (IntegrationException | BObStatusException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     ex.getMessage(), ""));
-            System.out.println("OccPeriodSearchWorkflowBB.saveOccPeriodChanges failure");
+            System.out.println("occPeriodBB.saveOccPeriodChanges failure");
 
             // Restore working copy of occ period to last working one if saving to database fails.
             discardOccPeriodChanges();
@@ -298,7 +244,7 @@ public class OccPeriodSearchWorkflowBB
      * set its value to that of the occ period present in the last successful save.
      */
     public void discardOccPeriodChanges() {
-        System.out.println("OccPeriodSearchWorkflowBB.discardOccPeriodChanges");
+        System.out.println("occPeriodBB.discardOccPeriodChanges");
 
         currentOccPeriod = new OccPeriodDataHeavy(getLastSavedOccPeriod());
     }
@@ -347,6 +293,8 @@ public class OccPeriodSearchWorkflowBB
         return "occPeriodWorkflow";
 
     }
+    
+    
 
 
     /**
@@ -376,85 +324,10 @@ public class OccPeriodSearchWorkflowBB
 
         return "occPeriodWorkflow";
     }
+    
+    
 
-    /**
-     * Listener method for requests from the user to clear the results list
-     *
-     */
-    public void clearOccPeriodList() {
-        if (occPeriodList != null) {
-            occPeriodList.clear();
-        }
-    }
-
-    /**
-     * Asks the Coordinator for the OccPeriod viewing history
-     */
-    public void loadOccPeriodHistory() {
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        try {
-            occPeriodList.addAll(oc.getOccPeriodPropertyUnitHeavyList(oc.assembleOccPeriodHistoryList(getSessionBean().getSessUser().getMyCredential())));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to assemble the data-rich occ period", ""));
-
-        }
-    }
-
-    /**
-     * Entry way into the Query world via the SearchCoordinator who is responsible
-     * for calling appropriate Coordinators and configuration methods and such
-     */
-    public void executeQuery() {
-        System.out.println("OccPeriodSearchWorkflowBB.executeQuery");
-        SearchCoordinator sc = getSearchCoordinator();
-        CaseCoordinator cc = getCaseCoordinator();
-        int listSize = 0;
-
-        if (!appendResultsToList) {
-            occPeriodList.clear();
-        }
-        try {
-            occPeriodList.addAll(sc.runQuery(occPeriodQuerySelected).getBOBResultList());
-            if (occPeriodList != null) {
-                listSize = occPeriodList.size();
-            }
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Your query completed with " + listSize + " results", ""));
-        } catch (SearchException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not query for Periods due to search errors, sorry.", ""));
-        }
-    }
-
-    /**
-     * Listener for user requests to start a new query
-     */
-    public void changeQuerySelected() {
-
-        configureParameters();
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "New query loaded!", ""));
-    }
-
-    /**
-     * Listener for user requests to clear out and restart the current Query
-     */
-    public void resetQuery() {
-        SearchCoordinator sc = getSearchCoordinator();
-        occPeriodQueryList = sc.buildQueryOccPeriodList(getSessionBean().getSessUser().getMyCredential());
-        if (occPeriodQueryList != null && !occPeriodQueryList.isEmpty()) {
-            occPeriodQuerySelected = occPeriodQueryList.get(0);
-        }
-        configureParameters();
-
-    }
+   
     
     /**
      * Listener for user requests to view or add blobs to this period
@@ -469,22 +342,32 @@ public class OccPeriodSearchWorkflowBB
         } 
         
     }
-
-
+    
     /**
-     * @return the searchParamsSelected
+     * Special getter that asks the session for its refreshed list
+     * and injects into the current occ period for viewing
+     * @return 
      */
-    public SearchParamsOccPeriod getSearchParamsSelected() {
-        return searchParamsSelected;
+    public List<FieldInspection> getManagedFieldInspectionList(){
+        List<FieldInspection> filist = getSessionBean().getSessFieldInspectionListForRefresh();
+        if(currentOccPeriod != null){
+        System.out.println("OccPeriodBB.getManagedFieldInspectionList() | session filist: " + filist );
+            
+            if(filist != null && !filist.isEmpty()){
+                System.out.println("OccPeriodBB.getManagedFieldInspectionList() | session filist size: " + filist.size());
+                currentOccPeriod.setInspectionList(filist);
+                getSessionBean().setSessFieldInspectionListForRefresh(null);
+                return currentOccPeriod.getInspectionList();
+            } else {
+                return currentOccPeriod.getInspectionList();
+            }
+        } else {
+            return new ArrayList<>();
+        }
     }
 
-    /**
-     * @param searchParamsSelected the searchParamsSelected to set
-     */
-    public void setSearchParamsSelected(SearchParamsOccPeriod searchParamsSelected) {
-        this.searchParamsSelected = searchParamsSelected;
-    }
 
+   
     /**
      * @return the currentOccPeriod
      */
@@ -506,118 +389,7 @@ public class OccPeriodSearchWorkflowBB
         return currentPropertyUnit;
     }
 
-    /**
-     * @return the occPeriodList
-     */
-    public List<OccPeriodPropertyUnitHeavy> getOccPeriodList() {
-        return occPeriodList;
-    }
-
-    /**
-     * @return the occPeriodListFiltered
-     */
-    public List<OccPeriodPropertyUnitHeavy> getOccPeriodListFiltered() {
-        return occPeriodListFiltered;
-    }
-
-    /**
-     * @return the occPeriodQueryList
-     */
-    public List<QueryOccPeriod> getOccPeriodQueryList() {
-        return occPeriodQueryList;
-    }
-
-    /**
-     * @return the occPeriodQuerySelected
-     */
-    public QueryOccPeriod getOccPeriodQuerySelected() {
-        return occPeriodQuerySelected;
-    }
-
-    /**
-     * @param occPeriodList the occPeriodList to set
-     */
-    public void setOccPeriodList(List<OccPeriodPropertyUnitHeavy> occPeriodList) {
-        this.occPeriodList = occPeriodList;
-    }
-
-    /**
-     * @param occPeriodListFiltered the occPeriodListFiltered to set
-     */
-    public void setOccPeriodListFiltered(List<OccPeriodPropertyUnitHeavy> occPeriodListFiltered) {
-        this.occPeriodListFiltered = occPeriodListFiltered;
-    }
-
-    /**
-     * @param occPeriodQueryList the occPeriodQueryList to set
-     */
-    public void setOccPeriodQueryList(List<QueryOccPeriod> occPeriodQueryList) {
-        this.occPeriodQueryList = occPeriodQueryList;
-    }
-
-    /**
-     * @param occPeriodQuerySelected the occPeriodQuerySelected to set
-     */
-    public void setOccPeriodQuerySelected(QueryOccPeriod occPeriodQuerySelected) {
-        this.occPeriodQuerySelected = occPeriodQuerySelected;
-    }
-
-    /**
-     * @return the search_occPeriodTypeList
-     */
-    public List<OccPeriodType> getSearch_occPeriodTypeList() {
-        return search_occPeriodTypeList;
-    }
-
-    /**
-     * @param search_occPeriodTypeList the search_occPeriodTypeList to set
-     */
-    public void setSearch_occPeriodTypeList(List<OccPeriodType> search_occPeriodTypeList) {
-        this.search_occPeriodTypeList = search_occPeriodTypeList;
-    }
-
-    /**
-     * @return the appendResultsToList
-     */
-    public boolean isAppendResultsToList() {
-        return appendResultsToList;
-    }
-
-    /**
-     * @param appendResultsToList the appendResultsToList to set
-     */
-    public void setAppendResultsToList(boolean appendResultsToList) {
-        this.appendResultsToList = appendResultsToList;
-    }
-
-    /**
-     * @return the search_propList
-     */
-    public List<Property> getSearch_propList() {
-        return search_propList;
-    }
-
-    /**
-     * @param search_propList the search_propList to set
-     */
-    public void setSearch_propList(List<Property> search_propList) {
-        this.search_propList = search_propList;
-    }
-
-    /**
-     * @return the search_personList
-     */
-    public List<Person> getSearch_personList() {
-        return search_personList;
-    }
-
-    /**
-     * @param search_personList the search_personList to set
-     */
-    public void setSearch_personList(List<Person> search_personList) {
-        this.search_personList = search_personList;
-    }
-
+   
     /**
      * @return the lastSavedOccPeriod
      */

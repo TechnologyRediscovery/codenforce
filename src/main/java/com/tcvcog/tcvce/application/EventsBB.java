@@ -393,7 +393,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
             // Set a default potentialCategory if there isn't already one in this list
             if (!eventCategories.contains(skeletonEvent.getCategory())){
                 skeletonEvent.setCategory(eventCategories.get(0));
-                potentiallyUpdateFieldsFromCategory();
+                onCategoryChangeUpdateSkeletonEventMembers();
             }
             return eventCategories;
         } else {
@@ -424,33 +424,34 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         setSkeletonDuration(0);
     }
 
+
+    /**
+     * Sets fields of the skeleton event based on the default fields
+     * of the skeleton event's category (if updateFieldsOnCategoryChange is set)
+     */
+    public void onCategoryChangeUpdateSkeletonEventMembers() {
+        if (isUpdateFieldsOnCategoryChange() && skeletonEvent != null && getSkeletonEvent().getCategory() != null) {
+            EventCategory category = skeletonEvent.getCategory();
+
+            skeletonEvent.setTimeStart(LocalDateTime.now());
+            skeletonDuration = category.getDefaultDurationMins();
+
+            skeletonEvent.setDescription(category.getHostEventDescriptionSuggestedText());
+
+            recalculateEndTime();
+        }
+    }
     /**
      * Sets end time of skeleton event based on the duration held in this class,
      * and the start time held in the skeleton event.
      */
     public void recalculateEndTime() {
         // Set end time of potential event to its start time + potential duration
-        if (skeletonEvent == null || skeletonEvent.getTimeStart() == null)
+        if (skeletonEvent == null || skeletonEvent.getTimeStart() == null){
             return;
+        }
 
         skeletonEvent.setTimeEnd(skeletonEvent.getTimeStart().plusMinutes(skeletonDuration));
-    }
-
-    /**
-     * Sets fields of the skeleton event based on the default fields
-     * of the skeleton event's category (if updateFieldsOnCategoryChange is set)
-     */
-    public void potentiallyUpdateFieldsFromCategory() {
-        if (isUpdateFieldsOnCategoryChange() && getSkeletonEvent() != null && getSkeletonEvent().getCategory() != null) {
-            EventCategory category = getSkeletonEvent().getCategory();
-
-            getSkeletonEvent().setTimeStart(LocalDateTime.now());
-            setSkeletonDuration(category.getDefaultDurationMins());
-
-            getSkeletonEvent().setDescription(category.getHostEventDescriptionSuggestedText());
-
-            recalculateEndTime();
-        }
     }
     
     /**
@@ -461,12 +462,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
      */
     private void checkForPersonListReloadTrigger(){
         if(currentEvent != null
-                && getSessionBean().getSessHumanListHolderRefreshTrigger() != null
-                && getSessionBean().getSessHumanListHolderRefreshTrigger() instanceof EventCnF
-                && getSessionBean().getSessHumanListHolderRefreshTrigger().getHostPK() == currentEvent.getEventID()  ){
-            refreshCurrentEvent();
+                && getSessionBean().getSessHumanListRefreshedList() != null  ){
+            
             // clear refresh trigger
-            getSessionBean().setSessHumanListHolderRefreshTrigger(null);
+            getSessionBean().setSessHumanListRefreshedList(null);
         }
     }
     
@@ -599,7 +598,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
     public void setSkeletonDuration(long skeletonDuration) {
         this.skeletonDuration = skeletonDuration;
-        recalculateEndTime();
     }
 
     public EventType getSkeletonType() {
@@ -616,7 +614,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
     public void setUpdateFieldsOnCategoryChange(boolean updateFieldsOnCategoryChange) {
         this.updateFieldsOnCategoryChange = updateFieldsOnCategoryChange;
-        potentiallyUpdateFieldsFromCategory();
+        onCategoryChangeUpdateSkeletonEventMembers();
     }
 
     /**

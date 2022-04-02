@@ -266,17 +266,7 @@
                                                     
                                                     <p:spacer height="5px" />
                                                     
-                                                    <h:outputText value="Session address: "/>
-                                                    <p:spacer height="2px" />
-                                                        <p:commandLink id="activebob-viewaddresses-cb"
-                                                                       value="#{sessionBean.sessMailingAddress.buildingNo} #{sessionBean.sessMailingAddress.street.name}" 
-                                                                       ajax="true"
-                                                                       actionListener="#{addressBB.onMailingAddressViewCurrentAddress}"
-                                                                       oncomplete="PF('address-dialog-var').show();">
-                                                        </p:commandLink>
-                                                    <p:spacer height="2px" />
-                                                    <h:outputText value="#{sessionBean.sessMailingAddress.street.cityStateZip.city}, #{sessionBean.sessMailingAddress.street.cityStateZip.state} #{sessionBean.sessMailingAddress.street.cityStateZip.zipCode}" />
-                                                    <p:spacer height="2px" />
+                                             
                                                     <div class="restrict-main-contents-io-link link-button">
 
                                                         <p:commandLink id="activebob-searchaddresses-cb"
@@ -316,7 +306,6 @@
                                             </h:form>
                                             
                                             <ui:include src="/restricted/cogstaff/prop/compositions/addresses.xhtml"/>
-                                            <ui:include src="/restricted/cogstaff/prop/compositions/addressLinks.xhtml"/>
                                             <ui:include src="/restricted/cogstaff/prop/compositions/propertySearch.xhtml"/>
 
                                         </div>
@@ -344,12 +333,12 @@
 
                                                 <h:outputText value="Person"/>
                                             </div>
-                                            <div class="aob-container aob-container-objectstring">
-
-                                                <h:outputText value="#{sessionBean.sessPerson.name} (ID:#{sessionBean.sessPerson.personID})"/>
-                                            </div>
+                                                
                                             <ui:include src="cogstaff/person/compositions/personTools.xhtml"/>
                                             <h:form id="topnav-pers-form">
+                                                <div class="aob-container aob-container-objectstring">
+                                                    <h:outputText value="#{sessionBean.sessPerson.name} (ID:#{sessionBean.sessPerson.personID})"/>
+                                                </div>
 
                                                 <div class="aob-container aob-container-actions">
 
@@ -368,8 +357,6 @@
                                                                         oncomplete="PF('person-profile-dialog-var').show();"/>
                                                     </div>
 
-                                                  
-
                                                     <div class="restrict-main-contents-io-link link-button">
 
                                                         <p:commandLink  id="activebob-perslist-cb"
@@ -380,12 +367,10 @@
                                                                         update="human-search-dialog
                                                                         search-query-form
                                                                         log-form
-                                                                        person-list-quickloads-form
                                                                         pers-search-results-form
                                                                         pers-selected-form
                                                                         hlh-humlist-form"/>
                                                     </div>
-
                                                 </div>
                                             </h:form>
                                         </div>
@@ -394,10 +379,7 @@
                                                         appendTo="activebob-person"
                                                         dismissable="true">
                                             <h:form id="topnav-perslist-form">
-
-
                                                 <b><h:outputText value="#{sessionBean.sessPersonList.size()} persons:"/></b><br/>
-
                                                 <ui:repeat id="activebob-perslist-repeat"
                                                            value="#{sessionBean.sessPersonList}"
                                                            var="spers">
@@ -407,12 +389,9 @@
                                                         <h:outputText value="#{spers.name} (ID:#{spers.humanID})"/>
                                                         <p:spacer height="3px"/>
                                                     </p:commandLink>
-
-
                                                 </ui:repeat>
                                             </h:form>
                                         </p:overlayPanel>
-
                                     </div>
                                 </div>
 
@@ -504,7 +483,9 @@
                                             </div>
 
                                             <div class="aob-container aob-container-objectstring">
-                                                <h:outputText value="#{sessionBean.sessOccPeriod.type.title} | Unit #{sessionBean.sessOccPeriod.propUnitProp.unitNumber} (ID:#{sessionBean.sessOccPeriod.periodID})"/>
+                                                <h:outputText value="#{!empty sessionBean.sessOccPeriod ? sessionBean.sessOccPeriod.type.title : 'no period'} | Unit #{sessionBean.sessOccPeriod.propUnitProp.unitNumber} (ID:#{sessionBean.sessOccPeriod.periodID})"/>
+                                                <h:outputText value="| Unit #{!empty sessionBean.sessOccPeriod ? sessionBean.sessOccPeriod.propUnitProp.unitNumber : ''}"/>
+                                                <h:outputText value="(ID:#{!empty sessionBean.sessOccPeriod ? sessionBean.sessOccPeriod.periodID : ''})"/>
                                             </div>
                                             <h:form id="topnav-occ-form">
                                                 <div class="aob-container aob-container-actions">
@@ -512,12 +493,14 @@
                                                         <p:commandLink id="activebob-occperiod-view-cl"
                                                                        value="view"
                                                                        ajax="false"
+                                                                       disabled="#{empty sessionBean.sessOccPeriod}"
                                                                        action="#{sessionBean.navigateToPageCorrespondingToObject(sessionBean.sessOccPeriod)}"/>
                                                     </div>
 
                                                     <div class="restrict-main-contents-io-link link-button">
                                                         <p:commandLink  id="activebob-occperiodlist-cb"
-                                                                        value="change"
+                                                                        value="search"
+                                                                        disabled="true"
                                                                         oncomplete="PF('activebob-occperiodlist-overlay-var').show();"/>
                                                     </div>
                                                 </div>

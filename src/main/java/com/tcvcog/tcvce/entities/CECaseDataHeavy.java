@@ -12,6 +12,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 
 /**
  *  Listified CECase object 
@@ -20,14 +21,15 @@ import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
  */
 public class CECaseDataHeavy
         extends CECase
-        implements Cloneable,
-        IFace_EventRuleGoverned,
-        IFace_CredentialSigned,
-        IFace_Loggable,
-        IFace_ActivatableBOB,
-        IFace_PaymentHolder,
-        IFace_BlobHolder,
-        IFace_humanListHolder{
+        implements  Cloneable,
+                    IFace_EventRuleGoverned,
+                    IFace_CredentialSigned,
+                    IFace_Loggable,
+                    IFace_ActivatableBOB,
+                    IFace_PaymentHolder,
+                    IFace_BlobHolder,
+                    IFace_humanListHolder,
+                    IFace_inspectable{
 
     // accessed through methods specified in the interfaces
     final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CECaseHuman;
@@ -39,6 +41,8 @@ public class CECaseDataHeavy
     private PropertyUnit propertyUnit;
     
     protected List<HumanLink> humanLinkList;
+    
+    protected List<FieldInspection> inspectionList;
     
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
@@ -425,6 +429,37 @@ public class CECaseDataHeavy
     @Override
     public int getBlobUpstreamPoolEnumPoolFeederID() {
         return property.parcelKey;
+    }
+
+    /**
+     * @return the inspectionList
+     */
+    @Override
+    public List<FieldInspection> getInspectionList() {
+        return inspectionList;
+    }
+
+    /**
+     * @param inspectionList the inspectionList to set
+     */
+    @Override
+    public void setInspectionList(List<FieldInspection> inspectionList) {
+        this.inspectionList = inspectionList;
+    }
+
+    @Override
+    public DomainEnum getDomainEnum() {
+        return CECASE_ENUM;
+    }
+
+    @Override
+    public User getManager() {
+        return caseManager;
+    }
+
+    @Override
+    public boolean isNewInspectionsAllowed() {
+        return closingDate == null;
     }
 
 }

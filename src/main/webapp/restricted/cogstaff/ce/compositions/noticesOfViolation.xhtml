@@ -978,21 +978,36 @@
                                                : ''}"
                                       escape="false"/>
                     </div>
-
-
-
                 </div>
                 <div class="p-col-6">
-                    <h2>Property-connected persons</h2>
+                    
+                      <p:commandLink    id="nov-chooseperson-perssearch-cb"
+                                        value="search for persons / create new person"
+                                        ajax="true"
+                                        actionListener="#{personBB.onSelectAndLinkPersonsInit(sessionBean.sessProperty)}"
+                                        style="color: blue; font-weight: bold;"
+                                        oncomplete="PF('human-search-dialog-var').show(); PF('nov-personchoose-dialog-var').hide();"
+                                        update="human-search-dialog
+                                        search-query-form
+                                        log-form
+                                        pers-search-results-form
+                                        pers-selected-form
+                                        hlh-humlist-form">
+                          <f:param name="person-list-component-to-update" value="nov-chooseperson-list-form:newRecipientPersonTD" />
+                      </p:commandLink>
+                    
+                      <p:spacer height="3px" />
+                    
+                      <h2>Person Links</h2>
 
-                    <p>Table contains all Persons currently connected to this case's property:
+                    <p>Showing all Persons currently connected to this case's property:
                         <h:outputText value="(Parcel ID: #{noticeOfViolationBB.currentCase.property.countyParcelID})" />
-                        If you don't see the persons you expect, navigate to the property profile and connect the person first.
-
-                        
                     </p>
 
+                    
                     <p:spacer height="3px" />
+                    
+                    
                     <p:dataTable
                         id="newRecipientPersonTD"
                         var="recipers"
@@ -1066,7 +1081,22 @@
 
                 <div class="p-col-6">
 
-                    <h2>Addresses attached to current property</h2>
+                    <p:commandLink      id="nov-addresses-add-cb"
+                                              value="Link a new address to property" 
+                                              ajax="true"
+                                              actionListener="#{addressBB.onLinkPersonPropToAddressInitButtonChange(sessionBean.sessProperty)}"
+                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                              oncomplete="PF('address-search-dialog-var').show(); PF('nov-personchoose-dialog-var').hide();"
+                                              style="color:blue; font-weight: bold;"
+                                              update="address-search-dialog">
+                            <f:param name="initiating-address-list-component-id" value="nov-chooseperson-list-form" />
+                    </p:commandLink>
+                    <p:spacer height="5px" />
+                    
+                    <h2>Addresses Links</h2>
+                      
+                    <p:spacer height="5px" />
+                    
                     <p:repeat   id="prop-addr-repeater"
                                 value="#{sessionBean.sessProperty.mailingAddressLinkList}"
                                 var="propaddr">
@@ -1082,6 +1112,7 @@
                                        actionListener="#{noticeOfViolationBB.storeRecipientAddress(propaddr)}"
                                        />
                         <p:spacer height="3px" />
+                        <hr />
                     </p:repeat>
                 </div>
             </div>

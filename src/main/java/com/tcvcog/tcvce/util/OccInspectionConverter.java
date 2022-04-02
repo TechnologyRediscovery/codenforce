@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionCause;
 
 import javax.faces.component.UIComponent;
@@ -32,7 +32,7 @@ public class OccInspectionConverter extends EntityConverter implements Converter
         if(titleS.isEmpty()) {
             return null;
         }
-        OccInspection o = (OccInspection) this.getViewMap(fc).get(titleS);
+        FieldInspection o = (FieldInspection) this.getViewMap(fc).get(titleS);
         return o;
     }
 
@@ -43,7 +43,7 @@ public class OccInspectionConverter extends EntityConverter implements Converter
             return "";
         }
 
-        OccInspection opt = (OccInspection) o;
+        FieldInspection opt = (FieldInspection) o;
         StringBuilder sb = new StringBuilder();
         sb.append("ID: ");
         sb.append(opt.getInspectionID());

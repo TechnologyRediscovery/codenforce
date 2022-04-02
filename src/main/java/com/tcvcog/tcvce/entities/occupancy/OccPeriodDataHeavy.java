@@ -41,7 +41,8 @@ public  class       OccPeriodDataHeavy
                     IFace_CredentialSigned,
                     IFace_PaymentHolder,
                     IFace_humanListHolder,
-                    IFace_BlobHolder{
+                    IFace_BlobHolder,
+                    IFace_inspectable{
     
     final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.OccPeriodHuman;
     final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.OCC_PERIOD;
@@ -56,7 +57,7 @@ public  class       OccPeriodDataHeavy
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
     
-    private List<OccInspection> inspectionList;
+    private List<FieldInspection> inspectionList;
     private List<OccPermit> permitList;
     
     private List<Integer> blobIDList;
@@ -295,7 +296,7 @@ public  class       OccPeriodDataHeavy
     /**
      * @return the inspectionList
      */
-    public List<OccInspection> getInspectionList() {
+    public List<FieldInspection> getInspectionList() {
         return inspectionList;
     }
 
@@ -331,7 +332,7 @@ public  class       OccPeriodDataHeavy
     /**
      * @param inspectionList the inspectionList to set
      */
-    public void setInspectionList(List<OccInspection> inspectionList) {
+    public void setInspectionList(List<FieldInspection> inspectionList) {
         this.inspectionList = inspectionList;
     }
 
@@ -471,6 +472,16 @@ public  class       OccPeriodDataHeavy
     @Override
     public int getBlobUpstreamPoolEnumPoolFeederID() {
         return this.getPropUnitProp().getParcelKey();
+    }
+
+    @Override
+    public DomainEnum getDomainEnum() {
+        return OCC_DOMAIN;
+    }
+
+    @Override
+    public boolean isNewInspectionsAllowed() {
+        return authorizedTS == null;
     }
 
    

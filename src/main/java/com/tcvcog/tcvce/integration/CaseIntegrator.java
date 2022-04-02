@@ -100,7 +100,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         params.appendSQL("SELECT DISTINCT caseid \n");
         params.appendSQL("FROM public.cecase \n");
-        params.appendSQL("INNER JOIN public.property ON (cecase.property_propertyid = property.propertyid) \n");
+        params.appendSQL("INNER JOIN public.parcel ON (cecase.parcel_parcelkey = parcel.parcelkey) \n");
         params.appendSQL("WHERE caseid IS NOT NULL ");
         
         // *******************************
@@ -131,10 +131,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             // *******************************
              if (params.isProperty_ctl()) {
                 if(params.getProperty_val()!= null){
-                    params.appendSQL("AND property_propertyid=? ");
+                    params.appendSQL("AND parcel_parcelkey=? ");
                 } else {
                     params.setProperty_ctl(false);
-                    params.appendToParamLog("PROPERTY: no Property object; prop filter disabled");
+                    params.appendToParamLog("PARCEL: no parcel object; prop filter disabled");
                 }
             }
             
@@ -143,10 +143,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             // *******************************
              if (params.isPropertyUnit_ctl()) {
                 if(params.getPropertyUnit_val()!= null){
-                    params.appendSQL("AND propertyunit_unitid=? ");
+                    params.appendSQL("AND parcelunit_unitid=? ");
                 } else {
                     params.setPropertyUnit_ctl(false);
-                    params.appendToParamLog("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
+                    params.appendToParamLog("PARCEL UNIT: no parcelunit object; propunit filter disabled");
                 }
             }
             
@@ -289,7 +289,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
         
         return cseidlst;
-        
     }
     
     
@@ -313,8 +312,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 params.appendSQL("SELECT DISTINCT codeviolation.violationid, cecase.caseid, cecase.casename, property.propertyid, property.address, municipality.municode, municipality.muniname ");
 params.appendSQL("FROM public.codeviolation  ");
 params.appendSQL("INNER JOIN public.cecase ON (cecase.caseid = codeviolation.cecase_caseid) ");
-params.appendSQL("INNER JOIN public.property ON (cecase.property_propertyid = property.propertyid) ");
-params.appendSQL("INNER JOIN public.municipality ON (property.municipality_municode = municipality.municode) ");
+params.appendSQL("INNER JOIN public.parcel ON (cecase.parcel_parcelkey = parcel.parcelkey) ");
+params.appendSQL("INNER JOIN public.municipality ON (parcel.muni_municode = municipality.municode) ");
 params.appendSQL("LEFT OUTER JOIN  ");
 params.appendSQL("(	SELECT codeviolation_violationid, citation.citationid, citation.dateofrecord ");
 params.appendSQL("FROM public.citationviolation  ");
@@ -530,7 +529,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public CECase getCECase(int ceCaseID) throws IntegrationException, BObStatusException{
-        String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
+        String query = "SELECT caseid, cecasepubliccc, parcel_parcelkey, parcelunit_unitid, \n" +
                         "       login_userid, casename, originationdate, closingdate, creationtimestamp, \n" +
                         "       notes, paccenabled, allowuplinkaccess, propertyinfocase, personinfocase_personid, \n" +
                         "       bobsource_sourceid, active, lastupdatedby_userid, lastupdatedts \n" +
@@ -574,11 +573,11 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public List<CECase> getCECasesByProp(int propID) throws IntegrationException, BObStatusException{
-        String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
+        String query = "SELECT caseid, cecasepubliccc, parcel_parcelkey, parcelunit_unitid, \n" +
                         "       login_userid, casename, originationdate, closingdate, creationtimestamp, \n" +
                         "       notes, paccenabled, allowuplinkaccess, propertyinfocase, personinfocase_personid, \n" +
                         "       bobsource_sourceid, active, lastupdatedby_userid, lastupdatedts \n" +
-                        "  FROM public.cecase WHERE property_propertyid = ?;";
+                        "  FROM public.cecase WHERE parcel_parcelkey = ?;";
         ResultSet rs = null;
         CaseCoordinator cc = getCaseCoordinator();
         PreparedStatement stmt = null;
@@ -627,8 +626,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             cse.setCaseID(rs.getInt("caseid"));
             cse.setPublicControlCode(rs.getInt("cecasepubliccc"));
             
-            cse.setParcelKey(rs.getInt("property_propertyid"));
-            cse.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
+            cse.setParcelKey(rs.getInt("parcel_parcelkey"));
+            cse.setPropertyUnitID(rs.getInt("parcelunit_unitid"));
             
             cse.setCaseManager(uc.user_getUser(rs.getInt("login_userid")));
             
@@ -728,7 +727,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      */
     public int insertNewCECase(CECase ceCase) throws IntegrationException, BObStatusException{
         String query = "INSERT INTO public.cecase(\n" +
-                        "            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
+                        "            caseid, cecasepubliccc, parcel_parcelkey, parcelunit_unitid, \n" +
                         "            login_userid, casename, originationdate, closingdate, creationtimestamp, \n" +
                         "            notes, paccenabled, allowuplinkaccess, propertyinfocase, personinfocase_personid, \n" +
                         "            bobsource_sourceid, active, lastupdatedby_userid, lastupdatedts)\n" +
@@ -833,7 +832,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      */
     public void updateCECaseMetadata(CECase ceCase) throws IntegrationException{
         String query =  "UPDATE public.cecase\n" +
-                        "   SET cecasepubliccc=?, property_propertyid=?, propertyunit_unitid=?, \n" + // 1-3
+                        "   SET cecasepubliccc=?, parcel_parcelkey=?, parcelunit_unitid=?, \n" + // 1-3
                         "       login_userid=?, casename=?, originationdate=?, closingdate=?, \n" + // 4-7
                         "       notes=?, paccenabled=?, allowuplinkaccess=?, \n" + // 5-7
                         "       propertyinfocase=?, personinfocase_personid=?, bobsource_sourceid=?, \n" + // 8-10
@@ -841,9 +840,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                         "  WHERE caseid=?;";
         PreparedStatement stmt = null;
         Connection con = null;
-        
         try {
-            
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getPublicControlCode());
@@ -912,8 +909,6 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         } // close finally
         
     }
-    
-    
     
    
     /**

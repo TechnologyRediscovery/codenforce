@@ -74,6 +74,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * "Give them a bit more time"
      */
     public final static int DEFAULT_EXTENSIONDAYS = 14;
+    final static String ADDRESSLESS_PROPERTY_STREET_NAME = "Not attached to a street";
     
     
     public final static RoleType MIN_RANK_TO_ISSUE_CITATION = RoleType.EnforcementOfficial;
@@ -127,11 +128,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         SearchCoordinator sc = getSearchCoordinator();
         WorkflowCoordinator wc = getWorkflowCoordinator();
-        PaymentIntegrator pi = getPaymentIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
-        BlobIntegrator bi = getBlobIntegrator();
         BlobCoordinator bc = getBlobCoordinator();
         PersonCoordinator persc = getPersonCoordinator();
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
 
         // Wrap our base class in the subclass wrapper--an odd design structure, indeed
         CECaseDataHeavy cse = new CECaseDataHeavy(cecase_getCECase(c.getCaseID()));
@@ -149,6 +149,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             
             // Human list
             cse.setHumanLinkList(persc.assembleLinkedHumanLinks(cse));
+            
+            // Inspection list
+            cse.setInspectionList(oic.getOccInspectionList(cse));
 
             // CEAR LIST
             QueryCEAR qcear = sc.initQuery(QueryCEAREnum.ATTACHED_TO_CECASE, cred);
@@ -1172,39 +1175,50 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 }
 
                 if(cseList != null && !cseList.isEmpty()){
-                    ReportCECaseListStreetCECaseContainer ssc;
+                    ReportCECaseListStreetCECaseContainer streetCaseContainer = null;
 
                     for(CECaseDataHeavy cse: cseList){
-                        if(!streetCaseMap.containsKey(cse.getProperty().getPrimaryAddressLink().getStreet())){
-                             ssc = new ReportCECaseListStreetCECaseContainer();
-                             ssc.setStreetName(cse.getProperty().getPrimaryAddressLink().getStreet().getName());
+                        // check for an address, and create a generic one if there isn't one
+                        if(cse.getProperty().getPrimaryAddressLink() == null){
+                            PropertyCoordinator pc = getPropertyCoordinator();
+                            MailingAddressLink madLink = pc.getMailingAddressLinkSkeleton(pc.getMailingAddressSkeleton());
+                            madLink.getStreet().setName(ADDRESSLESS_PROPERTY_STREET_NAME);
+                            List<MailingAddressLink> madLinkList = new ArrayList<>();
+                            madLinkList.add(madLink);
+                            cse.getProperty().setMailingAddressLinkList(madLinkList);
+                        } 
+                        // start with streets we don't currently have a case list for
+                        if(!streetCaseMap.containsKey(cse.getProperty().getPrimaryAddressLink().getStreet().getName())){
+                             streetCaseContainer = new ReportCECaseListStreetCECaseContainer();
+                             streetCaseContainer.setStreetName(cse.getProperty().getPrimaryAddressLink().getStreet().getName());
                             switch(enm){
                                 case CLOSED:
-                                    ssc.getCaseClosedList().add(cse);
+                                    streetCaseContainer.getCaseClosedList().add(cse);
                                     break;
                                 case CONTINUING:
-                                    ssc.getCaseContinuingList().add(cse);
+                                    streetCaseContainer.getCaseContinuingList().add(cse);
                                     break;
                                 case OPENED:
-                                    ssc.getCaseOpenedList().add(cse);
+                                    streetCaseContainer.getCaseOpenedList().add(cse);
                                     break;
                             } // close switch
+                        // process cases on streets already in our mapping
                         } else {
-                            ssc = streetCaseMap.get(cse.getProperty().getPrimaryAddressLink().getStreet());
+                            streetCaseContainer = streetCaseMap.get(cse.getProperty().getPrimaryAddressLink().getStreet().getName());
                             switch(enm){
                                 case CLOSED:
-                                    ssc.getCaseClosedList().add(cse);
+                                    streetCaseContainer.getCaseClosedList().add(cse);
                                     break;
                                 case CONTINUING:
-                                    ssc.getCaseContinuingList().add(cse);
+                                    streetCaseContainer.getCaseContinuingList().add(cse);
                                     break;
                                 case OPENED:
-                                    ssc.getCaseOpenedList().add(cse);
+                                    streetCaseContainer.getCaseOpenedList().add(cse);
                                     break;
                             } // close switch
                         } // close if/else
                         // Write new or updated Street Case continaer to our map
-                        streetCaseMap.put(cse.getProperty().getPrimaryAddressLink().getStreet().getName(), ssc);
+                        streetCaseMap.put(cse.getProperty().getPrimaryAddressLink().getStreet().getName(), streetCaseContainer);
                     } // close for over case list
                 } // close null/emtpy check
             } // close for over enum vals

@@ -168,7 +168,7 @@ public class    SessionBean
     private Person sessPerson;
     private ActivatableRouteEnum sessPersonRoute;
     private IFace_humanListHolder sessHumanListHolder;
-    private IFace_humanListHolder sessHumanListHolderRefreshTrigger;
+    private List<HumanLink> sessHumanListRefreshedList;
     
     private Person sessPersonQueued;
     private List<Person> sessPersonList;
@@ -220,11 +220,17 @@ public class    SessionBean
     private List<OccPeriodPropertyUnitHeavy> sessOccPeriodList;
     
     private OccPermit sessOccPermit;
-    private OccInspection sessOccInspection;
+    private FieldInspection sessOccInspection;
     
     /* >>> QUERY OCCPERIOD <<< */
     private QueryOccPeriod queryOccPeriod;
     private List<QueryOccPeriod> queryOccPeriodList;
+    
+    private IFace_inspectable sessInspectable;
+    
+    private List<FieldInspection> sessFieldInspectionListForRefresh;
+    
+    
     
     
     /* >>> -------------------------------------------------------------- <<< */
@@ -1140,7 +1146,7 @@ public class    SessionBean
     /**
      * @return the sessOccInspection
      */
-    public OccInspection getSessOccInspection() {
+    public FieldInspection getSessOccInspection() {
         return sessOccInspection;
     }
 
@@ -1185,7 +1191,7 @@ public class    SessionBean
     /**
      * @param sessOccInspection the sessOccInspection to set
      */
-    public void setSessOccInspection(OccInspection sessOccInspection) {
+    public void setSessOccInspection(FieldInspection sessOccInspection) {
         this.sessOccInspection = sessOccInspection;
     }
 
@@ -2068,17 +2074,17 @@ public class    SessionBean
     }
 
     /**
-     * @return the sessHumanListHolderRefreshTrigger
+     * @return the sessHumanListRefreshedList
      */
-    public IFace_humanListHolder getSessHumanListHolderRefreshTrigger() {
-        return sessHumanListHolderRefreshTrigger;
+    public List<HumanLink> getSessHumanListRefreshedList() {
+        return sessHumanListRefreshedList;
     }
 
     /**
-     * @param sessHumanListHolderRefreshTrigger the sessHumanListHolderRefreshTrigger to set
+     * @param sessHumanListRefreshedList the sessHumanListRefreshedList to set
      */
-    public void setSessHumanListHolderRefreshTrigger(IFace_humanListHolder sessHumanListHolderRefreshTrigger) {
-        this.sessHumanListHolderRefreshTrigger = sessHumanListHolderRefreshTrigger;
+    public void setSessHumanListRefreshedList(List<HumanLink> sessHumanListRefreshedList) {
+        this.sessHumanListRefreshedList = sessHumanListRefreshedList;
     }
 
     /**
@@ -2149,6 +2155,34 @@ public class    SessionBean
      */
     public void setSessCECaseRefreshTrigger(LocalDateTime sessCECaseRefreshTrigger) {
         this.sessCECaseRefreshTrigger = sessCECaseRefreshTrigger;
+    }
+
+    /**
+     * @return the sessInspectable
+     */
+    public IFace_inspectable getSessInspectable() {
+        return sessInspectable;
+    }
+
+    /**
+     * @param sessInspectable the sessInspectable to set
+     */
+    public void setSessInspectable(IFace_inspectable sessInspectable) {
+        this.sessInspectable = sessInspectable;
+    }
+
+    /**
+     * @return the sessFieldInspectionListForRefresh
+     */
+    public List<FieldInspection> getSessFieldInspectionListForRefresh() {
+        return sessFieldInspectionListForRefresh;
+    }
+
+    /**
+     * @param sessFieldInspectionListForRefresh the sessFieldInspectionListForRefresh to set
+     */
+    public void setSessFieldInspectionListForRefresh(List<FieldInspection> sessFieldInspectionListForRefresh) {
+        this.sessFieldInspectionListForRefresh = sessFieldInspectionListForRefresh;
     }
 
     

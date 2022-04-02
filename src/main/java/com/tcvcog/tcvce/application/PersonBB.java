@@ -262,13 +262,25 @@ public class PersonBB extends BackingBeanUtils {
                         "Person history logging is broken!",""));
         }
     }
+    
+    /**
+     * Adaptor method for calling explorePerson with a human
+     * @param h 
+     */
+    public void exploreHuman(Human h){
+        PersonCoordinator pc = getPersonCoordinator();
+        Person p = null;
+        try {
+            p = pc.getPerson(h);
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
+        if(p != null){
+            explorePerson(p);
+        }
+        
+    }
 
-    
-    
-    
-    
-    
-    
     
     /**********************************************************/
     /************** REFRESHING  *******************************/
@@ -741,183 +753,7 @@ public class PersonBB extends BackingBeanUtils {
         
     }
     
-    
-    /***********************************************************/
-    /************** LINK MANAGE INFRASTRUCTURE *****************/
-    /**********************************************************/
-    
-    /**
-     * Listener for user requests to load person links
-     * @param ev 
-     */
-    public void onLoadHumanLinks(ActionEvent ev){
-        if(currentPerson != null){
-            PersonCoordinator pc = getPersonCoordinator();
-            try {
-                currentPersonLinkHeavy = pc.assemblePersonLinkHeavy(currentPerson);
-                getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Loaded person " + currentPersonLinkHeavy.getHumanLinkList().size() + " links!", ""));
-            } catch (IntegrationException | BObStatusException ex) {
-                System.out.println(ex);
-                getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Fatal: Could not load person links, sorry!", ""));
-                
-            } 
-        }
-    }
-    
-    
-    /**
-     * Listener for user requests to load information about the human link
-     * @param hl 
-     */
-    public void onHumanLinkSelectLinkClick(HumanLink hl){
-        currentHumanLink = hl;
-        
-    }
-
-    /**
-     * Listener f
-     * @param ev 
-     */
-    public void onChangeHumanLinkTargetLinkClick(ActionEvent ev){
-        
-    }
-    
-    /**
-     * Listener for user clicks of a human link holder
-     * @param hlh 
-     */
-    public void onActivateNewHumanLinkTarget(IFace_humanListHolder hlh){
-        try {
-            loadLinkedObjectRoleListUsingSessionHLH();
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-        } 
-        getSessionBean().setSessHumanListHolder(hlh);
-    }
-    
-    /**
-     * Listener for user clicks of the link representing the
-     * target of a human link, such as a case or an event
-     *
-     * TODO: Finish me!
-     *
-     * @param hl the human link to explore
-     * @return page nav route
-     */
-    public String onHumanLinkTargetIDLinkClick(HumanLink hl){
-        
-        return "";
-    }
-    
-    /**
-     * Listener for user requests to complete the note appending process
-     * on a human link
-     * @param ev 
-     */
-    public void onHumanLinkNoteAppendCommitButtonChange(ActionEvent ev){
-       PersonCoordinator pc = getPersonCoordinator();
-        try {
-            pc.appendNoteToHumanLink(currentHumanLink, formHumanLinkNotes, getSessionBean().getSessUser());
-            onLoadHumanLinks(null);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Note write success!", ""));
-        } catch (BObStatusException | IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Fatal: Could not append note: " + ex.getMessage(), ""));
-        }
-        
-    }
-    
-    /**
-     * Listener for user requests to complete the note appending process
-     * on a human link
-     * @param ev 
-     */
-    public void onHumanLinkDeactivateButtonChange(ActionEvent ev){
-       PersonCoordinator pc = getPersonCoordinator();
-        try {
-            pc.deactivateHumanLink(currentHumanLink, getSessionBean().getSessUser());
-            onLoadHumanLinks(ev);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Link deactivate success!", ""));
-        } catch (BObStatusException | IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Fatal: Could not deactivate human link: " + ex.getMessage(), ""));
-        }
-        
-    }
-    
-    /**
-     * Listener to user requests to start the creation process
-     * for a new human link. Checks to make sure the session
-     * has a HumanLinkHolder. If it doesn't, inject the current CECase, 
-     * if that's null, inject the current session OccPeriod
-     * @param ev 
-     */
-    public void onHumanLinkAddInitButtonChange(ActionEvent ev){
-        PersonCoordinator pc = getPersonCoordinator();
-        currentHumanLink = pc.createHumanLinkSkeleton(currentPerson);
-        
-        if(getSessionBean().getSessHumanListHolder() == null){
-            if(getSessionBean().getSessCECase() != null){
-                getSessionBean().setSessHumanListHolder(getSessionBean().getSessCECase() );
-            } else if(getSessionBean().getSessOccPeriod() != null){
-                getSessionBean().setSessHumanListHolder(getSessionBean().getSessOccPeriod() );
-            }
-        }
-        
-         try {
-            loadLinkedObjectRoleListUsingSessionHLH();
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-        } 
-    }
-    
-    
-    /**
-     * Listener for user requests to link the current IFace_HumanListHolder
-     * to the current person with the currently selected role
-     * @param ev 
-     */
-    public void onHumanLinkCreateCommitButtonChange(ActionEvent ev){
-        PersonCoordinator pc = getPersonCoordinator();
-        try {
-            currentHumanLink.setLinkRole(selecetedLinkedObjetRole);
-            
-            pc.linkHuman(getSessionBean().getSessHumanListHolder(), currentHumanLink, getSessionBean().getSessUser());
-            refreshCurrentPersonAndUpdateSessionPerson();
-            onLoadHumanLinks(null);
-            getFacesContext().addMessage(null,
-                  new FacesMessage(FacesMessage.SEVERITY_INFO,
-                          "Successfully linked human!", ""));
-        } catch (BObStatusException | IntegrationException ex) {
-          
-          getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Fatal: Could not create human link: " + ex.getMessage(), ""));
-        } 
-        
-        
-    }
-    
-    
-      /**
-       *
-     * @return the linkRoleCandidateList
-     */
-    public List<LinkedObjectRole> getLinkRoleCandidateList() {
-       
-        return linkRoleCandidateList;
-    }
-    
+   
     
     
     /***********************************************************/
@@ -995,6 +831,208 @@ public class PersonBB extends BackingBeanUtils {
     /***********************************************************/
     /********************* FANCY LINK MANAGEMENT STUFF *********/
     /***********************************************************/
+     
+    /***********************************************************/
+    /************** LINK MANAGE INFRASTRUCTURE *****************/
+    /**********************************************************/
+    
+    /**
+     * Listener for user requests to load person links
+     * @param ev 
+     */
+    public void onLoadHumanLinksToCurrentPerson(ActionEvent ev){
+        if(currentPerson != null){
+            PersonCoordinator pc = getPersonCoordinator();
+            try {
+                currentPersonLinkHeavy = pc.assemblePersonLinkHeavy(currentPerson);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Loaded person " + currentPersonLinkHeavy.getHumanLinkList().size() + " links!", ""));
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal: Could not load person links, sorry!", ""));
+                
+            } 
+        }
+    }
+    
+    
+    /**
+     * Listener for user requests to load information about the human link
+     * @param hl 
+     */
+    public void onHumanLinkSelectLinkClick(HumanLink hl){
+        currentHumanLink = hl;
+        
+    }
+
+    /**
+     * Listener f
+     * @param ev 
+     */
+    public void onChangeHumanLinkTargetLinkClick(ActionEvent ev){
+        
+    }
+    
+    /**
+     * Listener for user clicks of a human link holder
+     * @param hlh 
+     */
+    public void onActivateNewHumanLinkTarget(IFace_humanListHolder hlh){
+        try {
+            loadLinkedObjectRoleListUsingSessionHLH();
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
+        getSessionBean().setSessHumanListHolder(hlh);
+    }
+    
+    /**
+     * Listener for user clicks of the link representing the
+     * target of a human link, such as a case or an event
+     *
+     * TODO: Finish me!
+     *
+     * @param hl the human link to explore
+     * @return page nav route
+     */
+    public String onHumanLinkTargetIDLinkClick(HumanLink hl){
+        
+        return "";
+    }
+    
+    /**
+     * Listener for user requests to complete the note appending process
+     * on a human link
+     * @param ev 
+     */
+    public void onHumanLinkNoteAppendCommitButtonChange(ActionEvent ev){
+       PersonCoordinator pc = getPersonCoordinator();
+        try {
+            pc.appendNoteToHumanLink(currentHumanLink, formHumanLinkNotes, getSessionBean().getSessUser());
+            onLoadHumanLinksToCurrentPerson(null);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Note write success!", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Fatal: Could not append note: " + ex.getMessage(), ""));
+        }
+        
+    }
+    
+    /**
+     * Listener for user requests to complete the note appending process
+     * on a human link
+     * @param ev 
+     */
+    public void onHumanLinkDeactivateButtonChange(ActionEvent ev){
+       PersonCoordinator pc = getPersonCoordinator();
+        try {
+            pc.deactivateHumanLink(currentHumanLink, getSessionBean().getSessUser());
+            onLoadHumanLinksToCurrentPerson(ev);
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Link deactivate success!", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Fatal: Could not deactivate human link: " + ex.getMessage(), ""));
+        }
+        
+    }
+    
+    /**
+     * Listener to user requests to start the creation process
+     * for a new human link. Checks to make sure the session
+     * has a HumanLinkHolder. If it doesn't, inject the current CECase, 
+     * if that's null, inject the current session OccPeriod
+     * 
+     * As of 30-March-2022, no calls to this exist. The disabled one 
+     * is the button with value "Create new link to this person"
+     * on person profile
+     * 
+     * @param ev 
+     */
+    public void onHumanLinkAddInitButtonChange(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        currentHumanLink = pc.createHumanLinkSkeleton(currentPerson);
+        
+        if(getSessionBean().getSessHumanListHolder() == null){
+            if(getSessionBean().getSessCECase() != null){
+                getSessionBean().setSessHumanListHolder(getSessionBean().getSessCECase() );
+            } else if(getSessionBean().getSessOccPeriod() != null){
+                getSessionBean().setSessHumanListHolder(getSessionBean().getSessOccPeriod() );
+            }
+        }
+        
+         try {
+            loadLinkedObjectRoleListUsingSessionHLH();
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
+    }
+    
+    
+    /**
+     * Listener for user requests to link the current IFace_HumanListHolder
+     * to the current person with the currently selected role
+     * @param ev 
+     */
+    public void onHumanLinkCreateCommitButtonChange(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            currentHumanLink.setLinkRole(selecetedLinkedObjetRole);
+            
+            pc.linkHuman(getSessionBean().getSessHumanListHolder(), currentHumanLink, getSessionBean().getSessUser());
+            refreshCurrentPersonAndUpdateSessionPerson();
+            onLoadHumanLinksToCurrentPerson(null);
+            injectSessionHumanLinkListForComponentRefresh();
+            getFacesContext().addMessage(null,
+                  new FacesMessage(FacesMessage.SEVERITY_INFO,
+                          "Successfully linked human!", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+          
+          getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Fatal: Could not create human link: " + ex.getMessage(), ""));
+        } 
+    }
+    
+    /**
+     * Gets a new set of human links from the coordinator and injects it into the
+     * session's master list of human links. It's the job of the refreshed
+     * component to ask the session for this list and inject it into its 
+     * HumanListHolder for immediate viewing by the user in the browser.
+     * Note that this means the only call to the DB is made here via
+     * the person coordinator and the calling object family need not 
+     * rebuild its entire data heaby object!
+     */
+    private void injectSessionHumanLinkListForComponentRefresh(){
+        PersonCoordinator pc = getPersonCoordinator();
+        List<HumanLink> hllist = null;
+        if(getSessionBean().getSessHumanListHolder() != null){
+            try {
+                hllist = pc.assembleLinkedHumanLinks(getSessionBean().getSessHumanListHolder());
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
+            getSessionBean().setSessHumanListRefreshedList(hllist);
+        }
+    }
+    
+    
+      /**
+       *
+     * @return the linkRoleCandidateList
+     */
+    public List<LinkedObjectRole> getLinkRoleCandidateList() {
+       
+        return linkRoleCandidateList;
+    }
     
     /**
      * Big cheese listener for user requests to start the process
@@ -1008,7 +1046,7 @@ public class PersonBB extends BackingBeanUtils {
     public void onSelectAndLinkPersonsInit(IFace_humanListHolder hlh){
         
         getSessionBean().setSessHumanListHolder(hlh);
-        getSessionBean().setSessHumanListHolderRefreshTrigger(hlh);
+        
         
         personListComponentIDToUpdatePostLinkingOperation = 
                 FacesContext.getCurrentInstance()

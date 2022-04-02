@@ -47,7 +47,7 @@ public class CitationBB extends BackingBeanUtils {
 
     private Citation currentCitation;
     private List<User> filingOfficerCandidateList;
-    private String formNoteText;
+    
     private List<CitationFilingType> citationFilingTypeList;
 
     private boolean issueCitationDisabled;
@@ -320,7 +320,7 @@ public class CitationBB extends BackingBeanUtils {
      * for a specific citation
      */
     public void onCitationNoteInitButtonChange(){
-        setFormNoteCitationText("");
+        formNoteCitationText = "";
         
     }
     
@@ -336,7 +336,7 @@ public class CitationBB extends BackingBeanUtils {
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.setCred(getSessionBean().getSessUser().getKeyCard());
         mbp.setExistingContent(getCurrentCitation().getNotes());
-        mbp.setNewMessageContent(getFormNoteText());
+        mbp.setNewMessageContent(formNoteCitationText);
         mbp.setHeader("Citation Note");
         mbp.setUser(getSessionBean().getSessUser());
 
@@ -851,13 +851,7 @@ public class CitationBB extends BackingBeanUtils {
         return filingOfficerCandidateList;
     }
 
-    /**
-     * @return the formNoteText
-     */
-    public String getFormNoteText() {
-        return formNoteText;
-    }
-
+   
     /**
      * @return the currentCitation
      */
@@ -964,12 +958,7 @@ public class CitationBB extends BackingBeanUtils {
     }
 
     /**
-     * @param formNoteText the formNoteText to set
-     */
-    public void setFormNoteText(String formNoteText) {
-        this.formNoteText = formNoteText;
-    }
-
+   
     /**
      * @param currentCitation the currentCitation to set
      */

@@ -223,20 +223,18 @@
                                          collapsed="false"
                                          header="Addresses links">
                                     <h:form id="property-profile-addresses-form">
-                                        <p:commandButton      id="prop-addresses-add-cb"
-                                                              value="Connect property to session Address" 
-                                                              ajax="true"
-                                                              icon="fa fa-link"
-                                                              actionListener="#{addressBB.onLinkToSessionMailingAddressInitButtonChange(propertyProfileBB.currentProperty)}"
-                                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                              oncomplete="PF('address-link-dialog-var').show()"
-                                                              update="address-link-dialog
-                                                              address-linking-form
-                                                              addresslink-list-growl-form">
+                                        
+                                        <p:commandButton        id="prop-addresses-add-cb"
+                                                                value="Link a new address to property" 
+                                                                ajax="true"
+                                                                icon="fa fa-link"
+                                                                actionListener="#{addressBB.onLinkPersonPropToAddressInitButtonChange(propertyProfileBB.currentProperty)}"
+                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                oncomplete="PF('address-search-dialog-var').show(); "
+                                                                update="address-search-dialog">
                                             <f:param name="initiating-address-list-component-id" value="property-profile-addresses-form" />
                                         </p:commandButton>
-
-
+                                        
                                         <p:spacer height="5px"/>
 
                                         <p:dataTable    id="property-addresses-table"
@@ -275,9 +273,7 @@
                                                                     style="color:blue;"
                                                                     oncomplete="PF('address-link-dialog-var').show()"
                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                    update="address-link-dialog
-                                                                    address-linking-form
-                                                                    addresslink-list-growl-form"
+                                                                    update="address-link-dialog"
                                                                     value="view/edit" >
                                                     <f:param name="initiating-address-list-component-id" value="property-profile-addresses-form" />
                                                 </p:commandLink>
@@ -872,12 +868,13 @@
                                                 <f:facet name="header">
                                                     <h:outputText value="Actions"/>
                                                 </f:facet>
-                                                <p:commandButton       id="button-occperiodtable-exploreperiod"
-                                                                       value="explore occ period"  
+                                                <p:commandLink          id="occperiodtable-exploreperiod-cl"
+                                                                       value="view period"  
+                                                                       style="color:blue; font-weight: bold;"
                                                                        ajax="false" 
-                                                                       action="#{propertyProfileBB.exploreOccPeriod(period)}"
+                                                                       action="#{propertyProfileBB.onViewOccPeriodButtonChange(period)}"
                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                       icon="fa fa-binoculars"/>
+                                                                       />
                                             </p:column>
                                         </p:dataTable>
                                     </h:form>
@@ -1096,6 +1093,21 @@
                                 <div class="p-col-4">
                                     <h:outputLabel value="Case Name" 
                                                    for="caseNameIT"/>
+                                    <p:commandButton id="casename-help-button"
+                                             icon="fa fa-question-circle-o"
+                                             styleClass="button-help"
+                                             type="button" />
+                            
+                                <p:overlayPanel for="casename-help-button"
+                                                style="width:350px;" 
+                                                dismissable="true"
+                                                showCloseIcon="true">
+                                    <h3>Code enforcement case names</h3>
+                                    <p>A case's name is a text field for INTERNAL office use only that allows managers to label a case something memorable,
+                                    such as 'deer feeding lady' or 'fridge in front yard' or 'imploded garage'. The case name appears on the dashboard's
+                                    case list for easy ID but does not by default print on case list reports .</p>
+                                </p:overlayPanel>
+                                    
                                 </div>
                                 <div class="p-col-8">
                                     <p:inputText    id="caseNameIT" 
@@ -1141,6 +1153,25 @@
                                 <div class="p-col-4">
                                     <h:outputLabel value="Origination category" 
                                                    for="cecase-add-origevent-som"/>
+                                   
+                                    <p:commandButton id="case-originationevent-help-button"
+                                             icon="fa fa-question-circle-o"
+                                             styleClass="button-help"
+                                             type="button" />
+                            
+                                <p:overlayPanel for="case-originationevent-help-button"
+                                                style="width:350px;" 
+                                                dismissable="true"
+                                                showCloseIcon="true">
+                                    <h3>Origination events</h3>
+                                    <p>An origination event is automatically attached to a code enforcement case to signal 
+                                    where the case came from, such as resulting from an officer's routine patrol or from
+                                    a lapsed occupancy permit inspection with outstanding violation.</p>
+                                    
+                                    <p>By selecting an accurate event category from this list now, 
+                                    the case's even history will be accurate from the beginning.</p>
+                                </p:overlayPanel>
+                                    
                                 </div>
                                 <div class="p-col-8">
                                     <h:selectOneMenu id="cecase-add-origevent-som"

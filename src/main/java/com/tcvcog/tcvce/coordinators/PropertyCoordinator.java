@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2017 Turtle Creek Valley
  * Council of Governments, PA
  *
@@ -89,6 +89,20 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         
         MailingAddressLink madLink = new MailingAddressLink(mad);
         return madLink;
+    }
+    
+    /**
+     * Getter for MAD links
+     * @param holder
+     * @param linkID
+     * @return the MAD link
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public MailingAddressLink getMailingAddressLink(IFace_addressListHolder holder, int linkID) throws IntegrationException, BObStatusException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        return pi.getMailingAddressLink(holder, linkID);
+        
     }
     
     
@@ -544,25 +558,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return pdh;
     }
 
-    /**
-     * Utility method for calling the integrator method that creates a single
-     * external data record given a list of record IDs
-     *
-     * @param extIDList
-     * @return
-     * @throws IntegrationException
-     */
-    private List<PropertyExtData> fetchExternalDataRecords(List<Integer> extIDList) throws IntegrationException {
-        PropertyIntegrator pi = getPropertyIntegrator();
-        List<PropertyExtData> extList = new ArrayList<>();
-        if (extIDList != null && !extIDList.isEmpty()) {
-            for (Integer i : extIDList) {
-                extList.add(pi.getPropertyExternalDataRecord(i));
-            }
-        }
-        return extList;
-    }
-
+   
     /**
      * Logic pass through for acquiring a PropertyUnitWithProp for OccPeriods
      * and such that need a property address but only have a unit ID on them
@@ -594,7 +590,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         while (iter.hasNext()) {
             try {
                 PropertyUnit pu = iter.next();
-                puwll.add(configurePropertyUnitDataHeavy(pi.getPropertyUnitWithLists(pu.getUnitID()), ua.getKeyCard()));
+                puwll.add(configurePropertyUnitDataHeavy(pi.getPropertyUnitDataHeavy(pu.getUnitID()), ua.getKeyCard()));
             } catch (ViolationException ex) {
                 System.out.println(ex);
             }
@@ -614,8 +610,11 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public PropertyUnitDataHeavy getPropertyUnitWithLists(PropertyUnit propUnit, Credential cred) throws IntegrationException, EventException, EventException, AuthorizationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
+        if(propUnit == null){
+            throw new BObStatusException("Cannot get property unit with lists given null prop unit or credential");
+        }
         try {
-            return configurePropertyUnitDataHeavy(pi.getPropertyUnitWithLists(propUnit.getUnitID()), cred);
+            return configurePropertyUnitDataHeavy(pi.getPropertyUnitDataHeavy(propUnit.getUnitID()), cred);
         } catch (ViolationException ex) {
             System.out.println(ex);
         }
@@ -712,16 +711,23 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         return p;
     }
     
-    public List<PropertyUnit> getPropertyUnitList(Property p){
+    /**
+     * Extracts all units associated with a given property
+     * @param p
+     * @return a list, perhaps with property units inside
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public List<PropertyUnit> getPropertyUnitList(Property p) throws IntegrationException, BObStatusException{
         PropertyIntegrator pi = getPropertyIntegrator();
         List<PropertyUnit> ul = new ArrayList<>();
-        
-        // TODO: Finish me!!
-        
-        
+        List<Integer> unitidl = pi.getPropertyUnitList(p);
+        if(unitidl != null && !unitidl.isEmpty()){
+            for(Integer i: unitidl){
+                ul.add(getPropertyUnit(i));
+            }
+        }
         return ul;
-        
-        
     }
     
     
@@ -1203,16 +1209,21 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param pdh
      * @param ua
      * @return the PK of the new unit
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public int insertPropertyUnit(PropertyUnit unit, PropertyDataHeavy pdh, UserAuthorized ua) throws BObStatusException{
+    public int insertPropertyUnit(PropertyUnit unit, PropertyDataHeavy pdh, UserAuthorized ua) throws BObStatusException, IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         
         if(unit == null || pdh == null || ua == null){
             throw new BObStatusException("Cannot insert unit with null unit, property, or user");
         }
+        unit.setCreatedBy(ua);
+        unit.setLastUpdatedBy(ua);
+        unit.setParcelKey(pdh.getParcelKey());
         
         
-        return 0;
+        return pi.insertPropertyUnit(unit);
         
     }
     
@@ -1220,17 +1231,18 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * Logic check for updates to a property unit
      * @param unit
      * @param ua 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public void updatePropertyUnit(PropertyUnit unit, PropertyDataHeavy pdh, UserAuthorized ua) throws BObStatusException{
+    public void updatePropertyUnit(PropertyUnit unit, UserAuthorized ua) throws BObStatusException, IntegrationException{
         PropertyIntegrator pi = getPropertyIntegrator();
         
-        if(unit == null || pdh == null || ua == null){
+        if(unit == null || ua == null){
             throw new BObStatusException("Cannot insert unit with null unit, property, or user");
         }
+        unit.setLastUpdatedBy(ua);
         
-        
-        
-        
+        pi.updatePropertyUnit(unit);
     }
     
     /**

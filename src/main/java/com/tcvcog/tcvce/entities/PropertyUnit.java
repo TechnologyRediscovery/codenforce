@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ public class    PropertyUnit
     
     protected MailingAddress parcelMailing;
     protected BOBSource source;
+    protected OccLocationDescriptor locationDescriptor;
 
     public PropertyUnit() {
     }
@@ -50,7 +52,10 @@ public class    PropertyUnit
         notes = input.getNotes();
         rentalNotes = input.getRentalNotes();
         conditionIntensityClassID = input.getConditionIntensityClassID();
-        lastUpdatedTS = input.getLastUpdatedTS();
+        lastUpdatedTS = input.lastUpdatedTS;
+        parcelMailing = input.parcelMailing;
+        source = input.source;
+        locationDescriptor = input.locationDescriptor;
     }
     
     @Override
@@ -87,6 +92,7 @@ public class    PropertyUnit
         return true;
     }
     
+  
 
 
     /**
@@ -180,6 +186,20 @@ public class    PropertyUnit
      */
     public void setSource(BOBSource source) {
         this.source = source;
+    }
+
+    /**
+     * @return the locationDescriptor
+     */
+    public OccLocationDescriptor getLocationDescriptor() {
+        return locationDescriptor;
+    }
+
+    /**
+     * @param locationDescriptor the locationDescriptor to set
+     */
+    public void setLocationDescriptor(OccLocationDescriptor locationDescriptor) {
+        this.locationDescriptor = locationDescriptor;
     }
 
 }

@@ -133,6 +133,7 @@ public class User implements Serializable{
     }
 
     /**
+     * adaptor for the userHuman member
      * @return the userHuman
      */
     public Human getHuman() {

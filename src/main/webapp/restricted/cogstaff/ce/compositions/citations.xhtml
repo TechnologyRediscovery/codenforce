@@ -61,7 +61,7 @@
                     <ui:repeat id="citation-status-uir"
                                value="#{citation.statusLog}"
                                var="logentry">
-                        <h:outputText value="[#{citationBB.getPrettyDateNoTime(logentry.dateOfRecord)}] #{logentry.status.statusTitle}"/>
+                        <h:outputText value="#{citationBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
                         <p:spacer height="3px" />
                     </ui:repeat>
 
@@ -583,7 +583,7 @@
                             toggleable="true"
                             collapsed="false"
                             header="Notes">
-                    <h:form id="citations-notes-form">
+                    <h:form id="citation-notes-form">
 
                         <p:commandButton    id="citation-note-add-cb"
                                             ajax="true"
@@ -1675,31 +1675,34 @@
                 >
 
         <h:form id="citation-note-form">
-            <h:panelGrid columns="1"
-                         columnClasses="gridTd, gridTd">
-                <h:panelGroup>
+            <div class="p-grid">
+                <div class="p-col-4">
                     <h:outputText styleClass="ui-label" value="Note text: "/>
+                    
+                </div>
+                <div class="p-col-8">
                     <p:inputTextarea   id="citation-notes-editor"
-                                       value="#{citationBB.formNoteText}"
+                                       value="#{citationBB.formNoteCitationText}"
                                        required="true"/>
-
-
                     <p:spacer height="5px" />
                     <h:outputText value="(your name and the current date/time will be automatically included)" 
                                   style="font-style: italic;"/>
-                    <p:spacer height="5px" />
+                </div>
+                <div class="p-col-12">
 
                     <p:commandButton   id="citation-dialog-notes-button-addnote"
                                        ajax="true"
                                        actionListener="#{citationBB.onCitationNoteCommitButtonChange}"
                                        oncomplete="PF('citation-note-dialog-var').hide()"
-                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                       rendered="true"
                                        value="Attach Note"
                                        styleClass="inline-button"
                                        icon="fa fa-sticky-note-o"
                                        update="citation-notes-form"/>
-                </h:panelGroup>
-            </h:panelGrid>
+                </div>
+            </div>
+
+
         </h:form>
     </p:dialog>
 </ui:composition>

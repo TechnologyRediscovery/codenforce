@@ -149,8 +149,8 @@ public enum LinkedObjectSchemaEnum {
                             "parcelmailingaddress",
                             "ParcelMailingaddress", 
                             "linkid", 
-                            "mailingparcel_parcelid",
-                            "mailingparcel_mailingid",
+                            "parcel_parcelkey",
+                            "mailingaddress_addressid",
                             "parcelmailing_linkid_seq",
                             LinkedObjectFamilyEnum.MAILING,
                             true
@@ -209,7 +209,7 @@ public enum LinkedObjectSchemaEnum {
         return LINK_ROLE_SCHEMA_TYPE_STRING;
     }
     
-    public String getLinkedTablePKField(){
+    public String getLinkingTablePKField(){
         return LINKING_TABLE_PK_FIELD;
     }
     

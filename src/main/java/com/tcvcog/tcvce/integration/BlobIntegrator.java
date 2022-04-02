@@ -32,7 +32,7 @@ import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import com.tcvcog.tcvce.entities.Metadata;
 import com.tcvcog.tcvce.entities.MetadataKey;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;

@@ -7,8 +7,8 @@
              toggleable="true"
              widgetVar="occperiod-status-panel-var"
              collapsed="false"
-             header="Occupancy Period Status | ID: #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}
-             | last updated: #{occPeriodSearchWorkflowBB.getPrettyDateNoTime(occPeriodSearchWorkflowBB.currentOccPeriod.lastUpdatedTS)}">
+             header="Occupancy Period Status | ID: #{occPeriodBB.currentOccPeriod.periodID}
+             | last updated: #{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPeriod.lastUpdatedTS)}">
 
         <h:form id="occperiod-status-form">
             <!-- Period type -->
@@ -26,25 +26,25 @@
                                            oncomplete="PF('occperiod-changetype-dialog-var').show()"
                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                            value="edit"
-                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedTS}"/>
+                                           disabled="#{!empty occPeriodBB.currentOccPeriod.periodTypeCertifiedTS}"/>
                         </div>
                     </div>
                     <div class="restrict-data-field-value-inline">
                         <h:outputText id="occperiod-type-ot"
-                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.type.title}"/>
+                                      value="#{occPeriodBB.currentOccPeriod.type.title}"/>
                         <br/>
                         <h:panelGroup id="occperiod-type-lockunlock-group">
-                            <i class="fa fa-#{empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedTS ? 'exclamation-circle' : 'shield'} p-mr-1"
+                            <i class="fa fa-#{empty occPeriodBB.currentOccPeriod.periodTypeCertifiedTS ? 'exclamation-circle' : 'shield'} p-mr-1"
                                aria-hidden="true"/>
                             <!-- command link if period type is unlocked -->
                             <p:commandLink id="occperiod-type-lock-cb"
                                            ajax="true"
                                            style="color:blue;"
-                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
-                                           rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy}"
+                                           actionListener="#{occPeriodBB.certifyOccPeriodField}"
+                                           rendered="#{empty occPeriodBB.currentOccPeriod.periodTypeCertifiedBy}"
                                            value="Uncertified"
                                            update="occperiod-status-form"
-                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
+                                           disabled="#{!empty occPeriodBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="occperiodtype"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to certify the period type?" icon="pi pi-info-circle"/>
@@ -53,18 +53,18 @@
                             <p:commandLink id="occperiod-type-unlock-cb"
                                            ajax="true"
                                            style="color:blue;"
-                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
-                                           rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy}"
+                                           actionListener="#{occPeriodBB.certifyOccPeriodField}"
+                                           rendered="#{!empty occPeriodBB.currentOccPeriod.periodTypeCertifiedBy}"
                                            value="Certified"
                                            update="occperiod-status-form"
-                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
+                                           disabled="#{!empty occPeriodBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="occperiodtype"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to unlock the start date? It was originally locked by
-                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy.human.firstName}
-                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy.human.lastName}
-                                                         on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedTS)}"
+                                                         #{occPeriodBB.currentOccPeriod.periodTypeCertifiedBy.human.firstName}
+                                                         #{occPeriodBB.currentOccPeriod.periodTypeCertifiedBy.human.lastName}
+                                                         on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.periodTypeCertifiedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
                         </h:panelGroup>
@@ -82,19 +82,19 @@
                     </div>
                     <div class="restrict-data-field-value-inline">
                         <h:panelGroup id="occperiod-authorization-lockunlock-group">
-                            <i class="fa fa-#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS ? 'exclamation-circle' : 'shield'} p-mr-1"
+                            <i class="fa fa-#{empty occPeriodBB.currentOccPeriod.authorizedTS ? 'exclamation-circle' : 'shield'} p-mr-1"
                                aria-hidden="true"/>
                             <!-- command link if period is unauthorized -->
                             <p:commandLink id="occperiod-authorization-lock-cb"
                                            ajax="true"
                                            style="color:blue;"
-                                           actionListener="#{occPeriodSearchWorkflowBB.toggleOccPeriodAuthorization}"
-                                           rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"
+                                           actionListener="#{occPeriodBB.toggleOccPeriodAuthorization}"
+                                           rendered="#{empty occPeriodBB.currentOccPeriod.authorizedBy}"
                                            value="Unauthorized"
                                            update="occperiod-status-form occperiod-permits-form inspections-form"
-                                           disabled="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy
-                                                        || empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy
-                                                        || empty occPeriodSearchWorkflowBB.currentOccPeriod.periodTypeCertifiedBy}">
+                                           disabled="#{empty occPeriodBB.currentOccPeriod.endDateCertifiedBy
+                                                        || empty occPeriodBB.currentOccPeriod.startDateCertifiedBy
+                                                        || empty occPeriodBB.currentOccPeriod.periodTypeCertifiedBy}">
                                 <f:param name="fieldtocertify" value="authorization"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to authorize this occupancy period?" icon="pi pi-info-circle"/>
@@ -103,17 +103,17 @@
                             <p:commandLink id="occperiod-authorization-unlock-cb"
                                            ajax="true"
                                            style="color:blue;"
-                                           actionListener="#{occPeriodSearchWorkflowBB.toggleOccPeriodAuthorization}"
-                                           rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"
+                                           actionListener="#{occPeriodBB.toggleOccPeriodAuthorization}"
+                                           rendered="#{!empty occPeriodBB.currentOccPeriod.authorizedBy}"
                                            value="Authorized"
                                            update="occperiod-status-form occperiod-permits-form inspections-form">
                                 <f:param name="fieldtocertify" value="authorization"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to deauthorize the occupancy period? It was originally authorized by
-                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.human.name}
-                                                         #{occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy.human.name}
-                                                         on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS)}"
+                                                         #{occPeriodBB.currentOccPeriod.authorizedBy.human.name}
+                                                         #{occPeriodBB.currentOccPeriod.authorizedBy.human.name}
+                                                         on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.authorizedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
                         </h:panelGroup>
@@ -136,17 +136,17 @@
                                            oncomplete="PF('occperiod-changemanager-dialog-var').show()"
                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                            value="edit"
-                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}"/>
+                                           disabled="#{!empty occPeriodBB.currentOccPeriod.authorizedBy}"/>
                         </div>
                     </div>
                     <div class="restrict-data-field-value-inline">
 
                         <h:outputText id="occperiod-manager-ot"
-                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.human.name}
-                                                              #{occPeriodSearchWorkflowBB.currentOccPeriod.manager.human.name}"/>
+                                      value="#{occPeriodBB.currentOccPeriod.manager.human.name}
+                                                              #{occPeriodBB.currentOccPeriod.manager.human.name}"/>
                         <br/>
                         <h:outputText id="occperiod-manager-username"
-                                      value="(#{occPeriodSearchWorkflowBB.currentOccPeriod.manager.username})"/>
+                                      value="(#{occPeriodBB.currentOccPeriod.manager.username})"/>
                     </div>
                 </div>
             </div>
@@ -160,11 +160,11 @@
                         </p:outputLabel>
                     </div>
                     <div class="restrict-data-field-value-inline">
-                        <h:outputText value="#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.human.name}
-                                                  #{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.human.name}
-                                                  (#{occPeriodSearchWorkflowBB.currentOccPeriod.createdBy.username})"/>
+                        <h:outputText value="#{occPeriodBB.currentOccPeriod.createdBy.human.name}
+                                                  #{occPeriodBB.currentOccPeriod.createdBy.human.name}
+                                                  (#{occPeriodBB.currentOccPeriod.createdBy.username})"/>
                         <br/>
-                        <h:outputText value="at #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.createdTS)}"/>
+                        <h:outputText value="at #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.createdTS)}"/>
                     </div>
                 </div>
             </div>
@@ -196,25 +196,25 @@
                                            oncomplete="PF('occperiod-editstart-dialog-var').show()"
                                            style="color:blue;"
                                            value="edit"
-                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedTS}"/>
+                                           disabled="#{!empty occPeriodBB.currentOccPeriod.startDateCertifiedTS}"/>
                         </div>
                     </div>
                     <div class="restrict-data-field-value-vertical">
-                        <h:outputText id="seloccperiod-sdate-it" value="#{occPeriodSearchWorkflowBB.currentOccPeriod.startDatePretty}"/>
+                        <h:outputText id="seloccperiod-sdate-it" value="#{occPeriodBB.currentOccPeriod.startDatePretty}"/>
                     </div>
                     <div class="restrict-data-field-value-vertical">
                         <h:panelGroup id="occperiod-startdate-lockunlock-group">
-                            <i class="fa fa-#{empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedTS ? 'unlock' : 'lock'} p-mr-1"
+                            <i class="fa fa-#{empty occPeriodBB.currentOccPeriod.startDateCertifiedTS ? 'unlock' : 'lock'} p-mr-1"
                                aria-hidden="true"/>
                             <!-- command link if start date is unlocked -->
                             <p:commandLink id="occperiod-startdate-lock-cb"
                                            ajax="true"
                                            style="color:blue;"
-                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
-                                           rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy}"
+                                           actionListener="#{occPeriodBB.certifyOccPeriodField}"
+                                           rendered="#{empty occPeriodBB.currentOccPeriod.startDateCertifiedBy}"
                                            value="Unlocked"
                                            update="occperiod-status-form"
-                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
+                                           disabled="#{!empty occPeriodBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="startdate"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to lock the start date?" icon="pi pi-info-circle"/>
@@ -223,18 +223,18 @@
                             <p:commandLink id="occperiod-startdate-unlock-cb"
                                            ajax="true"
                                            style="color:blue;"
-                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
-                                           rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy}"
+                                           actionListener="#{occPeriodBB.certifyOccPeriodField}"
+                                           rendered="#{!empty occPeriodBB.currentOccPeriod.startDateCertifiedBy}"
                                            value="Locked"
                                            update="occperiod-status-form"
-                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
+                                           disabled="#{!empty occPeriodBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="startdate"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to unlock the start date? It was originally locked by
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy.human.name}
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedBy.username}
-                                                     on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.startDateCertifiedTS)}"
+                                                     #{occPeriodBB.currentOccPeriod.startDateCertifiedBy.human.name}
+                                                     #{occPeriodBB.currentOccPeriod.startDateCertifiedBy.username}
+                                                     on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.startDateCertifiedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
                         </h:panelGroup>
@@ -252,27 +252,27 @@
                                            oncomplete="PF('occperiod-editend-dialog-var').show()"
                                            style="color:blue;"
                                            value="edit"
-                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedTS}"/>
+                                           disabled="#{!empty occPeriodBB.currentOccPeriod.endDateCertifiedTS}"/>
 
                         </div>
                     </div>
                     <div class="restrict-data-field-value-vertical">
                         <h:outputText id="seloccperiod-edate-it"
-                                      value="#{occPeriodSearchWorkflowBB.currentOccPeriod.endDatePretty}"/>
+                                      value="#{occPeriodBB.currentOccPeriod.endDatePretty}"/>
                     </div>
                     <div class="restrict-data-field-value-vertical">
                         <h:panelGroup id="occperiod-enddate-lockunlock-group">
-                            <i class="fa fa-#{empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedTS ? 'unlock' : 'lock'} p-mr-1"
+                            <i class="fa fa-#{empty occPeriodBB.currentOccPeriod.endDateCertifiedTS ? 'unlock' : 'lock'} p-mr-1"
                                aria-hidden="true"/>
                             <!-- command link if end date is unlocked -->
                             <p:commandLink id="occperiod-enddate-lock-cb"
                                            ajax="true"
                                            style="color:blue;"
-                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
-                                           rendered="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy}"
+                                           actionListener="#{occPeriodBB.certifyOccPeriodField}"
+                                           rendered="#{empty occPeriodBB.currentOccPeriod.endDateCertifiedBy}"
                                            value="Unlocked"
                                            update="occperiod-status-form"
-                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
+                                           disabled="#{!empty occPeriodBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="enddate"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to lock the end date?" icon="pi pi-info-circle"/>
@@ -281,18 +281,18 @@
                             <p:commandLink id="occperiod-enddate-unlock-cb"
                                            ajax="true"
                                            style="color:blue;"
-                                           actionListener="#{occPeriodSearchWorkflowBB.certifyOccPeriodField}"
-                                           rendered="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy}"
+                                           actionListener="#{occPeriodBB.certifyOccPeriodField}"
+                                           rendered="#{!empty occPeriodBB.currentOccPeriod.endDateCertifiedBy}"
                                            value="Locked"
                                            update="occperiod-status-form"
-                                           disabled="#{!empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedBy}">
+                                           disabled="#{!empty occPeriodBB.currentOccPeriod.authorizedBy}">
                                 <f:param name="fieldtocertify" value="enddate"/>
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to unlock the end date? It was originally locked by
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.human.name}
-                                                     #{occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedBy.human.name}
-                                                     on #{occPeriodSearchWorkflowBB.getPrettyDate(occPeriodSearchWorkflowBB.currentOccPeriod.endDateCertifiedTS)}"
+                                                     #{occPeriodBB.currentOccPeriod.endDateCertifiedBy.human.name}
+                                                     #{occPeriodBB.currentOccPeriod.endDateCertifiedBy.human.name}
+                                                     on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.endDateCertifiedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
                         </h:panelGroup>
@@ -312,9 +312,9 @@
                         <p:commandButton id="view-property-cb"
                                          ajax="false"
                                          icon="fa fa-home"
-                                         action="#{occPeriodSearchWorkflowBB.exploreProperty}"
+                                         action="#{occPeriodBB.exploreProperty}"
                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                         value="view property parcel ID: #{occPeriodSearchWorkflowBB.currentPropertyUnit.parcelKey}"/>
+                                         value="view property parcel ID: #{occPeriodBB.currentPropertyUnit.parcelKey}"/>
 
 
                     </div>
@@ -324,7 +324,7 @@
                         <p:commandButton id="refresh-period-cb"
                                          ajax="false"
                                          icon="fa fa-refresh"
-                                         action="#{occPeriodSearchWorkflowBB.refreshCurrentPeriod}"
+                                         action="#{occPeriodBB.refreshCurrentPeriod}"
                                          value="reload period"/>
                     </div>
                 </div>
@@ -336,7 +336,7 @@
                                    rendered="true"
                                    update="@form:@parent:@parent:blob-upload-dialog"
                                    value="Upload or connect photos/docs"
-                                   actionListener="#{occPeriodSearchWorkflowBB.manageBlobsOnOccPeriod}">
+                                   actionListener="#{occPeriodBB.manageBlobsOnOccPeriod}">
                         
                     </p:commandLink>
                     
@@ -351,7 +351,7 @@
                                    rendered="true"
                                    update="@form:@parent:@parent:blobs-gallery-dialog"
                                    value="View photos/docs"
-                                   actionListener="#{occPeriodSearchWorkflowBB.manageBlobsOnOccPeriod}">
+                                   actionListener="#{occPeriodBB.manageBlobsOnOccPeriod}">
                         
                     </p:commandLink>
                 
@@ -396,13 +396,13 @@
                     <div class="restrict-main-contents-io-content">
                         <p:selectOneMenu id="occperiod-type-som"
                                          tabindex="1"
-                                         value="#{occPeriodSearchWorkflowBB.currentOccPeriod.type}">
+                                         value="#{occPeriodBB.currentOccPeriod.type}">
 
                             <f:selectItem itemLabel="select a type"
                                           noSelectionOption="true"
                                           itemDisabled="true"/>
                             <f:selectItems id="occperiod-search-type-field-val-items"
-                                           value="#{occPeriodSearchWorkflowBB.search_occPeriodTypeList}"
+                                           value="#{occPeriodBB.occPeriodTypeList}"
                                            var ="typ" itemValue="#{typ}" itemLabel="#{typ.title}"/>
                             <f:converter converterId="occPeriodTypeConverter"/>
                         </p:selectOneMenu>
@@ -411,11 +411,11 @@
                 </div>
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-changetype-button"
-                                     value="Change type of period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
+                                     value="Change type of period ID #{occPeriodBB.currentOccPeriod.periodID}"
                                      icon="fa fa-user"
                                      oncomplete="PF('occperiod-changetype-dialog-var').hide()"
                                      update="occperiod-status-form"
-                                     actionListener="#{occPeriodSearchWorkflowBB.saveOccPeriodChanges}"/>
+                                     actionListener="#{occPeriodBB.saveOccPeriodChanges}"/>
 
                 </div>
 
@@ -427,7 +427,7 @@
                                          value="Cancel"
                                          icon="fa fa-stop"
                                          oncomplete="PF('occperiod-changetype-dialog-var').hide()"
-                                         actionListener="#{occPeriodSearchWorkflowBB.discardOccPeriodChanges}"/>
+                                         actionListener="#{occPeriodBB.discardOccPeriodChanges}"/>
                     </div>
                 </div>
             </div>
@@ -457,7 +457,7 @@
                     <div class="restrict-main-contents-io-content">
                         <p:selectOneMenu id="occperiod-manager-som"
                                          tabindex="1"
-                                         value="#{occPeriodSearchWorkflowBB.currentOccPeriod.manager}">
+                                         value="#{occPeriodBB.currentOccPeriod.manager}">
 
                             <f:selectItem itemLabel="select a user"
                                           noSelectionOption="true"
@@ -473,11 +473,11 @@
                 </div>
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-changemanager-button"
-                                     value="Change manager of period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
+                                     value="Change manager of period ID #{occPeriodBB.currentOccPeriod.periodID}"
                                      icon="fa fa-user"
                                      oncomplete="PF('occperiod-changemanager-dialog-var').hide()"
                                      update="occperiod-status-form"
-                                     actionListener="#{occPeriodSearchWorkflowBB.saveOccPeriodChanges}"/>
+                                     actionListener="#{occPeriodBB.saveOccPeriodChanges}"/>
                 </div>
 
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
@@ -486,7 +486,7 @@
                                          value="Cancel"
                                          icon="fa fa-stop"
                                          oncomplete="PF('occperiod-changemanager-dialog-var').hide()"
-                                         actionListener="#{occPeriodSearchWorkflowBB.discardOccPeriodChanges}"/>
+                                         actionListener="#{occPeriodBB.discardOccPeriodChanges}"/>
                     </div>
                 </div>
             </div>
@@ -519,7 +519,7 @@
                             <h:outputText value="Start date"/>
                         </p:outputLabel>
 
-                        <p:calendar value="#{occPeriodSearchWorkflowBB.currentOccPeriod.startDate}"
+                        <p:calendar value="#{occPeriodBB.currentOccPeriod.startDate}"
                                     mode="popup"
                                     tabindex="3"
                                     id="occperiod-date-start-cal"
@@ -539,11 +539,11 @@
 
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-editstart-button"
-                                     value="Change start date of occupancy period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
+                                     value="Change start date of occupancy period ID #{occPeriodBB.currentOccPeriod.periodID}"
                                      icon="fa fa-user"
                                      oncomplete="PF('occperiod-editstart-dialog-var').hide()"
                                      update="occperiod-status-form"
-                                     actionListener="#{occPeriodSearchWorkflowBB.saveOccPeriodChanges}"/>
+                                     actionListener="#{occPeriodBB.saveOccPeriodChanges}"/>
 
                 </div>
 
@@ -555,7 +555,7 @@
                                          value="Cancel"
                                          icon="fa fa-stop"
                                          oncomplete="PF('occperiod-editstart-dialog-var').hide()"
-                                         actionListener="#{occPeriodSearchWorkflowBB.discardOccPeriodChanges}"/>
+                                         actionListener="#{occPeriodBB.discardOccPeriodChanges}"/>
                     </div>
                 </div>
             </div>
@@ -588,7 +588,7 @@
                             <h:outputText value="End date"/>
                         </p:outputLabel>
 
-                        <p:calendar value="#{occPeriodSearchWorkflowBB.currentOccPeriod.endDate}"
+                        <p:calendar value="#{occPeriodBB.currentOccPeriod.endDate}"
                                     mode="popup"
                                     tabindex="3"
                                     id="occperiod-date-end-cal"
@@ -608,11 +608,11 @@
 
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-editend-button"
-                                     value="Change end date of occupancy period ID #{occPeriodSearchWorkflowBB.currentOccPeriod.periodID}"
+                                     value="Change end date of occupancy period ID #{occPeriodBB.currentOccPeriod.periodID}"
                                      icon="fa fa-user"
                                      oncomplete="PF('occperiod-editend-dialog-var').hide()"
                                      update="occperiod-status-form"
-                                     actionListener="#{occPeriodSearchWorkflowBB.saveOccPeriodChanges}"/>
+                                     actionListener="#{occPeriodBB.saveOccPeriodChanges}"/>
                 </div>
 
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
@@ -621,7 +621,7 @@
                                          value="Cancel"
                                          icon="fa fa-stop"
                                          oncomplete="PF('occperiod-editend-dialog-var').hide()"
-                                         actionListener="#{occPeriodSearchWorkflowBB.discardOccPeriodChanges}"/>
+                                         actionListener="#{occPeriodBB.discardOccPeriodChanges}"/>
                     </div>
                 </div>
             </div>

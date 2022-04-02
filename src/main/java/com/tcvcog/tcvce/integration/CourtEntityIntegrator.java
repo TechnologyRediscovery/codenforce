@@ -982,8 +982,8 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
         
         String query =  "SELECT citationid FROM public.citation 	"
                         + "INNER JOIN public.cecase ON cecase.caseid = citation.caseid \n" +
-                        "INNER JOIN public.property ON cecase.property_propertyID = property.propertyID \n" +
-                        "WHERE propertyID=? AND citation.isactive = TRUE; ";
+                        "INNER JOIN public.parcel ON cecase.parcel_parcelkey = parcel.parcelkey \n" +
+                        "WHERE parcelkey=? AND citation.isactive = TRUE; ";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;

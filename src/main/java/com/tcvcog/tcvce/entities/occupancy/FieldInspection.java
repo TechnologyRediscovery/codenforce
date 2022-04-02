@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities.occupancy;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobLinkEnum;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
@@ -40,9 +41,9 @@ import java.util.*;
  *
  * @author Adam Gutonski and Sylvia
  */
-public  class       OccInspection 
+public  class       FieldInspection 
         extends     BOb 
-        implements  Comparable<OccInspection>,
+        implements  Comparable<FieldInspection>,
                     IFace_BlobHolder{
     
     private final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.FIELD_INSPECTION;
@@ -67,8 +68,10 @@ public  class       OccInspection
     private LocalDateTime timeStart;
     private LocalDateTime timeEnd;
 
-    /** ID for the OccPeriod that this OccInspection is for **/
+    /** ID for the OccPeriod that this FieldInspection is for **/
+    private DomainEnum domainEnum;
     private int occPeriodID;
+    private int cecaseID;
     
     // This template object provides us the raw lists of uninspected
     // space types, from which we extract a list of Spaces and their CodeElements
@@ -109,7 +112,7 @@ public  class       OccInspection
 
     private OccInspectionCause cause;
     
-    public OccInspection() {
+    public FieldInspection() {
         inspectedSpaceList = new ArrayList<>();
         inspectedSpaceListVisible = new ArrayList<>();
         viewSetting = ViewOptionsOccChecklistItemsEnum.ALL_ITEMS;
@@ -374,7 +377,7 @@ public  class       OccInspection
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        OccInspection that = (OccInspection) o;
+        FieldInspection that = (FieldInspection) o;
         return inspectionID == that.inspectionID && followUpToInspectionID == that.followUpToInspectionID && occPeriodID == that.occPeriodID && includeEmptySpaces == that.includeEmptySpaces && pacc == that.pacc && enablePacc == that.enablePacc && readyForPassedCertification == that.readyForPassedCertification && maxOccupantsAllowed == that.maxOccupantsAllowed && numBedrooms == that.numBedrooms && numBathrooms == that.numBathrooms && Objects.equals(inspector, that.inspector) && Objects.equals(createdBy, that.createdBy) && Objects.equals(creationTS, that.creationTS) && Objects.equals(lastUpdatedBy, that.lastUpdatedBy) && Objects.equals(lastUpdatedTS, that.lastUpdatedTS) && Objects.equals(checklistTemplate, that.checklistTemplate) && Objects.equals(inspectedSpaceList, that.inspectedSpaceList) && Objects.equals(inspectedSpaceListVisible, that.inspectedSpaceListVisible) && viewSetting == that.viewSetting && Objects.equals(effectiveDateOfRecord, that.effectiveDateOfRecord) && Objects.equals(thirdPartyInspector, that.thirdPartyInspector) && Objects.equals(thirdPartyInspectorApprovalTS, that.thirdPartyInspectorApprovalTS) && Objects.equals(thirdPartyApprovalBy, that.thirdPartyApprovalBy) && Objects.equals(notesPreInspection, that.notesPreInspection) && Objects.equals(determination, that.determination) && Objects.equals(determinationBy, that.determinationBy) && Objects.equals(determinationTS, that.determinationTS) && Objects.equals(remarks, that.remarks) && Objects.equals(generalComments, that.generalComments) && Objects.equals(cause, that.cause);
     }
 
@@ -390,7 +393,7 @@ public  class       OccInspection
      * @param ins
      * @return the selected date for comparison
      */
-    private LocalDateTime getDateForComparison(OccInspection ins){
+    private LocalDateTime getDateForComparison(FieldInspection ins){
         if(ins.getEffectiveDateOfRecord() == null){
             return ins.getCreationTS();
         } else {
@@ -400,7 +403,7 @@ public  class       OccInspection
     
 
     @Override
-    public int compareTo(OccInspection ins) {
+    public int compareTo(FieldInspection ins) {
         int compRes = getDateForComparison(this).compareTo(getDateForComparison(ins));
 
 //        if(getDateForComparison(this).isBefore(getDateForComparison(ins))){
@@ -640,5 +643,33 @@ public  class       OccInspection
     @Override
     public int getBlobUpstreamPoolEnumPoolFeederID() {
         return occPeriodID;
+    }
+
+    /**
+     * @return the cecaseID
+     */
+    public int getCecaseID() {
+        return cecaseID;
+    }
+
+    /**
+     * @param cecaseID the cecaseID to set
+     */
+    public void setCecaseID(int cecaseID) {
+        this.cecaseID = cecaseID;
+    }
+
+    /**
+     * @return the domainEnum
+     */
+    public DomainEnum getDomainEnum() {
+        return domainEnum;
+    }
+
+    /**
+     * @param domainEnum the domainEnum to set
+     */
+    public void setDomainEnum(DomainEnum domainEnum) {
+        this.domainEnum = domainEnum;
     }
 }

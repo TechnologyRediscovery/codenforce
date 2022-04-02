@@ -208,22 +208,6 @@
                             collapsed="false"
                             header="Person list">
 
-                    <h:form id="person-list-quickloads-form">
-                        
-                      <h:outputLabel styleClass="bold" value="Load persons currently linked to "  />
-                        <p:spacer height="5px" />
-                            <p:commandLink     id="loadpersonsonsessionproperty-link"
-                                               actionListener="#{personBB.onLoadPersonListOnSessionPropertyLinkClick}"
-                                                ajax="true"
-                                                style="color: blue;"
-                                                value="current property at #{sessionBean.sessProperty.address.addressPretty1Line}"
-                                                update="pers-search-results-form
-                                                        persontools-growl-form"
-                                                />
-                        
-                        <p:spacer height="5px" />
-                        
-                    </h:form>
                         
                     <h:form id="pers-search-results-form">
 
@@ -240,28 +224,18 @@
                                                        update="pers-search-results-form
                                                        persontools-growl-form"
                                                        />
-
-
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
-                                <div class="restrict-main-contents-io-link">
-
-                                    <p:commandLink      id="clear-results-cb"
+                        <h:outputText value="list contains #{personBB.querySelected.results.size()} persons " 
+                                      styleClass="italic"/>
+                          <p:commandLink      id="clear-results-cb"
                                                         actionListener="#{personBB.clearResultList}"
                                                         ajax="true"
                                                         value="clear result list"
                                                         update="pers-search-results-form
                                                         persontools-growl-form"/>
-
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <h:outputText value="list contains #{personBB.querySelected.results.size()} persons" 
-                                      styleClass="italic"/>
                         <p:spacer height="5px" />
 
                         <p:dataTable
@@ -276,7 +250,7 @@
                             filteredValue="#{personBB.filteredPersonList}"
                             widgetVar="personSelectListTable">
 
-                            <p:column width="80%" sortBy="#{per.name}"
+                            <p:column width="70%" sortBy="#{per.name}"
                                       filterBy="#{per.name}">
                                 <f:facet name="header">
                                     <h:outputText value="Name" />
@@ -286,7 +260,7 @@
                                 <h:outputText value="(ID: #{per.humanID})"/>
                             </p:column>
 
-                            <p:column width="20%" >
+                            <p:column width="30%" >
                                 <f:facet name="header">
                                     <h:outputText value="Actions" />
                                 </f:facet>
@@ -307,13 +281,14 @@
                                                             person-profile-emails-form
                                                             person-links-form
                                                             person-profile-dialog
-                                                            persontools-growl-form"
+                                                            persontools-growl-form
+                                                            topnav-pers-form"
                                                             />
 
                                             <p:spacer height="3px" />
                                             <p:commandLink  id="person-addtolist-commandlink"
                                                             ajax="true" 
-                                                            value="add"
+                                                            value="queue for linking"
                                                             actionListener="#{personBB.onAddPersonToSelectedList(per)}"
                                                             update="pers-selected-panel
                                                             pers-selected-form
@@ -335,16 +310,16 @@
                              collapsed="false"
                              header="Selected persons">
                     <h:form id="pers-selected-form">
-                          <p:commandButton   id="selected-persons-connect-button" 
+                        <p:commandButton   id="selected-persons-connect-button" 
                                            ajax="true" 
                                            actionListener="#{personBB.onLinkSelectedPersonsToPersonHolder}"
                                            icon="fa fa-link" 
                                            styleClass="button"
                                            value="Link these persons to #{sessionBean.sessHumanListHolder.HUMAN_LINK_SCHEMA_ENUM.TARGET_OBJECT_FRIENDLY_NAME} (ID:#{sessionBean.sessHumanListHolder.hostPK})" 
-                                           disabled="#{empty sessionBean.sessHumanListHolder}"
+                                           disabled="#{empty sessionBean.sessHumanListHolder or personBB.personsSelectedList.size() eq 0}"
                                            oncomplete="PF('human-search-dialog-var').hide();"
                                            update="#{personBB.personListComponentIDToUpdatePostLinkingOperation}
-                                           persontools-growl-form"/>
+                                           persontools-growl-form" />
                           
                           <p:spacer height="5px" />
                         
@@ -412,7 +387,6 @@
                         </p:dataTable>
                     </h:form>
                 </p:panel>
-                
                   <p:panel     id="hlh-humlist-panel"
                              toggleable="true"
                              widgetVar="hlh-humlist-panel-var"
@@ -456,14 +430,18 @@
                                     <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                                         <div class="restrict-main-contents-io-link">
 
-                                            <p:commandLink  id="hlh-removelink-link"
+                                            <p:commandLink  id="linklist-view-commandlink"
                                                             ajax="true" 
-                                                            value="remove link"
-                                                            actionListener="#{personBB.onRemoveHumanFromSessionHumanListHolder(hum)}"
-                                                            update="@form"
+                                                            value="view"
+                                                            actionListener="#{personBB.exploreHuman(hum)}"
+                                                            oncomplete="PF('person-profile-dialog-var').show();"
+                                                            update="person-info-form
+                                                            person-profile-addresses-form
+                                                            person-profile-phones-form
+                                                            person-profile-emails-form
+                                                            person-links-form
+                                                            person-profile-dialog"
                                                             />
-                                            
-                                       
                                         </div>
                                     </div>
                                 </div>
@@ -502,26 +480,28 @@
                                          value="#{personBB.currentPersonHumanFieldsEditMode ? 'Save changes' : 'Edit'}"
                                          rendered="true"
                                          ajax="true"
+                                         style="margin-right: 5px;"
                                          icon="fa #{personBB.currentPersonHumanFieldsEditMode ? 'fa-check' : 'fa-pencil'}"
                                          actionListener="#{personBB.toggleHumanEditMode}"
+                                         oncomplete="PF('person-profile-dialog-var').show();"
                                          update="@form
                                          @form:@parent:persontools-growl-form
-                                         topnav-pers-form"
+                                         topnav-pers-form
+                                         person-profile-dialog"
                                          />
 
 
-                        <div class="restrict-main-contents-io-button gray_button">
 
                             <p:commandButton    id="person-profile-info-edit-abort-button"
                                                 ajax="true"
                                                 rendered="#{personBB.currentPersonHumanFieldsEditMode}"
                                                 value="Abort edit"
+                                                style="background-color: darkgray;"
                                                 actionListener="#{personBB.onHumanOperationAbortButtonChange}"
                                                 update="@form:@parent:persontools-growl-form
                                                 @form"
                                                 icon="fa fa-stop" />
 
-                        </div>
 
                         <p:spacer height="5px"/>    
 
@@ -556,7 +536,32 @@
                             </div>
 
 
-                            <div class="p-col-6">Multi-Person</div>
+                            <div class="p-col-6">
+                                Multi-Person  <p:commandButton id="person-multiperson-help-button"
+                                             icon="fa fa-question-circle-o"
+                                             styleClass="button-help"
+                                             type="button" />
+                            
+                                <p:overlayPanel for="person-multiperson-help-button"
+                                                style="width:350px;" 
+                                                dismissable="true"
+                                                showCloseIcon="true">
+                                    <h3>What is a multi-person?</h3>
+                                    <p>A multi-person is a name that represents two or more people or a person and 
+                                    a corporate entity. This is common since we use exactly the name listed as a property
+                                    owner by Allegheny County as the person name, and many folks jointly own properties in the county.</p>
+                                    
+                                    <p>For example, a property might be owned by "SHELLY MARY R AND PERCY B". We would enter this entire
+                                    String of characters as the Person name in codeNforce.</p>
+                                    
+                                    <p>In other words, we don't try to parse the name
+                                    into separate person records. Instead, we turn on this flag to note that this Person
+                                    represents two or more people in the world or a person and a business.</p>
+
+                                    
+                                </p:overlayPanel>
+                            
+                            </div>
                             <div class="p-col-6">
                                 <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
                                                 value="#{personBB.currentPerson.multiHuman ? 'Yes' : 'No'}" />
@@ -628,24 +633,23 @@
                                                          value="#{personBB.currentPerson.under18}" />
                             </div>
 
-                            <div class="p-col-6">
+                            <div class="p-col-6">          
                                 Date of Birth
                             </div>
                             <div class="p-col-6">
 
                                 <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
-                                              value="#{personBB.currentPerson.dob}"/>
+                                              value="#{personBB.getPrettyLocalDateOnlyNoTime(personBB.currentPerson.dob)}"/>
                                 <p:spacer height="2px" />
 
-                                <p:calendar id="person-dor-it"
+                                <p:datePicker id="person-dor-it"
                                             rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
-                                            value="#{personBB.currentPerson.dob}"
-                                            mode="popup" tabindex="3"
-                                            showOn="button"
-                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                            navigator="true" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                            showButtonPanel="true"
-                                            showTodayButton="true"
+                                            value="#{personBB.currentPerson.dob}"                                          
+                                            tabindex="3"
+                                            showButtonBar="false"
+                                            mask="true"
+                                            pattern="MM/dd/yyyy"
+                                            timeInput="false" 
                                             required="false"/>
                             </div>
 
@@ -656,22 +660,24 @@
                             <div class="p-col-6">
 
                                 <h:outputText rendered="#{!personBB.currentPersonHumanFieldsEditMode}" 
-                                              value="#{personBB.getPrettyDateNoTime(personBB.currentPerson.deceasedDate)}"/>
+                                              value="#{personBB.getPrettyLocalDateOnlyNoTime(personBB.currentPerson.deceasedDate)}"/>
 
                                 <p:spacer height="2px" />
                                 <h:outputText rendered="#{!empty personBB.currentPersonHumanFieldsEditMode and !empty personBB.currentPerson.deceasedBy}" 
-                                              value="recorded by user: #{personBB.currentPerson.deceasedBy.username}"/>
+                                              value="recorded by user: #{personBB.currentPerson.deceasedBy.human.name}"/>
 
-                                <p:calendar id="person-dod-it"
+                                
+                                   <p:datePicker id="person-dod-it"
                                             rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
-                                            value="#{personBB.currentPerson.deceasedDate}"
-                                            mode="popup" tabindex="3"
-                                            showOn="button"
-                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                            navigator="true" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                            showButtonPanel="true"
-                                            showTodayButton="true"
+                                            value="#{personBB.currentPerson.deceasedDate}"                                      
+                                            tabindex="3"
+                                            showButtonBar="false"
+                                            mask="true"
+                                            pattern="MM/dd/yyyy"
+                                            timeInput="false" 
                                             required="false"/>
+                                   
+                              
                             </div>
 
                             <div class="p-col-6">Notes
@@ -706,15 +712,14 @@
                          header="Addresses">
                     <h:form id="person-profile-addresses-form">
                         <p:commandButton      id="addresses-add-cb"
-                                              value="Connect person to session Address" 
+                                              value="Connect person to Address" 
                                               ajax="true"
                                               icon="fa fa-link"
-                                              actionListener="#{addressBB.onLinkToSessionMailingAddressInitButtonChange(personBB.currentPerson)}"
+                                              disabled="#{personBB.currentPersonHumanFieldsEditMode}"
+                                              actionListener="#{addressBB.onLinkPersonPropToAddressInitButtonChange(personBB.currentPerson)}"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                              oncomplete="PF('address-link-dialog-var').show()"
-                                              update="address-link-dialog
-                                                    address-linking-form
-                                                    addresslink-list-growl-form">
+                                              oncomplete="PF('address-search-dialog-var').show()"
+                                              update="address-search-dialog">
                             <f:param name="initiating-address-list-component-id" value="person-profile-addresses-form" />
                         </p:commandButton>
 
@@ -754,15 +759,14 @@
                                 </f:facet>
 
                                 <p:commandLink      id="address-actions-cl"
+                                                    value="view/edit"
                                                     ajax="true"
                                                     actionListener="#{addressBB.onMalingAddressLinkViewEditInit(hmal)}"
                                                     style="color:blue;"
                                                     oncomplete="PF('address-link-dialog-var').show()"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                     update="address-link-dialog
-                                                    address-linking-form
-                                                    addresslink-list-growl-form"
-                                                    value="view/edit" >
+                                                    address-linking-form">
                                     <f:param name="initiating-address-list-component-id" value="person-profile-addresses-form" />
                                 </p:commandLink>
 
@@ -782,6 +786,7 @@
                                              ajax="true"
                                              icon="fa fa-phone-square"
                                              actionListener="#{personBB.onPhoneAddInitButtonChange}"
+                                             disabled="#{personBB.currentPersonHumanFieldsEditMode}"
                                              oncomplete="PF('phone-dialog-var').show()"
                                              rendered="true"
                                              value="Add phone number" 
@@ -866,6 +871,7 @@
                         <p:commandButton      id="email-add-cb"
                                               ajax="true"
                                               icon="fa fa-envelope-open"
+                                              disabled="#{personBB.currentPersonHumanFieldsEditMode}"
                                               actionListener="#{personBB.onEmailAddInitButtonChange}"
                                               oncomplete="PF('email-dialog-var').show()"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
@@ -939,8 +945,9 @@
 
                         <p:commandButton      id="load-personlinks-button"
                                               ajax="true"
-                                              actionListener="#{personBB.onLoadHumanLinks}"
+                                              actionListener="#{personBB.onLoadHumanLinksToCurrentPerson}"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                              disabled="#{personBB.currentPersonHumanFieldsEditMode}"
                                               update="person-links-table
                                               persontools-growl-form"
                                               style="margin-right:5px;"
@@ -951,12 +958,13 @@
                                               ajax="true"
                                               icon="fa fa-plus"
                                               actionListener="#{personBB.onHumanLinkAddInitButtonChange}"
+                                              disabled="true"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                               oncomplete="PF('human-createlink-dialog-var').show();"
                                               update="human-createlink-dialog
                                               human-createlink-form
                                               persontools-growl-form"
-                                              value="Create new object link to this person" />
+                                              value="Create new link to this person" />
 
                         <p:spacer height="5px" />
 

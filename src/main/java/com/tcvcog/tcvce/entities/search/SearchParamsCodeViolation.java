@@ -19,7 +19,7 @@ import com.tcvcog.tcvce.entities.Property;
 public class        SearchParamsCodeViolation 
         extends     SearchParams{
     
-    public static final String DBFIELD_MUNI = "property.municipality_municode";
+    public static final String DBFIELD_MUNI = "parcel.muni_municode";
     public static final String DBFIELD_ACTIVE = "codeviolation.active";
     
     

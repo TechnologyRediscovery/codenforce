@@ -1490,6 +1490,13 @@ gridTd-bignum{
     
 }
 
+button.button-help{
+    background-color: white; 
+    color: blue; 
+    border: none;
+    display: inline-block;
+}
+
 /* ****************** CLOSE BUTTON STYLES ********************/
 
 

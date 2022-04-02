@@ -19,7 +19,7 @@ import com.tcvcog.tcvce.entities.PropertyUnit;
 public class        SearchParamsCECase 
         extends     SearchParams{
     
-    public static final String MUNI_DBFIELD = "property.municipality_municode";
+    public static final String MUNI_DBFIELD = "parcel.muni_municode";
     
     // filter CECASE-1
     private boolean caseOpen_ctl;

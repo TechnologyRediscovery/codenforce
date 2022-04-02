@@ -49,7 +49,6 @@ public  class       PropertyDataHeavy
     private List<PropertyUnitDataHeavy> unitWithListsList;
     private List<CECaseDataHeavy> propInfoCaseList;
     private List<BlobLight> blobList;
-    private List<PropertyExtData> extDataList;
     
     private String credentialSignature;
     
@@ -223,20 +222,7 @@ public  class       PropertyDataHeavy
         return propInfoCaseList;
     }
 
-    /**
-     * @return the extDataList
-     */
-    public List<PropertyExtData> getExtDataList() {
-        return extDataList;
-    }
-
-    /**
-     * @param extDataList the extDataList to set
-     */
-    public void setExtDataList(List<PropertyExtData> extDataList) {
-        this.extDataList = extDataList;
-    }
-
+   
    
 
 

@@ -125,7 +125,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * creation, update, and deactivation 
      * @throws SQLException 
      */
-    protected void populateTrackedFields(TrackedEntity te, ResultSet rs, boolean userIDOnly) throws SQLException, IntegrationException, BObStatusException{
+    public void populateTrackedFields(TrackedEntity te, ResultSet rs, boolean userIDOnly) throws SQLException, IntegrationException, BObStatusException{
         UserIntegrator ui = getUserIntegrator();
         
         if(rs != null){
@@ -717,7 +717,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+            throw new IntegrationException("Unable to build improvement suggestion due to an DB integration error", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -737,7 +737,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+            throw new IntegrationException("Unable to get improvement suggestion RS due to an DB integration error", ex);
         } finally {
             if (con != null) {
                 try {
@@ -830,7 +830,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+            throw new IntegrationException("Unable to build suggestion type map due to an DB integration error", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -865,7 +865,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+            throw new IntegrationException("Unable to build bob source list complete due to an DB integration error", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -906,7 +906,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to build property unit list due to an DB integration error", ex);
+            throw new IntegrationException("Unable to get bob source due to an DB integration error", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }

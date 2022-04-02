@@ -56,7 +56,7 @@
                           styleClass="centeredColumnContent">
 
                     <h:outputText value="#{unit.periodList.size()}"/>
-
+                    <p:spacer height="3px" />
 
                     <p:commandLink   id="prop-unit-newperiod-button"
                                      ajax="true"
@@ -64,6 +64,7 @@
                                      oncomplete="PF('occperiod-add-dialog-var').show()"
                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                      value="New Occ Period"
+                                     style="color:blue; font-weight: bold;"
                                      update="occperiod-add-form"
                                      />
 
@@ -73,31 +74,27 @@
                 <p:column headerText="Rent start"
                           styleClass="centeredColumnContent">
 
-                    <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
+                    <h:outputText value="#{propertyProfileBB.getPrettyLocalDateOnlyNoTime(unit.rentalIntentDateStart)}"/>
 
                 </p:column>
 
                 <p:column headerText="Rent stop"
                           styleClass="centeredColumnContent">
 
-                    <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.rentalIntentDateStart)}"/>
+                    <h:outputText value="#{propertyProfileBB.getPrettyLocalDateOnlyNoTime(unit.rentalIntentDateStop)}"/>
 
                 </p:column>
 
-                <p:column headerText="Last updated"
-                          styleClass="centeredColumnContent">
-
-                    <h:outputText value="#{propertyProfileBB.getPrettyDateNoTime(unit.lastUpdatedTS)}"/>
-
-                </p:column>
+             
 
                 <p:column headerText="Options"
                           styleClass="centeredColumnContent">
 
                     <p:commandLink id="prop-unit-viewedit-cl"
-                                   actionListener="#{propertyProfileBB.onUnitViewEditLinkClick(pu)}"
+                                   actionListener="#{propertyProfileBB.onUnitViewEditLinkClick(unit)}"
                                    value="view/edit"
                                    ajax="true"
+                                   style="color:blue; font-weight: bold;"
                                    oncomplete="PF('unit-dialog-var').show();"
                                    update="unit-info-form
                                    units-growl-form
@@ -119,7 +116,7 @@
 
 
     <p:dialog   id="unit-dialog"
-                height="700" width="1300"
+                height="600" width="1300"
                 widgetVar="unit-dialog-var"
                 responsive="true"
                 resizable="true"
@@ -127,7 +124,7 @@
                 closeOnEscape="true"
                 dynamic="true"
                 modal="true"
-                header="Manage Property Unit: #{propertyProfileBB.currentPropertyUnit.unitNumber} (ID: #{propertyProfileBB.currentPropertyUnit.unitID})"
+                header="Manage Property Unit: #{propertyProfileBB.currentPropertyUnit.unitNumberCleaned} (ID: #{propertyProfileBB.currentPropertyUnit.unitID})"
                 rendered="true"
                 >
 
@@ -145,14 +142,16 @@
                     <h:form id="unit-info-form">
 
                         <p:commandButton id="unit-edit-toggle-button"
+                                         ajax="true"
                                          value="#{propertyProfileBB.unitEditMode ? 'Save Changes' : 'Edit'}"
                                          rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                          icon="fa #{propertyProfileBB.unitEditMode ? 'fa-check' : 'fa-pencil'}"
                                          actionListener="#{propertyProfileBB.onUnitEditToggleButtonChange}"
+                                         oncomplete="PF('unit-dialog-var').show();"
                                          update="@form
                                          units-growl-form
-                                         prop-units-panel-form
-                                         "/>
+                                         unit-dialog
+                                         prop-units-panel-form"/>
 
                         <div class="gray_button">
 
@@ -164,34 +163,23 @@
                                              process="@none"
                                              immediate="true"
                                              ajax="true"
-                                             actionListener="#{propertyProfileBB.onUnitEditModeAbortButtonChange(ev)}"
+                                             actionListener="#{propertyProfileBB.onUnitEditModeAbortButtonChange}"
                                              update="@form"
                                              />
                         </div>
 
-
                         <div class="p-grid">
-
-                            <div class="p-col-4">
-                                <h:outputText value="Attached to parcel ID" />
-                            </div>
-
-                            <div class="p-col-8">
-                                <h:outputText value="#{propertyProfileBB.currentPropertyUnit.parcelKey}"/>
-                            </div>
 
                             <div class="p-col-4">
                                 <h:outputText value="Unit Number" />
                             </div>
 
                             <div class="p-col-8">
-                                <h:outputText value="#{propertyProfileBB.currentPropertyUnit.unitNumber}"
+                                <h:outputText value="#{propertyProfileBB.currentPropertyUnit.unitNumberCleaned}"
                                               rendered="#{!propertyProfileBB.unitEditMode}"/>
-
                                 <p:inputText value="#{propertyProfileBB.currentPropertyUnit.unitNumber}"
                                              rendered="#{propertyProfileBB.unitEditMode}"/>
                             </div>
-
 
                             <div class="p-col-4">
                                 <h:outputText value="Mailing address" />
@@ -211,7 +199,6 @@
                             <div class="p-col-8">
                                 <h:outputText value="#{propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentPropertyUnit.rentalIntentDateStart)}"
                                               rendered="#{!propertyProfileBB.unitEditMode}"/>
-
                                 <p:datePicker   value="#{propertyProfileBB.currentPropertyUnit.rentalIntentDateStart}"
                                                 pattern="MM/dd/yyyy"
                                                 mask="true"
@@ -250,8 +237,13 @@
                                                  rendered="#{propertyProfileBB.unitEditMode}"/>
                             </div>
 
+                            <div class="p-col-4">
+                                <h:outputText value="Attached to parcel ID" />
+                            </div>
 
-
+                            <div class="p-col-8">
+                                <h:outputText value="#{propertyProfileBB.currentPropertyUnit.parcelKey}"/>
+                            </div>
 
                             <div class="p-col-4">
                                 <h:outputText value="Record status" />
@@ -334,6 +326,12 @@
                             var="period"
                             value="#{propertyProfileBB.currentPropertyUnit.periodList}"
                             >                                         
+                            <div style="datum">
+                                <h:outputText value="Type: " 
+                                              styleClass="ui-label-inline" />
+                                <h:outputText value="#{period.type.title}" 
+                                              styleClass="data-text"/>
+                            </div>
 
                             <div style="datum">
 
@@ -352,22 +350,15 @@
                                               styleClass="data-text"/>
                             </div>
                             <div style="datum">
-                                <h:outputText value="Type: " 
-                                              styleClass="ui-label-inline" />
-                                <h:outputText value="#{period.type.title}" 
-                                              styleClass="data-text"/>
-                            </div>
-                            <div style="datum">
                                 <h:outputText value="Authorization" 
                                               styleClass="ui-label-inline" />
                                 <h:outputText value="#{empty period.authorizedTS ? 'Unauthorized!' : PropertyUnitsBB.getPrettyDate(period.authorizedTS)}" />
                             </div>
-                            <p:commandButton       id="button-occperiodtable-editperiod"
+                            <p:commandLink          id="button-occperiodtable-editperiod"
                                                    ajax="false" 
-                                                   action="#{propertyUnitsBB.manageOccPeriod(period)}"
+                                                   action="#{propertyProfileBB.onViewOccPeriodButtonChange(period)}"
                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                   value="manage occupancy period"  
-                                                   icon="fa fa-edit"/>
+                                                   value="view period"  />
                         </p:dataScroller>
                     </h:form>
                 </p:panel>
@@ -382,10 +373,76 @@
                         <p>Case list coming soon!</p>
                     </h:form>
                 </p:panel>
+                
+                 <p:panel    id="unit-notes-panel"
+                            toggleable="true"
+                            collapsed="false"
+                            header="Notes">
+                    <h:form id="unit-notes-form">
+
+                        <p:commandButton    id="unit-note-add-cb"
+                                            ajax="true"
+                                            value="Create new note"
+                                            process="@none"
+                                            immediate="true"
+                                            oncomplete="PF('unit-note-dialog-var').show()"
+                                            actionListener="#{propertyProfileBB.onUnitNoteAddInitButtonChange}"
+                                            update="unit-note-dialog
+                                            unit-note-form"
+                                            icon="fa fa-plus" />
+
+                        <p:spacer height="2px" />
+
+                        <h:outputText value="#{propertyProfileBB.currentPropertyUnit.notes}"
+                                      escape="false" 
+                                      class="wrapText"/>
+                    </h:form>
+                </p:panel>
+                
+                
             </div>
         </div>
     </p:dialog>
 
+  <p:dialog   id="unit-note-dialog"
+                height="350" width="400"
+                widgetVar="unit-note-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                dynamic="true"
+                modal="true"
+                rendered="true"
+                >
+        <f:facet name="header">
+            <h:outputText value="Add note to unit #{propertyProfileBB.currentPropertyUnit.unitNumber}" />
+        </f:facet>
+        <h:form id="unit-note-form">
+
+            <p:inputTextarea value="#{propertyProfileBB.formUnitNoteText}"
+                             cols="50"
+                             rows="10"/>
+            <p:spacer height="5px" />
+            
+            <h:outputText value="date, time, and your name is automatically included in the note"
+                          style="font-style: italic;"/>
+
+            <p:spacer height="5px" />
+
+
+            <p:commandButton    id="unit-note-commit-button"
+                                rendered="true"
+                                ajax="true"
+                                disabled="false"
+                                value="Save Note"
+                                actionListener="#{propertyProfileBB.onUnitNoteAddCommitButtonChange}"
+                                icon="fa fa-save"
+                                oncomplete="PF('unit-note-dialog').hide()"
+                                update="unit-notes-form
+                                units-growl-form"/>
+        </h:form>
+    </p:dialog>
 
 
     <p:dialog    id="occperiod-add-dialog"

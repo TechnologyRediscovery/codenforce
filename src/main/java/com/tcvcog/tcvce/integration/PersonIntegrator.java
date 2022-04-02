@@ -397,7 +397,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getLinkingTableName());
             sb.append(" SET source_sourceid=?, lastupdatedts=now(), lastupdatedby_userid=?, ");
             sb.append(" linkedobjectrole_lorid=? WHERE ");
-            sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getLinkedTablePKField());
+            sb.append(humanziedBOb.getHUMAN_LINK_SCHEMA_ENUM().getLinkingTablePKField());
             sb.append(" = ?;");
                         
             stmt = con.prepareStatement(sb.toString());
@@ -460,7 +460,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             sb.append(hl.getLinkedObjectRole().getSchema().getLinkingTableName());
             sb.append(" SET lastupdatedts=now(), lastupdatedby_userid=?, ");
             sb.append(" deactivatedts=now(), deactivatedby_userid=? WHERE ");
-            sb.append(hl.getLinkedObjectRole().getSchema().getLinkedTablePKField());
+            sb.append(hl.getLinkedObjectRole().getSchema().getLinkingTablePKField());
             sb.append(" = ?;");
                         
             stmt = con.prepareStatement(sb.toString());
@@ -515,7 +515,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             sb.append(hl.getLinkedObjectRole().getSchema().getLinkingTableName());
             sb.append(" SET lastupdatedts=now(), lastupdatedby_userid=?, ");
             sb.append(" notes=? WHERE ");
-            sb.append(hl.getLinkedObjectRole().getSchema().getLinkedTablePKField());
+            sb.append(hl.getLinkedObjectRole().getSchema().getLinkingTablePKField());
             sb.append(" = ?;");
                         
             stmt = con.prepareStatement(sb.toString());

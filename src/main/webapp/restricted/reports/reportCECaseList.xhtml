@@ -358,8 +358,8 @@
                                             <!--NESTED DATA VALUE INLINE -->
                                             <div class="restrict-data-field-value-inline" >
                                                 <h:outputText id="selcase-manager-it" 
-                                                              value="#{cse.caseManager.person.firstName} 
-                                                              #{cse.caseManager.person.lastName} "/>  
+                                                              value="#{cse.caseManager.human.name} 
+                                                              #{cse.caseManager.human.name} "/>  
                                             </div>
                                            
                                         </div>
@@ -470,12 +470,16 @@
                                                                 value="#{cse.citationList}"
                                                                 var="cit"
                                                                 style="font-family: sans-serif;">
-
-                                                    <h:outputText value="Date: " />
-                                                    <h:outputText value="#{cit.dateOfRecordPretty}" />
-                                                    <h:outputText value="; Status: " />
-                                                    <h:outputText value="#{cit.status.statusTitle}" />
-
+                                                    <div style="text-decoration: underline;">
+                                                        <h:outputText value="ID: #{cit.citationNo}" />
+                                                    </div>
+                                                    <p:spacer height="3px" />
+                                                      <ui:repeat id="citation-status-uir"
+                                                                value="#{cit.statusLog}"
+                                                                var="logentry">
+                                                         <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
+                                                         <p:spacer height="3px" />
+                                                     </ui:repeat>
                                                 </p:dataScroller>
                                             </div>
                                         </div>
@@ -521,8 +525,7 @@
                                             <!--NESTED DATA VALUE INLINE -->
                                             <div class="restrict-data-field-value-inline" >
                                                 <h:outputText id="selcase-manager-it" 
-                                                              value="#{cse.caseManager.person.firstName} 
-                                                              #{cse.caseManager.person.lastName} "/>  
+                                                              value="#{cse.caseManager.human.name} "/>  
                                             </div>
                                         </div>
                                         <!--NESTED DATA FIELD -->
@@ -632,12 +635,16 @@
                                                                 value="#{cse.citationList}"
                                                                 var="cit"
                                                                 style="font-family: sans-serif;">
-
-                                                    <h:outputText value="Date: " />
-                                                    <h:outputText value="#{cit.dateOfRecordPretty}" />
-                                                    <h:outputText value="; Status: " />
-                                                    <h:outputText value="#{cit.status.statusTitle}" />
-
+                                                    <div style="text-decoration: underline;">
+                                                        <h:outputText value="ID: #{cit.citationNo}" />
+                                                    </div>
+                                                    <p:spacer height="3px" />
+                                                      <ui:repeat id="citation-status-uir"
+                                                                value="#{cit.statusLog}"
+                                                                var="logentry">
+                                                         <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
+                                                         <p:spacer height="3px" />
+                                                     </ui:repeat>
                                                 </p:dataScroller>
                                             </div>
                                         </div>
@@ -679,8 +686,7 @@
                                             </div>
                                             <div class="restrict-data-field-value-inline" >
                                                 <h:outputText id="selcase-manager-it" 
-                                                              value="#{cse.caseManager.person.firstName} 
-                                                              #{cse.caseManager.person.lastName} "/>  
+                                                              value="#{cse.caseManager.human.name}"/>  
                                             </div>
                                         
                                         </div>
@@ -786,17 +792,21 @@
                                                 <h:outputLabel value="Citations: "/>
                                             </div>
                                             <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
+                                           <div class="restrict-data-field-value-inline" >
                                                 <p:dataScroller id="case-citations-scroller"
                                                                 value="#{cse.citationList}"
                                                                 var="cit"
                                                                 style="font-family: sans-serif;">
-
-                                                    <h:outputText value="Date: " />
-                                                    <h:outputText value="#{cit.dateOfRecordPretty}" />
-                                                    <h:outputText value="; Status: " />
-                                                    <h:outputText value="#{cit.status.statusTitle}" />
-
+                                                    <div style="text-decoration: underline;">
+                                                        <h:outputText value="ID: #{cit.citationNo}" />
+                                                    </div>
+                                                    <p:spacer height="3px" />
+                                                      <ui:repeat id="citation-status-uir"
+                                                                value="#{cit.statusLog}"
+                                                                var="logentry">
+                                                         <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
+                                                         <p:spacer height="3px" />
+                                                     </ui:repeat>
                                                 </p:dataScroller>
                                             </div>
                                         </div>

@@ -26,16 +26,16 @@
 
         <p:selectOneMenu id="occperiod-query-som" 
                          tabindex="1" 
-                         value="#{occPeriodSearchWorkflowBB.occPeriodQuerySelected}"
-                         disabled="#{occPeriodSearchWorkflowBB.occPeriodQuerySelected.queryExecuted}">
+                         value="#{occPeriodSearchBB.occPeriodQuerySelected}"
+                         disabled="#{occPeriodSearchBB.occPeriodQuerySelected.queryExecuted}">
             <f:converter converterId="bOBQueryConverter"/>
             <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
             <f:selectItems id="querylist-si" 
-                           value="#{occPeriodSearchWorkflowBB.occPeriodQueryList}" 
+                           value="#{occPeriodSearchBB.occPeriodQueryList}" 
                            var="ql" 
                            itemValue="#{ql}" 
                            itemLabel="#{ql.queryTitle}" />
-            <p:ajax listener="#{occPeriodSearchWorkflowBB.changeQuerySelected}"
+            <p:ajax listener="#{occPeriodSearchBB.changeQuerySelected}"
                     update="@form
                     occperiod-messages-form" />
         </p:selectOneMenu>
@@ -46,14 +46,14 @@
                        value="Description: " 
                        for="occperiod-query-desc-ot" />
         <h:outputText id="occperiod-query-desc-ot" 
-                      value="#{occPeriodSearchWorkflowBB.occPeriodQuerySelected.queryName.desc}" />
+                      value="#{occPeriodSearchBB.occPeriodQuerySelected.queryName.desc}" />
 
         <p:spacer height="5px" />
 
         <p:commandButton   id="occperiod-executequery-cb" 
                            ajax="true" 
-                           actionListener="#{occPeriodSearchWorkflowBB.executeQuery}"
-                           disabled="#{occPeriodSearchWorkflowBB.occPeriodQuerySelected.queryExecuted}"
+                           actionListener="#{occPeriodSearchBB.executeQuery}"
+                           disabled="#{occPeriodSearchBB.occPeriodQuerySelected.queryExecuted}"
                            icon="fa fa-flash" 
                            styleClass="button"
                            value="run query" 
@@ -63,11 +63,11 @@
 
         <p:commandButton   id="occperiod-search-clear-cb" 
                            ajax="true" 
-                           actionListener="#{occPeriodSearchWorkflowBB.resetQuery}"
+                           actionListener="#{occPeriodSearchBB.resetQuery}"
                            icon="fa fa-eraser" 
                            styleClass="button inline-button"
                            value="clear query" 
-                           disabled="#{!occPeriodSearchWorkflowBB.occPeriodQuerySelected.queryExecuted}"
+                           disabled="#{!occPeriodSearchBB.occPeriodQuerySelected.queryExecuted}"
                            update=" occperiod-search-log-form
                            @form"/>
 
@@ -77,7 +77,7 @@
                                 onIcon="fa fa-indent"
                                 offLabel="Build Fresh Period List On Search"
                                 offIcon="fa fa-eraser"
-                                value="#{occPeriodSearchWorkflowBB.appendResultsToList}" 
+                                value="#{occPeriodSearchBB.appendResultsToList}" 
                                 disabled="false" />
 
         </h:form>
@@ -86,7 +86,7 @@
 
             <p:commandButton   id="occperiod-search-results-clear-button" 
                                ajax="true" 
-                               actionListener="#{occPeriodSearchWorkflowBB.clearOccPeriodList}"
+                               actionListener="#{occPeriodSearchBB.clearOccPeriodList}"
                                icon="fa fa-eraser" 
                                styleClass="button"
                                value="clear results list" 
@@ -96,7 +96,7 @@
             <p:commandButton   id="occperiod-search-loadhistory-button" 
                                ajax="true" 
                                rendered="false"
-                               actionListener="#{occPeriodSearchWorkflowBB.loadOccPeriodHistory}"
+                               actionListener="#{occPeriodSearchBB.loadOccPeriodHistory}"
                                icon="fa fa-clock-o" 
                                styleClass="button"
                                value="load period history" 
@@ -104,7 +104,7 @@
                                         @form"/>
             <p:spacer height="5px" />
 
-            <h:outputText value="listing #{occPeriodSearchWorkflowBB.occPeriodList.size()} periods" 
+            <h:outputText value="listing #{occPeriodSearchBB.occPeriodList.size()} periods" 
                           styleClass="italic"/>
             <p:spacer height="5px" />
 
@@ -112,7 +112,7 @@
                 id="occperiods-table"
                 var="period"
                 rowKey="#{period.periodID}"
-                value="#{occPeriodSearchWorkflowBB.occPeriodList}"
+                value="#{occPeriodSearchBB.occPeriodList}"
                 tableStyleClass="primeDataTable"
                 resizableColumns="true"
                 widgetVar="occperiods-table-var"
@@ -162,7 +162,7 @@
                     <f:facet name="header">
                         <h:outputText value="Start Date" />
                     </f:facet>
-                    <h:outputText value="#{occPeriodSearchWorkflowBB.getPrettyDateNoTime(period.startDate)}" />
+                    <h:outputText value="#{occPeriodSearchBB.getPrettyDateNoTime(period.startDate)}" />
                 </p:column>
 
                 <p:column width="10%">
@@ -206,7 +206,7 @@
         <h:form id="occperiod-search-log-form">
             <div class="search-query-desc">
                 <h:outputText id="occperiod-search-log-ot" 
-                              value="#{occPeriodSearchWorkflowBB.occPeriodQuerySelected.queryLog}"
+                              value="#{occPeriodSearchBB.occPeriodQuerySelected.queryLog}"
                               escape="false"/>
             </div>
         </h:form>

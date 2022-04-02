@@ -5,9 +5,10 @@
  */
 package com.tcvcog.tcvce.entities.reports;
 
+import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionViewOptions;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -23,8 +24,9 @@ public class ReportConfigOccInspection
         implements Serializable{
     
     private OccPeriodPropertyUnitHeavy occPeriod;
+    private CECasePropertyUnitHeavy ceCase;
     
-    private OccInspection inspection;
+    private FieldInspection inspection;
     
     
     private Icon defaultItemIcon;
@@ -221,15 +223,29 @@ public class ReportConfigOccInspection
     /**
      * @return the inspection
      */
-    public OccInspection getInspection() {
+    public FieldInspection getInspection() {
         return inspection;
     }
 
     /**
      * @param inspection the inspection to set
      */
-    public void setInspection(OccInspection inspection) {
+    public void setInspection(FieldInspection inspection) {
         this.inspection = inspection;
+    }
+
+    /**
+     * @return the ceCase
+     */
+    public CECasePropertyUnitHeavy getCeCase() {
+        return ceCase;
+    }
+
+    /**
+     * @param ceCase the ceCase to set
+     */
+    public void setCeCase(CECasePropertyUnitHeavy ceCase) {
+        this.ceCase = ceCase;
     }
 
 }

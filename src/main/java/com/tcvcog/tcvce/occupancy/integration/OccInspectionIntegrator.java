@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.IFace_inspectable;
 import com.tcvcog.tcvce.entities.occupancy.*;
 import com.tcvcog.tcvce.integration.*;
 import com.tcvcog.tcvce.util.Constants;
@@ -57,7 +58,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     /**
      * Called by the OccupancyIntegrator during the construction of an
-     * OccInspection object. This method, in turn, calls the private
+ FieldInspection object. This method, in turn, calls the private
      * getInspectedSpaceList method in this class to populate the actual
      * inspection data.
      *
@@ -340,7 +341,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      * @param inspection
      * @return 
      */
-    public List<OccLocationDescriptor> getLocationDescriptorsByInspection(OccInspection inspection) {
+    public List<OccLocationDescriptor> getLocationDescriptorsByInspection(FieldInspection inspection) {
         //
 
         return new ArrayList();
@@ -429,7 +430,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      * @return
      * @throws IntegrationException 
      */
-    public OccInspectedSpace recordCommencementOfSpaceInspection(OccInspectedSpace spc, OccInspection inspection)
+    public OccInspectedSpace recordCommencementOfSpaceInspection(OccInspectedSpace spc, FieldInspection inspection)
             throws IntegrationException {
 
         String sql =    "INSERT INTO public.occinspectedspace(\n" +
@@ -499,14 +500,14 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      * and these will come from the DB sequences ;
      *
      *
-     * @param inspection the current OccInspection
+     * @param inspection the current FieldInspection
      * @param inspSpace an OccInspectedSpace that was NOT retrieved from the DB
      * @return the number of newly inserted spaces (mostly for info value only)
-     * passed as the second input parameter having been written to DB and added
-     * to the OccInspection's internal List of inspected elements.
+ passed as the second input parameter having been written to DB and added
+ to the FieldInspection's internal List of inspected elements.
      * @throws IntegrationException
      */
-    public int recordInspectionOfSpaceElements(OccInspectedSpace inspSpace, OccInspection inspection) throws IntegrationException {
+    public int recordInspectionOfSpaceElements(OccInspectedSpace inspSpace, FieldInspection inspection) throws IntegrationException {
         int spaceInserts = 0;
         Iterator<OccInspectedSpaceElement> inspectedElementListIterator = inspSpace.getInspectedElementList().iterator();
         while (inspectedElementListIterator.hasNext()) {
@@ -708,7 +709,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      * method being given an OccInspectedSpace object whose constituent members
      * lack ID numbers for the updates.
      */
-    public void updateInspectedSpace(OccInspection inspection, OccInspectedSpace inspSpace) throws IntegrationException {
+    public void updateInspectedSpace(FieldInspection inspection, OccInspectedSpace inspSpace) throws IntegrationException {
 
         String query = "UPDATE public.occinspectedspace\n"
                 + "   SET occspace_spaceid=?, occinspection_inspectionid=?, \n"
@@ -794,25 +795,33 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     }
 
     /**
-     * Builds an ID list of all inspections by OccPeriod
+     * Builds an ID list of all inspections by OccPeriod or CECase
      * which have not been deactivated.
-     * @param op
+     * @param inspectable
      * @return
      * @throws IntegrationException 
      */
-    public List<Integer> getOccInspectionList(OccPeriod op) throws IntegrationException {
+    public List<Integer> getOccInspectionList(IFace_inspectable inspectable) throws IntegrationException, BObStatusException {
 
         List<Integer> inspecIDList = new ArrayList<>();
+        
+        if(inspectable == null){
+            throw new BObStatusException("Cannot retrieve inspections from null inspectable");
+        }
 
-        String query = "SELECT inspectionid FROM occinspection WHERE occperiod_periodid=? AND deactivatedts IS NULL;";
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT inspectionid FROM occinspection WHERE ");
+        sb.append(inspectable.getDomainEnum().getDbField());
+        sb.append("=? AND deactivatedts IS NULL;");
+        
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
 
         try {
 
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, op.getPeriodID());
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, inspectable.getHostPK());
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -880,10 +889,10 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      * @return
      * @throws IntegrationException 
      */
-    public OccInspection getOccInspection(int inspectionID) throws IntegrationException {
+    public FieldInspection getOccInspection(int inspectionID) throws IntegrationException {
         OccupancyCoordinator oc = getOccupancyCoordinator();
 
-        OccInspection inspection = null;
+        FieldInspection inspection = null;
 
         String query = " SELECT inspectionid, occperiod_periodid, inspector_userid, publicaccesscc, \n"
                 + "       enablepacc, notespreinspection, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
@@ -892,7 +901,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 + "       deactivatedts, deactivatedby_userid, timestart, timeend, \n"
                 + "       createdby_userid, lastupdatedts, lastupdatedby_userid, determination_detid, \n"
                 + "       determinationby_userid, determinationts, remarks, generalcomments, \n"
-                + "       cause_causeid \n"
+                + "       cause_causeid, cecase_caseid \n"
                 + "  FROM public.occinspection WHERE inspectionid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -922,14 +931,14 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     }
 
     /**
-     * Generator of OccInspection objects
+     * Generator of FieldInspection objects
      * @param rs
      * @return
      * @throws IntegrationException
      * @throws SQLException 
      */
-    private OccInspection generateOccInspection(ResultSet rs) throws IntegrationException, SQLException {
-            OccInspection ins = new OccInspection();
+    private FieldInspection generateOccInspection(ResultSet rs) throws IntegrationException, SQLException {
+            FieldInspection ins = new FieldInspection();
             
             
             UserIntegrator ui = getUserIntegrator();
@@ -938,6 +947,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             
             ins.setInspectionID(rs.getInt("inspectionid"));
             ins.setOccPeriodID(rs.getInt("occperiod_periodid"));
+            ins.setCecaseID(rs.getInt("cecase_caseid"));
             ins.setInspector(ui.getUser(rs.getInt("inspector_userid")));
             ins.setPacc(rs.getInt("publicaccesscc"));
             
@@ -1018,7 +1028,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      * @param occInsp
      * @throws IntegrationException 
      */
-    public void updateOccInspection(OccInspection occInsp) throws IntegrationException {
+    public void updateOccInspection(FieldInspection occInsp) throws IntegrationException {
         String sql = "UPDATE public.occinspection\n"
                 + "   SET inspector_userid=?, publicaccesscc=?, \n"
                 + "       enablepacc=?, notespreinspection=?, thirdpartyinspector_personid=?, thirdpartyinspectorapprovalts=?, \n"
@@ -1142,11 +1152,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     }
 
     /**
-     * Sets the deactivation fields on the given OccInspection
+     * Sets the deactivation fields on the given FieldInspection
      * @param ins
      * @throws IntegrationException 
      */
-    public void deactivateOccInspection(OccInspection ins) throws IntegrationException {
+    public void deactivateOccInspection(FieldInspection ins) throws IntegrationException {
 
         String query = "UPDATE occinspection SET deactivatedts=now() AND deactivatedby_userid=? WHERE inspectionid=?;";
         Connection con = getPostgresCon();
@@ -1180,7 +1190,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      * @return
      * @throws IntegrationException 
      */
-    public int insertOccInspection(OccInspection occInsp) throws IntegrationException {
+    public int insertOccInspection(FieldInspection occInsp) throws IntegrationException {
         String query = "INSERT INTO public.occinspection(\n"
                 + "            inspectionid, occperiod_periodid, inspector_userid, publicaccesscc, \n"
                 + "            enablepacc, notespreinspection, thirdpartyinspector_personid, thirdpartyinspectorapprovalts, \n"
@@ -1189,7 +1199,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 + "            deactivatedts, deactivatedby_userid, timestart, timeend, \n"
                 + "            createdby_userid, lastupdatedts, lastupdatedby_userid, determination_detid, \n"
                 + "            determinationby_userid, determinationts, remarks, generalcomments, \n"
-                + "            cause_causeid)\n"
+                + "            cause_causeid, cecase_caseid)\n"
                 + "    VALUES (DEFAULT, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
@@ -1197,7 +1207,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
                 + "            ?, ?, ?, ?, \n"
-                + "            ?);";
+                + "            ?, ?);";
 
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1205,7 +1215,19 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         int newInspectionID = 0;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, occInsp.getOccPeriodID());
+            if(occInsp.getDomainEnum() == null){
+                throw new IntegrationException("cannot write inspection with null domain");
+            }
+            switch(occInsp.getDomainEnum()){
+                case OCCUPANCY:
+                    stmt.setInt(1, occInsp.getOccPeriodID());
+                    stmt.setNull(28, java.sql.Types.NULL);
+                    break;
+                case CODE_ENFORCEMENT:
+                    stmt.setNull(28, occInsp.getCecaseID());
+                    stmt.setInt(1, java.sql.Types.NULL);
+                    break;
+            }
             stmt.setInt(2, occInsp.getInspector().getUserID());
             stmt.setInt(3, occInsp.getPacc());
 
@@ -1385,7 +1407,6 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
             while (rs.next()) {
                 didl.add(rs.getInt("determinationid"));
-                               
             }
 
         } catch (SQLException ex) {

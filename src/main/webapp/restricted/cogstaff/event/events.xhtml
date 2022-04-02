@@ -594,8 +594,6 @@
                                     <p:overlayPanel id="event-cat-details-overlay"
                                                     for="event-profile-form:event-cat-details-cl "
                                                     widgetVar="event-cat-details-overlay-var" 
-                                                    showEffect="fade" 
-                                                    hideEffect="fade"
                                                     dismissable="true" 
                                                     showCloseIcon="true">
 
@@ -1039,12 +1037,7 @@
 
                         <h:form id="event-note-form">
                             <h:outputText styleClass="ui-label" value="Note text: "/>
-                            <p:editor   id="event-notes-editor"
-                                        value="#{eventsBB.formNoteText}"
-                                        controls="bold italic underline strikethrough font size style color
-                                        bullets numbering center undo redo rule link removeformat"
-                                        width="400" required="false"
-                                        height="200"/>
+                         
 
 
                             <p:commandButton    id="event-note-button-cancel"

@@ -505,7 +505,8 @@
                                             value="#{eventsBB.skeletonEvent.category}"
                                             tabindex="11">
 
-                            <p:ajax update="event-add-form" listener="#{eventsBB.potentiallyUpdateFieldsFromCategory}"/>
+                            <p:ajax listener="#{eventsBB.onCategoryChangeUpdateSkeletonEventMembers}"
+                                    update="event-add-form" />
 
                             <f:converter converterId="eventCategoryConverter"/>
 
@@ -546,7 +547,6 @@
                         <h:outputLabel for="event-add-time-start-cal">
                             <h:outputText value="Start time"/>
                         </h:outputLabel>
-                        <p style="color:darkred; font-size: 0.7em;">NOTE: The time picker is unresponsive; click a date, then click anywhere to close the picker. (Until fixed, all events now will need to start at the current time.)</p>
                     </div>
 
                     <div class="restrict-main-contents-io-content">
@@ -578,7 +578,8 @@
                         <p:inputNumber id="event-add-duration-in"
                                        value="#{eventsBB.skeletonDuration}"
                                        style="width: 50px;">
-                            <p:ajax update="event-add-time-end-cal"/>
+                            <p:ajax     listener="#{eventsBB.recalculateEndTime}"
+                                        update="event-add-time-end-cal"/>
                         </p:inputNumber>
                     </div>
                 </div>

@@ -19,10 +19,10 @@
                         <!-- Title -->
                         <h:form id="occperiod-launcher">
                             <h1>
-                                <h:outputText id="header-title-ot" value="#{occPeriodSearchWorkflowBB.currentOccPeriod.type.title} @ "/>
-                                <h:outputText id="header-addr-ot" value="#{occPeriodSearchWorkflowBB.currentPropertyUnit.parcelMailing.addressPretty1Line} "/>
-                                <h:outputText id="header-unit-ot" value="Unit #{occPeriodSearchWorkflowBB.currentPropertyUnit.unitNumber} "/>
-                                <h:outputText id="header-muni-ot" value="(#{occPeriodSearchWorkflowBB.currentPropertyUnit.property.muni.muniName})"/>
+                                <h:outputText id="header-title-ot" value="#{occPeriodBB.currentOccPeriod.type.title} @ "/>
+                                <h:outputText id="header-addr-ot" value="#{occPeriodBB.currentPropertyUnit.parcelMailing.addressPretty1Line} "/>
+                                <h:outputText id="header-unit-ot" value="Unit #{occPeriodBB.currentPropertyUnit.unitNumberCleaned} "/>
+                                <h:outputText id="header-muni-ot" value="(#{occPeriodBB.currentPropertyUnit.property.muni.muniName})"/>
                             </h1>
                         </h:form>
 
@@ -51,12 +51,78 @@
                                     <h:outputText value="notes"/>
                                 </a>
                             </div>
-                            
+
                             <div class="ui-g data_container_nested_restrict">
                                 <!-- First column -->
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                                     <ui:include src="compositions/statusPanel.xhtml"/>
-                                    <ui:include src="compositions/inspectionsPanel.xhtml"/>
+                                    <ui:include src="/restricted/compositions/inspectionTools.xhtml"/>
+
+                                    <p:panel id="inspections-panel"
+                                             toggleable="true"
+                                             widgetVar="inspections-panel-var"
+                                             collapsed="false"
+                                             header="Inspections">
+                                        <h:form id="occperiod-inspections-form">
+
+
+                                            <p:commandButton id="inspections-newbutton"
+                                                             value="New inspection"
+                                                             disabled="#{!empty occPeriodBB.currentOccPeriod.authorizedTS}"
+                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                             icon="fa fa-plus"
+                                                             oncomplete="PF('inspections-selectchecklist-var').show()"
+                                                             actionListener="#{fieldInspectionBB.onCreateInspectionInitButtonChange(occPeriodBB.currentOccPeriod)}"
+                                                             update="inspections-selectchecklist-form">
+                                                <f:param name="initiating-inspection-list-component-id" value="occperiod-inspections-form" />
+                                            </p:commandButton>
+
+                                            <p:spacer height="5px"/>
+
+                                            <p:dataTable    id="occperiod-inspections-table"
+                                                            var="inspection"
+                                                            value="#{occPeriodBB.managedFieldInspectionList}"
+                                                            rowKey="#{inspection.inspectionID}"
+                                                            reflow="true"
+                                                            lazy="true">
+
+                                                <p:column headerText="Date"
+                                                          style="width:20%;">
+                                                    <h:outputText value="#{occPeriodBB.getPrettyDate(inspection.effectiveDateOfRecord)}" />
+                                                </p:column>
+                                                <p:column headerText="Inspector"
+                                                          style="width:25%;">
+                                                    <h:outputText value="#{inspection.inspector.human.name}" />
+                                                </p:column>
+                                                <p:column headerText="Determination"
+                                                          style="width:30%;">
+                                                    <h:outputText value="#{empty inspection.determination ? '(in process)':inspection.determination.title}" />
+                                                </p:column>
+                                                <p:column headerText="Actions"
+                                                          style="width:25%;">
+                                                            <p:commandLink  id="inspection-details-cl"
+                                                                    value="view/edit"
+                                                                    actionListener="#{fieldInspectionBB.onViewEditInspectionLinkClick(occPeriodBB.currentOccPeriod, inspection)}"
+                                                                    ajax="true"
+                                                                    style="color:blue;"
+                                                                    oncomplete="PF('inspection-profile-dialog-var').show()"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                    update="inspectiontools-growl-form
+                                                                    inspection-profile-dialog
+                                                                    inspection-profile-form
+                                                                    inspection-advancedtools-form
+                                                                    inspection-actions-form
+                                                                    inspection-inspectedspaces-form"
+                                                                    >
+                                                        <f:param name="initiating-inspection-list-component-id" value="occperiod-inspections-form" />
+                                                    </p:commandLink>
+                                                    <p:spacer height="3px" />
+                                                    <h:outputText value="(ID:#{inspection.inspectionID})" />
+                                                </p:column>
+                                            </p:dataTable>
+                                        </h:form>
+                                    </p:panel>
+
                                     <ui:include src="compositions/permitsPanel.xhtml"/>
                                 </div>
                                 <!-- Second column -->
@@ -67,9 +133,9 @@
                                     <ui:include src="../compositions/notesPanel.xhtml"/>
                                 </div>
                             </div>
-                    
+
                             <ui:include src="../../compositions/blobTools.xhtml"/>
-                            
+
                         </div>
                     </p:outputPanel>
                 </f:view>

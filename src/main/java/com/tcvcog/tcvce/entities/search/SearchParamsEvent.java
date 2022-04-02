@@ -19,7 +19,7 @@ import com.tcvcog.tcvce.entities.PropertyUseType;
 public class        SearchParamsEvent 
         extends     SearchParams {
     
-    public static final String MUNI_DBFIELD = "property.municipality_municode";
+    public static final String MUNI_DBFIELD = "parcel.muni_municode";
     
     // filter EVENT-1
     private boolean eventCat_ctl;

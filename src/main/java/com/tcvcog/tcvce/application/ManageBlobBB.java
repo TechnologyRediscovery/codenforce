@@ -36,7 +36,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
@@ -435,7 +435,7 @@ public class ManageBlobBB extends BackingBeanUtils implements Serializable{
         try {
             OccInspectedSpace space = oii.getInspectedSpace(input.getInspectedSpaceID());
 
-            OccInspection ins = oii.getOccInspection(space.getInspectionID());
+            FieldInspection ins = oii.getOccInspection(space.getInspectionID());
 
             getSessionBean().setSessOccPeriodFromPeriodBase(oc.getOccPeriod(ins.getOccPeriodID()));
             return "occInspectionAdd";

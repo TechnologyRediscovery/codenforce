@@ -615,37 +615,28 @@ public  class       SessionInitializer
         MunicipalityCoordinator mc = getMuniCoordinator();
         
         OccPeriod op = null;
-        try {
-            // Session object init
+        // Session object init
             
 //            QueryOccPeriod qop = sc.runQuery(sc.initQuery(QueryOccPeriodEnum.ALL_PERIODS_IN_MUNI, cred));
             
 //            sb.setSessOccPeriodList(qop.getBOBResultList());
-            sb.setSessOccPeriodList(new ArrayList<>());
-            
-            if(sb.getSessOccPeriodList().isEmpty()){
-                op = occCord.getOccPeriod(sb.getSessMuni().getDefaultOccPeriodID());
-            } else {
-                // if there's a history, convert the head item to a data heavy and put in session
-                op = sb.getSessOccPeriodList().get(0);
-            }
-            
-            if(op == null){
-                throw new SessionException("Unable to set a session occ period");
-            }
-            sb.setSessOccPeriodFromPeriodBase(op);
-            
-            // Query set init
-            sb.setQueryOccPeriodList(sc.buildQueryOccPeriodList(cred));
-            if(!sb.getQueryOccPeriodList().isEmpty()){
-                sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
-            }
-        } catch (IntegrationException  ex) {
-            System.out.println(ex);
-            throw new SessionException( "Occ period list or query assembly failure", 
-                                        ex, 
-                                        ss, 
-                                        ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
+        sb.setSessOccPeriodList(new ArrayList<>());
+        if(sb.getSessOccPeriodList().isEmpty()){
+            // Turn off during occ period refresh migration
+        //                op = occCord.getOccPeriod(sb.getSessMuni().getDefaultOccPeriodID());
+        } else {
+            // if there's a history, convert the head item to a data heavy and put in session
+        //                op = sb.getSessOccPeriodList().get(0);
+        }
+        //            if(op == null){
+        //                throw new SessionException("Unable to set a session occ period");
+        //            }
+        //            sb.setSessOccPeriodFromPeriodBase(op);
+
+        // Query set init
+        sb.setQueryOccPeriodList(sc.buildQueryOccPeriodList(cred));
+        if(!sb.getQueryOccPeriodList().isEmpty()){
+            sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
         }
     }
     

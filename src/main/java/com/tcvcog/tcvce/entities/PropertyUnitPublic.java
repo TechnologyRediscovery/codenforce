@@ -30,6 +30,8 @@ public  class       PropertyUnitPublic
     
     final static String TABLE_NAME = "parcelunit";
     final static String PK_FIELD = "unitid";
+    final static String PRIMARY_DWELLING_UNIT_NUM_CODE = "-D";
+    final static String PRIMARY_DWELLING_UNIT_PRETTY_NAME = "Primary Dwelling Unit";
     
     
     protected int unitID;
@@ -40,6 +42,24 @@ public  class       PropertyUnitPublic
     protected LocalDate rentalIntentDateStop;
     
 
+    /**
+     * Fancy getter that converts the system's default dwelling unit number into
+     * a pretty string for display
+     * @return the pretty unit number
+     */
+    public String getUnitNumberCleaned(){
+        if(unitNumber != null){
+            System.out.println("PropertyUnitPublic.getUnitNumberCleaned: " + unitNumber);
+            if(unitNumber.equals(PRIMARY_DWELLING_UNIT_NUM_CODE)){
+                System.out.println("PropertyUnitPublic.getUnitNumberCleaned | found primary");
+                return PRIMARY_DWELLING_UNIT_PRETTY_NAME;
+            } else {
+                return unitNumber;
+            }
+        }
+        return "";
+    }
+    
     /**
      * @return the unitID
      */

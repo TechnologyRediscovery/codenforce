@@ -482,9 +482,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * whose subclasses are passed to the searchForXXX(SearchParamsXXX params) method family spread across the
      * main Integrators. We remove duplication of building these shared search criteria across all 6 searchable
      * BOBs as of the beta: Property, Person, Event, OccPeriod, CECase, and CEActionRequest
+     * 
      * @param params
      * @param muniDBField
-     * @param activeField
+     * @param activeField This method works with both legacy active boolean fields 
+     * and deactivatedts fields. This method distinguishes between them by 
+     * asking the activeField if it contains the letters 'ts'
      * @return the configured apram for      */
     public SearchParams assembleBObSearchSQL_muniDatesUserActive(   SearchParams params, 
                                                                     String muniDBField,

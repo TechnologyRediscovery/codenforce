@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter;
  * @author sylvia
  */
 public abstract class   TrackedEntity 
+        extends         BOb
         implements      Serializable, 
                         IFace_keyIdentified{
     

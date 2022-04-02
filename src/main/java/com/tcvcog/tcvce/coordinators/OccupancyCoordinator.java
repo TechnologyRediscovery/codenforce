@@ -29,7 +29,7 @@ import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.integration.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
@@ -186,7 +186,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
             // INSPECTION LIST
 
-            opdh.setInspectionList(oic.getOccInspectionsFromOccPeriod(opdh));
+            opdh.setInspectionList(oic.getOccInspectionList(opdh));
 
             // FEE AND PAYMENT LIST
 //          TODO: Activate fee/payment stuff  
@@ -218,7 +218,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @param periodIDTarget ID of the period to which the given inspection should
      * be attached
      */
-    public void transferInspectionOccPeriod(OccInspection ins, int periodIDTarget) throws BObStatusException, IntegrationException{
+    public void transferInspectionOccPeriod(FieldInspection ins, int periodIDTarget) throws BObStatusException, IntegrationException{
         if(ins == null || periodIDTarget == 0){
             throw new BObStatusException("Cannot xcer an inspection to a new period with null Inspection or target ID of 0");
         }
@@ -294,7 +294,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * then they'll become the unit manager
      * @return 
      */
-    public OccPeriod getOccPeriodSkeleton(PropertyUnit pu, UserAuthorized ua){
+    public OccPeriod getOccPeriodSkeleton(PropertyUnit pu, UserAuthorized ua) throws BObStatusException{
+       if(pu == null || ua == null){
+           throw new BObStatusException("Cannot make occ period skeleton with null unit or user");
+           
+       }
         OccPeriod per = new OccPeriod();
         per.setPropertyUnitID(pu.getUnitID());
         if(ua.getKeyCard().getGoverningAuthPeriod().getOathTS() != null 
@@ -305,7 +309,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return per;
     }
 
-    
+    /**
+     * Coordinates with the integrator to build an occ period history list
+     * @param cred
+     * @return 
+     */
     public List<OccPeriod> assembleOccPeriodHistoryList(Credential cred) {
         OccupancyIntegrator oi = getOccupancyIntegrator();
 
@@ -473,23 +481,23 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
 
     /**
-     * Updates DB to mark the passed in OccInspection the governing one in the
-     * given OccPeriod
+     * Updates DB to mark the passed in FieldInspection the governing one in the
+ given OccPeriod
      *
      * @param period
      * @return the governing Inspection
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public OccInspection designateGoverningInspection(OccPeriodDataHeavy period) throws BObStatusException {
-        List<OccInspection> inspectionList = period.getInspectionList();
-        OccInspection selIns = null;
+    public FieldInspection designateGoverningInspection(OccPeriodDataHeavy period) throws BObStatusException {
+        List<FieldInspection> inspectionList = period.getInspectionList();
+        FieldInspection selIns = null;
         // logic for determining the currentOccInspection
         if (inspectionList != null) {
             if (inspectionList.size() == 1) {
                 selIns = inspectionList.get(0);
             } else {
                 Collections.sort(inspectionList);
-                for (OccInspection ins : inspectionList) {
+                for (FieldInspection ins : inspectionList) {
                     // TODO: if you are refactoring this, isActive used to be checked here!
                     selIns = ins;
                 }
@@ -510,27 +518,29 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     /**
      * Initialization method for creating a of an OccPeriod with
      * sensible default values for first insertion into DB
+     * 
+     * Also attaches an initialization event to the occ period
      *
      * @param period
-     * @param p
      * @param ua
      * @return
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.EventException
      */
     public int insertOccPeriod(   OccPeriod period,
-                                        Property p,
                                         UserAuthorized ua) 
-            throws IntegrationException, BObStatusException {
+            throws IntegrationException, BObStatusException, EventException {
         SystemIntegrator si = getSystemIntegrator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
         
-        if(period == null || ua == null || ua == null){
-            throw new BObStatusException("cannot create new occ period with null period, user, or property");
+        if(period == null || period.getPropertyUnitID() == 0 || period.getType() == null || ua == null){
+            throw new BObStatusException("cannot create new occ period with null period, type, unit of id 0, or user");
         }
         
         period.setCreatedBy(ua);
-        period.setCreatedTS(LocalDateTime.now());
+        period.setLastUpdatedBy(ua);
+        
 
         period.setStartDate(LocalDateTime.now().plusDays(DEFAULT_OCC_PERIOD_START_DATE_OFFSET));
         period.setStartDateCertifiedBy(null);
@@ -547,46 +557,23 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                         .getString("occPeriodNewInternalBOBSourceID"))));
 
         System.out.println("OccupancyCoordinator.intitializeNewOccPeriod | period: " + period);
-        return oi.insertOccPeriod(period);
+        
+        // send to integrator!
+        int freshID = oi.insertOccPeriod(period);
+        
+        if(period.getOriginationEventCategory() != null){
+            EventCoordinator ec = getEventCoordinator();
+            EventCnF ev = ec.initEvent(period, period.getOriginationEventCategory());
+            ev.setUserCreator(ua);
+            ev.setLastUpdatedBy(ua);
+            ev.setOccPeriodID(freshID);
+            ec.addEvent(ev, period, ua);
+        }
+        
+        return freshID;
     }
 
-    /**
-     * Primary insertion point for the creation of new OccPeriod objects in the
-     * DB The caller must already have an initialized OccPeriod object to insert
-     *
-     * @param op an initialized object which can be retrieved from the method
-           insertOccPeriod in this class
-     * @param u  the UserAuthorized requesting the new Period
-     * @return the unique ID given to the fresh OccPeriod by the database
-     * @throws IntegrationException
-     * @throws InspectionException
-     * @throws com.tcvcog.tcvce.domain.EventException
-     * @throws com.tcvcog.tcvce.domain.AuthorizationException
-     * @throws com.tcvcog.tcvce.domain.ViolationException
-     */
-    public int addOccPeriod(OccPeriod op, UserAuthorized u)
-            throws IntegrationException,
-            InspectionException,
-            EventException,
-            AuthorizationException,
-            ViolationException {
-        OccupancyIntegrator oi = getOccupancyIntegrator();
-        EventIntegrator ei = getEventIntegrator();
-        EventCoordinator ec = getEventCoordinator();
-
-        int freshOccPeriodID = oi.insertOccPeriod(op);
-
-//        OccPeriodDataHeavy opdh = oi.generateOccPeriodDataHeavy(oi.getOccPeriod(freshOccPeriodID));
-//        
-//        if(op.getType().getBaseRuleSetID()!= 0){
-//            EventRuleSet ers = ei.rules_getEventRuleSet(op.getType().getBaseRuleSetID());
-//            ec.rules_attachRuleSet(ers, opdh, u);
-//        }
-        System.out.println("OccupancyCoordinator.insertNewOccPeriod | freshid: " + freshOccPeriodID);
-
-        return freshOccPeriodID;
-    }
-
+   
     /**
      * Factory method for creating new OccPermitApplications
      *
@@ -642,7 +629,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
  
 
-    public void activateOccInspection(OccInspection is) throws IntegrationException {
+    public void activateOccInspection(FieldInspection is) throws IntegrationException {
         // Nothing to do here yet
         
         

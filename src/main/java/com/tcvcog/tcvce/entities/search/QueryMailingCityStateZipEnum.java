@@ -10,27 +10,28 @@ import com.tcvcog.tcvce.entities.RoleType;
 
 
 /**
- * Pre-built quries against city/state/zip
+ * Pre-built queries against city/state/zip
  * @author Ellen Bascomb of Apartment 31Y
  */
 public enum QueryMailingCityStateZipEnum 
 implements IFace_RankLowerBounded{
-    ZIPCODES_BY_CITY_AND_STATE         (   "ZIP Codes by city and state",
-                                    "Returns zip codes associated with a city and state based on a case insensitive search of city",
-                                    RoleType.Public,
-                                    false),
-    
-    ALL_RECORDS_BY_ZIPCODE         (   "ZIP Code Search: All Records",
+    ALL_RECORDS_BY_ZIPCODE         (   "Search by ZIP code",
                                     "Returns all record types for a gizen ZIP Code",
                                     RoleType.MuniStaff,
                                     false),
     
-    VALID_RECORDS_BY_ZIPCODE   (   "ZIP Code Search: Valid records only",
+    ZIPCODES_BY_CITY_AND_STATE         (   "Search by city and state",
+                                    "Returns zip codes associated with a city and state based on a case insensitive search of city",
+                                    RoleType.Public,
+                                    false),
+    
+    
+    VALID_RECORDS_BY_ZIPCODE   (   "Search by ZIP code (Valid records only)",
                                     "Returns only valid record types for a gizen ZIP Code",
                                     RoleType.Public,
                                     false),
     
-     DEFAULT_RECORD_BY_ZIPCODE            (   "Default city & state by zip",
+     DEFAULT_RECORD_BY_ZIPCODE            ("Search by ZIP code (Default city only)",
                                     "Returns only a single record, the default city & state for a gizen ZIP Code",
                                     RoleType.Public,
                                     false);
