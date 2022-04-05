@@ -222,15 +222,8 @@
                                                                         for="userinfo-personlink"
                                                                         />
                                                         <div class="data_field_value" >
-                                                            <h:outputText id="userinfo-personlink"
-                                                                          styleClass="data_field_value" 
-                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.pershumanuserConfigBB.userAuthorizedInConfig.pershumantName: ''}" />
                                                             <h:outputText id="userinfo-personlink2"
-                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.personhumanID:': ''}" />
-                                                            <h:outputText id="userinfo-personlink3"
-                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.personhumanerConfigBB.userAuthorizedInConfig.personhumannID: ''}" />
-                                                            <h:outputText id="userinfo-personlink4"
-                                                                          value="#{!(empty userConfigBB.userAuthorizedInConfig.human) ? ')': ''}" />
+                                                                          value="#{!empty userConfigBB.userAuthorizedInConfig ? userConfigBB.userAuthorizedInConfig.human.name : ''}" />
                                                         </div>
                                                     </div>
 
@@ -245,8 +238,8 @@
                                                                           styleClass="data_field_value" 
                                                                           value="#{empty userConfigBB.userAuthorizedInConfig.deactivatedTS ? 'Active user': 'Deactivated'}" />
                                                             <h:outputText id="userinfo-alreadydeleted-ot"
-                                                              value="This user is deactivated as of #{userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.deactivatedTS)}"
-                                                              rendered="#{!(empty userConfigBB.userAuthorizedInConfig.deactivatedTS)}" />
+                                                                          value="This user is deactivated as of #{userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.deactivatedTS)}"
+                                                                          rendered="#{!(empty userConfigBB.userAuthorizedInConfig.deactivatedTS)}" />
                                                         </div>
                                                     </div>
 
@@ -375,7 +368,7 @@
                                                         <p:selectOneMenu id="usercfg-add-muni-som" 
                                                                          required="true" 
                                                                          value="#{userConfigBB.userAuthorizedInConfig.homeMuniID}">
-                                                            
+
                                                             <f:selectItem itemLabel="select a muni..." noSelectionOption="true" />
                                                             <f:selectItems value="#{userConfigBB.muniCandidateList}"  var="mu" itemValue="#{mu.muniCode}" 
                                                                            itemLabel="#{mu.muniName}"/>
@@ -398,10 +391,9 @@
                                                             class="ui-g-12 ui-md-12 ui-lg-12 data_field"
                                                             style="clear:both;">
 
-                                                        <h:outputText   rendered="#{!(empty userConfigBB.userAuthorizedInConfig.person)}"
-human                                                                  value="This user is currently mapped to: #{userConfigBB.userAuthorizedInConfig.pehumanirstName} #{userConfigBB.userAuthorizedInConfig.personhumaname} (ID: #{userConfigBB.userAuthorizedInConfig.human.personID})" />
+                                                        <h:outputText   rendered="#{!empty userConfigBB.userAuthorizedInConfig ? userConfigBB.userAuthorizedInConfig.human.name : '' }" />
 
-                                                        <h:outputText   rendered="#{empty userConfigBB.userAuthorizedInConfig.pehuman
+                                                        <h:outputText   rendered="#{empty userConfigBB.userAuthorizedInConfig}"
                                                                         value="Map the User to a Person:" />
                                                     </div>
 
@@ -517,11 +509,11 @@ human                                                                  value="Th
 
                                             <h:form id="usercfg-remove-form">
 
-                                                
+
                                                 <h:outputText id="usercfg-oneway-ot"
                                                               value="Caution: User deactivation is a one-way street!"
                                                               rendered="#{(empty userConfigBB.userAuthorizedInConfig.deactivatedTS)}" />
-                                                
+
                                                 <h:outputText id="usercfg-alreadydeleted-ot"
                                                               value="This user is deactivated as of #{userConfigBB.getPrettyDate(userConfigBB.userAuthorizedInConfig.deactivatedTS)}"
                                                               rendered="#{!(empty userConfigBB.userAuthorizedInConfig.deactivatedTS)}" />
@@ -892,13 +884,13 @@ human                                                                  value="Th
 
                         <h:form id="usercfg-userdeactivate-form">
                             <h:outputText value="Are you sure you want to permanently deactivate User #{userConfigBB.userAuthorizedInConfig.username}? " />
-                            
+
                             <p:spacer height="5px" />
-                            
+
                             <h:outputText value="This action cannot be undone without DB admin help." />
 
                             <p:spacer height="5px" />
-                            
+
                             <p:commandButton    ajax="true"
                                                 value="Abort Operation" icon="fa fa-stop"
                                                 onclick="PF('usercfg-userdeactivate-confirm-dialog-var').hide()"
@@ -971,18 +963,19 @@ human                                                                  value="Th
                                     <h:outputLabel value="Access Start Date*" 
                                                    for="startDateCal"
                                                    styleClass="data_field_label"/>
+                                    <p:datePicker 	id="aup-cal-starttdate"
+                                                   value="#{userConfigBB.umapInConfig.startDate}" 
+                                                   rendered="true"
+                                                   style="width: 100%;"
+                                                   pattern="MM/dd/yyyy HH:mm"
+                                                   disabled="false"
+                                                   showButtonBar="true"
+                                                   mask="true"
+                                                   timeInput="true" 
+                                                   required="true" />
 
-                                    <p:calendar value="#{userConfigBB.umapInConfig.startDateUtilDate}" 
-                                                mode="popup" 
-                                                id="aup-cal-starttdate"
-                                                styleClass="data_field_value"
-                                                showOn="button"
-                                                pattern="EEE, dd MMM, yyyy"
-                                                navigator="true"
-                                                tabindex="5"
-                                                showButtonPanel="true"
-                                                showTodayButton="true"
-                                                required="true"/>
+
+
 
                                     <h:message for="aup-cal-starttdate" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -994,18 +987,20 @@ human                                                                  value="Th
                                     <h:outputLabel value="Access Termination Date*" 
                                                    for="aup-cal-stopdate"
                                                    styleClass="data_field_label"/>
+                                    <p:datePicker 	id="aup-cal-stopdate"
+                                                   value="#{userConfigBB.umapInConfig.stopDate}" 
+                                                   rendered="true"
+                                                   style="width: 100%;"
+                                                   pattern="MM/dd/yyyy HH:mm"
+                                                   disabled="false"
+                                                   hideOnDateTimeSelect="true"
+                                                    showOnFocus="false"
+                                                    showIcon="true"
+                                                   showButtonBar="true"
+                                                   mask="true"
+                                                   timeInput="true" 
+                                                   required="true" />
 
-
-                                    <p:calendar value="#{userConfigBB.umapInConfig.stopDateUtilDate}" 
-                                                mode="popup" tabindex="6"
-                                                id="aup-cal-stopdate"
-                                                showOn="button"
-                                                pattern="EEE, dd MMM, yyyy"
-                                                navigator="true"
-                                                showButtonPanel="true"
-                                                showTodayButton="true"
-                                                required="true"
-                                                styleClass="data_field_value"/>
 
                                     <h:message for="aup-cal-stopdate" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -1198,12 +1193,11 @@ human                                                                  value="Th
 
                                 <h:panelGroup>
                                     <h:outputText styleClass="ui-label" value="Note text: "/>
-                                    <p:editor   id="usercfg-notes-editor"
-                                                value="#{userConfigBB.formNoteText}"
-                                                controls="bold italic underline strikethrough font size style color
-                                                bullets numbering center undo redo rule link removeformat"
-                                                width="400" required="false"
-                                                height="200"/>
+                                    <p:inputTextarea   id="usercfg-notes-editor"
+                                                       value="#{userConfigBB.formNoteText}"
+                                                       cols="40"
+                                                       rows="5"
+                                                       />
 
 
                                     <p:spacer height="5px" />

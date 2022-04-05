@@ -59,6 +59,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     private static final long DAYS_IN_WEEK = 7;
     private static final long HOURS_IN_DAY = 24;
     
+    private static final int MIN_ZIP_LENGTH = 3;
+    
     
     
     /**
@@ -422,6 +424,14 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         for(SearchParamsMailingCityStateZip sp: paramsList){
             mcszTempList.clear();
                 try {
+                    if(sp.isZip_ctl()){
+                        if(sp.getZip_val() == null){
+                            throw new SearchException("Cannot search for zip by zip with null zip");
+                        }
+                        if(sp.getZip_val().length() < MIN_ZIP_LENGTH){
+                            throw new SearchException("Zip code must be 4 or more digits");
+                        }
+                    }
                     for(Integer i: pi.searchForMailingCityStateZip(sp)){
                             mcszTempList.add(pc.getMailingCityStateZip(i));
                     }

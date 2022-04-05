@@ -462,40 +462,40 @@
 
                                             <p:outputLabel for="prop-search-date-start-val"
                                                            value="Start Date"/>
-                                            <p:calendar id="prop-search-date-start-val"
-                                                        value="#{propertySearchBB.querySelected.primaryParams.startDate_val_utilDate}"
-                                                        disabled="#{(!propertySearchBB.querySelected.primaryParams.date_startEnd_ctl) or propertySearchBB.querySelected.primaryParams.date_relativeDates_ctl}"
-                                                        mode="popup"
-                                                        showOn="button"
-                                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                        navigator="true"
-                                                        tabindex="16"
-                                                        timeInput="true"
-                                                        showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                        showButtonPanel="true"
-                                                        showTodayButton="true"
-                                                        required="false"
-                                                        style="width: 100%"/>
+                                            <p:datePicker 	id="prop-search-date-start-val"
+                                                           value="#{propertySearchBB.querySelected.primaryParams.startDate_val}"
+                                                           disabled="#{(!propertySearchBB.querySelected.primaryParams.date_startEnd_ctl) or propertySearchBB.querySelected.primaryParams.date_relativeDates_ctl}"
+                                                           rendered="true"
+                                                           style="width: 100%;"
+                                                           pattern="MM/dd/yyyy HH:mm"
+                                                           showButtonBar="true"
+                                                           hideOnDateTimeSelect="true"
+                                                            showOnFocus="false"
+                                                            showIcon="true"
+                                                           mask="true"
+                                                           timeInput="true" 
+                                                           required="true" />
+
+
 
                                         </div>
                                         <div class="p-col-6">
                                             <p:outputLabel for="prop-search-date-end-val"
                                                            value="End Date"/>
+                                            <p:datePicker  id="prop-search-date-end-val"
+                                                           value="#{propertySearchBB.querySelected.primaryParams.endDate_val}"
+                                                           disabled="#{(!propertySearchBB.querySelected.primaryParams.date_startEnd_ctl) or propertySearchBB.querySelected.primaryParams.date_relativeDates_ctl}"
+                                                           rendered="true"
+                                                           style="width: 100%;"
+                                                           pattern="MM/dd/yyyy HH:mm"
+                                                           showButtonBar="true"
+                                                           hideOnDateTimeSelect="true"
+                                                            showOnFocus="false"
+                                                            showIcon="true"
+                                                           mask="true"
+                                                           timeInput="true" 
+                                                           required="true" />
 
-                                            <p:calendar id="prop-search-date-end-val"
-                                                        value="#{propertySearchBB.querySelected.primaryParams.endDate_val_utilDate}"
-                                                        disabled="#{(!propertySearchBB.querySelected.primaryParams.date_startEnd_ctl) or propertySearchBB.querySelected.primaryParams.date_relativeDates_ctl}"
-                                                        mode="popup"
-                                                        showOn="button"
-                                                        pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                                        navigator="true"
-                                                        tabindex="16"
-                                                        timeInput="true"
-                                                        showHour="true" showMinute="false" showSecond="false" showMillisec="false"
-                                                        showButtonPanel="true"
-                                                        showTodayButton="true"
-                                                        required="false"
-                                                        style="width: 100%"/>
 
 
 
@@ -525,7 +525,9 @@
                                 </div>
                             </div>
                         </f:subview>
-
+                        
+                        <p:spacer height="5px" />
+                        
                         <div class="p-grid">
                             <div class="p-grid-6">
                                 <p:commandButton id="prop-search-exec-cb-0"
@@ -591,27 +593,27 @@
 
 
             <div class="p-col">
-                
-                   <p:panel id="property-tools-panel"
-                                         toggleable="true"
-                                         collapsed="false"
-                                         header="Can't find your property? Create a new property in #{systemServicesBB.bbSessionMuni.muniName}"
-                                         rendered="true"
-                                         >
 
-                                    <h:form id="property-tools-form">
+                <p:panel id="property-tools-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Can't find your property? Create a new property in #{systemServicesBB.bbSessionMuni.muniName}"
+                         rendered="true"
+                         >
 
-                                        <p:commandButton id="prop-add-init-cb"
-                                                         ajax="true"
-                                                         value="Add new property"
-                                                         icon="fa fa-plus"
-                                                         actionListener="#{propertySearchBB.onPropertyAddInit}"
-                                                         oncomplete="PF('prop-add-dialog-var').show()"
-                                                         update="prop-add-form
-                                                         prop-add-dialog"
-                                                         />
-                                    </h:form>
-                                </p:panel>
+                    <h:form id="property-tools-form">
+
+                        <p:commandButton id="prop-add-init-cb"
+                                         ajax="true"
+                                         value="Add new property"
+                                         icon="fa fa-plus"
+                                         actionListener="#{propertySearchBB.onPropertyAddInit}"
+                                         oncomplete="PF('prop-add-dialog-var').show()"
+                                         update="prop-add-form
+                                         prop-add-dialog"
+                                         />
+                    </h:form>
+                </p:panel>
 
                 <!-- PANEL CONTAINER -->
                 <p:panel id="prop-search-results-panel"
@@ -697,8 +699,8 @@
             </div>
         </div>
     </p:dialog>
-    
-    
+
+
     <p:dialog   id="prop-add-dialog"
                 height="400" width="600"
                 widgetVar="prop-add-dialog-var"
@@ -709,54 +711,54 @@
                 modal="true"
                 header="Create new property in #{systemServicesBB.bbSessionMuni.muniName}"
                 rendered="true"
-          >
-          
-          
-          <h:form id="prop-add-form">
-              
-              <div class="p-grid">
-                  <div class="p-col-4">
-                      
-                      <h:outputText value="Parcel ID (County issued)" />
-                  </div>
-                  <div class="p-col-8">
-                      <h:inputText  id="parcel-add-parid-it"
-                                    value="#{propertySearchBB.currentProperty.countyParcelID}" 
-                                    disabled="#{propertySearchBB.currentProperty.parcelInfo.nonAddressable}"
-                                    />
-                  </div>
-                  <div class="p-col-4">
-                      
-                      <h:outputText value="Non-addressable?" />
-                  </div>
-                  <div class="p-col-8">
-                      
-                      <p:selectBooleanCheckbox value="#{propertySearchBB.currentProperty.parcelInfo.nonAddressable}"
-                                rendered="true"
-                                >
-                            <p:ajax update="parcel-add-parid-it" 
-                                    listener="#{propertySearchBB.onPropertyCreateNonAddressableSliderActuation}"/>
-                      </p:selectBooleanCheckbox>
-                  </div>
-                  <div class="p-col-4">
-                      
-                      <h:outputText value="Creation notes" />
-                  </div>
-                  <div class="p-col-8">
-                      <p:inputTextarea value="#{propertySearchBB.currentProperty.notes}"
-                                       rows="5"
-                                       cols="30" />
-                      <p:spacer height="3px" />
-                      <p style="font-style: italic">Your name and the date will be automatically included in the note.</p>
-                  </div>
-              </div>
-              
-              <p:spacer height="5px" />
-                 <p:commandButton id="prop-add-commit-button"
-                                         ajax="false"
-                                         action="#{propertySearchBB.onPropertyAddCommit}"
-                                         icon="fa fa-plus"
-                                         value="Create property and go to profile"/>
-          </h:form>
-      </p:dialog>
+                >
+
+
+        <h:form id="prop-add-form">
+
+            <div class="p-grid">
+                <div class="p-col-4">
+
+                    <h:outputText value="Parcel ID (County issued)" />
+                </div>
+                <div class="p-col-8">
+                    <h:inputText  id="parcel-add-parid-it"
+                                  value="#{propertySearchBB.currentProperty.countyParcelID}" 
+                                  disabled="#{propertySearchBB.currentProperty.parcelInfo.nonAddressable}"
+                                  />
+                </div>
+                <div class="p-col-4">
+
+                    <h:outputText value="Non-addressable?" />
+                </div>
+                <div class="p-col-8">
+
+                    <p:selectBooleanCheckbox value="#{propertySearchBB.currentProperty.parcelInfo.nonAddressable}"
+                                             rendered="true"
+                                             >
+                        <p:ajax update="parcel-add-parid-it" 
+                                listener="#{propertySearchBB.onPropertyCreateNonAddressableSliderActuation}"/>
+                    </p:selectBooleanCheckbox>
+                </div>
+                <div class="p-col-4">
+
+                    <h:outputText value="Creation notes" />
+                </div>
+                <div class="p-col-8">
+                    <p:inputTextarea value="#{propertySearchBB.currentProperty.notes}"
+                                     rows="5"
+                                     cols="30" />
+                    <p:spacer height="3px" />
+                    <p style="font-style: italic">Your name and the date will be automatically included in the note.</p>
+                </div>
+            </div>
+
+            <p:spacer height="5px" />
+            <p:commandButton id="prop-add-commit-button"
+                             ajax="false"
+                             action="#{propertySearchBB.onPropertyAddCommit}"
+                             icon="fa fa-plus"
+                             value="Create property and go to profile"/>
+        </h:form>
+    </p:dialog>
 </ui:composition>

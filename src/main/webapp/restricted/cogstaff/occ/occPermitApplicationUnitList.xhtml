@@ -57,7 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <br />
                                         <h:outputLabel styleClass="data_field_label" 
                                                        value="WARNING: Make sure to check public-proposed changes to units before editing the unit list."/>
-                                       
+
                                     </div>
 
                                     <div class="ui-g-12 ui-md-6 ui-lg-3 data_field">
@@ -106,15 +106,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <h:outputText value="#{unit.rentalIntentDateStart}" />
                                                 </f:facet>
                                                 <f:facet name="input">
-                                                    <p:calendar
-                                                        value="#{unit.rentalIntentDateStartUtil}"
-                                                        mode="popup"
-                                                        showOn="button"
-                                                        pattern="EEE, dd MMM, yyyy"
-                                                        navigator="true"
-                                                        showButtonPanel="true"
-                                                        showTodayButton="true"
-                                                        required="false"/>
+                                                    <p:datePicker 	id="unit-rental-start-datepicker"
+                                                                   value="#{unit.rentalIntentDateStart}"
+                                                                   rendered="true"
+                                                                   style="width: 100%;"
+                                                                   pattern="MM/dd/yyyy HH:mm"
+                                                                   disabled="false"
+                                                                   hideOnDateTimeSelect="true"
+                                                                    showOnFocus="false"
+                                                                    showIcon="true"
+                                                                   showButtonBar="true"
+                                                                   mask="true"
+                                                                   timeInput="true" 
+                                                                   required="true" />
+
+
                                                 </f:facet>
                                             </p:cellEditor>
                                         </p:column>
@@ -125,15 +131,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <h:outputText value="#{unit.rentalIntentDateStop}" />
                                                 </f:facet>
                                                 <f:facet name="input">
-                                                    <p:calendar
-                                                        value="#{unit.rentalIntentDateStopUtil}"
-                                                        mode="popup"
-                                                        showOn="button"
-                                                        pattern="EEE, dd MMM, yyyy"
-                                                        navigator="true"
-                                                        showButtonPanel="true"
-                                                        showTodayButton="true"
-                                                        required="false"/>
+                                                    <p:datePicker 	id="unit-rental-stop-datepicker"
+                                                                   value="#{unit.rentalIntentDateStop}"
+                                                                   rendered="true"
+                                                                   style="width: 100%;"
+                                                                   pattern="MM/dd/yyyy HH:mm"
+                                                                   disabled="false"
+                                                                   hideOnDateTimeSelect="true"
+                                                                    showOnFocus="false"
+                                                                    showIcon="true"
+                                                                   showButtonBar="true"
+                                                                   mask="true"
+                                                                   timeInput="true" 
+                                                                   required="true" />
                                                 </f:facet>
                                             </p:cellEditor>
                                         </p:column>

@@ -48,10 +48,7 @@ public  class       CodeViolationPropCECaseHeavy
     this.description = cv.description;
     this.notes = cv.notes;
     this.dateOfRecord = cv.dateOfRecord;
-    this.dateOfRecordUtilDate = cv.dateOfRecordUtilDate;
-    this.dateOfRecordPretty = cv.dateOfRecordPretty;
     this.creationTS = cv.creationTS;
-    this.creationTSPretty = cv.creationTSPretty;
     this.createdBy = cv.createdBy;
     this.allowHostCaseUpdate = cv.allowHostCaseUpdate;
     this.allowOrdinanceUpdates = cv.allowOrdinanceUpdates;

@@ -45,8 +45,6 @@ public  class       OccPeriod
     final static String OCCPERIOD_HFNAME = "Occupancy Period";
     final static DomainEnum OCC_DOMAIN = DomainEnum.OCCUPANCY;
     
-    
-    
     protected int periodID;
     protected int propertyUnitID;
     
@@ -120,10 +118,7 @@ public  class       OccPeriod
             this.notes = otherPeriod.getNotes();
 
         }
-
     }
-
-
 
     @Override
     public int compareTo(OccPeriod op) {
@@ -132,7 +127,6 @@ public  class       OccPeriod
              c = this.startDate.compareTo(op.startDate);
         } 
         return c;
-        
     }
 
     public long getPeriodAge() {
@@ -145,7 +139,6 @@ public  class       OccPeriod
 
     public long getPeriodAgeAsOf(LocalDateTime ageEndTime){
         return DateTimeUtil.getTimePeriodAsDays(startDate, ageEndTime);
-
     }
     
     /**
@@ -426,42 +419,7 @@ public  class       OccPeriod
         this.notes = notes;
     }
    
-    /**
-     * @return the startDateUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getStartDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(startDate);
-    }
-
-    /**
-     * @return the endDateUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getEndDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(endDate);
-    }
-
-    /**
-     * @param startDateUtilDate the startDateUtilDate to set
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
-        startDate = DateTimeUtil.convertUtilDate(startDateUtilDate);
-    }
-
-    /**
-     * @param endDateUtilDate the endDateUtilDate to set
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
-        endDate = DateTimeUtil.convertUtilDate(endDateUtilDate);
-    }
-
+    
     /**
      * @return the governingInspection
      */

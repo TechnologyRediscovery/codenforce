@@ -395,34 +395,7 @@ public class UserMuniAuthPeriod extends BOb implements Serializable, Comparable<
         this.validityEvaluatedTS = validityEvaluatedTS;
     }
 
-    /**
-     * @return the stopDateUtilDate
-     */
-    public java.util.Date getStopDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(stopDate);
-    }
-
-    /**
-     * @param stopDateUtilDate the stopDateUtilDate to set
-     */
-    public void setStopDateUtilDate(java.util.Date stopDateUtilDate) {
-        stopDate = DateTimeUtil.convertUtilDate(stopDateUtilDate);
-    }
-
-    /**
-     * @return the startDateUtilDate
-     */
-    public java.util.Date getStartDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(startDate);
-    }
-
-    /**
-     * @param startDateUtilDate the startDateUtilDate to set
-     */
-    public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
-        startDate = DateTimeUtil.convertUtilDate(startDateUtilDate);
-    }
-
+  
     /**
      * @return the oathCourtEntity
      */

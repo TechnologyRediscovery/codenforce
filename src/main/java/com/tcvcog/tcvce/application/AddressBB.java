@@ -90,18 +90,25 @@ public  class   AddressBB
         SystemCoordinator sc = getSystemCoordinator();
         addressSourceList = sc.getBobSourceListComplete();
         
-        SearchCoordinator srchc = getSearchCoordinator();
-        qcszEnumList = srchc.buildQueryMailingCityStateZipList(getSessionBean().getSessUser().getMyCredential());
-        if(qcszEnumList != null && !qcszEnumList.isEmpty()){
-            selectedCSZQuery = qcszEnumList.get(0);
-        }
+     
         
         // LOAD UP OUR FILTERED LISTS 
         cityStateZipListFiltered = new ArrayList<>();
         streetListFiltered = new ArrayList<>();
         mailingAddressListFiltered = new ArrayList<>();
+        setupCSZQuery();
         
-        
+    }
+    
+    /**
+     * Internal tool for resetting the query and selecting the first one
+     */
+    private void setupCSZQuery(){
+        SearchCoordinator srchc = getSearchCoordinator();
+        qcszEnumList = srchc.buildQueryMailingCityStateZipList(getSessionBean().getSessUser().getMyCredential());
+        if(qcszEnumList != null && !qcszEnumList.isEmpty()){
+            selectedCSZQuery = qcszEnumList.get(0);
+        }
     }
     
     
@@ -142,9 +149,8 @@ public  class   AddressBB
      */
     public void onQueryResetButtonChange(ActionEvent ev){
         selectedCSZQuery = null;
-        
-        SearchCoordinator srchc = getSearchCoordinator();
-        qcszEnumList = srchc.buildQueryMailingCityStateZipList(getSessionBean().getSessUser().getMyCredential());
+        setupCSZQuery();
+       
          getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO,
                          "Search system reset",""));
@@ -303,6 +309,7 @@ public  class   AddressBB
     public void onMailingStreetInitButtonChange(ActionEvent ev){
         PropertyCoordinator pc = getPropertyCoordinator();
         currentStreet = pc.getMailingStreetSkeleton(currentCityStateZip);
+        editModeCurrentStreet = true;
         
     }
 

@@ -1351,6 +1351,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         WorkflowCoordinator wc = getWorkflowCoordinator();
         BlobIntegrator bi = getBlobIntegrator();
         BlobCoordinator bc = getBlobCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
+        
         
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
@@ -1411,6 +1413,10 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             v.setNullifiedUser(ui.getUser(rs.getInt("nullifiedby")));
         } 
         
+        if(rs.getInt("severity_classid") != 0){
+            v.setSeverityIntensity(si.getIntensityClass(rs.getInt("severity_classid")));
+        }
+        
         List<BlobLight> blobList = new ArrayList<>();
 //        try {
 //            for(int id : bi.getBlobsByCECase(v.getViolationID())){
@@ -1429,6 +1435,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @param violationID
      * @return
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public CodeViolation getCodeViolation(int violationID) 
             throws IntegrationException, BObStatusException {

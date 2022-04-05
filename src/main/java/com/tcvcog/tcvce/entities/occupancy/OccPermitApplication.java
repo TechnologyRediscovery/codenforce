@@ -38,7 +38,7 @@ public class OccPermitApplication extends BOb {
     private OccPermitApplicationReason reason;
     private OccApplicationStatusEnum status;
     private LocalDateTime submissionDate;
-    private Date submissionDateUtilDate;
+    
     private String submissionNotes;
     private String internalNotes;
     private String externalPublicNotes;
@@ -138,15 +138,7 @@ public class OccPermitApplication extends BOb {
         this.internalNotes = internalNotes;
     }
 
-    public Date getSubmissionDateUtilDate() {
-        submissionDateUtilDate = DateTimeUtil.convertUtilDate(submissionDate);
-        return submissionDateUtilDate;
-    }
-
-    public void setSubmissionDateUtilDate(Date submissionDateUtilDate) {
-        this.submissionDateUtilDate = submissionDateUtilDate;
-        submissionDate = DateTimeUtil.convertUtilDate(submissionDateUtilDate);
-    }
+   
 
     public PropertyUnit getApplicationPropertyUnit() {
         return applicationPropertyUnit;

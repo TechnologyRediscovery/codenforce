@@ -96,7 +96,7 @@ public class CECaseSearchProfileBB
     private ViewOptionsActiveListsEnum selectedViewOption;
     
     private List<IntensityClass> severityList;
-    private java.util.Date complianceDateForm;
+    private LocalDateTime complianceDateForm;
     
     private String formNoteTextViolation;
     private List<EnforcableCodeElement> filteredElementList;
@@ -106,7 +106,7 @@ public class CECaseSearchProfileBB
     private CodeSet currentCodeSet;
 
     private boolean extendStipCompUsingDate;
-    private java.util.Date extendedStipCompDate;
+    private LocalDateTime extendedStipCompDate;
     private int extendedStipCompDaysFromToday;
     
     private boolean formMakeFindingsDefault;
@@ -1046,7 +1046,6 @@ public class CECaseSearchProfileBB
     public void onViolationRecordComplianceInitButtonChange(CodeViolation viol){
         currentViolation = viol;
         // set default compliance date of today
-        prepareComplianceDateForm();
     }
     
     /**
@@ -1057,13 +1056,9 @@ public class CECaseSearchProfileBB
      */
     public void onViolationRecordComplianceInitButtonChange(ActionEvent ev){
         System.out.println("CeCaseSearchProfileBB.onViolationRecordComplianceInitButtonChange | from dialog");
-        prepareComplianceDateForm();
     }
     
-    private void prepareComplianceDateForm(){
-        complianceDateForm = java.util.Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
-        
-    }
+  
     
     /**
      * Listener for user requests to start nuke operation
@@ -1222,13 +1217,13 @@ public class CECaseSearchProfileBB
         long secBetween;
         try {
             if (isExtendStipCompUsingDate() && getExtendedStipCompDate() != null) {
-                LocalDateTime freshDate = getExtendedStipCompDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                if (freshDate.isBefore(LocalDateTime.now())) {
+                
+                if (extendedStipCompDate.isBefore(LocalDateTime.now())) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                     "Stipulated compliance dates must be in the future!", ""));
                 } else {
-                    secBetween = freshDate.toEpochSecond(ZoneOffset.of("-4")) - LocalDateTime.now().toEpochSecond(ZoneOffset.of("-4"));
+                    secBetween = extendedStipCompDate.toEpochSecond(ZoneOffset.of("-4")) - LocalDateTime.now().toEpochSecond(ZoneOffset.of("-4"));
                     // divide by num seconds in a day
                     long daysBetween = secBetween / (24 * 60 * 60);
                     cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), daysBetween, currentCase, getSessionBean().getSessUser());
@@ -1542,7 +1537,7 @@ public class CECaseSearchProfileBB
         EventCoordinator ec = getEventCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         if(currentViolation != null){
-            currentViolation.setActualComplianceDateUtilDate(complianceDateForm);
+            currentViolation.setActualComplianceDate(complianceDateForm);
         }
         // build event details package
         EventCnF e = null;
@@ -1660,6 +1655,10 @@ public class CECaseSearchProfileBB
 
     }
     
+    /**
+     * Listener for user requests to nullify a violation
+     * @return 
+     */
     public String onViolationNullifyCommitButtonChange(){
         CaseCoordinator cc = getCaseCoordinator();
          try {
@@ -1676,7 +1675,29 @@ public class CECaseSearchProfileBB
 
         }
         return "ceCaseProfile";
-        
+    }
+    
+   
+    /**
+     * Listener for user requests to reactivate a violation
+     * @return 
+     */
+    public String onViolationReactivateButtonChange(){
+        CaseCoordinator cc = getCaseCoordinator();
+         try {
+            cc.violation_reactivateViolation(currentViolation, currentCase, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Success! Violation reactivated.", ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), null));
+            return "";
+
+        }
+        return "ceCaseProfile";
     }
     
    
@@ -2449,12 +2470,7 @@ public class CECaseSearchProfileBB
         return extendStipCompUsingDate;
     }
 
-    /**
-     * @return the extendedStipCompDate
-     */
-    public java.util.Date getExtendedStipCompDate() {
-        return extendedStipCompDate;
-    }
+   
 
     /**
      * @return the extendedStipCompDaysFromToday
@@ -2519,12 +2535,7 @@ public class CECaseSearchProfileBB
         this.extendStipCompUsingDate = extendStipCompUsingDate;
     }
 
-    /**
-     * @param extendedStipCompDate the extendedStipCompDate to set
-     */
-    public void setExtendedStipCompDate(java.util.Date extendedStipCompDate) {
-        this.extendedStipCompDate = extendedStipCompDate;
-    }
+   
 
     /**
      * @param extendedStipCompDaysFromToday the extendedStipCompDaysFromToday to set
@@ -2536,14 +2547,14 @@ public class CECaseSearchProfileBB
     /**
      * @return the complianceDateForm
      */
-    public java.util.Date getComplianceDateForm() {
+    public LocalDateTime getComplianceDateForm() {
         return complianceDateForm;
     }
 
     /**
      * @param complianceDateForm the complianceDateForm to set
      */
-    public void setComplianceDateForm(java.util.Date complianceDateForm) {
+    public void setComplianceDateForm(LocalDateTime complianceDateForm) {
         this.complianceDateForm = complianceDateForm;
     }
 
@@ -2841,6 +2852,20 @@ public class CECaseSearchProfileBB
      */
     public void setSelectedViolationList(List<CodeViolation> selectedViolationList) {
         this.selectedViolationList = selectedViolationList;
+    }
+
+    /**
+     * @return the extendedStipCompDate
+     */
+    public LocalDateTime getExtendedStipCompDate() {
+        return extendedStipCompDate;
+    }
+
+    /**
+     * @param extendedStipCompDate the extendedStipCompDate to set
+     */
+    public void setExtendedStipCompDate(LocalDateTime extendedStipCompDate) {
+        this.extendedStipCompDate = extendedStipCompDate;
     }
 
    

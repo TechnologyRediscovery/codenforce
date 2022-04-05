@@ -323,6 +323,7 @@ public class PersonBB extends BackingBeanUtils {
      * @param h 
      */
     public void onHumanViewLinkClick(Human h){
+        System.out.println("PersonBB.onHumanViewLinkClick : " + h.getName());
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.getPerson(h);
@@ -1143,6 +1144,30 @@ public class PersonBB extends BackingBeanUtils {
         
         
     }
+    
+    /**
+     * Quick workaround to link a person to the session property
+     * @param ev 
+     */
+    public void onLinkPersonToCurrentParcel(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        if(currentPerson != null && getSessionBean().getSessProperty() != null){
+            try {
+                pc.linkHuman(getSessionBean().getSessProperty(), pc.createHumanLinkSkeleton(currentPerson), getSessionBean().getSessUser());
+                  getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Linked " + currentPerson.getName() + " to Property ID " + getSessionBean().getSessProperty().getCountyParcelID(), ""));
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Error linking person: " + ex.getMessage(), ""));
+            } 
+        }
+        
+        
+    }
+    
     
     /**
      * listener for user requests to undertake the linking

@@ -1042,13 +1042,9 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
         this.queryBegin = queryBegin;
     }
 
-    public Date getQueryBegin_Util() {
-        return convertDate(queryEnd);
-    }
+   
 
-    public void setQueryBegin_Util(Date queryBeginUtil) {
-        queryBegin = convertDate(queryBeginUtil);
-    }
+   
 
     public LocalDateTime getQueryEnd() {
         return queryEnd;
@@ -1058,13 +1054,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
         this.queryEnd = queryEnd;
     }
 
-    public Date getQueryEnd_Util() {
-        return convertDate(queryEnd);
-    }
-
-    public void setQueryEnd_Util(Date queryEndUtil) {
-        queryEnd = convertDate(queryEndUtil);
-    }
+   
 
     public List<OccApplicationStatusEnum> getStatusList() {
         return statusList;

@@ -49,15 +49,21 @@
                         <h:outputText value="Date of Record" />
                     </f:facet>
                     <h:outputText value="#{citationBB.getPrettyDateNoTime(citation.dateOfRecord)}"/>
-                    
+
 
                 </p:column>
 
                 <p:column width="85%">
 
                     <f:facet name="header">
-                        <h:outputText value="Status Log" />
+                        <h:outputText value="Dockets and Status Log" />
                     </f:facet>
+                    <ui:repeat id="docket-uir"
+                               value="#{citation.docketNos}"
+                               var="dlog">
+                        <h:outputText value="Docket No.: #{dlog.docketNumber}" />
+                    </ui:repeat>
+                    <hr />
                     <ui:repeat id="citation-status-uir"
                                value="#{citation.statusLog}"
                                var="logentry">
@@ -82,8 +88,8 @@
                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                             update="citation-profile-dialog"
                                             value="view/edit" />
-                        
-                        
+
+
                     </div>
                     <p:spacer height="2px"/>
                     <h:outputText value="(ID: #{citation.citationID})"/>
@@ -214,15 +220,21 @@
                     <div class="p-col-4">Date of Record</div>
                     <div class="p-col-8">
 
-                        <p:calendar id="citation-dor-it"
-                                    value="#{citationBB.currentCitation.dateOfRecord}"
-                                    mode="popup" tabindex="3"
-                                    showOn="button"
-                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                    navigator="true" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
-                                    showButtonPanel="true"
-                                    showTodayButton="true"
-                                    required="true"/>
+                        <p:datePicker 	id="citation-dor-it"
+                                       value="#{citationBB.currentCitation.dateOfRecord}"
+                                       rendered="true"
+                                       style="width: 100%;"
+                                       pattern="MM/dd/yyyy HH:mm"
+                                       disabled="false"
+                                       hideOnDateTimeSelect="true"
+                                        showOnFocus="false"
+                                        showIcon="true"
+                                       showButtonBar="true"
+                                       mask="true"
+                                       timeInput="true" 
+                                       required="true" />
+
+
 
                         <h:message for="citation-dor-it" showDetail="false" showSummary="true"
                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -383,17 +395,22 @@
 
                                 <h:outputText rendered="#{!citationBB.citationInfoEditMode}" 
                                               value="#{citationBB.getPrettyDateNoTime(citationBB.currentCitation.dateOfRecord)}"/>
+                                
+                                <p:datePicker 	id="citation-dor-it"
+                                               rendered="#{citationBB.citationInfoEditMode}" 
+                                               value="#{citationBB.currentCitation.dateOfRecord}"
+                                               style="width: 100%;"
+                                               pattern="MM/dd/yyyy HH:mm"
+                                               disabled="false"
+                                               hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                               showButtonBar="true"
+                                               mask="true"
+                                               timeInput="true" 
+                                               required="true" />
 
-                                <p:calendar id="citation-dor-it"
-                                            rendered="#{citationBB.citationInfoEditMode}" 
-                                            value="#{citationBB.currentCitation.dateOfRecord}"
-                                            mode="popup" tabindex="3"
-                                            showOn="button"
-                                            pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                            navigator="true" timeInput="true" showHour="true" showMinute="true" showSecond="false" showMillisec="false"
-                                            showButtonPanel="true"
-                                            showTodayButton="true"
-                                            required="true"/>
+
 
                                 <h:message for="citation-dor-it" showDetail="false" showSummary="true"
                                            warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -612,7 +629,7 @@
                             collapsed="false"
                             header="Cited Code Violations">
                     <h:form id="citation-violations-form">
-                        
+
                         <p:dataTable    id="citation-violation-table"
                                         value="#{citationBB.currentCitation.violationList}"
                                         var="cv"
@@ -676,7 +693,7 @@
                         <p:spacer height="5px" />
                         <p style="font-style: italic; font-size: 0.9em;">
                             Note that code violations attachments to citations are permanent. If you failed to include a violation that was, in fact, part of the official citation, you can either remove this citation and start over or you can create another citation with just that violation.
-                            
+
                         </p>
                     </h:form>
 
@@ -980,21 +997,21 @@
                                         cols="40" />
                     <p:spacer height="5px" />
                     <h:outputText value="The new status, a timestamp, and your name is automatically included"
-                          style="font-style: italic;"/>
+                                  style="font-style: italic;"/>
                 </div>
             </div>
-            
+
             <p:spacer height="5px" />
-            
-                <p:commandButton id="citation-violation-status-update-button"
+
+            <p:commandButton id="citation-violation-status-update-button"
                              value="Update status and attach note"
                              rendered="true"
                              icon="fa fa-save"
                              actionListener="#{citationBB.onCitationViolationStatusUpdateCommit}"
                              oncomplete="PF('citation-violation-status-update-dialog-var').hide();"
                              update="   citation-violations-form
-                                        citations-growl-form"/>
- 
+                             citations-growl-form"/>
+
 
         </h:form>
     </p:dialog>
@@ -1023,7 +1040,7 @@
                                   escape="false" />
                 </div>
             </div>
-            
+
         </h:form>
     </p:dialog>
 
@@ -1099,17 +1116,20 @@
                 <div class="p-col-8">
                     <h:outputText rendered="#{!citationBB.citationStatusEditMode}"
                                   value="#{citationBB.getPrettyDate(citationBB.currentCitationStatusLogEntry.dateOfRecord)}" />
+                    <p:datePicker 	id="citation-statuslog-dor-it"
+                                        rendered="#{citationBB.citationStatusEditMode}"
+                                        value="#{citationBB.currentCitationStatusLogEntry.dateOfRecord}"
+                                        style="width: 100%;"
+                                        pattern="MM/dd/yyyy HH:mm"
+                                        disabled="false"
+                                        hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                        showButtonBar="true"
+                                        mask="true"
+                                        timeInput="true" 
+                                        required="true" />
 
-                    <p:calendar id="citation-statuslog-dor-it"
-                                rendered="#{citationBB.citationStatusEditMode}"
-                                value="#{citationBB.currentCitationStatusLogEntry.dateOfRecord}"
-                                mode="popup" tabindex="3"
-                                showOn="button"
-                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                navigator="true" timeInput="false" 
-                                showButtonPanel="true"
-                                showTodayButton="true"
-                                required="true"/>
                 </div>
 
 
@@ -1197,7 +1217,7 @@
                              cols="50"
                              rows="10"/>
             <p:spacer height="5px" />
-            
+
             <h:outputText value="date, time, and your name is automatically included in the note"
                           style="font-style: italic;"/>
 
@@ -1244,14 +1264,14 @@
                              #{ceCaseSearchProfileBB.reloadCECaseComponentIDToUpdate}"/>
 
 
-                <p:commandButton id="citation-docket-edit-abort-button"
-                                 value="Discard Edits"
-                                 rendered="#{citationBB.citationDocketEditMode}"
-                                 icon="fa fa-stop"
-                                 actionListener="#{citationBB.onDocketAddEditOperationAbortButtonChange}"
-                                 oncomplete="PF('citation-docket-dialog-var').show()"
-                                 update="citation-docket-form
-                                 citations-growl-form"/>
+            <p:commandButton id="citation-docket-edit-abort-button"
+                             value="Discard Edits"
+                             rendered="#{citationBB.citationDocketEditMode}"
+                             icon="fa fa-stop"
+                             actionListener="#{citationBB.onDocketAddEditOperationAbortButtonChange}"
+                             oncomplete="PF('citation-docket-dialog-var').show()"
+                             update="citation-docket-form
+                             citations-growl-form"/>
 
 
             <p:spacer height="5px"/>
@@ -1292,17 +1312,20 @@
                 <div class="p-col-8">
                     <h:outputText   rendered="#{!citationBB.citationDocketEditMode}"
                                     value="#{citationBB.getPrettyDate(citationBB.currentCitationDocket.dateOfRecord)}" />
-
-                    <p:calendar id="citation-dor-it"
-                                rendered="#{citationBB.citationDocketEditMode}"
-                                value="#{citationBB.currentCitationDocket.dateOfRecord}"
-                                mode="popup" tabindex="3"
-                                showOn="button"
-                                pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                navigator="true" timeInput="false" 
-                                showButtonPanel="true"
-                                showTodayButton="true"
-                                required="true"/>
+                   
+                    <p:datePicker 	id="citation-dor-it"
+                                        rendered="#{citationBB.citationDocketEditMode}"
+                                        value="#{citationBB.currentCitationDocket.dateOfRecord}"
+                                        style="width: 100%;"
+                                        pattern="MM/dd/yyyy HH:mm"
+                                        disabled="false"
+                                        hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                        showButtonBar="true"
+                                        mask="true"
+                                        timeInput="true" 
+                                        required="true" />
 
                 </div>
                 <div class="p-col-4">
@@ -1678,7 +1701,7 @@
             <div class="p-grid">
                 <div class="p-col-4">
                     <h:outputText styleClass="ui-label" value="Note text: "/>
-                    
+
                 </div>
                 <div class="p-col-8">
                     <p:inputTextarea   id="citation-notes-editor"

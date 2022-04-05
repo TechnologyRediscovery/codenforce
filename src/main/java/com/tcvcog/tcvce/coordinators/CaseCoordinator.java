@@ -3409,6 +3409,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         ci.updateCodeViolation(cv);
 
     }
+    
     /**
      * Attempts to deactivate a code violation, but will thow an Exception if
      * the CodeViolation has been used in a notice or in a citation
@@ -3438,10 +3439,26 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             }
         } else {
             throw new BObStatusException("Cannot nullify a violation with null CV or User");
-            
         }
+    }
+    
+    /**
+     * Listener for user requests to reactivate a nullified violation
+     * @param cv
+     * @param cse
+     * @param ua
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public void violation_reactivateViolation(CodeViolation cv, CECase cse, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(cv == null || cv.getNullifiedTS() == null || cse == null || ua == null){
+            throw new BObStatusException("Cannot reactivate with null violation, null nullified ts, null case, or null user");
+        }
+        CaseIntegrator ci = getCaseIntegrator();
+        cv.setNullifiedTS(null);
+        cv.setNullifiedUser(null);
+        ci.updateCodeViolation(cv);
         
-
+        
     }
     
     /**

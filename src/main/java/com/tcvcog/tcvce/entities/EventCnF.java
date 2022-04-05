@@ -330,14 +330,7 @@ public  class       EventCnF
         return timeStart;
     }
 
-    /**
-     * @return the timeStartUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getTimeStartUtilDate() {
-        return DateTimeUtil.convertUtilDate(timeStart);
-    }
+  
 
     /**
      * @return the timeEnd
@@ -347,14 +340,7 @@ public  class       EventCnF
         return timeEnd;
     }
 
-    /**
-     * @return the timeEndUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getTimeEndUtilDate() {
-        return DateTimeUtil.convertUtilDate(timeEnd);
-    }
+   
     
     public String getTimeStartPretty(){
         return DateTimeUtil.getPrettyDate(timeStart);
@@ -372,14 +358,7 @@ public  class       EventCnF
         this.timeStart = timeStart;
     }
 
-    /**
-     * @param tsud
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setTimeStartUtilDate(java.util.Date tsud) {
-        timeStart = DateTimeUtil.convertUtilDate(tsud);
-    }
+   
 
     /**
      * @param timeEnd the timeEnd to set
@@ -388,14 +367,7 @@ public  class       EventCnF
         this.timeEnd = timeEnd;
     }
 
-    /**
-     * @param teud
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setTimeEndUtilDate(java.util.Date teud) {
-        timeEnd = DateTimeUtil.convertUtilDate(teud);
-    }
+   
 
     /**
      * @return the lastUpdatedBy

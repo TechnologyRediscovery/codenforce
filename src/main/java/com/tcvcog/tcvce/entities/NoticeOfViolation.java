@@ -63,11 +63,9 @@ public  class NoticeOfViolation
     
     
     private LocalDateTime dateOfRecord;
-    private java.util.Date dateOfRecordUtilDate;
-    private String dateOfRecordPretty;
     
     private LocalDateTime creationTS;
-    private String creationTSPretty;
+   
     private User creationBy;
     
     private User notifyingOfficer;
@@ -184,26 +182,7 @@ public  class NoticeOfViolation
         this.sentTS = sentTS;
     }
 
-    /**
-     * @return the creationTSPretty
-     */
-    public String getCreationTSPretty() {
-        if(creationTS != null){
-            creationTSPretty = DateTimeUtil.getPrettyDate(creationTS);
-        }
-        return creationTSPretty;
-    }
-
-    /**
-     * @return the dateOfRecordPretty
-     */
-    public String getDateOfRecordPretty() {
-        if(dateOfRecord != null){
-            dateOfRecordPretty = DateTimeUtil.getPrettyDate(dateOfRecord);
-        }
-        return dateOfRecordPretty;
-    }
-
+   
     /**
      * @return the sentTSPretty
      */
@@ -214,19 +193,7 @@ public  class NoticeOfViolation
         return sentTSPretty;
     }
 
-    /**
-     * @param creationTSPretty the creationTSPretty to set
-     */
-    public void setCreationTSPretty(String creationTSPretty) {
-        this.creationTSPretty = creationTSPretty;
-    }
-
-    /**
-     * @param dateOfRecordPretty the dateOfRecordPretty to set
-     */
-    public void setDateOfRecordPretty(String dateOfRecordPretty) {
-        this.dateOfRecordPretty = dateOfRecordPretty;
-    }
+  
 
     /**
      * @param sentTSPretty the sentTSPretty to set
@@ -450,22 +417,7 @@ public  class NoticeOfViolation
         this.includeViolationPhotoAttachment = includeViolationPhotoAttachment;
     }
 
-    /**
-     * @return the dateOfRecordUtilDate
-     */
-    public java.util.Date getDateOfRecordUtilDate() {
-        dateOfRecordUtilDate = DateTimeUtil.convertUtilDate(dateOfRecord);
-        return dateOfRecordUtilDate;
-    }
-
-    /**
-     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
-     */
-    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        dateOfRecord = DateTimeUtil.convertUtilDate(dateOfRecordUtilDate);
-        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-    }
-
+   
   
     /**
      * @return the headerImageID

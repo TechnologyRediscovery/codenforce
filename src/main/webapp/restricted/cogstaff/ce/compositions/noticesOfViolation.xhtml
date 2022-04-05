@@ -571,16 +571,20 @@
                 <h:form id="nov-date-form">
 
                     <h2>Date of record</h2>
+                    <p:datePicker 	    id="noticeDateOfRecord"
+                                            value="#{noticeOfViolationBB.currentNotice.dateOfRecord}" 
+                                            rendered="true"
+                                            style="width: 100%;"
+                                            pattern="MM/dd/yyyy HH:mm"
+                                            disabled="false"
+                                            hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                            showButtonBar="true"
+                                            mask="true"
+                                            timeInput="true" 
+                                            required="true" />
 
-                    <p:calendar value="#{noticeOfViolationBB.currentNotice.dateOfRecordUtilDate}" 
-                                mode="popup" tabindex="13"
-                                id="noticeDateOfRecord"
-                                showOn="button"
-                                pattern="EEE, dd MMM, yyyy"
-                                navigator="true"
-                                showButtonPanel="true"
-                                showTodayButton="true"
-                                required="true"/>
 
                     <h:message for="noticeDateOfRecord" showDetail="true" showSummary="true" 
                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -1042,8 +1046,10 @@
                                              />
 
                             <p:spacer height="3px" />
+                            
                             <p:commandLink id="edit-person-from-lookup-cb-1"
                                            ajax="true"
+                                           rendered="false"
                                            value="View/edit person"
                                            oncomplete="PF('pers-selected-panel-var').show();"
                                            update="person-info-form

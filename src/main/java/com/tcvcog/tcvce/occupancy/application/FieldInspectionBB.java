@@ -63,6 +63,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     private boolean useDefaultFindingsOnCurrentOISE;
 
     private boolean editModeInspectionMetadata;
+    private FieldInspection formFollowUpInspectionTo;
     
     private int occPeriodIDFortransferFormField;
     
@@ -264,12 +265,12 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      */
     public void onToggleEditModeInspectionMetadata() {
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
-        // if we're hitting the button and we're not in edit mode, don't udpated
+        // if we're hitting the button and we're not in edit mode, don't udpate
         if(editModeInspectionMetadata){
             try {
                 // REFACTOR
-//                if(formFollowUpInspection != null){
-//                    currentInspection.setFollowUpToInspectionID(formFollowUpInspection.getInspectionID());
+//                if(formFollowUpInspectionTo != null){
+//                    currentInspection.setFollowUpToInspectionID(formFollowUpInspectionTo.getInspectionID());
 //                }
                 oic.updateOccInspection(currentInspection, getSessionBean().getSessUser());
                  getFacesContext().addMessage(null,
@@ -709,6 +710,22 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
         
         return "inspectionReport";
     }
+    
+    
+    // *****************************************
+    // ************ REINSPECTION STUFF *********
+    // *****************************************
+    
+    /**
+     * Listener for user requests to start a follow-up inspection
+     * @param ev 
+     */
+    public void onSetupReinspectionButtonClick(ActionEvent ev){
+        formFollowUpInspectionTo = currentInspection;
+        
+    }
+
+    
 
     // getters & setters below you know the drill
 
@@ -940,5 +957,19 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      */
     public void setInspectionListComponentForUpdate(String inspectionListComponentForUpdate) {
         this.inspectionListComponentForUpdate = inspectionListComponentForUpdate;
+    }
+
+    /**
+     * @return the formFollowUpInspectionTo
+     */
+    public FieldInspection getFormFollowUpInspectionTo() {
+        return formFollowUpInspectionTo;
+    }
+
+    /**
+     * @param formFollowUpInspectionTo the formFollowUpInspectionTo to set
+     */
+    public void setFormFollowUpInspectionTo(FieldInspection formFollowUpInspectionTo) {
+        this.formFollowUpInspectionTo = formFollowUpInspectionTo;
     }
 }

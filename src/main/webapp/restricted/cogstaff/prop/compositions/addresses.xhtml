@@ -291,13 +291,13 @@
                     <div class="p-col-2">
 
                         <h:form id="address-search-selected-help-form">
-                        <h2>Selected address:   <p:commandButton id="address-search-selected-help-button"
-                                             icon="fa fa-question-circle-o"
-                                             styleClass="button-help"
-                                             type="button" /></h2>
-                        
-                          
-                            
+                            <h2>Selected address:   <p:commandButton id="address-search-selected-help-button"
+                                                                     icon="fa fa-question-circle-o"
+                                                                     styleClass="button-help"
+                                                                     type="button" /></h2>
+
+
+
                             <p:overlayPanel for="address-search-selected-help-button"
                                             style="width:350px;" 
                                             dismissable="true"
@@ -306,13 +306,13 @@
                                 <p>Select an address by searching for a ZIP code (or using the quick 
                                     ZIP code link in the street search column (middle), choosing a 
                                     street, and then choosing a building on that street.</p>
-                                
+
                                 <p>Once you have a selected address, you can link it to your 
                                     current property or person using buttons that appear after selection.</p>
                             </p:overlayPanel>
-                            
+
                         </h:form>
-                        
+
                     </div>
                     <div class="p-col-4">
                         <h:form id="selected-address-form">
@@ -330,8 +330,8 @@
                                            actionListener="#{addressBB.onMailingAddressViewCurrentAddress}"
                                            oncomplete="PF('address-dialog-var').show();"
                                            update="address-dialog
-                                                    address-info-form
-                                                    addresses-growl-form">
+                                           address-info-form
+                                           addresses-growl-form">
                             </p:commandLink>
 
                         </h:form>
@@ -392,13 +392,72 @@
                                                    itemValue="#{ql}"
                                                    itemLabel="#{ql.queryTitle}" 
                                                    />
-                                    <p:ajax update="param-itfield-city 
-                                            param-itfield-zip
-                                            param-itfield-state
+                                    <p:ajax update="
+                                            csz-params-form
                                             addresses-growl-form"
                                             listener="#{addressBB.onQueryChange}"
                                             />
                                 </p:selectOneMenu>
+
+                            </h:form>
+
+                            <p:spacer height="5px"/>    
+                            <h:form id="csz-params-form">
+
+                                <f:subview  id="csz-params-subview-zip"
+                                            rendered="#{addressBB.selectedCSZQuery.primaryParams.zip_ctl}">
+
+
+                                    <div class="p-grid">
+                                        <div class="p-col-6">
+                                            <h:outputText   id="param-zip-zip-label"
+                                                            value="ZIP Code" />
+
+                                        </div>
+
+                                        <div class="p-col-6">
+                                            <p:inputText    id="param-zip-zip-it"
+                                                            value="#{addressBB.selectedCSZQuery.primaryParams.zip_val}" />
+                                        </div>
+
+                                    </div>
+
+                                </f:subview>
+
+                                <f:subview  id="csz-params-subview-city"
+                                            rendered="#{addressBB.selectedCSZQuery.primaryParams.city_ctl}">
+
+                                    <div class="p-grid">
+
+                                        <div class="p-col-6">
+                                            <h:outputText   id="param-zip-city-label"
+                                                            value="City" />
+                                        </div>
+
+
+                                        <div class="p-col-6">
+                                            <p:inputText    id="param-zip-city-it"
+                                                            value="#{addressBB.selectedCSZQuery.primaryParams.city_val}"  />
+                                        </div>
+                                    </div>
+                                </f:subview>
+
+                                <f:subview  id="csz-params-subview-state"
+                                            rendered="#{addressBB.selectedCSZQuery.primaryParams.state_ctl}">
+                                    <div class="p-grid">
+                                        <div class="p-col-6">
+
+                                            <h:outputText   id="param-zip-state-label"
+                                                            value="State" />
+                                        </div>
+
+                                        <div class="p-col-6">
+                                            <p:inputText    id="param-zip-state-it"
+                                                            value="#{addressBB.selectedCSZQuery.primaryParams.state_val}" 
+                                                            />
+                                        </div>
+                                    </div>
+                                </f:subview>
 
                                 <p:commandButton id="csz-search-button"
                                                  value="Search"
@@ -408,58 +467,26 @@
                                                  disabled="#{addressBB.selectedCSZQuery.queryExecuted}"
                                                  actionListener="#{addressBB.onQueryCSZExecuteButtonChange}"
                                                  oncomplete="PF('address-search-dialog-var').show()"
-                                                 update="   csz-search-form
+                                                 update="@form
+                                                 csz-results-form
                                                  addresses-growl-form"/>
-                                
-                                    <p:commandButton    id="csz-search-clear-button"
-                                                        ajax="true"
-                                                        rendered="true"
-                                                        disabled="#{!addressBB.selectedCSZQuery.queryExecuted}"
-                                                        value="Reset search"
-                                                        actionListener="#{addressBB.onQueryResetButtonChange}"
-                                                        update="addresses-growl-form
-                                                        @form"
-                                                        icon="fa fa-eraser" />
 
-                                <p:spacer height="5px"/>    
+                                <p:commandButton    id="csz-search-clear-button"
+                                                    ajax="true"
+                                                    rendered="true"
+                                                    disabled="#{!addressBB.selectedCSZQuery.queryExecuted}"
+                                                    value="Reset search"
+                                                    actionListener="#{addressBB.onQueryResetButtonChange}"
+                                                    update="addresses-growl-form
+                                                    csz-results-form
+                                                    @form"
+                                                    icon="fa fa-eraser" />
 
-                                <div class="p-grid">
-                                    <div class="p-col-6">
-                                        <h:outputText value="ZIP Code"
-                                                      rendered="#{addressBB.selectedCSZQuery.primaryParams.zip_ctl}" />
-                                                      
-                                    </div>
+                            </h:form>
 
-                                    <div class="p-col-6">
-                                        <p:inputText    id="param-itfield-zip"
-                                                        value="#{addressBB.selectedCSZQuery.primaryParams.zip_val}" 
-                                                        rendered="#{addressBB.selectedCSZQuery.primaryParams.zip_ctl}" />
-                                    </div>
-                                    <div class="p-col-6">
-                                        <h:outputText value="City"
-                                                      rendered="#{addressBB.selectedCSZQuery.primaryParams.city_ctl}" />
-                                    </div>
-                                        
+                            <p:spacer height="5px"/>   
 
-                                    <div class="p-col-6">
-                                        <p:inputText    id="param-itfield-city"
-                                                        value="#{addressBB.selectedCSZQuery.primaryParams.city_val}" 
-                                                        rendered="#{addressBB.selectedCSZQuery.primaryParams.city_ctl}" />
-                                    </div>
-                                    <div class="p-col-6">
-                                        
-                                        <h:outputText value="State"
-                                                      rendered="#{addressBB.selectedCSZQuery.primaryParams.state_ctl}" />
-                                    </div>
-
-                                    <div class="p-col-6">
-                                        <p:inputText    id="param-itfield-state"
-                                                        value="#{addressBB.selectedCSZQuery.primaryParams.state_val}" 
-                                                        rendered="#{addressBB.selectedCSZQuery.primaryParams.state_ctl}" />
-                                    </div>
-                                </div>
-
-                                <p:spacer height="5px"/>    
+                            <h:form id="csz-results-form">
 
                                 <p:dataTable    id="csz-results-table"
                                                 value="#{addressBB.selectedCSZQuery.results}"
@@ -548,6 +575,8 @@
                                         </div>
                                     </p:rowExpansion>
                                 </p:dataTable>
+
+
                             </h:form>
                         </p:panel>  
                     </div>

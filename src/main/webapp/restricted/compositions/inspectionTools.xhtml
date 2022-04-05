@@ -79,20 +79,7 @@
                                 <h:outputText rendered="#{fieldInspectionBB.currentInspection.followUpToInspectionID ne 0 and !fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="Yes: To inspection ID: #{fieldInspectionBB.currentInspection.followUpToInspectionID}"/>
 
-                                <p:selectOneMenu rendered="#{fieldInspectionBB.editModeInspectionMetadata}"
-                                                 value="#{fieldInspectionBB.formFollowUpInspection}"
-                                                 filter="false"
-                                                 required="false"
-                                                 converter="occInspectionConverter">
-                                    <f:selectItems value="#{occPeriodBB.currentOccPeriod.inspectionList}" 
-                                                   var="ins"
-                                                   itemLabel="#{ins.inspectionID} (#{fieldInspectionBB.getPrettyDate(ins.effectiveDateOfRecord)})"
-                                                   itemValue="#{ins}"/>
-                                </p:selectOneMenu>
-                                <p:spacer rendered="#{fieldInspectionBB.editModeInspectionMetadata}"
-                                          height="3px" />
-                                <h:outputText rendered="#{fieldInspectionBB.editModeInspectionMetadata}"
-                                              value="Showing all inspections on the current occupancy period" />
+
 
                             </div>
                             <div class="p-col-6">
@@ -226,10 +213,21 @@
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.timeStart)}"/>
 
-                                <p:calendar rendered="#{fieldInspectionBB.editModeInspectionMetadata}"
-                                            value="#{fieldInspectionBB.currentInspection.timeStart}" 
-                                            pattern="MM/dd/yyyy HH:mm" 
-                                            mask="true"/>
+                                <p:datePicker 	 id="inspection-time-start-datepicker"
+                                                rendered="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                value="#{fieldInspectionBB.currentInspection.timeStart}" 
+                                                style="width: 100%;"
+                                                pattern="MM/dd/yyyy HH:mm"
+                                                disabled="false"
+                                                showButtonBar="true"
+                                                hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                                mask="true"
+                                                timeInput="true" 
+                                                required="true" />
+
+
                             </div>
 
                             <div class="p-col-6">
@@ -239,10 +237,20 @@
                             <div class="p-col-6">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.timeEnd)}"/>
-                                <p:calendar rendered="#{fieldInspectionBB.editModeInspectionMetadata}" 
-                                            value="#{fieldInspectionBB.currentInspection.timeEnd}" 
-                                            pattern="MM/dd/yyyy HH:mm" 
-                                            mask="true"/>
+                                <p:datePicker 	 id="inspection-time-start-datepicker"
+                                                rendered="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                value="#{fieldInspectionBB.currentInspection.timeEnd}" 
+                                                style="width: 100%;"
+                                                pattern="MM/dd/yyyy HH:mm"
+                                                disabled="false"
+                                                showButtonBar="true"
+                                                hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                                mask="true"
+                                                timeInput="true" 
+                                                required="true" />
+
                             </div>
 
                             <p:divider/>
@@ -337,16 +345,16 @@
                          header="Transfer or Deactivation">
                     <h:form id="inspection-advancedtools-form">
                         <h3>Transfer inspection to new period</h3>
-                        
+
                         <h:outputText     value="Current Occupancy period ID: #{fieldInspectionBB.currentInspection.occPeriodID}"/>
-                        
+
                         <p:spacer height="4px" />
-                        
+
                         <h:outputText  value="Enter the ID of the Occupancy Period to which this inspection should be transferred. On successful transfer, you'll be sent to the dashboard." />
-                        
+
                         <p:inputNumber value="#{fieldInspectionBB.occPeriodIDFortransferFormField}"
                                        required="true" />
-                        
+
                         <p:commandButton id="inspection-occperiodxfer-button"
                                          action="#{fieldInspectionBB.onOccPeriodXferButtonClick}"
                                          ajax="false"
@@ -433,6 +441,18 @@
                                         actionListener="#{fieldInspectionBB.onFieldInspectionReportInitLinkClick(ins)}">
 
                         </p:commandLink>
+
+                        <p:spacer height="3px" />
+
+                        <p:commandButton    id="insp-followup-button"
+                                            value="Setup Re-inspection"
+                                            ajax="true"
+                                            actionListener="#{fieldInspectionBB.onSetupReinspectionButtonClick}"
+                                            oncomplete="PF('inspection-followup-dialog-var').show()"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                            icon="fa fa-repeat"
+                                            update="inspection-followup-form"
+                                            />
 
                     </h:form>
                 </p:panel>
@@ -621,7 +641,7 @@
                 </p:column>
             </p:dataTable>
 
-            
+
             <p:commandButton id="inspections-selectchecklist-continuebutton"
                              value="Create"
                              rendered="true"
@@ -630,19 +650,19 @@
                              icon="pi pi-arrow-right"
                              actionListener="#{fieldInspectionBB.onChecklistSelectionCompleteButtonClick}"
                              update="   inspectiontools-growl-form
-                                        inspection-profile-dialog
-                                        inspection-advancedtools-form
-                                        inspection-actions-form
-                                        inspection-inspectedspaces-form
-                                        #{fieldInspectionBB.inspectionListComponentForUpdate}"
+                             inspection-profile-dialog
+                             inspection-advancedtools-form
+                             inspection-actions-form
+                             inspection-inspectedspaces-form
+                             #{fieldInspectionBB.inspectionListComponentForUpdate}"
                              oncomplete="PF('inspections-selectchecklist-var').hide(); PF('inspection-profile-dialog-var').show();"/>
-            
+
             <p:commandButton value="Cancel"
                              icon="pi pi-times"
                              style="background-color: darkgrey; border: solid darkgray;"
                              class="ui-button-outlined p-mr-1"
                              oncomplete="PF('inspections-selectchecklist-var').hide()"/>
-            
+
         </h:form>
     </p:dialog>
 
@@ -797,7 +817,7 @@
                              icon="pi pi-check-square "
                              actionListener="#{fieldInspectionBB.onAddSpaceToInspectionCommitButtonChange}"
                              update="inspection-inspectedspaces-form
-                            inspectiontools-growl-form
+                             inspectiontools-growl-form
                              inspections-entryscreen
                              inspections-entryscreen-controls-form"
                              oncomplete="PF('inspections-selectspace-var').hide();
@@ -1301,6 +1321,48 @@
     </p:dialog>
 
 
+
+    <p:dialog id="inspection-followup-dialog"
+              widgetVar="inspection-followup-dialog-var"
+              header="Setup re-inspection of inspection ID: #{fieldInspectionBB.formFollowUpInspectionTo.inspectionID}"
+              closable="true"
+              closeOnEscape="true"
+              dynamic="true"
+              modal="true"
+              height="600"
+              width="600"
+              resizable="true"
+              responsive="true">
+
+        <h:form id="inspection-followup-form">
+
+            <div class="p-grid">
+
+                <div class="p-col-4">
+                    <h:outputText value="Follow-up to" />
+                </div>
+                <div class="p-col-8">
+                    <h:outputText value="Inspection ID: #{fieldInspectionBB.formFollowUpInspectionTo.inspectionID}" />
+                    <h:outputText value="Start Time: #{!empty fieldInspectionBB.formFollowUpInspection.timeStart 
+                                                       ? fieldInspectionBB.getPrettyDate(fieldInspectionBB.formFollowupInspection.timeStart) 
+                                                       : ''}" />
+
+                </div>
+                <div class="p-col-4">
+                    <h:outputText value="Reinspection Options:" />
+                </div>
+                <div class="p-col-8">
+
+
+                </div>
+            </div>
+
+
+
+        </h:form>
+
+
+    </p:dialog>
 
     <p:dialog id="inspection-reportconfig-dialog"
               widgetVar="inspection-reportconfig-dialog-var"

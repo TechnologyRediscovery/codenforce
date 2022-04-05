@@ -586,21 +586,7 @@ public class ManageBlobBB extends BackingBeanUtils implements Serializable{
         this.searchAfter = searchAfter;
     }
     
-    public java.util.Date getSearchBeforeUtil() {
-        return convertDate(searchBefore);
-    }
-
-    public void setSearchBeforeUtil(java.util.Date searchBefore) {
-        this.searchBefore = convertDate(searchBefore);
-    }
-
-    public java.util.Date getSearchAfterUtil() {
-        return convertDate(searchAfter);
-    }
-
-    public void setSearchAfterUtil(java.util.Date searchAfter) {
-        this.searchAfter = convertDate(searchAfter);
-    }
+   
 
     public List<CEActionRequest> getConnectedRequests() {
         return connectedRequests;

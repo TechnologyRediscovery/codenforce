@@ -62,9 +62,9 @@
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to unlock the start date? It was originally locked by
-                                                         #{occPeriodBB.currentOccPeriod.periodTypeCertifiedBy.human.firstName}
-                                                         #{occPeriodBB.currentOccPeriod.periodTypeCertifiedBy.human.lastName}
-                                                         on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.periodTypeCertifiedTS)}"
+                                           #{occPeriodBB.currentOccPeriod.periodTypeCertifiedBy.human.firstName}
+                                           #{occPeriodBB.currentOccPeriod.periodTypeCertifiedBy.human.lastName}
+                                           on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.periodTypeCertifiedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
                         </h:panelGroup>
@@ -93,8 +93,8 @@
                                            value="Unauthorized"
                                            update="occperiod-status-form occperiod-permits-form inspections-form"
                                            disabled="#{empty occPeriodBB.currentOccPeriod.endDateCertifiedBy
-                                                        || empty occPeriodBB.currentOccPeriod.startDateCertifiedBy
-                                                        || empty occPeriodBB.currentOccPeriod.periodTypeCertifiedBy}">
+                                                       || empty occPeriodBB.currentOccPeriod.startDateCertifiedBy
+                                                       || empty occPeriodBB.currentOccPeriod.periodTypeCertifiedBy}">
                                 <f:param name="fieldtocertify" value="authorization"/>
                                 <f:param name="certifymode" value="certify"/>
                                 <p:confirm header="Confirmation" message="Are you sure you want to authorize this occupancy period?" icon="pi pi-info-circle"/>
@@ -111,9 +111,9 @@
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to deauthorize the occupancy period? It was originally authorized by
-                                                         #{occPeriodBB.currentOccPeriod.authorizedBy.human.name}
-                                                         #{occPeriodBB.currentOccPeriod.authorizedBy.human.name}
-                                                         on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.authorizedTS)}"
+                                           #{occPeriodBB.currentOccPeriod.authorizedBy.human.name}
+                                           #{occPeriodBB.currentOccPeriod.authorizedBy.human.name}
+                                           on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.authorizedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
                         </h:panelGroup>
@@ -143,7 +143,7 @@
 
                         <h:outputText id="occperiod-manager-ot"
                                       value="#{occPeriodBB.currentOccPeriod.manager.human.name}
-                                                              #{occPeriodBB.currentOccPeriod.manager.human.name}"/>
+                                      #{occPeriodBB.currentOccPeriod.manager.human.name}"/>
                         <br/>
                         <h:outputText id="occperiod-manager-username"
                                       value="(#{occPeriodBB.currentOccPeriod.manager.username})"/>
@@ -161,8 +161,8 @@
                     </div>
                     <div class="restrict-data-field-value-inline">
                         <h:outputText value="#{occPeriodBB.currentOccPeriod.createdBy.human.name}
-                                                  #{occPeriodBB.currentOccPeriod.createdBy.human.name}
-                                                  (#{occPeriodBB.currentOccPeriod.createdBy.username})"/>
+                                      #{occPeriodBB.currentOccPeriod.createdBy.human.name}
+                                      (#{occPeriodBB.currentOccPeriod.createdBy.username})"/>
                         <br/>
                         <h:outputText value="at #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.createdTS)}"/>
                     </div>
@@ -232,9 +232,9 @@
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to unlock the start date? It was originally locked by
-                                                     #{occPeriodBB.currentOccPeriod.startDateCertifiedBy.human.name}
-                                                     #{occPeriodBB.currentOccPeriod.startDateCertifiedBy.username}
-                                                     on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.startDateCertifiedTS)}"
+                                           #{occPeriodBB.currentOccPeriod.startDateCertifiedBy.human.name}
+                                           #{occPeriodBB.currentOccPeriod.startDateCertifiedBy.username}
+                                           on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.startDateCertifiedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
                         </h:panelGroup>
@@ -290,9 +290,9 @@
                                 <f:param name="certifymode" value="withdraw"/>
                                 <p:confirm header="Confirmation"
                                            message="Are you sure you want to unlock the end date? It was originally locked by
-                                                     #{occPeriodBB.currentOccPeriod.endDateCertifiedBy.human.name}
-                                                     #{occPeriodBB.currentOccPeriod.endDateCertifiedBy.human.name}
-                                                     on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.endDateCertifiedTS)}"
+                                           #{occPeriodBB.currentOccPeriod.endDateCertifiedBy.human.name}
+                                           #{occPeriodBB.currentOccPeriod.endDateCertifiedBy.human.name}
+                                           on #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.endDateCertifiedTS)}"
                                            icon="pi pi-exclamation-triangle"/>
                             </p:commandLink>
                         </h:panelGroup>
@@ -331,32 +331,32 @@
                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
                     <p:commandLink  id="period-uploadphotos-cl"
                                     ajax="true"
-                                   style="color:blue;"
-                                   oncomplete="PF('blob-upload-dialog-var').show()"
-                                   rendered="true"
-                                   update="@form:@parent:@parent:blob-upload-dialog"
-                                   value="Upload or connect photos/docs"
-                                   actionListener="#{occPeriodBB.manageBlobsOnOccPeriod}">
-                        
+                                    style="color:blue;"
+                                    oncomplete="PF('blob-upload-dialog-var').show()"
+                                    rendered="true"
+                                    update="@form:@parent:@parent:blob-upload-dialog"
+                                    value="Upload or connect photos/docs"
+                                    actionListener="#{occPeriodBB.manageBlobsOnOccPeriod}">
+
                     </p:commandLink>
-                    
+
                 </div>
-                
+
                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
-                    
-                <p:commandLink  id="period-viewphotos-cl"
+
+                    <p:commandLink  id="period-viewphotos-cl"
                                     ajax="true"
-                                   style="color:blue;"
-                                   oncomplete="PF('blobs-gallery-dialog-var').show()"
-                                   rendered="true"
-                                   update="@form:@parent:@parent:blobs-gallery-dialog"
-                                   value="View photos/docs"
-                                   actionListener="#{occPeriodBB.manageBlobsOnOccPeriod}">
-                        
+                                    style="color:blue;"
+                                    oncomplete="PF('blobs-gallery-dialog-var').show()"
+                                    rendered="true"
+                                    update="@form:@parent:@parent:blobs-gallery-dialog"
+                                    value="View photos/docs"
+                                    actionListener="#{occPeriodBB.manageBlobsOnOccPeriod}">
+
                     </p:commandLink>
-                
+
                 </div>
-                
+
             </div>
         </h:form>
     </p:panel>
@@ -518,18 +518,20 @@
 
                             <h:outputText value="Start date"/>
                         </p:outputLabel>
+                        <p:datePicker 	    id="occperiod-date-start-cal"
+                                           value="#{occPeriodBB.currentOccPeriod.startDate}"
+                                           rendered="true"
+                                           style="width: 100%;"
+                                           pattern="MM/dd/yyyy HH:mm"
+                                           disabled="false"
+                                           hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                           showButtonBar="true"
+                                           mask="true"
+                                           timeInput="true" 
+                                           required="true" />
 
-                        <p:calendar value="#{occPeriodBB.currentOccPeriod.startDate}"
-                                    mode="popup"
-                                    tabindex="3"
-                                    id="occperiod-date-start-cal"
-                                    showOn="button"
-                                    pattern="EEE, dd MMM, yyyy"
-                                    navigator="true"
-                                    showButtonPanel="true"
-                                    showTodayButton="true"
-                                    required="true"
-                                    styleClass="data_field_value"/>
 
                         <h:message for="occperiod-date-start-cal" showDetail="false" showSummary="true"
                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>
@@ -587,18 +589,20 @@
 
                             <h:outputText value="End date"/>
                         </p:outputLabel>
+                        <p:datePicker 	id="occperiod-date-end-cal"
+                                       value="#{occPeriodBB.currentOccPeriod.endDate}"
+                                       rendered="true"
+                                       style="width: 100%;"
+                                       pattern="MM/dd/yyyy HH:mm"
+                                       disabled="false"
+                                       hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                       showButtonBar="true"
+                                       mask="true"
+                                       timeInput="true" 
+                                       required="true" />
 
-                        <p:calendar value="#{occPeriodBB.currentOccPeriod.endDate}"
-                                    mode="popup"
-                                    tabindex="3"
-                                    id="occperiod-date-end-cal"
-                                    showOn="button"
-                                    pattern="EEE, dd MMM, yyyy"
-                                    navigator="true"
-                                    showButtonPanel="true"
-                                    showTodayButton="true"
-                                    required="true"
-                                    styleClass="data_field_value"/>
 
                         <h:message for="occperiod-date-end-cal" showDetail="false" showSummary="true"
                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError"/>

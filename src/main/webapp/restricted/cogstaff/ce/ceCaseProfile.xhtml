@@ -280,12 +280,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <div class="restrict-main-contents-io-link link-button">
 
                                                             <p:commandButton      id="cecase-forceclose-init-cb" 
-                                                                                ajax="true" 
-                                                                                icon="fa fa-folder"
-                                                                                actionListener="#{ceCaseSearchProfileBB.onCaseForceCloseInitButtonChange}"
-                                                                                oncomplete="PF('case-forceclose-dialog-var').show()"
-                                                                                disabled="#{!empty ceCaseSearchProfileBB.currentCase.closingDate}"
-                                                                                value="close case"/>
+                                                                                  ajax="true" 
+                                                                                  icon="fa fa-folder"
+                                                                                  actionListener="#{ceCaseSearchProfileBB.onCaseForceCloseInitButtonChange}"
+                                                                                  oncomplete="PF('case-forceclose-dialog-var').show()"
+                                                                                  disabled="#{!empty ceCaseSearchProfileBB.currentCase.closingDate}"
+                                                                                  value="close case"/>
 
                                                         </div>
 
@@ -305,7 +305,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                                                     <hr/>
                                                 </div>
-                                         
+
 
                                                 <div class="ui-g-12 ui-md-6 ui-lg-3 restrict-data-field">
                                                     <div class="restrict-main-contents-io-button gray_button">
@@ -355,7 +355,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:outputText value="#{!empty ceCaseSearchProfileBB.reloadCECaseTrigger
                                                                    ? ceCaseSearchProfileBB.getPrettyDate(ceCaseSearchProfileBB.reloadCECaseTrigger) 
                                                                    : ''}" />
-                                            
+
                                         </h:form>
                                     </p:panel>
 
@@ -516,7 +516,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <f:facet name="header">
                                                         <h:outputText value="View" />
                                                     </f:facet>
-                                                 
+
                                                 </p:column>
                                             </p:dataTable>
                                         </h:form>
@@ -912,16 +912,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </p:outputLabel>
 
                                     <div class="restrict-main-contents-io-content">
-                                        <p:calendar id="case-close-date"
-                                                    value="#{ceCaseSearchProfileBB.currentCase.closingDateUtilDate}"
-                                                    mode="popup"
-                                                    showOn="button"
-                                                    pattern="EEE, dd MMM, yyyy"
-                                                    navigator="true"
-                                                    tabindex="1"
-                                                    showButtonPanel="true"
-                                                    showTodayButton="true"
-                                                    required="true"/>
+
+                                        <p:datePicker 	id="case-close-date"
+                                                       value="#{ceCaseSearchProfileBB.currentCase.closingDate}"
+                                                       rendered="true"
+                                                       style="width: 100%;"
+                                                       pattern="MM/dd/yyyy HH:mm"
+                                                       disabled="false"
+                                                       hideOnDateTimeSelect="true"
+                                                        showOnFocus="false"
+                                                        showIcon="true"
+                                                       showButtonBar="true"
+                                                       mask="true"
+                                                       timeInput="true" 
+                                                       required="true" />
+
+
                                     </div>
                                 </div>
                                 <div class="ui-g-12 ui-md-12 ui-lg-12 data_field">
@@ -1099,18 +1105,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                             <h:outputText value="Opening date"/>
                                         </p:outputLabel>
-
-                                        <p:calendar value="#{ceCaseSearchProfileBB.currentCase.originationDateUtilDate}"
-                                                    mode="popup"
-                                                    tabindex="3"
-                                                    id="cecase-date-origination-cal"
-                                                    showOn="button"
-                                                    pattern="EEE, dd MMM, yyyy"
-                                                    navigator="true"
-                                                    showButtonPanel="true"
-                                                    showTodayButton="true"
-                                                    required="true"
-                                                    styleClass="data_field_value"/>
+                                        <p:datePicker 	id="cecase-date-origination-cal"
+                                                       value="#{ceCaseSearchProfileBB.currentCase.originationDate}"
+                                                       rendered="true"
+                                                       style="width: 100%;"
+                                                       pattern="MM/dd/yyyy HH:mm"
+                                                       disabled="false"
+                                                       hideOnDateTimeSelect="true"
+                                                        showOnFocus="false"
+                                                        showIcon="true"
+                                                       showButtonBar="true"
+                                                       mask="true"
+                                                       timeInput="true" 
+                                                       required="true" />
 
                                         <h:message for="cecase-date-origination-cal" showDetail="false" showSummary="true"
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />

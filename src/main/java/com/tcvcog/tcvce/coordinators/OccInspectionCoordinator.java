@@ -91,6 +91,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      *
      * @param in     A skeleton of an FieldInspection without an ID number
      * @param tem
+     * @param inspectable
      * @param user   The current user who will become the Inspector
      * @return An FieldInspection object with the ID given in the DB and a
  configured Template inside
@@ -138,7 +139,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         }
         inspec.setInspector(user);
         inspec.setPacc(generateControlCodeFromTime(user.getHomeMuniID()));
-
+        inspec.setEffectiveDateOfRecord(LocalDateTime.now());
         inspec = getOccInspection(oii.insertOccInspection(inspec));
         return inspec;
     }

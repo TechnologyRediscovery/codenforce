@@ -125,17 +125,22 @@
                                                                                />
                                                             </div>
                                                             <div class="ui-g-4" >
-                                                                <p:calendar value="#{cEActionRequestSubmitBB.currentRequest.dateOfRecordUtilDate}" 
-                                                                            mode="popup" 
-                                                                            tabindex="3"
-                                                                            id="dateOfRecord"
-                                                                            showOn="button"
-                                                                            pattern="EEE, dd MMM, yyyy HH:mm"
-                                                                            maxdate="#{cEActionRequestSubmitBB.currentDate}"
-                                                                            navigator="true"
-                                                                            showButtonPanel="true"
-                                                                            showTodayButton="true"
-                                                                            />
+                                                                
+                                                                 <p:datePicker 	id="dateOfRecord"
+                                                                                value="#{cEActionRequestSubmitBB.currentRequest.dateOfRecord}" 
+                                                                                rendered="true"
+                                                                                style="width: 100%;"
+                                                                                pattern="MM/dd/yyyy HH:mm"
+                                                                                disabled="false"
+                                                                                maxdate="#{cEActionRequestSubmitBB.currentDate}"
+                                                                                hideOnDateTimeSelect="true"
+                                                                                showOnFocus="false"
+                                                                                showIcon="true"
+                                                                                showButtonBar="true"
+                                                                                mask="true"
+                                                                                timeInput="true" 
+                                                                                required="true" />
+                                                                 
                                                             </div>
                                                         </div>
                                                         <div class="data_container_nested_public">

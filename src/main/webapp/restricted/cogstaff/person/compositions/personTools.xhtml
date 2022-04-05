@@ -36,8 +36,8 @@
 
                     <h:form id="search-query-form">
 
-                      
-                        
+
+
                         <h:outputLabel styleClass="bold" value="Available queries" for="search-query-som" />
 
                         <p:spacer height="5px" />
@@ -181,8 +181,8 @@
                             header="Create new person">
 
                     <h:form id="person-create-init-form">
-                        
-                          <p:commandButton   id="pers-create-init-cb" 
+
+                        <p:commandButton   id="pers-create-init-cb" 
                                            ajax="true" 
                                            actionListener="#{personBB.onPersonCreateInitButtonChange}"
                                            icon="fa fa-plus" 
@@ -191,30 +191,30 @@
                                            oncomplete="PF('human-search-dialog-var').hide(); PF('person-profile-dialog-var').show();"
                                            disabled="false"
                                            update=" person-info-form
-                                                    person-profile-addresses-form
-                                                    person-profile-phones-form
-                                                    person-profile-emails-form
-                                                    person-links-form
-                                                    person-profile-dialog
-                                                    persontools-growl-form"/>
-                        
+                                           person-profile-addresses-form
+                                           person-profile-phones-form
+                                           person-profile-emails-form
+                                           person-links-form
+                                           person-profile-dialog
+                                           persontools-growl-form"/>
+
                     </h:form>
-                    
+
                 </p:panel>
-                        
+
                 <p:panel    id="pers-search-results-panel"
                             toggleable="true"
                             widgetVar="pers-search-results-panel-var"
                             collapsed="false"
                             header="Person list">
 
-                        
+
                     <h:form id="pers-search-results-form">
 
                         <div class="ui-g data_container_nested_restrict">
 
                             <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
-                                
+
                                 <div class="restrict-main-contents-io-link">
 
                                     <p:commandLink     id="load-history-cb"
@@ -230,12 +230,12 @@
 
                         <h:outputText value="list contains #{personBB.querySelected.results.size()} persons " 
                                       styleClass="italic"/>
-                          <p:commandLink      id="clear-results-cb"
-                                                        actionListener="#{personBB.clearResultList}"
-                                                        ajax="true"
-                                                        value="clear result list"
-                                                        update="pers-search-results-form
-                                                        persontools-growl-form"/>
+                        <p:commandLink      id="clear-results-cb"
+                                            actionListener="#{personBB.clearResultList}"
+                                            ajax="true"
+                                            value="clear result list"
+                                            update="pers-search-results-form
+                                            persontools-growl-form"/>
                         <p:spacer height="5px" />
 
                         <p:dataTable
@@ -302,7 +302,7 @@
                     </h:form>
                 </p:panel>
             </div>
-            
+
             <div class="p-col-4">
                 <p:panel     id="pers-selected-panel"
                              toggleable="true"
@@ -320,10 +320,10 @@
                                            oncomplete="PF('human-search-dialog-var').hide();"
                                            update="#{personBB.personListComponentIDToUpdatePostLinkingOperation}
                                            persontools-growl-form" />
-                          
-                          <p:spacer height="5px" />
-                        
-                          <p:dataTable
+
+                        <p:spacer height="5px" />
+
+                        <p:dataTable
                             id="pers-selected-table"
                             var="selper"
                             value="#{personBB.personsSelectedList}"
@@ -371,9 +371,9 @@
                                                             person-links-form
                                                             person-profile-dialog"
                                                             />
-                                            
+
                                             <h:outputText value=" | " />
-                                            
+
                                             <p:commandLink  id="selperson-remove-commandlink"
                                                             ajax="true" 
                                                             value="remove"
@@ -387,14 +387,14 @@
                         </p:dataTable>
                     </h:form>
                 </p:panel>
-                  <p:panel     id="hlh-humlist-panel"
+                <p:panel     id="hlh-humlist-panel"
                              toggleable="true"
                              widgetVar="hlh-humlist-panel-var"
                              collapsed="false"
                              header="Persons currently linked to #{sessionBean.sessHumanListHolder.HUMAN_LINK_SCHEMA_ENUM.TARGET_OBJECT_FRIENDLY_NAME} (ID:#{sessionBean.sessHumanListHolder.hostPK})">
                     <h:form id="hlh-humlist-form">
-                        
-                          <p:dataTable
+
+                        <p:dataTable
                             id="hlh-table"
                             var="hum"
                             value="#{sessionBean.sessHumanListHolder.humanLinkList}"
@@ -492,15 +492,15 @@
 
 
 
-                            <p:commandButton    id="person-profile-info-edit-abort-button"
-                                                ajax="true"
-                                                rendered="#{personBB.currentPersonHumanFieldsEditMode}"
-                                                value="Abort edit"
-                                                style="background-color: darkgray;"
-                                                actionListener="#{personBB.onHumanOperationAbortButtonChange}"
-                                                update="@form:@parent:persontools-growl-form
-                                                @form"
-                                                icon="fa fa-stop" />
+                        <p:commandButton    id="person-profile-info-edit-abort-button"
+                                            ajax="true"
+                                            rendered="#{personBB.currentPersonHumanFieldsEditMode}"
+                                            value="Abort edit"
+                                            style="background-color: darkgray;"
+                                            actionListener="#{personBB.onHumanOperationAbortButtonChange}"
+                                            update="@form:@parent:persontools-growl-form
+                                            @form"
+                                            icon="fa fa-stop" />
 
 
                         <p:spacer height="5px"/>    
@@ -538,29 +538,29 @@
 
                             <div class="p-col-6">
                                 Multi-Person  <p:commandButton id="person-multiperson-help-button"
-                                             icon="fa fa-question-circle-o"
-                                             styleClass="button-help"
-                                             type="button" />
-                            
+                                                               icon="fa fa-question-circle-o"
+                                                               styleClass="button-help"
+                                                               type="button" />
+
                                 <p:overlayPanel for="person-multiperson-help-button"
                                                 style="width:350px;" 
                                                 dismissable="true"
                                                 showCloseIcon="true">
                                     <h3>What is a multi-person?</h3>
                                     <p>A multi-person is a name that represents two or more people or a person and 
-                                    a corporate entity. This is common since we use exactly the name listed as a property
-                                    owner by Allegheny County as the person name, and many folks jointly own properties in the county.</p>
-                                    
-                                    <p>For example, a property might be owned by "SHELLY MARY R AND PERCY B". We would enter this entire
-                                    String of characters as the Person name in codeNforce.</p>
-                                    
-                                    <p>In other words, we don't try to parse the name
-                                    into separate person records. Instead, we turn on this flag to note that this Person
-                                    represents two or more people in the world or a person and a business.</p>
+                                        a corporate entity. This is common since we use exactly the name listed as a property
+                                        owner by Allegheny County as the person name, and many folks jointly own properties in the county.</p>
 
-                                    
+                                    <p>For example, a property might be owned by "SHELLY MARY R AND PERCY B". We would enter this entire
+                                        String of characters as the Person name in codeNforce.</p>
+
+                                    <p>In other words, we don't try to parse the name
+                                        into separate person records. Instead, we turn on this flag to note that this Person
+                                        represents two or more people in the world or a person and a business.</p>
+
+
                                 </p:overlayPanel>
-                            
+
                             </div>
                             <div class="p-col-6">
                                 <h:outputText   rendered="#{!personBB.currentPersonHumanFieldsEditMode}"
@@ -643,14 +643,17 @@
                                 <p:spacer height="2px" />
 
                                 <p:datePicker id="person-dor-it"
-                                            rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
-                                            value="#{personBB.currentPerson.dob}"                                          
-                                            tabindex="3"
-                                            showButtonBar="false"
-                                            mask="true"
-                                            pattern="MM/dd/yyyy"
-                                            timeInput="false" 
-                                            required="false"/>
+                                              rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
+                                              value="#{personBB.currentPerson.dob}"                                          
+                                              tabindex="3"
+                                              showButtonBar="false"
+                                              mask="true"
+                                              hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                              pattern="MM/dd/yyyy"
+                                              timeInput="false" 
+                                              required="false"/>
                             </div>
 
                             <div class="p-col-6">
@@ -666,18 +669,21 @@
                                 <h:outputText rendered="#{!empty personBB.currentPersonHumanFieldsEditMode and !empty personBB.currentPerson.deceasedBy}" 
                                               value="recorded by user: #{personBB.currentPerson.deceasedBy.human.name}"/>
 
-                                
-                                   <p:datePicker id="person-dod-it"
-                                            rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
-                                            value="#{personBB.currentPerson.deceasedDate}"                                      
-                                            tabindex="3"
-                                            showButtonBar="false"
-                                            mask="true"
-                                            pattern="MM/dd/yyyy"
-                                            timeInput="false" 
-                                            required="false"/>
-                                   
-                              
+
+                                <p:datePicker id="person-dod-it"
+                                              rendered="#{personBB.currentPersonHumanFieldsEditMode}" 
+                                              value="#{personBB.currentPerson.deceasedDate}"                                      
+                                              tabindex="3"
+                                              showButtonBar="false"
+                                              mask="true"
+                                              pattern="MM/dd/yyyy"
+                                              hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                              timeInput="false" 
+                                              required="false"/>
+
+
                             </div>
 
                             <div class="p-col-6">Notes
@@ -706,6 +712,27 @@
                 </p:panel>
             </div>
             <div class="p-col">
+                <p:panel id="person-quicklink-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Quick Links">
+                    <h:form id="person-quicktools-form">
+                        <p:commandButton      id="addresses-add-cb"
+                                              value="Connect person to current property #{systemServicesBB.bbSessionProperty.address.addressPretty1Line}" 
+                                              ajax="true"
+                                              icon="fa fa-home"
+                                              disabled="#{personBB.currentPersonHumanFieldsEditMode}"
+                                              actionListener="#{personBB.onLinkPersonToCurrentParcel}"
+                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                              update="persontools-growl-form">
+                            
+                        </p:commandButton>
+                        
+                        
+                        
+                    </h:form>
+                    
+                </p:panel>
                 <p:panel id="person-adresses-panel"
                          toggleable="true"
                          collapsed="false"
@@ -819,12 +846,12 @@
                                 <p:spacer height="3px"
                                           rendered="#{!empty ph.disconnectTS}" />
                                 <h:outputText   rendered="#{!empty ph.disconnectTS}"
-                                                    style="color:red;"
-                                                    value="#{!empty ph.disconnectTS ? 'Flagged as disonnected on: ': ''}" />
+                                                style="color:red;"
+                                                value="#{!empty ph.disconnectTS ? 'Flagged as disonnected on: ': ''}" />
                                 <h:outputText   rendered="#{!empty ph.disconnectTS}"
-                                                    style="color:red;"
-                                                    value="#{!empty ph.disconnectTS ? personBB.getPrettyDate(ph.disconnectTS) : ''}" />
-                                
+                                                style="color:red;"
+                                                value="#{!empty ph.disconnectTS ? personBB.getPrettyDate(ph.disconnectTS) : ''}" />
+
                             </p:column>
 
                             <p:column width="17%">
@@ -903,15 +930,15 @@
                                 <h:outputText value="#{ea.emailaddress}" />
                                 <p:spacer height="3px"
                                           rendered="#{!empty ea.bounceTS}" />
-                                    <h:outputText   rendered="#{!empty ea.bounceTS}"
-                                                    style="color:red;"
-                                                    value="#{!empty ea.bounceTS ? 'Bounced on: ': ''}" />
-                                    <h:outputText   rendered="#{!empty ea.bounceTS}"
-                                                    style="color:red;"
-                                                    value="#{!empty ea.bounceTS ? personBB.getPrettyDate(ea.bounceTS) : ''}" />
+                                <h:outputText   rendered="#{!empty ea.bounceTS}"
+                                                style="color:red;"
+                                                value="#{!empty ea.bounceTS ? 'Bounced on: ': ''}" />
+                                <h:outputText   rendered="#{!empty ea.bounceTS}"
+                                                style="color:red;"
+                                                value="#{!empty ea.bounceTS ? personBB.getPrettyDate(ea.bounceTS) : ''}" />
                             </p:column>
-                            
-                             <p:column width="8%"
+
+                            <p:column width="8%"
                                       sortBy="#{ea.priority}">
                                 <f:facet name="header">
                                     <h:outputText value="Priority"/>
@@ -953,7 +980,7 @@
                                               style="margin-right:5px;"
                                               icon="fa fa-link"
                                               value="Load object connections for #{personBB.currentPerson.name}" />
-                        
+
                         <p:commandButton      id="new-personlinks-button"
                                               ajax="true"
                                               icon="fa fa-plus"
@@ -1443,7 +1470,7 @@
                     </div>
 
                     <div class="p-col-6">Record status
-                     <p:spacer height="3px" />
+                        <p:spacer height="3px" />
                         <p:commandLink      id="phone-deac-init-cl"
                                             ajax="true"
                                             actionListener="#{personBB.onPhoneRemoveInitLinkClick}"
@@ -1454,9 +1481,9 @@
                                             update="phone-deactivate-form
                                             phone-deactivate-dialog"
                                             value="remove record" >
-                            
+
                         </p:commandLink>
-                    
+
                     </div>
                     <div class="p-col-6">
                         <h:outputText value="#{empty personBB.currentContactPhone.deactivatedTS ? 'active' : 'deactivated on'}" />
@@ -1552,7 +1579,7 @@
                                         validatorMessage="Enter email in format address@domain.com/org/etc"
                                         requiredMessage="An email address is required to complete the form"
                                         required="true">
-                              <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                            <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
                         </p:inputText>
                     </div>
 
@@ -1583,20 +1610,23 @@
 
                         <h:outputText   rendered="#{!personBB.currentContactEmailEditMode}"
                                         value="#{!empty personBB.currentContactEmail.bounceTS ? 'Bounce recorded ' : ''}" />
-                        
+
                         <h:outputText   rendered="#{!personBB.currentContactEmailEditMode}"
                                         value="#{!empty personBB.currentContactEmail.bounceTS ? personBB.getPrettyDate(personBB.currentContactEmail.bounceTS) : ''}" />
+                        <p:datePicker 	 id="email-bounce-cal"  
+                                        rendered="#{personBB.currentContactEmailEditMode}" 
+                                        value="#{personBB.currentContactEmail.bounceTS}"
+                                        style="width: 100%;"
+                                        pattern="MM/dd/yyyy HH:mm"
+                                        hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                        disabled="false"
+                                        showButtonBar="true"
+                                        mask="true"
+                                        timeInput="true" 
+                                        required="true" />
 
-                        <p:calendar id="email-bounce-cal"  
-                                    rendered="#{personBB.currentContactEmailEditMode}" 
-                                    value="#{personBB.currentContactEmail.bounceTS}"
-                                    mode="popup" tabindex="3"
-                                    showOn="button"
-                                    pattern="EEE, dd MMM, yyyy HH:mm:ss"
-                                    navigator="true" timeInput="false" showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                    showButtonPanel="true"
-                                    showTodayButton="true"
-                                    required="false"/>
 
 
                     </div>
@@ -1629,9 +1659,9 @@
                                             update="email-deactivate-form
                                             email-deactivate-dialog"
                                             value="remove record" >
-                            
+
                         </p:commandLink>
-                    
+
                     </div>
                     <div class="p-col-6">
                         <h:outputText value="#{empty personBB.currentContactEmail.deactivatedTS ? 'active' : 'deactivated on'}" />
@@ -1667,7 +1697,7 @@
             </h:form>
         </p:panel>
     </p:dialog>
-    
+
     <p:dialog   id="phone-deactivate-dialog"
                 height="400" width="400"
                 widgetVar="phone-deactivate-dialog-var"
@@ -1696,7 +1726,7 @@
                              persontools-growl-form"/>
         </h:form>
     </p:dialog>
-    
+
     <p:dialog   id="email-deactivate-dialog"
                 height="400" width="400"
                 widgetVar="email-deactivate-dialog-var"

@@ -100,32 +100,43 @@
 
                                                 <div class="restrict-main-contents-io-content">
                                                     <h:outputLabel value="Uploaded before..."/>
-                                                    <p:calendar value="#{manageBlobBB.searchBeforeUtil}" 
-                                                                mode="popup" 
-                                                                tabindex="3"
-                                                                id="blob-search-filter-upload-before"
-                                                                showOn="button"
-                                                                pattern="EEE, dd MMM, yyyy HH:mm"
-                                                                navigator="true"
-                                                                showButtonPanel="true"
-                                                                showTodayButton="true"
-                                                                />
+                                                    
+                                                    <p:datePicker 	id="blob-search-filter-upload-before"
+                                                                        value="#{manageBlobBB.searchBefore}" 
+                                                                        rendered="true"
+                                                                        style="width: 100%;"
+                                                                        pattern="MM/dd/yyyy HH:mm"
+                                                                        disabled="false"
+                                                                        hideOnDateTimeSelect="true"
+                                                                        showOnFocus="false"
+                                                                        showIcon="true"
+                                                                        showButtonBar="true"
+                                                                        mask="true"
+                                                                        timeInput="true" 
+                                                                        required="true" />
+                                               
 
                                                     <p:message for="blob-search-filter-upload-before" showDetail="false" showSummary="true"/>
                                                 </div>
 
                                                 <div class="restrict-main-contents-io-content">
                                                     <h:outputLabel value="Uploaded after..."/>
-                                                    <p:calendar value="#{manageBlobBB.searchAfterUtil}" 
-                                                                mode="popup" 
-                                                                tabindex="3"
-                                                                id="blob-search-filter-upload-after"
-                                                                showOn="button"
-                                                                pattern="EEE, dd MMM, yyyy HH:mm"
-                                                                navigator="true"
-                                                                showButtonPanel="true"
-                                                                showTodayButton="true"
-                                                                />
+                                                    
+                                                       <p:datePicker 	id="blob-search-filter-upload-after"
+                                                                        value="#{manageBlobBB.searchAfter}" 
+                                                                        rendered="true"
+                                                                        style="width: 100%;"
+                                                                        pattern="MM/dd/yyyy HH:mm"
+                                                                        disabled="false"
+                                                                        hideOnDateTimeSelect="true"
+                                                                        showOnFocus="false"
+                                                                        showIcon="true"
+                                                                        showButtonBar="true"
+                                                                        mask="true"
+                                                                        timeInput="true" 
+                                                                        required="true" />
+                                                       
+                                                 
 
                                                     <p:message for="blob-search-filter-upload-after" showDetail="false" showSummary="true"/>
                                                 </div>
@@ -252,7 +263,7 @@
                                             <h:form id="blobManage-form-actions">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+                                                             
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -729,7 +740,7 @@
                                                  <p:growl id="messages-update" showDetail="false" />
                                                 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+                                                             
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 

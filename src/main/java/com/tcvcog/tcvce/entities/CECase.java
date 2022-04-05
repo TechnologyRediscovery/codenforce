@@ -543,42 +543,7 @@ public class        CECase
 
   
 
-    /**
-     * @return the closingDateUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getClosingDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(closingDate);
-    }
-
-    /**
-     * @param cd
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setClosingDateUtilDate(java.util.Date cd) {
-        closingDate = DateTimeUtil.convertUtilDate(cd);
-    }
-
-    /**
-     * @return the originationDateUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getOriginationDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(originationDate);
-    }
-
-    /**
-     * @param od
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setOriginationDateUtilDate(java.util.Date od) {
-        originationDate = DateTimeUtil.convertUtilDate(od);
-    }
-
+   
     /**
      * @return the source
      */

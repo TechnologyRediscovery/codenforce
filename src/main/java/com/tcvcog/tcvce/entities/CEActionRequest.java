@@ -420,20 +420,7 @@ public class        CEActionRequest
         this.caseID = i;
     }
 
-    /**
-     * @return the dateOfRecordUtilDate
-     */
-    public java.util.Date getDateOfRecordUtilDate() {        
-        return DateTimeUtil.convertUtilDate(dateOfRecord);
-    }
-
-    /**
-     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
-     */
-    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        dateOfRecord = DateTimeUtil.convertUtilDate(dateOfRecordUtilDate);
-    }
-
+  
     @Override
     public int hashCode() {
         int hash = 7;

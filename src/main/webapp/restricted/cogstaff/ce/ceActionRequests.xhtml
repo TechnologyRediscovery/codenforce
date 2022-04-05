@@ -166,7 +166,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:form id="cearManage-form-lookup">
 
                                                 <h:panelGrid columns="4" 
-                                                             
+
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
                                                     <h:panelGroup>
@@ -192,7 +192,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             form-messages-global"/>
                                                         <p:spacer height="5px" />
                                                     </h:panelGroup>
-                                                    
+
                                                     <h:panelGroup>
                                                         <h:outputLabel styleClass="bold" value="Query description: " for="cears-query-desc-ot" />
                                                         <p:spacer height="5px" />
@@ -210,11 +210,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Query start date"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearSearchTermsLabel">
-                                                            <p:calendar id="eventDateCalStart" value="#{cEActionRequestsBB.searchParams.date_start_val_util}" 
-                                                                        mode="popup"  
-                                                                        showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                                        navigator="true" tabindex="16"
-                                                                        showButtonPanel="true" showTodayButton="true"/>
+
+                                                            <p:datePicker 	id="eventDateCalStart" 
+                                                                           value="#{cEActionRequestsBB.searchParams.date_start_val}" 
+                                                                           rendered="true"
+                                                                           style="width: 100%;"
+                                                                           pattern="MM/dd/yyyy HH:mm"
+                                                                           disabled="false"
+                                                                           hideOnDateTimeSelect="true"
+                                                                            showOnFocus="false"
+                                                                            showIcon="true"
+                                                                           showButtonBar="true"
+                                                                           mask="true"
+                                                                           timeInput="true" 
+                                                                           required="true" />
+
                                                             <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
                                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                         </div>
@@ -225,11 +235,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Query end date"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearSearchTermsLabel">
-                                                            <p:calendar id="eventDateCalEnd" value="#{cEActionRequestsBB.searchParams.date_end_val_util}" 
-                                                                        mode="popup" 
-                                                                        showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                                        navigator="true" tabindex="16"
-                                                                        showButtonPanel="true" showTodayButton="true"/>
+                                                            <p:datePicker 	id="eventDateCalEnd" 
+                                                                           value="#{cEActionRequestsBB.searchParams.date_end_val}" 
+                                                                           rendered="true"
+                                                                           style="width: 100%;"
+                                                                           pattern="MM/dd/yyyy HH:mm"
+                                                                           disabled="false"
+                                                                           hideOnDateTimeSelect="true"
+                                                                            showOnFocus="false"
+                                                                            showIcon="true"
+                                                                           showButtonBar="true"
+                                                                           mask="true"
+                                                                           timeInput="true" 
+                                                                           required="true" />
+
+
                                                             <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
                                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                         </div>
@@ -273,7 +293,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <!--TODO: at the time of writing this comment, there isn't a parameter for searching by request ID. If one is added, please put it here. -->
 
                                                     <p:spacer/>
-                                                    
+
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Filter by not at address?"/>
                                                         <p:spacer height="5px"/>
@@ -288,7 +308,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-                                                    
+
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Search by Request status?"/>
                                                         <p:spacer height="5px"/>
@@ -302,9 +322,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                            var="cearqs" itemValue="#{cearqs}" itemLabel="#{cearqs.statusTitle}"/>
                                                         </p:selectOneMenu>
                                                     </h:panelGroup>
-                                                    
+
                                                     <p:spacer/>
-                                                    
+
                                                     <p:spacer/>
 
                                                     <p:commandButton id="custom-query-cb"
@@ -336,7 +356,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:form id="cearManage-form-actions">
 
                                                 <h:panelGrid columns="4" 
-                                                             
+
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -431,7 +451,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-                                                    
+
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Description:"/>
                                                         <p:spacer height="5px"/>
@@ -457,15 +477,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-                                                    
+
                                                     <p:spacer/>
-                                                    
+
                                                     <h3>Available actions:</h3>
 
                                                     <p:spacer height="5px"/>
-                                                    
+
                                                     <p:spacer/>
-                                                    
+
                                                     <p:spacer/>
 
                                                     <p:commandButton    id="open-new-case-cb"
@@ -601,34 +621,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                 <h3>Attached photos:</h3>
 
-                                                    <p:dataTable
-                                                        id="photoTable"
-                                                        var="blob"
-                                                        value="#{cEActionRequestsBB.selectedRequest.blobList}"
-                                                        rowKey="#{blob.blobID}"
-                                                        tableStyleClass="primeDataTable"
-                                                        draggableRows="false" tabindex="6">
-                                                        <p:column width="10%" headerText="Manage">
-                                                            <p:commandButton ajax="true" 
-                                                                             actionListener="#{cEActionRequestsBB.deletePhoto(blob.blobID)}"
-                                                                             value="Delete" 
-                                                                             icon="fa fa-bomb"
-                                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
-                                                                             update="photoTable"/>
-                                                        </p:column>
-                                                        <p:column headerText="Photo">
-                                                            <p:graphicImage width="100%" value="#{blobCoordinator.image}">
-                                                                <f:param name="blobID" value="#{blob.blobID}"/>
-                                                            </p:graphicImage>
-                                                        </p:column>
-                                                        <p:column width="20%" headerText="Filename">
-                                                            <h:outputText escape="false" value="#{blob.filename}"/>
-                                                        </p:column>
-                                                        <p:column width="20%" headerText="Description">
-                                                            <h:outputText escape="false" value="#{blob.description}"/>
-                                                        </p:column>
-                                                    </p:dataTable>
-                                                
+                                                <p:dataTable
+                                                    id="photoTable"
+                                                    var="blob"
+                                                    value="#{cEActionRequestsBB.selectedRequest.blobList}"
+                                                    rowKey="#{blob.blobID}"
+                                                    tableStyleClass="primeDataTable"
+                                                    draggableRows="false" tabindex="6">
+                                                    <p:column width="10%" headerText="Manage">
+                                                        <p:commandButton ajax="true" 
+                                                                         actionListener="#{cEActionRequestsBB.deletePhoto(blob.blobID)}"
+                                                                         value="Delete" 
+                                                                         icon="fa fa-bomb"
+                                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                                         update="photoTable"/>
+                                                    </p:column>
+                                                    <p:column headerText="Photo">
+                                                        <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                                            <f:param name="blobID" value="#{blob.blobID}"/>
+                                                        </p:graphicImage>
+                                                    </p:column>
+                                                    <p:column width="20%" headerText="Filename">
+                                                        <h:outputText escape="false" value="#{blob.filename}"/>
+                                                    </p:column>
+                                                    <p:column width="20%" headerText="Description">
+                                                        <h:outputText escape="false" value="#{blob.description}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+
                                             </h:form>
 
                                         </p:panel>
@@ -647,7 +667,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:form id="cearManage-form-notes">
 
                                                 <h:panelGrid columns="4" 
-                                                             
+
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 

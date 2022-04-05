@@ -35,43 +35,7 @@ public abstract class Report
     private boolean sortInRevChrono;
     
     
-    /**
-     * @return the startDate_val_utilDate
-     */
-    public java.util.Date getStartDate_val_utilDate() {
-        if(date_start_val != null){
-            return java.util.Date.from(getDate_start_val().atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return null;
-    }
-
-    /**
-     * @param startDate_val_utilDate the startDate_val_utilDate to set
-     */
-    public void setStartDate_val_utilDate(java.util.Date startDate_val_utilDate) {
-        if(startDate_val_utilDate != null){
-            date_start_val = startDate_val_utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-    }
-
-    /**
-     * @return the endDate_val_utilDate
-     */
-    public java.util.Date getEndDate_val_utilDate() {
-        if(date_end_val != null){
-            return java.util.Date.from(getDate_end_val().atZone(ZoneId.systemDefault()).toInstant());
-        }
-        return null;
-    }
-
-    /**
-     * @param endDate_val_utilDate the endDate_val_utilDate to set
-     */
-    public void setEndDate_val_utilDate(java.util.Date endDate_val_utilDate) {
-        if(endDate_val_utilDate != null){
-            date_end_val = endDate_val_utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        }
-    }
+  
      /**
      * @return the startDate_val_SQLDate
      */
