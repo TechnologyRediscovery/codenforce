@@ -4,6 +4,8 @@
 -- OCT 10, 2021
 -- GIT Issue #214 
 --********************
+
+-- BAKED INTO dbpatch_beta39.sql on 11 APRIL 22 by ECD
 	
 INSERT INTO public.eventcategory
 	(categoryid, categorytype, title, notifymonitors, hidable, icon_iconid, relativeorderwithintype, 
