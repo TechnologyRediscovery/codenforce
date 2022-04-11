@@ -12,23 +12,24 @@ import java.util.Objects;
  * @author sylvia
  */
 public class Icon  {
-    private int iconid;
+    private int iconID;
     private String name;
     private String styleClass;
     private String fontAwesome;
     private String materialIcon;
+    private Boolean active;
 
     /**
-     * @return the iconid
+     * @return the iconID
      */
-    public int getIconid() {
-        return iconid;
+    public int getIconID() {
+        return iconID;
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 73 * hash + this.iconid;
+        hash = 73 * hash + this.iconID;
         hash = 73 * hash + Objects.hashCode(this.name);
         hash = 73 * hash + Objects.hashCode(this.styleClass);
         hash = 73 * hash + Objects.hashCode(this.fontAwesome);
@@ -48,7 +49,7 @@ public class Icon  {
             return false;
         }
         final Icon other = (Icon) obj;
-        if (this.iconid != other.iconid) {
+        if (this.iconID != other.iconID) {
             return false;
         }
         if (!Objects.equals(this.name, other.name)) {
@@ -61,6 +62,9 @@ public class Icon  {
             return false;
         }
         if (!Objects.equals(this.materialIcon, other.materialIcon)) {
+            return false;
+        }
+        if (!Objects.equals(this.active, other.active)) {
             return false;
         }
         return true;
@@ -95,10 +99,10 @@ public class Icon  {
     }
 
     /**
-     * @param iconid the iconid to set
+     * @param iconID the iconID to set
      */
-    public void setIconid(int iconid) {
-        this.iconid = iconid;
+    public void setIconID(int iconID) {
+        this.iconID = iconID;
     }
 
     /**
@@ -127,6 +131,20 @@ public class Icon  {
      */
     public void setMaterialIcon(String materialIcon) {
         this.materialIcon = materialIcon;
+    }
+
+    /**
+     * @return the active
+     */
+    public Boolean getActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(Boolean active) {
+        this.active = active;
     }
     
 }

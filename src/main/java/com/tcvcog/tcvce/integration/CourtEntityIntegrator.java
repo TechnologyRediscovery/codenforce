@@ -1700,7 +1700,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             stmt = con.prepareStatement(query);
             stmt.setString(1, cs.getStatusTitle());
             stmt.setString(2, cs.getDescription());
-            stmt.setInt(3, cs.getIcon().getIconid());
+            stmt.setInt(3, cs.getIcon().getIconID());
             stmt.setBoolean(4, cs.isEditsForbidden());
             if(cs.getEventRuleAbstract()!= null){
                 stmt.setInt(5, cs.getEventRuleAbstract().getRuleid());
@@ -1770,7 +1770,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             stmt = con.prepareStatement(query);
             stmt.setString(1, cs.getStatusTitle());
             stmt.setString(2, cs.getDescription());
-            stmt.setInt(3, cs.getIcon().getIconid());
+            stmt.setInt(3, cs.getIcon().getIconID());
             stmt.setBoolean(4, cs.isEditsForbidden());
              if(cs.getEventRuleAbstract()!= null){
                 stmt.setInt(5, cs.getEventRuleAbstract().getRuleid());

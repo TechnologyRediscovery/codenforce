@@ -24,7 +24,18 @@ import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.domain.IntegrationException;
+
 import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.Icon;
+import com.tcvcog.tcvce.entities.IntensityClass;
+import com.tcvcog.tcvce.entities.IntensitySchema;
+import com.tcvcog.tcvce.entities.NavigationItem;
+import com.tcvcog.tcvce.entities.NavigationSubItem;
+import com.tcvcog.tcvce.entities.PrintStyle;
+import com.tcvcog.tcvce.entities.PropertyUseType;
+import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -390,7 +401,66 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
        return si.getBOBSource(sourceid);
        
    }
-    
+   
+   public int iconCheckForUse(Icon i) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       return si.iconCheckForUse(i);
+   }
+   
+   public Icon getIcon(int iconID) throws IntegrationException {
+      SystemIntegrator si = getSystemIntegrator();
+      return si.getIcon(iconID);
+   }
+   
+   public void deactivateIcon(Icon i) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.deactivateIcon(i);
+   }
+   
+   public void updateIcon(Icon i) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.updateIcon(i);
+   }
+   
+   public void insertIcon(Icon i) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.insertIcon(i);
+   }
+   
+   public List<Icon> getIconList() throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       return si.getIconList();
+   }
+   
+   public int putCheckForUse(PropertyUseType p) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       return si.putCheckForUse(p);
+   }
+   
+   public PropertyUseType getPut(int putID) throws IntegrationException {
+      SystemIntegrator si = getSystemIntegrator();
+      return si.getPut(putID);
+   }
+   
+   public void deactivatePut(PropertyUseType p) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.deactivatePut(p);
+   }
+   
+   public void updatePut(PropertyUseType p) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.updatePut(p);
+   }
+   
+   public void insertPut(PropertyUseType p) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.insertPut(p);
+   }
+   
+   public List<PropertyUseType> getPutList() throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       return si.getPutList();
+   }
 
     /**
      * Adapter method for taking in simple note info, not in Object format and
@@ -681,6 +751,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     //Sidebar Sub Nav Item: System
     private final NavigationSubItem users = getNavSubItem("Users", "/restricted/cogadmin/userConfig.xhtml", "fa fa-user-o", false);
     private final NavigationSubItem icons = getNavSubItem("Icons", "/restricted/cogadmin/iconManage.xhtml", "fa fa-rebel", false);
+    private final NavigationSubItem puts = getNavSubItem("PUTs", "/restricted/cogadmin/propertyUseTypeManage.xhtml", "fa fa-flag", false);
+    private final NavigationSubItem oid = getNavSubItem("Occ Det's", "/restricted/cogadmin/occInspectionDeterminationManage.xhtml", "fa fa-pencil-square-o", false);
     private final NavigationSubItem blobs = getNavSubItem("Files", "/restricted/cogadmin/manageBlob.xhtml", "fa fa-folder", false);
 
     //Store SubNav Items into List: Reports
@@ -689,6 +761,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         navList = new ArrayList<>();
         navList.add(users);
         navList.add(icons);
+        navList.add(puts);
+        navList.add(oid);
         navList.add(blobs);
         return navList;
     }

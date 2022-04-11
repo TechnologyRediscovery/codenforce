@@ -927,7 +927,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(5, ec.isHidable());
 
             if(ec.getIcon() != null){
-                stmt.setInt(6, ec.getIcon().getIconid());
+                stmt.setInt(6, ec.getIcon().getIconID());
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
@@ -986,7 +986,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(5, ec.isHidable());
 
             if(ec.getIcon() != null){
-                stmt.setInt(6, ec.getIcon().getIconid());
+                stmt.setInt(6, ec.getIcon().getIconID());
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }

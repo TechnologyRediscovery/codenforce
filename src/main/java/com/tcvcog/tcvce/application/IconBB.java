@@ -7,7 +7,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Icon;
-import com.tcvcog.tcvce.integration.SystemIntegrator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
@@ -36,9 +36,13 @@ public class IconBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        SystemIntegrator si = getSystemIntegrator();
+        refreshIconList();
+    }
+    
+    public void refreshIconList(){
+        SystemCoordinator sc = getSystemCoordinator();
         try {
-            iconList = si.getIconList();
+            iconList = sc.getIconList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -50,9 +54,9 @@ public class IconBB extends BackingBeanUtils implements Serializable{
     }
     
     public void commitUpdates(ActionEvent ev){
-        SystemIntegrator si = getSystemIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
         try {
-            si.updateIcon(currentIcon);
+            sc.updateIcon(currentIcon);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully updated icon", ""));
@@ -61,13 +65,13 @@ public class IconBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not update icon, sorry", ""));
         }
-        
+        refreshIconList();
     }
     
     public void commitInsert(ActionEvent ev){
-        SystemIntegrator si = getSystemIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
         try {
-            si.insertIcon(currentIcon);
+            sc.insertIcon(currentIcon);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Icon inserted", ""));
@@ -76,20 +80,35 @@ public class IconBB extends BackingBeanUtils implements Serializable{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not insert icon, sorry", ""));
         }
-        
+        refreshIconList();
     }
-    //method for deleting existing icons
-    public void commitDelete(ActionEvent ev) {
-//		  SystemIntegrator si = getSystemIntegrator(); 
-//		  try {
-//			  si.deleteIcon(currentIcon); 
-//			  getFacesContext().addMessage(null, 
-//					  new FacesMessage(FacesMessage.SEVERITY_INFO, 
-//							  "Success! Icon removed", "")); 
-//		  } catch (IntegrationException ex) { getFacesContext().addMessage(null, new
-//				  FacesMessage(FacesMessage.SEVERITY_ERROR, "Could not remove icon, sorry",
-//				  "")); }
-//		 
+    
+    public void commitRemove(ActionEvent ev) {
+        SystemCoordinator sc = getSystemCoordinator();
+        if(currentIcon.getIconID() > 0){             
+            try {
+                int uses = sc.iconCheckForUse(currentIcon);
+                if(uses == 0){
+                    sc.deactivateIcon(currentIcon);
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Success! Icon removed", ""));
+                } else {
+                    getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Icon is in use " + uses + " times. Could not remove", ""));
+                }
+            } catch (IntegrationException ex) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Could not remove Icon, sorry", ""));
+            }
+            refreshIconList();
+        } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Invalid IconID: " + currentIcon.getIconID(), ""));
+        }
     }
     
     public void createNewIcon(){
@@ -116,7 +135,6 @@ public class IconBB extends BackingBeanUtils implements Serializable{
      * @return the currentIcon
      */
     public Icon getCurrentIcon() {
-        System.out.println("getCurrentIcons");
         return currentIcon;
     }
 

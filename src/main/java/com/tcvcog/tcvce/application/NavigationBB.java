@@ -66,9 +66,9 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public void initBean() {
         // Load Navigation lists from SystemCoordinator and place
         // in member variables here
-        SystemCoordinator ssc = getSystemCoordinator();
-        NavList = ssc.navList();
-        sideBarNavList = ssc.sideBarNavList();
+        SystemCoordinator sc = getSystemCoordinator();
+        NavList = sc.navList();
+        sideBarNavList = sc.sideBarNavList();
 
         System.out.println("NavigationBB.initBean");
 

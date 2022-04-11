@@ -16,6 +16,8 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.util.Objects;
+
 /**
  * Models a property use type, such as residential - single family, etc.
  * 
@@ -28,7 +30,52 @@ public class PropertyUseType {
     private String description;
     private Icon icon;
     private String zoneClass;
+    private Boolean active;
+    
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 73 * hash + this.typeID;
+        hash = 73 * hash + Objects.hashCode(this.name);
+        hash = 73 * hash + Objects.hashCode(this.description);
+        hash = 73 * hash + Objects.hashCode(this.icon);
+        hash = 73 * hash + Objects.hashCode(this.zoneClass);
+        hash = 73 * hash + Objects.hashCode(this.getActive());
+        return hash;
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PropertyUseType other = (PropertyUseType) obj;
+        if (this.typeID != other.typeID) {
+            return false;
+        }
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        if (!Objects.equals(this.description, other.description)) {
+            return false;
+        }
+        if (!Objects.equals(this.icon, other.icon)) {
+            return false;
+        }
+        if (!Objects.equals(this.zoneClass, other.zoneClass)) {
+            return false;
+        }
+        if (!Objects.equals(this.active, other.active)) {
+            return false;
+        }
+        return true;
+    }
     /**
      * @return the typeID
      */
@@ -97,6 +144,20 @@ public class PropertyUseType {
      */
     public void setZoneClass(String zoneClass) {
         this.zoneClass = zoneClass;
+    }
+
+    /**
+     * @return the active
+     */
+    public Boolean getActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(Boolean active) {
+        this.active = active;
     }
     
     

@@ -3104,7 +3104,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(1, put.getName());
             stmt.setString(2, put.getDescription());
             if(put.getIcon() != null){
-                stmt.setInt(3, put.getIcon().getIconid());
+                stmt.setInt(3, put.getIcon().getIconID());
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
@@ -3137,7 +3137,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             stmt.setString(1, put.getName());
             stmt.setString(2, put.getDescription());
             if(put.getIcon() != null){
-                stmt.setInt(3, put.getIcon().getIconid());
+                stmt.setInt(3, put.getIcon().getIconID());
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }

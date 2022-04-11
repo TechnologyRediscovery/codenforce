@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectionRequirementAssigned;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 
 import java.time.LocalDateTime;
@@ -112,7 +113,10 @@ public  class       FieldInspection
 
     private OccInspectionCause cause;
     
+    private List<OccInspectionRequirementAssigned> requirementList;
+
     public FieldInspection() {
+
         inspectedSpaceList = new ArrayList<>();
         inspectedSpaceListVisible = new ArrayList<>();
         viewSetting = ViewOptionsOccChecklistItemsEnum.ALL_ITEMS;

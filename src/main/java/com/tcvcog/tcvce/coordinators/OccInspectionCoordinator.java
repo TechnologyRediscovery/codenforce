@@ -439,11 +439,14 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                 allSpacesPassed = false;
             }
         }
+
         inspection.setReadyForPassedCertification(allSpacesPassed);
         if (!inspection.getInspectedSpaceList().isEmpty()) {
             Collections.sort(inspection.getInspectedSpaceList());
             Collections.reverse(inspection.getInspectedSpaceList());
         }
+        
+
         return inspection;
     }
 
@@ -611,6 +614,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         } 
         return inSpaceEle;
     }
+
     
     /**
      * Coordinates removing a space from being part of a checklist, 
@@ -1239,13 +1243,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      */
     public List<OccInspectionDetermination> getOccDeterminationList() throws IntegrationException{
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
-        List<Integer> didl = oii.getDeterminationListActiveOnly();
-        List<OccInspectionDetermination> detList = new ArrayList<>();
-        if(didl != null && !didl.isEmpty()){
-            for(Integer i: didl){
-                detList.add(oii.getDetermination(i));
-            }
-        }
+        List<OccInspectionDetermination> detList = oii.getDeterminationList();
+        
         return detList;
     }
     
@@ -1294,6 +1293,73 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 
         rpt.setViewSetting(ViewOptionsOccChecklistItemsEnum.FAILED_ITEMS_ONLY);
         return rpt;
+    }
+
+
+     /**
+      * Logic intermediary for getter of determination
+      * @param currentDetermination
+      * @return
+      * @throws IntegrationException 
+      */
+    public int determinationCheckForUse(OccInspectionDetermination currentDetermination) throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       return oii.determinationCheckForUse(currentDetermination);
+    }
+    
+    public OccInspectionDetermination getDetermination(int determinationID) throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       return oii.getDetermination(determinationID);
+    }
+
+    public void deactivateDetermination(OccInspectionDetermination currentDetermination) throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       oii.deactivateDetermination(currentDetermination);
+    }
+
+    public void updateDetermination(OccInspectionDetermination currentDetermination) throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       oii.updateDetermination(currentDetermination);
+    }
+
+    public void insertDetermination(OccInspectionDetermination currentDetermination) throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       oii.insertDetermination(currentDetermination);
+    }
+   
+    public List<OccInspectionDetermination> getDeterminationList() throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       return oii.getDeterminationList();
+    }
+    
+    public int requirementCheckForUse(OccInspectionRequirement currentRequirement) throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       return oii.requirementCheckForUse(currentRequirement);
+    }
+    
+    public OccInspectionRequirement getRequirement(int requirementID) throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       return oii.getRequirement(requirementID);
+    }
+
+    public void deactivateRequirement(OccInspectionRequirement currentRequirement) throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       oii.deactivateRequirement(currentRequirement);
+    }
+
+    public void updateRequirement(OccInspectionRequirement currentRequirement) throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       oii.updateRequirement(currentRequirement);
+    }
+
+    public void insertRequirement(OccInspectionRequirement currentRequirement) throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       oii.insertRequirement(currentRequirement);
+    }
+   
+    public List<OccInspectionRequirement> getRequirementList() throws IntegrationException {
+       OccInspectionIntegrator oii = getOccInspectionIntegrator();
+       return oii.getRequirementList();
     }
 
 }
