@@ -18,7 +18,7 @@
               widgetVar="inspection-profile-dialog-var"
               width="1200"
               height="600"
-              header="Inspection Profile (ID:#{fieldInspectionBB.currentInspection.inspectionID}"
+              header="Inspection Profile (ID:#{fieldInspectionBB.currentInspection.inspectionID})"
               modal="true"
               dynamic="true"
               resizable="true"
@@ -36,7 +36,7 @@
                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                      icon="fa #{fieldInspectionBB.editModeInspectionMetadata ? 'fa-check' : 'fa-pencil'}"
                                      actionListener="#{fieldInspectionBB.onToggleEditModeInspectionMetadata}"
-                                     oncomplete="PF('inspections-inspectiondetails-var').show();"
+                                     oncomplete="PF('inspection-profile-dialog-var').show();"
                                      update="@form
                                      @form:@parent:inspectiontools-growl-form
                                      #{fieldInspectionBB.inspectionListComponentForUpdate}"/>
@@ -49,7 +49,7 @@
                                          rendered="#{fieldInspectionBB.editModeInspectionMetadata}"
                                          icon="fa fa-stop"
                                          actionListener="#{fieldInspectionBB.abortEditsOccInspectionMetadata}"
-                                         oncomplete="PF('inspections-inspectiondetails-var').show()"
+                                         oncomplete="PF('inspection-profile-dialog-var').show()"
                                          update="@form
                                          @form:@parent:inspectiontools-growl-form"/>
                     </div>
@@ -95,6 +95,7 @@
                                                  value="#{fieldInspectionBB.currentInspection.inspector}"
                                                  filter="true"
                                                  filterMatchMode="contains"
+                                                 required="false"
                                                  converter="userConverter">
                                     <f:selectItems value="#{systemServicesBB.bbSessionMuni.swornOfficerList}" 
                                                    var="user"
@@ -172,11 +173,13 @@
                             <div class="p-col-6">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.cause.title}"
-                                              title="#{fieldInspectionBB.currentInspection.cause.description}" />
+                                              title="#{fieldInspectionBB.currentInspection.cause.description}"
+                                              />
 
                                 <p:selectOneMenu rendered="#{fieldInspectionBB.editModeInspectionMetadata}"
                                                  value="#{fieldInspectionBB.currentInspection.cause}"
-                                                 converter="occInspectionCauseConverter">
+                                                 converter="occInspectionCauseConverter"
+                                                 required="false">
                                     <f:selectItems value="#{fieldInspectionBB.causeList}" 
                                                    var="cause"
                                                    itemLabel="#{cause.title}"
@@ -195,7 +198,8 @@
 
                                 <p:selectOneMenu rendered="#{fieldInspectionBB.editModeInspectionMetadata}"
                                                  value="#{fieldInspectionBB.currentInspection.checklistTemplate}"
-                                                 converter="checklistTitleConverter">
+                                                 converter="checklistTitleConverter"
+                                                 required="false">
                                     <f:selectItems value="#{fieldInspectionBB.checklistTemplateList}" 
                                                    var="temp"
                                                    itemLabel="#{temp.title}"
@@ -221,13 +225,11 @@
                                                 disabled="false"
                                                 showButtonBar="true"
                                                 hideOnDateTimeSelect="true"
-                                              showOnFocus="false"
-                                              showIcon="true"
+                                                showOnFocus="false"
+                                                showIcon="true"
                                                 mask="true"
                                                 timeInput="true" 
-                                                required="true" />
-
-
+                                                required="false" />
                             </div>
 
                             <div class="p-col-6">
@@ -235,9 +237,9 @@
                             </div>
 
                             <div class="p-col-6">
-                                <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
-                                              value="#{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.timeEnd)}"/>
-                                <p:datePicker 	 id="inspection-time-start-datepicker"
+                                <h:outputText   rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
+                                                value="#{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.timeEnd)}"/>
+                                <p:datePicker 	 id="inspection-time-end-datepicker"
                                                 rendered="#{fieldInspectionBB.editModeInspectionMetadata}"
                                                 value="#{fieldInspectionBB.currentInspection.timeEnd}" 
                                                 style="width: 100%;"
@@ -245,12 +247,11 @@
                                                 disabled="false"
                                                 showButtonBar="true"
                                                 hideOnDateTimeSelect="true"
-                                              showOnFocus="false"
-                                              showIcon="true"
+                                                showOnFocus="false"
+                                                showIcon="true"
                                                 mask="true"
                                                 timeInput="true" 
-                                                required="true" />
-
+                                                required="false" />
                             </div>
 
                             <p:divider/>
@@ -263,7 +264,8 @@
                                               value="#{fieldInspectionBB.currentInspection.maxOccupantsAllowed}"/>
 
                                 <p:inputText rendered="#{fieldInspectionBB.editModeInspectionMetadata}"  
-                                             value="#{fieldInspectionBB.currentInspection.maxOccupantsAllowed}"/>
+                                             value="#{fieldInspectionBB.currentInspection.maxOccupantsAllowed}"
+                                             required="false"/>
                             </div>
                             <div class="p-col-6">
                                 Number of bedrooms
@@ -272,7 +274,8 @@
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.numBedrooms}"/>
                                 <p:inputText rendered="#{fieldInspectionBB.editModeInspectionMetadata}"  
-                                             value="#{fieldInspectionBB.currentInspection.numBedrooms}"/>
+                                             value="#{fieldInspectionBB.currentInspection.numBedrooms}"
+                                             required="false"/>
                             </div>
 
                             <div class="p-col-6">
@@ -282,12 +285,9 @@
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.numBathrooms}"/>
                                 <p:inputText rendered="#{fieldInspectionBB.editModeInspectionMetadata}"  
-                                             value="#{fieldInspectionBB.currentInspection.numBathrooms}"/>
+                                             value="#{fieldInspectionBB.currentInspection.numBathrooms}"
+                                             required="false"/>
                             </div>
-
-
-
-
                         </div>
                     </p:panel>
 
@@ -306,7 +306,8 @@
                                 <p:inputTextarea    rendered="#{fieldInspectionBB.editModeInspectionMetadata}" 
                                                     value="#{fieldInspectionBB.currentInspection.notesPreInspection}"
                                                     rows="8"
-                                                    cols="30" />
+                                                    cols="30"
+                                                    required="false"/>
                             </div>
 
                             <div class="p-col-6">
@@ -320,7 +321,8 @@
                                 <p:inputTextarea    rendered="#{fieldInspectionBB.editModeInspectionMetadata}" 
                                                     value="#{fieldInspectionBB.currentInspection.remarks}"
                                                     rows="8"
-                                                    cols="30" />
+                                                    cols="30"
+                                                    required="false"/>
                             </div>
 
                             <div class="p-col-6">
@@ -333,11 +335,11 @@
                                 <p:inputTextarea    rendered="#{fieldInspectionBB.editModeInspectionMetadata}" 
                                                     value="#{fieldInspectionBB.currentInspection.generalComments}"
                                                     rows="8"
-                                                    cols="30" />
+                                                    cols="30"
+                                                    required="false"/>
                             </div>
                         </div>
                     </p:panel>
-
                 </h:form>
                 <p:panel id="inspection-advancedtools-panel"
                          toggleable="true"
@@ -398,61 +400,81 @@
 
                     <h:form id="inspection-actions-form">
 
+                        <div class="p-grid">
+                            <div class="p-col-4">
 
-                        <h:outputText value=" | " />
+                                <p:commandButton  id="inspection-uploadphotos-cl"
+                                                value="Add Photos"
+                                                actionListener="#{fieldInspectionBB.onUploadImagesToInspectionInitButtonClick(ins)}"
+                                                ajax="true"
+                                                icon="fa fa-upload"
+                                                oncomplete="PF('blob-upload-dialog-var').show()"
+                                                rendered="true"
+                                                disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                update="@form:@parent:@parent:blob-upload-dialog"
+                                                />
+                                
+                            </div>
+                            <div class="p-col-4">
 
-                        <p:commandLink  id="inspection-uploadphotos-cl"
-                                        value="Add Photos"
-                                        ajax="true"
-                                        style="color:blue;"
-                                        oncomplete="PF('blob-upload-dialog-var').show()"
-                                        rendered="true"
-                                        update="@form:@parent:@parent:blob-upload-dialog
-                                        "
-                                        actionListener="#{fieldInspectionBB.onUploadImagesToInspectionInitButtonClick(ins)}">
+                                <p:commandButton  id="inspection-viewphotos-cl"
+                                                value="View photo pool"
+                                                actionListener="#{fieldInspectionBB.onViewPhotoPoolLinkClick(ins)}" 
+                                                ajax="true"
+                                                icon="fa fa-file-image-o"
+                                                oncomplete="PF('blobs-gallery-dialog-var').show()"
+                                                disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                rendered="true"
+                                                update="@form:@parent:@parent:blobs-gallery-dialog
+                                                "
+                                                />
+                                
+                            </div>
+                            <div class="p-col-4">
 
-                        </p:commandLink>
+                                <p:commandButton  id="inspection-generatereport-cl"
+                                                value="Inspection report"
+                                                actionListener="#{fieldInspectionBB.onFieldInspectionReportInitLinkClick(ins)}"
+                                                ajax="true"
+                                                disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                rendered="true"
+                                                icon="fa fa-print"
+                                                oncomplete="PF('inspection-reportconfig-dialog-var').show()"
+                                                update="inspection-reportconfig-dialog
+                                                inspection-reportconfig-form"
+                                                />
+                                
+                            </div>
+                            <div class="p-col-4">
+                                <p:commandButton    id="insp-followup-button"
+                                                    value="Setup Re-inspection"
+                                                    ajax="true"
+                                                    disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                    actionListener="#{fieldInspectionBB.onSetupReinspectionButtonClick}"
+                                                    oncomplete="PF('inspection-followup-dialog-var').show()"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                    icon="fa fa-repeat"
+                                                    update="inspection-followup-form"
+                                                    />
+                                
+                            </div>
+                            <div class="p-col-4">
+                                <p:commandButton    id="insp-extractviolations-button"
+                                                    value="Extract Violated Elements"
+                                                    ajax="true"
+                                                    disabled="true"
+                                                    actionListener="#{fieldInspectionBB.onSetupReinspectionButtonClick}"
+                                                    oncomplete="PF('inspection-followup-dialog-var').show()"
+                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                    icon="fa fa-gavel"
+                                                    update="inspection-followup-form"
+                                                    />
+                                
+                            </div>
+                            
+                        </div>
 
-                        <h:outputText value=" | " />
 
-                        <p:commandLink  id="inspection-viewphotos-cl"
-                                        value="View photo pool"
-                                        ajax="true"
-                                        style="color:blue;"
-                                        oncomplete="PF('blobs-gallery-dialog-var').show()"
-                                        rendered="true"
-                                        update="@form:@parent:@parent:blobs-gallery-dialog
-                                        "
-                                        actionListener="#{fieldInspectionBB.onViewPhotoPoolLinkClick(ins)}">
-
-                        </p:commandLink>
-
-                        <h:outputText value=" | " />
-
-                        <p:commandLink  id="inspection-generatereport-cl"
-                                        value="Generate inspection report"
-                                        ajax="true"
-                                        style="color:blue;"
-                                        oncomplete="PF('inspection-reportconfig-dialog-var').show()"
-                                        rendered="true"
-                                        update="inspection-reportconfig-dialog
-                                        inspection-reportconfig-form"
-
-                                        actionListener="#{fieldInspectionBB.onFieldInspectionReportInitLinkClick(ins)}">
-
-                        </p:commandLink>
-
-                        <p:spacer height="3px" />
-
-                        <p:commandButton    id="insp-followup-button"
-                                            value="Setup Re-inspection"
-                                            ajax="true"
-                                            actionListener="#{fieldInspectionBB.onSetupReinspectionButtonClick}"
-                                            oncomplete="PF('inspection-followup-dialog-var').show()"
-                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                            icon="fa fa-repeat"
-                                            update="inspection-followup-form"
-                                            />
 
                     </h:form>
                 </p:panel>
@@ -470,6 +492,7 @@
                                             actionListener="#{fieldInspectionBB.onAddSpaceInitLinkClick}"
                                             oncomplete="PF('inspections-selecttype-var').show()"
                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                            disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
                                             icon="fa fa-plus"
                                             update="inspections-selecttype-form"
                                             />
@@ -478,9 +501,10 @@
                         <p:spacer height="5px" />
 
                         <p:dataTable var="inspectedSpace"
-                                     value="#{inspection.inspectedSpaceList}"
+                                     value="#{fieldInspectionBB.currentInspection.inspectedSpaceList}"
                                      rowKey="#{inspectedSpace.inspectedSpaceID}"
                                      reflow="true">
+                            
                             <p:column style="width:2rem">
                                 <p:rowToggler/>
                             </p:column>
@@ -513,7 +537,7 @@
                                                update="inspections-entryscreen-form
                                                inspections-entryscreen"
                                                value="Edit">
-                                    <f:actionListener binding="#{fieldInspectionBB.onViewInspectedSpaceLinkClick(inspectedSpace, ins)}"/>
+                                    <f:actionListener binding="#{fieldInspectionBB.onViewInspectedSpaceLinkClick(inspectedSpace)}"/>
                                 </p:commandLink>
                             </p:column>
                             <p:rowExpansion>
@@ -568,32 +592,7 @@
                                     </ui:repeat>
                                 </ul>
 
-                                <h3>Determination</h3>
-                                <h:outputText  value="#{empty inspection.determination 
-                                                        ? 'No determination assigned' 
-                                                        : ''}" />
-                                <h:outputText  value="#{!empty inspection.determinationTS} 
-                                               ? #{fieldInspectionBB.getPrettyDateNoTime(inspection.determinationTS)}
-                                               : '' }" />
-                                <h:outputText  value="#{!empty inspection.determinationTS} 
-                                               ? #{inspection.determination.title} 
-                                               : '' " />
-
-                                <p:spacer height="5px" />
-
-                                <p:commandButton   id="inspections-selectchecklist-continuebutton"
-                                                   value="Finalzie and lock inspection ID:#{fieldInspectionBB.currentInspection.inspectionID}"
-                                                   rendered="#{((systemServicesBB.bbSessionUser.userID eq fieldInspectionBB.currentInspection.inspector.userID) 
-                                                               or systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions) 
-                                                               and empty fieldInspectionBB.currentInspection}"
-                                                   icon="fa fa-check-square "
-                                                   actionListener="#{fieldInspectionBB.onCertifyInspectionInitButtonChange}"
-                                                   update="@form:@parent:inspection-finalize-form"
-                                                   oncomplete="PF('inspection-finalize-dialog-var').show();"/>
-
-                                <p:spacer height="5px" />
-                                <hr />
-                                <p:spacer height="5px" />
+                             
                             </p:rowExpansion>
                         </p:dataTable>
                     </h:form>
@@ -659,7 +658,7 @@
 
             <p:commandButton value="Cancel"
                              icon="pi pi-times"
-                             style="background-color: darkgrey; border: solid darkgray;"
+                             style="background-color: darkgrey; border: solid darkgray; color:white;"
                              class="ui-button-outlined p-mr-1"
                              oncomplete="PF('inspections-selectchecklist-var').hide()"/>
 
@@ -746,7 +745,7 @@
                              actionListener="#{fieldInspectionBB.onAddSpaceTypeSelectedButtonChange}"
                              ajax="true"
                              value="Continue"
-                             disabled="#{empty fieldInspectionBB.currentSpaceType}"
+                             disabled="false"
                              icon="pi pi-arrow-right"
                              update="inspections-selectspace-form"
                              oncomplete="PF('inspections-selecttype-var').hide(); 
@@ -924,7 +923,7 @@
                     <p:commandLink     id="applybatch-cl"
                                        ajax="true"
                                        style="color:blue;"
-                                       update="@form:@parent:space-element-accordion-form:element-accordion
+                                       update="@form:@parent:inspections-entryscreen-form:element-accordion
                                        @form:@parent:inspectiontools-growl-form"
                                        value="Batch apply to all ords"
                                        actionListener="#{fieldInspectionBB.onBatchProcessElementLinkClick}" />
@@ -976,7 +975,7 @@
 
         <h:form id="inspections-entryscreen-form">
 
-            <p:commandButton id="inspections-newbutton"
+            <p:commandButton id="inspections-saveandclose"
                              value="Save space data and close"
                              disabled="false"
                              rendered="true"
@@ -985,10 +984,9 @@
                              oncomplete="PF('inspections-entryscreen-var').hide()"
                              update="@form:@parent:inspection-inspectedspaces-form
                              @form:@parent:inspectiontools-growl-form"/>
-        </h:form>
-        <p:spacer height="5px" />
 
-        <h:form id="space-element-accordion-form">
+            <p:spacer height="5px" />
+
             <p:accordionPanel id="element-accordion"
                               value="#{fieldInspectionBB.currentInspectedSpace.inspectedElementGroupList}" 
                               var="elegrp" multiple="true"

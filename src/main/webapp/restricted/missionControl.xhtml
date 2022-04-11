@@ -731,6 +731,7 @@
                                 widgetVar="cecase-list-report-dialog-var"
                                 closable="true" 
                                 responsive="true"
+                                header="Configure Code Enforcement Case List Report"
                                 >
 
                         <h:form id="cecase-list-report-form">
@@ -748,12 +749,9 @@
                                     <p:spacer height="5px"/>
                                     <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
 
-                                    <p:spacer height="5px"/>
+                                  
 
-                                    <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCaseNames}" />
-
-
+                                    <p:spacer height="5px" />
                                     <p:outputLabel for="cecase-list-report-date-start-cal" 
                                                    value="start date"/>
 
@@ -804,26 +802,43 @@
 
 
                                     <h3>Additional case list report options</h3>
+                                    <div class="p-grid">
+                                        <div class="p-col">
+                                                <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCaseNames}" />
 
-                                    <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeListSummaryFigures}" />
+                                                <p:spacer height="5px"/>
 
-                                    <p:spacer height="5px"/>
+                                                <h:outputLabel class="bold" value="Include street level summary" for="report-caselist-streetsummary-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-streetsummary-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeStreetLevelSummary}" />
 
-                                    <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeViolationList}" />
+                                                <p:spacer height="5px"/>
 
-                                    <p:spacer height="5px"/>
+                                                <h:outputLabel class="bold" value="Include case status pie" for="report-caselist-casestatus-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-casestatus-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCECaseStatusPie}" />
 
-                                    <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeEventSummaryByCase}" />
+                                                <p:spacer height="5px"/>
 
-                                    <p:spacer height="5px"/>
+                                                <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeListSummaryFigures}" />
 
-                                    <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
-                                    <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchProfileBB.reportCECaseList.includeExtendedPropertyDetails}" />
+                                        </div>
+                                        <div class="p-col">
+                                                <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeViolationList}" />
 
+                                                <p:spacer height="5px"/>
 
+                                                <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeEventSummaryByCase}" />
+
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
+                                                <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchProfileBB.reportCECaseList.includeExtendedPropertyDetails}" />
+
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">

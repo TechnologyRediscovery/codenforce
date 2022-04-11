@@ -12,6 +12,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.IFace_inspectable;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.User;
@@ -105,7 +106,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      * Gets the list of possible checklist template objects and sets the member
      * variable checklistTemplates to its value.
      */
-    public void initChecklistTemplates() {
+    private void initChecklistTemplates() {
         SessionBean sb = getSessionBean();
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
@@ -116,7 +117,8 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     }
 
     /**
-     * Listener for user to view an inspection
+     * Listener for user to view an inspection from either the CECase profile
+     * or occ period profile
      * @param holder
      * @param fi 
      */
@@ -154,7 +156,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     }
 
     /**
-     * Creates empty inspection object for the current occupancy period.
+     * Creates empty inspection object for the current occupancy period or cecase
      
      */
     public void createInspection() {
@@ -198,6 +200,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
             try {
                 List<FieldInspection> filist = oic.getOccInspectionList(currentInspectable);
                 System.out.println("FieldInspectionBB.refreshInspectionListAndTriggerManagedListReload | filist size: " + filist.size());
+                System.out.println("FieldInspectionBB.refreshInspectionListAndTriggerManagedListReload | component for reload: " + inspectionListComponentForUpdate);
                 getSessionBean().setSessFieldInspectionListForRefresh(filist);
             } catch (IntegrationException | BObStatusException | BlobException ex) {
                 System.out.println(ex);
@@ -239,7 +242,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      * @param ev 
      */
     public void onChecklistSelectionCompleteButtonClick(ActionEvent ev){
-        selectedInspector = getSessionBean().getSessOccPeriod().getManager();
+        selectInspectorUsingCurrentInspectionHolder();
         System.out.println("OccInspectionBB.onChecklistSelectionCompleteButtonClick");
         createInspection();
         // tell ui to start the meata data form in edit mode
@@ -247,14 +250,28 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     }
     
     /**
+     * If the current inspectable is an occ period, make the new
+     * inspection's inspector by default that period's manager. 
+     * Similarly, if the current inspectable is a cecase, 
+     * then make the new inspection's inspector that case's manager;
+     */
+    private void selectInspectorUsingCurrentInspectionHolder(){
+        if(currentInspectable != null){
+            if(currentInspectable instanceof OccPeriod){
+                selectedInspector = getSessionBean().getSessOccPeriod().getManager();
+            } else if(currentInspectable instanceof CECase){
+                selectedInspector = getSessionBean().getSessCECase().getManager();
+            }
+        }
+    }
+    
+    /**
      * Listener for user requests to view a space for inspection.
      * @param ois 
-     * @param oi the inspection
      */
-    public void onViewInspectedSpaceLinkClick(OccInspectedSpace ois, FieldInspection oi){
+    public void onViewInspectedSpaceLinkClick(OccInspectedSpace ois){
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         currentInspectedSpace = oic.configureElementDisplay(ois);
-        currentInspection = oi;
         System.out.println("OccInspectionsBB.onViewInspectedSpaceLinkClick | ois: " + ois.getInspectedSpaceID());
         
     }
@@ -262,9 +279,13 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     /**
      * Listener for user requests to start or end an 
      * occ inspection meta data editing session
+     * @param ev
      */
-    public void onToggleEditModeInspectionMetadata() {
+    public void onToggleEditModeInspectionMetadata(ActionEvent ev) {
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        System.out.println("FieldInspectionBB.onToggleEditModeInspectionMetadata : component to update" + inspectionListComponentForUpdate);
+        System.out.println("FieldInspectionBB.onToggleEditModeInspectionMetadata : current ID " + currentInspection.getInspectionID());
+        System.out.println("FieldInspectionBB.onToggleEditModeInspectionMetadata : mode " + editModeInspectionMetadata);
         // if we're hitting the button and we're not in edit mode, don't udpate
         if(editModeInspectionMetadata){
             try {
@@ -273,7 +294,8 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
 //                    currentInspection.setFollowUpToInspectionID(formFollowUpInspectionTo.getInspectionID());
 //                }
                 oic.updateOccInspection(currentInspection, getSessionBean().getSessUser());
-                 getFacesContext().addMessage(null,
+                System.out.println("FieldInspectionBB.onToggleEditModeInspectionMetadata : Updated inspection ID " + currentInspection.getInspectionID());
+                getFacesContext().addMessage(null,
                      new FacesMessage(FacesMessage.SEVERITY_INFO,
                              "Updated inspection ID: " + currentInspection.getInspectionID(), ""));
                 refreshCurrentInspectionAndRestoreSelectedSpace();
@@ -556,29 +578,25 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     private void refreshCurrentInspectionAndRestoreSelectedSpace() 
             throws IntegrationException, BObStatusException, BlobException{
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
-        currentInspection = oic.getOccInspection(currentInspection.getInspectionID());
-        if(currentInspectedSpace != null){
-            // go find my current space in the inspection and make it the selected one
-            for(OccInspectedSpace ois: currentInspection.getInspectedSpaceList()){
-                if(ois.getInspectedSpaceID() == currentInspectedSpace.getInspectedSpaceID()){
-                    currentInspectedSpace = oic.configureElementDisplay(ois);
-                    System.out.println("OccInspectionsBB.refreshCurrentInspectionAndRestoreSelectedSpace | oisid " + ois.getInspectedSpaceID());
-                    break;
+        if(currentInspection != null){
+            currentInspection = oic.getOccInspection(currentInspection.getInspectionID());
+            System.out.println("OccInspectionBB.refreshCurrentInspectionAndRestoreSelectedSpace | " + currentInspection.getInspectionID() );
+            if(currentInspectedSpace != null){
+                // go find my current space in the inspection and make it the selected one
+                for(OccInspectedSpace ois: currentInspection.getInspectedSpaceList()){
+                    if(ois.getInspectedSpaceID() == currentInspectedSpace.getInspectedSpaceID()){
+                        currentInspectedSpace = oic.configureElementDisplay(ois);
+                        System.out.println("OccInspectionsBB.refreshCurrentInspectionAndRestoreSelectedSpace | oisid " + ois.getInspectedSpaceID());
+                        break;
+                    }
                 }
             }
+        } else {
+            throw new BObStatusException("No current inspection selected; cannot refresh");
         }
     }
     
-    /**
-     * Tells session bean to reload itself
-     */
-    private void reloadSessionOccPeriod(){
-        // We also need to get our occ period updated with this inspection
-        // the contract says to pass null to refresh the current session period
-        getSessionBean().setSessOccPeriod(null);
-        
-    }
-    
+ 
     /**
      * Listener for user requests to edit a space (from the inspection dialog)
      * @param ev 
@@ -620,15 +638,14 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     
     /**
      * Listener for user requests to deactivate the selected inspection
-     * @return stays here
+     * @param ev
      */
-    public String onDeactivateInspectionButtonClick(){
+    public void onDeactivateInspectionButtonClick(ActionEvent ev){
         System.out.println("OccInspectionBB.onDeactivateInspectionButtonClick | deactivating inspection " + currentInspection.getInspectionID());
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
             oic.deactivateOccInspection(getSessionBean().getSessUser(), currentInspection, getSessionBean().getSessOccPeriod());
-            // trigger a reload
-            getSessionBean().setSessOccPeriod(null);
+            refreshInspectionListAndTriggerManagedListReload();
              getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Occ Inspection deactivated with ID " + currentInspection.getInspectionID(), ""));
@@ -638,9 +655,6 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                ex.getMessage(), ""));
         } 
-        
-        return "occPeriodWorkflow";
-        
     }
     
     /**
@@ -725,9 +739,12 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
         
     }
 
+        
+    // *****************************************
+    // ************ GETTERS AND SETTERS ********
+    // *****************************************
     
 
-    // getters & setters below you know the drill
 
     public List<OccChecklistTemplate> getChecklistTemplateList() {
         return checklistTemplateList;

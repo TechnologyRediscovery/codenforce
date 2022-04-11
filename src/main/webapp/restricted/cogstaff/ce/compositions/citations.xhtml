@@ -29,7 +29,6 @@
                                 icon="fa fa-gavel"
                                 update="citation-add-dialog
                                 citation-add-form"
-
                                 />
 
             <p:spacer height="5px" />
@@ -49,12 +48,9 @@
                         <h:outputText value="Date of Record" />
                     </f:facet>
                     <h:outputText value="#{citationBB.getPrettyDateNoTime(citation.dateOfRecord)}"/>
-
-
                 </p:column>
 
                 <p:column width="85%">
-
                     <f:facet name="header">
                         <h:outputText value="Dockets and Status Log" />
                     </f:facet>
@@ -62,6 +58,7 @@
                                value="#{citation.docketNos}"
                                var="dlog">
                         <h:outputText value="Docket No.: #{dlog.docketNumber}" />
+                        <p:spacer height="3px" />
                     </ui:repeat>
                     <hr />
                     <ui:repeat id="citation-status-uir"
@@ -70,9 +67,7 @@
                         <h:outputText value="#{citationBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
                         <p:spacer height="3px" />
                     </ui:repeat>
-
                 </p:column>
-
 
                 <p:column width="10%">
                     <f:facet name="header">
@@ -88,8 +83,6 @@
                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                             update="citation-profile-dialog"
                                             value="view/edit" />
-
-
                     </div>
                     <p:spacer height="2px"/>
                     <h:outputText value="(ID: #{citation.citationID})"/>
@@ -98,7 +91,6 @@
             </p:dataTable>
         </h:form>
     </p:panel>
-
 
     <p:dialog   id="citation-add-dialog"
                 height="600" width="900"
@@ -112,12 +104,9 @@
                 header="Add new citation"
                 rendered="true"
                 >
-
         <h:form id="citation-add-form">
 
-
             <p:spacer height="15px"/>
-
 
             <f:subview id="citviol-empty-subview"
                        rendered="#{citationBB.currentCitation.violationList.size() eq 0}">

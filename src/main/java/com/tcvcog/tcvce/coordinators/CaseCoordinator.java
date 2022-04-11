@@ -37,6 +37,7 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -1013,8 +1014,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public ReportConfigCECaseList report_getDefaultReportConfigCECaseList() {
         ReportConfigCECaseList listRpt = new ReportConfigCECaseList();
         listRpt.setIncludeListSummaryFigures(true);
-        listRpt.setIncludeCaseNames(true);
-        listRpt.setIncludeFullOwnerContactInfo(true);
+        listRpt.setIncludeCaseNames(false);
+        listRpt.setIncludeFullOwnerContactInfo(false);
         listRpt.setIncludeViolationList(true);
         listRpt.setIncludeEventSummaryByCase(false);
         return listRpt;
@@ -1090,7 +1091,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 sumOfAges += cse.getCaseAgeAsOf(rpt.getDate_end_val());
             }
             double avg = (double) sumOfAges / (double) rpt.getCaseListOpenAsOfDateEnd().size();
-            rpt.setAverageAgeOfCasesOpenAsOfReportEndDate(avg);
+            DecimalFormat df = new DecimalFormat("###.#");
+            rpt.setAverageAgeOfCasesOpenAsOfReportEndDate(df.format(avg));
         }
         
         QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_CASES, ua.getKeyCard());
@@ -1410,7 +1412,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             List<CECaseDataHeavy> nccl = rpt.assembleNonClosedCaseList();
             List<Citation> citl = new ArrayList<>();
             for(CECaseDataHeavy cse: nccl){
-                citl.addAll(cse.assembleCitationListNonDrafts());
+                citl.addAll(cse.getCitationList());
             }
             
             rpt.setCitationList(citl);
@@ -1420,12 +1422,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             // COUNT BY Citation status
             if(!citl.isEmpty()){
                 for(Citation cit: citl){
-                    String statTitle = cit.getMostRecentStatusLogEntry().getStatus().getStatusTitle();
-                    if(citStatusMap.containsKey(statTitle)){
-                        Integer statCount = citStatusMap.get(statTitle) + 1;
-                        citStatusMap.put(statTitle, statCount);
-                    } else {
-                        citStatusMap.put(statTitle, 1);
+                    if(cit != null && cit.getMostRecentStatusLogEntry() != null && cit.getMostRecentStatusLogEntry().getStatus() != null){
+                        String statTitle = cit.getMostRecentStatusLogEntry().getStatus().getStatusTitle();
+                        if(citStatusMap.containsKey(statTitle)){
+                            Integer statCount = citStatusMap.get(statTitle) + 1;
+                            citStatusMap.put(statTitle, statCount);
+                        } else {
+                            citStatusMap.put(statTitle, 1);
+                        }
                     }
                 }
             }

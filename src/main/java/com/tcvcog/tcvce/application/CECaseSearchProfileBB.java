@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.*;
 import com.tcvcog.tcvce.domain.*;
 import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
@@ -2098,6 +2099,28 @@ public class CECaseSearchProfileBB
         
     }
     
+    
+    /**
+     * Special getter that returns a field inspection list on a CECase
+     * and will check the session bean to see if there are any updates
+     * from the inspection specific code
+     * @return 
+     */
+    public List<FieldInspection> getManagedCECaseFieldInspectionList(){
+        List<FieldInspection> updatedFIList = getSessionBean().getSessFieldInspectionListForRefresh();
+        if(updatedFIList != null){
+             if(currentCase != null){
+                 currentCase.setInspectionList(updatedFIList);
+                 getSessionBean().setSessFieldInspectionListForRefresh(null);
+                 return currentCase.getInspectionList();
+             }
+        } else {
+            if(currentCase != null){
+                 return currentCase.getInspectionList();
+            } 
+        }
+        return new ArrayList<>();
+    }
     
     
     

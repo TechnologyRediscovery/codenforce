@@ -359,8 +359,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </h:form>
                                     </p:panel>
 
-
-
                                     <ui:include src="compositions/noticesOfViolation.xhtml" />
                                     <ui:include src="compositions/citations.xhtml" />
 
@@ -474,7 +472,72 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </p:panel>
                                     <ui:include src="compositions/codeViolations.xhtml" />
 
+                                    <ui:include src="/restricted/compositions/inspectionTools.xhtml"/>
 
+                                    <p:panel id="inspections-panel"
+                                             toggleable="true"
+                                             widgetVar="inspections-panel-var"
+                                             collapsed="false"
+                                             header="Field Inspections">
+                                        <h:form id="cecase-inspections-form">
+
+
+                                            <p:commandButton id="inspections-newbutton"
+                                                             value="New inspection"
+                                                             disabled="#{!empty ceCaseSearchProfileBB.currentCase.closingDate}"
+                                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                             icon="fa fa-plus"
+                                                             oncomplete="PF('inspections-selectchecklist-var').show()"
+                                                             actionListener="#{fieldInspectionBB.onCreateInspectionInitButtonChange(ceCaseSearchProfileBB.currentCase)}"
+                                                             update="inspections-selectchecklist-form">
+                                                <f:param name="initiating-inspection-list-component-id" value="cecase-inspections-form" />
+                                            </p:commandButton>
+
+                                            <p:spacer height="5px"/>
+
+                                            <p:dataTable    id="cecase-inspections-table"
+                                                            var="inspection"
+                                                            value="#{ceCaseSearchProfileBB.managedCECaseFieldInspectionList}"
+                                                            rowKey="#{inspection.inspectionID}"
+                                                            reflow="true"
+                                                            lazy="true">
+
+                                                <p:column headerText="Date"
+                                                          style="width:20%;">
+                                                    <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(inspection.effectiveDateOfRecord)}" />
+                                                </p:column>
+                                                <p:column headerText="Inspector"
+                                                          style="width:25%;">
+                                                    <h:outputText value="#{inspection.inspector.human.name}" />
+                                                </p:column>
+                                                <p:column headerText="Determination"
+                                                          style="width:30%;">
+                                                    <h:outputText value="#{empty inspection.determination ? '(in process)':inspection.determination.title}" />
+                                                </p:column>
+                                                <p:column headerText="Actions"
+                                                          style="width:25%;">
+                                                            <p:commandLink  id="inspection-details-cl"
+                                                                    value="view/edit"
+                                                                    actionListener="#{fieldInspectionBB.onViewEditInspectionLinkClick(ceCaseSearchProfileBB.currentCase, inspection)}"
+                                                                    ajax="true"
+                                                                    style="color:blue;"
+                                                                    oncomplete="PF('inspection-profile-dialog-var').show()"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                    update="inspectiontools-growl-form
+                                                                    inspection-profile-dialog
+                                                                    inspection-profile-form
+                                                                    inspection-advancedtools-form
+                                                                    inspection-actions-form
+                                                                    inspection-inspectedspaces-form"
+                                                                    >
+                                                        <f:param name="initiating-inspection-list-component-id" value="cecase-inspections-form" />
+                                                    </p:commandLink>
+                                                    <p:spacer height="3px" />
+                                                    <h:outputText value="(ID:#{inspection.inspectionID})" />
+                                                </p:column>
+                                            </p:dataTable>
+                                        </h:form>
+                                    </p:panel>
 
                                     <ui:include src="../compositions/eventsPanel.xhtml"/>
 
@@ -645,7 +708,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     </p:panel>
 
                                     <ui:include src="../compositions/feesPanel.xhtml"/>
-
                                     <ui:include src="../compositions/paymentsPanel.xhtml"/>
 
                                     <p:panel id="caseprofile-todos-panel"

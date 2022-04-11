@@ -10,7 +10,7 @@ public class DateTimeUtil {
     private final int DAYS_IN_YEAR = 365;
 
     /**
-     * Converts a date from LocalDateTime to a string using DateTimeFormatter, returns null if
+     * Converts a date from LocalDateTime to a string using DateTimeFormatter, returns empty string if
      * input is null.
      *
      * @param input
@@ -25,6 +25,11 @@ public class DateTimeUtil {
         return formattedDateTime;
     }
     
+    /**
+     * Converts a local date to a no time string. 
+     * @param input if null, empty string returned
+     * @return String representing a date only
+     */
     public static String getPrettyLocalDateNoTime(LocalDate input){
         String formattedDateTime = "";
         if(input != null) {

@@ -287,7 +287,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             
             inspectedEle.setMigrateToCaseOnFail(rs.getBoolean("migratetocecaseonfail"));
             
-                inspectedEle.setBlobList(bc.getBlobLightList(inspectedEle));
+            inspectedEle.setBlobList(bc.getBlobLightList(inspectedEle));
         } catch(BObStatusException | BlobException ex){
             System.out.println(ex);
         }
@@ -1224,8 +1224,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                     stmt.setNull(28, java.sql.Types.NULL);
                     break;
                 case CODE_ENFORCEMENT:
-                    stmt.setNull(28, occInsp.getCecaseID());
-                    stmt.setInt(1, java.sql.Types.NULL);
+                    stmt.setInt(28, occInsp.getCecaseID());
+                    stmt.setNull(1, java.sql.Types.NULL);
                     break;
             }
             stmt.setInt(2, occInsp.getInspector().getUserID());
