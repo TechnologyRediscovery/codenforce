@@ -1099,7 +1099,7 @@ public class CECaseSearchProfileBB
        
         CaseCoordinator cc = getCaseCoordinator();
         CodeViolation cv = null;
-        cv = cc.violation_injectOrdinance(currentCase, cc.violation_getCodeViolationSkeleton(currentCase), ece, null);
+        cv = cc.violation_injectOrdinance(cc.violation_getCodeViolationSkeleton(currentCase), ece);
        
         return cv;
     }

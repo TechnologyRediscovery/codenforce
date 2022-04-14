@@ -17,12 +17,15 @@
 package com.tcvcog.tcvce.util.viewoptions;
 
 /**
- *
+ * Represents a set of view options for looking at elements in an
+ * occ inspected space
+ * 
  * @author sylvia
  */
 public enum ViewOptionsOccChecklistItemsEnum {
     FAILED_ITEMS_ONLY("Failed items only"),
     UNISPECTED_ITEMS_ONLY("Uninspected items only"),
+    PASSED_ITEMS("Items marked with compliance"),
     ALL_ITEMS("All items");
     
      private final String label;

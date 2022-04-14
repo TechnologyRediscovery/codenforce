@@ -3,6 +3,7 @@ package com.tcvcog.tcvce.occupancy.application;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.SessionBean;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
@@ -13,6 +14,7 @@ import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.IFace_inspectable;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.User;
@@ -65,6 +67,9 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
 
     private boolean editModeInspectionMetadata;
     private FieldInspection formFollowUpInspectionTo;
+    
+    private boolean migrateFailedItemsOnFinalization;
+    private List<CodeViolation> violationListToMigrate;
     
     private int occPeriodIDFortransferFormField;
     
@@ -693,6 +698,14 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
         
     }
     
+    public void onToggleMigrateFailedItemsToCase(){
+        CaseCoordinator cc = getCaseCoordinator();
+        if(migrateFailedItemsOnFinalization){
+            
+        }
+    }
+    
+    
     
     /**
      * Listener for user requests to start the report building process
@@ -988,5 +1001,33 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      */
     public void setFormFollowUpInspectionTo(FieldInspection formFollowUpInspectionTo) {
         this.formFollowUpInspectionTo = formFollowUpInspectionTo;
+    }
+
+    /**
+     * @return the migrateFailedItemsOnFinalization
+     */
+    public boolean isMigrateFailedItemsOnFinalization() {
+        return migrateFailedItemsOnFinalization;
+    }
+
+    /**
+     * @param migrateFailedItemsOnFinalization the migrateFailedItemsOnFinalization to set
+     */
+    public void setMigrateFailedItemsOnFinalization(boolean migrateFailedItemsOnFinalization) {
+        this.migrateFailedItemsOnFinalization = migrateFailedItemsOnFinalization;
+    }
+
+    /**
+     * @return the violationListToMigrate
+     */
+    public List<CodeViolation> getViolationListToMigrate() {
+        return violationListToMigrate;
+    }
+
+    /**
+     * @param violationListToMigrate the violationListToMigrate to set
+     */
+    public void setViolationListToMigrate(List<CodeViolation> violationListToMigrate) {
+        this.violationListToMigrate = violationListToMigrate;
     }
 }

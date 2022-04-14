@@ -8,12 +8,6 @@
         <p:growl id="inspectiontools-growl" />
     </h:form>
 
-
-
-
-    <!-- Dialogs -->
-    <!-- Master inspection profile -->
-
     <p:dialog id="inspection-profile-dialog"
               widgetVar="inspection-profile-dialog-var"
               width="1200"
@@ -209,11 +203,11 @@
                                               value="Warning: changing templates after an inspection has begun is a recipe for disaster!"/>
                             </div>
 
-                            <div class="p-col-6">
+                            <div class="p-col-4">
                                 Start time
                             </div>
 
-                            <div class="p-col-6">
+                            <div class="p-col-8">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.timeStart)}"/>
 
@@ -232,11 +226,11 @@
                                                 required="false" />
                             </div>
 
-                            <div class="p-col-6">
+                            <div class="p-col-4">
                                 End time
                             </div>
 
-                            <div class="p-col-6">
+                            <div class="p-col-8">
                                 <h:outputText   rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                                 value="#{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.timeEnd)}"/>
                                 <p:datePicker 	 id="inspection-time-end-datepicker"
@@ -253,6 +247,29 @@
                                                 timeInput="true" 
                                                 required="false" />
                             </div>
+
+                            <div class="p-col-4">
+                                Determination
+                                <p:spacer height="3px" />
+                                <p:commandLink id="determination-init-button"
+                                               ajax="true"
+                                               style="color:blue;"
+                                               oncomplete="PF('inspection-finalize-dialog-var').show()"
+                                               disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                               update="inspection-finalize-form
+                                               inspection-finalize-dialog"
+                                               value="#{!empty fieldInspectionBB.currentInspection.determination ? 'edit determination':'finalize inspection'}">
+                                    <f:actionListener binding="#{fieldInspectionBB.onViewInspectedSpaceLinkClick(inspectedSpace)}"/>
+                                </p:commandLink>
+                            </div>
+
+                            <div class="p-col-8">
+                                <h:outputText value="#{!empty fieldInspectionBB.currentInspection.determination 
+                                                       ? fieldInspectionBB.currentInspection.determination.title 
+                                                       : ''}" />
+                            </div>
+
 
                             <p:divider/>
 
@@ -389,8 +406,6 @@
                     </h:form>  
                 </p:panel>
             </div>
-
-            <!-- Space level info -->
             <div class="p-col-6">
 
                 <p:panel id="inspection-tools-panel"
@@ -404,46 +419,46 @@
                             <div class="p-col-4">
 
                                 <p:commandButton  id="inspection-uploadphotos-cl"
-                                                value="Add Photos"
-                                                actionListener="#{fieldInspectionBB.onUploadImagesToInspectionInitButtonClick(ins)}"
-                                                ajax="true"
-                                                icon="fa fa-upload"
-                                                oncomplete="PF('blob-upload-dialog-var').show()"
-                                                rendered="true"
-                                                disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
-                                                update="@form:@parent:@parent:blob-upload-dialog"
-                                                />
-                                
+                                                  value="Add Photos"
+                                                  actionListener="#{fieldInspectionBB.onUploadImagesToInspectionInitButtonClick(ins)}"
+                                                  ajax="true"
+                                                  icon="fa fa-upload"
+                                                  oncomplete="PF('blob-upload-dialog-var').show()"
+                                                  rendered="true"
+                                                  disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                  update="@form:@parent:@parent:blob-upload-dialog"
+                                                  />
+
                             </div>
                             <div class="p-col-4">
 
                                 <p:commandButton  id="inspection-viewphotos-cl"
-                                                value="View photo pool"
-                                                actionListener="#{fieldInspectionBB.onViewPhotoPoolLinkClick(ins)}" 
-                                                ajax="true"
-                                                icon="fa fa-file-image-o"
-                                                oncomplete="PF('blobs-gallery-dialog-var').show()"
-                                                disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
-                                                rendered="true"
-                                                update="@form:@parent:@parent:blobs-gallery-dialog
-                                                "
-                                                />
-                                
+                                                  value="View photo pool"
+                                                  actionListener="#{fieldInspectionBB.onViewPhotoPoolLinkClick(ins)}" 
+                                                  ajax="true"
+                                                  icon="fa fa-file-image-o"
+                                                  oncomplete="PF('blobs-gallery-dialog-var').show()"
+                                                  disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                  rendered="true"
+                                                  update="@form:@parent:@parent:blobs-gallery-dialog
+                                                  "
+                                                  />
+
                             </div>
                             <div class="p-col-4">
 
                                 <p:commandButton  id="inspection-generatereport-cl"
-                                                value="Inspection report"
-                                                actionListener="#{fieldInspectionBB.onFieldInspectionReportInitLinkClick(ins)}"
-                                                ajax="true"
-                                                disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
-                                                rendered="true"
-                                                icon="fa fa-print"
-                                                oncomplete="PF('inspection-reportconfig-dialog-var').show()"
-                                                update="inspection-reportconfig-dialog
-                                                inspection-reportconfig-form"
-                                                />
-                                
+                                                  value="Inspection report"
+                                                  actionListener="#{fieldInspectionBB.onFieldInspectionReportInitLinkClick(ins)}"
+                                                  ajax="true"
+                                                  disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                  rendered="true"
+                                                  icon="fa fa-print"
+                                                  oncomplete="PF('inspection-reportconfig-dialog-var').show()"
+                                                  update="inspection-reportconfig-dialog
+                                                  inspection-reportconfig-form"
+                                                  />
+
                             </div>
                             <div class="p-col-4">
                                 <p:commandButton    id="insp-followup-button"
@@ -456,7 +471,7 @@
                                                     icon="fa fa-repeat"
                                                     update="inspection-followup-form"
                                                     />
-                                
+
                             </div>
                             <div class="p-col-4">
                                 <p:commandButton    id="insp-extractviolations-button"
@@ -469,13 +484,10 @@
                                                     icon="fa fa-gavel"
                                                     update="inspection-followup-form"
                                                     />
-                                
+
                             </div>
-                            
+
                         </div>
-
-
-
                     </h:form>
                 </p:panel>
 
@@ -504,7 +516,7 @@
                                      value="#{fieldInspectionBB.currentInspection.inspectedSpaceList}"
                                      rowKey="#{inspectedSpace.inspectedSpaceID}"
                                      reflow="true">
-                            
+
                             <p:column style="width:2rem">
                                 <p:rowToggler/>
                             </p:column>
@@ -591,8 +603,6 @@
 
                                     </ui:repeat>
                                 </ul>
-
-                             
                             </p:rowExpansion>
                         </p:dataTable>
                     </h:form>
@@ -1199,7 +1209,6 @@
                               rendered="#{!empty fieldInspectionBB.currentInspectedSpaceElement.ordSubSubSecNum}"/>
             </h3> 
 
-
             <h:outputText id="codeelement-fulltext-ot"
                           value="#{fieldInspectionBB.currentInspectedSpaceElement.ordTechnicalText}" 
                           escape="false"/>
@@ -1276,48 +1285,83 @@
               resizable="true"
               responsive="true">
 
-        <h:form id="inspection-finalize-form">
 
-            <p:spacer height="5px" />
+        <div class="p-grid">
+           
+            <div class="p-col-6">
+                <h:form id="inspection-finalize-form">
+                    <p:panel id="inspection-determination-panel"
+                                        toggleable="true"
+                                        collapsed="false"
+                                        header="Determination">
 
-            <p:selectOneMenu rendered="true"
-                             value="#{fieldInspectionBB.selectedDetermination}"
-                             converter="occInspectionDeterminationConverter">
-                <f:selectItem noSelectionOption="true"
-                              itemDisabled="true"
-                              itemLabel="choose a determination" />
-                <f:selectItems value="#{fieldInspectionBB.determinationList}" 
-                               var="det"
-                               itemLabel="#{det.title}"
-                               itemValue="#{det}"/>
-                <p:ajax update="inspection-finalize-commit-cb" />
-            </p:selectOneMenu>
+                        <p:selectOneMenu rendered="true"
+                                         value="#{fieldInspectionBB.selectedDetermination}"
+                                         converter="occInspectionDeterminationConverter">
+                            <f:selectItem noSelectionOption="true"
+                                          itemDisabled="true"
+                                          itemLabel="choose a determination" />
+                            <f:selectItems value="#{fieldInspectionBB.determinationList}" 
+                                           var="det"
+                                           itemLabel="#{det.title}"
+                                           itemValue="#{det}"/>
+                            <p:ajax update="inspection-finalize-commit-cb" />
+                        </p:selectOneMenu>
 
-            <p:spacer height="5px" />
+                        <p:spacer height="5px" />
 
-            <p:commandButton   id="inspection-finalize-commit-cb"
-                               value="Finalzie and lock inspection ID:#{ins.inspectionID} with selected determination"
-                               rendered="#{(systemServicesBB.bbSessionUser.userID eq ins.inspector.userID) or systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
-                               icon="fa fa-check-square "
-                               disabled="false"
-                               actionListener="#{fieldInspectionBB.onCertifyInspectionCommitButtonChange}"
-                               update="@form:@parent:inspection-profile-form
-                               @form:@parent:inspectiontools-growl-form
-                               #{fieldInspectionBB.inspectionListComponentForUpdate}" 
-                               oncomplete="PF('inspection-finalize-dialog-var').hide();"
-                               style="margin-right: 5px;"/>
+                        <p:commandButton   id="inspection-finalize-commit-cb"
+                                           value="Finalzie and lock inspection ID:#{ins.inspectionID} with selected determination"
+                                           rendered="#{(systemServicesBB.bbSessionUser.userID eq ins.inspector.userID) or systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                           icon="fa fa-check-square "
+                                           disabled="false"
+                                           actionListener="#{fieldInspectionBB.onCertifyInspectionCommitButtonChange}"
+                                           update="@form:@parent:inspection-profile-form
+                                           @form:@parent:inspectiontools-growl-form
+                                           #{fieldInspectionBB.inspectionListComponentForUpdate}" 
+                                           oncomplete="PF('inspection-finalize-dialog-var').hide();"
+                                           style="margin-right: 5px;"/>
 
-            <p:commandButton value="Cancel"
-                             icon="pi pi-times"
-                             process="@none"
-                             immediate="true"
-                             class="ui-button-outlined p-mr-1"
-                             oncomplete="PF('inspection-finalize-dialog-var').hide();"/>
+                    </p:panel>
+                </h:form>
+            </div>
+            
+            <div class="p-col-6">
+                <p:panel id="inspections-inspectiondetails-generalpanel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Inspection results">
+                    
+                    <h:form id="inspection-finalize-migrate-form">
+                        
+                        <p:inputSwitch id="migrate-violations-is" 
+                                       value="#{fieldInspectionBB.migrateFailedItemsOnFinalization}"
+                                       onLabel="Migrate failed items to code enforcement case"
+                                       offLabel="Do not migrate failed items">
+                            <p:ajax listener="#{fieldInspectionBB.onToggleMigrateFailedItemsToCase}" />
+                        </p:inputSwitch>
+                    
+                        <h3>Violations marked for migration to CE Case</h3>
 
-        </h:form>
 
+                        <ui:repeat id="spaceele-uir-fail"
+                                   value="#{fieldInspectionBB.currentInspection.extractFailedItemsForCECaseMigration}"
+                                   var="ele_fail_tomigrate">
+                            <li>
+                                <h:outputText value="#{ele_fail_tomigrate.headerString}" 
+                                              escape="false"/>
+                                <p:spacer height="2px" />
+                                <h:outputText value="findings: #{ele_fail_tomigrate.inspectionNotes}" 
+                                              escape="true"
+                                              rendered="#{!empty ele_fail_tomigrate.inspectionNotes}"/>
+                            </li>
+                        </ui:repeat>
+                    </h:form>
+
+                </p:panel>
+            </div>
+        </div>
     </p:dialog>
-
 
 
     <p:dialog id="inspection-followup-dialog"
@@ -1341,8 +1385,8 @@
                 </div>
                 <div class="p-col-8">
                     <h:outputText value="Inspection ID: #{fieldInspectionBB.formFollowUpInspectionTo.inspectionID}" />
-                    <h:outputText value="Start Time: #{!empty fieldInspectionBB.formFollowUpInspection.timeStart 
-                                                       ? fieldInspectionBB.getPrettyDate(fieldInspectionBB.formFollowupInspection.timeStart) 
+                    <h:outputText value="Start Time: #{!empty fieldInspectionBB.formFollowUpInspectionTo.timeStart 
+                                                       ? fieldInspectionBB.getPrettyDate(fieldInspectionBB.formFollowupInspectionTo.timeStart) 
                                                        : ''}" />
 
                 </div>
@@ -1350,16 +1394,9 @@
                     <h:outputText value="Reinspection Options:" />
                 </div>
                 <div class="p-col-8">
-
-
                 </div>
             </div>
-
-
-
         </h:form>
-
-
     </p:dialog>
 
     <p:dialog id="inspection-reportconfig-dialog"

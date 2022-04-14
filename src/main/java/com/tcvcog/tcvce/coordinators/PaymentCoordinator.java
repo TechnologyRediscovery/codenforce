@@ -109,6 +109,9 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
         EnforcableCodeElement codeElement = violation.getCodeViolated();
 
+        if(codeElement.getFeeList() == null){
+            return;
+        }
         ArrayList<Fee> feeList = (ArrayList<Fee>) codeElement.getFeeList();
 
         for (Fee fee : feeList) {

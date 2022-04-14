@@ -147,8 +147,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     
     /**
      * Logic container for updating space element data on all elements in an inspection
-     * EXCEPT for inspection status which must be routed through the appropriate other methods on
-     * this Coordinator
+     
      * @param osi
      * @throws IntegrationException 
      */
@@ -159,6 +158,15 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                 oii.updateInspectedSpaceElement(oise);
             }
         }
+    }
+    
+    public void inspectionActino_updateSpaceElement(OccInspectedSpaceElement oise, FieldInspection fin) 
+            throws IntegrationException, BObStatusException{
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        if(oise == null || fin == null){
+            throw new BObStatusException("Cannot update an inspectd space element with null element or inspection ");
+        }
+        oii.updateInspectedSpaceElement(oise);
     }
 
     /**
@@ -789,6 +797,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 
         return oise;
     }
+    
+   
     
     /** 
      * ************************************************************

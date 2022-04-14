@@ -167,6 +167,7 @@ public  class       CodeViolation
     }
 
     /**
+     * Calls getVioltedEnfElement on my inside
      * @return the codeViolated
      */
     public EnforcableCodeElement getCodeViolated() {

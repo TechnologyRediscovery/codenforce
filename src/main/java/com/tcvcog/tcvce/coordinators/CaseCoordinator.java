@@ -25,6 +25,7 @@ import com.tcvcog.tcvce.application.LegendItem;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.*;
 import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.reports.ReportCECaseListCatEnum;
 import com.tcvcog.tcvce.entities.reports.ReportCECaseListStreetCECaseContainer;
 import com.tcvcog.tcvce.entities.search.*;
@@ -3136,29 +3137,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         PaymentCoordinator pc = getPaymentCoordinator();
         int insertedViolationID;
 
-//        EventCategory eventCat = ec.initEventCategory(
-//                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
-//                        .getString("complianceTimeframeExpiry")));
-//        EventCategory eventCat = ec.initEventCategory(113);
-//        tfEvent = ec.initEvent(cse, eventCat);
-//        tfEvent.setTimeStart(cv.getStipulatedComplianceDate());
-//        tfEvent.setUserCreator(cse.getCaseManager());
-//
-//        sb.append(getResourceBundle(Constants.MESSAGE_TEXT)
-//                .getString("complianceTimeframeEndEventDesc"));
-//        sb.append("Case: ");
-//        sb.append(cse.getCaseName());
-//        sb.append(" at ");
-//        sb.append(cc.cecase_assembleCECasePropertyUnitHeavy(cse).getProperty().getAddressString());
-//        sb.append("(");
-//        sb.append(cc.cecase_assembleCECasePropertyUnitHeavy(cse).getProperty().getMuni().getMuniName());
-//        sb.append(")");
-//        sb.append("; Violation: ");
-//        sb.append(cv.getViolatedEnfElement().getHeaderString());
-//        tfEvent.setDescription(sb.toString());
         violation_verifyCodeViolationAttributes(cse, cv);
-        cv.setLastUpdatedUser(ua);
-        cv.setCreatedBy(ua);
+        if(cv.getLastUpdatedUser() == null){
+            cv.setLastUpdatedUser(ua);
+        }
+        if(cv.getCreatedBy() == null){
+            cv.setCreatedBy(ua);
+        }
         insertedViolationID = ci.insertCodeViolation(cv);
         pc.insertAutoAssignedFees(cse, cv);
         return insertedViolationID;
@@ -3274,6 +3259,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if(cse == null || cv == null){
             throw new ViolationException("Cannot verify code violation attributes with null case or violation");
         }
+        if(cv.getCeCaseID() != cse.getCaseID()){
+            throw new ViolationException("Violation is not mapped to parent case ID");
+        }
         
         if (cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed) {
             throw new ViolationException("Cannot update code violations on closed cases!");
@@ -3284,40 +3272,276 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
+    
+    
+    /**
+     * Asks the given field inspection for its failed ordinances that are slated for
+     * migration and injects them into CodeViolations for the user to tweak. When the
+     * user is done, they should all get injected into the CodeViolationMigratingSettings 
+     * object and sent to the method in this class which will conduct the actual migration
+     * 
+     * @param fin from which the failed items are to be extracted
+     * @return a list, perhaps with the CodeViolations that correspond to each of the failed items
+     * @throws BObStatusException with null inputs or insufficient inputs
+     * 
+     */
+    public List<CodeViolation> violation_buildViolationListFromFailedInspectionItems(FieldInspection fin) 
+            throws BObStatusException{
+        
+        if(fin == null){
+            throw new BObStatusException("Cannot build violation list from null field inspection");
+        }
+        
+        List<CodeViolation> cvl = new ArrayList<>();
+        List<EnforcableCodeElement> ecel = fin.extractFailedItemsForCECaseMigration();
+        if(ecel != null && !ecel.isEmpty()){
+            for(EnforcableCodeElement ece: ecel){
+                cvl.add(violation_injectOrdinance(null, ece)); // method will make new violation
+            }
+        }
+        return cvl;
+        
+    }
+    
+    
+    /**
+     * Generator method for violation migration settings, with sensible 
+     * defaults applied before returning
+     * @return 
+     */
+    public CodeViolationMigrationSettings violation_getCodeViolationMigrationSettingsSkeleton(){
+        CodeViolationMigrationSettings cvms = new CodeViolationMigrationSettings();
+        cvms.setViolationListReadyForInsertion(new ArrayList<>());
+        cvms.setLinkInspectedElementPhotoDocsToViolation(true);
+        cvms.setUseInspectedElementFindingsAsViolationFindings(true);
+        return cvms;
+    }
+    
+    
+    /**
+     * The primary entry way for migrating code violations from all sorts of places
+     * to either a new or existing code enforcement case
+     * 
+     * @param cvms containing the migration pathway and all the necessary trimmings
+     * @return a list, perhaps with one or more IDs of the new Code Violations
+     * written to the DB
+     * @throws com.tcvcog.tcvce.domain.ViolationException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public List<Integer> violation_migrateViolations(CodeViolationMigrationSettings cvms) 
+            throws ViolationException, IntegrationException, BObStatusException{
+        if(cvms == null 
+                || cvms.getPathway() == null 
+                || cvms.getViolationListToMigrate() == null 
+                || cvms.getViolationListToMigrate().isEmpty()) {
+            throw new ViolationException("Cannot migrate code violations with null settings or null pathway in that settings or violationlist or empty list");
+        }
+        List<Integer> freshViolationList = new ArrayList<>();
+        
+        try{
+            // setup basic configuration stuff
+            violation_migration_auditMigrationSettings(cvms);
+            violation_migration_configureTargetCase(cvms);
+            violation_migration_assembleFreshViolations(cvms);
+            
+            // then write the new violations
+            for(CodeViolation cv : cvms.getViolationListReadyForInsertion()){
+                freshViolationList.add(violation_attachViolationToCase(cv, cvms.getCeCaseParent(), cvms.getUserEnactingMigration()));
+            }
+            
+        } catch (EventException | SearchException ex){
+            System.out.println(ex);
+            throw new ViolationException(ex.getMessage());
+        }
+        return freshViolationList;
+    }
+    
+    
+    /**
+     * Internal logic checker for code violation migration settings 
+     * @param cvms
+     * @throws BObStatusException 
+     */
+    private void violation_migration_auditMigrationSettings(CodeViolationMigrationSettings cvms) throws ViolationException{
+        if(cvms == null){
+            throw new ViolationException("Cannot audit null migration settings");
+        }
+        if(cvms.getUserEnactingMigration() == null){
+            throw new ViolationException("Cannot migrate with null user authorized doing migration");
+        }
+    }
+    
+    /**
+     * Internal logic organ for examining the migration settings object and 
+     * building a new case if needed
+     * 
+     * @param cvms not null
+     */
+    private void violation_migration_configureTargetCase(CodeViolationMigrationSettings cvms) 
+            throws ViolationException, IntegrationException, BObStatusException, SearchException{
+        if(cvms == null){
+            throw new ViolationException("Cannot configure case with null cvms");
+        }
+        
+        if(cvms.getPathway().isUseExistingCase()){
+            if(cvms.getCeCaseParent() == null){
+                throw new ViolationException("Cannot migrate to an existing case with null case on settings");
+            } 
+        // We need a new case
+        } else {
+            if(cvms.getProp() == null){
+                throw new ViolationException("Cannot make new case for violations with null property");
+            }
+            CECase targetCase = cecase_initCECase(cvms.getProp(), cvms.getUserEnactingMigration());
+            if(cvms.getNewCaseDateOfRecord() != null){
+                targetCase.setOriginationDate(cvms.getNewCaseDateOfRecord());
+            } else {
+                targetCase.setOriginationDate(LocalDateTime.now());
+            }
+            
+            cvms.setCeCaseParent(cecase_assembleCECaseDataHeavy(targetCase, cvms.getUserEnactingMigration()));
+        }
+    }
+    
+    /**
+     * Internal organ for actually setting up each new violation from the 
+     * list of violations to migrate
+     * 
+     * @param cvms Caller is responsible for having audited this
+     */
+    private void violation_migration_assembleFreshViolations(CodeViolationMigrationSettings cvms) throws ViolationException{
+        if(cvms.getViolationListReadyForInsertion() == null){
+            cvms.setViolationListReadyForInsertion(new ArrayList<>());
+        }
+        for(CodeViolation cv: cvms.getViolationListToMigrate()){
+            
+            CodeViolation targetViol = new CodeViolation();
+            
+            targetViol.setCeCaseID(cvms.getCeCaseParent().getCaseID());
+            targetViol.setViolatedEnfElement(cv.getViolatedEnfElement());
+            
+            if(cvms.getViolationDateOfRecord() != null){
+                targetViol.setDateOfRecord(cvms.getViolationDateOfRecord());
+            } else {
+                targetViol.setDateOfRecord(LocalDateTime.now());
+            }
+            
+            targetViol.setStipulatedComplianceDate(violation_migration_determineTargetViolStipCompDate(cv, cvms));
+            
+            targetViol.setDescription(cv.getDescription());
+            targetViol.setPenalty(cv.getPenalty());
+            
+            if(cvms.isLinkInspectedElementPhotoDocsToViolation()){
+                targetViol.setBlobList(cv.getBlobList());
+            }
+            targetViol.setSeverityIntensity(cv.getSeverityIntensity());
+            targetViol.setActive(true);
+            targetViol.setCreatedBy(cvms.getUserEnactingMigration());
+            targetViol.setLastUpdatedUser(cvms.getUserEnactingMigration());
+            
+            targetViol.setNotes(violation_migration_buildTargetViolationNotes(cv, cvms));
+            
+            // finally, add our new violation to the list for insertion
+            cvms.getViolationListReadyForInsertion().add(targetViol);
+            
+        }
+    }
+    
+    
+    
+    /**
+     * Internal logic organ for determining the target violation stip comp date
+     * @param cv
+     * @param cvms
+     * @return 
+     */
+    private LocalDateTime violation_migration_determineTargetViolStipCompDate(CodeViolation cv, CodeViolationMigrationSettings cvms) throws ViolationException{
+        if(cv == null || cvms == null){
+            throw new ViolationException("Cannot determine new stip date with null cv or settings object");
+        }    
+        LocalDateTime targetVStipDate;
+            if(cv.getStipulatedComplianceDate() != null){
+                targetVStipDate = cv.getStipulatedComplianceDate();
+            } else {
+                if(cvms.getUnifiedStipComplianceDate() != null){
+                    targetVStipDate = cvms.getUnifiedStipComplianceDate();
+                } else {
+                    if(cv.getViolatedEnfElement().getNormDaysToComply() != 0){
+                        targetVStipDate = LocalDateTime.now().plusDays(cv.getViolatedEnfElement().getNormDaysToComply());
+                    } else {
+                        targetVStipDate = LocalDateTime.now().plusDays(FALLBACK_DAYSTOCOMPLY);
+                    }
+                }
+            }
+        return targetVStipDate;
+    }
+    
+    
+    private static final String VIOLMIG_INJECTION_MARKER_NOW = "[NOW]";
+    private static final String VIOLMIG_INJECTION_MARKER_FIELDINSPECTIONID = "[FINID]";
+    private static final String VIOLMIG_INJECTION_MARKER_SOURCECECASEID = "[CASEID]";
+    private static final String VIOLMIG_INJECTION_MARKER_SOURCEOCCPERIOD = "[PERIODID]";
+    
+    /**
+     * Internal organ for building a nice, descriptive note on the violations
+     * being migrated so we know where they came from
+     * 
+     * @param cv yet to be inserted that needs the note
+     * @param cvms with all the goodies
+     */
+    private String violation_migration_buildTargetViolationNotes(CodeViolation cv, CodeViolationMigrationSettings cvms) throws ViolationException{
+        if(cv == null || cvms == null){
+            throw new ViolationException("Cannot determine new stip date with null cv or settings object");
+        }    
+        
+        String vnote = cvms.getPathway().getViolationNoteInjectableString();
+        
+        String now = LocalDateTime.now().toString();
+        vnote = vnote.replace(VIOLMIG_INJECTION_MARKER_NOW, now);    
+        
+        if(cvms.getSourceInspection() != null){
+            String insID = String.valueOf(cvms.getSourceInspection().getInspectionID());
+            if(insID != null){
+                vnote = vnote.replace(VIOLMIG_INJECTION_MARKER_FIELDINSPECTIONID, insID);    
+            }
+        }
+        if(cvms.getSourceCase() != null){
+            String scaseID = String.valueOf(cvms.getSourceCase().getCaseID());
+            if(scaseID != null){
+                vnote = vnote.replace(VIOLMIG_INJECTION_MARKER_SOURCECECASEID, scaseID);    
+            }
+        }
+        if(cvms.getSourceOccPeriod()!= null){
+            String speriodID = String.valueOf(cvms.getSourceOccPeriod().getPeriodID());
+            if(speriodID != null){
+                vnote = vnote.replace(VIOLMIG_INJECTION_MARKER_SOURCEOCCPERIOD, speriodID);    
+            }
+        }
+        
+        return vnote;
+    }
+    
+  
+    
     /**
      * Logic holder for injecting a code element into a code violation and setting sensible default values
      * based on preferences by muni 
-     * @param cse
-     * @param cv
+     * @param cv can be null
      * @param ece to be injected
-     * @param mdh if not null, will be asked for its auto-config settings (e.g. don't set compliance dates on weekends).
-     * @return
+     * @return the CodeViolation with injected ordinance
      * @throws BObStatusException 
      */
-    public CodeViolation    violation_injectOrdinance(  CECase cse, 
-                                                        CodeViolation cv, 
-                                                        EnforcableCodeElement ece, 
-                                                        MunicipalityDataHeavy mdh ) 
+    public CodeViolation    violation_injectOrdinance(  CodeViolation cv, 
+                                                        EnforcableCodeElement ece ) 
                             throws BObStatusException{
 
-        if(cse != null && cv != null && ece != null){
-            List<CodeViolation> vlst = new ArrayList<>();
-            vlst.addAll(cse.getViolationList());
+        if(ece != null){
             
-            // AS OF Spring Break '22, officers want to add more than 1 instance of any given
-            // ordinanec to a CE case, so turn off this check, perhaps look up muni profile
-            // for settings at a later time?
-            
-            // ALLOW DUPLICATE INSTANCES OF VIOLATING A SINGLE ORDINANCE  (ECE)
-            
-//            if(!vlst.isEmpty()){
-                // check to make sure that particular ordinance isn't already on the case
-//                for (CodeViolation tempCv : vlst) {
-//                    if(tempCv.getViolatedEnfElement().getCodeSetElementID() == ece.getCodeSetElementID()){
-//                        throw new BObStatusException("Duplicate Violation of ordiance with ID " + ece.getCodeSetElementID() + "Select a different ordinance, please!");
-//                    }
-//                }
-//            }
+            if(cv == null){
+                cv = new CodeViolation();
+            }
+           
             int daysInFuture;
             if(ece.getNormDaysToComply() != 0){
                 daysInFuture = ece.getNormDaysToComply();
@@ -3337,6 +3561,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         return cv;
     }
+    
+    
 
     /**
      * Access point for updating a CodeViolation record

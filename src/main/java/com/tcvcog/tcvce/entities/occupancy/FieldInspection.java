@@ -16,10 +16,12 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.BlobLinkEnum;
 import com.tcvcog.tcvce.entities.DomainEnum;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.User;
@@ -115,6 +117,10 @@ public  class       FieldInspection
     
     private List<OccInspectionRequirementAssigned> requirementList;
 
+    /**
+     * No Arg constructor for FieldInspections:
+     * I setup lists
+     */
     public FieldInspection() {
 
         inspectedSpaceList = new ArrayList<>();
@@ -122,11 +128,27 @@ public  class       FieldInspection
         viewSetting = ViewOptionsOccChecklistItemsEnum.ALL_ITEMS;
     }
     
-    public void addSpaceToInspectedSpaces(OccInspectedSpace spc){
-        inspectedSpaceList.add(spc);
-    }
     
-    public void configureVisibleSpaceElementList() {
+    /** 
+     * Special getter for subsets of elements
+     * @return the inspectedSpaceListVisible
+     */
+    public List<OccInspectedSpace> getInspectedSpaceListVisible() {
+        configureVisibleSpaceElementList(null);
+
+        return inspectedSpaceListVisible;
+    }
+
+
+    /**
+     * Uses the Inspection's view setting (the given one if not null)
+     * to build a list of visible inspected spaces based on 
+     * @param viewEnum if not null, I become this inspection's default view setting
+     */
+    public void configureVisibleSpaceElementList(ViewOptionsOccChecklistItemsEnum viewEnum) {
+        if(viewEnum != null){
+            viewSetting = viewEnum;
+        }
         inspectedSpaceListVisible.clear();
         for(Iterator<OccInspectedSpace> it = inspectedSpaceList.iterator(); it.hasNext(); ){
             OccInspectedSpace ois = it.next(); 
@@ -138,7 +160,35 @@ public  class       FieldInspection
             }
         } // close for over inspectedspaces
     }
+    
+     /**
+     * I extract all failed elements who have a true flag on their migrate to CE case
+     * in their belly
+     * @param fin
+     * @return a list, perhaps with eces to include in a case
+     * @throws BObStatusException 
+     */
+    public List<EnforcableCodeElement> extractFailedItemsForCECaseMigration() 
+            throws BObStatusException{
+        
+        List<EnforcableCodeElement> eceList = new ArrayList<>();
+        if(inspectedSpaceList != null && !inspectedSpaceList.isEmpty()){
+            for(OccInspectedSpace ois: inspectedSpaceList){
+                for(OccInspectedSpaceElement oise: ois.getElementListFail()){
+                    if(oise.isMigrateToCaseOnFail()){
+                        eceList.add(oise);
+                    }
+                }
+            }
+        } 
+        return eceList;
+    }
 
+    /**
+     * Asks each inspected space for its unique location descriptors and
+     * builds a nice list
+     * @return a list, perhaps containing one or more unique location descriptors
+     */
     public List<OccLocationDescriptor> getAllUniqueLocationDescriptors() {
         Set<OccLocationDescriptor> locationDescriptors = new HashSet();
 
@@ -162,7 +212,15 @@ public  class       FieldInspection
 
         return size;
     }
+    
+    
+    
 
+    // ********************************************************
+    // **************** GETTERS AND SETTERS *******************
+    // ********************************************************
+    
+    
     /**
      * @return the inspectionID
      */
@@ -434,14 +492,6 @@ public  class       FieldInspection
         this.creationTS = creationTS;
     }
 
-    /**
-     * @return the inspectedSpaceListVisible
-     */
-    public List<OccInspectedSpace> getInspectedSpaceListVisible() {
-        configureVisibleSpaceElementList();
-
-        return inspectedSpaceListVisible;
-    }
 
     /**
      * @param inspectedSpaceListVisible the inspectedSpaceListVisible to set

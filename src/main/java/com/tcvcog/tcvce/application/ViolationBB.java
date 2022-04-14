@@ -432,7 +432,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
     public void onViolationSelectElementButtonChange(EnforcableCodeElement ece) {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            currentViolation = cc.violation_injectOrdinance(currentCase, currentViolation, ece, null);
+            currentViolation = cc.violation_injectOrdinance(currentViolation, ece);
         } catch (BObStatusException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
