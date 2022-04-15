@@ -22,8 +22,38 @@
                     <f:view>
                         <h:form id="put-manage-form">
                             
+                            <p:outputLabel for="@next" value="Icon"/>
+                                    <p:selectOneMenu id="advanced" value="#{manageBB.currentPut.icon}"
+                                                     panelStyle="width:180px" var="i" converter="mSchemaEnumConverter"
+                                                    filter="true" filterMatchMode="startsWith">
+
+                                        <f:selectItems value="#{ManagedSchemaEnum.values}" var="schemaEnum"
+                                                    itemLabel="#{schemaEnum.getTARGET_OBJECT_FRIENDLY_NAME}" itemValue="#{managedSchemaEnum}"/>
+
+                                        <p:column style="width:10%">
+                                            <i class="material-icons"><h:outputText value="#{i.materialIcon}"/></i>
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Name"/>
+                                            </f:facet>
+                                            <h:outputText value="#{i.name}"/>
+                                        </p:column>
+
+                                        <f:facet name="footer">
+                                            <h:outputText value="#{manageBB.iconList.size()} icons" 
+                                                       style="font-weight:bold;" styleClass="p-py-1 p-d-block"/>
+                                         </f:facet>
+                                    </p:selectOneMenu>
+                            
+                            
+                            
+                            
+                            
+                            
                             <p:commandButton ajax="true" value="Add New Put" icon="fa fa-plus" 
-                                             actionListener="#{propertyUseTypeBB.createNewPut}"
+                                             actionListener="#{manageBB.createNewPut}"
                                              oncomplete="PF('put-addupdate-dialog').show()"
                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
                                              update="put-add-update-form"/>
@@ -32,22 +62,22 @@
                             
                              <p:dataTable
                                 id="put-table"
-                                var="propertyUseType"
-                                value="#{propertyUseTypeBB.putList}"
-                                rowKey="#{propertyUseType.typeID}"
+                                var="managed"
+                                value="#{manageBB.putList}"
+                                rowKey="#{managed.typeID}"
                                 tableStyleClass="primeDataTable">
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="ID" />
                                     </f:facet>
-                                    <h:outputText value="#{propertyUseType.typeID}"/>
+                                    <h:outputText value="#{managed.typeID}"/>
                                 </p:column>
                                 
                                 <p:column width="8%">
                                     <p:commandButton ajax="true"
-                                                     id="update-put-cb" value="edit" icon="#{propertyUseType.icon.fontAwesome}"
+                                                     id="update-put-cb" value="edit" icon="#{managed.icon.fontAwesome}"
                                         styleClass="multiButtonLineButton" 
-                                        actionListener="#{propertyUseTypeBB.editPut(propertyUseType)}"
+                                        actionListener="#{manageBB.editPut(managed)}"
                                         oncomplete="PF('put-addupdate-dialog').show()"
                                         update="put-add-update-form" />
                                 </p:column>
@@ -56,14 +86,14 @@
                                     <f:facet name="header">
                                         <h:outputText value="Name" />
                                     </f:facet>
-                                    <h:outputText value="#{propertyUseType.name}"/>
+                                    <h:outputText value="#{managed.name}"/>
                                 </p:column>
                                  
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Description " />
                                     </f:facet>
-                                    <h:outputText value="#{propertyUseType.description}"/>
+                                    <h:outputText value="#{managed.description}"/>
                                 </p:column>
                                 
                                 
@@ -71,14 +101,14 @@
                                     <f:facet name="header">
                                         <h:outputText value="Icon " />
                                     </f:facet>
-                                    <i class="material-icons"><h:outputText value="#{propertyUseType.icon.materialIcon}"/></i>
+                                    <i class="material-icons"><h:outputText value="#{managed.icon.materialIcon}"/></i>
                                 </p:column>
                                  
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Zoneclass" />
                                     </f:facet>
-                                    <h:outputText value="#{propertyUseType.zoneClass}"/>
+                                    <h:outputText value="#{managed.zoneClass}"/>
                                 </p:column>
                                  
                             
@@ -108,7 +138,7 @@
                         <h:form id="put-add-update-form">
                             
                             <h2>Add/update Property Use Type</h2>
-                            <p><h:outputText id="put-id-ot" value="userid: #{propertyUseTypeBB.currentPut.typeID}"/></p>
+                            <p><h:outputText id="put-id-ot" value="userid: #{manageBB.currentPut.typeID}"/></p>
                             
                             
                             <div class="p-grid">
@@ -117,7 +147,7 @@
                                                     value="Name" 
                                                     for="put-name-it"/>
                                     <p:inputText id="put-name-it" 
-                                                 value="#{propertyUseTypeBB.currentPut.name}" 
+                                                 value="#{manageBB.currentPut.name}" 
                                                  style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
                                     <h:message for="put-name-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -127,18 +157,18 @@
                                                     value="Description" 
                                                     for="put-describe-it"/>
                                     <p:inputText id="put-describe-it" 
-                                                 value="#{propertyUseTypeBB.currentPut.description}" 
+                                                 value="#{manageBB.currentPut.description}" 
                                                  style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
                                     <h:message for="put-describe-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                 </div>
                                 <div class="p-col-6">
                                     <p:outputLabel for="@next" value="Icon"/>
-                                    <p:selectOneMenu id="advanced" value="#{propertyUseTypeBB.currentPut.icon}"
+                                    <p:selectOneMenu id="advanced" value="#{manageBB.currentPut.icon}"
                                                      panelStyle="width:180px" var="i" converter="iconConverter"
                                                     filter="true" filterMatchMode="startsWith">
 
-                                        <f:selectItems value="#{propertyUseTypeBB.iconList}" var="icon"
+                                        <f:selectItems value="#{manageBB.iconList}" var="icon"
                                                     itemLabel="#{icon.name}" itemValue="#{icon}"/>
 
                                         <p:column style="width:10%">
@@ -153,7 +183,7 @@
                                         </p:column>
 
                                         <f:facet name="footer">
-                                            <h:outputText value="#{propertyUseTypeBB.iconList.size()} icons" 
+                                            <h:outputText value="#{manageBB.iconList.size()} icons" 
                                                        style="font-weight:bold;" styleClass="p-py-1 p-d-block"/>
                                          </f:facet>
                                     </p:selectOneMenu>
@@ -163,7 +193,7 @@
                                                     value="Zone Class" 
                                                     for="put-zoneclass-it"/>
                                     <p:inputText id="put-zoneclass-it" 
-                                                 value="#{propertyUseTypeBB.currentPut.zoneClass}" 
+                                                 value="#{manageBB.currentPut.zoneClass}" 
                                                  style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
                                     <h:message for="put-zoneclass-it" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
@@ -178,8 +208,8 @@
                              <p:commandButton    id="put-commitupdates-cb"
                                                 ajax="true" value="Update Put data" icon="fa fa-plus" 
                                              tabindex="11" 
-                                             actionListener="#{propertyUseTypeBB.commitUpdates}"
-                                             disabled="#{!(propertyUseTypeBB.currentPut.typeID != 0)}"
+                                             actionListener="#{manageBB.commitUpdates}"
+                                             disabled="#{!(manageBB.currentPut.typeID != 0)}"
                                              oncomplete="PF('put-addupdate-dialog').hide()"
                                              update="put-manage-form:put-table
                                              putmanage-messages-form"
@@ -187,8 +217,8 @@
                             
                              <p:commandButton    id="put-commitinsert-cb"
                                                 ajax="true" value="Add new Put" icon="fa fa-plus" 
-                                                tabindex="11" actionListener="#{propertyUseTypeBB.commitInsert}"
-                                                disabled="#{!(propertyUseTypeBB.currentPut.typeID == 0)}"
+                                                tabindex="11" actionListener="#{manageBB.commitInsert}"
+                                                disabled="#{!(manageBB.currentPut.typeID == 0)}"
                                              oncomplete="PF('put-addupdate-dialog').hide()"
                                              update="put-manage-form:put-table
                                              putmanage-messages-form"
@@ -197,8 +227,8 @@
                              
                              <p:commandButton    id="put-commitremove-cb"
                                                 ajax="true" value="Remove Put" icon="fa fa-trash" 
-                                                tabindex="11" actionListener="#{propertyUseTypeBB.commitRemove}"
-                                                disabled="#{!(propertyUseTypeBB.currentPut.typeID != 0)}"
+                                                tabindex="11" actionListener="#{manageBB.commitRemove}"
+                                                disabled="#{!(manageBB.currentPut.typeID != 0)}"
                                              oncomplete="PF('put-addupdate-dialog').hide()"
                                              update="put-manage-form:put-table
                                              putmanage-messages-form"

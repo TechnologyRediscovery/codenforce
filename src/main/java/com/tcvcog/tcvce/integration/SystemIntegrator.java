@@ -35,6 +35,8 @@ import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.entities.LinkedObjectRole;
 import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
+import com.tcvcog.tcvce.entities.Managed;
+import com.tcvcog.tcvce.entities.ManagedSchemaEnum;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.Property;
@@ -599,7 +601,13 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         return results;
     }
     
-    public int iconCheckForUse(Icon i) throws IntegrationException {
+    /**
+     * 
+     * @param m
+     * @return
+     * @throws IntegrationException 
+     */
+    public int checkManagableForUse(Managed m) throws IntegrationException { 
         int uses = 0;
         List<String> useTables = findForeignUseTables("iconid");
         for(int x = 0; x < useTables.size(); x++){
@@ -607,6 +615,47 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
             //System.out.println("Checked public." + useTables.get(x) + " for icon_iconid:" + i.getIconID());
         }
         return uses;
+    }
+    
+    /**
+     * 
+     * @param mse 
+     * @param managedID
+     * @return
+     * @throws IntegrationException 
+     */
+    public Managed getManagedObject(ManagedSchemaEnum mse,int managedID) throws IntegrationException {
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT iconid, name, styleclass, fontawesome, materialicons, active ");
+        sb.append("FROM public.icon WHERE iconid=?;");
+        Icon i = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, iconID);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                i = new Icon();
+                i.setIconID(rs.getInt("iconid"));
+                i.setName(rs.getString("name"));
+                i.setStyleClass(rs.getString("styleclass"));
+                i.setFontAwesome(rs.getString("fontawesome"));
+                i.setMaterialIcon(rs.getString("materialicons"));
+                i.setdeactiveated(rs.getBoolean("active"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to generate icon", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return i;
+
     }
     
     public Icon getIcon(int iconID) throws IntegrationException {
@@ -629,7 +678,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 i.setStyleClass(rs.getString("styleclass"));
                 i.setFontAwesome(rs.getString("fontawesome"));
                 i.setMaterialIcon(rs.getString("materialicons"));
-                i.setActive(rs.getBoolean("active"));
+                i.setdeactiveated(rs.getBoolean("active"));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());

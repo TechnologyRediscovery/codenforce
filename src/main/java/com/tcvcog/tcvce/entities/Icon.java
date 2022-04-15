@@ -11,26 +11,21 @@ import java.util.Objects;
  *
  * @author sylvia
  */
-public class Icon  {
-    private int iconID;
-    private String name;
+public class Icon extends Managed{
     private String styleClass;
     private String fontAwesome;
     private String materialIcon;
-    private Boolean active;
-
-    /**
-     * @return the iconID
-     */
-    public int getIconID() {
-        return iconID;
+    
+    
+    public Icon(){
+        super(ManagedSchemaEnum.Icon);
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 73 * hash + this.iconID;
-        hash = 73 * hash + Objects.hashCode(this.name);
+        hash = 73 * hash + getID();
+        hash = 73 * hash + Objects.hashCode(getTitle());
         hash = 73 * hash + Objects.hashCode(this.styleClass);
         hash = 73 * hash + Objects.hashCode(this.fontAwesome);
         hash = 73 * hash + Objects.hashCode(this.materialIcon);
@@ -49,10 +44,10 @@ public class Icon  {
             return false;
         }
         final Icon other = (Icon) obj;
-        if (this.iconID != other.iconID) {
+        if (getID() != other.getID()) {
             return false;
         }
-        if (!Objects.equals(this.name, other.name)) {
+        if (!Objects.equals(this.getTitle(), other.getTitle())) {
             return false;
         }
         if (!Objects.equals(this.styleClass, other.styleClass)) {
@@ -64,17 +59,10 @@ public class Icon  {
         if (!Objects.equals(this.materialIcon, other.materialIcon)) {
             return false;
         }
-        if (!Objects.equals(this.active, other.active)) {
+        if (!Objects.equals(this.getDeactivatedts(), other.getDeactivatedts())) {
             return false;
         }
         return true;
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
     }
 
     /**
@@ -99,20 +87,6 @@ public class Icon  {
     }
 
     /**
-     * @param iconID the iconID to set
-     */
-    public void setIconID(int iconID) {
-        this.iconID = iconID;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * @param styleClass the styleClass to set
      */
     public void setStyleClass(String styleClass) {
@@ -132,19 +106,4 @@ public class Icon  {
     public void setMaterialIcon(String materialIcon) {
         this.materialIcon = materialIcon;
     }
-
-    /**
-     * @return the active
-     */
-    public Boolean getActive() {
-        return active;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-    
 }

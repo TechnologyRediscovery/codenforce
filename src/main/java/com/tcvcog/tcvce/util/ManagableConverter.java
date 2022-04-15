@@ -17,7 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.Icon;
+import com.tcvcog.tcvce.entities.Managed;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -28,15 +28,15 @@ import javax.faces.convert.FacesConverter;
  * and object types
  * @author echocharliedelta
  */
-@FacesConverter(value="iconConverter")
-public class IconConverter extends EntityConverter implements Converter {
+@FacesConverter(value="managableConverter")
+public class ManagableConverter extends EntityConverter implements Converter {
     
      @Override
     public Object getAsObject(FacesContext fc, UIComponent uic, String titleS) {
         if(titleS.isEmpty()) {
             return null; 
         }
-        Icon o = (Icon) this.getViewMap(fc).get(titleS);
+        Managed o = (Managed) this.getViewMap(fc).get(titleS);
         return o;
     }
 
@@ -47,14 +47,14 @@ public class IconConverter extends EntityConverter implements Converter {
             return "";
         }
         
-        Icon i = (Icon) o;
+        Managed i = (Managed) o;
         String title = i.getTitle();
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;
             
         } else {
-            return "icon converter error";
+            return "managable converter error";
         }
     }
 }
