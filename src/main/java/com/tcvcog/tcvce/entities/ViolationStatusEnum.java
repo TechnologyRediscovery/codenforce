@@ -50,6 +50,10 @@ public enum ViolationStatusEnum {
     NULLIFIED(                              "Nullified",
                                             "",
                                             "codeviolation_nullified_iconid",
+                                            -1),
+    TRANSFERRED(                              "Transferred",
+                                            "",
+                                            "codeviolation_nullified_iconid",
                                             -1);
     
     

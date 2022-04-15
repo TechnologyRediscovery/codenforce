@@ -1584,9 +1584,10 @@ public class CECaseSearchProfileBB
     /**
      * Listener for commencement of note writing process
      *
-     * @param ev
+     * @param cv
      */
-    public void onViolationNotesInitButtonChange(ActionEvent ev) {
+    public void onViolationNotesInitButtonChange(CodeViolation cv) {
+        currentViolation = cv;
         formNoteTextViolation = null;
 
     }

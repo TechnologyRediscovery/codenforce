@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,30 +17,72 @@ import java.util.List;
  * 
  * @author Ellen Bascomb of Apartment 31Y
  */
+
 public class CodeViolationMigrationSettings {
+    
+    final static String HTML_BREAK = "<br />";
+    final static String SEP = ": ";
     
     private CodeViolationMigrationPathwayEnum pathway;
     private List<CodeViolation> violationListToMigrate;
     private List<CodeViolation> violationListReadyForInsertion;
+    private List<CodeViolation> violationListSuccessfullyMigrated;
     
     private UserAuthorized userEnactingMigration;
     
     private FieldInspection sourceInspection;
+    private List<IFace_transferrable> transferrableList;
     private CECase sourceCase;
     private OccPeriod sourceOccPeriod;
     
-    private CECaseDataHeavy ceCaseParent;
+    private CECasePropertyUnitHeavy ceCaseParent;
     private MunicipalityDataHeavy muniDH;
-    private Property prop;
-    private PropertyUnit propUnit;
     
     private LocalDateTime violationDateOfRecord;
     private LocalDateTime unifiedStipComplianceDate;
     private boolean useInspectedElementFindingsAsViolationFindings;
     private boolean linkInspectedElementPhotoDocsToViolation;
+    
+    private Property prop;
+    private PropertyUnit newCasePropUnit;
     private String newCECaseName;
+    private boolean newCECaseUnitAssociated;
     private User newCECaseManager;
+    private EventCategory newCECaseOriginationEventCategory;
     private LocalDateTime newCaseDateOfRecord;
+    
+    private StringBuilder migrationLogSB;
+    
+    
+    /**
+     * Asks the internal StringBuilder for its string
+     * @return the migrationLog
+     */
+    public String getMigrationLog() {
+        if(migrationLogSB != null){
+            return migrationLogSB.toString();
+        } else {
+            return "[Empty Log]";
+        }
+    }
+
+    /**
+     * Appends input to the internal StringBuilder, 
+     * and adds HTML breaks and timestamps 
+     * @param logData
+     */
+    public void appendToMigrationLog(String logData) {
+        int nano = LocalDateTime.now().getNano();
+        if(migrationLogSB == null){
+            migrationLogSB = new StringBuilder();
+        } 
+        migrationLogSB.append(nano);
+        migrationLogSB.append(SEP);
+        migrationLogSB.append(logData);
+        migrationLogSB.append(HTML_BREAK);
+    }
+  
+    
 
     /**
      * No arg Constructor
@@ -73,7 +116,7 @@ public class CodeViolationMigrationSettings {
     /**
      * @return the ceCaseParent
      */
-    public CECaseDataHeavy getCeCaseParent() {
+    public CECasePropertyUnitHeavy getCeCaseParent() {
         return ceCaseParent;
     }
 
@@ -115,7 +158,7 @@ public class CodeViolationMigrationSettings {
     /**
      * @param ceCaseParent the ceCaseParent to set
      */
-    public void setCeCaseParent(CECaseDataHeavy ceCaseParent) {
+    public void setCeCaseParent(CECasePropertyUnitHeavy ceCaseParent) {
         this.ceCaseParent = ceCaseParent;
     }
 
@@ -183,10 +226,10 @@ public class CodeViolationMigrationSettings {
     }
 
     /**
-     * @return the propUnit
+     * @return the newCasePropUnit
      */
-    public PropertyUnit getPropUnit() {
-        return propUnit;
+    public PropertyUnit getNewCasePropUnit() {
+        return newCasePropUnit;
     }
 
     /**
@@ -197,10 +240,10 @@ public class CodeViolationMigrationSettings {
     }
 
     /**
-     * @param propUnit the propUnit to set
+     * @param newCasePropUnit the newCasePropUnit to set
      */
-    public void setPropUnit(PropertyUnit propUnit) {
-        this.propUnit = propUnit;
+    public void setNewCasePropUnit(PropertyUnit newCasePropUnit) {
+        this.newCasePropUnit = newCasePropUnit;
     }
 
     /**
@@ -300,8 +343,74 @@ public class CodeViolationMigrationSettings {
     public void setSourceOccPeriod(OccPeriod sourceOccPeriod) {
         this.sourceOccPeriod = sourceOccPeriod;
     }
-    
-    
+
+    /**
+     * Casts all the code violations to transferrables
+     * @return the transferrableList
+     */
+    public List<IFace_transferrable> getTransferrableList() {
+       List<IFace_transferrable> trl = new ArrayList<>(); 
+       if(violationListToMigrate != null && !violationListToMigrate.isEmpty()){
+           for(CodeViolation cv: violationListToMigrate){
+               trl.add((IFace_transferrable) cv);
+           }
+       }
+        
+        return trl;
+     
+        
+    }
+
+    /**
+     * @param transferrableList the transferrableList to set
+     */
+    public void setTransferrableList(List<IFace_transferrable> transferrableList) {
+        this.transferrableList = transferrableList;
+    }
+
+    /**
+     * @return the newCECaseOriginationEventCategory
+     */
+    public EventCategory getNewCECaseOriginationEventCategory() {
+        return newCECaseOriginationEventCategory;
+    }
+
+    /**
+     * @param newCECaseOriginationEventCategory the newCECaseOriginationEventCategory to set
+     */
+    public void setNewCECaseOriginationEventCategory(EventCategory newCECaseOriginationEventCategory) {
+        this.newCECaseOriginationEventCategory = newCECaseOriginationEventCategory;
+    }
+
+    /**
+     * @return the newCECaseUnitAssociated
+     */
+    public boolean isNewCECaseUnitAssociated() {
+        return newCECaseUnitAssociated;
+    }
+
+    /**
+     * @param newCECaseUnitAssociated the newCECaseUnitAssociated to set
+     */
+    public void setNewCECaseUnitAssociated(boolean newCECaseUnitAssociated) {
+        this.newCECaseUnitAssociated = newCECaseUnitAssociated;
+    }
+
+    /**
+     * @return the violationListSuccessfullyMigrated
+     */
+    public List<CodeViolation> getViolationListSuccessfullyMigrated() {
+        return violationListSuccessfullyMigrated;
+    }
+
+    /**
+     * @param violationListSuccessfullyMigrated the violationListSuccessfullyMigrated to set
+     */
+    public void setViolationListSuccessfullyMigrated(List<CodeViolation> violationListSuccessfullyMigrated) {
+        this.violationListSuccessfullyMigrated = violationListSuccessfullyMigrated;
+    }
+
+ 
     
     
     

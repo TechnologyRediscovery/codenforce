@@ -1,0 +1,430 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="migration-growl-form">
+        <p:growl id="migration-growl" />
+    </h:form>
+
+    <p:dialog id="migration-configuration-dialog"
+              widgetVar="migration-configuration-dialog-var"
+              width="1200"
+              height="600"
+              header="Configure migration of code violations"
+              modal="true"
+              dynamic="true"
+              resizable="true"
+              closable="true"
+              closeOnEscape="true"
+              >
+
+        <div class="p-grid">
+            <div class="p-col-6">
+
+                <p:panel id="migration-settings"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Migration Settings">
+                    <h:form id="migration-configuration-form">
+                        <div class="p-grid">
+                            <div class="p-col-4">
+                                <h:outputText value="Pathway" />
+                            </div>
+                            <div class="p-col-8">
+                                <h:outputText value="#{migrationBB.currentMigrationSettings.pathway.description}" />
+
+                            </div>
+
+                            <div class="p-col-4">
+                                <h:outputText value="Property" />
+                            </div>
+                            <div class="p-col-8">
+                                <h:outputText value="#{migrationBB.currentMigrationSettings.prop.address.addressPretty1Line}" />
+                                <p:spacer height="3px" />
+                                <h:outputText value="Parcel ID: #{migrationBB.currentMigrationSettings.prop.countyParcelID}" />
+                            </div>
+
+                            <div class="p-col-4">
+                                <h:outputText value="Violation(s) Date of Record" />
+                            </div>
+                            <div class="p-col-8">
+
+                                <p:datePicker 	id="violation-newdor-dp"
+                                               value="#{migrationBB.currentMigrationSettings.violationDateOfRecord}"
+                                               rendered="true"
+                                               style="width: 100%;"
+                                               pattern="MM/dd/yyyy HH:mm"
+                                               disabled="false"
+                                               hideOnDateTimeSelect="true"
+                                               showOnFocus="false"
+                                               showIcon="true"
+                                               showButtonBar="true"
+                                               mask="true"
+                                               timeInput="true" 
+                                               required="true" />
+                            </div>
+                            
+
+                            <div class="p-col-4">
+                                <h:outputText value="Violation(s) Compliance Due" />
+                            </div>
+                            <div class="p-col-8">
+
+                                <p:datePicker 	id="violation-newstipdate-dp"
+                                               value="#{migrationBB.currentMigrationSettings.unifiedStipComplianceDate}"
+                                               rendered="true"
+                                               style="width: 100%;"
+                                               pattern="MM/dd/yyyy HH:mm"
+                                               disabled="false"
+                                               hideOnDateTimeSelect="true"
+                                               showOnFocus="false"
+                                               showIcon="true"
+                                               showButtonBar="true"
+                                               mask="true"
+                                               timeInput="true" 
+                                               required="true" />
+                            </div>
+                            
+                            <div class="p-col-4">
+                                <h:outputText value="Transfer findings" />
+                            </div>
+                            <div class="p-col-8">
+                                <p:selectBooleanButton id="migration-xferfindings-is"
+                                                       value="#{migrationBB.currentMigrationSettings.useInspectedElementFindingsAsViolationFindings}"
+                                                       onLabel="Yes"
+                                                       offLabel="No" />
+
+                            </div>
+                            <div class="p-col-4">
+                                <h:outputText value="Migrate photo and docs" />
+                            </div>
+                            <div class="p-col-8">
+                                <p:selectBooleanButton id="migration-photodoc-is"
+                                                       value="#{migrationBB.currentMigrationSettings.linkInspectedElementPhotoDocsToViolation}"
+                                                       onLabel="Yes"
+                                                       offLabel="No" />
+                            </div>
+                        </div>
+
+                        <h3>Target Code Enforcement Case</h3>
+
+                        <f:subview id="migration-existingcase-subview"
+                                   rendered="#{migrationBB.currentMigrationSettings.pathway.useExistingCase}">
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputText value="Select Case" />
+                                </div>
+                                <div class="p-col-8">
+                                    <p:selectOneMenu  id="migration-selectcase-som" 
+                                                      tabindex="1" 
+                                                      value="#{migrationBB.currentMigrationSettings.ceCaseParent}"
+                                                      >
+                                        <f:selectItem itemLabel="select a case on this property" 
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
+                                        <f:selectItems id="migration-selectcase-selitems" 
+                                                       value="#{migrationBB.caseCandidateList}" 
+                                                       var="cse" itemValue="#{cse}" itemLabel="#{cse.caseName} (ID: #{cse.caseID})" />
+                                        <f:converter converterId="cecaseConverter" />
+                                    </p:selectOneMenu>
+
+
+                                </div>
+                            </div>
+
+                        </f:subview>
+
+                        <f:subview id="migration-newcase-subview"
+                                   rendered="#{!migrationBB.currentMigrationSettings.pathway.useExistingCase}">
+
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                    <h:outputLabel value="Case Name" 
+                                                   for="caseNameIT"/>
+                                    <p:commandButton id="casename-help-button"
+                                                     icon="fa fa-question-circle-o"
+                                                     styleClass="button-help"
+                                                     type="button" />
+
+                                    <p:overlayPanel for="casename-help-button"
+                                                    style="width:350px;" 
+                                                    dismissable="true"
+                                                    showCloseIcon="true">
+                                        <h3>Code enforcement case names</h3>
+                                        <p>A case's name is a text field for INTERNAL office use only that allows managers to label a case something memorable,
+                                            such as 'deer feeding lady' or 'fridge in front yard' or 'imploded garage'. The case name appears on the dashboard's
+                                            case list for easy ID but does not by default print on case list reports .</p>
+                                    </p:overlayPanel>
+
+                                </div>
+                                <div class="p-col-8">
+                                    <p:inputText    id="caseNameIT" 
+                                                    value="#{migrationBB.currentMigrationSettings.newCECaseName}" 
+                                                    style="width: 100%;" 
+                                                    tabindex="1" 
+                                                    required="false" />
+                                </div>
+
+                                <div class="p-col-4">
+                                    <h:outputLabel value="Case Opening Date" 
+                                                   for="formOpenDateCal"/>
+                                </div>
+                                <div class="p-col-8">
+                                    <p:datePicker       value="#{migrationBB.currentMigrationSettings.newCaseDateOfRecord}" 
+                                                        id="cecase-add-origdate-picker"
+                                                        rendered="true"
+                                                        style="width: 100%;"
+                                                        pattern="MM/dd/yyyy HH:mm"
+                                                        disabled="false"
+                                                        hideOnDateTimeSelect="true"
+                                                        showOnFocus="false"
+                                                        showIcon="true"
+                                                        showButtonBar="true"
+                                                        mask="true"
+                                                        timeInput="true" 
+                                                        required="true" >
+
+
+                                    </p:datePicker>
+                                </div>
+                                <div class="p-col-4">
+                                    <h:outputLabel value="Case manager" />
+                                </div>
+                                <div class="p-col-8">
+
+                                    <p:selectOneMenu rendered="true"
+                                                     value="#{migrationBB.currentMigrationSettings.newCECaseManager}"
+                                                     converter="userConverter">
+                                        <f:selectItem itemLabel="select a case manager"
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
+                                        <f:selectItems value="#{systemServicesBB.bbSessionMuni.swornOfficerList}" 
+                                                       var="user"
+                                                       itemLabel="#{user.human.name} (#{user.username})"
+                                                       itemValue="#{user}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-col-4">
+                                    <h:outputLabel value="Origination category" 
+                                                   for="cecase-add-origevent-som"/>
+
+                                    <p:commandButton id="case-originationevent-help-button"
+                                                     icon="fa fa-question-circle-o"
+                                                     styleClass="button-help"
+                                                     type="button" />
+
+                                    <p:overlayPanel for="case-originationevent-help-button"
+                                                    style="width:350px;" 
+                                                    dismissable="true"
+                                                    showCloseIcon="true">
+                                        <h3>Origination events</h3>
+                                        <p>An origination event is automatically attached to a code enforcement case to signal 
+                                            where the case came from, such as resulting from an officer's routine patrol or from
+                                            a lapsed occupancy permit inspection with outstanding violation.</p>
+
+                                        <p>By selecting an accurate event category from this list now, 
+                                            the case's even history will be accurate from the beginning.</p>
+                                    </p:overlayPanel>
+
+                                </div>
+                                <div class="p-col-8">
+                                    <h:selectOneMenu id="cecase-add-origevent-som"
+                                                     value="#{migrationBB.currentMigrationSettings.newCECaseOriginationEventCategory}"
+                                                     required="true">
+
+                                        <f:converter converterId="eventCategoryConverter"/>
+                                        <f:selectItem itemLabel="select an event category"
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
+                                        <f:selectItems id="cecase-add-origevent-selectitems"
+                                                       value="#{migrationBB.caseOriginationEventCategoryCandidateList}"
+                                                       var="ec" 
+                                                       itemValue="#{ec}" 
+                                                       itemLabel="#{ec.eventCategoryTitle}"/>
+                                    </h:selectOneMenu>
+                                </div>
+
+                                <div class="p-col-4">
+                                    <h:outputLabel value="Associated with unit?" />
+                                </div>
+                                <div class="p-col-8">
+
+                                    <p:inputSwitch value="#{migrationBB.currentMigrationSettings.newCECaseUnitAssociated}"
+                                                   onLabel="Yes"                                                   
+                                                   offLabel="No">
+                                        <p:ajax update="cecase-unit-som" />
+                                    </p:inputSwitch>
+
+                                    <h:selectOneMenu id="cecase-unit-som"
+                                                     value="#{migrationBB.currentMigrationSettings.newCasePropUnit}"
+                                                     required="false"
+                                                     disabled="#{!migrationBB.currentMigrationSettings.newCECaseUnitAssociated}">
+
+                                        <f:converter converterId="propertyUnitConverter"/>
+
+                                        <f:selectItem itemLabel="select a unit on current property"
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
+                                        <f:selectItems id="cecase-unit-selectitems"
+                                                       value="#{migrationBB.currentMigrationSettings.prop.unitList}"
+                                                       var="pu" 
+                                                       itemValue="#{pu}" 
+                                                       itemLabel="#{pu.unitNumber} (ID:#{pu.unitID})"/>
+                                    </h:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>
+                        <p:spacer height="5px" />
+                        <p:commandButton   id="inspection-migrate-commit-cb"
+                                           value="Do Migration!"
+                                           rendered="true"
+                                           icon="fa fa-check-square "
+                                           disabled="false"
+                                           actionListener="#{migrationBB.onMigrationCommitButtonChange}"
+                                           update="migration-growl-form
+                                           migration-results-dialog
+                                           migration-results-form"
+                                           oncomplete="PF('migration-results-dialog-var').show(); PF('migration-configuration-dialog-var').show();"
+                                           />
+
+
+                    </h:form>
+                </p:panel>
+            </div>
+            <div class="p-col-6">
+
+                <p:panel id="migration-violations"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Migrating violations">
+
+                    <h:form id="inspection-finalize-migrate-form">
+                       
+
+                        <h2>
+                            <h:outputText value="Violations for migration (#{migrationBB.currentMigrationSettings.violationListToMigrate.size()})" />
+
+                    </h2>
+
+                    <ui:repeat id="spaceele-uir-fail"
+                               value="#{migrationBB.currentMigrationSettings.violationListToMigrate}"
+                               var="ele_fail_tomigrate">
+
+                        <h:outputText value="#{ele_fail_tomigrate.violatedEnfElement.headerString}" 
+                                      escape="false"
+                                      style="font-weight: bold;"/>
+
+
+                        <h:outputText value=" (ID: #{ele_fail_tomigrate.violationID})" 
+                                      />
+                        <p:spacer height="2px" />
+                      
+                        <p:spacer height="2px" />
+                        <h:outputText value="findings: #{ele_fail_tomigrate.description}"  
+                                      escape="true"
+                                      rendered="#{!empty ele_fail_tomigrate.description}"/>
+
+
+                        <p:spacer height="2px" />
+                        <h:outputText value="photos/docs: #{ele_fail_tomigrate.blobList.size()}"  
+                                      escape="true"
+                                      rendered="#{!empty ele_fail_tomigrate.blobList}"/>
+                        <p:spacer height="2px" />
+                        <p:commandLink      id="vtomigrate-remove-cl"
+                                            ajax="true"
+                                            style="color:blue; font-weight: bold;"
+                                            actionListener="#{migrationBB.onRemoveViolationFromMigrationList(ele_fail_tomigrate)}"
+                                            value="remove from migration"
+                                            update="@form
+                                            migration-growl-form"
+                                            />
+                        <p:separator />
+                    </ui:repeat>
+                </h:form>
+
+            </p:panel>
+        </div>
+    </div>
+</p:dialog>
+
+
+<p:dialog id="migration-results-dialog"
+          widgetVar="migration-results-dialog-var"
+          width="600"
+          height="600"
+          header="Migration Results"
+          modal="true"
+          dynamic="true"
+          resizable="true"
+          closable="true"
+          closeOnEscape="true"
+          >
+
+    <h:form id="migration-results-form">
+        <p:scrollPanel id="migration-results-scroller">
+
+            <h2>Migration results</h2>
+
+            <div class="p-grid">
+                <div class="p-col-4">
+                    Destination case
+                </div>
+                <div class="p-col-8">
+                    <p:commandLink      id="migration-results-navtocecase"
+                                        value="View case ID:#{migrationBB.currentMigrationSettings.ceCaseParent.caseID}"
+                                        ajax="false"
+                                        style="color:blue; font-weight: bold;"
+                                        action="#{migrationBB.onViewTargetCase}"
+                                        update="@form
+                                        migration-growl-form"
+                                        />
+                </div>
+
+            </div>
+
+            <h2>Migrated violations:</h2>
+            
+            <ui:repeat id="spaceele-uir-fail"
+                       value="#{migrationBB.currentMigrationSettings.violationListSuccessfullyMigrated}"
+                       var="migratedviol">
+
+                <h:outputText value="#{migratedviol.violatedEnfElement.headerString}" 
+                              escape="false"
+                              style="font-weight: bold;"/>
+
+                <h:outputText value="(ID: #{migratedviol.violationID})" 
+                              />
+                <p:spacer height="2px" />
+
+                <h:outputText value="findings: #{migratedviol.description}"  
+                              rendered="#{!empty migratedviol.description}"/>
+
+                <p:spacer height="2px" />
+
+                <h:outputText value="date of record: #{migrationBB.getPrettyDateNoTime(migratedViol.dateOfRecord)}"  />
+
+                <p:spacer height="2px" />
+
+                <h:outputText value="compliance due: #{migrationBB.getPrettyDateNoTime(migratedviol.stipulatedComplianceDate)}"  />
+
+                <p:spacer height="2px" />
+
+                <h:outputText value="photos/docs: #{migratedviol.blobList.size()}"  
+                              escape="true"
+                              rendered="#{!empty migratedviol.blobList}"/>
+                <p:separator />
+            </ui:repeat>
+
+            <h3>Migration Log</h3>
+
+            <h:outputText value="#{migrationBB.currentMigrationSettings.migrationLog}"
+                          escape="false" />
+        </p:scrollPanel>
+
+    </h:form>
+
+</p:dialog>
+
+</ui:composition>

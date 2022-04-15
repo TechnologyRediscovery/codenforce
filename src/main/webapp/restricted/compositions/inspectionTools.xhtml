@@ -475,14 +475,15 @@
                             </div>
                             <div class="p-col-4">
                                 <p:commandButton    id="insp-extractviolations-button"
-                                                    value="Extract Violated Elements"
+                                                    value="Migrate Violated Elements"
                                                     ajax="true"
-                                                    disabled="true"
-                                                    actionListener="#{fieldInspectionBB.onSetupReinspectionButtonClick}"
-                                                    oncomplete="PF('inspection-followup-dialog-var').show()"
+                                                    disabled="false"
+                                                    actionListener="#{migrationBB.onOpenMigrationOptionsDialog}"
+                                                    oncomplete="PF('faileditems-migrate-choosepath-dialog-var').show()"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                     icon="fa fa-gavel"
-                                                    update="inspection-followup-form"
+                                                    update="faileditems-migrate-choosepath-dialog
+                                                    faileditems-migrate-choosepath-form"
                                                     />
 
                             </div>
@@ -609,6 +610,53 @@
                 </p:panel>
             </div>
         </div>
+    </p:dialog>
+    
+    
+    
+    <p:dialog   id="faileditems-migrate-choosepath-dialog"
+                height="400" width="500"
+                widgetVar="faileditems-migrate-choosepath-dialog-var"
+                responsive="true"
+                dynamic="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                rendered="true"
+                header="Choose violated ordinances transfer pathway">
+
+        <h:form id="faileditems-migrate-choosepath-form">
+
+            <p:selectOneMenu id="faileditems-migrate-path-som"
+                             value="#{migrationBB.selectedTransferPathway}" 
+                             style="width: 100%;"
+                             required="true"
+                             tabindex="1"
+                             requiredMessage="A transfer pathway is required"
+                             >
+
+                <f:selectItem itemLabel="select a pathway" 
+                              noSelectionOption="true" 
+                              itemDisabled="true"/>
+
+                <f:selectItems id="faileditems-migrate-path-selitems"
+                               value="#{migrationBB.transferOptionsListOccInspection}"
+                               var="pathway" itemValue="#{pathway}" itemLabel="#{pathway.description}"/>
+            </p:selectOneMenu>
+
+            <p:spacer height="5px" />
+
+            <p:commandButton    id="faileditems-migrate-init-button"
+                                action="#{migrationBB.onTransferPathwaySelectionCompleteButtonChange}" 
+                                ajax="true" 
+                                value="Configure migration"  
+                                icon="fa fa-arrow-right" 
+                                oncomplete="PF('faileditems-migrate-choosepath-dialog-var').hide(); PF('migration-configuration-dialog-var').show();"
+                                update="migration-configuration-form
+                                migration-configuration-dialog
+                                migration-growl-form"/>
+        </h:form>
     </p:dialog>
 
 
@@ -1309,6 +1357,14 @@
                         </p:selectOneMenu>
 
                         <p:spacer height="5px" />
+                        
+                        <p:inputSwitch id="migrate-violations-is" 
+                                       value="#{fieldInspectionBB.migrateFailedItemsOnFinalization}"
+                                       onLabel="Migrate failed items to code enforcement case"
+                                       offLabel="Do not migrate failed items">
+                        </p:inputSwitch>
+                        
+                        <p:spacer height="5px" />
 
                         <p:commandButton   id="inspection-finalize-commit-cb"
                                            value="Finalzie and lock inspection ID:#{ins.inspectionID} with selected determination"
@@ -1327,38 +1383,7 @@
             </div>
             
             <div class="p-col-6">
-                <p:panel id="inspections-inspectiondetails-generalpanel"
-                         toggleable="true"
-                         collapsed="false"
-                         header="Inspection results">
-                    
-                    <h:form id="inspection-finalize-migrate-form">
-                        
-                        <p:inputSwitch id="migrate-violations-is" 
-                                       value="#{fieldInspectionBB.migrateFailedItemsOnFinalization}"
-                                       onLabel="Migrate failed items to code enforcement case"
-                                       offLabel="Do not migrate failed items">
-                            <p:ajax listener="#{fieldInspectionBB.onToggleMigrateFailedItemsToCase}" />
-                        </p:inputSwitch>
-                    
-                        <h3>Violations marked for migration to CE Case</h3>
-
-
-                        <ui:repeat id="spaceele-uir-fail"
-                                   value="#{fieldInspectionBB.currentInspection.extractFailedItemsForCECaseMigration}"
-                                   var="ele_fail_tomigrate">
-                            <li>
-                                <h:outputText value="#{ele_fail_tomigrate.headerString}" 
-                                              escape="false"/>
-                                <p:spacer height="2px" />
-                                <h:outputText value="findings: #{ele_fail_tomigrate.inspectionNotes}" 
-                                              escape="true"
-                                              rendered="#{!empty ele_fail_tomigrate.inspectionNotes}"/>
-                            </li>
-                        </ui:repeat>
-                    </h:form>
-
-                </p:panel>
+              
             </div>
         </div>
     </p:dialog>

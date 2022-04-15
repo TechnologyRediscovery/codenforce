@@ -69,7 +69,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     private FieldInspection formFollowUpInspectionTo;
     
     private boolean migrateFailedItemsOnFinalization;
-    private List<CodeViolation> violationListToMigrate;
+    
     
     private int occPeriodIDFortransferFormField;
     
@@ -697,14 +697,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
         } 
         
     }
-    
-    public void onToggleMigrateFailedItemsToCase(){
-        CaseCoordinator cc = getCaseCoordinator();
-        if(migrateFailedItemsOnFinalization){
-            
-        }
-    }
-    
+ 
     
     
     /**
@@ -1017,17 +1010,5 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
         this.migrateFailedItemsOnFinalization = migrateFailedItemsOnFinalization;
     }
 
-    /**
-     * @return the violationListToMigrate
-     */
-    public List<CodeViolation> getViolationListToMigrate() {
-        return violationListToMigrate;
-    }
-
-    /**
-     * @param violationListToMigrate the violationListToMigrate to set
-     */
-    public void setViolationListToMigrate(List<CodeViolation> violationListToMigrate) {
-        this.violationListToMigrate = violationListToMigrate;
-    }
+    
 }

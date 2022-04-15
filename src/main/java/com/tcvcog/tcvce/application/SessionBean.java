@@ -1146,7 +1146,7 @@ public class    SessionBean
     /**
      * @return the sessOccInspection
      */
-    public FieldInspection getSessOccInspection() {
+    public FieldInspection getSessFieldInspection() {
         return sessOccInspection;
     }
 

@@ -51,6 +51,7 @@ import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.CitationCodeViolationLink;
 import com.tcvcog.tcvce.entities.CitationDocketRecord;
 import com.tcvcog.tcvce.entities.CitationStatus;
+import com.tcvcog.tcvce.entities.IFace_transferrable;
 import com.tcvcog.tcvce.entities.ViolationStatusEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsDateRule;
 import java.io.Serializable;
@@ -936,7 +937,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to update notes", ex);
+            throw new IntegrationException("Unable to update cecase notes", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -970,7 +971,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to update notes", ex);
+            throw new IntegrationException("Unable to update citation notes", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -1004,7 +1005,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to update notes", ex);
+            throw new IntegrationException("Unable to update NOV notes", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -1349,8 +1350,6 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         CodeIntegrator ci = getCodeIntegrator();
         UserIntegrator ui = getUserIntegrator();
         WorkflowCoordinator wc = getWorkflowCoordinator();
-        BlobIntegrator bi = getBlobIntegrator();
-        BlobCoordinator bc = getBlobCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         
         
@@ -1427,6 +1426,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 //        }
         v.setBlobList(blobList);
         
+        populateTransferrableFields(v, rs);
+        
         return v;
     }
 
@@ -1443,7 +1444,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                         "       entrytimestamp, stipulatedcompliancedate, actualcompliancedate, \n" +
                         "       penalty, description, notes, legacyimport, compliancetimestamp, \n" +
                         "       complianceuser, severity_classid, createdby, compliancetfexpiry_proposalid, \n" +
-                        "       lastupdatedts, lastupdated_userid, active, compliancenote, nullifiedts, nullifiedby \n" +
+                        "       lastupdatedts, lastupdated_userid, active, compliancenote, nullifiedts, nullifiedby,  " +
+                        "       transferredts, transferredby_userid, transferredtocecase_caseid \n" +
                         "  FROM public.codeviolation WHERE violationid = ?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1495,9 +1497,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                
                 idl.add(rs.getInt("violationid"));
-
             }
 
         } catch (SQLException ex) {
@@ -1588,7 +1588,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to update notes", ex);
+            throw new IntegrationException("Unable to update code violation notes", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -1597,6 +1597,80 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
     }
     
     
+    /**
+     * Writes the three fields specified by the IFace_transferrable interface
+     * @param trable 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateTransferrable(IFace_transferrable trable) throws IntegrationException{
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        
+        if(trable == null){
+            throw new IntegrationException("cannot update notes a null transferrable");
+        }
+        
+        try {
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("UPDATE ");
+            sb.append(trable.getTransferEnum().getTargetTableID());
+            sb.append(" SET transferredts=?, transferredby_userid=?, transferredtocecase_caseid=? ");
+            sb.append(" WHERE ");
+            sb.append(trable.getTransferEnum().getTargetPKField());
+            sb.append("=?;");
+                    
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setTimestamp(1, java.sql.Timestamp.valueOf(trable.getTransferredTS()));
+            if(trable.getTransferredBy() != null && trable.getTransferredBy().getUserID() != 0){
+                stmt.setInt(2, trable.getTransferredBy().getUserID());
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            if(trable.getTransferredToCECaseID() != 0){
+                stmt.setInt(3, trable.getTransferredToCECaseID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(4, trable.getDBKey());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update transferrable status", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    
+    /**
+     * Populates the three fields on a transferrable object:
+     * 
+     * @param trable
+     * @param rs
+     * @throws IntegrationException
+     * @throws SQLException
+     * @throws BObStatusException 
+     */
+    public void populateTransferrableFields(IFace_transferrable trable, ResultSet rs) throws IntegrationException, SQLException, BObStatusException{
+        
+        if(trable == null || rs == null){
+            throw new IntegrationException("Cannot populate transferrable with null transferrable or RS");
+        }
+        UserCoordinator uc = getUserCoordinator();
+        
+        if(rs.getTimestamp("transferredts") != null){
+            trable.setTransferredTS(rs.getTimestamp("transferredts").toLocalDateTime());
+        }
+        if(rs.getInt("transferredby_userid") != 0){
+            trable.setTransferredBy(uc.user_getUser(rs.getInt("transferredby_userid")));
+        }
+        trable.setTransferredToCECaseID(rs.getInt("transferredtocecase_caseid"));
+        
+    }
     
     
     // *************************************************************************

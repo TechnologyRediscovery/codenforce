@@ -20,12 +20,23 @@
                                 actionListener="#{ceCaseSearchProfileBB.onViolationAddInit}"
                                 value="Add Violations"
                                 disabled="#{!empty ceCaseSearchProfileBB.currentCase.closingDate}"
-
                                 oncomplete="PF('violation-selectelement-dialog-var').show()"
                                 icon="fa fa-plus"
+                                style="margin-right: 5px;"
                                 update="violation-selectelement-dialog
                                 violation-selectelement-form"
+                                />
 
+            <p:commandButton    id="cecase-violation-migrate-showpathwayoptions"
+                                ajax="true"
+                                styleClass="noFill button-size-small"
+                                actionListener="#{migrationBB.onOpenMigrationOptionsDialog}"
+                                value="Transfer violations"
+                                disabled="#{ceCaseSearchProfileBB.currentCase.violationList.size() eq 0}"
+                                oncomplete="PF('violation-migrate-choosepath-dialog-var').show()"
+                                icon="fa fa-mail-forward"
+                                update="violation-migrate-choosepath-dialog
+                                violation-migrate-choosepath-form"
                                 />
 
             <p:spacer height="5px" />
@@ -72,14 +83,14 @@
                               rendered="#{empty(v.actualComplianceDate) }"/>
                     <h:outputText value="#{(empty v.actualComplianceDate) and (empty v.nullifiedTS)  ? ceCaseSearchProfileBB.getPrettyDate(v.stipulatedComplianceDate) : ''}"
                                   styleClass="compliance-date-stipulated"/>
-                    
+
                     <h:outputText value="#{!empty(v.actualComplianceDate) ? 'Compliance achieved on '  : ''}"
                                   styleClass="compliance-date"/>
                     <p:spacer height="3px" 
                               rendered="#{!empty(v.actualComplianceDate) }"/>
                     <h:outputText value="#{!empty(v.actualComplianceDate) ? ceCaseSearchProfileBB.getPrettyDate(v.actualComplianceDate) : ''}"
                                   styleClass="compliance-date"/>
-                    
+
                     <h:outputText value="#{!empty(v.nullifiedTS) ? 'Nullified on '  : ''}"
                                   styleClass="compliance-date-nullified"/>
                     <p:spacer height="3px" 
@@ -124,14 +135,9 @@
                                         update="violation-details-dialog
                                         violation-details-form"
                                         oncomplete="PF('violation-details-dialog-var').show()"/>
-
-
                     </div>
-
-
                     <h:outputText value=" | "
                                   styleClass="link-button"/>
-
                     <div class="restrict-main-contents-io-link link-button">
 
                         <p:commandLink  id="violation-notes-init-cb"
@@ -142,19 +148,59 @@
                                         update="violation-notes-dialog
                                         violation-notes-form"
                                         oncomplete="PF('violation-notes-dialog-var').show()"/>
-
-
                     </div>
                 </p:column>
-
             </p:dataTable>
-
-
         </h:form>
-
     </p:panel>
 
+    <p:dialog   id="violation-migrate-choosepath-dialog"
+                height="400" width="500"
+                widgetVar="violation-migrate-choosepath-dialog-var"
+                responsive="true"
+                dynamic="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                rendered="true"
+                header="Choose violation transfer pathway">
 
+        <h:form id="violation-migrate-choosepath-form">
+
+            <p:selectOneMenu id="violation-migrate-path-som"
+                             value="#{migrationBB.selectedTransferPathway}" 
+                             style="width: 100%;"
+                             required="true"
+                             tabindex="1"
+                             requiredMessage="A transfer pathway is required"
+                             >
+
+                <f:selectItem itemLabel="select a pathway" 
+                              noSelectionOption="true" 
+                              itemDisabled="true"/>
+
+                <f:selectItems id="violation-migrate-path-selitems"
+                               value="#{migrationBB.transferOptionsListCaseViolation}"
+                               var="pathway" itemValue="#{pathway}" itemLabel="#{pathway.description}"/>
+            </p:selectOneMenu>
+
+            <p:spacer height="5px" />
+
+            <p:commandButton    id="violation-migrate-init-button"
+                                actionListener="#{migrationBB.onTransferPathwaySelectionCompleteButtonChange}" 
+                                ajax="true" 
+                                value="Configure migration"  
+                                icon="fa fa-arrow-right" 
+                                oncomplete="PF('violation-migrate-choosepath-dialog-var').hide(); PF('migration-configuration-dialog-var').show();"
+                                update="@form:@parent:migration-configuration-dialog
+                                @form:@parent:migration-configuration-form
+                                @form:@parent:migration-growl-form"/>
+        </h:form>
+    </p:dialog>
+    
+    <ui:include src="/restricted/compositions/violationMigration.xhtml" />
+    
     <p:dialog   id="violation-add-dialog"
                 height="700" width="1200"
                 widgetVar="violation-add-dialog-var"
@@ -221,7 +267,7 @@
                                                 escape="false" />
                             </div>
                         </div>
-                        
+
                         <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
 
                             <div class="restrict-main-contents-io-title" >
@@ -238,8 +284,8 @@
                                                  required="true" />
                             </div>
                         </div>
-                        
-                        
+
+
                         <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
 
                             <div class="restrict-main-contents-io-content" >
@@ -251,7 +297,7 @@
                             </div>
 
                         </div>
-                        
+
                         <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
 
                             <div class="restrict-main-contents-io-title" >
@@ -261,7 +307,7 @@
                             </div>
 
                             <div class="restrict-main-contents-io-content" >
-                                
+
 
                                 <p:datePicker id="viol-date-dor"
                                               value="#{bcv.dateOfRecord}" 
@@ -808,7 +854,7 @@
                                           value="Nullify Violation"
                                           update="violation-nullify-dialog
                                           violation-nullify-form"/>
-                        
+
                         <p:commandLink    id="violation-reactivate-init-cb"
                                           ajax="true"
                                           rendered="#{!empty ceCaseSearchProfileBB.currentViolation.nullifiedTS}"
@@ -946,8 +992,8 @@
                                        pattern="MM/dd/yyyy HH:mm"
                                        showButtonBar="true"
                                        hideOnDateTimeSelect="true"
-                                        showOnFocus="false"
-                                        showIcon="true"
+                                       showOnFocus="false"
+                                       showIcon="true"
                                        mask="true"
                                        tabindex="16" 
                                        timeInput="true" 
@@ -1031,7 +1077,7 @@
             <div class="ui-g data_container_nested_restrict">
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <h:outputText value="Ordinance: #{ceCaseSearchProfileBB.currentViolation.codeViolated.headerString}" />
-                
+
                 </div>
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
 
@@ -1053,8 +1099,8 @@
                                        showButtonBar="true"
                                        mask="true"
                                        hideOnDateTimeSelect="true"
-                                              showOnFocus="false"
-                                              showIcon="true"
+                                       showOnFocus="false"
+                                       showIcon="true"
                                        tabindex="16" 
                                        timeInput="true" 
                                        required="true" />
@@ -1146,8 +1192,8 @@
                                        disabled="false"
                                        showButtonBar="true"
                                        hideOnDateTimeSelect="true"
-                                              showOnFocus="false"
-                                              showIcon="true"
+                                       showOnFocus="false"
+                                       showIcon="true"
                                        mask="true"
                                        timeInput="true" 
                                        required="true" />
@@ -1478,7 +1524,7 @@
         <h:form id="violation-reactivate-form">
 
             <div class="ui-g data_container_nested_restrict">
-               
+
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
 
                     <div class="restrict-main-contents-io-button">
@@ -1607,7 +1653,7 @@
 
 
     <p:dialog   id="violation-notes-dialog"
-                height="800" width="1600"
+                height="600" width="800"
                 widgetVar="violation-notes-dialog-var"
                 responsive="true"
                 resizable="true"
@@ -1624,7 +1670,7 @@
             <h:outputText styleClass="ui-label" value="Note text: "/>
             <p:textEditor   id="violation-notes-editor"
                             value="#{ceCaseSearchProfileBB.formNoteText}"
-                            required="false"
+                            required="true"
                             secure="false"
                             height="200"/>
 

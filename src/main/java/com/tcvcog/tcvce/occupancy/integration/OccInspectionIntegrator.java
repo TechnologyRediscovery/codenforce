@@ -210,7 +210,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 + "occchecklistspacetypeelement_elementid, "
                 + "failureseverity_intensityclassid, "
                 + "migratetocecaseonfail, "
-                + "occchecklistspacetypeelement.codesetelement_seteleid \n"
+                + "occchecklistspacetypeelement.codesetelement_seteleid, transferredts, transferredby_userid, transferredtocecase_caseid  \n"
                 + "FROM public.occinspectedspaceelement "
                 + "INNER JOIN public.occchecklistspacetypeelement ON (occchecklistspacetypeelement_elementid = spaceelementid) \n"
                 + "WHERE inspectedspaceelementid=?;";
@@ -258,7 +258,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     private OccInspectedSpaceElement generateInspectedSpaceElement(ResultSet rs) throws SQLException, IntegrationException {
             CodeIntegrator ci = getCodeIntegrator();
             UserIntegrator ui = getUserIntegrator();
-            
+            CaseIntegrator cseint = getCaseIntegrator();
             BlobCoordinator bc = getBlobCoordinator();
             SystemIntegrator si = getSystemIntegrator();
             OccInspectedSpaceElement inspectedEle = null;
@@ -288,6 +288,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             inspectedEle.setMigrateToCaseOnFail(rs.getBoolean("migratetocecaseonfail"));
             
             inspectedEle.setBlobList(bc.getBlobLightList(inspectedEle));
+            cseint.populateTransferrableFields(inspectedEle, rs);
+            
         } catch(BObStatusException | BlobException ex){
             System.out.println(ex);
         }

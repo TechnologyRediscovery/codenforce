@@ -23,7 +23,10 @@ import com.tcvcog.tcvce.entities.BlobLinkEnum;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
+import com.tcvcog.tcvce.entities.IFace_keyIdentified;
+import com.tcvcog.tcvce.entities.IFace_transferrable;
 import com.tcvcog.tcvce.entities.IntensityClass;
+import com.tcvcog.tcvce.entities.TransferrableEnum;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -37,10 +40,15 @@ import java.util.Objects;
  */
 public class OccInspectedSpaceElement
         extends OccSpaceElement
-        implements Serializable, Comparable<OccInspectedSpaceElement>, IFace_BlobHolder {
+        implements Serializable, 
+                    Comparable<OccInspectedSpaceElement>, 
+                    IFace_BlobHolder,
+                    IFace_keyIdentified,
+                    IFace_transferrable{
 
-    private final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.INSPECTED_ELEMENT;
-    private final static BlobLinkEnum BLOP_UPSPTREAM_POOL = BlobLinkEnum.FIELD_INSPECTION;
+    final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.INSPECTED_ELEMENT;
+    final static BlobLinkEnum BLOP_UPSPTREAM_POOL = BlobLinkEnum.FIELD_INSPECTION;
+    final static TransferrableEnum TRANSFER_ENUM = TransferrableEnum.INSPECTED_ELEMENT;
     
     private int inspectedSpaceElementID;
 
@@ -64,6 +72,11 @@ public class OccInspectedSpaceElement
     private OccInspectableStatus status;
 
     private boolean migrateToCaseOnFail;
+    
+    protected LocalDateTime transferredTS;
+    protected User transferredBy;
+    protected int transferredToCECaseID;
+    
 
     /**
      * For advanced checklist object management in the UI
@@ -391,4 +404,67 @@ public class OccInspectedSpaceElement
     public void setFaillureSeverity(IntensityClass faillureSeverity) {
         this.faillureSeverity = faillureSeverity;
     }
+    
+
+
+    /**
+     * @return the transferredTS
+     */
+    @Override
+    public LocalDateTime getTransferredTS() {
+        return transferredTS;
+    }
+
+    /**
+     * @param transferredTS the transferredTS to set
+     */
+    @Override
+    public void setTransferredTS(LocalDateTime transferredTS) {
+        this.transferredTS = transferredTS;
+    }
+
+
+    @Override
+    public void setTransferredBy(User usr) {
+        transferredBy = usr;
+    }
+
+    @Override
+    public void setTransferredToCECaseID(int ceCaseID) {
+        transferredToCECaseID = ceCaseID;
+    }
+
+    @Override
+    public User getTransferredBy() {
+        return transferredBy;
+    }
+
+    @Override
+    public int getTransferredToCECaseID() {
+        return transferredToCECaseID;
+    }
+
+    @Override
+    public TransferrableEnum getTransferEnum() {
+        return TRANSFER_ENUM;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return TRANSFER_ENUM.getTargetPKField();
+    }
+
+    @Override
+    public int getDBKey() {
+        return occChecklistSpaceTypeElementID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return TRANSFER_ENUM.getTargetTableID();
+        
+    }
+
+   
+
 }

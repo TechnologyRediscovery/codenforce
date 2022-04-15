@@ -32,10 +32,14 @@ public  class       CodeViolation
         extends     BOb
         implements  Serializable,
                     IFace_BlobHolder,
-                    Comparable<CodeViolation> {
+                    Comparable<CodeViolation>,
+                    IFace_keyIdentified,
+                    IFace_transferrable{
     
     static final BlobLinkEnum VIOLATION_BLOB_LINK_ENUM = BlobLinkEnum.CODE_VIOLATION;
     static final BlobLinkEnum VIOLATION_BLOB_LINK_ENUM_UPSTREAM_POOL = BlobLinkEnum.CE_CASE;
+    static final TransferrableEnum TRANSFER_ENUM = TransferrableEnum.CODE_VIOLATION;
+    
     
     protected int violationID;
     protected EnforcableCodeElement violatedEnfElement;
@@ -90,6 +94,10 @@ public  class       CodeViolation
     protected LocalDateTime lastUpdatedTS;
     protected User lastUpdatedUser;
     
+    protected LocalDateTime transferredTS;
+    protected User transferredBy;
+    protected int transferredToCECaseID;
+    
     public CodeViolation(){
         
     }
@@ -129,6 +137,10 @@ public  class       CodeViolation
         this.severityIntensity = cv.severityIntensity;
         this.lastUpdatedTS = cv.lastUpdatedTS;
         this.lastUpdatedUser = cv.lastUpdatedUser;
+        
+        this.transferredTS = cv.transferredTS;
+        this.transferredBy = cv.transferredBy;
+        this.transferredToCECaseID = cv.transferredToCECaseID;
     }
     
      /**
@@ -808,6 +820,63 @@ public  class       CodeViolation
     @Override
     public int getBlobUpstreamPoolEnumPoolFeederID() {
         return ceCaseID;
+    }
+
+    /**
+     * @return the transferredTS
+     */
+    @Override
+    public LocalDateTime getTransferredTS() {
+        return transferredTS;
+    }
+
+    /**
+     * @param transferredTS the transferredTS to set
+     */
+    @Override
+    public void setTransferredTS(LocalDateTime transferredTS) {
+        this.transferredTS = transferredTS;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return TRANSFER_ENUM.getTargetPKField();
+    }
+
+    @Override
+    public int getDBKey() {
+        return violationID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return TRANSFER_ENUM.targetTableID;
+        
+    }
+
+    @Override
+    public void setTransferredBy(User usr) {
+        transferredBy = usr;
+    }
+
+    @Override
+    public void setTransferredToCECaseID(int ceCaseID) {
+        transferredToCECaseID = ceCaseID;
+    }
+
+    @Override
+    public User getTransferredBy() {
+        return transferredBy;
+    }
+
+    @Override
+    public int getTransferredToCECaseID() {
+        return transferredToCECaseID;
+    }
+
+    @Override
+    public TransferrableEnum getTransferEnum() {
+        return TRANSFER_ENUM;
     }
 
    
