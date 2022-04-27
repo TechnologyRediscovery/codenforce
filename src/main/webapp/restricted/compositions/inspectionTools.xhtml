@@ -32,6 +32,10 @@
                                      actionListener="#{fieldInspectionBB.onToggleEditModeInspectionMetadata}"
                                      oncomplete="PF('inspection-profile-dialog-var').show();"
                                      update="@form
+                                     inspection-actions-form
+                                     inspection-advancedtools-form
+                                     inspection-actions-form
+                                     inspection-inspectedspaces-form
                                      @form:@parent:inspectiontools-growl-form
                                      #{fieldInspectionBB.inspectionListComponentForUpdate}"/>
 
@@ -160,11 +164,33 @@
                              collapsed="false"
                              header="Inspection">
                         <div class="p-grid">
+                            <div class="p-col-4">
+                                Effective Date
+                            </div>
 
-                            <div class="p-col-6">
+                            <div class="p-col-8">
+                                <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
+                                              value="#{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.effectiveDateOfRecord)}"/>
+
+                                <p:datePicker 	 id="inspection-dor-datepicker"
+                                                rendered="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                value="#{fieldInspectionBB.currentInspection.effectiveDateOfRecord}" 
+                                                style="width: 100%;"
+                                                pattern="MM/dd/yyyy HH:mm"
+                                                disabled="false"
+                                                showButtonBar="true"
+                                                hideOnDateTimeSelect="true"
+                                                showOnFocus="false"
+                                                showIcon="true"
+                                                mask="true"
+                                                timeInput="true" 
+                                                required="false" />
+                            </div>
+
+                            <div class="p-col-4">
                                 Cause
                             </div>
-                            <div class="p-col-6">
+                            <div class="p-col-8">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.cause.title}"
                                               title="#{fieldInspectionBB.currentInspection.cause.description}"
@@ -182,10 +208,10 @@
 
                             </div>
 
-                            <div class="p-col-6">
+                            <div class="p-col-4">
                                 Checklist
                             </div>
-                            <div class="p-col-6">
+                            <div class="p-col-8">
 
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.checklistTemplate.title}"/>
@@ -273,10 +299,10 @@
 
                             <p:divider/>
 
-                            <div class="p-col-6">
+                            <div class="p-col-4">
                                 Max occupants allowed
                             </div>
-                            <div class="p-col-6">
+                            <div class="p-col-8">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.maxOccupantsAllowed}"/>
 
@@ -284,10 +310,10 @@
                                              value="#{fieldInspectionBB.currentInspection.maxOccupantsAllowed}"
                                              required="false"/>
                             </div>
-                            <div class="p-col-6">
+                            <div class="p-col-4">
                                 Number of bedrooms
                             </div>
-                            <div class="p-col-6">
+                            <div class="p-col-8">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.numBedrooms}"/>
                                 <p:inputText rendered="#{fieldInspectionBB.editModeInspectionMetadata}"  
@@ -295,10 +321,10 @@
                                              required="false"/>
                             </div>
 
-                            <div class="p-col-6">
+                            <div class="p-col-4">
                                 Number of bathrooms
                             </div>
-                            <div class="p-col-6">
+                            <div class="p-col-8">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.numBathrooms}"/>
                                 <p:inputText rendered="#{fieldInspectionBB.editModeInspectionMetadata}"  
@@ -313,10 +339,10 @@
                              collapsed="false"
                              header="Notes">
                         <div class="p-grid">
-                            <div class="p-col-6">
+                            <div class="p-col-4">
                                 Pre-inspection notes
                             </div>
-                            <div class="p-col-6">
+                            <div class="p-col-8">
                                 <h:outputText   rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                                 value="#{fieldInspectionBB.currentInspection.notesPreInspection}"/>
 
@@ -327,11 +353,11 @@
                                                     required="false"/>
                             </div>
 
-                            <div class="p-col-6">
+                            <div class="p-col-4">
                                 Remarks
                             </div>
 
-                            <div class="p-col-6">
+                            <div class="p-col-8">
                                 <h:outputText   rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                                 value="#{fieldInspectionBB.currentInspection.remarks}"/>
 
@@ -342,10 +368,10 @@
                                                     required="false"/>
                             </div>
 
-                            <div class="p-col-6">
+                            <div class="p-col-4">
                                 General Comments
                             </div>
-                            <div class="p-col-6">
+                            <div class="p-col-8">
                                 <h:outputText   rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                                 value="#{fieldInspectionBB.currentInspection.generalComments}"/>
 
@@ -420,13 +446,14 @@
 
                                 <p:commandButton  id="inspection-uploadphotos-cl"
                                                   value="Add Photos"
-                                                  actionListener="#{fieldInspectionBB.onUploadImagesToInspectionInitButtonClick(ins)}"
+                                                  actionListener="#{fieldInspectionBB.onUploadImagesToInspectionInitButtonClick}"
                                                   ajax="true"
                                                   icon="fa fa-upload"
                                                   oncomplete="PF('blob-upload-dialog-var').show()"
                                                   rendered="true"
                                                   disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
-                                                  update="@form:@parent:@parent:blob-upload-dialog"
+                                                  update="@form:@parent:@parent:blob-upload-dialog
+                                                  inspectiontools-growl-form"
                                                   />
 
                             </div>
@@ -434,22 +461,22 @@
 
                                 <p:commandButton  id="inspection-viewphotos-cl"
                                                   value="View photo pool"
-                                                  actionListener="#{fieldInspectionBB.onViewPhotoPoolLinkClick(ins)}" 
+                                                  actionListener="#{fieldInspectionBB.onViewPhotoPoolLinkClick}" 
                                                   ajax="true"
                                                   icon="fa fa-file-image-o"
                                                   oncomplete="PF('blobs-gallery-dialog-var').show()"
                                                   disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
                                                   rendered="true"
                                                   update="@form:@parent:@parent:blobs-gallery-dialog
-                                                  "
+                                                  inspectiontools-growl-form"
                                                   />
 
                             </div>
                             <div class="p-col-4">
 
                                 <p:commandButton  id="inspection-generatereport-cl"
-                                                  value="Inspection report"
-                                                  actionListener="#{fieldInspectionBB.onFieldInspectionReportInitLinkClick(ins)}"
+                                                  value="Build Inspection report"
+                                                  actionListener="#{fieldInspectionBB.onFieldInspectionReportInitLinkClick}"
                                                   ajax="true"
                                                   disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
                                                   rendered="true"
@@ -462,9 +489,9 @@
                             </div>
                             <div class="p-col-4">
                                 <p:commandButton    id="insp-followup-button"
-                                                    value="Setup Re-inspection"
+                                                    value="Setup Re-inspection (coming soon)"
                                                     ajax="true"
-                                                    disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                    disabled="true"
                                                     actionListener="#{fieldInspectionBB.onSetupReinspectionButtonClick}"
                                                     oncomplete="PF('inspection-followup-dialog-var').show()"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
@@ -475,7 +502,7 @@
                             </div>
                             <div class="p-col-4">
                                 <p:commandButton    id="insp-extractviolations-button"
-                                                    value="Migrate Violated Elements"
+                                                    value="Transfer Violated Elements"
                                                     ajax="true"
                                                     disabled="false"
                                                     actionListener="#{migrationBB.onOpenMigrationOptionsDialog}"
@@ -513,10 +540,11 @@
 
                         <p:spacer height="5px" />
 
-                        <p:dataTable var="inspectedSpace"
-                                     value="#{fieldInspectionBB.currentInspection.inspectedSpaceList}"
-                                     rowKey="#{inspectedSpace.inspectedSpaceID}"
-                                     reflow="true">
+                        <p:dataTable    id="inspectedspaces-table"
+                                        var="inspectedSpace"
+                                        value="#{fieldInspectionBB.currentInspection.inspectedSpaceList}"
+                                        rowKey="#{inspectedSpace.inspectedSpaceID}"
+                                        reflow="true">
 
                             <p:column style="width:2rem">
                                 <p:rowToggler/>
@@ -611,9 +639,9 @@
             </div>
         </div>
     </p:dialog>
-    
-    
-    
+
+
+
     <p:dialog   id="faileditems-migrate-choosepath-dialog"
                 height="400" width="500"
                 widgetVar="faileditems-migrate-choosepath-dialog-var"
@@ -648,7 +676,7 @@
             <p:spacer height="5px" />
 
             <p:commandButton    id="faileditems-migrate-init-button"
-                                action="#{migrationBB.onTransferPathwaySelectionCompleteButtonChange}" 
+                                actionListener="#{migrationBB.onTransferPathwaySelectionCompleteButtonChange}" 
                                 ajax="true" 
                                 value="Configure migration"  
                                 icon="fa fa-arrow-right" 
@@ -730,7 +758,7 @@
 
     <!-- Type selection used in space add flow -->
     <p:dialog id="inspections-selecttype"
-              width="800"
+              width="800" height="600"
               closeOnEscape="true"
               widgetVar="inspections-selecttype-var"
               header="Select Space Type"
@@ -738,76 +766,78 @@
               dynamic="true"
               resizable="true">
         <h:form id="inspections-selecttype-form">
+            <p:scrollPanel id="selectspacetype-scrollpanel">
 
-            <p:dataTable id="inspections-selecttype-dt"
-                         scrollHeight="600"
-                         var="ost" 
-                         value="#{fieldInspectionBB.currentInspection.checklistTemplate.occSpaceTypeList}"
-                         rowKey="#{ost.checklistSpaceTypeID}"
-                         selection="#{fieldInspectionBB.currentSpaceType}"
-                         stripedRows="true"
-                         rowExpandMode="multiple">
-                <p:ajax event="rowSelect"
-                        update=":inspections-selecttype-form:inspections-selecttype-continuebutton"/>
-                <p:column selectionMode="single" style="width:16px;text-align:center"/>
-                <p:column style="width:2rem">
-                    <p:rowToggler/>
-                </p:column>
-                <p:column headerText="CSTID">
-                    <h:outputText value="#{ost.checklistSpaceTypeID}"/>
-                </p:column>
-                <p:column headerText="Type ID">
-                    <h:outputText value="#{ost.spaceTypeID}"/>
-                </p:column>
-                <p:column headerText="Chklst ID">
-                    <h:outputText value="#{ost.checklistParentID}"/>
-                </p:column>
-                <p:column headerText="Name">
-                    <h:outputText value="#{ost.spaceTypeTitle}"/>
-                </p:column>
-                <p:column headerText="Description">
-                    <h:outputText value="#{ost.spaceTypeDescription}"/>
-                </p:column>
-                <p:column headerText="Required">
-                    <i class="#{ost.required ? 'pi pi-star' : ''}"/>
-                </p:column>
-                <p:rowExpansion>
-                    <p:dataTable id="ordbytype-table"
-                                 var="ord"
-                                 value="#{ost.codeElementList}"
-                                 rowKey="#{ord.elementID}"
-                                 stripedRows="true">
+                <p:dataTable id="inspections-selecttype-dt"
+                             scrollHeight="600"
+                             var="ost" 
+                             value="#{fieldInspectionBB.currentInspection.checklistTemplate.occSpaceTypeList}"
+                             rowKey="#{ost.checklistSpaceTypeID}"
+                             selection="#{fieldInspectionBB.currentSpaceType}"
+                             stripedRows="true"
+                             rowExpandMode="multiple">
+                    <p:ajax event="rowSelect"
+                            update=":inspections-selecttype-form:inspections-selecttype-continuebutton"/>
+                    <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                    <p:column style="width:2rem">
+                        <p:rowToggler/>
+                    </p:column>
+                    <p:column headerText="CSTID">
+                        <h:outputText value="#{ost.checklistSpaceTypeID}"/>
+                    </p:column>
+                    <p:column headerText="Type ID">
+                        <h:outputText value="#{ost.spaceTypeID}"/>
+                    </p:column>
+                    <p:column headerText="Chklst ID">
+                        <h:outputText value="#{ost.checklistParentID}"/>
+                    </p:column>
+                    <p:column headerText="Name">
+                        <h:outputText value="#{ost.spaceTypeTitle}"/>
+                    </p:column>
+                    <p:column headerText="Description">
+                        <h:outputText value="#{ost.spaceTypeDescription}"/>
+                    </p:column>
+                    <p:column headerText="Required">
+                        <i class="#{ost.required ? 'pi pi-star' : ''}"/>
+                    </p:column>
+                    <p:rowExpansion>
+                        <p:dataTable id="ordbytype-table"
+                                     var="ord"
+                                     value="#{ost.codeElementList}"
+                                     rowKey="#{ord.elementID}"
+                                     stripedRows="true">
 
-                        <p:column headerText="EleID">
-                            <h:outputText value="#{ord.elementID}"/>
-                        </p:column>
-                        <p:column headerText="subsec">
-                            <h:outputText value="#{ord.ordSubSecTitle}"/>
-                        </p:column>
+                            <p:column headerText="EleID">
+                                <h:outputText value="#{ord.elementID}"/>
+                            </p:column>
+                            <p:column headerText="subsec">
+                                <h:outputText value="#{ord.ordSubSecTitle}"/>
+                            </p:column>
 
-                    </p:dataTable>
+                        </p:dataTable>
 
-                </p:rowExpansion>
+                    </p:rowExpansion>
 
 
-            </p:dataTable>
-            <p:spacer height="3px" />
+                </p:dataTable>
+                <p:spacer height="3px" />
 
-            <p:commandButton value="Cancel"
-                             icon="pi pi-times"
-                             process="@none"
-                             immediate="true"
-                             class="ui-button-outlined p-mr-1"
-                             oncomplete="PF('inspections-selecttype-var').hide()"/>
-            <p:commandButton id="inspections-selecttype-continuebutton"
-                             actionListener="#{fieldInspectionBB.onAddSpaceTypeSelectedButtonChange}"
-                             ajax="true"
-                             value="Continue"
-                             disabled="false"
-                             icon="pi pi-arrow-right"
-                             update="inspections-selectspace-form"
-                             oncomplete="PF('inspections-selecttype-var').hide(); 
-                             PF('inspections-selectspace-var').show()"/>
+                <p:commandButton value="Cancel"
+                                 icon="pi pi-times"
+                                 process="@none"
+                                 immediate="true"
+                                 class="ui-button-outlined p-mr-1"
+                                 oncomplete="PF('inspections-selecttype-var').hide()"/>
+                <p:commandButton id="inspections-selecttype-continuebutton"
+                                 actionListener="#{fieldInspectionBB.onAddSpaceTypeSelectedButtonChange}"
+                                 ajax="true"
+                                 value="Continue"
+                                 disabled="false"
+                                 icon="pi pi-arrow-right"
+                                 update="inspections-selectspace-form"
+                                 oncomplete="PF('inspections-selecttype-var').hide(); 
+                                 PF('inspections-selectspace-var').show()"/>
+            </p:scrollPanel>
         </h:form>
     </p:dialog>
 
@@ -1335,13 +1365,13 @@
 
 
         <div class="p-grid">
-           
+
             <div class="p-col-6">
                 <h:form id="inspection-finalize-form">
                     <p:panel id="inspection-determination-panel"
-                                        toggleable="true"
-                                        collapsed="false"
-                                        header="Determination">
+                             toggleable="true"
+                             collapsed="false"
+                             header="Determination">
 
                         <p:selectOneMenu rendered="true"
                                          value="#{fieldInspectionBB.selectedDetermination}"
@@ -1357,13 +1387,13 @@
                         </p:selectOneMenu>
 
                         <p:spacer height="5px" />
-                        
+
                         <p:inputSwitch id="migrate-violations-is" 
                                        value="#{fieldInspectionBB.migrateFailedItemsOnFinalization}"
                                        onLabel="Migrate failed items to code enforcement case"
                                        offLabel="Do not migrate failed items">
                         </p:inputSwitch>
-                        
+
                         <p:spacer height="5px" />
 
                         <p:commandButton   id="inspection-finalize-commit-cb"
@@ -1381,9 +1411,9 @@
                     </p:panel>
                 </h:form>
             </div>
-            
+
             <div class="p-col-6">
-              
+
             </div>
         </div>
     </p:dialog>
@@ -1432,105 +1462,169 @@
               dynamic="true"
               modal="true"
               height="600"
-              width="600"
+              width="1000"
               resizable="true"
               responsive="true">
 
         <h:form id="inspection-reportconfig-form">
-
-
             <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                <div class="restrict-main-contents-io-link">
+                <div class="restrict-main-contents-io-link"
+                     style="font-size: 3em;">
 
                     <p:commandLink  ajax="false" 
                                     action="#{fieldInspectionBB.onFieldInspectionReportCommitLinkClick}"
                                     value="Click to generate inspection report in new tab" 
                                     target="_blank"
-                                    style="font-size:5em;"
                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                     />
                 </div>
-                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
-                    <div class="ui-button gray_button">
-
-                        <p:commandButton ajax="true" 
-                                         value="Cancel" icon="fa fa-stop" immediate="true"
-                                         onclick="PF('inspection-reportconfig-dialog-var').hide()"/>
-
-                    </div>
-                </div>
             </div>
 
-
-
-            <h2>Report Settings: Include...</h2>
             <div class="p-grid">
+                
+                <div class="p-col-12">
+                    <h2>Inspection details options</h2>
+                </div>
+                 <div class="p-col-4">
+                    Include containing Object info <br />(Occ Period or CECase):
+                </div>
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includeParentObjectInfoHeader}"
+                                             rendered="false"/>
+                </div>
+                
+                <div class="p-col-4">
+                    Include bed/bath count <br />and occupant limits:
+                </div>
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includeBedBathOccCounts}" />
+                </div>
+                
+                
+                
+                <div class="p-col-12">
+                    <h2>Ordinance display options</h2>
+                </div>
+                <div class="p-col-4">
+                    Ordinances to display:
+                </div>
+                <div class="p-col-8">
+                    
+                
+                    <p:selectOneMenu rendered="true"
+                                     value="#{fieldInspectionBB.reportConfigFIN.viewSetting}"
+                                     filter="false"
+                                     required="true">
+                        <f:selectItems value="#{fieldInspectionBB.ordinanceViewOptionsList}" 
+                                       var="viewOpt"
+                                       itemLabel="#{viewOpt.label}"
+                                       itemValue="#{viewOpt}"/>
+                    </p:selectOneMenu>
 
-                <div class="p-col-6">
-                    Parent Object info (Occ Period or CECase)
                 </div>
-                <div class="p-col-6">
-                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.inspectionReportConfig.includeOccPeriodInfoHeader}" />
+                 <div class="p-col-4">
+                    Include ordinance text:
                 </div>
-                <div class="p-col-6">
-                    Photos on passed items
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includeFullOrdText}" />
                 </div>
-                <div class="p-col-6">
-                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.inspectionReportConfig.includePhotos_pass}" />
+                
+                <div class="p-col-4">
+                    Include inspection findings:
                 </div>
-                <div class="p-col-6">
-                    Photos on violated items
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includeOrdinanceFindings}" />
                 </div>
-                <div class="p-col-6">
-                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.inspectionReportConfig.includePhotos_fail}" />
+                
+                <div class="p-col-4">
+                    Include ordinance timestamps:
                 </div>
-                <div class="p-col-6">
-                    Full ordinance text
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includeOrdinanceInspectionTimestamps}" />
                 </div>
-                <div class="p-col-6">
-                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.inspectionReportConfig.includeFullOrdText}" />
+                
+                
+                
+               
+                
+                <div class="p-col-12">
+                    <h2>Photo options: Include...</h2>
                 </div>
-                <div class="p-col-6">
-                    Item notes 
+                
+                <div class="p-col-4">
+                    Photos on violated Ords:
                 </div>
-                <div class="p-col-6">
-                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.inspectionReportConfig.includeElementNotes}" />
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includePhotos_fail}" />
                 </div>
-                <div class="p-col-6">
-                    Inspection timestamp by item
+                
+                 <div class="p-col-4">
+                    Photos on passed Ords:
                 </div>
-                <div class="p-col-6">
-                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.inspectionReportConfig.includeElementLastInspectedInfo}" />
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includePhotos_pass}" />
                 </div>
-                <div class="p-col-6">
-                    Compliance granted timestamp by item
+                
+                <div class="p-col-4">
+                    Overall photos:
                 </div>
-                <div class="p-col-6">
-                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.inspectionReportConfig.includeElementComplianceInfo}" />
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includeOverallInspectionPhotos}" />
                 </div>
-                <div class="p-col-6">
-                    Inspector signature
+                <div class="p-col-4">
+                    Photo IDs:
                 </div>
-                <div class="p-col-6">
-                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.inspectionReportConfig.includeSignature}" 
-                                             disabled="true"/>
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includePhotoIDs}" />
                 </div>
-                <div class="p-col-6">
-                    Remedy info
+                
+                <div class="p-col-4">
+                    Photo Titles:
                 </div>
-                <div class="p-col-6">
-                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.inspectionReportConfig.includeRemedyInfo}" 
-                                             disabled="true"/>
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includePhotoTitles}" />
+                </div>
+                
+                <div class="p-col-4">
+                    Photo original filenames:
+                </div>
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includePhotoOriginalFileNames}" />
+                </div>
+                
+                <div class="p-col-4">
+                    Photo descriptions:
+                </div>
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includePhotoDescriptions}" />
+                </div>
+                
+               
+                
+                <div class="p-col-3">
+                    Default photo width:
+                </div>
+                <div class="p-col-3">
+                    <p:inputNumber value="#{fieldInspectionBB.reportConfigFIN.unifiedPhotoWidth}" />
+                </div>
+                
+                
+            
+                
+               
+                
+                <div class="p-col-4">
+                    Inspector signature:
+                </div>
+                <div class="p-col-2">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includeSignature}" 
+                                             disabled="true"
+                                             rendered="false"/>
+                    
                 </div>
             </div>
-
-
 
             <p:spacer height="5px" />
-
-
         </h:form>
-
     </p:dialog>
-
 </ui:composition>

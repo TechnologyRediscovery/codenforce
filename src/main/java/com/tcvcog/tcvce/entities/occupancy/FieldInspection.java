@@ -134,7 +134,7 @@ public  class       FieldInspection
      * @return the inspectedSpaceListVisible
      */
     public List<OccInspectedSpace> getInspectedSpaceListVisible() {
-        configureVisibleSpaceElementList(null);
+        
 
         return inspectedSpaceListVisible;
     }
@@ -152,8 +152,7 @@ public  class       FieldInspection
         inspectedSpaceListVisible.clear();
         for(Iterator<OccInspectedSpace> it = inspectedSpaceList.iterator(); it.hasNext(); ){
             OccInspectedSpace ois = it.next(); 
-            ois.setViewSetting(viewSetting);
-            ois.configureVisibleElementList();
+            ois.configureVisibleElementList(viewSetting);
             if(!ois.getInspectedElementListVisible().isEmpty()
                     || (ois.getInspectedElementListVisible().isEmpty() && includeEmptySpaces)){
                 inspectedSpaceListVisible.add(ois);
@@ -168,10 +167,10 @@ public  class       FieldInspection
      * @return a list, perhaps with eces to include in a case
      * @throws BObStatusException 
      */
-    public List<EnforcableCodeElement> extractFailedItemsForCECaseMigration() 
+    public List<OccInspectedSpaceElement> extractFailedItemsForCECaseMigration() 
             throws BObStatusException{
         
-        List<EnforcableCodeElement> eceList = new ArrayList<>();
+        List<OccInspectedSpaceElement> eceList = new ArrayList<>();
         if(inspectedSpaceList != null && !inspectedSpaceList.isEmpty()){
             for(OccInspectedSpace ois: inspectedSpaceList){
                 for(OccInspectedSpaceElement oise: ois.getElementListFail()){

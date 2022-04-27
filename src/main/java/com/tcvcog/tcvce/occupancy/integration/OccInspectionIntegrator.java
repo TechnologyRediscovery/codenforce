@@ -645,7 +645,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     public void updateInspectedSpaceElement(OccInspectedSpaceElement inspElement) throws IntegrationException {
         String sql = "UPDATE public.occinspectedspaceelement\n"
                 + "   SET notes=?, lastinspectedby_userid=?, lastinspectedts=?, compliancegrantedby_userid=?, \n"
-                + "       compliancegrantedts=?, failureseverity_intensityclassid=? \n"
+                + "       compliancegrantedts=?, failureseverity_intensityclassid=?, migratetocecaseonfail=? \n"
                 + " WHERE inspectedspaceelementid=?;";
 
         Connection con = getPostgresCon();
@@ -685,8 +685,10 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             } else {
                 stmt.setNull(6,java.sql.Types.NULL);
             }
+            
+            stmt.setBoolean(7, inspElement.isMigrateToCaseOnFail());
 
-            stmt.setInt(7, inspElement.getInspectedSpaceElementID());
+            stmt.setInt(8, inspElement.getInspectedSpaceElementID());
 
             stmt.executeUpdate();
             System.out.println("OccInspectionIntegrator.updatedInspectedCodeElement | completed updated on ineleid: " + inspElement.getInspectedSpaceElementID());

@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.IFace_inspectable;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.MunicipalityDataHeavy;
+import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.*;
@@ -61,6 +62,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     final static String NO_ELEMENT_CATEGORY_TITLE = "Uncategorized";
     final static String SPACE = " ";
     final static boolean COMMENCE_SPACE_WITH_DEF_FAIL_FINDINGS = false;
+    final static int DEFAULT_PHOTO_WIDTH = 600;
     
     
     
@@ -217,24 +219,25 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         // Wrap each CodeElement in an InspectedCodeElement blanket to keep it warm :)
         List<OccInspectedSpaceElement> inspectedElements;
         inspectedElements = tpe.getCodeElementList().stream().map(element -> {
-        OccInspectedSpaceElement inspectedElement = new OccInspectedSpaceElement(element);
+            OccInspectedSpaceElement inspectedElement = new OccInspectedSpaceElement(element);
 
-            switch (initialStatus) {
-                case VIOLATION:
-                    inspectionAction_configureElementForInspectionNoCompliance( 
-                                        inspectedElement, 
-                                        user, 
-                                        inspection, 
-                                        COMMENCE_SPACE_WITH_DEF_FAIL_FINDINGS);
-                    break;
-                case PASS:
-                    inspectionAction_configureElementForCompliance(inspectedElement, user, inspection);
-                    break;
-                default:
-                    inspectionAction_configureElementForNotInspected(inspectedElement, user, inspection);
-            }
-            return inspectedElement;
-        }).collect(Collectors.toList());
+                switch (initialStatus) {
+                    case VIOLATION:
+                        inspectionAction_configureElementForInspectionNoCompliance( 
+                                            inspectedElement, 
+                                            user, 
+                                            inspection, 
+                                            COMMENCE_SPACE_WITH_DEF_FAIL_FINDINGS);
+                        break;
+                    case PASS:
+                        inspectionAction_configureElementForCompliance(inspectedElement, user, inspection);
+                        break;
+                    default:
+                        inspectionAction_configureElementForNotInspected(inspectedElement, user, inspection);
+                }
+                inspectedElement.setMigrateToCaseOnFail(true);
+                return inspectedElement;
+            }).collect(Collectors.toList());
 
         inspectedSpace.setInspectedElementList(inspectedElements);
         inspectedSpace.setType(tpe);
@@ -1273,11 +1276,19 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 
         ReportConfigOccInspection rpt = new ReportConfigOccInspection();
         rpt.setGenerationTimestamp(LocalDateTime.now());
+        
         if(inspectable instanceof OccPeriodPropertyUnitHeavy){
-            rpt.setOccPeriod((OccPeriodPropertyUnitHeavy) inspectable);
+            OccPeriodPropertyUnitHeavy op = (OccPeriodPropertyUnitHeavy) inspectable;
+            rpt.setOccPeriod(op);
+            rpt.setInspectedUnit(op.getPropUnitProp());
+            rpt.setInspectedProperty(op.getPropUnitProp().getProperty());
         } else if(inspectable instanceof CECasePropertyUnitHeavy){
-            rpt.setCeCase((CECasePropertyUnitHeavy) inspectable);
+            CECasePropertyUnitHeavy csepuh  = (CECasePropertyUnitHeavy) inspectable;
+            rpt.setCeCase(csepuh);
+            rpt.setInspectedProperty(csepuh.getProperty());
+            rpt.setInspectedUnit(csepuh.getPropUnit());
         }
+        
         rpt.setInspection(insp);
 
         rpt.setTitle(getResourceBundle(Constants.MESSAGE_TEXT).getString("report_occinspection_default_title"));
@@ -1287,21 +1298,34 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         rpt.setDefaultItemIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                 .getString(OccInspectionStatusEnum.NOTINSPECTED.getIconPropertyLookup()))));
 
-        rpt.setIncludeOccPeriodInfoHeader(true);
+        rpt.setIncludeParentObjectInfoHeader(false);
 
+        rpt.setIncludeOwnerInfo(true);
+        rpt.setIncludeOwnerPhones(true);
+        rpt.setIncludeOwnerAddresses(true);
+        rpt.setIncludeOwnerEmails(true);
+        
+        rpt.setIncludeBedBathOccCounts(true);
+        
         rpt.setIncludePhotos_pass(true);
         rpt.setIncludePhotos_fail(true);
-
+        
+        rpt.setIncludePhotoIDs(true);
+        rpt.setIncludePhotoTitles(true);
+        rpt.setIncludePhotoOriginalFileNames(false);
+        rpt.setIncludePhotoDescriptions(true);
+        rpt.setUnifiedPhotoWidth(DEFAULT_PHOTO_WIDTH);
+        
         rpt.setIncludeFullOrdText(true);
-        rpt.setIncludeElementNotes(true);
+        rpt.setIncludeOrdinanceFindings(true);
 
-        rpt.setIncludeElementLastInspectedInfo(true);
-        rpt.setIncludeElementComplianceInfo(true);
+        rpt.setIncludeOrdinanceInspectionTimestamps(true);
+        
 
         rpt.setIncludeRemedyInfo(false);
-        rpt.setIncludeSignature(true);
+        rpt.setIncludeSignature(false);
 
-        rpt.setViewSetting(ViewOptionsOccChecklistItemsEnum.FAILED_ITEMS_ONLY);
+        rpt.setViewSetting(ViewOptionsOccChecklistItemsEnum.FAILED_PASSEDWPHOTOFINDING);
         return rpt;
     }
 

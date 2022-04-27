@@ -220,7 +220,7 @@ public class    SessionBean
     private List<OccPeriodPropertyUnitHeavy> sessOccPeriodList;
     
     private OccPermit sessOccPermit;
-    private FieldInspection sessOccInspection;
+    private FieldInspection sessFieldInspection;
     
     /* >>> QUERY OCCPERIOD <<< */
     private QueryOccPeriod queryOccPeriod;
@@ -1144,10 +1144,10 @@ public class    SessionBean
     }
 
     /**
-     * @return the sessOccInspection
+     * @return the sessFieldInspection
      */
     public FieldInspection getSessFieldInspection() {
-        return sessOccInspection;
+        return sessFieldInspection;
     }
 
     /**
@@ -1189,10 +1189,10 @@ public class    SessionBean
     }
 
     /**
-     * @param sessOccInspection the sessOccInspection to set
+     * @param sessFieldInspection the sessFieldInspection to set
      */
-    public void setSessOccInspection(FieldInspection sessOccInspection) {
-        this.sessOccInspection = sessOccInspection;
+    public void setSessFieldInspection(FieldInspection sessFieldInspection) {
+        this.sessFieldInspection = sessFieldInspection;
     }
 
     /**

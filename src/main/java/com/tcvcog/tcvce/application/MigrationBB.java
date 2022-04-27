@@ -106,7 +106,7 @@ public class MigrationBB extends BackingBeanUtils{
        CaseCoordinator cc = getCaseCoordinator();
        EventCoordinator ec = getEventCoordinator();
        
-       currentMigrationSettings = cc.violation_getCodeViolationMigrationSettingsSkeleton();
+       currentMigrationSettings = cc.violation_migration_getCodeViolationMigrationSettingsSkeleton();
        currentMigrationSettings.setProp(getSessionBean().getSessProperty());
 
        if(selectedTransferPathway != null){
@@ -121,9 +121,17 @@ public class MigrationBB extends BackingBeanUtils{
        
        try{
             if(currentMigrationSettings.getPathway().getViolationSourceEnum() == CodeViolationMigrationSourceEnum.CECASE_VIOLATIONS){
+                
+                // ****************************************************************************
+                // EXTRACT VIOLATIONS FROM CECASE FOR USE IN THE MIGRATION DIALOG
+                // ****************************************************************************
                  currentMigrationSettings.setViolationListToMigrate(cc.violation_migration_assembleViolationsForMigrationFromCECase(getSessionBean().getSessCECase()));
             } else if(currentMigrationSettings.getPathway().getViolationSourceEnum() == CodeViolationMigrationSourceEnum.CECASE_INSPECTION
                     || currentMigrationSettings.getPathway().getViolationSourceEnum() == CodeViolationMigrationSourceEnum.OCCUPNACY_PERIOD_INSPECTION){
+                
+                // ****************************************************************************
+                // EXTRACT VIOLATED ELEMENTS IN THE SESSION FIN FOR USE IN THE MIGRATION DIALOG
+                // ****************************************************************************
                  currentMigrationSettings.setViolationListToMigrate(cc.violation_buildViolationListFromFailedInspectionItems(getSessionBean().getSessFieldInspection()));
             }
        } catch (BObStatusException | ViolationException ex){
@@ -132,15 +140,13 @@ public class MigrationBB extends BackingBeanUtils{
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Could not assemble violation list; Aborting!" , ""));
        }
     
-       caseCandidateList = getSessionBean().getSessProperty().getCeCaseList();
+       caseCandidateList = cc.cecase_assembleListOfOpenCases(getSessionBean().getSessProperty().getCeCaseList(), getSessionBean().getSessCECase());
 
        if(currentMigrationSettings.getPathway().getDomain() == DomainEnum.CODE_ENFORCEMENT){
             caseOriginationEventCategoryCandidateList = ec.determinePermittedEventCategories(EventType.Origination, getSessionBean().getSessUser());
        } else {
             caseOriginationEventCategoryCandidateList = ec.determinePermittedEventCategories(EventType.Occupancy, getSessionBean().getSessUser());
        }
-       
-       
     }
     
     
@@ -156,11 +162,13 @@ public class MigrationBB extends BackingBeanUtils{
             if(currentMigrationSettings.getPathway() != null){
                 if(currentMigrationSettings.getPathway().getViolationSourceEnum() == CodeViolationMigrationSourceEnum.CECASE_VIOLATIONS){
                     currentMigrationSettings.setSourceCase(getSessionBean().getSessCECase());
+                    // turn me off to let the user select manager
+//                    currentMigrationSettings.setNewCECaseManager(getSessionBean().getSessCECase().getManager());
                 }
             }
                 
             try {
-                currentMigrationSettings = cc.violation_migrateViolations(currentMigrationSettings);
+                currentMigrationSettings = cc.violation_migration_migrateViolations(currentMigrationSettings);
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully migrated " + currentMigrationSettings.getViolationListSuccessfullyMigrated().size() + " violations!", ""));
             } catch (BObStatusException ex) {

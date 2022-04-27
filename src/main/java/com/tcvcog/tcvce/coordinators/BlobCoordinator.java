@@ -155,7 +155,7 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     public Blob generateBlobSkeleton(UserAuthorized ua) throws IntegrationException {
         Blob blob = new Blob();
         blob.setBlobMetadata(new Metadata());
-        blob.setDescription("No description.");
+        blob.setDescription("");
         blob.setCreatedTS(LocalDateTime.now());
         if (getSessionBean().getSessUser() != null) {
             blob.setBlobUploadedBy(ua);

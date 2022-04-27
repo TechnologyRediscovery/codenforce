@@ -56,6 +56,7 @@
                                 <!-- First column -->
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                                     <ui:include src="compositions/statusPanel.xhtml"/>
+                                    <ui:include src="/restricted/compositions/violationMigration.xhtml" />
                                     <ui:include src="/restricted/compositions/inspectionTools.xhtml"/>
 
                                     <p:panel id="inspections-panel"
@@ -112,7 +113,9 @@
                                                                     inspection-profile-form
                                                                     inspection-advancedtools-form
                                                                     inspection-actions-form
-                                                                    inspection-inspectedspaces-form"
+                                                                    inspection-spaces-panel
+                                                                    inspection-inspectedspaces-form
+                                                                    inspection-inspectedspaces-form:inspectedspaces-table"
                                                                     >
                                                         <f:param name="initiating-inspection-list-component-id" value="occperiod-inspections-form" />
                                                     </p:commandLink>

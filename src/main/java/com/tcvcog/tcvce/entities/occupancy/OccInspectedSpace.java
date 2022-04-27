@@ -78,32 +78,87 @@ public class OccInspectedSpace
         this.inspectionID = space.getInspectionID();
     }
 
-    public void configureVisibleElementList() {
-        if(inspectedElementListVisible != null){
-            inspectedElementListVisible.clear();
-            for(Iterator<OccInspectedSpaceElement> itEle = inspectedElementList.iterator(); itEle.hasNext(); ){
-                OccInspectedSpaceElement oise = itEle.next();
-                switch(viewSetting){
-                    case ALL_ITEMS:
+    public void configureVisibleElementList(ViewOptionsOccChecklistItemsEnum vo) {
+        viewSetting = vo;
+        inspectedElementListVisible = new ArrayList<>();
+
+        for(OccInspectedSpaceElement oise: inspectedElementList){
+            switch(viewSetting){
+                case ALL_ITEMS:
+                    inspectedElementListVisible.add(oise);
+                    break;
+                case FAILED_ITEMS_ONLY:
+                    // look for failed items
+                    if(checkForFailure(oise)){
                         inspectedElementListVisible.add(oise);
-                        break;
-                    case FAILED_ITEMS_ONLY:
-                        // look for failed items
-                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() != null){
-                            inspectedElementListVisible.add(oise);
-                        } 
-                        break;
-                    case UNISPECTED_ITEMS_ONLY:
-                        // look for failed items
-                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() == null){
-                            inspectedElementListVisible.add(oise);
-                        } 
-                        break;
-                    default:
+                    } 
+                    break;
+                case FAILED_PASSEDWPHOTOFINDING:
+                    if(checkForFailure(oise) || checkForPassPhotoOrFinding(oise)){
                         inspectedElementListVisible.add(oise);
-                }
+                    }
+                    break;
+                case PASSED_AND_FAILED: 
+                    if(checkForCompliance(oise) || checkForFailure(oise)){
+                        inspectedElementListVisible.add(oise);
+                    }
+                    break;
+                case PASSED_ITEMS:
+                    if(checkForCompliance(oise)){
+                        inspectedElementListVisible.add(oise);
+                    }
+                    break;
+                case UNISPECTED_ITEMS_ONLY:
+                    // look for failed items
+                    if(checkForNoninspection(oise)){
+                        inspectedElementListVisible.add(oise);
+                    } 
+                    break;
+                default:
+                    inspectedElementListVisible.add(oise);
             }
         }
+    }
+    
+    /**
+     * Internal orgran for inspected space element logic
+     * @param oise
+     * @return if the element should be included in a visible liste
+     */
+    private boolean checkForFailure(OccInspectedSpaceElement oise){
+        return oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() != null;
+        
+    }
+    
+    /**
+     * Internal orgran for inspected space element logic
+     * @param oise
+     * @return if the element should be included in a visible liste
+     */
+    private boolean checkForCompliance(OccInspectedSpaceElement oise){
+        return oise.getComplianceGrantedTS() != null;
+        
+    }
+    
+    /**
+     * Internal orgran for inspected space element logic
+     * @param oise
+     * @return if the element should be included in a visible liste
+     */
+    private boolean checkForNoninspection(OccInspectedSpaceElement oise){
+        return oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() == null;
+    }
+    
+    /**
+     * Internal orgran for inspected space element logic
+     * @param oise
+     * @return if the element should be included in a visible liste
+     */
+    private boolean checkForPassPhotoOrFinding(OccInspectedSpaceElement oise){
+        return checkForCompliance(oise) 
+                && ((oise.getBlobList() != null && !oise.getBlobList().isEmpty())
+                        || (oise.getInspectionNotes() != null && !oise.getInspectionNotes().equals("")));
+        
     }
     
     public List<OccInspectedSpaceElement> getElementListPass(){
@@ -303,7 +358,7 @@ public class OccInspectedSpace
      * @return the inspectedElementListVisible
      */
     public List<OccInspectedSpaceElement> getInspectedElementListVisible() {
-        configureVisibleElementList();
+        
         return inspectedElementListVisible;
     }
 

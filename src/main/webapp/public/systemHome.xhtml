@@ -48,6 +48,62 @@
                                                 <p:spacer height="20px" />
                                                 <h2>Release notes</h2>
                                                 <p:accordionPanel id="release-panel">
+                                                    <p:tab title="Release Alpha 0.842: Tuesday, 26-April-2022 @ 0642h">
+                                                        <ul>
+                                                            <li>Field inspection reports now can be customized at creation to specify <span style="font-weight: bold;">which combination of ordinances to display</span>.
+                                                            Options include: pass &amp; violated, violated only, all violated ordinances and passed ords with photos or comments, and more!</li>
+                                                            <li>Field inspection reports can now <span style="font-weight: bold;">display the photo pool on the inspection</span>; this option is turned off by default thinking that the pool is mostly
+                                                            used to upload a batch for individual assignment to violations.</li>
+                                                            <li>Start &amp; end times now display on the field inspection report</li>
+                                                            <li><span style="font-weight: bold;">Four-column formatting</span> now works on the field inspection report</li>
+                                                            <li>The <span style="font-weight: bold;">photo pool for inspections now works</span>, so you can upload a batch of photos to the inspection's "add photos" dialog and then
+                                                            pick from that pool for individual elements. Remember, to choose photos from the inspection pool on an individual ordinance,
+                                                            choose the right-most tab in the upload dialog to choose from the pool of already uploaded photos instead of uploading a new one.</li>
+                                                            <li>Case list report no longer throws a null pointer due to having added a "transferred" category!</li>
+                                                        </ul>
+                                                        <h3>Work in progress (ECD front burner)</h3>
+                                                        <ul>
+                                                            <li>Person role selection (owns, tenant at, etc.) system wide</li>
+                                                            <li>Broad view photo on field inspection reports</li>
+                                                            <li>Owner/tenant selection and display on field inspection report</li>
+                                                            <li>Property status on case list report</li>
+                                                        </ul>
+                                                        <h3>Known bugs</h3>
+                                                        <ul>
+                                                            <li>Once you generate a field inspection report, and were you to want to make another after tweaking the options, you must first close the 
+                                                            report generation diaog, and the inspection dialog, and re-load them to get a new report object or you'll get an error page on report generation. 
+                                                            This error is due to our somewhat non-traditional use of opening the report in a new tab; 
+                                                            this new tab operation closes out the internal objects of the report generator.</li>
+                                                            <li>Incomplete migrated (i.e. transferred) violation notes</li>
+                                                            <li>Violation transfer errors out if you attempt to do so after making a new inspection 
+                                                            but before reloading the parent case or occ period.</li>
+                                                            <li>About a hundred others lurking...</li>
+                                                            
+                                                        </ul>
+                                                    </p:tab>
+                                                    <p:tab title="Release Alpha 0.841: Wednesday, 20-April-2022 @ 17:05h">
+                                                        <ul>
+                                                            <li>Field inspection reports are now live, and they do contain findings, and images for each ordinance in each space!</li>
+                                                            <li>The bug on reloading inspections which meant the list of displayed spaces was inaccurate has been fixed.</li>
+                                                        </ul>
+                                                        <h3>Still to resolve</h3>
+                                                        <ul>
+                                                            <li>The inspection report configuration asks about showing property owner--this currently does nothing. Property owners do not show on reports yet</li>
+                                                            <li>The formatting on the inspection report is ugly for the top part (before ordinances). This is a CSS gremlin which is haunting me. My apologies.</li>
+                                                        </ul>
+                                                        
+                                                    </p:tab>
+                                                    <p:tab title="Release Alpha 0.840: Friday, 15-April-2022 @ 13:20h">
+                                                        <ul>
+                                                            <li>Code violations can now be migrated from one case to another using the "transfer violations" button
+                                                                in the code violation panel of the code enforcement case profile.
+                                                            </li>
+                                                            <li>
+                                                                Field inspections now exist on code enforcement cases, but not with custom inspection check lists.
+                                                            </li>
+                                                        </ul>
+                                                        
+                                                    </p:tab>
                                                     <p:tab title="Release Alpha 0.836: Monday, 11-April-2022 @ 1054h">
                                                         <ul>
                                                             <li>Adjusted the Code Enforcement case list report to reflect, once again, the changes specified

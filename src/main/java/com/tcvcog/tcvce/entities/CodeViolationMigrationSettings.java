@@ -42,6 +42,7 @@ public class CodeViolationMigrationSettings {
     private LocalDateTime unifiedStipComplianceDate;
     private boolean useInspectedElementFindingsAsViolationFindings;
     private boolean linkInspectedElementPhotoDocsToViolation;
+    private boolean migrateWithoutMarkingSourceViolsAsTransferred;
     
     private Property prop;
     private PropertyUnit newCasePropUnit;
@@ -408,6 +409,20 @@ public class CodeViolationMigrationSettings {
      */
     public void setViolationListSuccessfullyMigrated(List<CodeViolation> violationListSuccessfullyMigrated) {
         this.violationListSuccessfullyMigrated = violationListSuccessfullyMigrated;
+    }
+
+    /**
+     * @return the migrateWithoutMarkingSourceViolsAsTransferred
+     */
+    public boolean isMigrateWithoutMarkingSourceViolsAsTransferred() {
+        return migrateWithoutMarkingSourceViolsAsTransferred;
+    }
+
+    /**
+     * @param migrateWithoutMarkingSourceViolsAsTransferred the migrateWithoutMarkingSourceViolsAsTransferred to set
+     */
+    public void setMigrateWithoutMarkingSourceViolsAsTransferred(boolean migrateWithoutMarkingSourceViolsAsTransferred) {
+        this.migrateWithoutMarkingSourceViolsAsTransferred = migrateWithoutMarkingSourceViolsAsTransferred;
     }
 
  

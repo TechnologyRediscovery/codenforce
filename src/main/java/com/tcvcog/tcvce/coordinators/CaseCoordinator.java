@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.*;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccInspectedSpaceElement;
 import com.tcvcog.tcvce.entities.reports.ReportCECaseListCatEnum;
 import com.tcvcog.tcvce.entities.reports.ReportCECaseListStreetCECaseContainer;
 import com.tcvcog.tcvce.entities.search.*;
@@ -735,9 +736,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // no closing date, by design of case flow
         newCase.setPublicControlCode(casePCC);
         newCase.setParcelKey(p.getParcelKey());
-        if (ua.getKeyCard().getGoverningAuthPeriod().getOathTS() != null) {
-            newCase.setCaseManager(ua);
-        }
+        // TURN OFF MANAGER AUTO INSERT
+        // APR 2022 to debug manager issues
+//        if (ua.getKeyCard().getGoverningAuthPeriod().getOathTS() != null) {
+//            newCase.setCaseManager(ua);
+//        }
         newCase.setOriginationDate(LocalDateTime.now());
 
         return newCase;
@@ -772,26 +775,26 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * origination event is built and attached to the case that was just
      * created.
      *
-     * @param freshCase
+     * @param inputCase
      * @param ua
      * @param origEventCat
      * @param cear
-     * @return
+     * @return the ID of the freshly inserted case
      * @throws IntegrationException
      * @throws BObStatusException
      * @throws ViolationException
      * @throws com.tcvcog.tcvce.domain.EventException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public int cecase_insertNewCECase(CECase freshCase,
+    public int cecase_insertNewCECase(CECase inputCase,
             UserAuthorized ua,
             EventCategory origEventCat,
             CEActionRequest cear)
-            throws IntegrationException,
-            BObStatusException,
-            ViolationException,
-            EventException,
-            SearchException {
+            throws  IntegrationException,
+                    BObStatusException,
+                    ViolationException,
+                    EventException,
+                    SearchException {
 
         CaseIntegrator ci = getCaseIntegrator();
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
@@ -800,20 +803,24 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         EventCnF originationEvent;
         UserCoordinator uc = getUserCoordinator();
 
-        freshCase.setActive(true);
-        freshCase.setLastUpdatedBy(ua);
+        if(inputCase == null){
+            throw new BObStatusException("Cannot insert new case with null input case");
+        }
+        inputCase.setActive(true);
+        inputCase.setLastUpdatedBy(ua);
 
-        if (freshCase.getCaseManager() == null) {
-            freshCase.setCaseManager(ua);
+        if (inputCase.getCaseManager() == null) {
+            throw new BObStatusException("CeCase Must have a non-null manager");
+            
         }
 
-        cecase_auditCaseForInsert(freshCase);
+        cecase_auditCaseForInsert(inputCase);
 
         // the integrator returns to us a CECaseDataHeavy with the correct ID after it has
         // been written into the DB
-        int freshID = ci.insertNewCECase(freshCase);
-        freshCase = cecase_getCECase(freshID);
-        CECaseDataHeavy cedh = cecase_assembleCECaseDataHeavy(freshCase, ua);
+        int freshID = ci.insertNewCECase(inputCase);
+        inputCase = cecase_getCECase(freshID);
+        CECaseDataHeavy cedh = cecase_assembleCECaseDataHeavy(inputCase, ua);
 
         // If we were passed in an action request, connect it to the new case we just made
         if (cear != null) {
@@ -824,7 +831,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             originationEvent = ec.initEvent(cedh, originationCategory);
             StringBuilder sb = new StringBuilder();
             originationEvent.setNotes(sb.toString());
-        } else if (freshCase.isPropertyInfoCase()) {
+        } else if (inputCase.isPropertyInfoCase()) {
             // This is a property info case, it originated to store info
             originationCategory = ec.initEventCategory(
                     Integer.parseInt(getResourceBundle(
@@ -894,6 +901,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         return sb.toString();
     }
 
+    /**
+     * Logic container for checking that the inputted case is not null, 
+     * has an origination date, has a property connection, and if it has a 
+     * closing date that date is after the opening date
+     * @param cse
+     * @throws BObStatusException 
+     */
     private void cecase_auditCaseForInsert(CECase cse) throws BObStatusException {
         if (cse == null) {
             throw new BObStatusException("Cannot insert a null case");
@@ -1282,10 +1296,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         violMap.put(ViolationStatusEnum.RESOLVED, 0);
         violMap.put(ViolationStatusEnum.UNRESOLVED_CITED, 0);
         violMap.put(ViolationStatusEnum.NULLIFIED, 0);
+        violMap.put(ViolationStatusEnum.TRANSFERRED, 0);
+        
 
         for (CodeViolation cv : vl) {
             ViolationStatusEnum vs = cv.getStatus();
-
             Integer catCount = violMap.get(vs);
             catCount += 1;
             violMap.put(cv.getStatus(), catCount);
@@ -3268,14 +3283,48 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
 
         List<CodeViolation> cvl = new ArrayList<>();
-        List<EnforcableCodeElement> ecel = fin.extractFailedItemsForCECaseMigration();
-        if (ecel != null && !ecel.isEmpty()) {
-            for (EnforcableCodeElement ece : ecel) {
-                cvl.add(violation_injectOrdinance(null, ece)); // method will make new violation
+        System.out.println("CaseCoordinator.violation_buildViolationListFromFailedInspectionItems | current FIN ID: " + fin.getInspectionID());
+        List<OccInspectedSpaceElement> ecel = fin.extractFailedItemsForCECaseMigration();
+        System.out.println("CaseCoordinator.violation_buildViolationListFromFailedInspectionItems | violated ecel size: " + ecel.size());
+        if (!ecel.isEmpty()) {
+            for (OccInspectedSpaceElement oise : ecel) {
+                CodeViolation cv = new CodeViolation();
+                cv.setViolatedEnfElement((EnforcableCodeElement) oise);
+                cv.setDescription(oise.getInspectionNotes());
+                cv.setSeverityIntensity(oise.getFaillureSeverity());
+                cv.setCreatedBy(oise.getLastInspectedBy());
+                cv.setLastUpdatedUser(oise.getLastInspectedBy());
+                cv.setPenalty(oise.getNormPenalty());
+                cvl.add(cv); // method will make new violation
             }
         }
         return cvl;
-
+    }
+    
+    /**
+     * Iterates over a list of cecases and only returns those which can receive
+     * new violations during the migration process either from another CECase
+     * or from a field inspection attached to either a cecase or an occ period
+     * @param cecaseList of possible migration targets
+     * @param currentCase If not null, I won't add this case to the list
+     * @return a list, perhaps containing one or more eligible cases
+     */
+    public List<CECasePropertyUnitHeavy> cecase_assembleListOfOpenCases(List<CECasePropertyUnitHeavy> cecaseList, CECaseDataHeavy currentCase){
+        List<CECasePropertyUnitHeavy> cl = new ArrayList<>();
+        if(cecaseList != null && !cecaseList.isEmpty()){
+            for(CECasePropertyUnitHeavy cse: cecaseList){
+                if(cse.getClosingDate() != null){
+                    continue;
+                }
+                if(currentCase != null){
+                    if(currentCase.getCaseID() == cse.getCaseID()){
+                        continue;
+                    }
+                }
+                cl.add(cse);
+            }
+        }
+        return cl;
     }
 
     /**
@@ -3284,12 +3333,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      *
      * @return
      */
-    public CodeViolationMigrationSettings violation_getCodeViolationMigrationSettingsSkeleton() {
+    public CodeViolationMigrationSettings violation_migration_getCodeViolationMigrationSettingsSkeleton() {
         CodeViolationMigrationSettings cvms = new CodeViolationMigrationSettings();
         cvms.setViolationListReadyForInsertion(new ArrayList<>());
         cvms.setViolationListSuccessfullyMigrated(new ArrayList<>());
         cvms.setLinkInspectedElementPhotoDocsToViolation(true);
         cvms.setUseInspectedElementFindingsAsViolationFindings(true);
+        cvms.setMigrateWithoutMarkingSourceViolsAsTransferred(false);
         cvms.appendToMigrationLog("Init complete");
 
         return cvms;
@@ -3328,7 +3378,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * written to the DB
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public CodeViolationMigrationSettings violation_migrateViolations(CodeViolationMigrationSettings cvms)
+    public CodeViolationMigrationSettings violation_migration_migrateViolations(CodeViolationMigrationSettings cvms)
             throws BObStatusException {
         if (cvms == null) {
             throw new BObStatusException("Cannot migrate code violations with null settings or null pathway in that settings or violationlist or empty list");
@@ -3348,7 +3398,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 freshViolationList.add(violation_attachViolationToCase(cv, cvms.getCeCaseParent(), cvms.getUserEnactingMigration()));
             }
 
-            violation_migration_recordTransferOfTransferrables(cvms);
+            if(!cvms.isMigrateWithoutMarkingSourceViolsAsTransferred()){
+                violation_migration_recordTransferOfTransferrables(cvms);
+            } else {
+                cvms.appendToMigrationLog("User indiciated NOT to mark source violations as transferrred; skipping this step.");
+            }
+            
             cvms.getViolationListSuccessfullyMigrated().addAll(violation_getCodeViolations(freshViolationList));
         } catch (ViolationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
             System.out.println(ex);
@@ -3449,6 +3504,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 targetCase.setOriginationDate(LocalDateTime.now());
             }
             targetCase.setCaseName(cvms.getNewCECaseName());
+            targetCase.setCaseManager(cvms.getNewCECaseManager());
 
             try {
                 targetCase = cecase_getCECase(cecase_insertNewCECase(targetCase, cvms.getUserEnactingMigration(), cvms.getNewCECaseOriginationEventCategory(), null));
@@ -3490,6 +3546,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             targetViol.setStipulatedComplianceDate(cvms.getUnifiedStipComplianceDate());
 
             targetViol.setDescription(cv.getDescription());
+            if(targetViol.getDescription() == null){
+                targetViol.setDescription("[no description]");
+            }
             targetViol.setPenalty(cv.getPenalty());
 
             if (cvms.isLinkInspectedElementPhotoDocsToViolation()) {
@@ -3608,6 +3667,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 daysInFuture = FALLBACK_DAYSTOCOMPLY;
             }
             cv.setViolatedEnfElement(ece);
+            
             cv.setDescription(ece.getDefaultViolationDescription());
             cv.setStipulatedComplianceDate(LocalDateTime.now().plusDays(daysInFuture));
             cv.setDateOfRecord(LocalDateTime.now());

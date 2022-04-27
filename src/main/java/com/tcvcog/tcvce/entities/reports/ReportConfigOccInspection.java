@@ -7,6 +7,9 @@ package com.tcvcog.tcvce.entities.reports;
 
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.Icon;
+import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.Property;
+import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PropertyUnitWithProp;
 import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccInspectionViewOptions;
@@ -23,29 +26,50 @@ public class ReportConfigOccInspection
         extends Report 
         implements Serializable{
     
+    private FieldInspection inspection;
+    
+    private Property inspectedProperty;
+    private PropertyUnit inspectedUnit;
+    
+    // The property and unit are extracted from one of these
+    // based on the domain of the FIN
     private OccPeriodPropertyUnitHeavy occPeriod;
     private CECasePropertyUnitHeavy ceCase;
     
-    private FieldInspection inspection;
+    private Person propertyOwner;
+    private boolean includeOwnerInfo;
+    private boolean includeOwnerPhones;
+    private boolean includeOwnerEmails;
+    private boolean includeOwnerAddresses;
     
-    
+    private boolean includeBedBathOccCounts;
     private Icon defaultItemIcon;
         
-    private boolean includeOccPeriodInfoHeader;
+    private boolean includeParentObjectInfoHeader;
     
     private ViewOptionsOccChecklistItemsEnum viewSetting;
     
-    private boolean includePhotos_pass;
-    private boolean includePhotos_fail;
-    
+    private boolean includeInspectedSpaceLocation;
+
+    private boolean includeOrdinanceInspectionTimestamps;
     private boolean includeFullOrdText;
-    private boolean includeElementNotes;
-    
-    private boolean includeElementLastInspectedInfo;
-    private boolean includeElementComplianceInfo;
-   
+    private boolean includeOrdinanceFindings;
     private boolean includeRemedyInfo;
+    
+    private boolean includePhotos_pass;
+    private boolean includePhotos_fail;    
+    private boolean includeOverallInspectionPhotos;
+    private int unifiedPhotoWidth;
+    
+    private boolean includePhotoIDs;
+    private boolean includePhotoTitles;
+    private boolean includePhotoOriginalFileNames;
+    private boolean includePhotoDescriptions;
+
     private boolean includeSignature;
+    
+    
+   
 
     /**
      * @return the occPeriod
@@ -55,10 +79,10 @@ public class ReportConfigOccInspection
     }
 
     /**
-     * @return the includeOccPeriodInfoHeader
+     * @return the includeParentObjectInfoHeader
      */
-    public boolean isIncludeOccPeriodInfoHeader() {
-        return includeOccPeriodInfoHeader;
+    public boolean isIncludeParentObjectInfoHeader() {
+        return includeParentObjectInfoHeader;
     }
 
    
@@ -86,26 +110,20 @@ public class ReportConfigOccInspection
     }
 
     /**
-     * @return the includeElementNotes
+     * @return the includeOrdinanceFindings
      */
-    public boolean isIncludeElementNotes() {
-        return includeElementNotes;
+    public boolean isIncludeOrdinanceFindings() {
+        return includeOrdinanceFindings;
     }
 
     /**
-     * @return the includeElementLastInspectedInfo
+     * @return the includeOrdinanceInspectionTimestamps
      */
-    public boolean isIncludeElementLastInspectedInfo() {
-        return includeElementLastInspectedInfo;
+    public boolean isIncludeOrdinanceInspectionTimestamps() {
+        return includeOrdinanceInspectionTimestamps;
     }
 
-    /**
-     * @return the includeElementComplianceInfo
-     */
-    public boolean isIncludeElementComplianceInfo() {
-        return includeElementComplianceInfo;
-    }
-
+    
 
     /**
      * @return the includeRemedyInfo
@@ -129,10 +147,10 @@ public class ReportConfigOccInspection
     }
 
     /**
-     * @param includeOccPeriodInfoHeader the includeOccPeriodInfoHeader to set
+     * @param includeParentObjectInfoHeader the includeParentObjectInfoHeader to set
      */
-    public void setIncludeOccPeriodInfoHeader(boolean includeOccPeriodInfoHeader) {
-        this.includeOccPeriodInfoHeader = includeOccPeriodInfoHeader;
+    public void setIncludeParentObjectInfoHeader(boolean includeParentObjectInfoHeader) {
+        this.includeParentObjectInfoHeader = includeParentObjectInfoHeader;
     }
 
     /**
@@ -157,26 +175,20 @@ public class ReportConfigOccInspection
     }
 
     /**
-     * @param includeElementNotes the includeElementNotes to set
+     * @param includeOrdinanceFindings the includeOrdinanceFindings to set
      */
-    public void setIncludeElementNotes(boolean includeElementNotes) {
-        this.includeElementNotes = includeElementNotes;
+    public void setIncludeOrdinanceFindings(boolean includeOrdinanceFindings) {
+        this.includeOrdinanceFindings = includeOrdinanceFindings;
     }
 
     /**
-     * @param includeElementLastInspectedInfo the includeElementLastInspectedInfo to set
+     * @param includeOrdinanceInspectionTimestamps the includeOrdinanceInspectionTimestamps to set
      */
-    public void setIncludeElementLastInspectedInfo(boolean includeElementLastInspectedInfo) {
-        this.includeElementLastInspectedInfo = includeElementLastInspectedInfo;
+    public void setIncludeOrdinanceInspectionTimestamps(boolean includeOrdinanceInspectionTimestamps) {
+        this.includeOrdinanceInspectionTimestamps = includeOrdinanceInspectionTimestamps;
     }
 
-    /**
-     * @param includeElementComplianceInfo the includeElementComplianceInfo to set
-     */
-    public void setIncludeElementComplianceInfo(boolean includeElementComplianceInfo) {
-        this.includeElementComplianceInfo = includeElementComplianceInfo;
-    }
-
+   
 
     /**
      * @param includeRemedyInfo the includeRemedyInfo to set
@@ -248,4 +260,215 @@ public class ReportConfigOccInspection
         this.ceCase = ceCase;
     }
 
+    /**
+     * @return the includeOverallInspectionPhotos
+     */
+    public boolean isIncludeOverallInspectionPhotos() {
+        return includeOverallInspectionPhotos;
+    }
+
+    /**
+     * @param includeOverallInspectionPhotos the includeOverallInspectionPhotos to set
+     */
+    public void setIncludeOverallInspectionPhotos(boolean includeOverallInspectionPhotos) {
+        this.includeOverallInspectionPhotos = includeOverallInspectionPhotos;
+    }
+
+    /**
+     * @return the includeBedBathOccCounts
+     */
+    public boolean isIncludeBedBathOccCounts() {
+        return includeBedBathOccCounts;
+    }
+
+    /**
+     * @param includeBedBathOccCounts the includeBedBathOccCounts to set
+     */
+    public void setIncludeBedBathOccCounts(boolean includeBedBathOccCounts) {
+        this.includeBedBathOccCounts = includeBedBathOccCounts;
+    }
+
+    /**
+     * @return the includePhotoIDs
+     */
+    public boolean isIncludePhotoIDs() {
+        return includePhotoIDs;
+    }
+
+    /**
+     * @return the includePhotoTitles
+     */
+    public boolean isIncludePhotoTitles() {
+        return includePhotoTitles;
+    }
+
+    /**
+     * @return the includePhotoOriginalFileNames
+     */
+    public boolean isIncludePhotoOriginalFileNames() {
+        return includePhotoOriginalFileNames;
+    }
+
+    /**
+     * @return the includePhotoDescriptions
+     */
+    public boolean isIncludePhotoDescriptions() {
+        return includePhotoDescriptions;
+    }
+
+    /**
+     * @param includePhotoIDs the includePhotoIDs to set
+     */
+    public void setIncludePhotoIDs(boolean includePhotoIDs) {
+        this.includePhotoIDs = includePhotoIDs;
+    }
+
+    /**
+     * @param includePhotoTitles the includePhotoTitles to set
+     */
+    public void setIncludePhotoTitles(boolean includePhotoTitles) {
+        this.includePhotoTitles = includePhotoTitles;
+    }
+
+    /**
+     * @param includePhotoOriginalFileNames the includePhotoOriginalFileNames to set
+     */
+    public void setIncludePhotoOriginalFileNames(boolean includePhotoOriginalFileNames) {
+        this.includePhotoOriginalFileNames = includePhotoOriginalFileNames;
+    }
+
+    /**
+     * @param includePhotoDescriptions the includePhotoDescriptions to set
+     */
+    public void setIncludePhotoDescriptions(boolean includePhotoDescriptions) {
+        this.includePhotoDescriptions = includePhotoDescriptions;
+    }
+
+    /**
+     * @return the unifiedPhotoWidth
+     */
+    public int getUnifiedPhotoWidth() {
+        return unifiedPhotoWidth;
+    }
+
+    /**
+     * @param unifiedPhotoWidth the unifiedPhotoWidth to set
+     */
+    public void setUnifiedPhotoWidth(int unifiedPhotoWidth) {
+        this.unifiedPhotoWidth = unifiedPhotoWidth;
+    }
+
+    /**
+     * @return the inspectedProperty
+     */
+    public Property getInspectedProperty() {
+        return inspectedProperty;
+    }
+
+    /**
+     * @param inspectedProperty the inspectedProperty to set
+     */
+    public void setInspectedProperty(Property inspectedProperty) {
+        this.inspectedProperty = inspectedProperty;
+    }
+
+    /**
+     * @return the inspectedUnit
+     */
+    public PropertyUnit getInspectedUnit() {
+        return inspectedUnit;
+    }
+
+    /**
+     * @param inspectedUnit the inspectedUnit to set
+     */
+    public void setInspectedUnit(PropertyUnit inspectedUnit) {
+        this.inspectedUnit = inspectedUnit;
+    }
+
+    /**
+     * @return the propertyOwner
+     */
+    public Person getPropertyOwner() {
+        return propertyOwner;
+    }
+
+    /**
+     * @param propertyOwner the propertyOwner to set
+     */
+    public void setPropertyOwner(Person propertyOwner) {
+        this.propertyOwner = propertyOwner;
+    }
+
+    /**
+     * @return the includeOwnerInfo
+     */
+    public boolean isIncludeOwnerInfo() {
+        return includeOwnerInfo;
+    }
+
+    /**
+     * @return the includeOwnerPhones
+     */
+    public boolean isIncludeOwnerPhones() {
+        return includeOwnerPhones;
+    }
+
+    /**
+     * @return the includeOwnerEmails
+     */
+    public boolean isIncludeOwnerEmails() {
+        return includeOwnerEmails;
+    }
+
+    /**
+     * @return the includeOwnerAddresses
+     */
+    public boolean isIncludeOwnerAddresses() {
+        return includeOwnerAddresses;
+    }
+
+    /**
+     * @param includeOwnerInfo the includeOwnerInfo to set
+     */
+    public void setIncludeOwnerInfo(boolean includeOwnerInfo) {
+        this.includeOwnerInfo = includeOwnerInfo;
+    }
+
+    /**
+     * @param includeOwnerPhones the includeOwnerPhones to set
+     */
+    public void setIncludeOwnerPhones(boolean includeOwnerPhones) {
+        this.includeOwnerPhones = includeOwnerPhones;
+    }
+
+    /**
+     * @param includeOwnerEmails the includeOwnerEmails to set
+     */
+    public void setIncludeOwnerEmails(boolean includeOwnerEmails) {
+        this.includeOwnerEmails = includeOwnerEmails;
+    }
+
+    /**
+     * @param includeOwnerAddresses the includeOwnerAddresses to set
+     */
+    public void setIncludeOwnerAddresses(boolean includeOwnerAddresses) {
+        this.includeOwnerAddresses = includeOwnerAddresses;
+    }
+
+    /**
+     * @return the includeInspectedSpaceLocation
+     */
+    public boolean isIncludeInspectedSpaceLocation() {
+        return includeInspectedSpaceLocation;
+    }
+
+    /**
+     * @param includeInspectedSpaceLocation the includeInspectedSpaceLocation to set
+     */
+    public void setIncludeInspectedSpaceLocation(boolean includeInspectedSpaceLocation) {
+        this.includeInspectedSpaceLocation = includeInspectedSpaceLocation;
+    }
+
+    
 }

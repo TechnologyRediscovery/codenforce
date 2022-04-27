@@ -88,9 +88,9 @@
                             </div>
                             
                             <div class="p-col-4">
-                                <h:outputText value="Transfer findings" />
+                                <h:outputText value="Migrate findings:" />
                             </div>
-                            <div class="p-col-8">
+                            <div class="p-col-2">
                                 <p:selectBooleanButton id="migration-xferfindings-is"
                                                        value="#{migrationBB.currentMigrationSettings.useInspectedElementFindingsAsViolationFindings}"
                                                        onLabel="Yes"
@@ -98,13 +98,45 @@
 
                             </div>
                             <div class="p-col-4">
-                                <h:outputText value="Migrate photo and docs" />
+                                <h:outputText value="Migrate photo and docs:" />
                             </div>
-                            <div class="p-col-8">
+                            <div class="p-col-2">
                                 <p:selectBooleanButton id="migration-photodoc-is"
                                                        value="#{migrationBB.currentMigrationSettings.linkInspectedElementPhotoDocsToViolation}"
                                                        onLabel="Yes"
                                                        offLabel="No" />
+                            </div>
+                            <div class="p-col-4">
+                                <h:outputText value="Migration type:" />
+                                 <p:commandButton id="help-migtype-button"
+                                                     icon="fa fa-question-circle-o"
+                                                     styleClass="button-help"
+                                                     type="button" />
+
+                                    <p:overlayPanel for="help-migtype-button"
+                                                    style="width:350px;" 
+                                                    dismissable="true"
+                                                    showCloseIcon="true">
+                                        <h3>Migration types</h3>
+                                        <p>
+                                            <span style="font-weight: bold">Mark source violations as transferred (default): </span> When a 
+                                            failed ordinance from an inspection or a code violation from a code enforcement case is migrated with this option set, 
+                                            that source object will be marked as "Transferred" such that it will no longer be considered "active" by reports, etc. 
+                                            This option makes the most sense if the target code enforcement case is replacing the source case, as is the case
+                                            during a property transfer.
+                                        </p>
+                                        <p>
+                                            <span style="font-weight: bold">Simple copy: </span> With this option selected, the source failed ordinances or code violations
+                                            remain untouched, and continue to function just as they did before the migration. This operation setting is akin to a "copy/paste"
+                                            operation in that you are duplicating the violation without marking the source as transfered.
+                                        </p>
+                                    </p:overlayPanel>
+                            </div>
+                            <div class="p-col-8">
+                                <p:selectBooleanButton id="migration-migrationtype-is"
+                                                       value="#{migrationBB.currentMigrationSettings.migrateWithoutMarkingSourceViolsAsTransferred}"
+                                                       onLabel="Simple copy (do not mark source viols transferred)"
+                                                       offLabel="Mark source viols as transferred" />
                             </div>
                         </div>
 

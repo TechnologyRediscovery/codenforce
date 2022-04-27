@@ -56,7 +56,7 @@ public enum CasePhaseEnum {
                                         true,
                                         true),
     
-    TimeframeExpiredNotCited    (   "Compliance window has expired; no citations issued",
+    TimeframeExpiredNotCited    (   "Requiring ongoing officer action",
                                     "Verify compliance status; record compliance, extend timeframe, or issue a citation",
                                     "howto-expiredtimeframe",
                                     4, 
@@ -66,6 +66,7 @@ public enum CasePhaseEnum {
                                     true,
                                     true,
                                     true),
+    
     Cited                       (   "Citation issued--Any stage of court process", 
                                         "Case is at any stage of the court review process.",
                                         "howto-citation",

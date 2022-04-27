@@ -15,15 +15,18 @@ import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CodeViolation;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.IFace_inspectable;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.*;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,8 +76,9 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     
     private int occPeriodIDFortransferFormField;
     
-    private ReportConfigOccInspection inspectionReportConfig;
-    
+    private ReportConfigOccInspection reportConfigFIN;
+    private List<ViewOptionsOccChecklistItemsEnum> ordinanceViewOptionsList;
+       
 
     @PostConstruct
     public void initBean() {
@@ -86,6 +90,8 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
+        
+        ordinanceViewOptionsList = Arrays.asList(ViewOptionsOccChecklistItemsEnum.values());
         
         // Initialize list of checklist templates
        initChecklistTemplates();
@@ -130,6 +136,15 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     public void onViewEditInspectionLinkClick(IFace_inspectable holder, FieldInspection fi){
         currentInspectable = holder;
         currentInspection = fi;
+        try {
+            refreshCurrentInspectionAndRestoreSelectedSpace();
+        } catch (IntegrationException | BObStatusException | BlobException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                         "Fatal error reloading current inspection! ", ""));
+        } 
+        getSessionBean().setSessFieldInspection(fi);
         extractComponentForReloadFromRequest();
         
     }
@@ -335,37 +350,41 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      * an occ inspection
      * I take the current inspection and make it the session's 
      * BlobHolder so the reuasable code modules can take over
-     * @param oi
+     * @param ev
      */
-    public void onUploadImagesToInspectionInitButtonClick(FieldInspection oi){
+    public void onUploadImagesToInspectionInitButtonClick(ActionEvent ev){
         System.out.println("OccInspectionsBB.onUploadImagesToInspectionInitButtonClick");
-        if(oi != null){
-            currentInspection = oi;
-            getSessionBean().setSessBlobHolder(currentInspection);
-        } else {
-            System.out.println("OccInspectionsBB.onUploadImagesToInspectionInitButtonClick | cannot set BlobHolder");
-        }
+            try {
+                getSessionBean().setSessBlobHolder(currentInspection);
+                getSessionBean().setAndRefreshSessionBlobHolderAndBuildUpstreamPool(currentInspection);
+            } catch (BObStatusException | BlobException | IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not initiate photo pool",  ""));
+                
+            } 
     }
     
     /**
      * Listener for user requests to see the photos on an inspection
      * Sets the inspection as the blobholder for the blob UI to take over.
      * And asks our blob coordinator for my most recent blob list
-     * @param oi 
+     * @param ev
      */
-    public void onViewPhotoPoolLinkClick(FieldInspection oi){
+    public void onViewPhotoPoolLinkClick(ActionEvent ev){
         
         System.out.println("OccInspectionsBB.onViewPhotoPoolLinkClick");
-        if(oi != null){
-            currentInspection = oi;
             try {
+                getSessionBean().setSessBlobHolder(currentInspection);
                 getSessionBean().setAndRefreshSessionBlobHolderAndBuildUpstreamPool(currentInspection);
             } catch (BObStatusException | BlobException | IntegrationException ex) {
+                 System.out.println(ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could not initiate photo pool",  ""));
                 
             }
-        } else {
-            // do nothing
-        }
         
     }
     
@@ -702,16 +721,26 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     
     /**
      * Listener for user requests to start the report building process
-     * @param oi 
+     * @param ev
      */
-    public void onFieldInspectionReportInitLinkClick(FieldInspection oi){
+    public void onFieldInspectionReportInitLinkClick(ActionEvent ev){
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        IFace_inspectable ins = null;
         try {
-            inspectionReportConfig = oic.getOccInspectionReportConfigDefault(
-                    oi, 
-                    getSessionBean().getSessOccPeriod(), 
+            if(currentInspection.getDomainEnum() == DomainEnum.CODE_ENFORCEMENT){
+                ins = getSessionBean().getSessCECase();
+            } else if(currentInspection.getDomainEnum() == DomainEnum.OCCUPANCY){
+                ins = getSessionBean().getSessOccPeriod();
+            } else {
+                throw new BObStatusException("Field Inspection must have a domain");
+            }
+            reportConfigFIN = oic.getOccInspectionReportConfigDefault(
+                    currentInspection, 
+                    ins,
                     getSessionBean().getSessUser());
-        } catch (IntegrationException ex) {
+                    reportConfigFIN.setInspection(currentInspection);
+
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -726,7 +755,9 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      * @return 
      */
     public String onFieldInspectionReportCommitLinkClick(){
-        getSessionBean().setReportConfigFieldInspection(inspectionReportConfig);
+        
+        reportConfigFIN.getInspection().configureVisibleSpaceElementList(reportConfigFIN.getViewSetting());
+        getSessionBean().setReportConfigFieldInspection(reportConfigFIN);
         
         return "inspectionReport";
     }
@@ -927,17 +958,17 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     }
 
     /**
-     * @return the inspectionReportConfig
+     * @return the reportConfigFIN
      */
-    public ReportConfigOccInspection getInspectionReportConfig() {
-        return inspectionReportConfig;
+    public ReportConfigOccInspection getReportConfigFIN() {
+        return reportConfigFIN;
     }
 
     /**
-     * @param inspectionReportConfig the inspectionReportConfig to set
+     * @param reportConfigFIN the reportConfigFIN to set
      */
-    public void setInspectionReportConfig(ReportConfigOccInspection inspectionReportConfig) {
-        this.inspectionReportConfig = inspectionReportConfig;
+    public void setReportConfigFIN(ReportConfigOccInspection reportConfigFIN) {
+        this.reportConfigFIN = reportConfigFIN;
     }
 
     /**
@@ -1008,6 +1039,20 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      */
     public void setMigrateFailedItemsOnFinalization(boolean migrateFailedItemsOnFinalization) {
         this.migrateFailedItemsOnFinalization = migrateFailedItemsOnFinalization;
+    }
+
+    /**
+     * @return the ordinanceViewOptionsList
+     */
+    public List<ViewOptionsOccChecklistItemsEnum> getOrdinanceViewOptionsList() {
+        return ordinanceViewOptionsList;
+    }
+
+    /**
+     * @param ordinanceViewOptionsList the ordinanceViewOptionsList to set
+     */
+    public void setOrdinanceViewOptionsList(List<ViewOptionsOccChecklistItemsEnum> ordinanceViewOptionsList) {
+        this.ordinanceViewOptionsList = ordinanceViewOptionsList;
     }
 
     

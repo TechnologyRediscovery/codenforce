@@ -23,9 +23,11 @@ package com.tcvcog.tcvce.util.viewoptions;
  * @author sylvia
  */
 public enum ViewOptionsOccChecklistItemsEnum {
-    FAILED_ITEMS_ONLY("Failed items only"),
+    FAILED_PASSEDWPHOTOFINDING("Violated and passed ordinances w/photos or findings"),
+    FAILED_ITEMS_ONLY("Violated ordinances only"),
+    PASSED_AND_FAILED("Violated and passed ordinances"),
+    PASSED_ITEMS("Passed ordinances only"),
     UNISPECTED_ITEMS_ONLY("Uninspected items only"),
-    PASSED_ITEMS("Items marked with compliance"),
     ALL_ITEMS("All items");
     
      private final String label;

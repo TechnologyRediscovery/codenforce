@@ -503,7 +503,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                             value="#{ceCaseSearchProfileBB.managedCECaseFieldInspectionList}"
                                                             rowKey="#{inspection.inspectionID}"
                                                             reflow="true"
-                                                            lazy="true">
+                                                            lazy="false">
 
                                                 <p:column headerText="Date"
                                                           style="width:20%;">
@@ -533,8 +533,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     inspection-actions-form
                                                                     inspection-inspectedspaces-form"
                                                                     >
-                                                        <f:param name="initiating-inspection-list-component-id" value="cecase-inspections-form" />
-                                                    </p:commandLink>
+                                                                <f:param name="initiating-inspection-list-component-id" value="cecase-inspections-form" />
+                                                            </p:commandLink>
                                                     <p:spacer height="3px" />
                                                     <h:outputText value="(ID:#{inspection.inspectionID})" />
                                                 </p:column>
