@@ -725,13 +725,13 @@
                                               actionListener="#{personBB.onLinkPersonToCurrentParcel}"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                               update="persontools-growl-form">
-                            
+
                         </p:commandButton>
-                        
-                        
-                        
+
+
+
                     </h:form>
-                    
+
                 </p:panel>
                 <p:panel id="person-adresses-panel"
                          toggleable="true"
@@ -1027,85 +1027,7 @@
 
 
                             <p:rowExpansion>
-                                <div class="p-grid">
-                                    <div class="p-col-4">
-                                        Link ID
-                                    </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{hl.linkID}" />
-                                    </div>
-                                    <div class="p-col-4">
-                                        Linking table
-                                    </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{hl.linkedObjectRole.schema.linkingTableName}" />
-                                    </div>
-                                    <div class="p-col-4">
-                                        Parent field &amp; ID
-                                    </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{!empty hl.linkedObjectRole ? hl.linkedObjectRole.schema.targetTableFKField : ''}" />
-                                        <h:outputText value=": #{hl.parentObjectID}" />
-                                    </div>
-                                    <div class="p-col-4">
-                                        Source
-                                    </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{!empty hl.source ? hl.source.title : ''}" />
-                                    </div>
-                                    <div class="p-col-4">
-                                        Created
-                                    </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{!empty hl.createdBy ? hl.createdBy.human.name : ''}" />
-                                        <p:spacer height="3px"
-                                                  rendered="#{!empty hl.createdTS}" />
-                                        <h:outputText value="#{!empty hl.createdTS ? personBB.getPrettyDate(hl.createdTS): ''}" />
-                                    </div>
-                                    <div class="p-col-4">
-                                        Last Updated
-                                    </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{!empty hl.lastUpdatedBy ? hl.lastUpdatedBy.human.name : ''}" />
-                                        <p:spacer height="3px"
-                                                  rendered="#{!empty hl.lastUpdatedTS}" />
-                                        <h:outputText value="#{!empty hl.lastUpdatedTS? personBB.getPrettyDate(hl.lastUpdatedTS): ''}" />
-                                    </div>
-                                    <div class="p-col-4">
-                                        Deactivated
-                                        <p:spacer height="3px" />
-                                        <p:commandLink      id="link-deac-init-cl"
-                                                            ajax="true"
-                                                            actionListener="#{personBB.onHumanLinkSelectLinkClick(hl)}"
-                                                            style="color:blue;"
-                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                            oncomplete="PF('humanlink-deactivate-dialog-var').show()"
-                                                            value="deactivate" />
-                                    </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{!empty hl.deactivatedBy? 'Deactivated record' : 'Active record'}" />
-                                        <p:spacer height="3px" />
-                                        <h:outputText value="#{!empty hl.deactivatedBy? hl.deactivatedBy.human.name : ''}" />
-                                        <p:spacer height="3px"
-                                                  rendered="#{!empty hl.deactivatedTS}" />
-                                        <h:outputText value="#{!empty hl.deactivatedTS? personBB.getPrettyDate(hl.deactivatedTS): ''}" />
-                                    </div>
-                                    <div class="p-col-4">
-                                        Notes
-                                        <p:spacer height="3px" />
-                                        <p:commandLink      id="link-newnote-init-cl"
-                                                            ajax="true"
-                                                            actionListener="#{personBB.onHumanLinkSelectLinkClick(hl)}"
-                                                            style="color:blue;"
-                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                            oncomplete="PF('humanlink-note-dialog-var').show()"
-                                                            value="add note" />
-                                    </div>
-                                    <div class="p-col-8 wrapText">
-                                        <h:outputText value="#{hl.notes}"
-                                                      escape="false"/>
-                                    </div>
-                                </div>
+
                             </p:rowExpansion>
                         </p:dataTable>
                     </h:form>
@@ -1175,6 +1097,181 @@
         </h:form>
     </p:dialog>
 
+
+
+
+    <p:dialog   id="humanlink-viewedit-dialog"
+                height="500" width="600"
+                widgetVar="humanlink-viewedit-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                dynamic="true"
+                modal="true"
+                header="View/Edit Person Link ID: #{personBB.currentHumanLink.linkID}"
+                rendered="true"
+                >
+
+        <h:form id="humanlink-viewedit-form">
+
+            <p:commandButton id="humanlink-edit-button"
+                             value="#{personBB.currentHumanLinkEditMode? 'Save changes' : 'Edit'}"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             icon="fa #{personBB.currentHumanLinkEditMode ? 'fa-check' : 'fa-pencil'}"
+                             ajax="true"
+                             actionListener="#{personBB.toggleHumanLinkEditMode(ev)}"
+                             oncomplete="PF('humanlink-viewedit-dialog-var').show()"
+                             update="@form
+                             persontools-growl-form
+                             #{personBB.personListComponentIDToUpdatePostLinkingOperation}"/>
+
+
+            <div class="restrict-main-contents-io-button gray_button">
+
+                <p:commandButton    id="humanlink-edit-abort-button"
+                                    ajax="true"
+                                    rendered="#{personBB.currentContactPhoneEditMode}"
+                                    value="Abort edit"
+                                    actionListener="#{personBB.onPhoneOperationAbortButtonChange}"
+                                    oncomplete="PF('humanlink-viewedit-dialog-var').show()"
+                                    update="@form
+                                    persontools-growl-form"
+                                    icon="fa fa-stop" />
+
+            </div>
+
+            <p:spacer height="5px"/>    
+
+            <div class="p-grid">
+                <div class="p-col-4">
+                    Link ID
+                </div>
+                <div class="p-col-8">
+                    <h:outputText value="#{personBB.currentHumanLink.linkID}" />
+                </div>
+                <div class="p-col-4">
+                    Linking table
+                </div>
+                <div class="p-col-8">
+                    <h:outputText value="#{personBB.currentHumanLink.linkedObjectRole.schema.linkingTableName}" />
+                </div>
+
+
+                <div class="p-col-4">
+                    Role
+                </div>
+
+                <div class="p-col-8">
+                    <h:outputText value="#{personBB.currentHumanLink.linkedObjectRole.title}"
+                                  rendered="#{!personBB.currentHumanLinkEditMode}"/>
+
+                    <p:selectOneMenu id="human-linkedit-role-som" 
+                                     value="#{personBB.currentHumanLink.linkedObjectRole}" 
+                                     converter="linkedObjectRoleConverter" 
+                                     rendered="#{personBB.currentHumanLinkEditMode}"
+                                     required="true"
+                                     requiredMessage="Oops, please select an association type">
+
+                        <f:selectItem itemLabel="Choose an association type" 
+                                      itemDisabled="true"
+                                      noSelectionOption="true"/>
+
+                        <f:selectItems id="human-linkedit-rolelist-si" 
+                                       value="#{personBB.linkRoleCandidateList}" 
+                                       var="lr" 
+                                       itemValue="#{lr}" 
+                                       itemLabel="#{lr.title} (#{lr.roleID})"/>
+                    </p:selectOneMenu>
+                </div>
+
+
+                <div class="p-col-4">
+                    Parent field &amp; ID
+                </div>
+                <div class="p-col-8">
+                    <h:outputText value="#{!empty personBB.currentHumanLink.linkedObjectRole ? personBB.currentHumanLink.linkedObjectRole.schema.targetTableFKField : ''}" />
+                    <h:outputText value=": #{personBB.currentHumanLink.parentObjectID}" />
+                </div>
+                <div class="p-col-4">
+                    Source
+                </div>
+                <div class="p-col-8">
+                    <h:outputText value="#{!empty personBB.currentHumanLink.source ? personBB.currentHumanLink.source.title : ''}" 
+                                  rendered="#{!personBB.currentHumanLinkEditMode}"  />
+
+                    <h:selectOneMenu id="humanlink-edit-source-som"
+                                     value="#{personBB.currentHumanLink.linkSource}" 
+                                     style="width:175px;height:25px"
+                                     rendered="#{personBB.currentHumanLinkEditMode}">
+                        <f:converter converterId="bobSourceConverter"/>
+                        <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
+                        <f:selectItems id="pers-info-source-selitems"
+                                       value="#{personBB.sourceList}"
+                                       var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
+                    </h:selectOneMenu>
+
+                </div>
+                <div class="p-col-4">
+                    Created
+                </div>
+                <div class="p-col-8">
+                    <h:outputText value="#{!empty personBB.currentHumanLink.createdBy ? personBB.currentHumanLink.createdBy.human.name : ''}" />
+                    <p:spacer height="3px"
+                              rendered="#{!empty personBB.currentHumanLink.createdTS}" />
+                    <h:outputText value="#{!empty personBB.currentHumanLink.createdTS ? personBB.getPrettyDate(personBB.currentHumanLink.createdTS): ''}" />
+                </div>
+                <div class="p-col-4">
+                    Last Updated
+                </div>
+                <div class="p-col-8">
+                    <h:outputText value="#{!empty personBB.currentHumanLink.lastUpdatedBy ? personBB.currentHumanLink.lastUpdatedBy.human.name : ''}" />
+                    <p:spacer height="3px"
+                              rendered="#{!empty personBB.currentHumanLink.lastUpdatedTS}" />
+                    <h:outputText value="#{!empty personBB.currentHumanLink.lastUpdatedTS? personBB.getPrettyDate(personBB.currentHumanLink.lastUpdatedTS): ''}" />
+                </div>
+                <div class="p-col-4">
+                    Deactivated
+                    <p:spacer height="3px" />
+                    <p:commandLink      id="link-deac-init-cl"
+                                        ajax="true"
+                                        actionListener="#{personBB.onHumanLinkDeactivatInitLinkClick}"
+                                        style="color:blue; font-weight: bold;"
+                                        disabled="#{personBB.currentHumanLinkEditMode}"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                        oncomplete="PF('humanlink-deactivate-dialog-var').show()"
+                                        value="deactivate" />
+                </div>
+                <div class="p-col-8">
+                    <h:outputText value="#{!empty personBB.currentHumanLink.deactivatedBy? 'Deactivated record' : 'Active record'}" />
+                    <p:spacer height="3px" />
+                    <h:outputText value="#{!empty personBB.currentHumanLink.deactivatedBy? personBB.currentHumanLink.deactivatedBy.human.name : ''}" />
+                    <p:spacer height="3px"
+                              rendered="#{!empty personBB.currentHumanLink.deactivatedTS}" />
+                    <h:outputText value="#{!empty personBB.currentHumanLink.deactivatedTS? personBB.getPrettyDate(personBB.currentHumanLink.deactivatedTS): ''}" />
+                </div>
+                <div class="p-col-4">
+                    Notes
+                    <p:spacer height="3px" />
+                    <p:commandLink      id="link-newnote-init-cl"
+                                        ajax="true"
+                                        actionListener="#{personBB.onHumanLinkSelectLinkClick(hl)}"
+                                        style="color:blue;"
+                                        disabled="#{personBB.currentHumanLinkEditMode}"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                        oncomplete="PF('humanlink-note-dialog-var').show()"
+                                        value="add note" />
+                </div>
+                <div class="p-col-8 wrapText">
+                    <h:outputText value="#{personBB.currentHumanLink.notes}"
+                                  escape="false"/>
+                </div>
+            </div>
+
+        </h:form>
+
+    </p:dialog>
+
     <p:dialog   id="humanlink-note-dialog"
                 height="400" width="400"
                 widgetVar="humanlink-note-dialog-var"
@@ -1209,7 +1306,8 @@
                              actionListener="#{personBB.onHumanLinkNoteAppendCommitButtonChange}"
                              oncomplete="PF('humanlink-note-dialog-var').hide()"
                              update="person-links-form
-                             persontools-growl-form"/>
+                             persontools-growl-form
+                             humanlink-viewedit-form"/>
         </h:form>
     </p:dialog>
 
@@ -1242,7 +1340,8 @@
                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                           oncomplete="PF('humanlink-changetarget-dialog-var').hide()"
                                           update="human-createlink-form
-                                          human-createlink-dialog"
+                                          human-createlink-dialog
+                                          #{personBB.personListComponentIDToUpdatePostLinkingOperation}"
                                           value="#{sessionBean.sessProperty.addressString} (Parcel ID:#{sessionBean.sessProperty.countyParcelID}" />
                 </div>
 
@@ -1257,7 +1356,8 @@
                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                           oncomplete="PF('humanlink-changetarget-dialog-var').hide()"
                                           update="human-createlink-form
-                                          human-createlink-dialog"
+                                          human-createlink-dialog
+                                          #{personBB.personListComponentIDToUpdatePostLinkingOperation}"
                                           value="#{sessionBean.sessCECase.caseName} (ID:#{sessionBean.sessCECase.caseID})" />
                 </div>
 
@@ -1272,7 +1372,8 @@
                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                           oncomplete="PF('humanlink-changetarget-dialog-var').hide()"
                                           update="human-createlink-form
-                                          human-createlink-dialog"
+                                          human-createlink-dialog
+                                          #{personBB.personListComponentIDToUpdatePostLinkingOperation}"
                                           value="#{sessionBean.sessOccPeriod.type.title} (ID:#{sessionBean.sessOccPeriod.periodID})" />
                 </div>
             </div>
@@ -1301,9 +1402,10 @@
                              icon="fa fa-trash"
                              ajax="true"
                              actionListener="#{personBB.onHumanLinkDeactivateButtonChange}"
-                             oncomplete="PF('humanlink-deactivate-dialog-var').hide()"
+                             oncomplete="PF('humanlink-deactivate-dialog-var').hide(); PF('humanlink-viewedit-dialog-var').hide();"
                              update="person-links-form
-                             persontools-growl-form"/>
+                             persontools-growl-form
+                             #{personBB.personListComponentIDToUpdatePostLinkingOperation}"/>
         </h:form>
     </p:dialog>
 
@@ -1619,8 +1721,8 @@
                                         style="width: 100%;"
                                         pattern="MM/dd/yyyy HH:mm"
                                         hideOnDateTimeSelect="true"
-                                              showOnFocus="false"
-                                              showIcon="true"
+                                        showOnFocus="false"
+                                        showIcon="true"
                                         disabled="false"
                                         showButtonBar="true"
                                         mask="true"

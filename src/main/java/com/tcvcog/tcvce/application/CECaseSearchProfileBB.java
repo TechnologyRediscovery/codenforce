@@ -1217,20 +1217,21 @@ public class CECaseSearchProfileBB
         CaseCoordinator cc = getCaseCoordinator();
         long secBetween;
         try {
-            if (isExtendStipCompUsingDate() && getExtendedStipCompDate() != null) {
-                
-                if (extendedStipCompDate.isBefore(LocalDateTime.now())) {
+            if (extendStipCompUsingDate) {
+                if (currentViolation.getStipulatedComplianceDate().isBefore(LocalDateTime.now())) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                     "Stipulated compliance dates must be in the future!", ""));
                 } else {
-                    secBetween = extendedStipCompDate.toEpochSecond(ZoneOffset.of("-4")) - LocalDateTime.now().toEpochSecond(ZoneOffset.of("-4"));
+                    secBetween = currentViolation.getStipulatedComplianceDate().toEpochSecond(ZoneOffset.of("-4")) - LocalDateTime.now().toEpochSecond(ZoneOffset.of("-4"));
                     // divide by num seconds in a day
                     long daysBetween = secBetween / (24 * 60 * 60);
-                    cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), daysBetween, currentCase, getSessionBean().getSessUser());
+                    System.out.println("Extending stip comp date for violation " + currentViolation.getViolationID() + " to " + extendedStipCompDate.toString() );
+                    cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), currentCase, getSessionBean().getSessUser());
                 }
             } else {
-                cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), getExtendedStipCompDaysFromToday(), currentCase, getSessionBean().getSessUser());
+                // no math to do
+                cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), currentCase, getSessionBean().getSessUser());
             }
         } catch (BObStatusException | IntegrationException | ViolationException ex) {
             System.out.println(ex);
@@ -2084,7 +2085,7 @@ public class CECaseSearchProfileBB
         
             Property property = currentCase.getProperty();
             
-            pc.linkHuman(currentCase, hl, getSessionBean().getSessUser());
+            pc.insertHumanLink(currentCase, hl, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO, 
                      "Successfully added " + per.getName() + " to the Database!" 

@@ -455,6 +455,20 @@ public class PropertyProfileBB
         reloadPropertyOnCurrentPropertyGetterCall = true;
         System.out.println("PropertyProfileBB.onPersonConnectInitButtonChange : "+ reloadPropertyOnCurrentPropertyGetterCall);
     }
+    
+    /**
+     * Special wrapper getter around the current property's human
+     * link list that asks the session for a new link list
+     * on table load that might occur during a link edit operation
+     * @return the new human link list
+     */
+    public List<HumanLink> getManagedHumanLinkList(){
+        List<HumanLink> hll = getSessionBean().getSessHumanListRefreshedList();
+        if(hll != null){
+            currentProperty.setHumanLinkList(hll);
+        }
+        return currentProperty.getHumanLinkList();
+    }
 
     /**
      * Listener for user requests to remove the currently selected ERA;

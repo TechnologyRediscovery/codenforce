@@ -49,11 +49,13 @@ public class PersonBB extends BackingBeanUtils {
     
     private Person currentPerson;
     private boolean currentPersonHumanFieldsEditMode;
+    private boolean currentHumanLinkEditMode;
     
     private IFace_noteHolder currentNoteHolder;
     private String formNewNoteUniversal;
     private String pageComponentToUpdateAfterNoteCommit;
     
+    private IFace_humanListHolder currentHumanListHolder;
     private List<LinkedObjectRole> linkRoleCandidateList;
     private LinkedObjectRole selecetedLinkedObjetRole;
     
@@ -113,7 +115,7 @@ public class PersonBB extends BackingBeanUtils {
         
         
         try {
-            loadLinkedObjectRoleListUsingSessionHLH();
+            loadLinkedObjectRoleList();
             phoneTypeList = pc.getContactPhoneTypeList();
             sourceList = sc.getBobSourceListComplete();
         } catch (IntegrationException | BObStatusException ex) {
@@ -128,10 +130,13 @@ public class PersonBB extends BackingBeanUtils {
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-    private void loadLinkedObjectRoleListUsingSessionHLH() throws IntegrationException, BObStatusException{
+    private void loadLinkedObjectRoleList() throws IntegrationException, BObStatusException{
         SystemCoordinator sc = getSystemCoordinator();
-        if(getSessionBean().getSessHumanListHolder() != null){
-            linkRoleCandidateList = sc.assembleLinkedObjectRolesBySchema(getSessionBean().getSessHumanListHolder().getHUMAN_LINK_SCHEMA_ENUM());
+        if(currentHumanListHolder == null){
+            currentHumanListHolder = getSessionBean().getSessHumanListHolder();
+        }
+        if(currentHumanListHolder != null){
+            linkRoleCandidateList = sc.assembleLinkedObjectRolesBySchema(currentHumanListHolder.getHUMAN_LINK_SCHEMA_ENUM());
             if(linkRoleCandidateList != null){
                 System.out.println("PersonBB.loadLinkedObjectRoleListUsingSessionHLH | roleListSize = " + linkRoleCandidateList.size());
             }
@@ -355,6 +360,89 @@ public class PersonBB extends BackingBeanUtils {
         }
         currentPersonHumanFieldsEditMode = !currentPersonHumanFieldsEditMode;
     }
+    
+    /**
+     * Listener for user clicks of the human link edit button
+     * @param ev
+     */
+    public void toggleHumanLinkEditMode(ActionEvent ev){
+        System.out.println("PersonBB.toggleHumanLinkEditMode: toggle val: " + currentHumanLinkEditMode);
+        if(currentHumanLinkEditMode){
+           
+            onHumanLinkEditCommit();
+            System.out.println("PersonBB.toggleHumanLinkEditMode: person link edit done");
+            refreshCurrentPersonAndUpdateSessionPerson();
+        }
+        currentHumanLinkEditMode = !currentHumanLinkEditMode;
+    }
+    
+    /**
+     * 
+     * @param ev 
+     */
+    private void onHumanLinkEditCommit(){
+       PersonCoordinator pc = getPersonCoordinator();
+        try {
+            pc.updateHumanLink(currentHumanListHolder, currentHumanLink, getSessionBean().getSessUser());
+            refreshCurrentHumanLink();
+            injectSessionHumanLinkListForComponentRefresh();
+            getFacesContext().addMessage(null,
+             new FacesMessage(FacesMessage.SEVERITY_INFO,
+                     "Successfully updated human link ID: " + currentHumanLink.getLinkID(), ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+             new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                     "Fatal error updating human link", ""));
+        } 
+    }
+    
+    /**
+     * Refreshes current human link (how could you have guessed?)
+     */
+    private void refreshCurrentHumanLink(){
+        PersonCoordinator pc = getPersonCoordinator();
+        if(currentHumanLink != null){
+            try {
+                currentHumanLink = pc.getHumanLink(currentHumanLink.getLinkID(), currentHumanListHolder.getHUMAN_LINK_SCHEMA_ENUM());
+                System.out.println("PersonBB.refreshCurrentHumanLink | Refreshed human link: " + currentHumanLink.getLinkID());
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+            }
+        }
+    }
+    
+    /**
+     *  Listener for user requests to start the humanlink view process
+     * @param hl 
+     * @param hlh 
+     */
+    public void onHumanLinkEditInitButtonChange(HumanLink hl, IFace_humanListHolder hlh){
+        currentHumanLink = hl;
+        if(hlh != null){
+            currentHumanListHolder = hlh;
+        }
+        extractHumanLinkListComponentIDFromHTTPRequest();
+        try {
+            loadLinkedObjectRoleList();
+            
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+             new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                     "Fatal error preparing human link view edit operation", ""));
+        }
+        
+    }
+    
+    /**
+     * Listener for user requests to cease editing a human link
+     * @param ev 
+     */
+    public void onHumanLinkEditOpertationAbortButtonChange(ActionEvent ev){
+        currentHumanLinkEditMode = false;
+    }
+    
     
     /**
      * Listener for user requests to add a human
@@ -883,7 +971,7 @@ public class PersonBB extends BackingBeanUtils {
      */
     public void onActivateNewHumanLinkTarget(IFace_humanListHolder hlh){
         try {
-            loadLinkedObjectRoleListUsingSessionHLH();
+            loadLinkedObjectRoleList();
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         } 
@@ -913,7 +1001,7 @@ public class PersonBB extends BackingBeanUtils {
        PersonCoordinator pc = getPersonCoordinator();
         try {
             pc.appendNoteToHumanLink(currentHumanLink, formHumanLinkNotes, getSessionBean().getSessUser());
-            onLoadHumanLinksToCurrentPerson(null);
+            refreshCurrentHumanLink();
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Note write success!", ""));
@@ -926,6 +1014,15 @@ public class PersonBB extends BackingBeanUtils {
     }
     
     /**
+     * Listener for user requests to start the deac process
+     * for human links
+     * @param ev 
+     */
+    public void onHumanLinkDeactivatInitLinkClick(ActionEvent ev){
+        System.out.println("PersonBB.onHumanLinkDeactivatInitLinkClick");
+    }
+    
+    /**
      * Listener for user requests to complete the note appending process
      * on a human link
      * @param ev 
@@ -934,7 +1031,7 @@ public class PersonBB extends BackingBeanUtils {
        PersonCoordinator pc = getPersonCoordinator();
         try {
             pc.deactivateHumanLink(currentHumanLink, getSessionBean().getSessUser());
-            onLoadHumanLinksToCurrentPerson(ev);
+            injectSessionHumanLinkListForComponentRefresh();
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Link deactivate success!", ""));
@@ -971,7 +1068,7 @@ public class PersonBB extends BackingBeanUtils {
         }
         
          try {
-            loadLinkedObjectRoleListUsingSessionHLH();
+            loadLinkedObjectRoleList();
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         } 
@@ -988,7 +1085,7 @@ public class PersonBB extends BackingBeanUtils {
         try {
             currentHumanLink.setLinkRole(selecetedLinkedObjetRole);
             
-            pc.linkHuman(getSessionBean().getSessHumanListHolder(), currentHumanLink, getSessionBean().getSessUser());
+            pc.insertHumanLink(getSessionBean().getSessHumanListHolder(), currentHumanLink, getSessionBean().getSessUser());
             refreshCurrentPersonAndUpdateSessionPerson();
             onLoadHumanLinksToCurrentPerson(null);
             injectSessionHumanLinkListForComponentRefresh();
@@ -1015,9 +1112,9 @@ public class PersonBB extends BackingBeanUtils {
     private void injectSessionHumanLinkListForComponentRefresh(){
         PersonCoordinator pc = getPersonCoordinator();
         List<HumanLink> hllist = null;
-        if(getSessionBean().getSessHumanListHolder() != null){
+        if(currentHumanListHolder != null){
             try {
-                hllist = pc.assembleLinkedHumanLinks(getSessionBean().getSessHumanListHolder());
+                hllist = pc.assembleLinkedHumanLinks(currentHumanListHolder);
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
@@ -1046,20 +1143,29 @@ public class PersonBB extends BackingBeanUtils {
      */
     public void onSelectAndLinkPersonsInit(IFace_humanListHolder hlh){
         
-        getSessionBean().setSessHumanListHolder(hlh);
+        currentHumanListHolder = hlh;
+        getSessionBean().setSessHumanListHolder(currentHumanListHolder);
         
-        
-        personListComponentIDToUpdatePostLinkingOperation = 
-                FacesContext.getCurrentInstance()
-                        .getExternalContext()
-                        .getRequestParameterMap()
-                        .get("person-list-component-to-update");
+        extractHumanLinkListComponentIDFromHTTPRequest();
+    
          getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Commencing linking of Persons to " + hlh.getHUMAN_LINK_SCHEMA_ENUM().getTARGET_OBJECT_FRIENDLY_NAME() + " ID: " + hlh.getHostPK(), ""));
         System.out.println("PersonBB.onSelectAndLinkPersonsInit | " + hlh.getHUMAN_LINK_SCHEMA_ENUM().getTARGET_OBJECT_FRIENDLY_NAME()  + " |  PK: " +hlh.getHostPK());
-        System.out.println("PersonBB.onSelectAndLinkPersonsInit | sending component ID: " +personListComponentIDToUpdatePostLinkingOperation);
         
+    }
+    
+    /**
+     * Extracts the value of key person-list-component-to-update
+     * from the HTTP request for later updating
+     */
+    private void extractHumanLinkListComponentIDFromHTTPRequest(){
+            personListComponentIDToUpdatePostLinkingOperation = 
+                FacesContext.getCurrentInstance()
+                        .getExternalContext()
+                        .getRequestParameterMap()
+                        .get("person-list-component-to-update");
+        System.out.println("PersonBB.extractHumanLinkListComponentIDFromHTTPRequest | got component ID: " +personListComponentIDToUpdatePostLinkingOperation);
     }
     
     /**
@@ -1153,7 +1259,7 @@ public class PersonBB extends BackingBeanUtils {
         PersonCoordinator pc = getPersonCoordinator();
         if(currentPerson != null && getSessionBean().getSessProperty() != null){
             try {
-                pc.linkHuman(getSessionBean().getSessProperty(), pc.createHumanLinkSkeleton(currentPerson), getSessionBean().getSessUser());
+                pc.insertHumanLink(getSessionBean().getSessProperty(), pc.createHumanLinkSkeleton(currentPerson), getSessionBean().getSessUser());
                   getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Linked " + currentPerson.getName() + " to Property ID " + getSessionBean().getSessProperty().getCountyParcelID(), ""));
@@ -1181,14 +1287,14 @@ public class PersonBB extends BackingBeanUtils {
         if(personsSelectedList != null && !personsSelectedList.isEmpty()){
             for(Person p: personsSelectedList){
                 try {
-                    pc.linkHuman(getSessionBean().getSessHumanListHolder(),
+                    pc.insertHumanLink(currentHumanListHolder,
                             pc.createHumanLinkSkeleton(p), 
                             getSessionBean().getSessUser());
                     System.out.println("PersonBB.onLinkSelectedPersonsToPersonHolder | linked p " + p.getName());
                     
                      getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Linked " + p.getName() + " to Object ID " + getSessionBean().getSessHumanListHolder().getHostPK(), ""));
+                        "Linked " + p.getName() + " to Object ID " + currentHumanListHolder.getHostPK(), ""));
                 } catch (BObStatusException | IntegrationException ex) {
                     System.out.println(ex);
                      getFacesContext().addMessage(null,
@@ -1620,6 +1726,34 @@ public class PersonBB extends BackingBeanUtils {
      */
     public void setPersonListComponentIDToUpdatePostLinkingOperation(String personListComponentIDToUpdatePostLinkingOperation) {
         this.personListComponentIDToUpdatePostLinkingOperation = personListComponentIDToUpdatePostLinkingOperation;
+    }
+
+    /**
+     * @return the currentHumanLinkEditMode
+     */
+    public boolean isCurrentHumanLinkEditMode() {
+        return currentHumanLinkEditMode;
+    }
+
+    /**
+     * @param currentHumanLinkEditMode the currentHumanLinkEditMode to set
+     */
+    public void setCurrentHumanLinkEditMode(boolean currentHumanLinkEditMode) {
+        this.currentHumanLinkEditMode = currentHumanLinkEditMode;
+    }
+
+    /**
+     * @return the currentHumanListHolder
+     */
+    public IFace_humanListHolder getCurrentHumanListHolder() {
+        return currentHumanListHolder;
+    }
+
+    /**
+     * @param currentHumanListHolder the currentHumanListHolder to set
+     */
+    public void setCurrentHumanListHolder(IFace_humanListHolder currentHumanListHolder) {
+        this.currentHumanListHolder = currentHumanListHolder;
     }
     
      

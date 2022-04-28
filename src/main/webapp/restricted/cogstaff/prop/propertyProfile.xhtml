@@ -727,30 +727,51 @@
 
                                         <p:dataTable id="prop-persons-table"
                                                      var="human"
-                                                     value="#{propertyProfileBB.currentProperty.humanLinkList}"
+                                                     value="#{propertyProfileBB.managedHumanLinkList}"
                                                      tableStyleClass="primeDataTable"
                                                      rowKey="#{human.humanID}"
                                                      >
+                                            
 
                                             <p:column headerText="Name"
+                                                      width="35%"
                                                       styleClass="centeredColumnContent">
-                                                <h:outputText value="#{human.name} is #{human.linkedObjectRole.title} this property"/>
-                                                <p:spacer height="3px" />
-                                                <h:outputText value="Link timestamp: #{propertyProfileBB.getPrettyDate(human.linkCreatedTS)}"/>
-                                                <p:spacer height="3px" />
-                                                <h:outputText value="(Human ID: #{human.humanID}; Link ID: #{human.linkID})"/>
+                                                <h:outputText value="#{human.name}" />
+                                                
+                                            </p:column>
+
+                                            <p:column headerText="Role"
+                                                      width="35%"
+                                                      styleClass="centeredColumnContent">
+                                                <h:outputText value="#{human.linkedObjectRole.title}"/>
 
                                             </p:column>
 
                                             <p:column headerText="Actions"
+                                                      width="30%"
                                                       styleClass="centeredColumnContent">
-                                                <p:commandLink      id="prop-person-exploreperson-button"
+                                                <p:commandLink      id="prop-person-exploreperson-cl"
                                                                     ajax="true"
                                                                     style="color:blue;"
                                                                     action="#{personBB.onHumanViewLinkClick(human)}"
                                                                     value="View Person"
                                                                     oncomplete="PF('person-profile-dialog-var').show();"
                                                                     />
+                                                <h:outputText value=" (HumID: #{human.humanID})" />
+                                                <p:spacer height="3px" />
+                                                <p:commandLink      id="prop-personlink-vieweditlink-cl"
+                                                                    ajax="true"
+                                                                    style="color:blue;"
+                                                                    action="#{personBB.onHumanLinkEditInitButtonChange(human, propertyProfileBB.currentProperty)}"
+                                                                    value="View/Edit link"
+                                                                    oncomplete="PF('humanlink-viewedit-dialog-var').show();"
+                                                                    update="humanlink-viewedit-dialog
+                                                                    humanlink-viewedit-form"
+                                                                    >
+                                                    <f:param name="person-list-component-to-update"
+                                                             value="prop-persons-panel-form" />
+                                                </p:commandLink>
+                                                <h:outputText value=" (LnkID: #{human.linkID})" />
 
                                             </p:column>
                                         </p:dataTable>

@@ -956,7 +956,8 @@
 
                         <p:outputLabel for="update-stipdate-sbb"
                                        styleClass="data_field_label">
-                            <h:outputText value="Select an extension method:"/>
+                            <h:outputText value="Select an extension method:"
+                                          rendered="true"/>
                         </p:outputLabel>
                     </div>
                     <div class="restrict-main-contents-io-content" >
@@ -965,6 +966,7 @@
                                                onLabel="Pick a date"
                                                offLabel="Enter a number of days from today"
                                                styleClass="selectButton"
+                                               rendered="true"
                                                value="#{ceCaseSearchProfileBB.extendStipCompUsingDate}"
                                                >
                             <p:ajax update="update-stipdate-cal
@@ -985,7 +987,7 @@
                         <p:growl for="update-stipdate-cal"/>
 
                         <p:datePicker  id="update-stipdate-cal"
-                                       value="#{ceCaseSearchProfileBB.extendedStipCompDate}"
+                                       value="#{ceCaseSearchProfileBB.currentViolation.stipulatedComplianceDate}"
                                        disabled="#{!ceCaseSearchProfileBB.extendStipCompUsingDate}"
                                        rendered="true"
                                        style="width: 100%;"

@@ -460,28 +460,26 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
 
     /**
      * Listener for requests to commit extension of stip comp date
-     *
+     * @deprecated 
      * @return
      */
     public String onViolationExtendStipCompDateCommitButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
         long secBetween;
         try {
-            if (extendStipCompUsingDate && extendedStipCompDate != null) {
-                LocalDateTime freshDate = extendedStipCompDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                if (freshDate.isBefore(LocalDateTime.now())) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Stipulated compliance dates must be in the future!", ""));
-                } else {
-                    secBetween = freshDate.toEpochSecond(ZoneOffset.of("-4")) - LocalDateTime.now().toEpochSecond(ZoneOffset.of("-4"));
-                    // divide by num seconds in a day
-                    long daysBetween = secBetween / (24 * 60 * 60);
-                    cc.violation_extendStipulatedComplianceDate(currentViolation, daysBetween, currentCase, getSessionBean().getSessUser());
-                }
-            } else {
-                cc.violation_extendStipulatedComplianceDate(currentViolation, extendedStipCompDaysFromToday, currentCase, getSessionBean().getSessUser());
-            }
+                // logic not used
+//                LocalDateTime freshDate = extendedStipCompDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+//                if (freshDate.isBefore(LocalDateTime.now())) {
+//                    getFacesContext().addMessage(null,
+//                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                                    "Stipulated compliance dates must be in the future!", ""));
+//                } else {
+//                    secBetween = freshDate.toEpochSecond(ZoneOffset.of("-4")) - LocalDateTime.now().toEpochSecond(ZoneOffset.of("-4"));
+//                    // divide by num seconds in a day
+//                    long daysBetween = secBetween / (24 * 60 * 60);
+//                    cc.violation_extendStipulatedComplianceDate(currentViolation, currentCase, getSessionBean().getSessUser());
+//                }
+                cc.violation_extendStipulatedComplianceDate(currentViolation, currentCase, getSessionBean().getSessUser());
         } catch (BObStatusException | IntegrationException | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,

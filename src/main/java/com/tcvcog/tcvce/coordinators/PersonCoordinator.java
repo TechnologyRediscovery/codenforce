@@ -137,7 +137,20 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return hll;
     }
     
-   
+    /**
+     * retrieves a single human link from the db
+     * @param linkID
+     * @param lose
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+   public HumanLink getHumanLink(int linkID, LinkedObjectSchemaEnum lose) throws BObStatusException, IntegrationException{
+       if(linkID == 0 || lose == null){
+           throw new BObStatusException("Cannot get link without nonzero ID and non null link enum");
+       }
+       PersonIntegrator pi = getPersonIntegrator();
+       return pi.getHumanLink(linkID, lose);
+   }
     
     /**
      * Grand staircase entrance for connecting a human holder to a human
@@ -149,7 +162,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @throws BObStatusException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public int linkHuman(IFace_humanListHolder hlh, HumanLink hlink, UserAuthorized ua) throws BObStatusException, IntegrationException{
+    public int insertHumanLink(IFace_humanListHolder hlh, HumanLink hlink, UserAuthorized ua) throws BObStatusException, IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         SystemCoordinator sc = getSystemCoordinator();
         if(hlh == null || hlink == null || ua == null){
@@ -169,6 +182,22 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return pi.insertHumanLink(hlh, hlink);
     }
     
+    /**
+     * Logic block for human ink updates
+     * @param hl
+     * @param hlh
+     * @param ua 
+     */
+    public void updateHumanLink(IFace_humanListHolder hlh, HumanLink hl, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(hl == null || ua == null){
+            throw new BObStatusException("Cannot update human link with null link or user");
+        }
+        
+        PersonIntegrator pi = getPersonIntegrator();
+        hl.setLinkLastUpdatedByUserID(ua.getUserID());
+        pi.updateHumanLink(hlh, hl);
+        
+    }
     
     /**
      * Uses instanceof to check what type of human holder we have and sets the default

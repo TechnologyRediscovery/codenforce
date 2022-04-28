@@ -60,6 +60,59 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     
     
    
+    /**
+     * Extractor of human link
+     * @param linkID
+     * @param lose
+     * @return
+     * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public HumanLink getHumanLink(int linkID, LinkedObjectSchemaEnum lose) throws BObStatusException, IntegrationException{
+        if(linkID == 0 || lose == null){
+            throw new BObStatusException("Cannot fetch a link with ID = 0 or null schema");
+        }
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        HumanLink hl = null;
+
+        try {
+            
+           StringBuilder sb = new StringBuilder();
+            sb.append("SELECT linkid, human_humanid, linkedobjectrole_lorid, \n");
+            sb.append("createdts, createdby_userid, lastupdatedts, lastupdatedby_userid,");
+            sb.append("deactivatedts, deactivatedby_userid, notes, source_sourceid  ");
+            sb.append("FROM ");
+            sb.append(lose.getLinkingTableName());
+            sb.append(" WHERE ");
+            sb.append(lose.getLinkingTablePKField());
+            sb.append("=?");
+            
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, linkID);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                // note that rs.next() is called and the cursor
+                // is advanced to the first row in the rs
+                hl = generateHumanLink(rs, null);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("PersonIntegrator.getHuman | Unable to retrieve human", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return hl;
+        
+    }
+    
     
     /**
      * Asks the inputted param for its linking table name and fetches
@@ -265,7 +318,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * the link source and the linked object role
      * 
      * @param rs containing fields for the standard linked tables
-     * @param h the human whose linked metadata is desired
+     * @param h the human whose linked metadata is desired; can be null, if so, 
+     * the resultset will be asked for the human id
      * @return the HumanLink which is a human with link metadata attached
      * @throws SQLException
      * @throws IntegrationException 
@@ -273,7 +327,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     public HumanLink generateHumanLink(ResultSet rs, Human h) throws SQLException, IntegrationException{
         SystemIntegrator si = getSystemIntegrator();
         HumanLink hl = null;
-        
+        if(h == null){
+            h = getHuman(rs.getInt("human_humanid"));
+        }
         if(rs != null && h != null){
             try {
                 hl = new HumanLink(h);
@@ -281,6 +337,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 hl.setLinkID(rs.getInt("linkid"));
                 hl.setNotes(rs.getString("notes"));
                 hl.setLinkRole(si.getLinkedObjectRole(rs.getInt("linkedobjectrole_lorid")));
+//                hl.setParentObjectID(rs.getInt(hl.getLinkedObjectRole().getSchema().getLINKED_OBJECT_FK_FIELD()));
+//                System.out.println("PersonIntegrator.generateHumanLink | parent ID: " + hl.getParentObjectID());
             } catch (BObStatusException ex) {
                 throw new IntegrationException(ex.getMessage());
             }
@@ -408,7 +466,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(1, java.sql.Types.NULL);
             }
             
-            if(hl.getLastUpdatedBy()!= null){
+            if(hl.getLinkLastUpdatedByUserID() != 0){
                 stmt.setInt(2, hl.getLinkLastUpdatedByUserID() );
             } else {
                 stmt.setNull(2, java.sql.Types.NULL);
@@ -444,8 +502,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     public void deactivateHumanLink(HumanLink hl) throws IntegrationException{
         if (hl == null 
                 || hl.getLinkedObjectRole() == null 
-                || hl.getLinkedObjectRole().getSchema() == null  
-                || hl.getParentObjectID() == 0){
+                || hl.getLinkedObjectRole().getSchema() == null  ){
             throw new IntegrationException("Cannot deactivate a human link with null link, schemaenum, or parent object ID == 0");
         }
 

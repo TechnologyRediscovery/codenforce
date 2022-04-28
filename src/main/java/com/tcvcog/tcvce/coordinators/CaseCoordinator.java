@@ -3864,16 +3864,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * Logic gateway for updates to a code violation's stipulated compliance
      * date
      *
-     * @param cv
-     * @param daysToExtend the number of days in the future FROM TODAY to extend
-     * the window
-     * @param cse
+     * @param cv with an updated stip date only. For other violation changes, see 
+     * methods prefixed with violation_ in this Coordinator
+     * @param cse on which the code violation for update should be connected. Verification 
+     * will occur
      * @param ua
-     * @throws com.tcvcog.tcvce.domain.BObStatusException
-     * @throws com.tcvcog.tcvce.domain.ViolationException
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException this violation doesn't go with this case
+     * @throws com.tcvcog.tcvce.domain.ViolationException If stip comp date on or before origination date
+     * @throws com.tcvcog.tcvce.domain.IntegrationException I can't write to the db
      */
-    public void violation_extendStipulatedComplianceDate(CodeViolation cv, long daysToExtend, CECaseDataHeavy cse, UserAuthorized ua)
+    public void violation_extendStipulatedComplianceDate(CodeViolation cv, CECaseDataHeavy cse, UserAuthorized ua)
             throws BObStatusException, ViolationException, IntegrationException {
 
         if (cv == null || cse == null || ua == null) {
@@ -3883,24 +3883,23 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if (cv.getStipulatedComplianceDate() == null) {
             throw new BObStatusException("Cannot extend a null stipulated compliance date");
         }
-
-        if (daysToExtend == 0) {
-            throw new BObStatusException("I, the mighty CaseCoordinator, shall not extend the compliance window by 0 days");
+        
+        if(cv.getCeCaseID() != cv.getCeCaseID()){
+            throw new BObStatusException("The inputted violation is NOT attached to the inputted CECASE");
         }
-
-//        if(cv.isAllowStipCompDateUpdate()){
-        LocalDateTime oldStipDate = cv.getStipulatedComplianceDate();
-        cv.setStipulatedComplianceDate(LocalDateTime.now().plusDays(daysToExtend));
+        
+        if(cv.getStipulatedComplianceDate().isBefore(cse.getOriginationDate())){
+            throw new BObStatusException("Stipulated compliance date cannot come on or before ce case origination date");
+        }
+        
+           
         violation_updateCodeViolation(cse, cv, ua);
-
+        System.out.println("CaseCoordinator.violation_extendStipulatedComplianceDate | done on cv " + cv.getViolationID());
         // now generate a note
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.setUser(ua);
-        mbp.setHeader("Stipulated compliance date extended");
+        mbp.setHeader("Stipulated compliance date extended to: ");
         StringBuilder sb = new StringBuilder();
-        sb.append("Previous stipulated compliance date of ");
-        sb.append(DateTimeUtil.getPrettyDate(oldStipDate));
-        sb.append(" has been changed to ");
         sb.append(DateTimeUtil.getPrettyDate(cv.getStipulatedComplianceDate()));
         sb.append(".");
 
@@ -3911,6 +3910,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 //            throw new BObStatusException("Code violation status does not permit updates to compliance date");
 //        }
     }
+    
+    
 
     /**
      * CodeViolation should have the actual compliance date set from the user's
