@@ -212,8 +212,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
         try {
             ec.updateEvent(currentEvent, getSessionBean().getSessUser());
-
-
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Save successful on event ID: " + currentEvent.getEventID(), ""));
             System.out.println("EventsBB.saveEventChanges successful");

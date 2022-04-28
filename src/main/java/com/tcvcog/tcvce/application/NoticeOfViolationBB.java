@@ -37,9 +37,6 @@ import javax.faces.event.ActionEvent;
  */
 public class NoticeOfViolationBB extends BackingBeanUtils implements Serializable {
 
-    private PageModeEnum currentMode;
-    private List<PageModeEnum> pageModes;
-
     private CECaseDataHeavy currentCase;
     private boolean draftNoticeLoaded;
 
@@ -1183,20 +1180,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
 
     /**
-     * @return the pageModes
-     */
-    public List<PageModeEnum> getPageModes() {
-        return pageModes;
-    }
-
-    /**
-     * @param pageModes the pageModes to set
-     */
-    public void setPageModes(List<PageModeEnum> pageModes) {
-        this.pageModes = pageModes;
-    }
-
-    /**
      * @return the formNoteText
      */
     public String getFormNoteText() {
@@ -1210,12 +1193,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         this.formNoteText = formNoteText;
     }
 
-    /**
-     * @return the currentMode
-     */
-    public PageModeEnum getCurrentMode() {
-        return currentMode;
-    }
 
     /**
      * @return the currentViolation

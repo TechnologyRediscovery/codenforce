@@ -35,6 +35,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -44,25 +46,16 @@ import org.primefaces.event.FileUploadEvent;
  * Primary backing bean for the Code Enforcement case 
  * @author sylvia
  */
-public class CECaseSearchProfileBB
+public class CECaseBB
         extends BackingBeanUtils
         implements Serializable {
     
-    private PageModeEnum currentMode;
-    private List<PageModeEnum> pageModes;
 
     private CECaseDataHeavy currentCase;
     private PropertyDataHeavy currentCasePropDataHeavy;
-    private boolean currentCaseSelected;
+    private boolean editModeCurrentCase;
 
     private int formNOVFollowupDays;
-    private List<CECasePropertyUnitHeavy> caseList;
-    private List<CECasePropertyUnitHeavy> filteredCaseList;
-    
-    private SearchParamsCECase searchParamsSelected;
-    private List<QueryCECase> queryList;
-    private QueryCECase querySelected;
-    private boolean appendResultsToList;
     
     private List<EventCategory> closingEventCategoryList;
     private EventCategory closingEventCategorySelected;
@@ -75,17 +68,8 @@ public class CECaseSearchProfileBB
     private List<BOBSource> bobSourceOptionList;
     
     private String formNoteText;
-
-    private List<Property> propListForSearch;
-    private CaseStageEnum[] caseStageList;
-
+    private String formViolationStipCompDateExtReason;
     private ReportConfigCECase reportCECase;
-    private ReportConfigCECaseList reportCECaseList;
-
-    
-    //NOV
-  
-    
     
     /*******************************************************
      *              Violation collapse fields
@@ -93,6 +77,8 @@ public class CECaseSearchProfileBB
     /*******************************************************/
     
     private CodeViolation currentViolation;
+    private boolean editModeCurrentViolation;
+    
     private List<ViewOptionsActiveListsEnum> viewOptionList;
     private ViewOptionsActiveListsEnum selectedViewOption;
     
@@ -106,50 +92,11 @@ public class CECaseSearchProfileBB
 
     private CodeSet currentCodeSet;
 
-    private boolean extendStipCompUsingDate;
-    private LocalDateTime extendedStipCompDate;
-    private int extendedStipCompDaysFromToday;
+    private boolean formExtendStipCompUsingDate;
+    private int formExtendedStipCompDaysFromToday;
     
     private boolean formMakeFindingsDefault;
 
-    
-    
-    /*******************************************************
-     *              Event collapse fields
-     *              FROM EventsBB
-    /*******************************************************/
-    
-    private EventCnF currentEvent;
-    
-    private Map<EventType, List<EventCategory>> typeCatMap;
-    private boolean updateNewEventFieldsWithCatChange;
-    
-    private List<EventType> eventTypeCandidates;
-    private EventType eventTypeSelected;
-    
-    private List<EventCategory> eventCategoryCandidates;
-    private EventCategory eventCategorySelected;
-    
-    private int eventDurationFormField;
-    
-    private List<Human> eventHumanCandidates;
-    private int eventHumanIDForLookup;
-    private Human eventHumanSelected;
-    
-    private String formEventNoteText;
-    
-    
-    /*******************************************************
-     *              Person utilities
-    /*******************************************************/
-    
-    private Person workingPerson;
-    
-    
-    
-  
-    
-    
     
     /*******************************************************
      *              BLOB Jazz
@@ -162,7 +109,7 @@ public class CECaseSearchProfileBB
     /**
      * Creates a new instance of CECaseSearchBB
      */
-    public CECaseSearchProfileBB() {
+    public CECaseBB() {
     }
 
     /**
@@ -173,132 +120,38 @@ public class CECaseSearchProfileBB
     @PostConstruct
     public void initBean()  {
         CaseCoordinator cc = getCaseCoordinator();
-        SearchCoordinator sc = getSearchCoordinator();
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sysCor = getSystemCoordinator();
-        EventCoordinator ec = getEventCoordinator();
-        PropertyCoordinator pc = getPropertyCoordinator();
-        
-
-        SessionBean sb = getSessionBean();
-        queryList = sc.buildQueryCECaseList(getSessionBean().getSessUser().getMyCredential());
-        querySelected = getSessionBean().getQueryCECase();
-
-        configureParameters();
-
         try {
-        caseList = new ArrayList<>();
-        caseList.addAll(cc.cecase_refreshCECasePropertyUnitHeavyList(sb.getSessCECaseList()));
-        CECaseDataHeavy cseTemp = getSessionBean().getSessCECase();
-            
-            // TODO: edie
-            // deal with event page load issues later
-//            if(cseTemp == null){
-//                if(caseList != null && !caseList.isEmpty()){
-//                    cseTemp = caseList.get(0);
-//                } else {
-//                    cseTemp = cc.cecase_selectDefaultCECase(sb.getSessUser());
-//                }
-//            }
-//            currentCase = cseTemp;
-            // request scoped bean: don't reload ergbob
-            currentCase = cc.cecase_assembleCECaseDataHeavy(cseTemp, getSessionBean().getSessUser());
-            if(currentCase.getEventList() != null && !currentCase.getEventList().isEmpty()){
-                injectSessionEvent(currentCase.getEventList().get(0));
-            }
-           
-            
-            System.out.println("CECaseSearchProfileBB.initBean(): current case ID: " + currentCase.getCaseID());
-            setClosingEventCategoryList(ec.getEventCategeryList(EventType.Closing));
-            
-
-        propListForSearch = sb.getSessPropertyList();
-        caseStageList = CaseStageEnum.values();
-        
-        eventViewOptions = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
-        setEventViewOptionSelected(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN);
-
-        userManagerOptionList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
-        bobSourceOptionList = sysCor.getBobSourceListComplete();
+            currentCase = cc.cecase_assembleCECaseDataHeavy(getSessionBean().getSessCECase(), getSessionBean().getSessUser());
+            userManagerOptionList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
+            bobSourceOptionList = sysCor.getBobSourceListComplete();
+            severityList = sysCor.getIntensitySchemaWithClasses(
+                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_violationseverity"))
+                    .getClassList();
 
         } catch (IntegrationException | BObStatusException | SearchException  ex) {
             System.out.println(ex);
         }
-        ReportConfigCECaseList listRpt = getSessionBean().getReportConfigCECaseList();
-        
-        if (listRpt != null) {
-            reportCECaseList = listRpt;
-        } else {
-            reportCECaseList = cc.report_getDefaultReportConfigCECaseList();
-        }
         
         
-        ReportConfigCECase rpt = getSessionBean().getReportConfigCECase();
-        
-        if (rpt != null) {
-            rpt.setTitle("Code Enforcement Case Summary");
-            reportCECase = rpt;
-        }
-        
-        refreshCasePropertyDataHeavy();
-        
-        pageModes = new ArrayList<>();
-        pageModes.add(PageModeEnum.LOOKUP);
-        pageModes.add(PageModeEnum.INSERT);
-        pageModes.add(PageModeEnum.UPDATE);
-        pageModes.add(PageModeEnum.REMOVE);
-        if(getSessionBean().getCeCaseSearchProfilePageModeRequest() != null){
-            setCurrentMode(getSessionBean().getCeCaseSearchProfilePageModeRequest());
-        } 
-        setCurrentMode(pageModes.get(0));
-     
-        // NOV
         formNOVFollowupDays = getSessionBean().getSessMuni().getProfile().getNovDefaultDaysForFollowup();
         if(formNOVFollowupDays == 0){
             formNOVFollowupDays = 20;
         }
         
-        
-        
         // VIOLATION STUFF FROM VIOLATIONBB
+        currentViolation = getSessionBean().getSessCodeViolation();
         
-         currentViolation = getSessionBean().getSessCodeViolation();
-            if (currentViolation == null) {
-                if (currentCase != null && currentCase.getViolationList() != null && !currentCase.getViolationList().isEmpty()) {
-                    currentViolation = currentCase.getViolationList().get(0);
-                }
+        if (currentViolation == null) {
+            if (currentCase != null && currentCase.getViolationList() != null && !currentCase.getViolationList().isEmpty()) {
+                currentViolation = currentCase.getViolationList().get(0);
             }
-        try{
-            
-            severityList = sysCor.getIntensitySchemaWithClasses(
-                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_violationseverity"))
-                    .getClassList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-
         }
         
         formMakeFindingsDefault = false;
-        
         filteredElementList = null;
-        extendStipCompUsingDate = true;
-        currentCodeSet = getSessionBean().getSessMuni().getCodeSet();
-
-        // EVENT STUFF
-        setTypeCatMap(ec.assembleEventTypeCatMap_toEnact(DomainEnum.CODE_ENFORCEMENT, currentCase, getSessionBean().getSessUser()));
-        eventTypeCandidates = new ArrayList<>(getTypeCatMap().keySet());
-        eventCategoryCandidates = new ArrayList<>();
-        if(eventTypeCandidates != null && !eventTypeCandidates.isEmpty()){
-            eventTypeSelected = getEventTypeCandidates().get(0);
-            eventCategoryCandidates.addAll(getTypeCatMap().get(eventTypeSelected));
-        }
-        eventHumanCandidates = new ArrayList<>();
-        
-        updateNewEventFieldsWithCatChange = true;
-       
+        formExtendStipCompUsingDate = true;
         
     }
     
@@ -319,9 +172,6 @@ public class CECaseSearchProfileBB
         }
     }
     
-       
- 
-    
     /**
      * Sets the session event
      * @param ev 
@@ -333,20 +183,7 @@ public class CECaseSearchProfileBB
         
     }
 
-    /**
-     * Loads the first parameter bundle of a selected query object
-     */
-    private void configureParameters() {
-        if (querySelected != null
-                && querySelected.getParamsList() != null
-                && !querySelected.getParamsList().isEmpty()) {
-
-            searchParamsSelected = querySelected.getParamsList().get(0);
-
-        } else {
-            searchParamsSelected = null;
-        }
-    }
+   
     
     /**
      * Listener for requests to reload the current CECaseDataHeavy
@@ -365,7 +202,7 @@ public class CECaseSearchProfileBB
     public LocalDateTime getReloadCECaseTrigger(){
         LocalDateTime trigger = getSessionBean().getSessCECaseRefreshTrigger();
         if(trigger != null){
-            reloadCase();
+            reloadCurrentCase();
             System.out.println("CECaseSearchProfileBB.getReloadCECaseTrigger: "+ getPrettyDateNoTime(trigger));
             trigger = null;
             getSessionBean().setSessCECaseRefreshTrigger(trigger);
@@ -388,7 +225,7 @@ public class CECaseSearchProfileBB
     /**
      * Gets a new cecase data heavy
      */
-    public void reloadCase(){
+    public void reloadCurrentCase(){
         CaseCoordinator cc = getCaseCoordinator();
         try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
@@ -403,126 +240,28 @@ public class CECaseSearchProfileBB
     }
     
     public void reloadCaseListener(ActionEvent ev){
-        reloadCase();
+        reloadCurrentCase();
     }
     
-     /**
-     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE, REMOVE
-     * @deprecated no longer used during page collapse and simplification DEC/JAN '21
-     * @param mode     
-     */
-    public void setCurrentMode(PageModeEnum mode) {
-
-        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
-        PageModeEnum tempCurMode = this.currentMode;
-        //reset default setting every time the Mode has been selected 
-//        loadDefaultPageConfig();
-        //check the currentMode == null or not
-        if (mode == null) {
-            this.currentMode = tempCurMode;
-        } else {
-            this.currentMode = mode;
-            System.out.println("CECaseSearchProfileBB.setCurrentMode: " + currentMode.getTitle());
-            switch(currentMode){
-                case LOOKUP:
-                    onModeLookupInit();
-                    break;
-                case INSERT:
-                    onModeInsertInit();
-                    break;
-                case UPDATE:
-//                    onModeUpdateInit();
-                    break;
-                case REMOVE:
-                    onModeRemoveInit();
-                    break;
-                default:
-                    break;
-                    
-            }
-        }
-    }
-    
-    
-    //check if current mode == Lookup
-    public boolean getActiveLookupMode() {
-        // hard-wired on since there's always a property loaded
-        return PageModeEnum.LOOKUP.equals(currentMode) ;
-    }
-
+  
     /**
-     * Provide UI elements a boolean true if the mode is UPDATE
-     * @return 
-     */
-    public boolean getActiveUpdateMode(){
-        return PageModeEnum.UPDATE.equals(currentMode);
-    }
-
-
-    //check if current mode == Insert
-    public boolean getActiveInsertUpdateMode() {
-        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
-    }
-
-    //check if current mode == Insert
-    public boolean getActiveInsertMode() {
-        return PageModeEnum.INSERT.equals(currentMode);
-    }
-
-    //check if current mode == Remove
-    public boolean getActiveRemoveMode() {
-        return PageModeEnum.REMOVE.equals(currentMode);
-    }
-
-    /**
-     * Listener for user requests to start case updates
+     * Listener for user requests to start case updates or end them
      * @param ev 
      */
-    public void onCaseSettingsInitButtonChnage(ActionEvent ev){
-        // nothing to do yet
+    public void onToggleCECaseEditButtonChange(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        if(editModeCurrentCase){
+            try {
+                cc.cecase_updateCECaseMetadata(currentCase, getSessionBean().getSessUser());
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+            } 
+        }
     }
 
     
-    /**
-     * Primary listener method which copies a reference to the selected
-     * user from the list and sets it on the selected user perch
-     * @param cse
-     * @return 
-     */
-    public String onObjetViewButtonChange(CECase cse){
-        CaseCoordinator cc = getCaseCoordinator();
-        
-        if(cse != null){
-            try {
-                currentCase = cc.cecase_assembleCECaseDataHeavy(cse, getSessionBean().getSessUser());
-                getSessionBean().setSessCECase(currentCase);
-                getSessionBean().setSessProperty(currentCase.getParcelKey());
-            } catch (IntegrationException | BObStatusException | SearchException ex) {
-                System.out.println(ex);
-                getFacesContext().addMessage(null, 
-                      new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                      "Unable to assemble case data heavy " + ex.getMessage(), ""));
-            }
-        }
-        System.out.println("CECaseSearchProfileBB.currentCase: " + currentCase.getCaseID());
-        return "";
-    }
-     
- 
-    /**
-     * Internal logic container for changes to page mode: Lookup
-     */
-    private void onModeLookupInit(){
-    }
-    
    
-    
-    /**
-     * Internal logic container for beginning the user creation change process
-     * Delegated from the mode button router
-     */
-    public void onModeInsertInit(){
-    }
+     
     
     /**
      * Listener for user requests to open new case at current property
@@ -534,31 +273,19 @@ public class CECaseSearchProfileBB
         
     }
     
+
+    
+    
+    
+    
+    
     /**
-     * Listener for beginning of update process
-     * @param ev
-     */
-     public void onModeUpdateInit(ActionEvent ev){
-         // nothing to do here yet since the user is selected
-     }
-     
-     /**
-      * Listener for user requests to commit updates
-      * @return 
-      */
-     public String onCaseUpdateButtonChange(){
-        
-         updateCaseMetatData(currentCase);
-         return "ceCaseProfile";
-    }
-     
-     /**
       * Funnel for all updateXXX methods on cases
       * The caller is responsible for updating notes to 
       * document the field changes, value by value
       * @param cse the case with updated fields
       */
-     private void updateCaseMetatData(CECase cse){
+     private void updateCaseMetatData(){
           CaseCoordinator cc = getCaseCoordinator();
         
         try {
@@ -573,14 +300,6 @@ public class CECaseSearchProfileBB
         }
          
      }
-     
-    
-     /**
-      * Listener for the start of the case remove process
-      */
-     public void onModeRemoveInit(){
-       
-    }
      
     /**
      * Listener for user requests to deactivate a cecase
@@ -645,7 +364,6 @@ public class CECaseSearchProfileBB
      * @return reload case profile page
      */
     public String onCaseRenameCommitButtonChange(){
-        updateCaseMetatData(currentCase);
         return "ceCaseProfile";
         
     }
@@ -665,7 +383,6 @@ public class CECaseSearchProfileBB
      * @return reload case profile page
      */
     public String onCaseChangeManagerCommitButtonChange(){
-        updateCaseMetatData(currentCase);
         return "ceCaseProfile";
         
     }
@@ -703,35 +420,6 @@ public class CECaseSearchProfileBB
     }
 
     
-    public String onProposalViewButtonChange(Proposal prop){
-        return "workflow";
-    }
-    
-    public String onProposalsListButtonChange(){
-        return "workflow";
-    }
-    
-    public void onEventViewButtonChange(EventCnF ev){
-        if(ev != null){
-            System.out.println("CECaseSearchProfileBB.onEventViewButtonChange: Event ID: " + ev.getEventID());
-            getSessionBean().setSessEvent(ev);
-            currentEvent = ev;
-        }
-    }
-  
-    
-    public String onCEARViewButtonChange(CEActionRequest cear){
-        getSessionBean().setSessCEAR(cear);
-        return "cEActionRequests";
-        
-    }
-    
-    public String onNOVViewButtonChange(NoticeOfViolation nov){
-        getSessionBean().setSessNotice(nov);
-        return "ceCaseNotices";
-        
-    }
-    
     public void onHowToNextStepButtonChange(ActionEvent ev){
         System.out.println("ceCaseSearchProfileBB.onHowToNextStepButtonChange");
         
@@ -755,7 +443,7 @@ public class CECaseSearchProfileBB
      * 
      * @return the CECases's updated blob list
      */
-    public List<BlobLight> getBlobLightListFromCECase(){
+    public List<BlobLight> getManagedBlobLightListFromCECase(){
         List<BlobLight> sessBlobListForUpdate = getSessionBean().getSessBlobLightListForRefreshUptake();
         if(sessBlobListForUpdate != null && currentCase != null){
             System.out.println("CECaseSearchProfileBB.getBlobLightListFromCECase | found non-null session blob list for uptake: " + sessBlobListForUpdate.size());
@@ -798,220 +486,8 @@ public class CECaseSearchProfileBB
     
    
     
-    /**
-     * Listener for user requests to build a code enforcement case
-     * 
-     * @return 
-     */
-    public String generateReportCECase() {
-        System.out.println("CECaseSearchProfileBB.generateReportCECase");
-        CaseCoordinator cc = getCaseCoordinator();
-
-        getReportCECase().setCse(currentCase);
-
-        getReportCECase().setCreator(getSessionBean().getSessUser());
-        getReportCECase().setMuni(getSessionBean().getSessMuni());
-        getReportCECase().setGenerationTimestamp(LocalDateTime.now());
-
-        try {
-            setReportCECase(cc.report_transformCECaseForReport(getReportCECase()));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-                getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Could not generate report, sorry!", ""));
-        }
-
-        getSessionBean().setReportConfigCECase(getReportCECase());
-        // this is for use by the report header to have a super class with only
-        // the basic info. reportingBB exposes it to the faces page
-        getSessionBean().setSessReport(getReportCECase());
-        // force our reportingBB to choose the right bundle
-        getSessionBean().setReportConfigCECaseList(null);
-
-        return "reportCECase";
-    }
-
-    /**
-     * Listener for the report initiation process
-     * @param ev 
-     */
-    public void prepareReportCECase(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        reportCECase = cc.report_getDefaultReportConfigCECase(currentCase);
-        System.out.println("CaseProfileBB.prepareReportCECase | reportConfigOb: " + getReportCECase());
-
-    }
-    
-    
-    
-    
-    /**
-     * Responder to the query button on the UI
-     *
-     * @param ev
-     */
-    public void executeQuery(ActionEvent ev) {
-        System.out.println("CaseProfileBB.executeQuery: Listener");
-        executeQuery();
-    }
-
-    /**
-     * Logic block for executing selected query
-     */
-    public void executeQuery() {
-        System.out.println("CECaseSearchBB.executeQuery");
-        SearchCoordinator sc = getSearchCoordinator();
-        CaseCoordinator cc = getCaseCoordinator();
-        int listSize = 0;
-
-        if (!appendResultsToList) {
-            caseList.clear();
-        }
-
-        try {
-            caseList.addAll(sc.runQuery(getQuerySelected()).getResults());
-            if (caseList != null) {
-                listSize = getCaseList().size();
-            }
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Your query completed with " + listSize + " results", ""));
-        } catch (SearchException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not query the database, sorry.", ""));
-        }
-    }
-
-    /**
-     * Convenience method for accessing the size of the CECase List
-     *
-     * @return
-     */
-    public int getCaseListSize() {
-        int s = 0;
-        if (caseList != null && !caseList.isEmpty()) {
-            s = caseList.size();
-        }
-        return s;
-
-    }
-
-    /**
-     * Listener method for requests to load case history
-     *
-     * @param ev
-     */
-    public void loadCECaseHistory(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        try {
-            caseList.addAll(cc.cecase_assembleCECasePropertyUnitHeavyList(cc.cecase_getCECaseHistory(getSessionBean().getSessUser())));
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Case history loaded", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not load case history, sorry.", ""));
-        } catch (BObStatusException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-        }
-    }
-
-    /**
-     * Listener method for requests to clear the search results list
-     *
-     * @param ev
-     */
-    public void clearCECaseList(ActionEvent ev) {
-        if (caseList != null) {
-            caseList.clear();
-        }
-    }
-
-    /**
-     * Listener method for changes in selected query objects
-     *
-     */
-    public void changeQuerySelected() {
-        configureParameters();
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "New query loaded!", ""));
-    }
-
-    /**
-     * Action listener for query resets
-     *
-     * @param ev
-     */
-    public void resetQuery(ActionEvent ev) {
-        SearchCoordinator sc = getSearchCoordinator();
-        queryList = sc.buildQueryCECaseList(getSessionBean().getSessUser().getMyCredential());
-        if (queryList != null && !queryList.isEmpty()) {
-            querySelected = queryList.get(0);
-        }
-        configureParameters();
-    }
-    
-    /**
-     * 
-     * @param ev 
-     */
-    public void prepareReportCECaseList(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-
-        if (reportCECaseList == null) {
-            reportCECaseList = cc.report_getDefaultReportConfigCECaseList();
-        }
-        reportCECaseList.setTitle("Code Enforcement Activity Report");
-        reportCECaseList.setDate_start_val(LocalDateTime.now().minusDays(30));
-        reportCECaseList.setDate_end_val(LocalDateTime.now());
-        System.out.println("CaseProfileBB.prepareCaseListReport");
-
-    }
-    
-    
-    /**
-     * Listener for the report initiation process
-     * @return 
-     */
-    public String prepareReportCECaseListCustomQuery() {
-        getSessionBean().setSessCECaseList(caseList);
-        
-//       rpt.setCaseListCustomQueryExport();
-        return "ceCaseListExport";
-        
-    }
-
-    /**
-     * 
-     * @return 
-     */
-    public String generateReportCECaseList() {
-        CaseCoordinator cc = getCaseCoordinator();
-        reportCECaseList.setCreator(getSessionBean().getSessUser());
-        reportCECaseList.setMuni(getSessionBean().getSessMuni());
-        reportCECaseList.setGenerationTimestamp(LocalDateTime.now());
-
-        try {
-            reportCECaseList = cc.report_buildCECaseListReport(reportCECaseList, getSessionBean().getSessUser());
-        } catch (SearchException ex) {
-            System.out.println(ex);
-            
-        }
-        getSessionBean().setReportConfigCECaseList(reportCECaseList);
-        getSessionBean().setReportConfigCECase(null);
-        getSessionBean().setSessReport(reportCECaseList);
-
-        return "reportCECaseList";
-
-    }
+  
+  
     
     /**
      * Catch all for cancellation requests
@@ -1154,7 +630,7 @@ public class CECaseSearchProfileBB
                                     "Success! Violation attached to case.", ""));
                     // Removed for batch processing
                     //            getSessionBean().getSessionBean().setSessCodeViolation(currentViolation);
-                    System.out.println("ViolationBB.onViolationAddCommmitButtonChange | attached violation to case");
+                    System.out.println("CECaseSearchProfileBB.onViolationAddCommmitButtonChange | attached violation to case");
                     if(cv.isMakeFindingsDefault()){
                         makeViolationFindingsDefault(cv);
                     }
@@ -1205,7 +681,7 @@ public class CECaseSearchProfileBB
      * @param ev
      */
     public void onViolationExtendStipCompDateInitButtonChange(ActionEvent ev) {
-        setExtendedStipCompDaysFromToday(CaseCoordinator.DEFAULT_EXTENSIONDAYS);
+        setFormExtendedStipCompDaysFromToday(CaseCoordinator.DEFAULT_EXTENSIONDAYS);
     }
 
     /**
@@ -1217,7 +693,7 @@ public class CECaseSearchProfileBB
         CaseCoordinator cc = getCaseCoordinator();
         long secBetween;
         try {
-            if (extendStipCompUsingDate) {
+            if (formExtendStipCompUsingDate) {
                 if (currentViolation.getStipulatedComplianceDate().isBefore(LocalDateTime.now())) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1226,12 +702,12 @@ public class CECaseSearchProfileBB
                     secBetween = currentViolation.getStipulatedComplianceDate().toEpochSecond(ZoneOffset.of("-4")) - LocalDateTime.now().toEpochSecond(ZoneOffset.of("-4"));
                     // divide by num seconds in a day
                     long daysBetween = secBetween / (24 * 60 * 60);
-                    System.out.println("Extending stip comp date for violation " + currentViolation.getViolationID() + " to " + extendedStipCompDate.toString() );
-                    cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), currentCase, getSessionBean().getSessUser());
+                    
+                    cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), formViolationStipCompDateExtReason, currentCase, getSessionBean().getSessUser());
                 }
             } else {
                 // no math to do
-                cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), currentCase, getSessionBean().getSessUser());
+                cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), formViolationStipCompDateExtReason, currentCase, getSessionBean().getSessUser());
             }
         } catch (BObStatusException | IntegrationException | ViolationException ex) {
             System.out.println(ex);
@@ -1708,421 +1184,50 @@ public class CECaseSearchProfileBB
     
     
     
-    /*******************************************************
-    /*******************************************************
-     **              EVENTS!!                             **
-    /*******************************************************/
-    /*******************************************************/
-      
-    public void onEventAddInitButtonChange(){
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            EventCnF ev = ec.initEvent(currentCase, null);
-            getSessionBean().setSessEvent(ev);
-            ev.setCeCaseID(currentCase.getBObID());
-            currentEvent = ev;
-        } catch (BObStatusException | EventException ex) {
-            System.out.println(ex);
-        } 
-    }
-    
-      public void hideEvent(EventCnF event){
-        EventIntegrator ei = getEventIntegrator();
-        event.setHidden(true);
-        try {
-            ei.updateEvent(event);
-            getFacesContext().addMessage(null,
-                   new FacesMessage(FacesMessage.SEVERITY_INFO,
-                           "Success! event ID: " + event.getEventID() + " is now hidden", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not hide event, sorry; this is a system erro", ""));
-        }
-    }
-    
-    public void unHideEvent(EventCnF event){
-        EventIntegrator ei = getEventIntegrator();
-        event.setHidden(false);
-        try {
-            ei.updateEvent(event);
-            getFacesContext().addMessage(null,
-                   new FacesMessage(FacesMessage.SEVERITY_INFO,
-                           "Success! Unhid event ID: " + event.getEventID(), ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                           "Could not unhide event, sorry; this is a system erro", ""));
-        }
-    }
-    
-    
-      /**
-     * Actionlistener Called when the user selects their own EventCategory to add to the case
-     * and is a pass-through method to the initiateNewEvent method
-     *
-     * @param ev
-     */
-    public void initiateUserChosenEventCreation(ActionEvent ev) {
-        initiateNewEvent();
-    }
-    
-    
-    /**
-     * Listener method for starting event edits
-     * @param ev 
-     */
-    public void initiateEventEdit(EventCnFPropUnitCasePeriodHeavy ev){
-        setCurrentEvent(ev);
-    }
-      /**
-     * Logic container for setting up new event which will be displayed 
-     * in the overlay window for the User
-     */
-    private void initiateNewEvent() {
-        System.out.println("EventsBB.initiateNewEvent");
-        EventCoordinator ec = getEventCoordinator();
-        
-        EventCnF ev = null;
-            
-        try {
-            if(getCurrentEvent() == null){
-
-                ev = ec.initEvent(currentCase, null);
-//                ev.setCategory(eventCategorySelected);
-                ev.setCeCaseID(currentCase.getBObID());
-                ev.setUserCreator(getSessionBean().getSessUser());
-                currentEvent = ec.assembleEventCnFPropUnitCasePeriodHeavy(ev);
-
-            }
-                
-        } catch (BObStatusException | EventException | IntegrationException | SearchException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-        }
-    }
-
-  
-    
-    /**
-     * All Code Enforcement case events are funneled through this method which
-     * has to carry out a number of checks based on the type of event being
-     * created. The event is then passed to the addEvent_processForCECaseDomain on the
-     * Event Coordinator who will do some more checking about the event before
-     * writing it to the DB
-     *
+     /**
+     * Listener for user requests to build a code enforcement case
+     * 
      * @return 
      */
-    public String onEventAddCommitButtonChange() {
-        System.out.println("EventsBB.onEventAddCommitButtonChange");
-        EventCoordinator ec = getEventCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
-        
-        List<EventCnFPropUnitCasePeriodHeavy> evDoneList;
-            
-        // category is already set from initialization sequence
+    public String generateReportCECase() {
+        System.out.println("CECaseSearchProfileBB.generateReportCECase");
+        CaseCoordinator cc = getCaseCoordinator();
+
+        getReportCECase().setCreator(getSessionBean().getSessUser());
+        getReportCECase().setMuni(getSessionBean().getSessMuni());
+        getReportCECase().setGenerationTimestamp(LocalDateTime.now());
 
         try {
-            getCurrentEvent().setCategory(getEventCategorySelected());
-            getCurrentEvent().setDomain(DomainEnum.CODE_ENFORCEMENT);
-            if(getCurrentEvent().getDomain() == null && getCurrentEvent().getDomain() == DomainEnum.UNIVERSAL){
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Event must have a domain that's not universal", ""));
-                return "";
-            }
-            if(getEventCategorySelected() == null){
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Event must have a category ", ""));
-                return "";
-            } else {
-                List<EventCnF> evSimpleList = ec.addEvent(getCurrentEvent(), currentCase, getSessionBean().getSessUser());
-                evDoneList = ec.assembleEventCnFPropUnitCasePeriodHeavyList(evSimpleList);
-
-                if(evDoneList != null && !evDoneList.isEmpty()){
-                    for(EventCnF evt: evDoneList){
-
-                        getFacesContext().addMessage(null,
-                                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                        "Successfully logged event with an ID " + evt.getEventID() + " ", ""));
-                    }
-                    setCurrentEvent(evDoneList.get(0));
-                    sc.logObjectView(getSessionBean().getSessUser(), getCurrentEvent());
-                }
-                getSessionBean().setSessEvent(getCurrentEvent());
-                
-                return "ceCaseProfile";
-            }
-    
-        } catch (IntegrationException | BObStatusException | EventException | SearchException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(),
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-            return "";
-        } 
-
-    }
-    
-      /**
-     * Listener for user requests to update an event
-     * @return 
-     */
-    public String onEventUpdateCommitButtonChange(){
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            ec.updateEvent(getCurrentEvent(), getSessionBean().getSessUser());
-        } catch (IntegrationException | BObStatusException | EventException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(),
-                            ""));
-            return "";
-        } 
-        
-        return "ceCaseProfile";
-    }
-    
-    public void onPersonListCommitButtonChange(ActionEvent ev){
-        
-        // nothing to do on the back end
-        
-    }
-    
-   
-    /**
-     * Listener for user request to go and view a person in personProfile
-     * @param p
-     * @return 
-     */
-    public String onPersonViewButtonChange(Person p){
-        
-        getSessionBean().setSessPersonQueued(p);
-        getSessionBean().setOnPageLoad_sessionSwitch_viewProfile(true);
-        return "personSearch";
-        
-    }
-    
-    /**
-     * Listener for user changes to the selected event type
-     */
-    public void onEventTypeMenuChange(){
-        System.out.println("EventsBB.onEventTypeMenuChange");
-        refreshAvailableEventCategories();
-        
-    }
-  
-    /**
-     * Listener method for changes in EventType selected by User
-     */
-    public void refreshAvailableEventCategories(){
-        
-        if(getEventTypeSelected() != null){
-            getEventCategoryCandidates().clear();
-            getEventCategoryCandidates().addAll(getTypeCatMap().get(getEventTypeSelected()));
-            if(!eventCategoryCandidates.isEmpty()){
-                setEventCategorySelected(getEventCategoryCandidates().get(0));
-            }
-            System.out.println("EventsBB.refreshavailableEventCategories");
-        }
-    }
-    /**
-     * Listener for user changes to the event category list on event add
-     */
-    public void onEventCategoryMenuChange(){
-        
-        configureEventFieldsOnAddConfig();
-    }
-   
-    /**
-     * Sets current event field values to those suggested by the 
-     * selected event category
-     */
-    private void configureEventFieldsOnAddConfig(){
-        if(eventCategorySelected != null 
-                && currentEvent != null 
-                && updateNewEventFieldsWithCatChange){
-            currentEvent.setTimeStart(LocalDateTime.now());
-            setEventDurationFormField(getEventCategorySelected().getDefaultDurationMins());
-            currentEvent.setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(getEventCategorySelected().getDefaultDurationMins()));
-            currentEvent.setDescription(getEventCategorySelected().getHostEventDescriptionSuggestedText());
-        }
-    }
-    
-    /**
-     * Listener for ajax updates to event time start
-     * @param ev
-     */
-    public void onTimeStartChange(){
-        System.out.println("CECaseSearchProfileBB.onTimeStartChange: " );
-        if(currentEvent.getTimeStart() != null){
-            currentEvent.setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(getEventDurationFormField()));
-            
-        }
-    }
-    
-    /**
-     * Listener for AJAX updates to event duration
-     */
-    public void onEventDurationChange(){
-        System.out.println("CECaseSearchProfileBB.onEventDurtaionChange");
-        if(getCurrentEvent().getTimeStart() != null){
-            getCurrentEvent().setTimeEnd(getCurrentEvent().getTimeStart().plusMinutes(getEventDurationFormField()));
-        }
-    }
-    
-
-    /**
-     * Listener pass through method for finalizing event edits
-     * @param ev 
-     */
-    public void finalizeEventUpdateListener(ActionEvent ev){
-        finalizeEventUpdate();
-    }
-    
-    /**
-     * Event update processing
-     */
-    public void finalizeEventUpdate() {
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            ec.updateEvent(getCurrentEvent(), getSessionBean().getSessUser());
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Event udpated!", ""));
-        } catch (IntegrationException | EventException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    ex.getMessage(),
-                    ""));
-        } 
-
-    }
-
-   
-
-   
-      /**
-     * Listener for commencement of note writing process
-     *
-     * @param ev
-     */
-    public void onEventNoteInitButtonChange(ActionEvent ev) {
-        formEventNoteText = "";
-
-    }
-
-    /**
-     * Listener for user requests to commit new note content to the current
-     * object
-     *
-     * @return
-     */
-    public String onNoteCommitButtonChange() {
-        EventCoordinator ec = getEventCoordinator();
-
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
-        mbp.setExistingContent(getCurrentEvent().getNotes());
-        mbp.setNewMessageContent(getFormNoteText());
-        mbp.setHeader("Notice of Violation Note");
-        mbp.setUser(getSessionBean().getSessUser());
-
-        try {
-
-            ec.updateEventNotes(mbp, getCurrentEvent(), getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Succesfully appended note!", ""));
+            setReportCECase(cc.report_transformCECaseForReport(getReportCECase()));
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
-            getFacesContext().addMessage(null,
+                getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Fatal error appending note; apologies!", ""));
-            return "";
+                    "Could not generate report, sorry!", ""));
         }
 
-        return "ceCaseProfile";
+        getSessionBean().setReportConfigCECase(getReportCECase());
+        // this is for use by the report header to have a super class with only
+        // the basic info. reportingBB exposes it to the faces page
+        getSessionBean().setSessReport(getReportCECase());
+        // force our reportingBB to choose the right bundle
+        getSessionBean().setReportConfigCECaseList(null);
 
+        return "reportCECase";
     }
 
-    
-    
-   
-    
-    /*******************************************************
-    /*******************************************************
-     **              Person management on cases           **
-    /*******************************************************/
-    /*******************************************************/
-    
-    /**
-     * Listener for beginning of person add process
+  /**
+     * Listener for the report initiation process
      * @param ev 
      */
-    public void personCreateInit(ActionEvent ev){
-        PersonCoordinator pc = getPersonCoordinator();
-        workingPerson = pc.createPersonSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
-    }
+    public void prepareReportCECase(ActionEvent ev) {
+        CaseCoordinator cc = getCaseCoordinator();
+        setReportCECase(cc.report_getDefaultReportConfigCECase(currentCase));
+        System.out.println("CaseProfileBB.prepareReportCECase | reportConfigOb: " + getReportCECase());
 
-    /**
-     * Action listener for creation of new person objectgs
-     * @param ev
-     */
-    public void personCreateCommit(ActionEvent ev){
-        PersonCoordinator pc = getPersonCoordinator();
-    
-        try {
-           Person per = pc.insertHuman(workingPerson, getSessionBean().getSessUser());
-            
-            getSessionBean().setSessPerson(per);
-            HumanLink hl = new HumanLink(per);
-        
-            Property property = currentCase.getProperty();
-            
-            pc.insertHumanLink(currentCase, hl, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                     "Successfully added " + per.getName() + " to the Database!" 
-                         + " and connected to " + property.getAddressString(), ""));
-           } catch (IntegrationException | BObStatusException ex) {
-               System.out.println(ex.toString());
-                  getFacesContext().addMessage(null,
-                       new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                               "Unable to add new person to the database, my apologies!", ""));
-        }
-        //make sure the person list includes our fresh person
-        refreshCasePropertyDataHeavy();
-        
     }
     
     
-    /**
-     * Special getter that returns a field inspection list on a CECase
-     * and will check the session bean to see if there are any updates
-     * from the inspection specific code
-     * @return 
-     */
-    public List<FieldInspection> getManagedCECaseFieldInspectionList(){
-        List<FieldInspection> updatedFIList = getSessionBean().getSessFieldInspectionListForRefresh();
-        if(updatedFIList != null){
-             if(currentCase != null){
-                 currentCase.setInspectionList(updatedFIList);
-                 getSessionBean().setSessFieldInspectionListForRefresh(null);
-                 return currentCase.getInspectionList();
-             }
-        } else {
-            if(currentCase != null){
-                 return currentCase.getInspectionList();
-            } 
-        }
-        return new ArrayList<>();
-    }
     
     
     
@@ -2142,48 +1247,8 @@ public class CECaseSearchProfileBB
         return currentCase;
     }
 
-    /**
-     * @return the caseList
-     */
-    public List<CECasePropertyUnitHeavy> getCaseList() {
-        return caseList;
-    }
-
-    /**
-     * @return the filteredCaseList
-     */
-    public List<CECasePropertyUnitHeavy> getFilteredCaseList() {
-        return filteredCaseList;
-    }
-
-    /**
-     * @return the searchParamsSelected
-     */
-    public SearchParamsCECase getSearchParamsSelected() {
-        return searchParamsSelected;
-    }
-
-    /**
-     * @return the queryList
-     */
-    public List<QueryCECase> getQueryList() {
-        return queryList;
-    }
-
-    /**
-     * @return the querySelected
-     */
-    public QueryCECase getQuerySelected() {
-        return querySelected;
-    }
-
-    /**
-     * @return the reportCECaseList
-     */
-    public ReportConfigCECaseList getReportCECaseList() {
-        return reportCECaseList;
-    }
-
+   
+    
     /**
      * @param currentCase the currentCase to set
      */
@@ -2191,140 +1256,8 @@ public class CECaseSearchProfileBB
         this.currentCase = currentCase;
     }
 
-    /**
-     * @param caseList the caseList to set
-     */
-    public void setCaseList(List<CECasePropertyUnitHeavy> caseList) {
-        this.caseList = caseList;
-    }
-
-    /**
-     * @param filteredCaseList the filteredCaseList to set
-     */
-    public void setFilteredCaseList(List<CECasePropertyUnitHeavy> filteredCaseList) {
-        this.filteredCaseList = filteredCaseList;
-    }
-
-    /**
-     * @param searchParamsSelected the searchParamsSelected to set
-     */
-    public void setSearchParamsSelected(SearchParamsCECase searchParamsSelected) {
-        this.searchParamsSelected = searchParamsSelected;
-    }
-
-    /**
-     * @param queryList the queryList to set
-     */
-    public void setQueryList(List<QueryCECase> queryList) {
-        this.queryList = queryList;
-    }
-
-    /**
-     * @param querySelected the querySelected to set
-     */
-    public void setQuerySelected(QueryCECase querySelected) {
-        this.querySelected = querySelected;
-    }
-
-    /**
-     * @param reportCECaseList the reportCECaseList to set
-     */
-    public void setReportCECaseList(ReportConfigCECaseList reportCECaseList) {
-        this.reportCECaseList = reportCECaseList;
-    }
-
-    /**
-     * @return the appendResultsToList
-     */
-    public boolean isAppendResultsToList() {
-        return appendResultsToList;
-    }
-
-    /**
-     * @param appendResultsToList the appendResultsToList to set
-     */
-    public void setAppendResultsToList(boolean appendResultsToList) {
-        this.appendResultsToList = appendResultsToList;
-    }
-
-    /**
-     * @return the propListForSearch
-     */
-    public List<Property> getPropListForSearch() {
-        return propListForSearch;
-    }
-
-    /**
-     * @param propListForSearch the propListForSearch to set
-     */
-    public void setPropListForSearch(List<Property> propListForSearch) {
-        this.propListForSearch = propListForSearch;
-    }
-
-    /**
-     * @return the caseStageList
-     */
-    public CaseStageEnum[] getCaseStageList() {
-        return caseStageList;
-    }
-
-    /**
-     * @param caseStageList the caseStageList to set
-     */
-    public void setCaseStageList(CaseStageEnum[] caseStageList) {
-        this.caseStageList = caseStageList;
-    }
-
-    /**
-     * @return the currentMode
-     */
-    public PageModeEnum getCurrentMode() {
-        return currentMode;
-    }
-
-    /**
-     * @return the pageModes
-     */
-    public List<PageModeEnum> getPageModes() {
-        return pageModes;
-    }
-
-    /**
-     * @return the currentCaseSelected
-     */
-    public boolean isCurrentCaseSelected() {
-        return currentCaseSelected;
-    }
-
-  
-
-    /**
-     * @param pageModes the pageModes to set
-     */
-    public void setPageModes(List<PageModeEnum> pageModes) {
-        this.pageModes = pageModes;
-    }
-
-    /**
-     * @param currentCaseSelected the currentCaseSelected to set
-     */
-    public void setCurrentCaseSelected(boolean currentCaseSelected) {
-        this.currentCaseSelected = currentCaseSelected;
-    }
-
-    /**
-     * @return the reportCECase
-     */
-    public ReportConfigCECase getReportCECase() {
-        return reportCECase;
-    }
-
-    /**
-     * @param reportCECase the reportCECase to set
-     */
-    public void setReportCECase(ReportConfigCECase reportCECase) {
-        this.reportCECase = reportCECase;
-    }
+   
+    
 
     /**
      * @return the eventViewOptions
@@ -2489,19 +1422,19 @@ public class CECaseSearchProfileBB
     }
 
     /**
-     * @return the extendStipCompUsingDate
+     * @return the formExtendStipCompUsingDate
      */
-    public boolean isExtendStipCompUsingDate() {
-        return extendStipCompUsingDate;
+    public boolean isFormExtendStipCompUsingDate() {
+        return formExtendStipCompUsingDate;
     }
 
    
 
     /**
-     * @return the extendedStipCompDaysFromToday
+     * @return the formExtendedStipCompDaysFromToday
      */
-    public int getExtendedStipCompDaysFromToday() {
-        return extendedStipCompDaysFromToday;
+    public int getFormExtendedStipCompDaysFromToday() {
+        return formExtendedStipCompDaysFromToday;
     }
 
     /**
@@ -2554,19 +1487,19 @@ public class CECaseSearchProfileBB
     }
 
     /**
-     * @param extendStipCompUsingDate the extendStipCompUsingDate to set
+     * @param formExtendStipCompUsingDate the formExtendStipCompUsingDate to set
      */
-    public void setExtendStipCompUsingDate(boolean extendStipCompUsingDate) {
-        this.extendStipCompUsingDate = extendStipCompUsingDate;
+    public void setFormExtendStipCompUsingDate(boolean formExtendStipCompUsingDate) {
+        this.formExtendStipCompUsingDate = formExtendStipCompUsingDate;
     }
 
    
 
     /**
-     * @param extendedStipCompDaysFromToday the extendedStipCompDaysFromToday to set
+     * @param formExtendedStipCompDaysFromToday the formExtendedStipCompDaysFromToday to set
      */
-    public void setExtendedStipCompDaysFromToday(int extendedStipCompDaysFromToday) {
-        this.extendedStipCompDaysFromToday = extendedStipCompDaysFromToday;
+    public void setFormExtendedStipCompDaysFromToday(int formExtendedStipCompDaysFromToday) {
+        this.formExtendedStipCompDaysFromToday = formExtendedStipCompDaysFromToday;
     }
 
     /**
@@ -2597,145 +1530,7 @@ public class CECaseSearchProfileBB
         this.formMakeFindingsDefault = formMakeFindingsDefault;
     }
 
-    /**
-     * @return the currentEvent
-     */
-    public EventCnF getCurrentEvent() {
-        return currentEvent;
-    }
-
-    /**
-     * @return the eventTypeCandidates
-     */
-    public List<EventType> getEventTypeCandidates() {
-        return eventTypeCandidates;
-    }
-
-    /**
-     * @return the eventTypeSelected
-     */
-    public EventType getEventTypeSelected() {
-        return eventTypeSelected;
-    }
-
-    /**
-     * @return the eventCategoryCandidates
-     */
-    public List<EventCategory> getEventCategoryCandidates() {
-        return eventCategoryCandidates;
-    }
-
-    /**
-     * @return the eventCategorySelected
-     */
-    public EventCategory getEventCategorySelected() {
-        return eventCategorySelected;
-    }
-
-    /**
-     * @return the eventDurationFormField
-     */
-    public int getEventDurationFormField() {
-        return eventDurationFormField;
-    }
-
-    /**
-     * @return the eventPersonCandidates
-     */
-    public List<Human> getEventPersonCandidates() {
-        return eventHumanCandidates;
-    }
-
-    /**
-     * @return the eventHumanIDForLookup
-     */
-    public int getEventHumanIDForLookup() {
-        return eventHumanIDForLookup;
-    }
-
-    /**
-     * @return the eventPersonSelected
-     */
-    public Human getEventPersonSelected() {
-        return eventHumanSelected;
-    }
-
-    /**
-     * @return the formEventNoteText
-     */
-    public String getFormEventNoteText() {
-        return formEventNoteText;
-    }
-
-    /**
-     * @param currentEvent the currentEvent to set
-     */
-    public void setCurrentEvent(EventCnF currentEvent) {
-        this.currentEvent = currentEvent;
-    }
-
-    /**
-     * @param eventTypeCandidates the eventTypeCandidates to set
-     */
-    public void setEventTypeCandidates(List<EventType> eventTypeCandidates) {
-        this.eventTypeCandidates = eventTypeCandidates;
-    }
-
-    /**
-     * @param eventTypeSelected the eventTypeSelected to set
-     */
-    public void setEventTypeSelected(EventType eventTypeSelected) {
-        this.eventTypeSelected = eventTypeSelected;
-    }
-
-    /**
-     * @param eventCategoryCandidates the eventCategoryCandidates to set
-     */
-    public void setEventCategoryCandidates(List<EventCategory> eventCategoryCandidates) {
-        this.eventCategoryCandidates = eventCategoryCandidates;
-    }
-
-    /**
-     * @param eventCategorySelected the eventCategorySelected to set
-     */
-    public void setEventCategorySelected(EventCategory eventCategorySelected) {
-        this.eventCategorySelected = eventCategorySelected;
-    }
-
-    /**
-     * @param eventDurationFormField the eventDurationFormField to set
-     */
-    public void setEventDurationFormField(int eventDurationFormField) {
-        this.eventDurationFormField = eventDurationFormField;
-    }
-
-    /**
-     * @param eventPersonCandidates the eventPersonCandidates to set
-     */
-    public void setEventPersonCandidates(List<Human> eventPersonCandidates) {
-        this.eventHumanCandidates = eventPersonCandidates;
-    }
-
-    /**
-     * @param eventHumanIDForLookup the eventHumanIDForLookup to set
-     */
-    public void setEventHumanIDForLookup(int eventHumanIDForLookup) {
-        this.eventHumanIDForLookup = eventHumanIDForLookup;
-    }
-
-    /**
-     * @param eventPersonSelected the eventPersonSelected to set
-     */
-    public void setEventPersonSelected(Person eventPersonSelected) {
-        this.eventHumanSelected = eventPersonSelected;
-    }
-
-    /**
-     * @param formEventNoteText the formEventNoteText to set
-     */
-    public void setFormEventNoteText(String formEventNoteText) {
-        this.formEventNoteText = formEventNoteText;
-    }
+   
 
     /**
      * @return the closingEventCategoryList
@@ -2744,20 +1539,7 @@ public class CECaseSearchProfileBB
         return closingEventCategoryList;
     }
 
-    /**
-     * @return the typeCatMap
-     */
-    public Map<EventType, List<EventCategory>> getTypeCatMap() {
-        return typeCatMap;
-    }
-
-    /**
-     * @return the updateNewEventFieldsWithCatChange
-     */
-    public boolean isUpdateNewEventFieldsWithCatChange() {
-        return updateNewEventFieldsWithCatChange;
-    }
-
+    
     /**
      * @param closingEventCategoryList the closingEventCategoryList to set
      */
@@ -2765,33 +1547,7 @@ public class CECaseSearchProfileBB
         this.closingEventCategoryList = closingEventCategoryList;
     }
 
-    /**
-     * @param typeCatMap the typeCatMap to set
-     */
-    public void setTypeCatMap(Map<EventType, List<EventCategory>> typeCatMap) {
-        this.typeCatMap = typeCatMap;
-    }
-
-    /**
-     * @param updateNewEventFieldsWithCatChange the updateNewEventFieldsWithCatChange to set
-     */
-    public void setUpdateNewEventFieldsWithCatChange(boolean updateNewEventFieldsWithCatChange) {
-        this.updateNewEventFieldsWithCatChange = updateNewEventFieldsWithCatChange;
-    }
-
-    /**
-     * @return the workingPerson
-     */
-    public Person getWorkingPerson() {
-        return workingPerson;
-    }
-
-    /**
-     * @param workingPerson the workingPerson to set
-     */
-    public void setWorkingPerson(Person workingPerson) {
-        this.workingPerson = workingPerson;
-    }
+ 
 
     /**
      * @return the currentCasePropDataHeavy
@@ -2879,18 +1635,61 @@ public class CECaseSearchProfileBB
         this.selectedViolationList = selectedViolationList;
     }
 
+    
     /**
-     * @return the extendedStipCompDate
+     * @return the formViolationStipCompDateExtReason
      */
-    public LocalDateTime getExtendedStipCompDate() {
-        return extendedStipCompDate;
+    public String getFormViolationStipCompDateExtReason() {
+        return formViolationStipCompDateExtReason;
     }
 
     /**
-     * @param extendedStipCompDate the extendedStipCompDate to set
+     * @param formViolationStipCompDateExtReason the formViolationStipCompDateExtReason to set
      */
-    public void setExtendedStipCompDate(LocalDateTime extendedStipCompDate) {
-        this.extendedStipCompDate = extendedStipCompDate;
+    public void setFormViolationStipCompDateExtReason(String formViolationStipCompDateExtReason) {
+        this.formViolationStipCompDateExtReason = formViolationStipCompDateExtReason;
+    }
+
+    /**
+     * @return the editModeCurrentViolation
+     */
+    public boolean isEditModeCurrentViolation() {
+        return editModeCurrentViolation;
+    }
+
+    /**
+     * @param editModeCurrentViolation the editModeCurrentViolation to set
+     */
+    public void setEditModeCurrentViolation(boolean editModeCurrentViolation) {
+        this.editModeCurrentViolation = editModeCurrentViolation;
+    }
+
+    /**
+     * @return the reportCECase
+     */
+    public ReportConfigCECase getReportCECase() {
+        return reportCECase;
+    }
+
+    /**
+     * @param reportCECase the reportCECase to set
+     */
+    public void setReportCECase(ReportConfigCECase reportCECase) {
+        this.reportCECase = reportCECase;
+    }
+
+    /**
+     * @return the editModeCurrentCase
+     */
+    public boolean isEditModeCurrentCase() {
+        return editModeCurrentCase;
+    }
+
+    /**
+     * @param editModeCurrentCase the editModeCurrentCase to set
+     */
+    public void setEditModeCurrentCase(boolean editModeCurrentCase) {
+        this.editModeCurrentCase = editModeCurrentCase;
     }
 
    

@@ -1052,9 +1052,8 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>ceCaseSearchProfileBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchProfileBB</managed-bean-class>
-    
+        <managed-bean-name>ceCaseBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope></managed-bean>
 
     <managed-bean>
@@ -1064,11 +1063,10 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>violationBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ViolationBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-
+        <managed-bean-name>cECaseSearchBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchAndReportBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
  
     
     <managed-bean>
@@ -2026,4 +2024,5 @@
         <managed-bean-class>com.tcvcog.tcvce.application.MigrationBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+
 </faces-config>

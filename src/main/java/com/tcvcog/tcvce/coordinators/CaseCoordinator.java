@@ -3873,7 +3873,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.ViolationException If stip comp date on or before origination date
      * @throws com.tcvcog.tcvce.domain.IntegrationException I can't write to the db
      */
-    public void violation_extendStipulatedComplianceDate(CodeViolation cv, CECaseDataHeavy cse, UserAuthorized ua)
+    public void violation_extendStipulatedComplianceDate(CodeViolation cv, String extEvDesc, CECaseDataHeavy cse, UserAuthorized ua)
             throws BObStatusException, ViolationException, IntegrationException {
 
         if (cv == null || cse == null || ua == null) {
@@ -3893,7 +3893,22 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         
            
+        cv.setLastUpdatedUser(ua);
+        
         violation_updateCodeViolation(cse, cv, ua);
+        prepareAndLogCodeViolationStipCompDateUpdateEvent(cv, extEvDesc, cse, ua);
+    }
+    
+    /**
+     * Logic and coordination block for creating a case event associated with the extension of a stip 
+     * comp date.
+     * @param cv
+     * @param cse
+     * @param ua
+     * @return 
+     */
+    private int prepareAndLogCodeViolationStipCompDateUpdateEvent(CodeViolation cv, String extEvDesc, CECaseDataHeavy cse, UserAuthorized ua){
+        
         System.out.println("CaseCoordinator.violation_extendStipulatedComplianceDate | done on cv " + cv.getViolationID());
         // now generate a note
         MessageBuilderParams mbp = new MessageBuilderParams();
@@ -3906,12 +3921,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         mbp.setNewMessageContent(sb.toString());
         violation_updateNotes(mbp, cv);
 //            
-//        } else {
-//            throw new BObStatusException("Code violation status does not permit updates to compliance date");
-//        }
+        
     }
-    
-    
 
     /**
      * CodeViolation should have the actual compliance date set from the user's
