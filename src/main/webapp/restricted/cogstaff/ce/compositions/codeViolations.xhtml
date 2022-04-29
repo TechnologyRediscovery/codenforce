@@ -4,6 +4,12 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns="http://www.w3.org/1999/xhtml">
 
+    <h:form id="violation-growl-form" >
+        <p:growl id="violation-growl" />
+        
+        
+    </h:form>
+    
     <p:panel id="cecase-violations-panel"
              toggleable="true"
              collapsed="false"
@@ -1091,6 +1097,7 @@
 
                         <p:datePicker  id="update-stipdate-cal"
                                        value="#{ceCaseSearchProfileBB.currentViolation.stipulatedComplianceDate}"
+
                                        disabled="#{!ceCaseSearchProfileBB.formExtendStipCompUsingDate}"
                                        rendered="true"
                                        style="width: 100%;"
@@ -1138,11 +1145,16 @@
             <p:commandButton
                 id="update-stipdate-sbb"
                 icon="fa fa-calendar"
-                ajax="false"
-                action="#{ceCaseSearchProfileBB.onViolationExtendStipCompDateCommitButtonChange}"
+                ajax="true"
+                actionListener="#{ceCaseSearchProfileBB.onViolationExtendStipCompDateCommitButtonChange}"
                 value="Change Stipulated Complaince Date"
                 disabled="false"
-                update="form-messages-growl"
+                oncomplete="PF('violation-update-stipdate-dialog-var').hide();"
+                update="cecase-violations-form
+                cecase-violations-panel
+                violation-details-dialog
+                violation-details-form
+                violation-growl-form"
                 />
             <p:spacer height="5px" />
 
@@ -1313,7 +1325,7 @@
                 ajax="false"
                 action="#{ceCaseSearchProfileBB.onViolationRecordComplianceCommitButtonChange}"
                 value="Record compliance"
-                update="messages-global-form"
+                update="violation-growl-form"
                 />
 
         </h:form>
@@ -1719,7 +1731,7 @@
                                        value="Delete Photo"
                                        icon="fa fa-eraser"
                                        ajax="true"
-                                       update="messages-global-form"
+                                       update="violation-growl-form"
                                        actionListener="#{ceCaseSearchProfileBB.onPhotoRemoveButtonChange(photo.blobID)}"
                                        />
 
@@ -1740,7 +1752,7 @@
                                        value="Update Desc"
                                        icon="fa fa-edit"
                                        ajax="true"
-                                       update="messages-global-form"
+                                       update="violation-growl-form"
                                        actionListener="#{ceCaseSearchProfileBB.onPhotoUpdateDescription(photo)}"
                                        />
 

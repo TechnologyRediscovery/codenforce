@@ -3873,7 +3873,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.ViolationException If stip comp date on or before origination date
      * @throws com.tcvcog.tcvce.domain.IntegrationException I can't write to the db
      */
-    public void violation_extendStipulatedComplianceDate(CodeViolation cv, String extEvDesc, CECaseDataHeavy cse, UserAuthorized ua)
+    public void violation_extendStipulatedComplianceDate(CodeViolation cv, CECaseDataHeavy cse, UserAuthorized ua)
             throws BObStatusException, ViolationException, IntegrationException {
 
         if (cv == null || cse == null || ua == null) {
@@ -3883,17 +3883,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if (cv.getStipulatedComplianceDate() == null) {
             throw new BObStatusException("Cannot extend a null stipulated compliance date");
         }
-        
-        if(cv.getCeCaseID() != cv.getCeCaseID()){
-            throw new BObStatusException("The inputted violation is NOT attached to the inputted CECASE");
+
+        if(cv.getStipulatedComplianceDate().isBefore(cv.getDateOfRecord())){
+            throw new BObStatusException("Cannot update a violation to have a stip comp date before the violation's date of record.");
         }
-        
-        if(cv.getStipulatedComplianceDate().isBefore(cse.getOriginationDate())){
-            throw new BObStatusException("Stipulated compliance date cannot come on or before ce case origination date");
-        }
-        
-           
-        cv.setLastUpdatedUser(ua);
         
         violation_updateCodeViolation(cse, cv, ua);
         prepareAndLogCodeViolationStipCompDateUpdateEvent(cv, extEvDesc, cse, ua);
@@ -3915,6 +3908,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         mbp.setUser(ua);
         mbp.setHeader("Stipulated compliance date extended to: ");
         StringBuilder sb = new StringBuilder();
+        sb.append("Previous stipulated compliance date of has been changed to ");
         sb.append(DateTimeUtil.getPrettyDate(cv.getStipulatedComplianceDate()));
         sb.append(".");
 

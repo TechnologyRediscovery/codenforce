@@ -83,9 +83,9 @@ public class CECaseBB
     private ViewOptionsActiveListsEnum selectedViewOption;
     
     private List<IntensityClass> severityList;
-    private LocalDateTime complianceDateForm;
     
     private String formNoteTextViolation;
+    private LocalDateTime complianceDateForm;
     private List<EnforcableCodeElement> filteredElementList;
     private List<EnforcableCodeElement> selectedElementList;
     private List<CodeViolation> selectedViolationList;
@@ -687,28 +687,14 @@ public class CECaseBB
     /**
      * Listener for requests to commit extension of stip comp date
      *
-     * @return
      */
-    public String onViolationExtendStipCompDateCommitButtonChange() {
+    public void onViolationExtendStipCompDateCommitButtonChange(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
-        long secBetween;
         try {
-            if (formExtendStipCompUsingDate) {
-                if (currentViolation.getStipulatedComplianceDate().isBefore(LocalDateTime.now())) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Stipulated compliance dates must be in the future!", ""));
-                } else {
-                    secBetween = currentViolation.getStipulatedComplianceDate().toEpochSecond(ZoneOffset.of("-4")) - LocalDateTime.now().toEpochSecond(ZoneOffset.of("-4"));
-                    // divide by num seconds in a day
-                    long daysBetween = secBetween / (24 * 60 * 60);
-                    
-                    cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), formViolationStipCompDateExtReason, currentCase, getSessionBean().getSessUser());
-                }
-            } else {
-                // no math to do
-                cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), formViolationStipCompDateExtReason, currentCase, getSessionBean().getSessUser());
-            }
+            if (!formExtendStipCompUsingDate) {
+                    currentViolation.setStipulatedComplianceDate(LocalDateTime.now().plusDays(formExtendedStipCompDaysFromToday));
+            } 
+            cc.violation_extendStipulatedComplianceDate(currentViolation, currentCase, getSessionBean().getSessUser());
         } catch (BObStatusException | IntegrationException | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -718,7 +704,7 @@ public class CECaseBB
         getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
                                     "Stipulated compliance dates is now: " + DateTimeUtil.getPrettyDate(getCurrentViolation().getStipulatedComplianceDate()), ""));
-        return "ceCaseProfile";
+        refreshCurrentCase();
 
     }
 
