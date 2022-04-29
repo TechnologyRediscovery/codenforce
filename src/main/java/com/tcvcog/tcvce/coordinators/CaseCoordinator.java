@@ -3873,7 +3873,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.ViolationException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public void violation_extendStipulatedComplianceDate(CodeViolation cv, long daysToExtend, CECaseDataHeavy cse, UserAuthorized ua)
+    public void violation_extendStipulatedComplianceDate(CodeViolation cv, CECaseDataHeavy cse, UserAuthorized ua)
             throws BObStatusException, ViolationException, IntegrationException {
 
         if (cv == null || cse == null || ua == null) {
@@ -3884,13 +3884,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("Cannot extend a null stipulated compliance date");
         }
 
-        if (daysToExtend == 0) {
-            throw new BObStatusException("I, the mighty CaseCoordinator, shall not extend the compliance window by 0 days");
+        if(cv.getStipulatedComplianceDate().isBefore(cv.getDateOfRecord())){
+            throw new BObStatusException("Cannot update a violation to have a stip comp date before the violation's date of record.");
         }
-
-//        if(cv.isAllowStipCompDateUpdate()){
-        LocalDateTime oldStipDate = cv.getStipulatedComplianceDate();
-        cv.setStipulatedComplianceDate(LocalDateTime.now().plusDays(daysToExtend));
+        
         violation_updateCodeViolation(cse, cv, ua);
 
         // now generate a note
@@ -3898,9 +3895,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         mbp.setUser(ua);
         mbp.setHeader("Stipulated compliance date extended");
         StringBuilder sb = new StringBuilder();
-        sb.append("Previous stipulated compliance date of ");
-        sb.append(DateTimeUtil.getPrettyDate(oldStipDate));
-        sb.append(" has been changed to ");
+        sb.append("Previous stipulated compliance date of has been changed to ");
         sb.append(DateTimeUtil.getPrettyDate(cv.getStipulatedComplianceDate()));
         sb.append(".");
 

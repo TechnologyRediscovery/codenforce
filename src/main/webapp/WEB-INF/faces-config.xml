@@ -1063,12 +1063,7 @@
         <managed-bean-scope>application</managed-bean-scope>
     </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>violationBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.ViolationBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
-
+   
  
     
     <managed-bean>
