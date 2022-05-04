@@ -1,0 +1,30 @@
+
+    DECLARE			
+	temp_violationid integer; 		
+	temp_cecase_caseid integer;	
+    temp_user integer; 
+
+    
+			
+    BEGIN			
+        --			
+        --Update the cecase lastupdate and user when citation record is updated.		
+        -- 	   RETURN(SELECT CAST ( current_user AS text ));
+        temp_user = 99;
+        IF (TG_OP = 'DELETE') THEN 			
+          
+	       UPDATE cecase SET lastupdatedts = now(),lastupdatedby_userid = OLD.lastupdated_userid
+           WHERE caseid = OLD.cecase_caseid;
+				   RETURN OLD;
+        ELSEIF 			
+        (TG_OP = 'INSERT') THEN			
+            UPDATE cecase SET lastupdatedts = now(),lastupdatedby_userid = NEW.lastupdated_userid 
+            WHERE caseid = NEW.cecase_caseid;
+				   RETURN NEW;
+        ELSIF (TG_OP = 'UPDATE') THEN	
+            UPDATE cecase SET lastupdatedts = now(),lastupdatedby_userid = temp_user
+            WHERE caseid = NEW.cecase_caseid;		
+				   RETURN NEW;
+        END IF;	   
+    END;  
+    
