@@ -5,7 +5,7 @@ DECLARE
  
     BEGIN			
         --			
-        --Update the cecase lastupdate and user when citation record is updated.		
+        --Update the cecase lastupdate and user when docketnohuman is updated.		
         -- 	   RETURN(SELECT CAST ( current_user AS text ));
         temp_user = 99;
         IF (TG_OP = 'DELETE') THEN 			

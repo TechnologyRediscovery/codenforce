@@ -1,0 +1,29 @@
+DECLARE					
+    temp_humanid integer;	
+    temp_user integer; 
+
+    			
+    BEGIN			
+        --			
+        --Update the parcel lastupdate and user when human table is has action taken on contactphone table.		
+        -- 	   RETURN(SELECT CAST ( current_user AS text ));
+        temp_user = 99;
+        IF (TG_OP = 'DELETE') THEN 			
+          
+	       UPDATE human SET lastupdatedts = now(),lastupdatedby_userid = OLD.lastupdated_userid
+           WHERE humanid = OLD.human_humanid;
+				   RETURN OLD;
+        ELSEIF 			
+        (TG_OP = 'INSERT') THEN	
+        
+            UPDATE human SET lastupdatedts = now(),lastupdatedby_userid = NEW.lastupdated_userid 
+            WHERE humanid = NEW.human_humanid;
+				   RETURN NEW;
+        ELSIF (TG_OP = 'UPDATE') THEN
+        
+           UPDATE human SET lastupdatedts = now(),lastupdatedby_userid = NEW.lastupdated_userid 
+            WHERE humanid = NEW.human_humanid;
+				   RETURN NEW;
+        END IF;	   
+    END;  
+    
