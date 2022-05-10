@@ -40,6 +40,7 @@ import java.util.List;
 import javax.faces.application.FacesMessage;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -257,9 +258,6 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // then let the other domain folks add to this stack if needed
 
         return addEvent_processStack(evsToAddQu);
-
-
-
     }
     
     /**
@@ -405,7 +403,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
        
-        ev.setHumanLinkList(pc.assembleLinkedHumanLinks(ev));
+        ev.setHumanLinkList(pc.getHumanLinkList(ev));
         
         return ev;
     }
@@ -428,6 +426,39 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
     }
     
+    
+    /**
+     * Business rule aware pathway to update fields on EventCnF objects
+     * When updating Person links, this method clears all previous connections
+     * and rebuilds the mapping from scratch on each update.
+     * 
+     * @param ev
+     * @param targetCat
+     * @param ua
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.EventException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void updateEventCategoryMaintainType(EventCnF ev, EventCategory targetCat, UserAuthorized ua) throws IntegrationException, EventException, BObStatusException{
+        EventIntegrator ei = getEventIntegrator();
+         if(ev == null || ua == null){
+            throw new BObStatusException("Event and User cannot be null");
+        }
+        if(ev.getCategory().getUserRankMinimumToUpdate() > ua.getRole().getRank()){
+            throw new BObStatusException("User's rank does not allow deactivation of given event");
+        }
+        
+        if(targetCat != null && targetCat.getEventType() == ev.getCategory().getEventType()){
+            auditEvent(ev);
+            ev.setLastUpdatedBy(ua);
+            ev.setLastUpdatedTS(LocalDateTime.now());
+            ev.setCategory(targetCat);
+            ei.updateEventCategoryMaintainType(ev);
+        } else {
+            throw new EventException("An event's type cannot change; the new category must be of the same type as the event's original type");
+        }
+        
+    }
     
     
     /**
@@ -902,6 +933,32 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return allowedCats;
     }
     
+    /**
+     * Utility method for examining a list of aribtrary events and selecting 
+     * the most recent active event by specified type
+     * @param evList pool to search
+     * @param targetType to assign from the eventList
+     * @return ref to the event that meets this criteria, null if not found
+     * 
+     */
+    public EventCnF findMostRecentEventByType(List<EventCnF> evList, EventType targetType){
+        EventCnF chosenEvent = null;
+        
+        List<EventCnF> targetEventCandidates = new ArrayList<>();
+        for(EventCnF ev: evList){
+            if(ev.getCategory().getEventType() == targetType && ev.isActive()){
+                targetEventCandidates.add(ev);
+            }
+        }
+        if(!targetEventCandidates.isEmpty()){
+            Collections.sort(targetEventCandidates);
+            Collections.reverse(targetEventCandidates);
+            chosenEvent = targetEventCandidates.get(0);
+        }
+        
+        return chosenEvent;
+    }
+    
     
 //    --------------------------------------------------------------------------
 //    **************** OPERATION SPECIFIC EVENT CONFIG *************************
@@ -995,19 +1052,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         StringBuilder sb = new StringBuilder();
         sb.append("Compliance with the following code violations was observed:");
         sb.append("<br /><br />");
-        
-            sb.append(violation.getViolatedEnfElement().getOrdchapterNo());
-            sb.append(".");
-            sb.append(violation.getViolatedEnfElement().getOrdSecNum());
-            sb.append(".");
-            sb.append(violation.getViolatedEnfElement().getOrdSubSecNum());
-            sb.append(":");
-            sb.append(violation.getViolatedEnfElement().getOrdSubSecTitle());
-            sb.append(" (ID ");
-            sb.append(violation.getViolationID());
-            sb.append(")");
-            sb.append("<br /><br />");
-        e.setNotes(sb.toString());
+        sb.append(violation.getViolatedEnfElement().getHeaderString());
+        sb.append("<br /><br />");
+        e.setDescription(sb.toString());
         EventCnF cev = new EventCnF(e);
         return cev;
     }

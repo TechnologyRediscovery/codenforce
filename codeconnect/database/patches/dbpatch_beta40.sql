@@ -3,7 +3,6 @@
 -- MOPPING up occ inspection and getting transfers working
 
 
--- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
 
 ALTER TABLE codeviolation ADD COLUMN transferredts TIMESTAMP WITH TIME ZONE;
@@ -19,15 +18,52 @@ ALTER TABLE occinspectedspaceelement ADD COLUMN transferredtocecase_caseid INTEG
 	CONSTRAINT occinspectedspaceelement_transferredtocecase_fk REFERENCES cecase (caseid);
 
 
+INSERT INTO public.eventcategory(
+            categoryid, categorytype, title, description, notifymonitors, 
+            hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, 
+            hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, 
+            active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
+    VALUES (311, CAST('Origination' AS eventtype), 'Generic case origination event', 'Placeholder category to signal a case opening', FALSE, 
+            TRUE, 10, 0, 0, 
+            'This generic event was created by the case auditor if it discovered a case without an origination event', NULL, 15, 
+            TRUE, 5, 0 , 5);
+
+
+INSERT INTO public.eventcategory(
+            categoryid, categorytype, title, description, notifymonitors, 
+            hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, 
+            hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, 
+            active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
+    VALUES (312, CAST('Closing' AS eventtype), 'Generic case closing event', 'Placeholder category to signal a case closing', FALSE, 
+            TRUE, 10, 0, 0, 
+            'This generic event was created by the case auditor if it discovered a case without a closing event', NULL, 15, 
+            TRUE, 5, 0 , 5);
+
+
+ALTER TABLE public.municipality ADD COLUMN officeparcel_parcelid INTEGER
+	CONSTRAINT municipality_parcelid_fk REFERENCES parcel (parcelkey);
+
+
+-- ******************************* run on LIVE DEPLOYED system up to here *******************************
 -- ******************************* run on LOCAL TEST system up to here *******************************
 
 
+ALTER TABLE public.cecase RENAME COLUMN login_userid TO manager_userid;
+ALTER TABLE public.cecase ADD COLUMN createdby_userid INTEGER
+	CONSTRAINT cecase_createdby_userid_fk REFERENCES login (userid);
+ALTER TABLE public.cecase ADD COLUMN createdts TIMESTAMP WITH TIME ZONE DEFAULT now();
+ALTER TABLE public.cecase ADD COLUMN deactivatedby_userid INTEGER
+	CONSTRAINT cecase_deactivatedby_userid_fk REFERENCES login (userid);
+ALTER TABLE public.cecase ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE DEFAULT now();
+UPDATE TABLE public.cecase SET createdby_userid = manager_userid;
 
 
+-- finish me
 ALTER TABLE occchecklist ADD COLUMN inspectionspecific INTEGER
     CONSTRAINT occchecklist_inspspecific_fk REFERENCES 
 
 
+ALTER TABLE public.municipality DROP COLUMN office_propertyid;
 
 
 -- EXTRA STUFF 

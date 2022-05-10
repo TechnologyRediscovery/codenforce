@@ -50,7 +50,8 @@ public  class       FieldInspection
                     IFace_BlobHolder{
     
     private final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.FIELD_INSPECTION;
-    private final static BlobLinkEnum BLOP_UPSPTREAM_POOL = BlobLinkEnum.OCC_PERIOD;
+    private final static BlobLinkEnum BLOP_UPSPTREAM_POOL_OCC = BlobLinkEnum.OCC_PERIOD;
+    private final static BlobLinkEnum BLOP_UPSPTREAM_POOL_CECASE = BlobLinkEnum.CE_CASE;
     
     private int inspectionID;
 
@@ -690,12 +691,20 @@ public  class       FieldInspection
 
     @Override
     public BlobLinkEnum getBlobUpstreamPoolEnum() {
-        return BLOP_UPSPTREAM_POOL;
+        if(domainEnum == DomainEnum.CODE_ENFORCEMENT){
+            return BLOP_UPSPTREAM_POOL_CECASE;
+        } else {
+            return BLOP_UPSPTREAM_POOL_OCC;
+        }
     }
 
     @Override
     public int getBlobUpstreamPoolEnumPoolFeederID() {
-        return occPeriodID;
+        if(domainEnum == DomainEnum.CODE_ENFORCEMENT){
+            return cecaseID;
+        } else {
+            return occPeriodID;
+        }
     }
 
     /**

@@ -124,7 +124,7 @@ public class        PropertyUnitDataHeavy
 
     @Override
     public int getHostPK() {
-        return parcelKey;
+        return unitID;
     }
     
     

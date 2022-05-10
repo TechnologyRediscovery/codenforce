@@ -61,7 +61,7 @@ public class PropertyProfileBB
     // UNIT STUFF
     protected boolean unitEditMode;
     private PropertyUnitDataHeavy currentPropertyUnit;
-    private boolean reloadPropertyOnCurrentPropertyGetterCall;
+    
     
     private CECase currentCECase;
     private EventCategory ceCaseOriginationEventSelected;
@@ -443,18 +443,7 @@ public class PropertyProfileBB
         return "ceCaseSearch";
     }
    
-    /**
-     * Listener for the user's commencement of the person link process
-     * Most importantly, I toggle the reload trigger to true, 
-     * causing the next call to the getCurrentProperty() method to
-     * also get a fresh copy of the object from the DB, with all the
-     * new goodies inside
-     *
-     */
-    public void onManagePropertyPersonLinksButtonChange() {
-        reloadPropertyOnCurrentPropertyGetterCall = true;
-        System.out.println("PropertyProfileBB.onPersonConnectInitButtonChange : "+ reloadPropertyOnCurrentPropertyGetterCall);
-    }
+    
     
     /**
      * Special wrapper getter around the current property's human
@@ -466,6 +455,8 @@ public class PropertyProfileBB
         List<HumanLink> hll = getSessionBean().getSessHumanListRefreshedList();
         if(hll != null){
             currentProperty.setHumanLinkList(hll);
+            // clear our refreshed list
+            getSessionBean().setSessHumanListRefreshedList(null);
         }
         return currentProperty.getHumanLinkList();
     }
@@ -804,11 +795,7 @@ public class PropertyProfileBB
      * @return the currentProperty
      */
     public PropertyDataHeavy getCurrentProperty() {
-        if(reloadPropertyOnCurrentPropertyGetterCall){
-            reloadCurrentPropertyDataHeavy();
-            reloadPropertyOnCurrentPropertyGetterCall = false;
-            System.out.println("PropertyProfileBB.getCurrentProperty | reloaded, toggled trigger to false");
-        }
+       
         return currentProperty;
     }
 
@@ -1177,19 +1164,7 @@ public class PropertyProfileBB
         this.ceCaseUnitAssociation = ceCaseUnitAssociation;
     }
 
-    /**
-     * @return the reloadPropertyOnCurrentPropertyGetterCall
-     */
-    public boolean isReloadPropertyOnCurrentPropertyGetterCall() {
-        return reloadPropertyOnCurrentPropertyGetterCall;
-    }
-
-    /**
-     * @param reloadPropertyOnCurrentPropertyGetterCall the reloadPropertyOnCurrentPropertyGetterCall to set
-     */
-    public void setReloadPropertyOnCurrentPropertyGetterCall(boolean reloadPropertyOnCurrentPropertyGetterCall) {
-        this.reloadPropertyOnCurrentPropertyGetterCall = reloadPropertyOnCurrentPropertyGetterCall;
-    }
+  
 
     /**
      * @return the occPeriodOriginiationEventCandidateList

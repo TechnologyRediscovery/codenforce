@@ -581,8 +581,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private void prepareRecipientPersonList(){
         PersonCoordinator pc = getPersonCoordinator();
         try {
-            System.out.println("NoticeOfViolationBB.prepareRecipientPersonList | property person link size: " + getSessionBean().getSessProperty().getHumanLinkList().size());
-            recipientPersonCandidateList = pc.getPersonListFromHumanLinkList(pc.assembleLinkedHumanLinks(getSessionBean().getSessProperty()));
+            recipientPersonCandidateList = pc.getPersonListFromHumanLinkList(pc.getHumanLinkList(getSessionBean().getSessProperty()));
+            recipientPersonCandidateList.addAll(pc.getPersonListFromHumanLinkList(pc.getHumanLinkList(getSessionBean().getSessCECase())));
+            System.out.println("NoticeOfViolationBB.prepareRecipientPersonList | recpient cadidate list size: " + recipientPersonCandidateList.size());
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         } 

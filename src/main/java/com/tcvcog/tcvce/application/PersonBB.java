@@ -6,15 +6,21 @@
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.ContactEmail;
 import com.tcvcog.tcvce.entities.ContactPhone;
 import com.tcvcog.tcvce.entities.ContactPhoneType;
+import com.tcvcog.tcvce.entities.DomainEnum;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
@@ -25,6 +31,8 @@ import com.tcvcog.tcvce.entities.MailingAddress;
 import com.tcvcog.tcvce.entities.MailingAddressLink;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PersonLinkHeavy;
+import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -56,8 +64,11 @@ public class PersonBB extends BackingBeanUtils {
     private String pageComponentToUpdateAfterNoteCommit;
     
     private IFace_humanListHolder currentHumanListHolder;
+    private List<IFace_humanListHolder> upstreamPersonPoolList;
     private List<LinkedObjectRole> linkRoleCandidateList;
     private LinkedObjectRole selecetedLinkedObjetRole;
+    private PropertyUnit selectedUnitForHumanLinkTarget;
+    private PropertyUnitDataHeavy selectedUnitForHumanLinkTargetDataHeavy;
     
     private PersonLinkHeavy currentPersonLinkHeavy;
     private HumanLink currentHumanLink;
@@ -92,7 +103,7 @@ public class PersonBB extends BackingBeanUtils {
     private List<Person> filteredPersonList;
     private boolean appendResultsToList;
     
-    private List<Person> personsSelectedList;
+    private List<HumanLink> humanLinkListQueued;
     private String personListComponentIDToUpdatePostLinkingOperation; 
     
     
@@ -118,11 +129,13 @@ public class PersonBB extends BackingBeanUtils {
             loadLinkedObjectRoleList();
             phoneTypeList = pc.getContactPhoneTypeList();
             sourceList = sc.getBobSourceListComplete();
+            currentHumanListHolder = getSessionBean().getSessProperty();
+            loadLinkedObjectRoleList();
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
         setupQueryInfrastructure();
-        personsSelectedList = new ArrayList<>();
+        humanLinkListQueued = new ArrayList<>();
     }
     
     /**
@@ -142,6 +155,31 @@ public class PersonBB extends BackingBeanUtils {
             }
         }
         
+    }
+    
+    /**
+     * Sets up person pools based on the current Human List Holder
+     */
+    private void configureUpstreamPersonPools() throws IntegrationException, EventException, AuthorizationException, BObStatusException{
+        upstreamPersonPoolList = new ArrayList<>();
+        SessionBean sb = getSessionBean();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(currentHumanListHolder != null){
+            if(currentHumanListHolder instanceof CECase){
+                upstreamPersonPoolList.add(sb.getSessProperty());
+                CECase cse = (CECase) currentHumanListHolder;
+                if(cse.getPropertyUnitID() != 0){
+                    upstreamPersonPoolList.add(pc.getPropertyUnitWithLists(sb.getSessPropertyUnit(), sb.getSessUser().getKeyCard()));
+                }
+            } else if(currentHumanListHolder instanceof PropertyUnit){
+                upstreamPersonPoolList.add(sb.getSessProperty());
+            } else if(currentHumanListHolder instanceof EventCnF){
+                EventCnF ev = (EventCnF) currentHumanListHolder;
+                if(ev.getDomain() == DomainEnum.CODE_ENFORCEMENT){
+                    upstreamPersonPoolList.add(sb.getSessCECase());
+                }
+            }
+        }
     }
     
     /**********************************************************/
@@ -308,6 +346,7 @@ public class PersonBB extends BackingBeanUtils {
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.getPerson(currentPerson);
+            onLoadHumanLinksToCurrentPerson(null);
             getSessionBean().setSessPerson(currentPerson);
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
@@ -332,6 +371,7 @@ public class PersonBB extends BackingBeanUtils {
         PersonCoordinator pc = getPersonCoordinator();
         try {
             currentPerson = pc.getPerson(h);
+            onLoadHumanLinksToCurrentPerson(null);
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         } 
@@ -912,15 +952,17 @@ public class PersonBB extends BackingBeanUtils {
             } else if(currentNoteHolder instanceof Person){
                 refreshCurrentPersonAndUpdateSessionPerson();
                 System.out.println("PersonBB.refreshCurrentNoteHolder | refreshing person");
-            }  
+            } else if(currentNoteHolder instanceof HumanLink){
+                refreshCurrentHumanLink();
+                System.out.println("PersonBB.refreshCurrentNoteHolder | refreshing humanlink");
+            } 
         }
     }
     
        
     /***********************************************************/
     /********************* FANCY LINK MANAGEMENT STUFF *********/
-    /***********************************************************/
-     
+    /***********************************************************/    
     /***********************************************************/
     /************** LINK MANAGE INFRASTRUCTURE *****************/
     /**********************************************************/
@@ -958,11 +1000,13 @@ public class PersonBB extends BackingBeanUtils {
     }
 
     /**
-     * Listener f
+     * Listener for user requests to start the change target operation
      * @param ev 
      */
     public void onChangeHumanLinkTargetLinkClick(ActionEvent ev){
-        
+         getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Choosing new person link target" , ""));
     }
     
     /**
@@ -971,9 +1015,16 @@ public class PersonBB extends BackingBeanUtils {
      */
     public void onActivateNewHumanLinkTarget(IFace_humanListHolder hlh){
         try {
+            currentHumanListHolder = hlh;
             loadLinkedObjectRoleList();
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "You are now ready to link to the session " + hlh.getHUMAN_LINK_SCHEMA_ENUM().getTARGET_OBJECT_FRIENDLY_NAME(), ""));
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "FATAL ERROR: Could not setup link target, sorry!", ""));
         } 
         getSessionBean().setSessHumanListHolder(hlh);
     }
@@ -995,6 +1046,7 @@ public class PersonBB extends BackingBeanUtils {
     /**
      * Listener for user requests to complete the note appending process
      * on a human link
+     * @deprecated  in favor of universal note holder interface
      * @param ev 
      */
     public void onHumanLinkNoteAppendCommitButtonChange(ActionEvent ev){
@@ -1048,10 +1100,6 @@ public class PersonBB extends BackingBeanUtils {
      * for a new human link. Checks to make sure the session
      * has a HumanLinkHolder. If it doesn't, inject the current CECase, 
      * if that's null, inject the current session OccPeriod
-     * 
-     * As of 30-March-2022, no calls to this exist. The disabled one 
-     * is the button with value "Create new link to this person"
-     * on person profile
      * 
      * @param ev 
      */
@@ -1114,7 +1162,7 @@ public class PersonBB extends BackingBeanUtils {
         List<HumanLink> hllist = null;
         if(currentHumanListHolder != null){
             try {
-                hllist = pc.assembleLinkedHumanLinks(currentHumanListHolder);
+                hllist = pc.getHumanLinkList(currentHumanListHolder);
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
@@ -1147,7 +1195,11 @@ public class PersonBB extends BackingBeanUtils {
         getSessionBean().setSessHumanListHolder(currentHumanListHolder);
         
         extractHumanLinkListComponentIDFromHTTPRequest();
-    
+        try {
+            loadLinkedObjectRoleList();
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
          getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Commencing linking of Persons to " + hlh.getHUMAN_LINK_SCHEMA_ENUM().getTARGET_OBJECT_FRIENDLY_NAME() + " ID: " + hlh.getHostPK(), ""));
@@ -1231,22 +1283,81 @@ public class PersonBB extends BackingBeanUtils {
      * @param per 
      */
     public void onAddPersonToSelectedList(Person per){
-        personsSelectedList.add(per);
+        PersonCoordinator pc = getPersonCoordinator();
+        humanLinkListQueued.add(pc.createHumanLinkSkeleton(per));
         getFacesContext().addMessage(null,
             new FacesMessage(FacesMessage.SEVERITY_INFO,
             "Added " + per.getName() + " to selected list.", ""));
     }
     
+      /**
+     * listener for user requests to add all of the persons in the working
+     * person list to the queued for linking list
+     * @param ev 
+     */
+    public void onQueueAllPersonsForLinking(ActionEvent ev){
+        if(personList != null && !personList.isEmpty() && humanLinkListQueued != null){
+            for(Person p: personList){
+                onAddPersonToSelectedList(p);
+            }
+        }
+    }
+    
+    
     /**
      * Listener for user requests to remove a person from the
      * session list of selected persons
-     * @param per
+     * @param hl
      */
-    public void onRemovePersonFromSelectedList(Person per){
-        personsSelectedList.remove(per);
+    public void onRemovePersonFromSelectedList(HumanLink hl){
+        humanLinkListQueued.remove(hl);
         getFacesContext().addMessage(null,
             new FacesMessage(FacesMessage.SEVERITY_INFO,
-            "Removed" + per.getName() + " to selected list.", ""));
+            "Removed" + hl.getName() + " to selected list.", ""));
+        
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to extract the humans from a list of human links 
+     * and make them part of our list queued for linking
+     * @param ev 
+     */
+    public void onTransferLinkedPersonsToWorkingPersonList(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        if(currentHumanListHolder != null && currentHumanListHolder.getHumanLinkList() != null && personList != null ){
+            if(!appendResultsToList){
+                personList.clear();
+            }
+            try {
+                System.out.println("PersonBB.onTransferLinkedPersonsToWorkingPersonList | Transferring " + currentHumanListHolder.getHumanLinkList().size() + " persons!");                personList.addAll(pc.getPersonListFromHumanLinkList(currentHumanListHolder.getHumanLinkList()));
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Transferred " + currentHumanListHolder.getHumanLinkList().size() + " persons to working list for queuing.", ""));
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Fatal error: transferring persons to working list!", ""));
+            } 
+        }
+    }
+
+  
+    
+    /**
+     * Listener for user requests to start the linking process
+     * @deprecated users must select a link role first
+     * @param ev 
+     */
+    public void onLinkPersonToCurrentParcelInit(ActionEvent ev){
+        PersonCoordinator pc = getPersonCoordinator();
+        currentHumanLink = pc.createHumanLinkSkeleton(currentPerson);
+        getSessionBean().setSessHumanListHolder(getSessionBean().getSessProperty());
+        getFacesContext().addMessage(null,
+              new FacesMessage(FacesMessage.SEVERITY_INFO,
+              "Choose your link role", ""));
         
         
     }
@@ -1284,17 +1395,17 @@ public class PersonBB extends BackingBeanUtils {
      */
     public void onLinkSelectedPersonsToPersonHolder(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-        if(personsSelectedList != null && !personsSelectedList.isEmpty()){
-            for(Person p: personsSelectedList){
+        if(humanLinkListQueued != null && !humanLinkListQueued.isEmpty()){
+            for(HumanLink hl: humanLinkListQueued){
                 try {
                     pc.insertHumanLink(currentHumanListHolder,
-                            pc.createHumanLinkSkeleton(p), 
+                            hl,
                             getSessionBean().getSessUser());
-                    System.out.println("PersonBB.onLinkSelectedPersonsToPersonHolder | linked p " + p.getName());
+                    System.out.println("PersonBB.onLinkSelectedPersonsToPersonHolder | linked p " + hl.getName());
                     
                      getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Linked " + p.getName() + " to Object ID " + currentHumanListHolder.getHostPK(), ""));
+                        "Linked " + hl.getName() + " to Object ID " + currentHumanListHolder.getHostPK(), ""));
                 } catch (BObStatusException | IntegrationException ex) {
                     System.out.println(ex);
                      getFacesContext().addMessage(null,
@@ -1302,7 +1413,23 @@ public class PersonBB extends BackingBeanUtils {
                         "Error linking person: " + ex.getMessage(), ""));
                 } 
             }
-            personsSelectedList.clear();
+            refreshHumanListHolder();
+            humanLinkListQueued.clear();
+        }
+    }
+    
+    /**
+     * Refreshes our human link list
+     */
+    public void refreshHumanListHolder(){
+        if(currentHumanListHolder != null){
+            PersonCoordinator pc = getPersonCoordinator();
+            try {
+                currentHumanListHolder.setHumanLinkList(pc.getHumanLinkList(currentHumanListHolder));
+                getSessionBean().setSessHumanListHolder(currentHumanListHolder);
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+            }
         }
     }
     
@@ -1327,6 +1454,19 @@ public class PersonBB extends BackingBeanUtils {
         
     }
     
+    
+    private void convertSelectedUnitToDataHeavyVersion(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(selectedUnitForHumanLinkTarget != null){
+            try {
+                selectedUnitForHumanLinkTargetDataHeavy = pc.getPropertyUnitWithLists(
+                        selectedUnitForHumanLinkTarget,
+                        getSessionBean().getSessUser().getKeyCard());
+            } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
+                System.out.println(ex);
+            } 
+        }
+    }
     
     
     
@@ -1701,17 +1841,17 @@ public class PersonBB extends BackingBeanUtils {
     }
 
     /**
-     * @return the personsSelectedList
+     * @return the humanLinkListQueued
      */
-    public List<Person> getPersonsSelectedList() {
-        return personsSelectedList;
+    public List<HumanLink> getHumanLinkListQueued() {
+        return humanLinkListQueued;
     }
 
     /**
-     * @param personsSelectedList the personsSelectedList to set
+     * @param humanLinkListQueued the humanLinkListQueued to set
      */
-    public void setPersonsSelectedList(List<Person> personsSelectedList) {
-        this.personsSelectedList = personsSelectedList;
+    public void setHumanLinkListQueued(List<HumanLink> humanLinkListQueued) {
+        this.humanLinkListQueued = humanLinkListQueued;
     }
 
     /**
@@ -1754,6 +1894,49 @@ public class PersonBB extends BackingBeanUtils {
      */
     public void setCurrentHumanListHolder(IFace_humanListHolder currentHumanListHolder) {
         this.currentHumanListHolder = currentHumanListHolder;
+    }
+
+    /**
+     * @return the selectedUnitForHumanLinkTarget
+     */
+    public PropertyUnit getSelectedUnitForHumanLinkTarget() {
+        return selectedUnitForHumanLinkTarget;
+    }
+
+    /**
+     * @param selectedUnitForHumanLinkTarget the selectedUnitForHumanLinkTarget to set
+     */
+    public void setSelectedUnitForHumanLinkTarget(PropertyUnit selectedUnitForHumanLinkTarget) {
+        convertSelectedUnitToDataHeavyVersion();
+        this.selectedUnitForHumanLinkTarget = selectedUnitForHumanLinkTarget;
+    }
+
+    /**
+     * @return the selectedUnitForHumanLinkTargetDataHeavy
+     */
+    public PropertyUnitDataHeavy getSelectedUnitForHumanLinkTargetDataHeavy() {
+        return selectedUnitForHumanLinkTargetDataHeavy;
+    }
+
+    /**
+     * @param selectedUnitForHumanLinkTargetDataHeavy the selectedUnitForHumanLinkTargetDataHeavy to set
+     */
+    public void setSelectedUnitForHumanLinkTargetDataHeavy(PropertyUnitDataHeavy selectedUnitForHumanLinkTargetDataHeavy) {
+        this.selectedUnitForHumanLinkTargetDataHeavy = selectedUnitForHumanLinkTargetDataHeavy;
+    }
+
+    /**
+     * @return the upstreamPersonPoolList
+     */
+    public List<IFace_humanListHolder> getUpstreamPersonPoolList() {
+        return upstreamPersonPoolList;
+    }
+
+    /**
+     * @param upstreamPersonPoolList the upstreamPersonPoolList to set
+     */
+    public void setUpstreamPersonPoolList(List<IFace_humanListHolder> upstreamPersonPoolList) {
+        this.upstreamPersonPoolList = upstreamPersonPoolList;
     }
     
      

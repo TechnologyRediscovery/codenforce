@@ -1054,7 +1054,14 @@
     <managed-bean>
         <managed-bean-name>ceCaseBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.CECaseBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope></managed-bean>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+
+    <managed-bean>
+        <managed-bean-name>ceCaseSearchAndReportBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseSearchAndReportBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 
     <managed-bean>
         <managed-bean-name>caseIntegrator</managed-bean-name>

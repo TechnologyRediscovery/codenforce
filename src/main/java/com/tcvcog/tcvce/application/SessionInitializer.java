@@ -485,6 +485,7 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_II_CodeBook(Credential cred, SubSysEnum ss, MunicipalityDataHeavy mdh) throws SessionException{
+        // the session code book is the current muni DH's codebook
         sb.setSessCodeSet(mdh.getCodeSet());
         
     }
@@ -664,7 +665,7 @@ public  class       SessionInitializer
 //            List<CECase> hist = cc.cecase_getCECaseHistory(ua);
             // NEXT LINE: YUCK!!!!!!!!
             sb.setSessCECaseList(cc.cecase_assembleCECasePropertyUnitHeavyList(cseQ.getBOBResultList()));
-            
+            System.out.println("VII: CeCase | Queried Open CECase list size " + sb.getSessCECaseList().size());
             if(sb.getSessCECaseList().isEmpty()){
                 sb.setSessCECase(cc.cecase_assembleCECaseDataHeavy(cc.cecase_selectDefaultCECase(ua), ua));
             } else {

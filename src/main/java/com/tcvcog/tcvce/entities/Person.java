@@ -38,6 +38,10 @@ public  class       Person
     protected List<MailingAddressLink> mailingAddressLinkList;
     protected List<ContactEmail> emailList;
     protected List<ContactPhone> phoneList;
+    
+    private String mailingAddressListPretty;
+    private String emailListPretty;
+    private String phoneListPretty;
 
     
   
@@ -53,6 +57,9 @@ public  class       Person
        this.emailList = p.emailList;
        this.phoneList = p.phoneList;
         
+       this.mailingAddressListPretty = p.mailingAddressListPretty;
+       this.emailListPretty = p.emailListPretty;
+       this.phoneListPretty = p.phoneListPretty;
     }
     
     /**
@@ -253,6 +260,48 @@ public  class       Person
     @Override
     public int getTargetObjectPK() {
         return humanID;
+    }
+
+    /**
+     * @return the mailingAddressListPretty
+     */
+    public String getMailingAddressListPretty() {
+        return mailingAddressListPretty;
+    }
+
+    /**
+     * @return the emailListPretty
+     */
+    public String getEmailListPretty() {
+        return emailListPretty;
+    }
+
+    /**
+     * @return the phoneListPretty
+     */
+    public String getPhoneListPretty() {
+        return phoneListPretty;
+    }
+
+    /**
+     * @param mailingAddressListPretty the mailingAddressListPretty to set
+     */
+    public void setMailingAddressListPretty(String mailingAddressListPretty) {
+        this.mailingAddressListPretty = mailingAddressListPretty;
+    }
+
+    /**
+     * @param emailListPretty the emailListPretty to set
+     */
+    public void setEmailListPretty(String emailListPretty) {
+        this.emailListPretty = emailListPretty;
+    }
+
+    /**
+     * @param phoneListPretty the phoneListPretty to set
+     */
+    public void setPhoneListPretty(String phoneListPretty) {
+        this.phoneListPretty = phoneListPretty;
     }
     
 

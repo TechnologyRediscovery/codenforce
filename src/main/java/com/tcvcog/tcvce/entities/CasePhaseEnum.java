@@ -32,6 +32,7 @@ public enum CasePhaseEnum {
                                         true,
                                         true,
                                         true,
+                                        true,
                                         true),
     
     IssueNotice                  (   "Generating and sending notice of violation", 
@@ -43,7 +44,8 @@ public enum CasePhaseEnum {
                                         true,
                                         true,
                                         true,
-                                        true),
+                                        true,
+                                        false),
     
     InsideComplianceWindow      (   "Inside violation compliance window", 
                                     "Allow time for violation resolution; monitor property for intensifications",
@@ -54,7 +56,8 @@ public enum CasePhaseEnum {
                                         true,
                                         true,
                                         true,
-                                        true),
+                                        true,
+                                        false),
     
     TimeframeExpiredNotCited    (   "Requiring ongoing officer action",
                                     "Verify compliance status; record compliance, extend timeframe, or issue a citation",
@@ -65,7 +68,8 @@ public enum CasePhaseEnum {
                                     true,
                                     true,
                                     true,
-                                    true),
+                                    true,
+                                    false),
     
     Cited                       (   "Citation issued--Any stage of court process", 
                                         "Case is at any stage of the court review process.",
@@ -76,7 +80,8 @@ public enum CasePhaseEnum {
                                         true,
                                         true,
                                         true,
-                                        true),
+                                        true,
+                                        false),
     
     
     AwaitingHearingDate             (   "Citation issued; Awaiting Hearing Date", 
@@ -88,7 +93,8 @@ public enum CasePhaseEnum {
                                         true,
                                         true,
                                         true,
-                                        true),
+                                        true,
+                                        false),
     
     HearingPreparation              (   "Hearing scheduled; Case preparation", 
                                         "Print case profile and prepare for court hearing",
@@ -99,7 +105,8 @@ public enum CasePhaseEnum {
                                         true,
                                         true,
                                         true,
-                                        true),
+                                        true,
+                                        false),
     
     InsideCourtOrderedComplianceTimeframe("Inside court-ordered extended violation compliance timeframe", 
                                             "Allow time for violation resolution; monitor property for intensification",
@@ -110,7 +117,8 @@ public enum CasePhaseEnum {
                                             true,
                                             true,
                                             true,
-                                            true),
+                                            true,
+                                        false),
     
     CourtOrderedComplainceTimeframeExpired("Court-ordered complaince window extension expired", 
                                             "Verify compliance status; record compliance, issue additional notices, or extend timeframe ",
@@ -121,7 +129,8 @@ public enum CasePhaseEnum {
                                             true,
                                             true,
                                             true,
-                                            true),
+                                            true,
+                                        false),
     
     InactiveHolding                 (       "Inactive Holding", 
                                             "Case is stuck; monitor for changes in property status",
@@ -132,7 +141,8 @@ public enum CasePhaseEnum {
                                             true,
                                             true,
                                             true,
-                                            true),
+                                            true,
+                                        false),
     
     FinalReview                          (       "Full Compliance; Final Review", 
                                             "All violations have been resolved; awaiting final review and formal closure",
@@ -140,6 +150,7 @@ public enum CasePhaseEnum {
                                             10, 
                                             CaseStageEnum.Review, 
                                             false,
+                                            true,
                                             true,
                                             true,
                                             true,
@@ -153,7 +164,8 @@ public enum CasePhaseEnum {
                                             true,
                                             true,
                                             true,
-                                            true),
+                                            true,
+                                        false),
     
     Container                  (       "Data container case for property and persons", 
                                         "Not a real case; used for storing administrative data",
@@ -161,6 +173,7 @@ public enum CasePhaseEnum {
                                             11, 
                                             CaseStageEnum.Unknown, 
                                             false,
+                                            true,
                                             true,
                                             true,
                                             true,
@@ -176,6 +189,7 @@ public enum CasePhaseEnum {
     private final boolean allowNewViolations;
     private final boolean allowNewNotices;
     private final boolean allowNewCitations;
+    private final boolean allowCaseClosure;
     
     private CasePhaseEnum(  String label, 
                             String nextDescr,
@@ -186,7 +200,8 @@ public enum CasePhaseEnum {
                             boolean propChange,
                             boolean attachViol,
                             boolean createnotices,
-                            boolean issueCitations){
+                            boolean issueCitations,
+                            boolean canClose){
         this.label = label;
         this.nextStep = nextDescr;
         this.nextStepHelpPanelID = nextStepHelp;
@@ -197,6 +212,7 @@ public enum CasePhaseEnum {
         this.allowNewViolations = attachViol;
         this.allowNewNotices = createnotices;
         this.allowNewCitations = issueCitations;
+        this.allowCaseClosure = canClose;
     }
     
     public String getLabel(){
@@ -269,6 +285,13 @@ public enum CasePhaseEnum {
      */
     public String getNextStepHelpPanelID() {
         return nextStepHelpPanelID;
+    }
+
+    /**
+     * @return the allowCaseClosure
+     */
+    public boolean isAllowCaseClosure() {
+        return allowCaseClosure;
     }
     
 }

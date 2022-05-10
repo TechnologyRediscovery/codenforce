@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -632,9 +633,48 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("Cannot update ECE with null ECE or UA");
         }
         
+        
         ece.setEceLastupdatedBy(ua);
         ci.updateEnforcableCodeElement(ece);
         
+    }
+    
+    
+      /**
+     * Internal operational code to determine which muni's the user has
+     * enforcement official permissions (or better), and update their codebooks
+     * that contain this same ordinance with default findings
+     *
+     * @param defFindings the new string to become the default findings
+     * @param ece into which I'll inject the new text before updating
+     * @param ua
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public void updateEnfCodeElementMakeFindingsDefault(String defFindings, EnforcableCodeElement ece, UserAuthorized ua) throws IntegrationException, BObStatusException {
+        if(defFindings == null || ece == null || ua == null){
+            throw new BObStatusException("Cannot update findings with null inputs");
+        }
+        System.out.println("CodeCoordinator.updateEnfCodeElementMakeFindingsDefault | updating ECE ID: " + ece.getCodeSetElementID() + " findings to " + defFindings);
+        CodeIntegrator ci = getCodeIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        ece.setDefaultViolationDescription(defFindings);
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        mbp.setUser(ua);
+        mbp.setExistingContent(ece.getNotes());
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Default findings changed to: ");
+        sb.append(defFindings);
+        sb.append(" from: ");
+        sb.append(ece.getDefaultViolationDescription());
+        mbp.setNewMessageContent(sb.toString());
+
+        ece.setMuniSpecificNotes(sc.appendNoteBlock(mbp));
+        ece.setDefaultViolationDescription(defFindings);
+        ece.setLastupdatedBy(ua);
+        ci.updateEnforcableCodeElement(ece);
+
     }
     
     /**

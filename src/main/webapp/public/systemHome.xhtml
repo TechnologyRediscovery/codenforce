@@ -48,7 +48,34 @@
                                                 <p:spacer height="20px" />
                                                 <h2>Release notes</h2>
                                                 <p:accordionPanel id="release-panel">
-                                                    <p:tab title="Release Alpha 0.8421: Thursday, 28-April-2022 @ 0652h">
+                                                    <p:tab title="Release Alpha 0.8.4.3: Tuesday, 10-May-2022 @ 0837h">
+                                                        <ul>
+                                                            <li><span style="font-weight: bold;">Photo/document pooling is now functioning</span> for field inspections on CECases and perhaps Occ Periods. Meaning: you can upload
+                                                            photos/docs to the field inspection itself and access them via the "upload from pool" tab in the file upload dialog for any given ordinance.
+                                                            This same pattern also applies recursively up to the property: uploading blobs to the property builds the pool for photos you'd like to 
+                                                            connect to either an occ period or CE Case on that property. And, photos/documents uploaded to a CECase or occ period become the upstream
+                                                            blob pool for field inspections on either of those objects, as well as violations and citations on CE cases. Try it out and report bugs!</li>
+                                                            <li><span style="font-weight: bold;">Person link roles are now active system-wide:</span> When you link persons, you can choose their role with respect to the object you're linking
+                                                            that person to. The main portal for link processing is the right-most column of the person search dialog. There is a very important button in that
+                                                            column called "change link target" which allows you to adjust which object you link the entire list of selected persons to, and this link target
+                                                            should default to the object from which you click "Manage person links". The default target is the current property.</li>
+                                                            <li>CE Case and Code Violation edit dialogs are now our current standard, with the "edit" button that shifts the attribute-value list into a form, 
+                                                            with all eligible values changing into input components. Save your work by clicking the "Save changes" button (the active-edit version of "</li>
+                                                            <li>Improved case display on dashboard </li>
+                                                        </ul>
+                                                        
+                                                        <h3>Work in progress</h3>
+                                                        <ul>
+                                                            <li>Person link pooling (easily accessing property persons on a cecase, etc)</li>
+                                                        </ul>
+                                                        <h3>Known front-burner bugs</h3>
+                                                        <ul>
+                                                            <li>Photo/doc pool isn't working on Violation photos/docs</li>
+                                                            <li>NO property listed on CECase inspection report</li>
+                                                        </ul>
+                                                        
+                                                    </p:tab>
+                                                    <p:tab title="Release Alpha 0.8.4.2.1: Thursday, 28-April-2022 @ 0652h">
                                                         
                                                         <ul>
                                                             <li>Mini release to fix a broken violation update stipulated compliance date dialog (thanks for phoning it in Alex).</li>
@@ -69,7 +96,7 @@
                                                         
                                                         
                                                     </p:tab>
-                                                    <p:tab title="Release Alpha 0.842: Tuesday, 26-April-2022 @ 0642h">
+                                                    <p:tab title="Release Alpha 0.8.4.2: Tuesday, 26-April-2022 @ 0642h">
                                                         <ul>
                                                             <li>Field inspection reports now can be customized at creation to specify <span style="font-weight: bold;">which combination of ordinances to display</span>.
                                                             Options include: pass &amp; violated, violated only, all violated ordinances and passed ords with photos or comments, and more!</li>
@@ -102,7 +129,7 @@
                                                             
                                                         </ul>
                                                     </p:tab>
-                                                    <p:tab title="Release Alpha 0.841: Wednesday, 20-April-2022 @ 17:05h">
+                                                    <p:tab title="Release Alpha 0.8.4.1: Wednesday, 20-April-2022 @ 17:05h">
                                                         <ul>
                                                             <li>Field inspection reports are now live, and they do contain findings, and images for each ordinance in each space!</li>
                                                             <li>The bug on reloading inspections which meant the list of displayed spaces was inaccurate has been fixed.</li>
@@ -114,7 +141,7 @@
                                                         </ul>
                                                         
                                                     </p:tab>
-                                                    <p:tab title="Release Alpha 0.840: Friday, 15-April-2022 @ 13:20h">
+                                                    <p:tab title="Release Alpha 0.8.4.0: Friday, 15-April-2022 @ 13:20h">
                                                         <ul>
                                                             <li>Code violations can now be migrated from one case to another using the "transfer violations" button
                                                                 in the code violation panel of the code enforcement case profile.
@@ -125,7 +152,7 @@
                                                         </ul>
                                                         
                                                     </p:tab>
-                                                    <p:tab title="Release Alpha 0.836: Monday, 11-April-2022 @ 1054h">
+                                                    <p:tab title="Release Alpha 0.8.3.6: Monday, 11-April-2022 @ 1054h">
                                                         <ul>
                                                             <li>Adjusted the Code Enforcement case list report to reflect, once again, the changes specified
                                                                 in the 8.11.21 specs document. These changes had to be re-applied after pushing the diverged

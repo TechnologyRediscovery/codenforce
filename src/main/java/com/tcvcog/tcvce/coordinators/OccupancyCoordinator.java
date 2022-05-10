@@ -164,7 +164,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
           
             // TODO: Humanization upgrade after Ben's integration
 
-            opdh.setHumanLinkList(persc.assembleLinkedHumanLinks(opdh));
+            opdh.setHumanLinkList(persc.getHumanLinkList(opdh));
 
             // EVENT LIST
 

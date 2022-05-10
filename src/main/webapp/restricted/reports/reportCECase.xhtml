@@ -11,144 +11,248 @@
     </h:head>
     <h:body>
         <ui:composition template="./../report_template.xhtml">
-
             <ui:define name="print-content">
                 <f:view id="report-cecase-view">
 
                     <h:form id="case-details-form">
-                        <div class="outlinedBox report">
+                        <div class="p-grid">
+                            <div class="p-col-6">
+                                <div class="p-grid">
 
-                            <h1>
-                                <h:outputText id="header-type-ot" value="#{ceCaseSearchProfileBB.currentCase.caseName}"/>
-                                <h:outputText id="header-type-ot-sep" value=" | "/>
-                                <h:outputText id="header-id-ot" value=" Code enf. case ID: #{ceCaseSearchProfileBB.currentCase.caseID}"/>
-                            </h1>
-                            <h2>
-                                <h:outputText id="header-addr-ot" value="#{ceCaseSearchProfileBB.currentCase.property.addressString} "/>  
-                                <h:outputText id="header-muni-ot" value="(#{ceCaseSearchProfileBB.currentCase.property.muni.muniName})"/>  
-                            </h2>
+                                    <div class="p-col-12">
 
-                            <p>
-                                <a href="#event-history">event history <h:outputText value=" (#{ceCaseSearchProfileBB.currentCase.eventList.size()})" /></a> | 
-                                <a href="#violations">violations <h:outputText value=" (#{ceCaseSearchProfileBB.currentCase.violationList.size()})" /></a> | 
-                                <a href="#notices">notices <h:outputText value=" (#{ceCaseSearchProfileBB.currentCase.noticeList.size()})" /></a> | 
-                                <a href="#citations">citations <h:outputText value=" (#{ceCaseSearchProfileBB.currentCase.citationList.size()})" /></a> | 
-                                <a href="#requests">enforcement requests <h:outputText value=" (#{ceCaseSearchProfileBB.currentCase.ceActionRequestList.size()})" /></a>  
-                            </p>
+                                        <h:outputText id="header-id-ot" 
+                                                      style="font-style: italic;"
+                                                      value=" Code enforcement case (ID: #{reportingBB.reportCECase.caseID}) at"/>
+                                        <p:spacer height="3px" />
+                                        <h1>
 
-
-                            <h:panelGrid columns="1" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
-                                         columnClasses="gridTd">
-                                <h:panelGroup>
-                                    <h:outputLabel styleClass="bold" value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phase.caseOpen ? 'Open Case :' : 'Closed Case :'}" />
-                                    <h:outputLabel styleClass="bold" value="#{ceCaseSearchProfileBB.currentCase.statusBundle.phase.label}" />
-                                    
-                                </h:panelGroup>      
-                                <h:panelGroup>
-                                    <h:outputLabel styleClass="bold" value="Opening Date: "/>
-                                    <h:outputText id="selcase-odate-it" value="#{ceCaseSearchProfileBB.currentCase.originiationDatePretty}"/>
-                                    <h:outputText id="selcase-age-it" 
-                                                  value=" (#{ceCaseSearchProfileBB.currentCase.caseAge} days ago)" 
-                                                  rendered="#{empty ceCaseSearchProfileBB.currentCase.closingDate}"/>
-                                    <p:spacer height="5px"/>
-                                    <h:outputLabel styleClass="bold" value="Closing Date:"/>
-                                    <h:outputText id="selcase-cdate-it" value="#{ceCaseSearchProfileBB.currentCase.closingDatePretty}"/>
-                                    <p:spacer height="5px"/>
-                                    <h:outputLabel styleClass="bold" value="Case Manager: "/>
-                                    <h:outputText id="selcase-manager-it" 
-                                                  value="#{ceCaseSearchProfileBB.currentCase.caseManager.human.firstName} 
-                                                  #{ceCaseSearchProfileBB.currentCase.caseManager.human.lastName} 
-                                                  (#{ceCaseSearchProfileBB.currentCase.caseManager.username})"/>  
-                                </h:panelGroup>      
-
-                                <f:facet name="footer" class="leftalign">
-                                    <h:outputLabel styleClass="bold" value="Case notes: "/>
-                                    <div class="rowExpansion">
-
-                                        <h:outputText id="selcase-notes-ot" value="#{ceCaseSearchProfileBB.currentCase.notes}"/>
+                                            <h:outputText id="header-addr-ot" 
+                                                          value="#{ceCaseBB.reportCECase.cse.property.address.addressPretty2LineEscapeFalse}"
+                                                          escape="false"/>  
+                                        </h1>
                                     </div>
-                                    <p:spacer height="5px"/>
+                                    <div class="p-col-12">
+                                        <p>Broadview photo here</p>
+                                    </div>
 
-                                     <h:outputLabel styleClass="bold" value="Unresolved code violations: 
-                                                               #{ceCaseSearchProfileBB.currentCase.violationListUnresolved.size()} 
-                                                               / #{ceCaseSearchProfileBB.currentCase.violationList.size()}"/> 
-                                    <p:dataScroller 
-                                        id="violations-datascroller-unresolved"
-                                        value="#{ceCaseSearchProfileBB.currentCase.violationListUnresolved}"
-                                        var="v"
-                                        widgetVar="violation-compactlist-widgetvar-unresolved">
+                                    <div class="p-col-12">
+                                        <h2>Property info</h2>
 
-                                        <div class="compact-violation-list-container">
-                                            <h:outputText  value="Source: #{v.violatedEnfElement.source.sourceName}" />
-                                            <h:outputText  value=" (#{v.violatedEnfElement.source.sourceYear})" />
-                                            <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
-                                            <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
-                                            <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
-                                            <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
-                                            <h:outputText id="sep-compactlist-line-ot-unresolved" value=" | "/>
-                                            <h:outputText id="status-compactlist-line-ot-unresolved" styleClass="italic" value="#{v.status.label}"/>
+                                    </div>
+
+                                    <div class="p-col-4 data_field_label">
+                                        <h:outputText value="Parcel ID (County)"  />
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{ceCaseBB.reportCECase.propDH.countyParcelID} "
+                                                      rendered="true" />
+                                    </div>
+                                    <div class="p-col-4 data_field_label">
+                                                <h:outputText value="InternalID" />
+                                            </div>
+                                            <div class="p-col-8">
+                                                <h:outputText value="#{ceCaseBB.reportCECase.propDH.propertyID} "/>
+                                            </div>
+
+                                            <div class="p-col-4 data_field_label">
+                                                <h:outputText value="Property Source" />
+                                            </div>
+                                            <div class="p-col-8">
+                                                <h:outputText value="#{ceCaseBB.reportCECase.propDH.source.title} "
+                                                              />
+                                            </div>
+                                    
+                                      <div class="p-col-4 data_field_label">
+                                                <h:outputLabel value="County"/>
+                                            </div>
+                                            <div class="p-col-8">
+                                                <h:outputText value="#{ceCaseBB.reportCECase.propDH.parcelInfo.countyCode}"  />
+                                            </div>
+
+                                            <div class="p-col-4 data_field_label">
+                                                <h:outputLabel value="Condition"/>
+                                            </div>
+                                            <div class="p-col-8">
+                                                <h:outputText value="#{!(empty ceCaseBB.reportCECase.propDH.parcelInfo.condition)
+                                                                       ? ceCaseBB.reportCECase.propDH.parcelInfo.condition.title
+                                                                       : ''}">
+                                            </div>
+                                    
+                                              <div class="p-col-4 data_field_label">
+                                                <h:outputLabel value="Use Type"/>
+                                            </div>
+                                            <div class="p-col-8">
+                                                <h:outputText value="#{ceCaseBB.reportCECase.propDH.parcelInfo.useType.name}"  />
+                                            </div>
+
+
+
+                                </div>
+
+
+
+                            </div>
+                            <div class="p-col-6">
+                                <f:subview id="rpt-cecase-persons-subview"
+                                           rendered="#{reportingBB.reportCECase.includeAssociatedPersons}">
+                                    
+                                    <div class="p-grid">
+                                        <div class="p-col-12">
+                                            <h2>Person connections</h2>
                                         </div>
-                                    </p:dataScroller>
-
-                                    <p:spacer height="10px" />
-
-                                    <h:outputLabel styleClass="bold" value="Compliance achieved: 
-                                                   #{ceCaseSearchProfileBB.currentCase.violationListResolved.size()} 
-                                                   / #{ceCaseSearchProfileBB.currentCase.violationList.size()}"/> 
-                                    <p:dataScroller 
-                                        id="violations-datascroller-resolved"
-                                        value="#{ceCaseSearchProfileBB.currentCase.violationListResolved}"
-                                        var="v"
-                                        widgetVar="violation-compactlist-widgetvar-resolved">
-
-                                        <div class="compact-violation-list-container">
-                                            <h:outputText  value="Source: #{v.violatedEnfElement.source.sourceName}" />
-                                            <h:outputText  value=" (#{v.violatedEnfElement.source.sourceYear})" />
-                                            <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
-                                            <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
-                                            <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
-                                            <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
-                                            <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
-                                            <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.status.label}"/>
-                                        </div>
-                                    </p:dataScroller>
-                                </f:facet>
-                            </h:panelGrid>
-
-
-                             <h:panelGrid columns="2" rendered="true"
-                                                         columnClasses="gridTd-solid-back, gridTd-solid-back"
-                                                         footerClass="no-border">
-
-                                 <h:panelGroup>
-                                     <h3>report generation notes:</h3>
-                                     <p>
-                                        <h:outputLabel id="report-creator-ol" for="report-creator-ot" styleClass="bold" value="creator name: " />
-                                        <h:outputText id="report-creator-ot"  value="#{reportingBB.currentReport.creator.human.firstName} 
-                                                      #{reportingBB.currentReport.creator.phumanfirstName} 
-                                                      (user: #{reportingBB.currentReport.creator.username})"/>
-                                        <br />
-                                        <h:outputLabel id="report-creator-cred-ol" for="report-creator-cred-ot" styleClass="bold" value="creator credentials: " />
-                                        <h:outputText id="report-creator-cred-ot"  value="#{reportingBB.currentReport.creator.roleType.label} 
-                                                      (ID: #{reportingBB.currentReport.creator.userID})"/>
-                                     </p>
-                                </h:panelGroup>
-                                 <h:panelGroup>
-                                     <p>
-                                         <h:outputLabel id="report-timestamp-ol" for="report-timestamp-ot" styleClass="bold" value="created on: " />
-                                         <h:outputText id="report-timestamp-ot"  value="#{reportingBB.currentReport.generationTimestampPretty}"/>
-                                        <br />
-                                        <h:outputLabel id="report-notes-ol" for="report-notes-ot" styleClass="bold" value="notes: "/>
-                                        <h:outputText id="report-notes-ot"  value="#{reportingBB.currentReport.notes}"/>
-                                     </p>
-                                </h:panelGroup>
-
-                             </h:panelGrid>
-
-
-
-
+                                        <ui:repeat id="person-con-uir"
+                                                   value="#{reportingBB.reportCECase.cse.humanLinkList}" 
+                                                   var="csehl">
+                                            <div class="p-col-4">
+                                                <h:outputText value="#{csehl.name}" />
+                                            </div>
+                                            <div class="p-col-8">
+                                                <h:outputText value="#{csehl.linkedObjectRole.title}" />
+                                            </div>
+                                            <f:subview id="rpt-cecase-person-contact"
+                                                       rendered="#{reportingBB.reportCECase.includePersonAddrPhoneEmail}">
+                                                <div class="p-col-4">
+                                                    <h:outputText value="address(s)" />
+                                                </div>
+                                                <div class="p-col-8">
+                                                    
+                                                </div>
+                                            </f:subview>
+                                        </ui:repeat>
+                                    </div>
+                                </f:subview>
+                            </div>
                         </div>
+
+
+
+                        <h1>
+                            <h:outputText id="header-type-ot" value="#{reportingBB.reportCECase.cse.caseName}"/>
+                            <h:outputText id="header-type-ot-sep" value=" | "/>
+                        </h1>
+                        <h2>
+                            <h:outputText id="header-muni-ot" value="(#{reportingBB.reportCECase.property.muni.muniName})"/>  
+                        </h2>
+
+                        <p>
+                            <a href="#event-history">event history <h:outputText value=" (#{reportingBB.reportCECase.eventList.size()})" /></a> | 
+                            <a href="#violations">violations <h:outputText value=" (#{reportingBB.reportCECase.violationList.size()})" /></a> | 
+                            <a href="#notices">notices <h:outputText value=" (#{reportingBB.reportCECase.noticeList.size()})" /></a> | 
+                            <a href="#citations">citations <h:outputText value=" (#{reportingBB.reportCECase.citationList.size()})" /></a> | 
+                            <a href="#requests">enforcement requests <h:outputText value=" (#{reportingBB.reportCECase.ceActionRequestList.size()})" /></a>  
+                        </p>
+
+
+                        <h:panelGrid columns="1" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
+                                     columnClasses="gridTd">
+                            <h:panelGroup>
+                                <h:outputLabel styleClass="bold" value="#{reportingBB.reportCECase.statusBundle.phase.caseOpen ? 'Open Case :' : 'Closed Case :'}" />
+                                <h:outputLabel styleClass="bold" value="#{reportingBB.reportCECase.statusBundle.phase.label}" />
+
+                            </h:panelGroup>      
+                            <h:panelGroup>
+                                <h:outputLabel styleClass="bold" value="Opening Date: "/>
+                                <h:outputText id="selcase-odate-it" value="#{ceCaseBB.currentCase}"/>
+                                <h:outputText id="selcase-age-it" 
+                                              value=" (#{reportingBB.reportCECase.caseAge} days ago)" 
+                                              rendered="#{empty reportingBB.reportCECase.closingDate}"/>
+                                <p:spacer height="5px"/>
+                                <h:outputLabel styleClass="bold" value="Closing Date:"/>
+                                <h:outputText id="selcase-cdate-it" value="#{reportingBB.reportCECase.closingDatePretty}"/>
+                                <p:spacer height="5px"/>
+                                <h:outputLabel styleClass="bold" value="Case Manager: "/>
+                                <h:outputText id="selcase-manager-it" 
+                                              value="#{reportingBB.reportCECase.caseManager.human.name} "/>  
+                            </h:panelGroup>      
+
+                            <f:facet name="footer" class="leftalign">
+                                <h:outputLabel styleClass="bold" value="Case notes: "/>
+                                <div class="rowExpansion">
+
+                                    <h:outputText id="selcase-notes-ot" value="#{reportingBB.reportCECase.notes}"/>
+                                </div>
+                                <p:spacer height="5px"/>
+
+                                <h:outputLabel styleClass="bold" value="Unresolved code violations: 
+                                               #{reportingBB.reportCECase.violationListUnresolved.size()} 
+                                               / #{reportingBB.reportCECase.violationList.size()}"/> 
+                                <p:dataScroller 
+                                    id="violations-datascroller-unresolved"
+                                    value="#{reportingBB.reportCECase.violationListUnresolved}"
+                                    var="v"
+                                    widgetVar="violation-compactlist-widgetvar-unresolved">
+
+                                    <div class="compact-violation-list-container">
+                                        <h:outputText  value="Source: #{v.violatedEnfElement.source.sourceName}" />
+                                        <h:outputText  value=" (#{v.violatedEnfElement.source.sourceYear})" />
+                                        <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
+                                        <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
+                                        <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                        <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
+                                        <h:outputText id="sep-compactlist-line-ot-unresolved" value=" | "/>
+                                        <h:outputText id="status-compactlist-line-ot-unresolved" styleClass="italic" value="#{v.status.label}"/>
+                                    </div>
+                                </p:dataScroller>
+
+                                <p:spacer height="10px" />
+
+                                <h:outputLabel styleClass="bold" value="Compliance achieved: 
+                                               #{reportingBB.reportCECase.violationListResolved.size()} 
+                                               / #{reportingBB.reportCECase.violationList.size()}"/> 
+                                <p:dataScroller 
+                                    id="violations-datascroller-resolved"
+                                    value="#{reportingBB.reportCECase.violationListResolved}"
+                                    var="v"
+                                    widgetVar="violation-compactlist-widgetvar-resolved">
+
+                                    <div class="compact-violation-list-container">
+                                        <h:outputText  value="Source: #{v.violatedEnfElement.source.sourceName}" />
+                                        <h:outputText  value=" (#{v.violatedEnfElement.source.sourceYear})" />
+                                        <h:outputText  value="&#167;#{v.violatedEnfElement.ordSecNum}:" />
+                                        <h:outputText  value="#{v.violatedEnfElement.ordSecTitle}; " />
+                                        <h:outputText  value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                        <h:outputText  value="#{v.violatedEnfElement.ordSubSecTitle}" />
+                                        <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
+                                        <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.status.label}"/>
+                                    </div>
+                                </p:dataScroller>
+                            </f:facet>
+                        </h:panelGrid>
+
+
+                        <h:panelGrid columns="2" rendered="true"
+                                     columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                     footerClass="no-border">
+
+                            <h:panelGroup>
+                                <h3>report generation notes:</h3>
+                                <p>
+                                    <h:outputLabel id="report-creator-ol" for="report-creator-ot" styleClass="bold" value="creator name: " />
+                                    <h:outputText id="report-creator-ot"  value="#{reportingBB.currentReport.creator.human.firstName} 
+                                                  #{reportingBB.currentReport.creator.phumanfirstName} 
+                                                  (user: #{reportingBB.currentReport.creator.username})"/>
+                                    <br />
+                                    <h:outputLabel id="report-creator-cred-ol" for="report-creator-cred-ot" styleClass="bold" value="creator credentials: " />
+                                    <h:outputText id="report-creator-cred-ot"  value="#{reportingBB.currentReport.creator.roleType.label} 
+                                                  (ID: #{reportingBB.currentReport.creator.userID})"/>
+                                </p>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <p>
+                                    <h:outputLabel id="report-timestamp-ol" for="report-timestamp-ot" styleClass="bold" value="created on: " />
+                                    <h:outputText id="report-timestamp-ot"  value="#{reportingBB.currentReport.generationTimestampPretty}"/>
+                                    <br />
+                                    <h:outputLabel id="report-notes-ol" for="report-notes-ot" styleClass="bold" value="notes: "/>
+                                    <h:outputText id="report-notes-ot"  value="#{reportingBB.currentReport.notes}"/>
+                                </p>
+                            </h:panelGroup>
+
+                        </h:panelGrid>
+
+
+
+
 
 
                         <hr />
@@ -160,7 +264,7 @@
                         <p:dataScroller
                             id="events-datascroller"
                             var="e"
-                            value="#{ceCaseSearchProfileBB.currentCase.eventList}"
+                            value="#{reportingBB.reportCECase.eventList}"
                             widgetVar="ceevent-ds-var">
 
                             <div class="outlinedBox event-ds-box">
@@ -188,7 +292,7 @@
                                             <h:outputText value="#{e.userCreator.pehumanirstName} #{e.userCreator.perhumanstName} (user: #{e.userCreator.username}, ID: #{e.userCreator.userID})"/>
                                             <br />
                                             <h:outputText styleClass="bold" value="Date of record: "/>
-                                        <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(e.timeStart)}"/>
+                                            <h:outputText value="#{ceCaseBB.getPrettyDate(e.timeStart)}"/>
                                             <br />
                                             <h:outputText styleClass="bold" value="Event ID: "/>
                                             <h:outputText value="#{e.eventID}"/>
@@ -196,7 +300,7 @@
                                         </p>
                                     </h:panelGroup>
 
-                                   
+
                                     <h:panelGroup>
 
                                         <h:outputLabel styleClass="bold" style="text-align: left" value="Event notes"/>
@@ -224,26 +328,26 @@
                         <p:dataScroller
                             id="violation-table"
                             var="v"
-                            value="#{ceCaseSearchProfileBB.currentCase.violationList}">
+                            value="#{reportingBB.reportCECase.violationList}">
 
                             <div class="outlinedBox">
 
                                 <h2><h:outputText value="Violation ID:  #{v.violationID}"/><h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
-                                            <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
-                                            <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.status.label}"/></h2>
+                                    <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
+                                    <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.status.label}"/></h2>
 
 
 
-                                 <h:panelGrid columns="2" rendered="true"
-                                                         columnClasses="gridTd-solid-back, gridTd-solid-back"
-                                                         headerClass="no-border"
-                                                         footerClass="no-border">
+                                <h:panelGrid columns="2" rendered="true"
+                                             columnClasses="gridTd-solid-back, gridTd-solid-back"
+                                             headerClass="no-border"
+                                             footerClass="no-border">
 
-                                     <f:facet name="header">
+                                    <f:facet name="header">
                                         <h:outputLabel styleClass="bold" value="Ordindance: "  />
                                         <p:spacer height="5px" />
                                         <h:outputLabel styleClass="mono" value="#{v.violatedEnfElement.source.sourceName} 
-                                                      (#{v.violatedEnfElement.source.sourceYear}), " />
+                                                       (#{v.violatedEnfElement.source.sourceYear}), " />
                                         <h:outputText   styleClass="mono" value="Ch. #{v.violatedEnfElement.ordchapterNo}:" />
                                         <h:outputText   styleClass="mono" value="#{v.violatedEnfElement.ordchapterTitle}" />
                                         <p:spacer height="2px" />
@@ -255,7 +359,7 @@
                                         <p:spacer height="2px" />
 
                                         <h:panelGrid    id="violation-ord-fulltext-pg" columns="1" columnClasses="gridTd" 
-                                                        rendered="#{ceCaseSearchProfileBB.reportCECase.includeFullOrdinanceText}">
+                                                        rendered="#{ceCaseBB.reportCECase.includeFullOrdinanceText}">
                                             <h:panelGroup>
                                                 <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
                                                 <div class="ord-text">
@@ -269,9 +373,9 @@
                                         <h:outputLabel styleClass="bold" value="Description of violation: "/>
                                         <h:outputText styleClass="weight-normal" value="#{v.description}"/>
 
-                                     </f:facet>
+                                    </f:facet>
 
-                                     <h:panelGroup>
+                                    <h:panelGroup>
                                         <h:outputText styleClass="bold" value="Violation ID: " />
                                         <h:outputText value="#{v.violationID}"/>
 
@@ -293,9 +397,9 @@
                                         <h:outputText value="#{v.actualComplianceDatePretty}"/>
 
 
-                                     </h:panelGroup>
+                                    </h:panelGroup>
 
-                                     <h:panelGroup>
+                                    <h:panelGroup>
 
                                         <h:outputText value="Photo count: " />
                                         <h:outputText value="#{empty v.blobList ? '0' : v.blobList.size()}"/>
@@ -314,75 +418,75 @@
 
                                         <h:outputLabel styleClass="bold" value="Officer Notes: "/>
                                         <h:outputText value="#{v.notes}" escape="false"/>
-                                     </h:panelGroup>
-                                 </h:panelGrid>
+                                    </h:panelGroup>
+                                </h:panelGrid>
 
 
                             </div>
 
                         </p:dataScroller>
                         <h4>Photos</h4>
-                         <p:dataScroller id="violations-photos-ds"
+                        <p:dataScroller id="violations-photos-ds"
                                         value="#{noticeOfViolationBB.currentNotice.violationList}"
                                         var="v">
                             <h4>Photos of code violation:
-                                
-                                    <h:outputText    value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
-                                    <h:outputText    value="#{v.violatedEnfElement.ordSubSecTitle}" />
+
+                                <h:outputText    value="&#167;&#167;#{v.violatedEnfElement.ordSubSecNum} " />
+                                <h:outputText    value="#{v.violatedEnfElement.ordSubSecTitle}" />
 
                             </h4>
                             <p:dataTable
-                                    id="photoTable"
-                                    var="photo"
-                                    value="#{v.blobList}"
-                                    rowKey="#{photo.blobID}"
-                                    tableStyleClass="primeDataTable"
-                                    draggableRows="false" tabindex="6">
-                                    <p:column width="70%">
-                                        <f:facet name="header">
-                                            <h:outputText value="Photo"/>
-                                        </f:facet>
-                                        <p:graphicImage width="100%" value="#{blobCoordinator.image}">
-                                            <f:param name="blobID" value="#{photo.blobID}"/>
-                                        </p:graphicImage>
-                                    </p:column>
-                                    <p:column>
-                                        <f:facet name="header">
-                                            <h:outputText value="Description"/>
-                                        </f:facet>
-                                        <p:inputTextarea id="desc" value="#{photo.description}"
-                                                         style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
-                                            <p:ajax />
-                                        </p:inputTextarea>
-                                    </p:column>
-
-                                </p:dataTable>
-
-
-                        </p:dataScroller>
-                        <p:dataTable
-                                id="violation-photo-table"
-                                var="blob"
+                                id="photoTable"
+                                var="photo"
                                 value="#{v.blobList}"
-                                rowKey="#{blob.blobID}"
-                                rendered="#{ceCaseSearchProfileBB.reportCECase.includeViolationPhotos and v.blobList.size()>0}"
+                                rowKey="#{photo.blobID}"
                                 tableStyleClass="primeDataTable"
                                 draggableRows="false" tabindex="6">
-                                <p:column width="80%">
+                                <p:column width="70%">
                                     <f:facet name="header">
                                         <h:outputText value="Photo"/>
                                     </f:facet>
                                     <p:graphicImage width="100%" value="#{blobCoordinator.image}">
-                                        <f:param name="photoID" value="#{blob.blobID}"/>
+                                        <f:param name="blobID" value="#{photo.blobID}"/>
                                     </p:graphicImage>
                                 </p:column>
-                                <p:column width="20%">
+                                <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Description"/>
                                     </f:facet>
-                                    <h:outputText escape="false" value="#{blob.description}"/>
+                                    <p:inputTextarea id="desc" value="#{photo.description}"
+                                                     style="width: 100%;" tabindex="5" required="true" styleClass="inputText">
+                                        <p:ajax />
+                                    </p:inputTextarea>
                                 </p:column>
+
                             </p:dataTable>
+
+
+                        </p:dataScroller>
+                        <p:dataTable
+                            id="violation-photo-table"
+                            var="blob"
+                            value="#{v.blobList}"
+                            rowKey="#{blob.blobID}"
+                            rendered="#{ceCaseBB.reportCECase.includeViolationPhotos and v.blobList.size()>0}"
+                            tableStyleClass="primeDataTable"
+                            draggableRows="false" tabindex="6">
+                            <p:column width="80%">
+                                <f:facet name="header">
+                                    <h:outputText value="Photo"/>
+                                </f:facet>
+                                <p:graphicImage width="100%" value="#{blobCoordinator.image}">
+                                    <f:param name="photoID" value="#{blob.blobID}"/>
+                                </p:graphicImage>
+                            </p:column>
+                            <p:column width="20%">
+                                <f:facet name="header">
+                                    <h:outputText value="Description"/>
+                                </f:facet>
+                                <h:outputText escape="false" value="#{blob.description}"/>
+                            </p:column>
+                        </p:dataTable>
 
                         <hr />
 
@@ -391,7 +495,7 @@
 
                         <p:dataScroller
                             id="notices-ds"
-                            value="#{ceCaseSearchProfileBB.reportCECase.noticeListForReport}"
+                            value="#{ceCaseBB.reportCECase.noticeListForReport}"
                             var="notice"
                             rendered="true">
 
@@ -419,7 +523,7 @@
                             <p:spacer height="5px"/>
 
                             <h:panelGrid    id="notice-text-pg" columns="1" columnClasses="gridTd" 
-                                            rendered="#{ceCaseSearchProfileBB.reportCECase.includeNoticeFullText}"
+                                            rendered="#{ceCaseBB.reportCECase.includeNoticeFullText}"
                                             styleClass="printing-page-break-after">
                                 <h:panelGroup>
 
@@ -441,7 +545,7 @@
                         <p:dataScroller
                             id="citation-table"
                             var="citation"
-                            value="#{ceCaseSearchProfileBB.currentCase.citationList}">
+                            value="#{reportingBB.reportCECase.citationList}">
 
                             <div class="outlinedBox">
                                 <h:panelGrid columns="2" cellpadding="10" styleClass="object-info-box" footerClass="gridFooter"
@@ -509,7 +613,7 @@
                         <p:dataScroller
                             id="actionRequestTable"
                             var="r"
-                            value="#{ceCaseSearchProfileBB.currentCase.ceActionRequestList}">
+                            value="#{reportingBB.reportCECase.ceActionRequestList}">
                             <div class="outlinedBox">
 
                                 <h3>Code Enforcement Action Request</h3>
@@ -573,7 +677,7 @@
                                             <h:outputText value="#{r.requestor.addressState}" />                                    
                                             <h:outputText value="#{r.requestor.addressZip}" />          
                                         </div>
-                                </h:panelGroup>
+                                    </h:panelGroup>
 
                                     <h:panelGroup>
                                         <h:outputLabel styleClass="bold" value="Contact: "/>

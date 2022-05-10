@@ -66,13 +66,9 @@ public class CECaseSearchAndReportBB
         SearchCoordinator sc = getSearchCoordinator();
         SessionBean sb = getSessionBean();
         
-        setCaseList(new ArrayList<>());
-        try {
-            getCaseList().addAll(cc.cecase_refreshCECasePropertyUnitHeavyList(sb.getSessCECaseList()));
-        } catch (BObStatusException ex) {
-            System.out.println(ex);
-        }
+        caseList = new ArrayList<>();
         
+        caseList.addAll(sb.getSessCECaseList());
 
         queryList = sc.buildQueryCECaseList(getSessionBean().getSessUser().getMyCredential());
         querySelected = getSessionBean().getQueryCECase();
@@ -82,6 +78,7 @@ public class CECaseSearchAndReportBB
         propListForSearch = sb.getSessPropertyList();
         caseStageList = CaseStageEnum.values();
 
+        reportCECaseList = cc.report_getDefaultReportConfigCECaseList();
     }
 
     /**
@@ -108,7 +105,7 @@ public class CECaseSearchAndReportBB
      */
     public String onObjetViewButtonChange(CECase cse) {
         CaseCoordinator cc = getCaseCoordinator();
-
+        
        return "ceCaseProfile";
        
     }

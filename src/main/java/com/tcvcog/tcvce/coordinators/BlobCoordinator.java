@@ -556,16 +556,17 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      * @throws com.tcvcog.tcvce.domain.BlobException 
      */
-    public BlobPool getBlobPool( IFace_BlobHolder bh) throws BObStatusException, IntegrationException, BlobException{
+    public BlobPool getUpstreamBlobPool( IFace_BlobHolder bh) throws BObStatusException, IntegrationException, BlobException{
         BlobIntegrator bi = getBlobIntegrator();
-        BlobPool pool = null;
+        BlobPool upstreamPool = null;
         if(bh.getBlobUpstreamPoolEnumPoolFeederID() != 0 && bh.getBlobUpstreamPoolEnum() != null){
-             pool = new BlobPool(bh.getBlobUpstreamPoolEnumPoolFeederID(), bh.getBlobUpstreamPoolEnum());
-             pool.setBlobList(getBlobLightList(bi.getBlobLightIDList(bh)));
+            System.out.println("BlobCoordinator.getUpstreamBlobPool | creating pool for blob holder of type " + bh.getBlobUpstreamPoolEnum().getBlobLinkTableName());
+             upstreamPool = new BlobPool(bh.getBlobUpstreamPoolEnumPoolFeederID(), bh.getBlobUpstreamPoolEnum());
+             upstreamPool.setBlobList(getBlobLightList(upstreamPool));
         } else {
             throw new BObStatusException("The blobholder passed in does not have a blob pool!! No pool for you.");
         }
-        return pool;
+        return upstreamPool;
         
     }
     

@@ -210,9 +210,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 + "occchecklistspacetypeelement_elementid, "
                 + "failureseverity_intensityclassid, "
                 + "migratetocecaseonfail, "
+                + "occinspection_inspectionid, "
                 + "occchecklistspacetypeelement.codesetelement_seteleid, transferredts, transferredby_userid, transferredtocecase_caseid  \n"
                 + "FROM public.occinspectedspaceelement "
-                + "INNER JOIN public.occchecklistspacetypeelement ON (occchecklistspacetypeelement_elementid = spaceelementid) \n"
+                + "INNER JOIN public.occchecklistspacetypeelement ON (occchecklistspacetypeelement_elementid = spaceelementid) "
+                + "INNER JOIN public.occinspectedspace on (occinspectedspace.inspectedspaceid = occinspectedspaceelement.inspectedspace_inspectedspaceid) "
                 + "WHERE inspectedspaceelementid=?;";
 
 
@@ -288,6 +290,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             inspectedEle.setMigrateToCaseOnFail(rs.getBoolean("migratetocecaseonfail"));
             
             inspectedEle.setBlobList(bc.getBlobLightList(inspectedEle));
+            inspectedEle.setOccInspectionID(rs.getInt("occinspection_inspectionid"));
             cseint.populateTransferrableFields(inspectedEle, rs);
             
         } catch(BObStatusException | BlobException ex){

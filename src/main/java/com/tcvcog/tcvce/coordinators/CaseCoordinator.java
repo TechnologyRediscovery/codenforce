@@ -42,6 +42,7 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -150,7 +151,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse.setEventRuleList(wc.rules_getEventRuleImpList(cse, cred));
 
             // Human list
-            cse.setHumanLinkList(persc.assembleLinkedHumanLinks(cse));
+            cse.setHumanLinkList(persc.getHumanLinkList(cse));
 
             // Inspection list
             cse.setInspectionList(oic.getOccInspectionList(cse));
@@ -319,16 +320,158 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 cse.setEventList(ec.getEventList(cse));
                 Collections.sort(cse.getEventList());
                 Collections.reverse(cse.getEventList());
+//                cecase_computeDaysSinceLastEvent(cse);
 
-                cse = cecase_configureCECaseStageAndPhase(cse);
+                // configure origination & closing events
+              
+                
+                cse.setOriginationEvent(ec.findMostRecentEventByType(cse.getEventList(), EventType.Origination));
+                cse.setClosingEvent(ec.findMostRecentEventByType(cse.getEventList(), EventType.Closing));
+                
+                cecase_auditCECase(cse, getSessionBean().getSessUser());
+                
+                cecase_configureCECaseStageAndPhase(cse);
             }
         } catch (BObStatusException | BlobException ex) {
             System.out.println(ex);
         }
-
         return cse;
-
     }
+    
+    
+    /**
+     * Big important logic container for checking all sorts of attributes about
+     * a CECase and rectifying the situation as possible, creating events and notes 
+     * along the way
+     * 
+     * This method is 
+     * 
+     * @param cse at any stage, or phase, even before a DB write!
+     * @param ua 
+     */
+    private void cecase_auditCECase(CECase cse, UserAuthorized ua) throws BObStatusException{
+       
+        if(cse == null || ua == null){
+           throw new BObStatusException("Cannot audit null case or null user");
+       }
+        
+        StringBuilder auditLog = new StringBuilder();
+        auditLog.append("AUDIT LOG for CECase ID: ");
+        auditLog.append(cse.getCaseID());
+        auditLog.append(Constants.FMT_HTML_BREAK);
+        
+        
+       if(cse.getCaseManager() == null){
+           auditLog.append("*NO case manager found");
+           throw new BObStatusException(auditLog.toString());
+       }
+       
+        if (cse.getOriginationDate() == null) {
+            cse.setOriginationDate(LocalDateTime.now());
+        }
+        
+        if (cse.getParcelKey() == 0) {
+            throw new BObStatusException("Cases must have a nonzero property id");
+        }
+        
+       // for cases that aren't just getting written to DB
+       if(cse.getCaseID() != 0){
+           try {
+
+                // origination event
+               if(cse.getOriginationEvent() == null){
+                   auditLog.append("Creating generic opening event;");
+                   cecase_auditcase_attachGenericOriginationEvent(cse, ua);
+                   cse = cecase_getCECase(cse.getCaseID());
+               }
+
+               if(cse.getClosingDate() != null && cse.getClosingEvent() == null){
+                   auditLog.append("Creating generic closingevent;");
+                   cecase_auditcase_attachGenericClosingEvent(cse, ua);
+                   cse = cecase_getCECase(cse.getCaseID());
+               }
+           } catch (BObStatusException | EventException | IntegrationException e) {
+               auditLog.append("Could not add new origination or closing event");
+               throw new BObStatusException(auditLog.toString());
+           }
+           
+           
+           // closing and opening date
+            if (cse.getClosingDate() != null && cse.getOriginationDate() != null) {
+                if (cse.getClosingDate().isBefore(cse.getOriginationDate())) {
+                    auditLog.append("Cases cannot close before they open");
+                    throw new BObStatusException(auditLog.toString());
+                }
+            }
+       }
+    }
+    
+    /**
+     * Used during the case audit process to add an origination event to a case
+     * that doesn't have one
+     * @param cse
+     * @param ua 
+     */
+    private void cecase_auditcase_attachGenericOriginationEvent(CECase cse, UserAuthorized ua) throws IntegrationException, BObStatusException, EventException{
+        EventCoordinator ec = getEventCoordinator();
+        UserCoordinator uc = getUserCoordinator();
+        EventCategory origCat = ec.getEventCategory(Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
+                                                    .getString("cecase_genericoriginationeventcatid")));
+        
+        EventCnF origEv = ec.initEvent(cse, origCat);
+        origEv.setUserCreator(uc.user_getUserRobot());
+        origEv.setTimeStart(cse.getOriginationDate());
+        origEv.setTimeEnd(origEv.getTimeStart().plusMinutes(origCat.getDefaultDurationMins()));
+        origEv.setDescription(origCat.getEventCategoryDesc());
+        ec.addEvent(origEv, cse, ua);
+        
+    }
+    
+    
+    /**
+     * Used during the case audit process to add a closing event to a case
+     * that doesn't have one
+     * @param cse
+     * @param ua 
+     */
+    private void cecase_auditcase_attachGenericClosingEvent(CECase cse, UserAuthorized ua) throws IntegrationException, BObStatusException, EventException{
+        EventCoordinator ec = getEventCoordinator();
+        UserCoordinator uc = getUserCoordinator();
+        EventCategory origCat = ec.getEventCategory(Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE)
+                                                            .getString("cecase_genericclosingeventcatid")));
+        
+        EventCnF origEv = ec.initEvent(cse, origCat);
+        origEv.setUserCreator(uc.user_getUserRobot());
+        origEv.setTimeStart(cse.getOriginationDate());
+        origEv.setTimeEnd(origEv.getTimeStart().plusMinutes(origCat.getDefaultDurationMins()));
+        origEv.setDescription(origCat.getEventCategoryDesc());
+        ec.addEvent(origEv, cse, ua);
+        
+    }
+    
+    
+    
+    
+    /**
+     * Set's the case's days since last event field
+     * @param cse 
+     */
+    private void cecase_computeDaysSinceLastEvent(CECase cse){
+        double dsle = -9;
+        DecimalFormat df = new DecimalFormat("###.#");
+        if(cse != null && cse.getEventList() != null && !cse.getEventList().isEmpty()){
+            if(cse.getEventList().get(0).getTimeStart() != null){
+                LocalDateTime le = cse.getEventList().get(0).getTimeStart();
+                long secBetween = LocalDateTime.now().toInstant(ZoneOffset.ofHours(-5)).getEpochSecond() - le.toInstant(ZoneOffset.ofHours(-5)).getEpochSecond();
+                dsle = (double) secBetween / (double) (60*60*24);
+                
+            }
+            
+            cse.setDaysSinceLastEvent(df.format(dsle));
+        }
+        
+    }
+    
 
     /**
      * Builds a property and propertyUnit heavy subclass of our CECase object
@@ -621,7 +764,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         selectedEvents = new ArrayList<>();
         if (evList != null && !evList.isEmpty()) {
             for (EventCnF ev : evList) {
-                if (ev.getCategory().getEventType() == EventType.Court) {
+                if (ev.getCategory().getEventType() == et) {
                     selectedEvents.add(ev);
                 }
             }
@@ -632,7 +775,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
     /**
      * Utility method for searching through a list of events and finding the
-     * "highest" (i.e. right-most) event of a certain category
+     * "latest in time" (i.e. right-most) event of a certain category
      *
      * @param evList complete event list to search
      * @param catID the category ID by which to create a comparison subset
@@ -814,7 +957,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             
         }
 
-        cecase_auditCaseForInsert(inputCase);
+        cecase_auditCECase(inputCase, ua);
 
         // the integrator returns to us a CECaseDataHeavy with the correct ID after it has
         // been written into the DB
@@ -901,34 +1044,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         return sb.toString();
     }
 
-    /**
-     * Logic container for checking that the inputted case is not null, 
-     * has an origination date, has a property connection, and if it has a 
-     * closing date that date is after the opening date
-     * @param cse
-     * @throws BObStatusException 
-     */
-    private void cecase_auditCaseForInsert(CECase cse) throws BObStatusException {
-        if (cse == null) {
-            throw new BObStatusException("Cannot insert a null case");
-        }
-
-        if (cse.getOriginationDate() == null) {
-            cse.setOriginationDate(LocalDateTime.now());
-        }
-
-        if (cse.getParcelKey() == 0) {
-            throw new BObStatusException("Cases must have a nonzero property id");
-        }
-
-        if (cse.getClosingDate() != null && cse.getOriginationDate() != null) {
-
-            if (cse.getClosingDate().isBefore(cse.getOriginationDate())) {
-                throw new BObStatusException("Cases cannot close before they open");
-            }
-        }
-    }
-
+  
     /**
      * Implements business logic before updating a CECaseDataHeavy's core data
      * (opening date, closing date, etc.). If all is well, pass to integrator.
@@ -952,6 +1068,51 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             }
         }
         ci.updateCECaseMetadata(c);
+    }
+    
+    /**
+     * Changes a CeCase's origination event category 
+     * @param cse
+     * @param revisedEventCategory 
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.EventException 
+     */
+    public void cecase_checkForAndUpdateCaseOriginationEventCategory(CECaseDataHeavy cse, EventCategory revisedEventCategory, UserAuthorized ua) 
+            throws IntegrationException, EventException, BObStatusException{
+        EventCoordinator ec = getEventCoordinator();
+        if(revisedEventCategory != null && cse.getOriginationEvent() != null){
+            // If we have an update, do the db write
+            if(revisedEventCategory.getCategoryID() != cse.getOriginationEvent().getCategory().getCategoryID() ){
+                System.out.println("CaseCoordinator.cecase_checkForAndUpdateCaseOriginationEventCategory");
+                ec.updateEventCategoryMaintainType(cse.getOriginationEvent(), revisedEventCategory, ua);
+                cecase_originationEventCategoryChangeNoteComposeAndWrite(cse, revisedEventCategory, ua);
+            }
+        }
+    }
+    
+    /**
+     * Writes and inserts a note about an origination event category update
+     * @param cse
+     * @param revisedEventCategory
+     * @param ua
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    private void cecase_originationEventCategoryChangeNoteComposeAndWrite(CECaseDataHeavy cse, EventCategory revisedEventCategory, UserAuthorized ua) throws BObStatusException, IntegrationException{
+                StringBuilder sb = new StringBuilder();
+                sb.append("Case origination event category changed from ");
+                sb.append(cse.getOriginationEvent().getCategory().getEventCategoryTitle());
+                sb.append("(Category ID:");
+                sb.append(cse.getOriginationEvent().getCategory().getCategoryID());
+                sb.append(") to  ");
+                sb.append(revisedEventCategory.getEventCategoryTitle());
+                sb.append("(Category ID:");
+                sb.append(revisedEventCategory.getCategoryID());
+                sb.append(").");
+                MessageBuilderParams mbp = new MessageBuilderParams(cse.getNotes(), "Origination event category change", null, sb.toString(), ua, null);
+                cecase_updateCECaseNotes(mbp, cse);
     }
 
     /**
@@ -1625,16 +1786,24 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * for display and printing
      *
      * @param rptCse
+     * @param ua
      * @return
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public ReportConfigCECase report_transformCECaseForReport(ReportConfigCECase rptCse) throws IntegrationException, BObStatusException {
+    public ReportConfigCECase report_transformCECaseForReport(ReportConfigCECase rptCse, UserAuthorized ua) throws IntegrationException, BObStatusException, SearchException {
         CaseIntegrator ci = getCaseIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(rptCse == null || rptCse.getCse() == null){
+            throw new BObStatusException("Cannot generate report with null config or case inside that config");
+            
+        }
         // we actually get an entirely new object instead of editing the 
         // one we used throughout the ceCases.xhtml
         CECaseDataHeavy c = rptCse.getCse();
-
+        
+        rptCse.setPropDH(pc.assemblePropertyDataHeavy(rptCse.getCse().getProperty(), ua));
+        
         List<EventCnF> evList = new ArrayList<>();
         Iterator<EventCnF> iter = c.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ALL).iterator();
         while (iter.hasNext()) {
@@ -2402,7 +2571,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         cit.setViolationList(cei.getCodeViolationsByCitation(cit));
         cit.setStatusLog(citation_getCitationStatusLog(cit));
-        cit.setHumanLinkList(pc.assembleLinkedHumanLinks(cit));
+        cit.setHumanLinkList(pc.getHumanLinkList(cit));
         cit.setDocketNos(cei.getCitationDocketRecords(cit));
         cit.setBlobList(bc.getBlobLightList(cit));
         // TODO: populate citation with events and blobs--but this can cycle, so be careful
@@ -3824,41 +3993,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if (cv == null || ua == null) {
             throw new BObStatusException("Cannot update default findings with null violation, codeset, or user");
         }
-        UserCoordinator uc = getUserCoordinator();
-        MunicipalityCoordinator mc = getMuniCoordinator();
 
-        violation_makeFindingsDefault(cv.getDescription(), cv.getViolatedEnfElement(), ua);
-
-    }
-
-    /**
-     * Internal operational code to determine which muni's the user has
-     * enforcement official permissions (or better), and update their codebooks
-     * that contain this same ordinance with default findings
-     *
-     * @param cv
-     * @param ua
-     */
-    private void violation_makeFindingsDefault(String defFindings, EnforcableCodeElement ece, UserAuthorized ua) throws IntegrationException {
-
-        CodeIntegrator ci = getCodeIntegrator();
-        SystemCoordinator sc = getSystemCoordinator();
-        ece.setDefaultViolationDescription(defFindings);
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setUser(ua);
-        mbp.setExistingContent(ece.getNotes());
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Default findings changed to: ");
-        sb.append(defFindings);
-        sb.append(" from: ");
-        sb.append(ece.getDefaultViolationDescription());
-        mbp.setNewMessageContent(sb.toString());
-
-        ece.setNotes(sc.appendNoteBlock(mbp));
-        ci.updateCodeElement(ece);
+        CodeCoordinator codeCoor = getCodeCoordinator();
+        codeCoor.updateEnfCodeElementMakeFindingsDefault(cv.getDescription(), cv.getViolatedEnfElement(), ua);
 
     }
+
+  
 
     /**
      * Logic gateway for updates to a code violation's stipulated compliance
@@ -3873,7 +4014,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws com.tcvcog.tcvce.domain.ViolationException If stip comp date on or before origination date
      * @throws com.tcvcog.tcvce.domain.IntegrationException I can't write to the db
      */
-    public void violation_extendStipulatedComplianceDate(CodeViolation cv, CECaseDataHeavy cse, UserAuthorized ua)
+    public void violation_extendStipulatedComplianceDate(CodeViolation cv, String extEvDesc, CECaseDataHeavy cse, UserAuthorized ua)
             throws BObStatusException, ViolationException, IntegrationException {
 
         if (cv == null || cse == null || ua == null) {
@@ -3900,7 +4041,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param ua
      * @return 
      */
-    private int prepareAndLogCodeViolationStipCompDateUpdateEvent(CodeViolation cv, String extEvDesc, CECaseDataHeavy cse, UserAuthorized ua){
+    private int prepareAndLogCodeViolationStipCompDateUpdateEvent(CodeViolation cv, String extEvDesc, CECaseDataHeavy cse, UserAuthorized ua) throws BObStatusException, IntegrationException{
         
         System.out.println("CaseCoordinator.violation_extendStipulatedComplianceDate | done on cv " + cv.getViolationID());
         // now generate a note
@@ -3915,7 +4056,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         mbp.setNewMessageContent(sb.toString());
         violation_updateNotes(mbp, cv);
 //            
-        
+        return 0;
     }
 
     /**

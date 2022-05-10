@@ -21,26 +21,17 @@ import com.tcvcog.tcvce.domain.*;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
-import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
-import com.tcvcog.tcvce.entities.search.QueryCECase;
-import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.util.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
-import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
-import org.primefaces.event.FileUploadEvent;
 
 /**
  * Primary backing bean for the Code Enforcement case 
@@ -52,12 +43,18 @@ public class CECaseBB
     
 
     private CECaseDataHeavy currentCase;
-    private PropertyDataHeavy currentCasePropDataHeavy;
     private boolean editModeCurrentCase;
+    private boolean editModeCurrentCaseManager;
+    private boolean editModeCurrentCloseCase;
+    private boolean editModeCurrentCaseRecord;
 
     private int formNOVFollowupDays;
+    private boolean formCurrentCaseUnitAssociated;
+    private PropertyUnit formSelectedUnit;
     
     private List<EventCategory> closingEventCategoryList;
+    private List<EventCategory> originationEventCategoryList;
+    private EventCategory formCECaseOriginationEventCat;
     private EventCategory closingEventCategorySelected;
     protected int eventPersonIDForLookup;
     
@@ -94,8 +91,8 @@ public class CECaseBB
 
     private boolean formExtendStipCompUsingDate;
     private int formExtendedStipCompDaysFromToday;
+    private String formExtensionEventDescr;
     
-    private boolean formMakeFindingsDefault;
 
     
     /*******************************************************
@@ -119,7 +116,9 @@ public class CECaseBB
      */
     @PostConstruct
     public void initBean()  {
+        System.out.println("CECaseBB.initBean();");
         CaseCoordinator cc = getCaseCoordinator();
+        EventCoordinator ec = getEventCoordinator();
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sysCor = getSystemCoordinator();
         try {
@@ -129,7 +128,9 @@ public class CECaseBB
             severityList = sysCor.getIntensitySchemaWithClasses(
                     getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("intensityschema_violationseverity"))
                     .getClassList();
-
+            originationEventCategoryList = ec.getEventCategeryList(EventType.Origination);
+            closingEventCategoryList = ec.getEventCategeryList(EventType.Closing);
+            
         } catch (IntegrationException | BObStatusException | SearchException  ex) {
             System.out.println(ex);
         }
@@ -149,28 +150,27 @@ public class CECaseBB
             }
         }
         
-        formMakeFindingsDefault = false;
+        
         filteredElementList = null;
         formExtendStipCompUsingDate = true;
+        
+        toggleAllEditModesToFalse();
         
     }
     
     /**
-     * Utility method for reloading the property data heavy version of this
-     * case's property
+     * Turns all page edit modes to false
      */
-    private void refreshCasePropertyDataHeavy(){
-        PropertyCoordinator pc = getPropertyCoordinator();
-        if(currentCase != null){
-            try {
-                currentCasePropDataHeavy = pc.assemblePropertyDataHeavy(currentCase.getProperty(), getSessionBean().getSessUser());
-            } catch (IntegrationException | BObStatusException | SearchException ex) {
-                  getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Fatal error loading property data heavy", ""));
-            
-            }
-        }
+    private void toggleAllEditModesToFalse(){
+        
+        editModeCurrentCase = false;
+        editModeCurrentCaseManager = false;
+        editModeCurrentCaseRecord = false;
+        editModeCurrentViolation = false;
+        editModeCurrentCloseCase = false;
     }
+    
+ 
     
     /**
      * Sets the session event
@@ -185,14 +185,151 @@ public class CECaseBB
 
    
     
+
+    
+    
+    /*******************************************************
+     *              Case Details form listeners
+    /*******************************************************/
+    
+    
+    
     /**
-     * Listener for requests to reload the current CECaseDataHeavy
-     * @return  
+     * Listener for user requests to start case updates or end them
+     * @param ev 
      */
-    public String refreshCurrentCase(){
-        return "ceCaseProfile";
+    public void onToggleCECaseEditButtonChange(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        System.out.println("CECaseBB.onToggleCECaseEditButtonChange | top of method case edit mode: " + editModeCurrentCase);
         
+        // if we don't have a case, then don't do anything.
+        if(currentCase == null){
+            return;
+        }
+        if(editModeCurrentCase){
+            // We're writing edits
+            if(formCurrentCaseUnitAssociated && formSelectedUnit != null){
+                currentCase.setPropertyUnitID(formSelectedUnit.getUnitID());
+            }
+            try {
+                System.out.println("CECaseBB.onToggleCECaseEditButtonChange | sending meta data " + currentCase.getCaseName());
+                cc.cecase_updateCECaseMetadata(currentCase, getSessionBean().getSessUser());
+                cc.cecase_checkForAndUpdateCaseOriginationEventCategory(currentCase, formCECaseOriginationEventCat, getSessionBean().getSessUser());
+                reloadCurrentCase();
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Case update success!", ""));
+                 
+            } catch (BObStatusException | IntegrationException | EventException ex) {
+                System.out.println(ex);
+                  getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Fatal error on case update!", ""));
+            } 
+        // prepare the form for EDITS
+        } else {
+            if(currentCase.getPropertyUnit() != null){
+                formSelectedUnit = currentCase.getPropertyUnit();
+                formCurrentCaseUnitAssociated = true;
+            } else {
+                formCurrentCaseUnitAssociated = false;
+            }
+            
+            if(currentCase.getOriginationEvent() != null){
+                formCECaseOriginationEventCat = currentCase.getOriginationEvent().getCategory();
+            }
+            
+        }
+        editModeCurrentCase = !editModeCurrentCase;
     }
+
+    /**
+     * Listener for user requests to abort case record update
+     * @param ev 
+     */
+    public void onEditCECaseAbort(ActionEvent ev){
+        editModeCurrentCase = false;
+        System.out.println("CECaseBB.onEditCECaseAbort | edit mode edit case: " + editModeCurrentCase);
+    }
+    
+    
+    
+    
+    /**
+     * Listener for toggling edit mode on and then saving manager edits
+     * @param ev 
+     */
+    public void onToggleCECaseManagerEdit(ActionEvent ev){
+        
+        CaseCoordinator cc = getCaseCoordinator();
+        if(editModeCurrentCaseManager){
+            try {
+                cc.cecase_updateCECaseMetadata(currentCase, getSessionBean().getSessUser());
+                reloadCurrentCase();
+                  getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Manager edit complete", ""));
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Fatal error udating case manager. Please log a ticket.", ""));
+            } 
+        }
+        editModeCurrentCaseManager = !editModeCurrentCaseManager;
+    }
+    
+    
+    
+    /**
+     * Listener for cancellation of manager edit
+     * @param ev 
+     */
+    public void onEditManagerAbort(ActionEvent ev){
+        
+        editModeCurrentCaseManager = false;
+        System.out.println("CECaseBB.onEditManagerAbort | edit mode edit manager: " + editModeCurrentCaseManager);
+         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Aborted: Manager edit operation.", ""));
+    }
+    
+    
+    /**
+     * Listener for toggling edit mode on and then saving manager edits
+     * @param ev 
+     */
+    public void onToggleEditCECaseRecordStatus(ActionEvent ev){
+        
+        CaseCoordinator cc = getCaseCoordinator();
+        if(editModeCurrentCaseRecord){
+            try {
+                cc.cecase_updateCECaseMetadata(currentCase, getSessionBean().getSessUser());
+                reloadCurrentCase();
+                  getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Record edit complete", ""));
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Fatal error udating case manager. Please log a ticket.", ""));
+            } 
+        }
+        editModeCurrentCaseRecord = !editModeCurrentCaseRecord;
+    }
+    
+    
+    
+    /**
+     * Listener for cancellation of manager edit
+     * @param ev 
+     */
+    public void onEditRecordAbort(ActionEvent ev){
+        
+        editModeCurrentCaseRecord = false;
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Aborted: Case record edit operation.", ""));
+    }
+    
+    
+    
+    
+    
+    
     
     /**
      * Special getter that tells this bean to check the session for a refresh 
@@ -215,6 +352,8 @@ public class CECaseBB
      * provides the ID of the component for accessory UIs to refresh so the CE case is
      * refreshed. Updating this component will call getReloadCECaseTrigger which, if not null
      * triggers a reload.
+     * 
+     * As of May 2022, I think this is defunct. Use managed fields instead
      * @return 
      */
     public String getReloadCECaseComponentIDToUpdate(){
@@ -229,6 +368,8 @@ public class CECaseBB
         CaseCoordinator cc = getCaseCoordinator();
         try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            getSessionBean().setSessCECase(currentCase);
+            getSessionBean().setNoteholderRefreshTimestampTrigger(LocalDateTime.now());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
                 "Refreshed case!", ""));
         } catch (BObStatusException  | IntegrationException | SearchException ex) {
@@ -239,73 +380,29 @@ public class CECaseBB
         
     }
     
+    /**
+     * Listener for UI requests to directly reload case
+     * @param ev 
+     */
     public void reloadCaseListener(ActionEvent ev){
         reloadCurrentCase();
     }
     
   
+   
     /**
-     * Listener for user requests to start case updates or end them
+     * Listener to start case deac process
      * @param ev 
      */
-    public void onToggleCECaseEditButtonChange(ActionEvent ev){
-        CaseCoordinator cc = getCaseCoordinator();
-        if(editModeCurrentCase){
-            try {
-                cc.cecase_updateCECaseMetadata(currentCase, getSessionBean().getSessUser());
-            } catch (BObStatusException | IntegrationException ex) {
-                System.out.println(ex);
-            } 
-        }
-    }
-
-    
-   
-     
-    
-    /**
-     * Listener for user requests to open new case at current property
-     * @return 
-     */
-    public String onCaseOpenButtonChange(){
-        getSessionBean().getNavStack().pushPage("ceCaseProfile");
-        return "caseAdd";
-        
-    }
-    
-
-    
-    
-    
-    
-    
-    /**
-      * Funnel for all updateXXX methods on cases
-      * The caller is responsible for updating notes to 
-      * document the field changes, value by value
-      * @param cse the case with updated fields
-      */
-     private void updateCaseMetatData(){
-          CaseCoordinator cc = getCaseCoordinator();
-        
-        try {
-            cc.cecase_updateCECaseMetadata(currentCase, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                "Case metadata updated", ""));
-        } catch (BObStatusException | IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                "Could not update case metadata, sorry! This error must be corrected by an administrator", ""));
-            
-        }
+     public void onCaseRemoveInitButtonChange(ActionEvent ev){
+         System.out.println("CECaseBB.onCaseRemoveInitButtonChange");
+         
          
      }
-     
     /**
      * Listener for user requests to deactivate a cecase
-     * @return 
      */
-    public String onCaseRemoveCommitButtonChange(){
+    public void onCaseRemoveCommitButtonChange(ActionEvent ev){
         CaseCoordinator cc = getCaseCoordinator();
         try {
             cc.cecase_deactivateCase(currentCase);
@@ -317,7 +414,7 @@ public class CECaseBB
                 ex.getMessage(), ""));
             
         }
-        return "ceCaseProfile";
+        
         
     }
     
@@ -325,8 +422,12 @@ public class CECaseBB
      * Listener for user requests to start the case force close operation
      * @param ev 
      */
-    public void onCaseForceCloseInitButtonChange(ActionEvent ev){
-        // nothing to do yet
+    public void onCaseCloseInitButtonChange(ActionEvent ev){
+        editModeCurrentCloseCase = true;
+        if(currentCase != null){
+            currentCase.setClosingDate(LocalDateTime.now());
+        }
+        System.out.println("CECaseBB.onCaseCloseInitButtonChange | edit mode case close: " + editModeCurrentCloseCase);
         
     }
     
@@ -351,74 +452,22 @@ public class CECaseBB
     }
     
     /**
-     * Listener for user requests to begin operation
+     * Listener for user requests to abort the case closure operation
      * @param ev 
      */
-    public void onCaseRenameInitButtonChange(ActionEvent ev){
+    public void onCaseCloseAbortLinkClick(ActionEvent ev){
+        editModeCurrentCase = false;
         
         
     }
     
-    /**
-     * User requests to commit rename operation
-     * @return reload case profile page
-     */
-    public String onCaseRenameCommitButtonChange(){
-        return "ceCaseProfile";
+    public void onCaseRepenInitLinkClikc(ActionEvent ev){
         
-    }
-    
-    
-    /**
-     * Listener for user requests to begin operation
-     * @param ev 
-     */
-    public void onCaseChangeManagerInitButtonChange(ActionEvent ev){
         
         
     }
     
-    /**
-     * User requests to commit change manager operation
-     * @return reload case profile page
-     */
-    public String onCaseChangeManagerCommitButtonChange(){
-        return "ceCaseProfile";
-        
-    }
-    
-    
-    /**
-     * Listener for user requests to begin operation
-     * @param ev 
-     */
-    public void onCaseUpdateDORInitButtonChange(ActionEvent ev){
-        
-        
-    }
-    
-    /**
-     * User requests to commit update DOR operation
-     * @return reload case profile page
-     */
-    public String onCaseUpdateDORCommitButtonChange(){
-        updateCaseMetatData(currentCase);
-        return "ceCaseProfile";
-        
-    }
-    
-    
-    
-      /**
-     * Listener for commencement of note writing process
-     *
-     * @param ev
-     */
-    public void onCaseNoteInitButtonChange(ActionEvent ev) {
-        formNoteText = new String();
-
-    }
-
+   
     
     public void onHowToNextStepButtonChange(ActionEvent ev){
         System.out.println("ceCaseSearchProfileBB.onHowToNextStepButtonChange");
@@ -426,6 +475,21 @@ public class CECaseBB
     }
     
     
+    /**
+     * Special listener for field inspection lists from the CECase
+     * I check the session bean for an updated list each call
+     * @return a list, perhaps with some freshly written inspections
+     */
+    public List<FieldInspection> getManagedCECaseFieldInspectionList(){
+        List<FieldInspection> finlist = getSessionBean().getSessFieldInspectionListForRefresh();
+        if(finlist != null){
+            currentCase.setInspectionList(finlist);
+        } else {
+            return currentCase.getInspectionList();
+        }
+        return finlist;
+        
+    }
     
     
     
@@ -505,24 +569,104 @@ public class CECaseBB
     /*******************************************************
      **              Violation processing                 **
     /*******************************************************/
-    /*******************************************************/
-    
+   
     
     /**
-     * Listener for start of violation update operation
-     * @param viol 
+     * Listener for users to view a violation
+     * @param cv 
      */
-    public void onViolationUpdateInitButtonChange(CodeViolation viol){
-        currentViolation = viol;
+    public void onViolationView(CodeViolation cv){
+        currentViolation = cv;
     }
+    
+    /**
+     * User toggling violation edit mode
+     * @param ev 
+     */
+    public void onToggleViolationUpdateButtonPress(ActionEvent ev){
+        System.out.println("CECaseBB.onToggleViolationUpdateButtonPress | mode in " + editModeCurrentViolation);
+        if(editModeCurrentViolation){
+            try {
+                onViolationUpdateCommitButtonChange();
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+            } 
+        } else {
+            
+        }
+        editModeCurrentViolation = !editModeCurrentViolation;
+    }
+    
+    /**
+     * Listener for user abort requests
+     * @param ev 
+     */
+    public void onViolationUpdateAbort(ActionEvent ev){
+        editModeCurrentViolation = false;   
+        System.out.println("CECaseBB.onViolationUpdateAbort | edit mode is now: " + editModeCurrentViolation);
+    }
+    
+     /**
+     * Listener for user reqeusts to commit updates to a codeViolation
+     *
+     * @throws IntegrationException
+     * @throws BObStatusException
+     */
+    public void onViolationUpdateCommitButtonChange() throws IntegrationException, BObStatusException {
+        CaseCoordinator cc = getCaseCoordinator();
+        EventCoordinator eventCoordinator = getEventCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        CodeCoordinator codec = getCodeCoordinator();
+        EventCategory ec = eventCoordinator.initEventCategory(
+                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
+
+        try {
+            if(currentCase != null && currentViolation != null){
+                cc.violation_updateCodeViolation(currentCase, currentViolation, getSessionBean().getSessUser());
+                if(currentViolation.isMakeFindingsDefault()){
+                    makeViolationFindingsDefault(currentViolation);
+                      getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Default findings for " + currentViolation.getViolatedEnfElement().getHeaderString() + " are now " + currentViolation.getViolatedEnfElement().getDefaultViolationDescription(), ""));
+                    System.out.println("CECaseBB.onViolationUpdateCommitButton | " 
+                            + "Default findings for " + currentViolation.getViolatedEnfElement().getHeaderString() 
+                            + " are now " + currentViolation.getViolatedEnfElement().getDefaultViolationDescription());
+                    
+                }
+                // if update succeeds without throwing an error, then generate an
+                // update violation event
+                // TODO: Rewire this to work with new event processing cycle
+    //             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
+                reloadCurrentCase();
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Success! Violation updated, ID: " + currentViolation.getViolationID(), ""));
+            }
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to edit violation in the database",
+                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
+
+        } catch (ViolationException ex) {
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_WARN,
+                            ex.getMessage(), "Please revise the stipulated compliance date"));
+        }
+    }
+
+    
     
     /**
      * Listener for user requests to start the compliance recording operation
      * @param viol 
      */
     public void onViolationRecordComplianceInitButtonChange(CodeViolation viol){
+        System.out.println("CeCaseSearchProfileBB.onViolationRecordComplianceInitButtonChange | from table");
         currentViolation = viol;
-        // set default compliance date of today
+        currentViolation.setComplianceTimeStamp(LocalDateTime.now());
+       
     }
     
     /**
@@ -532,6 +676,7 @@ public class CECaseBB
      * @param ev 
      */
     public void onViolationRecordComplianceInitButtonChange(ActionEvent ev){
+        onViolationRecordComplianceInitButtonChange(currentViolation);
         System.out.println("CeCaseSearchProfileBB.onViolationRecordComplianceInitButtonChange | from dialog");
     }
     
@@ -687,6 +832,7 @@ public class CECaseBB
     /**
      * Listener for requests to commit extension of stip comp date
      *
+     * @param ev
      */
     public void onViolationExtendStipCompDateCommitButtonChange(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
@@ -694,7 +840,7 @@ public class CECaseBB
             if (!formExtendStipCompUsingDate) {
                     currentViolation.setStipulatedComplianceDate(LocalDateTime.now().plusDays(formExtendedStipCompDaysFromToday));
             } 
-            cc.violation_extendStipulatedComplianceDate(currentViolation, currentCase, getSessionBean().getSessUser());
+            cc.violation_extendStipulatedComplianceDate(currentViolation, formViolationStipCompDateExtReason, currentCase, getSessionBean().getSessUser());
         } catch (BObStatusException | IntegrationException | ViolationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -704,53 +850,13 @@ public class CECaseBB
         getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_INFO,
                                     "Stipulated compliance dates is now: " + DateTimeUtil.getPrettyDate(getCurrentViolation().getStipulatedComplianceDate()), ""));
-        refreshCurrentCase();
+        reloadCurrentCase();
 
     }
+    
+    
 
-    /**
-     * Listener for user reqeusts to commit updates to a codeViolation
-     *
-     * @return
-     * @throws IntegrationException
-     * @throws BObStatusException
-     */
-    public String onViolationUpdateCommitButtonChange() throws IntegrationException, BObStatusException {
-        CaseCoordinator cc = getCaseCoordinator();
-        EventCoordinator eventCoordinator = getEventCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
-
-        EventCategory ec = eventCoordinator.initEventCategory(
-                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
-
-        try {
-
-            cc.violation_updateCodeViolation(currentCase, getCurrentViolation(), getSessionBean().getSessUser());
-
-            // if update succeeds without throwing an error, then generate an
-            // update violation event
-            // TODO: Rewire this to work with new event processing cycle
-//             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success! Violation updated and notice event generated", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to edit violation in the database",
-                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
-
-        } catch (ViolationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN,
-                            ex.getMessage(), "Please revise the stipulated compliance date"));
-
-        }
-
-        return "ceCaseProfile";
-    }
-
+   
      /**
      * Listener for user requests to start the update stip date operation
      * @param ev 
@@ -815,16 +921,15 @@ public class CECaseBB
     }
     
     /**
-     * Listener for user reqeusts to commit updates to a codeViolation
+     * Listener for user requests to commit updates to a codeViolation
      *
-     * @return
+     * @param ev
      * @throws IntegrationException
      * @throws BObStatusException
      */
-    public String onViolationUpdateStipDateCommitButtonChange() throws IntegrationException, BObStatusException {
+    public void onViolationUpdateStipDateCommitButtonChange(ActionEvent ev) throws IntegrationException, BObStatusException {
         CaseCoordinator cc = getCaseCoordinator();
         EventCoordinator eventCoordinator = getEventCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
 
         EventCategory ec = eventCoordinator.initEventCategory(
                 Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
@@ -832,7 +937,6 @@ public class CECaseBB
         try {
 
             cc.violation_updateCodeViolation(currentCase, getCurrentViolation(), getSessionBean().getSessUser());
-
             // if update succeeds without throwing an error, then generate an
             // update violation event
             // TODO: Rewire this to work with new event processing cycle
@@ -854,128 +958,19 @@ public class CECaseBB
 
         }
 
-        return "ceCaseProfile";
     }
     
     
     /**
-     * Listener for user requests to start the update penalty and severity operation
-     * @param ev 
+     * Internal tool for updating default findings on a violation
+     * 
+     * @param cv 
      */
-    public void onViolationUpdatePenaltySeverityInitButtonChange(ActionEvent ev){
-        System.out.println("CECaseSearchProfileBB.onViolationUpdatePenalitySeverityInitButtonChange");
-        // nothing to do here yet
-        
-    }
-    
-    
-    /**
-     * Listener for user reqeusts to commit updates to a codeViolation
-     *
-     * @return
-     * @throws IntegrationException
-     * @throws BObStatusException
-     */
-    public String onViolationUpdatePenaltySeverityCommitButtonChange() throws IntegrationException, BObStatusException {
-        CaseCoordinator cc = getCaseCoordinator();
-        EventCoordinator eventCoordinator = getEventCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
-
-        EventCategory ec = eventCoordinator.initEventCategory(
-                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
-
-        try {
-
-            cc.violation_updateCodeViolation(currentCase, getCurrentViolation(), getSessionBean().getSessUser());
-
-            // if update succeeds without throwing an error, then generate an
-            // update violation event
-            // TODO: Rewire this to work with new event processing cycle
-//             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success! Violation updated and notice event generated", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to edit violation in the database",
-                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
-
-        } catch (ViolationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN,
-                            ex.getMessage(), "Please revise the stipulated compliance date"));
-
-        }
-
-        return "ceCaseProfile";
-    }
-
-    
-    
-    
-    /**
-     * Listener for user requests to start the update findings operation
-     * @param ev 
-     */
-    public void onViolationUpdateFindingsInitButtonChange(ActionEvent ev){
-        System.out.println("CECaseSearchProfileBB.onViolationUpdateFindingsInitButtonChange");
-        // nothing to do here yet
-        
-    }
-    
-    /**
-     * Listener for user reqeusts to commit updates to a codeViolation
-     *
-     * @return
-     * @throws IntegrationException
-     * @throws BObStatusException
-     */
-    public String onViolationUpdateFindingsCommitButtonChange() throws IntegrationException, BObStatusException {
-        CaseCoordinator cc = getCaseCoordinator();
-        EventCoordinator eventCoordinator = getEventCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
-
-        EventCategory ec = eventCoordinator.initEventCategory(
-                Integer.parseInt(getResourceBundle(Constants.EVENT_CATEGORY_BUNDLE).getString("updateViolationEventCategoryID")));
-
-        try {
-
-            cc.violation_updateCodeViolation(currentCase, getCurrentViolation(), getSessionBean().getSessUser());
-
-            // if update succeeds without throwing an error, then generate an
-            // update violation event
-            // TODO: Rewire this to work with new event processing cycle
-//             eventCoordinator.generateAndInsertCodeViolationUpdateEvent(getCurrentCase(), currentViolation, event);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success! Violation updated and notice event generated", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to edit violation in the database",
-                            "This is a system-level error that msut be corrected by an administrator, Sorry!"));
-
-        } catch (ViolationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN,
-                            ex.getMessage(), "Please revise the stipulated compliance date"));
-
-        }
-        
-        if(formMakeFindingsDefault){
-            makeViolationFindingsDefault(currentViolation);
-        }
-
-        return "ceCaseProfile";
-    }
-    
     private void makeViolationFindingsDefault(CodeViolation cv){
         CaseCoordinator cc = getCaseCoordinator();
         try {
             cc.violation_makeFindingsDefaultInCodebook(cv, getSessionBean().getSessUser() , false);
+            getSessionBean().refreshSessionCodeBook();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Updated default violation findings",
@@ -997,7 +992,7 @@ public class CECaseBB
      *
      * @return 
      */
-    public String onViolationRecordComplianceCommitButtonChange() {
+    public void onViolationRecordComplianceCommitButtonChange(ActionEvent ev) {
         EventCoordinator ec = getEventCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         if(currentViolation != null){
@@ -1008,51 +1003,76 @@ public class CECaseBB
         try {
             // Delegate the heavy lifting to the coordinator
             cc.violation_recordCompliance(currentCase, currentViolation, getSessionBean().getSessUser());
-               getFacesContext().addMessage(null,
+            reloadCurrentCase();
+            getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Compliance recorded for Ordinacnce " + currentViolation.getViolationID(), ""));
 
             // ************ TODO: Finish me with events ******************//
             // ************ TODO: Finish me with events ******************//
-            e = ec.generateViolationComplianceEvent(getCurrentViolation());
+            e = ec.generateViolationComplianceEvent(currentViolation);
             e.setUserCreator(getSessionBean().getSessUser());
             e.setTimeStart(LocalDateTime.now());
 
             // ************ TODO: Finish me with events ******************//
             // ************ TODO: Finish me with events ******************//
 
-               getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Compliance event attached to case", ""));
+//               getFacesContext().addMessage(null,
+//                new FacesMessage(FacesMessage.SEVERITY_INFO,
+//                        "Compliance event attached to case", ""));
         } catch (IntegrationException | BObStatusException | ViolationException | EventException ex) {
             System.out.println(ex);
                getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
                         ex.toString(), ""));
-               return "";
         }
 
-
-        return "ceCaseProfile";
-        
-
-            
-        // the user is then shown the add event dialog, and when the
-        // event is added to the case, the CaseCoordinator will
-        // set the date of record on the violation to match that chosen
-        // for the event
-//        selectedEvent = e;
     }
 
+    /**
+     * reloads only the current violation, not the whole case
+     */
+    private void reloadCurrentViolationList(){
+        CaseCoordinator cc = getCaseCoordinator();
+        if(currentViolation != null){
+            try {
+                currentViolation = cc.violation_getCodeViolation(currentViolation.getViolationID());
+                reloadCurrentCase();
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+            } 
+        }
+    }
+    
+    
     /**
      * Listener for commencement of note writing process
      *
      * @param cv
      */
-    public void onViolationNotesInitButtonChange(CodeViolation cv) {
-        currentViolation = cv;
-        formNoteTextViolation = null;
+    public void onViolationNotesInitButtonChange(ActionEvent ev) {
+        formNoteTextViolation = "";
 
+    }
+    
+    
+    /**
+     * Special wrapper getter method for blobs on a code violation that checks session
+     * for updates on each getter call
+     * 
+     * @return 
+     */
+    public List<BlobLight> getManagedViolationBlobList(){
+        List<BlobLight> blist = getSessionBean().getSessBlobLightListForRefreshUptake();
+        if(currentViolation != null){
+            if(blist != null){
+                System.out.println("CECaseBB.getManagedViolationBlobList | found refreshed BLOB list for violation ID " + currentViolation.getViolationID());
+                currentViolation.setBlobList(blist);
+                getSessionBean().setSessBlobLightListForRefreshUptake(null);
+            }
+            return currentViolation.getBlobList();
+        }
+        return new ArrayList<>();
     }
 
     /**
@@ -1063,10 +1083,15 @@ public class CECaseBB
      */
     public void onViolationNoteCommitButtonChange(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
-
+        if(currentViolation == null){
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Fatal error appending note: no violation on cecaseBB!", ""));
+            return;
+        }
         MessageBuilderParams mbp = new MessageBuilderParams();
         mbp.setCred(getSessionBean().getSessUser().getKeyCard());
-        mbp.setExistingContent(getCurrentViolation().getNotes());
+        mbp.setExistingContent(currentViolation.getNotes());
         mbp.setNewMessageContent(getFormNoteText());
         mbp.setHeader("Violation Note");
         mbp.setUser(getSessionBean().getSessUser());
@@ -1179,13 +1204,14 @@ public class CECaseBB
         System.out.println("CECaseSearchProfileBB.generateReportCECase");
         CaseCoordinator cc = getCaseCoordinator();
 
-        getReportCECase().setCreator(getSessionBean().getSessUser());
-        getReportCECase().setMuni(getSessionBean().getSessMuni());
-        getReportCECase().setGenerationTimestamp(LocalDateTime.now());
-
+        reportCECase.setCreator(getSessionBean().getSessUser());
+        reportCECase.setMuni(getSessionBean().getSessMuni());
+        reportCECase.setGenerationTimestamp(LocalDateTime.now());
+        reportCECase.setCse(currentCase);
+        
         try {
-            setReportCECase(cc.report_transformCECaseForReport(getReportCECase()));
-        } catch (IntegrationException | BObStatusException ex) {
+            setReportCECase(cc.report_transformCECaseForReport(reportCECase, getSessionBean().getSessUser()));
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1215,6 +1241,20 @@ public class CECaseBB
     
     
     
+    
+    /**
+     * Special getter wrapper around the cease's human link list that can be managed
+     * by a shared UI for person link management and search
+     * @return the current Case's human link list
+     */
+    public List<HumanLink> getManagedCECaseHumanLinkList(){
+        List<HumanLink> hll = getSessionBean().getSessHumanListRefreshedList();
+        if(hll != null){
+            currentCase.setHumanLinkList(hll);
+            getSessionBean().setSessHumanListRefreshedList(null);
+        }
+        return currentCase.getHumanLinkList();
+    }
     
     
     /*******************************************************
@@ -1503,22 +1543,6 @@ public class CECaseBB
     }
 
     /**
-     * @return the formMakeFindingsDefault
-     */
-    public boolean isFormMakeFindingsDefault() {
-        return formMakeFindingsDefault;
-    }
-
-    /**
-     * @param formMakeFindingsDefault the formMakeFindingsDefault to set
-     */
-    public void setFormMakeFindingsDefault(boolean formMakeFindingsDefault) {
-        this.formMakeFindingsDefault = formMakeFindingsDefault;
-    }
-
-   
-
-    /**
      * @return the closingEventCategoryList
      */
     public List<EventCategory> getClosingEventCategoryList() {
@@ -1534,21 +1558,6 @@ public class CECaseBB
     }
 
  
-
-    /**
-     * @return the currentCasePropDataHeavy
-     */
-    public PropertyDataHeavy getCurrentCasePropDataHeavy() {
-        return currentCasePropDataHeavy;
-    }
-
-    /**
-     * @param currentCasePropDataHeavy the currentCasePropDataHeavy to set
-     */
-    public void setCurrentCasePropDataHeavy(PropertyDataHeavy currentCasePropDataHeavy) {
-        this.currentCasePropDataHeavy = currentCasePropDataHeavy;
-    }
-
     
     /**
      * @return the blobList
@@ -1676,6 +1685,121 @@ public class CECaseBB
      */
     public void setEditModeCurrentCase(boolean editModeCurrentCase) {
         this.editModeCurrentCase = editModeCurrentCase;
+    }
+
+    /**
+     * @return the formExtensionEventDescr
+     */
+    public String getFormExtensionEventDescr() {
+        return formExtensionEventDescr;
+    }
+
+    /**
+     * @param formExtensionEventDescr the formExtensionEventDescr to set
+     */
+    public void setFormExtensionEventDescr(String formExtensionEventDescr) {
+        this.formExtensionEventDescr = formExtensionEventDescr;
+    }
+
+    /**
+     * @return the editModeCurrentCaseManager
+     */
+    public boolean isEditModeCurrentCaseManager() {
+        return editModeCurrentCaseManager;
+    }
+
+
+
+    /**
+     * @return the editModeCurrentCloseCase
+     */
+    public boolean isEditModeCurrentCloseCase() {
+        return editModeCurrentCloseCase;
+    }
+
+    /**
+     * @return the editModeCurrentCaseRecord
+     */
+    public boolean isEditModeCurrentCaseRecord() {
+        return editModeCurrentCaseRecord;
+    }
+
+    /**
+     * @param editModeCurrentCaseManager the editModeCurrentCaseManager to set
+     */
+    public void setEditModeCurrentCaseManager(boolean editModeCurrentCaseManager) {
+        this.editModeCurrentCaseManager = editModeCurrentCaseManager;
+    }
+
+   
+    /**
+     * @param editModeCurrentCloseCase the editModeCurrentCloseCase to set
+     */
+    public void setEditModeCurrentCloseCase(boolean editModeCurrentCloseCase) {
+        this.editModeCurrentCloseCase = editModeCurrentCloseCase;
+    }
+
+    /**
+     * @param editModeCurrentCaseRecord the editModeCurrentCaseRecord to set
+     */
+    public void setEditModeCurrentCaseRecord(boolean editModeCurrentCaseRecord) {
+        this.editModeCurrentCaseRecord = editModeCurrentCaseRecord;
+    }
+
+    /**
+     * @return the formCurrentCaseUnitAssociated
+     */
+    public boolean getFormCurrentCaseUnitAssociated() {
+        return formCurrentCaseUnitAssociated;
+    }
+
+    /**
+     * @param formCurrentCaseUnitAssociated the formCurrentCaseUnitAssociated to set
+     */
+    public void setFormCurrentCaseUnitAssociated(boolean formCurrentCaseUnitAssociated) {
+        this.formCurrentCaseUnitAssociated = formCurrentCaseUnitAssociated;
+    }
+
+    /**
+     * @return the formSelectedUnit
+     */
+    public PropertyUnit getFormSelectedUnit() {
+        return formSelectedUnit;
+    }
+
+    /**
+     * @param formSelectedUnit the formSelectedUnit to set
+     */
+    public void setFormSelectedUnit(PropertyUnit formSelectedUnit) {
+        this.formSelectedUnit = formSelectedUnit;
+    }
+
+    /**
+     * @return the originationEventCategoryList
+     */
+    public List<EventCategory> getOriginationEventCategoryList() {
+        return originationEventCategoryList;
+    }
+
+    /**
+     * @param originationEventCategoryList the originationEventCategoryList to set
+     */
+    public void setOriginationEventCategoryList(List<EventCategory> originationEventCategoryList) {
+        this.originationEventCategoryList = originationEventCategoryList;
+    }
+
+    /**
+     * @return the formCECaseOriginationEventCat
+     */
+    public EventCategory getFormCECaseOriginationEventCat() {
+        return formCECaseOriginationEventCat;
+    }
+
+    /**
+     * @param formCECaseOriginationEventCat the formCECaseOriginationEventCat to set
+     */
+    public void setFormCECaseOriginationEventCat(EventCategory formCECaseOriginationEventCat) {
+        this.formCECaseOriginationEventCat = formCECaseOriginationEventCat;
     }
 
    

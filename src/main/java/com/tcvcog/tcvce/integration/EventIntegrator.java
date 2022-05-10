@@ -360,12 +360,53 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } // close finally
 
         // now connect people to event that has already been logged
-        event = ec.getEvent(insertedEventID);
-    
+      
         
         return insertedEventID;
 
     } // close method
+    
+    
+    /**
+     * Updates a record in the event table
+     * @param event
+     * @throws IntegrationException 
+     */
+    public void updateEventCategoryMaintainType(EventCnF event) throws IntegrationException {
+        if(event == null) return;
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.event\n");
+        sb.append("   SET  category_catid=?\n" );
+        sb.append(" WHERE eventid=?;");
+
+        // TO DO: finish clearing view confirmation
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            
+            
+            if(event.getCategory() != null){
+                stmt.setInt(1, event.getCategory().getCategoryID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            stmt.setInt(2, event.getEventID());
+            
+            stmt.executeUpdate();
+            
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot update event", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
     
 
 
@@ -442,7 +483,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot retrive event", ex);
+            throw new IntegrationException("Cannot update  event", ex);
 
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

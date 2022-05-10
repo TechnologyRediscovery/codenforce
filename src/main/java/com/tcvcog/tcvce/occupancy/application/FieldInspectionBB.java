@@ -71,7 +71,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     private boolean editModeInspectionMetadata;
     private FieldInspection formFollowUpInspectionTo;
     
-    private boolean migrateFailedItemsOnFinalization;
+    private boolean formMigrateFailedItemsOnFinalization;
     
     
     private int occPeriodIDFortransferFormField;
@@ -92,7 +92,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
         }
         
         ordinanceViewOptionsList = Arrays.asList(ViewOptionsOccChecklistItemsEnum.values());
-        
+        formMigrateFailedItemsOnFinalization = true;
         // Initialize list of checklist templates
        initChecklistTemplates();
        initSeverityClassList();
@@ -401,14 +401,20 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     
     /**
      * Listener for user requests to certify the given
-     * @param oi 
+     * @param ev
      */
-    public void onCertifyInspectionCommitButtonChange(){
+    public void onCertifyInspectionCommitButtonChange(ActionEvent ev){
 
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
             currentInspection.setDetermination(selectedDetermination);
-            oic.inspectionAction_certifyInspection(currentInspection, getSessionBean().getSessUser(), getSessionBean().getSessOccPeriod());
+            IFace_inspectable inspectable;
+            if(currentInspection.getDomainEnum() == DomainEnum.OCCUPANCY){
+                inspectable = getSessionBean().getSessOccPeriod();
+            } else {
+                inspectable = getSessionBean().getSessCECase();
+            }
+            oic.inspectionAction_certifyInspection(currentInspection, getSessionBean().getSessUser(), inspectable);
              getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Inspection determination has been certified and inspection is now locked!",  ""));
@@ -429,8 +435,14 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     public void onRemoveFinalizationOfInspection(){
         if(currentInspection != null){
             OccInspectionCoordinator oic = getOccInspectionCoordinator();
+            IFace_inspectable inspectable;
+            if(currentInspection.getDomainEnum() == DomainEnum.OCCUPANCY){
+                inspectable = getSessionBean().getSessOccPeriod();
+            } else {
+                inspectable = getSessionBean().getSessCECase();
+            }
             try {
-                oic.removeOccInspectionFinalization(getSessionBean().getSessUser(), currentInspection, getSessionBean().getSessOccPeriod());
+                oic.removeOccInspectionFinalization(getSessionBean().getSessUser(), currentInspection, inspectable);
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Inspection has been decertified and determination removed!",  ""));
@@ -1028,17 +1040,17 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     }
 
     /**
-     * @return the migrateFailedItemsOnFinalization
+     * @return the formMigrateFailedItemsOnFinalization
      */
-    public boolean isMigrateFailedItemsOnFinalization() {
-        return migrateFailedItemsOnFinalization;
+    public boolean isFormMigrateFailedItemsOnFinalization() {
+        return formMigrateFailedItemsOnFinalization;
     }
 
     /**
-     * @param migrateFailedItemsOnFinalization the migrateFailedItemsOnFinalization to set
+     * @param formMigrateFailedItemsOnFinalization the formMigrateFailedItemsOnFinalization to set
      */
-    public void setMigrateFailedItemsOnFinalization(boolean migrateFailedItemsOnFinalization) {
-        this.migrateFailedItemsOnFinalization = migrateFailedItemsOnFinalization;
+    public void setFormMigrateFailedItemsOnFinalization(boolean formMigrateFailedItemsOnFinalization) {
+        this.formMigrateFailedItemsOnFinalization = formMigrateFailedItemsOnFinalization;
     }
 
     /**

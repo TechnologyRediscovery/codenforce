@@ -73,16 +73,18 @@ public class        CECase
     protected List<CodeViolation> violationList;
     
     protected boolean active;
-    protected int personInfoPersonID;
     protected boolean propertyInfoCase;
+    protected int personInfoPersonID;
     
     protected User lastUpdatedBy;
     protected LocalDateTime lastUpdatedTS;
     
     protected List<EventCnF> eventList;
-    protected List<EventCnF> eventListMaster;
     
-
+    protected EventCnF originationEvent;
+    protected EventCnF closingEvent;
+    protected String daysSinceLastEvent;
+    
     
     public CECase(){
         
@@ -113,7 +115,8 @@ public class        CECase
         lastUpdatedBy = input.getLastUpdatedBy();
         lastUpdatedTS = input.getLastUpdatedTS();
         eventList = input.getEventList();
-        eventListMaster = input.getEventList();
+        originationEvent = input.originationEvent;
+        closingEvent = input.closingEvent;
     }
     
     @Override
@@ -150,6 +153,8 @@ public class        CECase
         }
         return futureEvents;
     }
+    
+    
      
 
     @Override
@@ -318,7 +323,7 @@ public class        CECase
         return DateTimeUtil.getTimePeriodAsDays(originationDate, ageEndTime);
         
     }
-
+    
     /**
      * @return the caseID
      */
@@ -435,26 +440,7 @@ public class        CECase
         this.creationTimestamp = creationTimestamp;
     }
 
-    /**
-     * @return the originiationDatePretty
-     */
-    public String getOriginiationDatePretty() {
-        if(originationDate != null){
-            return DateTimeUtil.getPrettyDate(originationDate);
-        }
-        return null;
-    }
-
-    /**
-     * @return the closingDatePretty
-     */
-    public String getClosingDatePretty() {
-        if(closingDate != null){
-            return DateTimeUtil.getPrettyDate(closingDate);
-        }
-        return null;
-    }
-
+   
     
     /**
      * @return the paccEnabled
@@ -718,11 +704,7 @@ public class        CECase
         this.eventList = eventList;
     }
 
-    public void setEventListMaster(List<EventCnF> eventListMaster) {
-        if (eventListMaster != null) {
-            this.eventListMaster = eventListMaster;
-        }
-    }
+ 
 
     @Override
     public String getStatusLog() {
@@ -764,6 +746,49 @@ public class        CECase
     @Override
     public DomainEnum getEventDomain() {
         return CECASE_ENUM;
+    }
+
+    /**
+     * @return the originationEvent
+     */
+    public EventCnF getOriginationEvent() {
+        return originationEvent;
+    }
+
+    /**
+     * @param originationEvent the originationEvent to set
+     */
+    public void setOriginationEvent(EventCnF originationEvent) {
+        this.originationEvent = originationEvent;
+    }
+
+    /**
+     * @return the closingEvent
+     */
+    public EventCnF getClosingEvent() {
+        return closingEvent;
+    }
+
+    /**
+     * @param closingEvent the closingEvent to set
+     */
+    public void setClosingEvent(EventCnF closingEvent) {
+        this.closingEvent = closingEvent;
+    }
+
+    /**
+     * @return the daysSinceLastEvent
+     */
+    public String getDaysSinceLastEvent() {
+        
+        return daysSinceLastEvent;
+    }
+
+    /**
+     * @param daysSinceLastEvent the daysSinceLastEvent to set
+     */
+    public void setDaysSinceLastEvent(String daysSinceLastEvent) {
+        this.daysSinceLastEvent = daysSinceLastEvent;
     }
 
    

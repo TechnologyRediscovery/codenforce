@@ -92,8 +92,14 @@ public class CECaseDataHeavy
 
             this.eventList = cse.eventList;
             this.statusAssignmentLog = cse.statusAssignmentLog;
+            
+            this.originationEvent = cse.originationEvent;
+            this.closingEvent = cse.closingEvent;
+            
+            this.daysSinceLastEvent = cse.daysSinceLastEvent;
+            
+            
 
-            eventListMaster = new ArrayList<>();
         } else {
             System.out.println("CECaseDataHeavy.const: null input case");
         }

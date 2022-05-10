@@ -12,7 +12,7 @@
     <p:panel id="cecase-notices-panel"
              toggleable="true"
              collapsed="false"
-             header="Notices of Violation (#{ceCaseSearchProfileBB.currentCase.noticeList.size()})"
+             header="Notices of Violation (#{ceCaseBB.currentCase.noticeList.size()})"
              rendered="true"
              >
         <h:form id="cecase-notices-form">
@@ -34,7 +34,7 @@
                 id="cecase-notices-table"
                 var="nov"
                 rowKey="#{nov.noticeID}"
-                value="#{ceCaseSearchProfileBB.currentCase.noticeList}"
+                value="#{ceCaseBB.currentCase.noticeList}"
                 tableStyleClass="primeDataTable"
                 >
 
@@ -42,7 +42,7 @@
                     <f:facet name="header">
                         <h:outputText value="Date of record"/>
                     </f:facet>
-                    <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(nov.dateOfRecord)}"/>
+                    <h:outputText value="#{ceCaseBB.getPrettyDate(nov.dateOfRecord)}"/>
                 </p:column>
                 <p:column width="15%">
                     <f:facet name="header">
@@ -60,17 +60,17 @@
                     <h:outputText value="#{empty nov.lockedAndqueuedTS ? 'Next step: Finalize notice' : ''}"/>
 
                     <h:outputText value="#{!(empty nov.lockedAndqueuedTS) ? 'Finalized: ' : ''}"/>
-                    <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(nov.lockedAndqueuedTS)}"/>
+                    <h:outputText value="#{ceCaseBB.getPrettyDate(nov.lockedAndqueuedTS)}"/>
 
                     <p:spacer height="3px"/>
 
                     <h:outputText value="#{!(empty nov.sentTS) ? 'Sent: ' : ''}"/>
-                    <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(nov.sentTS)}"/>
+                    <h:outputText value="#{ceCaseBB.getPrettyDate(nov.sentTS)}"/>
 
                     <p:spacer height="3px"/>
 
                     <h:outputText value="#{!(empty nov.returnedTS) ? 'Returned: ' : ''}"/>
-                    <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDate(nov.returnedTS)}"/>
+                    <h:outputText value="#{ceCaseBB.getPrettyDate(nov.returnedTS)}"/>
 
                     <p:spacer height="3px"/>
 
@@ -83,7 +83,7 @@
                                          styleClass="noFill"
                                          update="novstatus-dialog
                                          cecase-notices-form
-                                         messages-global-form"
+                                         nov-growl-form"
                                          disabled="#{!(empty nov.lockedAndqueuedTS)}"/>
 
                     </div>
@@ -336,7 +336,7 @@
                                          styleClass="noFill"
                                          icon="fa fa-mail-reply"
                                          update="nov-profile-form
-                                         messages-global-form"
+                                         nov-growl-form"
                                          disabled="#{(empty noticeOfViolationBB.currentNotice.sentTS) || !(empty noticeOfViolationBB.currentNotice.returnedTS)}"
                                          />
                     </div>
@@ -687,7 +687,7 @@
                                     ajax="false"
                                     action="#{noticeOfViolationBB.onInsertNewNoticeButtonChange}"
                                     value="Create new notice draft"
-                                    update="violation-table messages-global-form"
+                                    update="violation-table nov-growl-form"
                                     icon="fa fa-save"
                                     disabled="#{noticeOfViolationBB.currentNotice.noticeID != 0}"/>
 
@@ -695,7 +695,7 @@
                                     ajax="false"
                                     action="#{noticeOfViolationBB.onUpdateNoticeButtonChange}"
                                     value="Update notice text"
-                                    update="violation-table messages-global-form"
+                                    update="violation-table nov-growl-form"
                                     icon="fa fa-edit"
                                     disabled="#{noticeOfViolationBB.currentNotice.noticeID == 0}"/>
             </div>
@@ -739,7 +739,7 @@
                     <p:commandButton ajax="true"
                                      action="#{noticeOfViolationBB.removeViolationFromList(v)}"
                                      value="remove"
-                                     update="violation-table messages-global-form"
+                                     update="violation-table nov-growl-form"
                                      icon="fa fa-stop" />
                 </p:column>
                 <p:column width="15%">
@@ -914,7 +914,7 @@
                                     ajax="false"
                                     action="#{noticeOfViolationBB.onInsertNewNoticeButtonChange}"
                                     value="Create new notice draft"
-                                    update="violation-table messages-global-form"
+                                    update="violation-table nov-growl-form"
                                     icon="fa fa-save"
                                     disabled="#{noticeOfViolationBB.currentNotice.noticeID != 0}"/>
 
@@ -922,7 +922,7 @@
                                     ajax="false"
                                     action="#{noticeOfViolationBB.onUpdateNoticeButtonChange}"
                                     value="Update notice text"
-                                    update="violation-table messages-global-form"
+                                    update="violation-table nov-growl-form"
                                     icon="fa fa-edit"
                                     disabled="#{noticeOfViolationBB.currentNotice.noticeID == 0}"/>
             </div>
@@ -1041,7 +1041,7 @@
                                              tabindex="2"
                                              icon="fa fa-user-o"
                                              update="@form
-                                             messages-global-form
+                                             nov-growl-form
                                              nov-growl-form"
                                              />
 
@@ -1189,7 +1189,7 @@
                                      value="Delete"
                                      icon="fa fa-trash"
                                      ajax="true"
-                                     update="messages-global-form
+                                     update="nov-growl-form
                                      nov-templateblocks-table
                                      "
                                      actionListener="#{noticeOfViolationBB.onTemplateDeleteButtonChange(template)}"/>
@@ -1215,7 +1215,7 @@
                 styleClass="buttonOwnLine"
                 tabindex="6"
                 update="@form:@parent:nov-template-form
-                messages-global-form
+                nov-growl-form
                 "
                 actionListener="#{noticeOfViolationBB.onTemplateCreateButton}"/>
         </h:form>
@@ -1255,7 +1255,7 @@
                 disabled="#{noticeOfViolationBB.currentTemplateBlock.blockID == 0}"
                 actionListener="#{noticeOfViolationBB.onTemplateUpdateButtonChange}"
                 update="nov-template-select-form
-                messages-global-form"/>
+                nov-growl-form"/>
 
 
             <p:commandButton
@@ -1266,7 +1266,7 @@
                 disabled="#{noticeOfViolationBB.currentTemplateBlock.blockID != 0}"
                 actionListener="#{noticeOfViolationBB.onTemplateInsertButtonChange}"
                 update="nov-template-select-form
-                messages-global-form"/>
+                nov-growl-form"/>
 
             <p:commandButton    id="nov-template-manage-cancel"
                                 ajax="true"

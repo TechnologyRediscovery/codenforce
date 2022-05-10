@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -30,6 +31,7 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * The premier backing bean for universal notes panel workflow.
@@ -48,9 +50,6 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
 
     @PostConstruct
     public void initBean() {
-        SessionBean sb = getSessionBean();
-        EventCoordinator ec = getEventCoordinator();
-
         // Find event holder and setup event list
         updateNoteHolder();
     }
@@ -61,7 +60,6 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
      */
     public void updateNoteHolder() {
         SessionBean sb = getSessionBean();
-
         pageDomain = sb.getSessEventsPageEventDomainRequest();
         switch (pageDomain) {
             case CODE_ENFORCEMENT:
@@ -84,6 +82,20 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
         formNoteText = new String();
     }
 
+    /**
+     * Asks the session if notes need to be reloaded
+     * @return 
+     */
+    public String getManagedNoteContent(){
+        LocalDateTime trigger = getSessionBean().getNoteholderRefreshTimestampTrigger();
+        if(trigger != null){
+            updateNoteHolder();
+            getSessionBean().setNoteholderRefreshTimestampTrigger(null);
+        }
+        return currentNoteHolder.getNotes();
+    }
+    
+    
     /**
      * This method goes down the coordinator stack to add a cached note
      * (formNoteText) to the end of a note field in the database in a structured
@@ -115,6 +127,7 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
                     System.out.println("NotesBB reached universal case in appendNotes()--do something about this maybe?");
                     return;
             }
+            updateNoteHolder();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully appended note!", ""));
@@ -143,4 +156,5 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
         this.currentNoteHolder = currentNoteHolder;
     }
 
+    
 }

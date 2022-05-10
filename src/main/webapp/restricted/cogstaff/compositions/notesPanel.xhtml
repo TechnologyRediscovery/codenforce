@@ -6,7 +6,7 @@
              toggleable="true"
              widgetVar="notes-panel-var"
              collapsed="false"
-             header="Notes">
+             header="Notes on #{notesBB.currentNoteHolder.noteHolderFriendlyName} (ID:#{notesBB.currentNoteHolder.DBKey})">
 
         <h:form id="notes-form">
             <p:commandButton id="notes-add-button"
@@ -20,14 +20,14 @@
             <p:spacer height="5px"/>
             <h:outputText id="notes-ot"
                           escape="false"
-                          value="#{notesBB.currentNoteHolder.notes}"/>
+                          value="#{notesBB.managedNoteContent}"/>
 
         </h:form>
     </p:panel>
 
     <!-- Notes dialog -->
     <p:dialog id="note-dialog"
-              height="300" width="750"
+              height="400" width="750"
               widgetVar="note-dialog-var"
               closable="true"
               resizable="true"
@@ -41,7 +41,7 @@
             <h:outputText styleClass="ui-label" value="Note text: (name and time automatically inserted) "/>
             <p:textEditor id="note-editor"
                           value="#{notesBB.formNoteText}"
-                          required="false"
+                          required="true"
                           secure="false"
                           height="200"/>
 
@@ -55,7 +55,7 @@
             <p:commandButton id="note-button-addnote"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                              actionListener="#{notesBB.appendNotes}"
-                             onclick="PF(note-dialog-var').hide()"
+                             oncomplete="PF('note-dialog-var').hide()"
                              update="notes-form"
                              value="Attach Note"
                              styleClass="inline-button"

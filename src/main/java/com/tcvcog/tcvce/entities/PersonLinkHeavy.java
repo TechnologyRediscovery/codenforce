@@ -21,7 +21,8 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import java.util.List;
 
 /**
- * The Listified version of a Person
+ * The Listified version of a Person. This person knows its own set of object links!
+ * 
  * @author sylvia
  */
 public  class PersonLinkHeavy 
@@ -33,7 +34,6 @@ public  class PersonLinkHeavy
      * Dead on arrival method to follow pattern of other BObs whose previous
      * DataHeavy versions did not require Credentials to Instantiate
      * 
-     * @deprecated 
      * @param p to be injected into the superclass members
      * 
      */

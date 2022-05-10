@@ -265,6 +265,7 @@ public class    BlobUtilitiesBB
      */
     public void onViewBlobLinkClick(BlobLight bl, IFace_BlobHolder holder){
         System.out.println("BlobUtilitiesBB.onViewBlobLinkClick | viewing blob light ID " + bl.getPhotoDocID());
+        extractAndStoreBlobListComponentToUpdate();
         currentBlobLight = bl;
         currentBlobHolder = holder;
     }
@@ -314,6 +315,7 @@ public class    BlobUtilitiesBB
     /**
      * Listener for user request to edit a blob's meta data
      * @param bl 
+     * @param holder 
      */
     public void onBlobEditMetaDataInitLinkClick(BlobLight bl, IFace_BlobHolder holder){
         currentBlobLight = bl;
@@ -348,6 +350,7 @@ public class    BlobUtilitiesBB
             bc.linkBlobHolderToBlobList(currentBlobHolder, selectedBlobList);
             refreshCurrentBlobHolder();
             sendUpdatedBlobListToSessionForSenderRefresh();
+            selectedBlobList.clear();
             getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Successfully linked current object to selected photos/documents: " , ""));

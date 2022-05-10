@@ -507,22 +507,10 @@
                                                                   style="font-weight: bold;"/>
 
                                                     <h:outputText    id="violation-scroller-chapter-ot"
-                                                                     value="#{viol.violatedEnfElement.ordchapterNo}: #{viol.violatedEnfElement.ordchapterTitle}"/>
+                                                                     value="#{viol.violatedEnfElement.headerString}"
+                                                                     escape="false"/>
 
-                                                    <h:outputText value=" ; " />
-
-                                                    <h:outputText    id="violation-scroller-section-ot"
-                                                                     value="sec #{viol.violatedEnfElement.ordSecNum}: #{viol.violatedEnfElement.ordSecTitle}"/>
-
-                                                    <h:outputText value=" ; " />
-
-                                                    <h:outputText    id="violation-scroller-subsection-ot"
-                                                                     value="sub-sec #{viol.violatedEnfElement.ordSubSecNum}: #{viol.violatedEnfElement.ordSubSecTitle}"/>
-
-                                                    <h:outputText    id="violation-scroller-source-ot"
-                                                                     value=" (#{viol.violatedEnfElement.source.sourceName}, #{viol.violatedEnfElement.source.sourceYear})"/>
-
-
+                                                   
                                                 </p:dataScroller>
 
                                             </div>
@@ -673,21 +661,12 @@
                                                     <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
                                                                   style="font-weight: bold;"/>
 
+                                                  <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
+                                                                  style="font-weight: bold;"/>
+
                                                     <h:outputText    id="violation-scroller-chapter-ot"
-                                                                     value="#{viol.violatedEnfElement.ordchapterNo}: #{viol.violatedEnfElement.ordchapterTitle}"/>
-
-                                                    <h:outputText value=" ; " />
-
-                                                    <h:outputText    id="violation-scroller-section-ot"
-                                                                     value="sec #{viol.violatedEnfElement.ordSecNum}: #{viol.violatedEnfElement.ordSecTitle}"/>
-
-                                                    <h:outputText value=" ; " />
-
-                                                    <h:outputText    id="violation-scroller-subsection-ot"
-                                                                     value="sub-sec #{viol.violatedEnfElement.ordSubSecNum}: #{viol.violatedEnfElement.ordSubSecTitle}"/>
-
-                                                    <h:outputText    id="violation-scroller-source-ot"
-                                                                     value=" (#{viol.violatedEnfElement.source.sourceName}, #{viol.violatedEnfElement.source.sourceYear})"/>
+                                                                     value="#{viol.violatedEnfElement.headerString}"
+                                                                     escape="false"/>
 
 
                                                 </p:dataScroller>
@@ -837,22 +816,12 @@
                                                     <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
                                                                   style="font-weight: bold;"/>
 
+                                                  <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
+                                                                  style="font-weight: bold;"/>
+
                                                     <h:outputText    id="violation-scroller-chapter-ot"
-                                                                     value="#{viol.violatedEnfElement.ordchapterNo}: #{viol.violatedEnfElement.ordchapterTitle}"/>
-
-                                                    <h:outputText value=" ; " />
-
-                                                    <h:outputText    id="violation-scroller-section-ot"
-                                                                     value="sec #{viol.violatedEnfElement.ordSecNum}: #{viol.violatedEnfElement.ordSecTitle}"/>
-
-                                                    <h:outputText value=" ; " />
-
-                                                    <h:outputText    id="violation-scroller-subsection-ot"
-                                                                     value="sub-sec #{viol.violatedEnfElement.ordSubSecNum}: #{viol.violatedEnfElement.ordSubSecTitle}"/>
-
-                                                    <h:outputText    id="violation-scroller-source-ot"
-                                                                     value=" (#{viol.violatedEnfElement.source.sourceName}, #{viol.violatedEnfElement.source.sourceYear})"/>
-
+                                                                     value="#{viol.violatedEnfElement.headerString}"
+                                                                     escape="false"/>
 
                                                 </p:dataScroller>
 

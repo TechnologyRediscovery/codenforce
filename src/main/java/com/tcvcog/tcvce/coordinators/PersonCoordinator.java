@@ -52,6 +52,7 @@ import java.util.List;
 import com.tcvcog.tcvce.entities.LinkedObjectFamilyEnum;
 import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
 import com.tcvcog.tcvce.entities.MailingAddress;
+import com.tcvcog.tcvce.entities.MailingAddressLink;
 import com.tcvcog.tcvce.entities.Parcel;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
@@ -126,7 +127,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * Note the caller will probably want to cast back to the original type
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public List<HumanLink> assembleLinkedHumanLinks(IFace_humanListHolder hlh) throws IntegrationException{
+    public List<HumanLink> getHumanLinkList(IFace_humanListHolder hlh) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         List<HumanLink> hll = null;
         
@@ -459,9 +460,75 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         }
         p.setEmailList(eml);
         
+        generateMADLinkListPretty(p);
+        generatePhoneListPretty(p);
+        generateEmailListPretty(p);
+        
         return p;
         
     }
+    
+    
+    /**
+     * Internal logic for building an HTML string
+     * of the mailing addresses linked to this person
+     * @param p 
+     */
+    private void generateMADLinkListPretty(Person p){
+        if(p != null && p.getMailingAddressLinkList() != null && !p.getMailingAddressLinkList().isEmpty()){
+            StringBuilder sb = new StringBuilder("");
+            for(MailingAddressLink madlink: p.getMailingAddressLinkList()){
+                sb.append(madlink.getLinkedObjectRole().getTitle());
+                sb.append("<br />");
+                sb.append(madlink.getAddressPretty2LineEscapeFalse());
+            }
+            p.setMailingAddressListPretty(sb.toString());
+        }
+        
+        
+    }
+    
+    /**
+     * Internal logic for making a nice phone list with
+     * breaks and type, etc.
+     * @param p 
+     */
+    private void generatePhoneListPretty(Person p){
+        if(p != null && p.getPhoneList() != null && !p.getPhoneList().isEmpty()){
+            StringBuilder sb = new StringBuilder("");
+            for(ContactPhone ph: p.getPhoneList()){
+                sb.append(ph.getPhoneNumber());
+                sb.append(" (");
+                sb.append(ph.getPhoneType().getTitle());
+                sb.append(")");
+                if(ph.getExtension() != 0){
+                    sb.append("[ext. ");
+                    sb.append(ph.getExtension());
+                    sb.append("[ext.] ");
+                }
+                sb.append("<br />");
+            }
+            p.setPhoneListPretty(sb.toString());
+        }
+    }
+    
+    
+    /**
+     * Internal logic for generating an HTML string 
+     * of a person's email list.
+     * @param p 
+     */
+    private void generateEmailListPretty(Person p){
+         if(p != null && p.getEmailList()!= null && !p.getEmailList().isEmpty()){
+            StringBuilder sb = new StringBuilder("");
+            for(ContactEmail ce: p.getEmailList()){
+                sb.append(ce.getEmailaddress());
+                sb.append("<br />");
+            }
+            p.setMailingAddressListPretty(sb.toString());
+        }
+    }
+    
    
     
     

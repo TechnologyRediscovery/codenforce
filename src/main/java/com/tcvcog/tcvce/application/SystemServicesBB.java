@@ -18,9 +18,11 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.BOBSource;
 import com.tcvcog.tcvce.entities.ImprovementSuggestion;
 import com.tcvcog.tcvce.entities.ListChangeRequest;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -80,6 +82,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     private List<Municipality> municipalityListForSearch;
     private List<Property> propertyListForSearch;
     private List<Person> personListForSearch;
+    private List<BOBSource> sourceList;
     
     // *************************************************************************
     // **               improvement suggestions, etc.
@@ -110,10 +113,12 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
             System.out.println("SystemServicesBB.initBean");
             UserCoordinator uc = getUserCoordinator();
             SessionBean sb = getSessionBean();
+            SystemCoordinator sc = getSystemCoordinator();
             
             bbSessionUser = sb.getSessUser();
             bbSessionMuni = sb.getSessMuni();
             bbSessionProperty = sb.getSessProperty();
+            System.out.println("SystemServicesBB.initBean | Sessionproperty: " + bbSessionProperty);
             bbSessionPerson = sb.getSessPerson();
             bbSessionPersonList = sb.getSessPersonList();
             bbSessionPropertyList = sb.getSessPropertyList();
@@ -125,6 +130,8 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
             if(bbSessionUser != null){
                 municipalityListForSearch = bbSessionUser.getAuthMuniList();
             }
+            
+            sourceList = sc.getBobSourceListComplete();
         } catch (BObStatusException ex) {
             System.out.println(ex);
         }
@@ -517,6 +524,20 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public void setBbSessionPropertyList(List<Property> bbSessionPropertyList) {
         this.bbSessionPropertyList = bbSessionPropertyList;
+    }
+
+    /**
+     * @return the sourceList
+     */
+    public List<BOBSource> getSourceList() {
+        return sourceList;
+    }
+
+    /**
+     * @param sourceList the sourceList to set
+     */
+    public void setSourceList(List<BOBSource> sourceList) {
+        this.sourceList = sourceList;
     }
 
     

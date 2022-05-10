@@ -48,6 +48,8 @@ public class CECasePropertyUnitHeavy
         this.caseManager = cse.caseManager;
         this.caseName = cse.caseName;
 
+        this.statusBundle = cse.statusBundle;
+        this.statusAssignmentLog = cse.statusAssignmentLog;
 
         this.originationDate = cse.originationDate;
         this.closingDate = cse.closingDate;
@@ -65,9 +67,15 @@ public class CECasePropertyUnitHeavy
         this.propertyInfoCase = cse.propertyInfoCase;
         this.personInfoPersonID = cse.getPersonInfoPersonID();
         
-        this.lastUpdatedBy = cse.getLastUpdatedBy();
-        this.lastUpdatedTS = cse.getLastUpdatedTS();
-        this.statusBundle = cse.getStatusBundle();
+        this.lastUpdatedBy = cse.lastUpdatedBy;
+        this.lastUpdatedTS = cse.lastUpdatedTS;
+        
+        this.eventList = cse.eventList;
+        
+        this.originationEvent = cse.originationEvent;
+        this.closingEvent = cse.closingEvent;
+        this.daysSinceLastEvent = cse.daysSinceLastEvent;
+        
 
     }
 

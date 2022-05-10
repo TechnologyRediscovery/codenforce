@@ -2813,7 +2813,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         
         PropertyUnitDataHeavy pudh = new PropertyUnitDataHeavy(getPropertyUnit(unitID));
         pudh.setPeriodList(oi.getOccPeriodList(unitID));
-        pudh.setHumanLinkList(pc.assembleLinkedHumanLinks(pudh));
+        pudh.setHumanLinkList(pc.getHumanLinkList(pudh));
         
         
         // Disabled for parcelization and simplification of unit editing process

@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities.reports;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import java.io.Serializable;
@@ -20,11 +21,16 @@ import java.util.List;
 public class ReportConfigCECase extends Report{
     
     private CECaseDataHeavy cse;
+    private PropertyDataHeavy propDH;
     
     private List<EventCnF> eventListForReport;
     private List<NoticeOfViolation> noticeListForReport;
     
     private boolean includeCaseName; // add to ui
+    
+    private boolean includeAssociatedPersons;
+    private boolean includeAssociatedPersonsOnParentProperty;
+    private boolean includePersonAddrPhoneEmail;
     
     private boolean includeHiddenEvents;
     private boolean includeInactiveEvents;
@@ -38,9 +44,18 @@ public class ReportConfigCECase extends Report{
     
     private boolean includeAllNotices;
     private boolean includeNoticeFullText;
+    private boolean includeActionRequsts;
+    private boolean includeFeeAndPaymentInfo;
+    
+    private boolean includeFieldInspectionReports;
+    private boolean includeFieldInspectionReportsWithPhotos;
      
     private boolean includeFullOrdinanceText;
     private boolean includeViolationPhotos;  // add to 
+    private boolean includeViolationNotes;
+    private boolean includeCECasePhotoPool;
+    
+    private boolean includeDocDownloadLinks;
 
     /**
      * @return the cse
@@ -250,6 +265,160 @@ public class ReportConfigCECase extends Report{
      */
     public void setNoticeListForReport(List<NoticeOfViolation> noticeListForReport) {
         this.noticeListForReport = noticeListForReport;
+    }
+
+    /**
+     * @return the includeCECasePhotoPool
+     */
+    public boolean isIncludeCECasePhotoPool() {
+        return includeCECasePhotoPool;
+    }
+
+    /**
+     * @param includeCECasePhotoPool the includeCECasePhotoPool to set
+     */
+    public void setIncludeCECasePhotoPool(boolean includeCECasePhotoPool) {
+        this.includeCECasePhotoPool = includeCECasePhotoPool;
+    }
+
+    /**
+     * @return the includeAssociatedPersons
+     */
+    public boolean isIncludeAssociatedPersons() {
+        return includeAssociatedPersons;
+    }
+
+    /**
+     * @return the includeAssociatedPersonsOnParentProperty
+     */
+    public boolean isIncludeAssociatedPersonsOnParentProperty() {
+        return includeAssociatedPersonsOnParentProperty;
+    }
+
+    /**
+     * @return the includePersonAddrPhoneEmail
+     */
+    public boolean isIncludePersonAddrPhoneEmail() {
+        return includePersonAddrPhoneEmail;
+    }
+
+    /**
+     * @return the includeViolationNotes
+     */
+    public boolean isIncludeViolationNotes() {
+        return includeViolationNotes;
+    }
+
+    /**
+     * @param includeAssociatedPersons the includeAssociatedPersons to set
+     */
+    public void setIncludeAssociatedPersons(boolean includeAssociatedPersons) {
+        this.includeAssociatedPersons = includeAssociatedPersons;
+    }
+
+    /**
+     * @param includeAssociatedPersonsOnParentProperty the includeAssociatedPersonsOnParentProperty to set
+     */
+    public void setIncludeAssociatedPersonsOnParentProperty(boolean includeAssociatedPersonsOnParentProperty) {
+        this.includeAssociatedPersonsOnParentProperty = includeAssociatedPersonsOnParentProperty;
+    }
+
+    /**
+     * @param includePersonAddrPhoneEmail the includePersonAddrPhoneEmail to set
+     */
+    public void setIncludePersonAddrPhoneEmail(boolean includePersonAddrPhoneEmail) {
+        this.includePersonAddrPhoneEmail = includePersonAddrPhoneEmail;
+    }
+
+    /**
+     * @param includeViolationNotes the includeViolationNotes to set
+     */
+    public void setIncludeViolationNotes(boolean includeViolationNotes) {
+        this.includeViolationNotes = includeViolationNotes;
+    }
+
+    /**
+     * @return the includeFieldInspectionReports
+     */
+    public boolean isIncludeFieldInspectionReports() {
+        return includeFieldInspectionReports;
+    }
+
+    /**
+     * @return the includeFieldInspectionReportsWithPhotos
+     */
+    public boolean isIncludeFieldInspectionReportsWithPhotos() {
+        return includeFieldInspectionReportsWithPhotos;
+    }
+
+    /**
+     * @param includeFieldInspectionReports the includeFieldInspectionReports to set
+     */
+    public void setIncludeFieldInspectionReports(boolean includeFieldInspectionReports) {
+        this.includeFieldInspectionReports = includeFieldInspectionReports;
+    }
+
+    /**
+     * @param includeFieldInspectionReportsWithPhotos the includeFieldInspectionReportsWithPhotos to set
+     */
+    public void setIncludeFieldInspectionReportsWithPhotos(boolean includeFieldInspectionReportsWithPhotos) {
+        this.includeFieldInspectionReportsWithPhotos = includeFieldInspectionReportsWithPhotos;
+    }
+
+    /**
+     * @return the includeDocDownloadLinks
+     */
+    public boolean isIncludeDocDownloadLinks() {
+        return includeDocDownloadLinks;
+    }
+
+    /**
+     * @param includeDocDownloadLinks the includeDocDownloadLinks to set
+     */
+    public void setIncludeDocDownloadLinks(boolean includeDocDownloadLinks) {
+        this.includeDocDownloadLinks = includeDocDownloadLinks;
+    }
+
+    /**
+     * @return the includeFeeAndPaymentInfo
+     */
+    public boolean isIncludeFeeAndPaymentInfo() {
+        return includeFeeAndPaymentInfo;
+    }
+
+    /**
+     * @param includeFeeAndPaymentInfo the includeFeeAndPaymentInfo to set
+     */
+    public void setIncludeFeeAndPaymentInfo(boolean includeFeeAndPaymentInfo) {
+        this.includeFeeAndPaymentInfo = includeFeeAndPaymentInfo;
+    }
+
+    /**
+     * @return the includeActionRequsts
+     */
+    public boolean isIncludeActionRequsts() {
+        return includeActionRequsts;
+    }
+
+    /**
+     * @param includeActionRequsts the includeActionRequsts to set
+     */
+    public void setIncludeActionRequsts(boolean includeActionRequsts) {
+        this.includeActionRequsts = includeActionRequsts;
+    }
+
+    /**
+     * @return the propDH
+     */
+    public PropertyDataHeavy getPropDH() {
+        return propDH;
+    }
+
+    /**
+     * @param propDH the propDH to set
+     */
+    public void setPropDH(PropertyDataHeavy propDH) {
+        this.propDH = propDH;
     }
     
     

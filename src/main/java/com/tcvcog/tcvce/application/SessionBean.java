@@ -36,6 +36,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
+import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
@@ -100,6 +101,22 @@ public class    SessionBean
     private OccChecklistTemplate sessChecklistTemplate;
     private OccSpaceType sessOccSpaceType;
     
+    /**
+     * Listener for bean requests to get a fresh copy of the current code book
+     */
+    public void refreshSessionCodeBook(){
+        CodeCoordinator codeCoor = getCodeCoordinator();
+        if(sessMuni != null && sessMuni.getCodeSet() != null){
+            try {
+                System.out.println("SessionBean.refreshSessionCodeBook | refreshing");
+                sessMuni.setCodeSet(codeCoor.getCodeSet(sessMuni.getCodeSet().getCodeSetID()));
+                sessCodeSet = sessMuni.getCodeSet();
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+            } 
+        }
+    }
+    
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                   III Property                                 <<< */
@@ -110,8 +127,6 @@ public class    SessionBean
     private ActivatableRouteEnum sessPropertyRoute;
 
     private PropertyUnit sessPropertyUnit;
-    
-    private boolean startPropInfoPageWithAdd;
     
     private MailingCityStateZip sessMailingCityStateZip;
     private MailingAddress sessMailingAddress;
@@ -367,7 +382,7 @@ public class    SessionBean
             BlobLinkEnum upstreamPool = bh.getBlobUpstreamPoolEnum();
             if(upstreamPool != null){
 
-                sessBlobHolderPool = bc.getBlobPool(bh);
+                sessBlobHolderPool = bc.getUpstreamBlobPool(bh);
             }
         }
         
@@ -402,6 +417,10 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                  SESSION SERVICES                              <<< */
     /* >>> -------------------------------------------------------------- <<< */
+    
+    private LocalDateTime noteholderRefreshTimestampTrigger;
+    
+    
     
     
     /**
@@ -1754,20 +1773,7 @@ public class    SessionBean
         this.sessEventsPageEventDomainRequest = sessEventsPageEventDomainRequest;
     }
 
-    /**
-     * @return the startPropInfoPageWithAdd
-     */
-    public boolean isStartPropInfoPageWithAdd() {
-        return startPropInfoPageWithAdd;
-    }
-
-    /**
-     * @param startPropInfoPageWithAdd the startPropInfoPageWithAdd to set
-     */
-    public void setStartPropInfoPageWithAdd(boolean startPropInfoPageWithAdd) {
-        this.startPropInfoPageWithAdd = startPropInfoPageWithAdd;
-    }
-    
+        
     public List<PublicInfoBundlePerson> getOccPermitAttachedPersons() {
         return occPermitAttachedPersons;
     }
@@ -2183,6 +2189,20 @@ public class    SessionBean
      */
     public void setSessFieldInspectionListForRefresh(List<FieldInspection> sessFieldInspectionListForRefresh) {
         this.sessFieldInspectionListForRefresh = sessFieldInspectionListForRefresh;
+    }
+
+    /**
+     * @return the noteholderRefreshTimestampTrigger
+     */
+    public LocalDateTime getNoteholderRefreshTimestampTrigger() {
+        return noteholderRefreshTimestampTrigger;
+    }
+
+    /**
+     * @param noteholderRefreshTimestampTrigger the noteholderRefreshTimestampTrigger to set
+     */
+    public void setNoteholderRefreshTimestampTrigger(LocalDateTime noteholderRefreshTimestampTrigger) {
+        this.noteholderRefreshTimestampTrigger = noteholderRefreshTimestampTrigger;
     }
 
     

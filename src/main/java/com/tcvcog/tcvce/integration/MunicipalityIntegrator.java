@@ -97,8 +97,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "       defaultcodeset, occpermitissuingsource_sourceid, novprintstyle_styleid, \n" +
                         "       profile_profileid, enablecodeenforcement, enableoccupancy, enablepublicceactionreqsub, \n" +
                         "       enablepublicceactionreqinfo, enablepublicoccpermitapp, enablepublicoccinspectodo, \n" +
-                        "       munimanager_userid, office_propertyid, notes, lastupdatedts, \n" +
-                        "       lastupdated_userid, primarystaffcontact_userid, defaultoccperiod    \n" +
+                        "       munimanager_userid, notes, lastupdatedts, \n" +
+                        "       lastupdated_userid, primarystaffcontact_userid, defaultoccperiod, officeparcel_parcelid    \n" +
                         "  FROM public.municipality"
                       + "  WHERE municode=? AND activeinprogram = true;";
         ResultSet rs = null;
@@ -167,7 +167,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mdh.setEnablePublicOccInspectionTODOs(rs.getBoolean("enablepublicoccinspectodo"));
 
         mdh.setMuniManager(ui.getUser(rs.getInt("munimanager_userid")));
-        mdh.setMuniOfficePropertyId(rs.getInt("office_propertyid"));
+        mdh.setMuniOfficePropertyId(rs.getInt("officeparcel_parcelid"));
         mdh.setDefaultOccPeriodID(rs.getInt("defaultoccperiod"));
         
         
@@ -281,7 +281,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "       profile_profileid=?, enablecodeenforcement=?, enableoccupancy=?, \n" +
                         "       enablepublicceactionreqsub=?, enablepublicceactionreqinfo=?, \n" +
                         "       enablepublicoccpermitapp=?, enablepublicoccinspectodo=?, munimanager_userid=?, \n" +
-                        "       office_propertyid=?, notes=?, lastupdatedts=now(), lastupdated_userid=?, \n" +
+                        "       officeparcel_parcelid=?, notes=?, lastupdatedts=now(), lastupdated_userid=?, \n" +
                         "       primarystaffcontact_userid=?, defaultoccperiod=?\n" +
                         " WHERE municode=?;";
         ResultSet rs = null;

@@ -363,13 +363,12 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      */
     public void removeOccInspectionFinalization(UserAuthorized ua, FieldInspection oi, IFace_inspectable inspectable) throws IntegrationException, BObStatusException{
         if(verifyUserAuthorizationForInspectionActions(ua, oi, inspectable)){
+            System.out.println("OccInspectionCoordinator.removeOccInspectionFinalization | passed checks, about to remove finalization for inspection ID " + oi.getInspectionID());
             oi.setDetermination(null);
             oi.setDeterminationBy(null);
             oi.setDeterminationTS(null);
             updateOccInspection(oi, ua);
         }
-        
-        
     }
     
     
@@ -387,7 +386,9 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         boolean auth = false;
         if(ua != null && oi != null && inspectable != null && inspectable.getManager() != null){
             if(ua.getUserID() == oi.getInspector().getUserID() || ua.getUserID() == inspectable.getManager().getUserID() || ua.getKeyCard().isHasSysAdminPermissions()){
-                auth = true;
+                if(oi.getDomainEnum() != null && oi.getDomainEnum() == inspectable.getDomainEnum()){
+                    auth = true;
+                }
             }
         }
         

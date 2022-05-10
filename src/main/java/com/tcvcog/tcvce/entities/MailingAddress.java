@@ -43,8 +43,6 @@ public  class   MailingAddress
     protected BOBSource source;
     protected String notes;
     
-    
-        
     protected String addressPretty2LineEscapeFalse;
     protected String addressPretty1Line;
     
@@ -262,6 +260,7 @@ public  class   MailingAddress
         this.addressPretty1Line = addressPretty1Line;
     }
 
+  
     
     
    

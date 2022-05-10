@@ -328,7 +328,7 @@
                                             toggleable="true"
                                             widgetVar="cecase-query-panel-var"
                                             collapsed="false"
-                                            rendered="#{ceCaseSearchProfileBB.activeLookupMode}"
+                                            rendered="true"
                                             header="Code Enforcement Cases">
 
                                     <h:form id="cecase-help-form">
@@ -349,12 +349,12 @@
 
                                         <p:selectOneMenu id="cecase-query-som" 
                                                          tabindex="1" 
-                                                         value="#{ceCaseSearchProfileBB.querySelected}"
-                                                         disabled="#{ceCaseSearchProfileBB.querySelected.queryExecuted}">
+                                                         value="#{ceCaseSearchAndReportBB.querySelected}"
+                                                         disabled="#{ceCaseSearchAndReportBB.querySelected.queryExecuted}">
                                             <f:converter converterId="bOBQueryConverter"/>
                                             <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
-                                            <f:selectItems id="querylist-si" value="#{ceCaseSearchProfileBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
-                                            <p:ajax listener="#{ceCaseSearchProfileBB.changeQuerySelected}"
+                                            <f:selectItems id="querylist-si" value="#{ceCaseSearchAndReportBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                            <p:ajax listener="#{ceCaseSearchAndReportBB.changeQuerySelected}"
                                                     update="@form
                                                     messages-global-form" />
                                         </p:selectOneMenu>
@@ -365,14 +365,14 @@
                                                        value="Description: " 
                                                        for="cecase-query-desc-ot" />
                                         <h:outputText id="cecase-query-desc-ot" 
-                                                      value="#{ceCaseSearchProfileBB.querySelected.queryName.desc}" />
+                                                      value="#{ceCaseSearchAndReportBB.querySelected.queryName.desc}" />
 
                                         <p:spacer height="5px" />
 
                                         <p:commandButton   id="cecase-executequery-cb" 
                                                            ajax="true" 
-                                                           actionListener="#{ceCaseSearchProfileBB.executeQuery}"
-                                                           disabled="#{ceCaseSearchProfileBB.querySelected.queryExecuted}"
+                                                           actionListener="#{ceCaseSearchAndReportBB.executeQuery}"
+                                                           disabled="#{ceCaseSearchAndReportBB.querySelected.queryExecuted}"
                                                            icon="fa fa-flash" 
                                                            styleClass="button"
                                                            value="run query" 
@@ -382,11 +382,11 @@
 
                                         <p:commandButton   id="cecase-search-clear-cb" 
                                                            ajax="true" 
-                                                           actionListener="#{ceCaseSearchProfileBB.resetQuery}"
+                                                           actionListener="#{ceCaseSearchAndReportBB.resetQuery}"
                                                            icon="fa fa-eraser" 
                                                            styleClass="button inline-button"
                                                            value="clear query" 
-                                                           disabled="#{!ceCaseSearchProfileBB.querySelected.queryExecuted}"
+                                                           disabled="#{!ceCaseSearchAndReportBB.querySelected.queryExecuted}"
                                                            update=" cecase-search-log-form
                                                            @form"/>
 
@@ -396,7 +396,7 @@
                                                                 onIcon="fa fa-indent"
                                                                 offLabel="Build Fresh Case List On Search"
                                                                 offIcon="fa fa-eraser"
-                                                                value="#{ceCaseSearchProfileBB.appendResultsToList}" 
+                                                                value="#{ceCaseSearchAndReportBB.appendResultsToList}" 
                                                                 disabled="false" />
 
                                     </h:form>
@@ -405,7 +405,7 @@
 
                                         <p:commandButton   id="cecase-search-results-clear-button" 
                                                            ajax="true" 
-                                                           actionListener="#{ceCaseSearchProfileBB.clearCECaseList}"
+                                                           actionListener="#{ceCaseSearchAndReportBB.clearCECaseList}"
                                                            icon="fa fa-eraser" 
                                                            styleClass="button"
                                                            value="clear results list" 
@@ -415,7 +415,7 @@
                                         <p:commandButton   id="cecase-search-loadhistory-button" 
                                                            ajax="true" 
                                                            rendered="false"
-                                                           actionListener="#{ceCaseSearchProfileBB.loadCECaseHistory}"
+                                                           actionListener="#{ceCaseSearchAndReportBB.loadCECaseHistory}"
                                                            icon="fa fa-clock-o" 
                                                            styleClass="button"
                                                            value="load case history" 
@@ -436,7 +436,7 @@
 
                                         <p:commandButton   id="print-case-list-cb" 
                                                            ajax="true" 
-                                                           actionListener="#{ceCaseSearchProfileBB.prepareReportCECaseList}"
+                                                           actionListener="#{ceCaseSearchAndReportBB.prepareReportCECaseList}"
                                                            icon="fa fa-print" 
                                                            styleClass="button"
                                                            oncomplete="PF('cecase-list-report-dialog-var').show()"
@@ -446,64 +446,85 @@
 
                                         <p:spacer height="5px" />
 
-                                        <h:outputText value="listing #{ceCaseSearchProfileBB.caseListSize} cases" 
+                                        <h:outputText value="listing #{ceCaseSearchAndReportBB.caseListSize} cases" 
                                                       styleClass="italic"/>
                                         <p:spacer height="5px" />
 
                                         <p:dataTable
                                             id="cecase-search-results-table"
-                                            var="c"
-                                            filteredValue="#{ceCaseSearchProfileBB.filteredCaseList}"
-                                            rowKey="#{c.caseID}"
-                                            rowExpandMode="multiple"
+                                            var="cse"
+                                            filteredValue="#{ceCaseSearchAndReportBB.filteredCaseList}"
+                                            rowKey="#{cse.caseID}"
                                             widgetVar="ceViewTable"
-                                            value="#{ceCaseSearchProfileBB.caseList}"
-                                            tableStyleClass="primeDataTable">
+                                            value="#{ceCaseSearchAndReportBB.caseList}"
+                                            tableStyleClass="primeDataTable"
+                                            rowExpandMode="single"
+                                            expandedRow="false"
+                                            resizableColumns="true">
 
-                                            <p:column width="10%" sortBy="#{c.caseManager.human.name}"
-                                                      filterBy="#{c.caseManager.human.name}">
+                                            <p:column width="5%" sortBy="#{cse.caseManager.human.name}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Exp" />
+                                                </f:facet>
+                                                <p:rowToggler />
+                                            </p:column>
+
+                                            <p:column width="20%" sortBy="#{cse.caseManager.human.name}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Manager" />
                                                 </f:facet>
-                                                <h:outputText value="#{c.caseManager.human.name}"/>
+                                                <h:outputText value="#{cse.caseManager.human.name}"/>
                                             </p:column>
-                                            <p:column width="10%" sortBy="#{c.originationDate}">
+                                            <p:column width="20%" sortBy="#{cse.originationDate}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Opened" />
                                                 </f:facet>
-                                                <h:outputText value="#{ceCaseSearchProfileBB.getPrettyDateNoTime(c.originationDate)}"/>
+                                                <h:outputText value="#{ceCaseSearchAndReportBB.getPrettyDateNoTime(cse.originationDate)}"/>
                                                 <p:spacer height="2px"/>
-                                                <h:outputText value="Age: #{c.caseAge} days"
+                                                <h:outputText value="Age: #{cse.caseAge} days"
                                                               style="font-style: italic"/>
-
                                             </p:column>
-                                            <p:column width="15%" sortBy="#{c.property.address.buildingNo}">
+                                            <p:column width="35%" 
+                                                      sortBy="#{cse.property.address.buildingNo}"
+                                                      filterBy="#{cse.originationEvent.category.eventCategoryTitle}">
+                                                      
                                                 <f:facet name="header">
-                                                    <h:outputText value="Property" />
+                                                    <h:outputText value="Info" />
                                                 </f:facet>
-                                                <h:outputText value="#{c.property.address.addressPretty2LineEscapeFalse} "
-                                                              escape="false"/>
-                                                <p:spacer height="2px"/>
-                                                <h:outputText value=" (#{c.property.muni.muniName})"/>
+                                                
+                                                <h:outputText value="#{cse.property.address.addressPretty1Line} "
+                                                              styleClass="bold"/>
+                                                    
+                                                <f:subview id="case-property-unit-subview"
+                                                               rendered="#{!empty cse.propUnit}" >
+                                                        
+                                                            <p:spacer height="2px"
+                                                                          rendered="#{!(empty cse.propUnit)}"/>
+                                                            <h:outputText value="Unit: #{cse.propUnit.unitNumber}" />
+                                                    </f:subview>
+                                                        <p:spacer height="2px"
+                                                                      rendered="#{!(empty cse.originationEvent)}"/>
+                                                    
+                                                        <h:outputText value="Origin: #{cse.originationEvent.category.eventCategoryTitle}"
+                                                                      rendered="#{!empty cse.originationEvent}"/>
+                                                        <p:spacer height="2px" />
+                                                        <h:outputText value="Name: #{cse.caseName}"/>
+                                                        
+                                                
+                                            
                                             </p:column>
-                                            <p:column width="10%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Name" />
-                                                </f:facet>
-                                                <h:outputText value="#{c.caseName}"/>
-                                            </p:column>
-                                            <p:column width="8%" sortBy="#{c.statusBundle.phase.caseStage.label}">
+                                            <p:column width="10%" sortBy="#{cse.statusBundle.phase.caseStage.label}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Stage" />
                                                 </f:facet>
-                                                <div class="#{c.statusBundle.phaseIcon.styleClass}">
-                                                    <i class="material-icons status-display-icon-i"><h:outputText value="#{c.statusBundle.phaseIcon.materialIcon}"/></i>
+                                                <div class="#{cse.statusBundle.phaseIcon.styleClass}">
+                                                    <i class="material-icons status-display-icon-i"><h:outputText value="#{cse.statusBundle.phaseIcon.materialIcon}"/></i>
                                                 </div>
                                                 <p:spacer height="1px" />
-                                                <h:outputText value="#{c.statusBundle.phase.caseStage.label}" style="font-size:0.7em;" />
+                                                <h:outputText value="#{cse.statusBundle.phase.caseStage.label}" style="font-size:0.7em;" />
 
                                             </p:column>
-                                            <p:column width="8%">
+                                            <p:column width="10%">
                                                 <f:facet name="header">
                                                     <h:outputText value="Actions" />
                                                 </f:facet>
@@ -512,13 +533,93 @@
 
                                                     <p:commandLink  id="cecase-search-view-case"
                                                                     value="view"
-                                                                    action="#{navigationBB.onCECaseListItemSelect(c)}"
+                                                                    action="#{navigationBB.onCECaseListItemSelect(cse)}"
                                                                     ajax="false"/>
-                                                    <p:spacer height="3px" />
-                                                    <h:outputText value="ID #{c.caseID}" />
+                                                    <p:spacer height="2px" />
+                                                    <h:outputText value="(ID: #{cse.caseID})" />
+                                                   
 
                                                 </div>
                                             </p:column>
+                                            <p:rowExpansion>
+                                                <h4>Case Details 
+                                                    <h:outputText value=" (#{cse.daysSinceLastEvent} days since last event)" />
+
+                                                </h4>
+                                                 <p:accordionPanel id="case-expansioninfo-panel">
+                                                     <p:tab title="Violations (#{cse.violationList.size()})">
+
+                                                        <p:dataScroller id="violations-scroller"
+                                                                      value="#{cse.violationList}"
+                                                                      var="viol"
+                                                                      style="font-family: sans-serif;">
+
+                                                          <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
+                                                                        style="font-weight: bold;"/>
+
+
+                                                          <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
+                                                                        style="font-weight: bold;"/>
+
+                                                          <h:outputText    id="violation-scroller-chapter-ot"
+                                                                           value="#{viol.violatedEnfElement.headerString}"
+                                                                           escape="false"/>
+
+
+                                                      </p:dataScroller>
+                                                         
+                                                     </p:tab>
+                                                     <p:tab title="Notices (#{cse.noticeList.size()})">
+
+                                                        <p:dataScroller id="case-nov-scroller"
+                                                                       value="#{cse.noticeList}"
+                                                                       var="nov"
+                                                                       style="font-family: sans-serif;">
+
+                                                           <h:outputText value="Mailed on: " 
+                                                                         rendered="#{!(empty nov.sentTS)}"/>
+                                                           <h:outputText value="#{nov.sentTSPretty}"
+                                                                         rendered="#{!(empty nov.sentTS)}"/>
+
+                                                       </p:dataScroller>
+                                                         
+                                                     </p:tab>
+                                                     <p:tab title="Citations (#{cse.citationList.size()})">
+
+                                                        <p:dataScroller id="case-citations-scroller"
+                                                                        value="#{cse.citationList}"
+                                                                        var="cit"
+                                                                        style="font-family: sans-serif;">
+                                                            <div style="text-decoration: underline;">
+                                                                <h:outputText value="ID: #{cit.citationNo}" />
+                                                            </div>
+                                                            <p:spacer height="3px" />
+                                                              <ui:repeat id="citation-status-uir"
+                                                                        value="#{cit.statusLog}"
+                                                                        var="logentry">
+                                                                 <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
+                                                                 <p:spacer height="3px" />
+                                                             </ui:repeat>
+                                                        </p:dataScroller>
+                                                         
+                                                     </p:tab>
+                                                     <p:tab title="Events (#{cse.eventList.size()})">
+                                                        <p:dataScroller id="case-events-scroller"
+                                                                        value="#{cse.eventList}"
+                                                                        var="ev">
+                                                                <h:outputText value="#{missionControlBB.getPrettyDate(ev.timeStart)}" 
+                                                                              style="font-weight: bold;"/>
+                                                                <h:outputText value=": "
+                                                                              style="font-weight: bold;"/>
+
+                                                                <h:outputText value="#{ev.category.eventCategoryTitle}" />
+                                                                 <p:spacer height="3px" />
+                                                                
+
+                                                        </p:dataScroller>
+                                                     </p:tab>
+                                                 </p:accordionPanel>
+                                            </p:rowExpansion>
                                         </p:dataTable>
 
 
@@ -539,7 +640,7 @@
                                     <h:form id="cecase-search-log-form">
                                         <div class='search-query-desc'>
                                             <h:outputText id="cecase-search-log-ot" 
-                                                          value="#{ceCaseSearchProfileBB.querySelected.queryLog}"
+                                                          value="#{ceCaseSearchAndReportBB.querySelected.queryLog}"
                                                           escape="false"/>
                                         </div>
                                     </h:form>
@@ -731,6 +832,7 @@
                                 widgetVar="cecase-list-report-dialog-var"
                                 closable="true" 
                                 responsive="true"
+                                dynamic="true"
                                 header="Configure Code Enforcement Case List Report"
                                 >
 
@@ -745,7 +847,7 @@
 
                                     <p:spacer height="5px"/>
 
-                                    <p:inputText id="report-caselist-title-it" style="width: 300px;" value="#{ceCaseSearchProfileBB.reportCECaseList.title}"/>
+                                    <p:inputText id="report-caselist-title-it" style="width: 300px;" value="#{ceCaseSearchAndReportBB.reportCECaseList.title}"/>
                                     <p:spacer height="5px"/>
                                     <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
 
@@ -757,7 +859,7 @@
 
                                     <p:spacer height="1px" />
                                     <p:datePicker 	 id="cecase-list-report-date-start-cal" 
-                                                    value="#{ceCaseSearchProfileBB.reportCECaseList.date_start_val}" 
+                                                    value="#{ceCaseSearchAndReportBB.reportCECaseList.date_start_val}" 
                                                     rendered="true"
                                                     style="width: 100%;"
                                                     pattern="MM/dd/yyyy HH:mm"
@@ -780,7 +882,7 @@
                                     <p:spacer height="1px" />
 
                                     <p:datePicker 	 id="cecase-list-report-date-end-cal" 
-                                                    value="#{ceCaseSearchProfileBB.reportCECaseList.date_end_val}" 
+                                                    value="#{ceCaseSearchAndReportBB.reportCECaseList.date_end_val}" 
                                                     rendered="true"
                                                     style="width: 100%;"
                                                     pattern="MM/dd/yyyy HH:mm"
@@ -796,7 +898,7 @@
 
                                     <h:outputLabel for="report-caselist-notes-ita" value="Notes"/>
                                     <p:spacer height="5px"/>
-                                    <p:inputText id="report-caselist-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchProfileBB.reportCECaseList.notes}"/>
+                                    <p:inputText id="report-caselist-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchAndReportBB.reportCECaseList.notes}"/>
                                 </div>
                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
 
@@ -805,37 +907,37 @@
                                     <div class="p-grid">
                                         <div class="p-col">
                                                 <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCaseNames}" />
+                                                <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeCaseNames}" />
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel class="bold" value="Include street level summary" for="report-caselist-streetsummary-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-streetsummary-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeStreetLevelSummary}" />
+                                                <p:selectBooleanCheckbox id="report-caselist-streetsummary-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeStreetLevelSummary}" />
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel class="bold" value="Include case status pie" for="report-caselist-casestatus-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-casestatus-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCECaseStatusPie}" />
+                                                <p:selectBooleanCheckbox id="report-caselist-casestatus-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeCECaseStatusPie}" />
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeListSummaryFigures}" />
+                                                <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeListSummaryFigures}" />
 
                                         </div>
                                         <div class="p-col">
                                                 <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeViolationList}" />
+                                                <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeViolationList}" />
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeEventSummaryByCase}" />
+                                                <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeEventSummaryByCase}" />
 
                                                 <p:spacer height="5px"/>
 
                                                 <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
-                                                <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchProfileBB.reportCECaseList.includeExtendedPropertyDetails}" />
+                                                <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeExtendedPropertyDetails}" />
 
                                         </div>
                                     </div>
@@ -846,7 +948,7 @@
                                         <h2>
 
                                             <p:commandLink  ajax="false" 
-                                                            action="#{ceCaseSearchProfileBB.generateReportCECaseList}"
+                                                            action="#{ceCaseSearchAndReportBB.generateReportCECaseList}"
                                                             value="Click to generate report in new tab" 
                                                             target="_blank"
                                                             styleClass="font-size:2em;"

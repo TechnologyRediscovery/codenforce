@@ -217,8 +217,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @return ref to the configured object
      */
     private MailingAddress configureMailingAddress(MailingAddress addr){
-        addr.setAddressPretty1Line(buildPropertyAddressStrings(addr, false));
-        addr.setAddressPretty2LineEscapeFalse(buildPropertyAddressStrings(addr, true));
+        addr.setAddressPretty1Line(buildPropertyAddressStrings(addr, false, false));
+        addr.setAddressPretty2LineEscapeFalse(buildPropertyAddressStrings(addr, true, true));
         return addr;
     }
     
@@ -539,7 +539,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    }
 
                    // Person list
-                   pdh.setHumanLinkList(pc.assembleLinkedHumanLinks(pdh));
+                   pdh.setHumanLinkList(pc.getHumanLinkList(pdh));
 
                    
                    
@@ -741,7 +741,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * conventional address printing
      * @return the String for injection into the property
      */
-    private String buildPropertyAddressStrings(MailingAddress addr, boolean use2Lines){
+    private String buildPropertyAddressStrings(MailingAddress addr, boolean use2Lines, boolean includeCSZ){
         StringBuilder addrStr = new StringBuilder();
         if(addr != null){
             
@@ -749,7 +749,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             if(addr.getStreet() != null){
                 addrStr.append(SPACE);
                 addrStr.append(addr.getStreet().getName());
-                if(addr.getStreet().getCityStateZip() != null){
+                if(addr.getStreet().getCityStateZip() != null && includeCSZ){
                     if(use2Lines){
                         addrStr.append(HTML_BR);
                     } else {

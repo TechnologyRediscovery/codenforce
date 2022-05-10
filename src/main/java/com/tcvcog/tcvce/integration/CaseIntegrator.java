@@ -846,6 +846,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getPublicControlCode());
             stmt.setInt(2, ceCase.getParcelKey());
+            
             if(ceCase.getPropertyUnitID() != 0){
                 stmt.setInt(3, ceCase.getPropertyUnitID());
             } else {
