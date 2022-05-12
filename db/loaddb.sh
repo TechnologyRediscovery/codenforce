@@ -7,6 +7,6 @@ dbname=cogdb
 username=changeme
 
 
-find . -maxdepth 1 -type f -name '*.tar' -exec bash -c "docker exec -i $container pg_restore < {}" \;
+find . -maxdepth 1 -type f -name '*.tar' -exec bash -c "docker exec -i $container pg_restore -d $dbname < {}" \;
 
 find . -maxdepth 1 -type f -name '*.sql' -exec bash -c "docker exec -i $container psql -U $username -d $dbname < {}" \;
