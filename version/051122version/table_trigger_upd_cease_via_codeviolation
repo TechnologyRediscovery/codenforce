@@ -1,0 +1,9 @@
+-- Trigger: trg_upd_cecase_via_codeviolation
+
+DROP TRIGGER IF EXISTS trg_upd_cecase_via_codeviolation ON public.codeviolation;
+
+CREATE TRIGGER trg_upd_cecase_via_codeviolation
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.codeviolation
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_cecase_via_codeviolation_create();

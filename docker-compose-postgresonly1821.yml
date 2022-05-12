@@ -1,0 +1,5 @@
+
+postgres:
+  image: postgres:9.4
+  volumes:
+    - ./init.sql:/docker-entrypoint-initdb.d/init.sql

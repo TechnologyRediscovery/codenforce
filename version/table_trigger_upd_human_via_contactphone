@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_human_via_contactphone
+
+DROP TRIGGER IF EXISTS trigger_upd_human_via_contactphone ON public.contactphone;
+
+CREATE TRIGGER trigger_upd_human_via_contactphone
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.contactphone
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_human_via_contactphone();
+
+COMMENT ON TRIGGER trigger_upd_human_via_contactphone ON public.contactphone
+    IS 'This function will update the human table if the human contactphone table is updated. ';

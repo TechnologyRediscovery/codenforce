@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_occperiod_via_occperiodeventrule
+
+DROP TRIGGER IF EXISTS trigger_upd_occperiod_via_occperiodeventrule ON public.occperiodeventrule;
+
+CREATE TRIGGER trigger_upd_occperiod_via_occperiodeventrule
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.occperiodeventrule
+    FOR EACH ROW
+    EXECUTE PROCEDURE public."trigger_upd_occperiod_via_occperiodeventrule "();
+
+COMMENT ON TRIGGER trigger_upd_occperiod_via_occperiodeventrule ON public.occperiodeventrule
+    IS 'Update the occperiod when the occperiodeventrule table has an action taken on it. (insert,upd,delete)';

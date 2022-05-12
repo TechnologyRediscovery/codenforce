@@ -1,0 +1,29 @@
+DECLARE					
+	temp_parcelkey integer;	
+    temp_user integer; 
+
+    			
+    BEGIN			
+        --			
+        --Update the parcel lastupdate and user when parcelinfo table is has action taken.		
+        -- 	   RETURN(SELECT CAST ( current_user AS text ));
+        temp_user = 99;
+        IF (TG_OP = 'DELETE') THEN 			
+          
+	       UPDATE parcel SET lastupdatedts = now(),lastupdatedby_userid = OLD.lastupdated_userid
+           WHERE parcelkey = OLD.parcel_parcekkey;
+				   RETURN OLD;
+        ELSEIF 			
+        (TG_OP = 'INSERT') THEN	
+        
+            UPDATE parcel SET lastupdatedts = now(),lastupdatedby_userid = NEW.lastupdated_userid 
+            WHERE parcelkey = NEW.parcel_parcekkey;
+				   RETURN NEW;
+        ELSIF (TG_OP = 'UPDATE') THEN
+        
+           UPDATE parcel SET lastupdatedts = now(),lastupdatedby_userid = NEW.lastupdated_userid 
+            WHERE parcelkey = NEW.parcel_parcekkey;
+				   RETURN NEW;
+        END IF;	   
+    END;  
+    

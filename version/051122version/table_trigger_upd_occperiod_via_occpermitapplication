@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_occperiod_via_occperiodpermitapplication 
+
+DROP TRIGGER IF EXISTS "trigger_upd_occperiod_via_occperiodpermitapplication " ON public.occpermitapplication;
+
+CREATE TRIGGER "trigger_upd_occperiod_via_occperiodpermitapplication "
+    AFTER INSERT OR DELETE OR UPDATE OF applicationid, reason_reasonid, submissiontimestamp, submitternotes, internalnotes, propertyunitid, declaredtotaladults, declaredtotalyouth, occperiod_periodid, rentalintent, status, externalnotes
+    ON public.occpermitapplication
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_occperiod_via_occpermitapplication();
+
+COMMENT ON TRIGGER "trigger_upd_occperiod_via_occperiodpermitapplication " ON public.occpermitapplication
+    IS 'trigger to call function to update the occperiod information when action take on the occperiodpermitapplication table.';

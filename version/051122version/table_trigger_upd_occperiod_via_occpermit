@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_occperiod_via_occpermit
+
+-- DROP TRIGGER IF EXISTS trigger_upd_occperiod_via_occpermit ON public.occpermit;
+
+CREATE TRIGGER trigger_upd_occperiod_via_occpermit
+    AFTER INSERT OR DELETE OR UPDATE OF permitid, occperiod_periodid, referenceno, issuedto_personid, issuedby_userid, dateissued, permitadditionaltext, notes
+    ON public.occpermit
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_occperiod_via_occpermit();
+
+COMMENT ON TRIGGER trigger_upd_occperiod_via_occpermit ON public.occpermit
+    IS 'This trigger will update the occperiod with the  occpermit. ';

@@ -1,0 +1,4 @@
+CREATE TRIGGER upd_cecase_via_event
+    AFTER INSERT or DELETE or UPDATE ON event 
+    FOR EACH ROW
+    EXECUTE FUNCTION upd_cecase_via_event();

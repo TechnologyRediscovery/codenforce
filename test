@@ -1,0 +1,11 @@
+ALTER TABLE public.cecase ADD COLUMN parcelunit_unitid integer;
+
+ALTER TABLE public.cecase ADD COLUMN parcel_parcelkey integer;
+ALTER TABLE public.cecase
+  ADD CONSTRAINT cecase_parcelunitid_fk FOREIGN KEY (parcelunit_unitid)
+      REFERENCES public.parcelunit (unitid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
+  ALTER TABLE public.cecase
+  ADD CONSTRAINT cecase_parcelkey_fk FOREIGN KEY (parcel_parcelkey)
+      REFERENCES public.parcel (parcelkey) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;

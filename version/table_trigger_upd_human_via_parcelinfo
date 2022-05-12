@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_parcel_via_parcelinfo
+
+DROP TRIGGER IF EXISTS trigger_upd_parcel_via_parcelinfo ON public.parcelinfo;
+
+CREATE TRIGGER trigger_upd_parcel_via_parcelinfo
+    BEFORE INSERT OR DELETE OR UPDATE OF parcelinfoid, parcel_parcelkey, usegroup, constructiontype, countycode, notes, ownercode, propclass, locationdescription, bobsource_sourceid, unfitdatestart, unfitdatestop, unfitby_userid, abandoneddatestart, abandoneddatestop, abandonedby_userid, vacantdatestart, vacantdatestop, vacantby_userid, condition_intensityclassid, landbankprospect_intensityclassid, landbankheld, nonaddressable, usetype_typeid, createdts
+    ON public.parcelinfo
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_parcel_via_parcelinfo();
+
+COMMENT ON TRIGGER trigger_upd_parcel_via_parcelinfo ON public.parcelinfo
+    IS 'This trigger will call function to update parcel if action taken on parcelinfo.  ';

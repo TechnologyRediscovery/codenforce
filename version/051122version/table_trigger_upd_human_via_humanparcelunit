@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_human_via_humanparcelunit
+
+DROP TRIGGER IF EXISTS trigger_upd_human_via_humanparcelunit ON public.humanparcelunit;
+
+CREATE TRIGGER trigger_upd_human_via_humanparcelunit
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.humanparcelunit
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_human_via_humanparcelunit();
+
+COMMENT ON TRIGGER trigger_upd_human_via_humanparcelunit ON public.humanparcelunit
+    IS 'This function updates the human table userid and lastupdate dt when action is taken on humanparcelunit table (insert,del,upd). ';

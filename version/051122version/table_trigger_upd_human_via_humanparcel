@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_parcel_via_humanparcel
+
+DROP TRIGGER IF EXISTS trigger_upd_parcel_via_humanparcel ON public.humanparcel;
+
+CREATE TRIGGER trigger_upd_parcel_via_humanparcel
+    AFTER INSERT OR DELETE OR UPDATE OF human_humanid, lastupdatedts, lastupdatedby_userid
+    ON public.humanparcel
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_parcel_via_humanparcel();
+
+COMMENT ON TRIGGER trigger_upd_parcel_via_humanparcel ON public.humanparcel
+    IS 'Update to parcel via action on the  humanparcel table ';

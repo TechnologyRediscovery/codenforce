@@ -1,0 +1,4 @@
+CREATE TRIGGER upd_cecase_via_citationdocketnum
+    AFTER INSERT or DELETE or UPDATE ON citationdocketnum
+    FOR EACH ROW
+    EXECUTE FUNCTION upd_cecase_via_citationdocketnum();

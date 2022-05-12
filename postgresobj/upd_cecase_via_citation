@@ -1,0 +1,50 @@
+﻿begin
+    CREATE OR REPLACE FUNCTION upd_cecase_via_citation() RETURNS TRIGGER AS $$
+    DECLARE
+    temp_citation integer
+    temp_cv_citation_citationid
+    temp.citationid;
+
+    BEGIN
+        --
+        -- Perform the required operation on emp, and create a row in emp_audit
+        -- to reflect the change made to emp.
+        IF (TG_OP = 'DELETE') THEN 
+           OLD.citationid = temp_citation;
+           OLD.citation_citationid  = temp_cv_citation_citationid;
+        ELSEIF 
+        (TG_OP = 'UPDATE' or 'INSERT') THEN
+            NEW.citationid = temp_citation;
+            NEW.citation_citationid  = temp_cv_citation_citationid;
+        END IF;
+        CREATE TEMP TABLE IF NOT EXISTS temp_table AS
+        SELECT citationid FROM citationviolation where citationid =temp_cv_citation_citationid;
+         
+        set temp_citationid = citation_citationid;
+       
+        SELECT cecase.caseid where temp.cecase.caseid = cecase.caseid 
+        FROM cecase;
+      
+        set temp.cecase.caseid = cecase.caseid;   
+        IF (TG_OP = 'DELETE') THEN
+            
+            OLD.last_updated = now();
+            OLD.last_user = user;
+            INSERT INTO cecase VALUES(OLD.*);
+            RETURN OLD;
+        ELSIF (TG_OP = 'UPDATE') THEN
+          
+            NEW.lastupdatedby_userid = now();
+            NEW.cecase.lastupdatedby_userid = user;
+            INSERT INTO cecase VALUES(NEW.*);
+            RETURN NEW;
+        ELSIF (TG_OP = 'INSERT') then
+        
+            NEW.lastupdatedby_userid = now();
+            NEW.cecase.lastupdatedby_userid = user;
+            INSERT INTO cecase VALUES(NEW.*);
+            RETURN NEW;
+        END IF;
+    END;   
+    $$ LANGUAGE plpgsql;
+    END;

@@ -1,0 +1,9 @@
+#syntax=docker/dockerfile:1
+#FROM ubuntu:16.04 
+FROM codenforce_db
+COPY ./codenforce/Docker/init.sql /docker-entrypoint-initdb.d/
+#RUN docker exec run --rm -P --name codenforce_db
+#RUN docker exec ps
+#RUN docker run codenforce_db
+#RUN psql -h localhost -p 5432 -d cogdb  -U changeme --password changeme
+

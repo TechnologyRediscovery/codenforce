@@ -1,0 +1,9 @@
+-- Trigger: trigger_up_cecase_via_citation
+
+DROP TRIGGER IF EXISTS trigger_up_cecase_via_citation ON public.citation;
+
+CREATE TRIGGER trigger_up_cecase_via_citation
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.citation
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_cecase_via_citation();

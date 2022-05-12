@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_parcel_via_humanmailingaddress
+
+DROP TRIGGER IF EXISTS trigger_upd_parcel_via_humanmailingaddress ON public.humanmailingaddress;
+
+CREATE TRIGGER trigger_upd_parcel_via_humanmailingaddress
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.humanmailingaddress
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_parcel_via_mailingaddress();
+
+COMMENT ON TRIGGER trigger_upd_parcel_via_humanmailingaddress ON public.humanmailingaddress
+    IS 'Update the parcel userid and upd date when action is taken on the humanmailingaddress (upd,insert,delete)';

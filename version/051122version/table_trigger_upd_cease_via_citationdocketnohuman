@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_cecase_via_citationdocketnohuman
+
+DROP TRIGGER IF EXISTS trigger_upd_cecase_via_citationdocketnohuman ON public.citationdocketnohuman;
+
+CREATE TRIGGER trigger_upd_cecase_via_citationdocketnohuman
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.citationdocketnohuman
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_cecase_via_docketnohuman();
+
+COMMENT ON TRIGGER trigger_upd_cecase_via_citationdocketnohuman ON public.citationdocketnohuman
+    IS 'This is the table trigger that will update the cecase when an action is taken on ti citationdocketnohuman table (add,delete,update).';

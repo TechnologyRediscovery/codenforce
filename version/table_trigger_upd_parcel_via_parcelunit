@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_parcel_via_parcelunit
+
+-- DROP TRIGGER IF EXISTS trigger_upd_parcel_via_parcelunit ON public.parcelunit;
+
+CREATE TRIGGER trigger_upd_parcel_via_parcelunit
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.parcelunit
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_parcel_via_parcelunit();
+
+COMMENT ON TRIGGER trigger_upd_parcel_via_parcelunit ON public.parcelunit
+    IS 'Update the parcel when the parcelunit table has action taken on it (update,delete,or insert). ';

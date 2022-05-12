@@ -1,0 +1,27 @@
+DECLARE			
+	temp_violationid integer; 		
+	temp_cecase_caseid integer;	
+    temp_user integer; 
+ 
+    BEGIN			
+        --			
+        --Update the cecase lastupdate and user when citation record is updated.		
+        -- 	   RETURN(SELECT CAST ( current_user AS text ));
+        temp_user = 99;
+        IF (TG_OP = 'DELETE') THEN 			
+	       UPDATE cecase SET lastupdatedts = now(),lastupdatedby_userid = OLD.lastupdated_userid
+            WHERE propertyunit_unitid IN (SELECT propertyunit_unitid FROM occupancyperiod WHERE occperiod_periodid IN (SELECT occperiod_periodid FROM occinspection WHERE occperiod_periodid IN (SELECT inpectedspacedid FROM occinspectedspace WHERE inspectedspaceid  = OLD.inspectedspace_inspectedspacedid)));
+			      RETURN OLD;	
+        ELSEIF 			
+        (TG_OP = 'INSERT') THEN			
+            UPDATE cecase SET lastupdatedts = now(),lastupdatedby_userid = NEW.lastupdated_userid 
+              WHERE propertyunit_unitid IN (SELECT propertyunit_unitid FROM occupancyperiod WHERE occperiod_periodid IN (SELECT occperiod_periodid FROM occinspection WHERE occperiod_periodid IN (SELECT inpectedspacedid FROM occinspectedspace WHERE inspectedspaceid  = NEW.inspectedspace_inspectedspacedid)));
+			      RETURN NEW;
+        ELSIF 
+        (TG_OP = 'UPDATE') THEN	
+            UPDATE cecase SET lastupdatedts = now(),lastupdatedby_userid = temp_user
+            WHERE propertyunit_unitid IN (SELECT propertyunit_unitid FROM occupancyperiod WHERE occperiod_periodid IN (SELECT occperiod_periodid FROM occinspection WHERE occperiod_periodid IN (SELECT inpectedspacedid FROM occinspectedspace WHERE inspectedspaceid  = NEW.inspectedspace_inspectedspacedid)));
+			      RETURN NEW;		
+     	END IF;	   
+    END;  
+    

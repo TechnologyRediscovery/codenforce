@@ -1,0 +1,9 @@
+-- Trigger: trigger_upd_occperiod_via_occperiodphotodoc
+
+DROP TRIGGER IF EXISTS trigger_upd_occperiod_via_occperiodphotodoc ON public.occperiodphotodoc;
+
+CREATE TRIGGER trigger_upd_occperiod_via_occperiodphotodoc
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.occperiodphotodoc
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_occperiod_via_occperiodphotodoc();

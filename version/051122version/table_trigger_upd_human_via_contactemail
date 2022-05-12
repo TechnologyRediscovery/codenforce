@@ -1,0 +1,9 @@
+-- Trigger: trigger_upd_human_via_contactemail
+
+DROP TRIGGER IF EXISTS trigger_upd_human_via_contactemail ON public.contactemail;
+
+CREATE TRIGGER trigger_upd_human_via_contactemail
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.contactemail
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_human_via_contactemail();

@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_parcel_via_parcelphotodoc
+
+DROP TRIGGER IF EXISTS trigger_upd_parcel_via_parcelphotodoc ON public.parcelphotodoc;
+
+CREATE TRIGGER trigger_upd_parcel_via_parcelphotodoc
+    AFTER INSERT OR DELETE OR UPDATE OF photodoc_photodocid, parcel_parcelkey
+    ON public.parcelphotodoc
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_parcel_via_parcelphotodoc();
+
+COMMENT ON TRIGGER trigger_upd_parcel_via_parcelphotodoc ON public.parcelphotodoc
+    IS 'Update the parcel when action taken on the parcelphotodoc table. ';

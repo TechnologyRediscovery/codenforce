@@ -1,0 +1,12 @@
+-- Trigger: triggger_upd_occperiod_via_event
+
+DROP TRIGGER IF EXISTS triggger_upd_occperiod_via_event ON public.event;
+
+CREATE TRIGGER triggger_upd_occperiod_via_event
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.event
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_occperiod_via_event();
+
+COMMENT ON TRIGGER triggger_upd_occperiod_via_event ON public.event
+    IS 'This trigger will update the event table when occperiod has action take on it (insert,upd,delete).';

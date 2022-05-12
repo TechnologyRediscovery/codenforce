@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_cecase_via_occinspection 
+
+DROP TRIGGER IF EXISTS "trigger_upd_cecase_via_occinspection " ON public.occinspection;
+
+CREATE TRIGGER "trigger_upd_cecase_via_occinspection "
+    BEFORE INSERT OR DELETE OR UPDATE 
+    ON public.occinspection
+    FOR EACH ROW
+    EXECUTE PROCEDURE public."trigger_upd_cecase_via_occinspection "();
+
+COMMENT ON TRIGGER "trigger_upd_cecase_via_occinspection " ON public.occinspection
+    IS 'This trigger will update the cecase userid and last update date when action is taken on the occinspection(update,delete,insert). ';

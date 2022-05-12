@@ -1,0 +1,29 @@
+begin
+		CREATE OR REPLACE FUNCTION upd_occperiod_via_occinspection() RETURNS TRIGGER AS $$
+    BEGIN
+        --
+        -- Perform the required update the occperiod if action taken on occperiodpermitapplication
+        set occinspection.occperiod_periodid = temp_occperiod_periodid;
+        CREATE TEMP TABLE IF NOT EXISTS temp_table AS
+        SELECT * FROM occperiod where occperiod.periodid = temp_occperiod_periodid;     
+        IF (TG_OP = 'DELETE') THEN
+        
+            OLD.last_updated = now();
+            OLD.last_user = user;
+            INSERT INTO occperiod VALUES(OLD.*);
+            RETURN OLD;
+        ELSIF (TG_OP = 'UPDATE') THEN
+          
+            NEW.lastupdatedby_userid = now();
+            NEW.occperiod.lastupdatedby_userid = user;
+            INSERT INTO occperiod VALUES(NEW.*);
+            RETURN NEW;
+        ELSIF (TG_OP = 'INSERT') then
+            NEW.lastupdatedby_userid = now();
+            NEW.occperiod.lastupdatedby_userid = user;
+            INSERT INTO occperiod VALUES(NEW.*);
+            RETURN NEW;
+        END IF;
+    END;   
+    $$ LANGUAGE plpgsql;
+END;

@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_human_via_humanoccperiod
+
+DROP TRIGGER IF EXISTS trigger_upd_human_via_humanoccperiod ON public.humanoccperiod;
+
+CREATE TRIGGER trigger_upd_human_via_humanoccperiod
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.humanoccperiod
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_human_via_humanoccperiod();
+
+COMMENT ON TRIGGER trigger_upd_human_via_humanoccperiod ON public.humanoccperiod
+    IS 'Update the human table based on humanoccperiod. ';

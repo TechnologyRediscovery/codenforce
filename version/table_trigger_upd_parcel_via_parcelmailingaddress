@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_parcel_via_ parcelmailingaddress
+
+DROP TRIGGER IF EXISTS "trigger_upd_parcel_via_ parcelmailingaddress" ON public.parcelmailingaddress;
+
+CREATE TRIGGER "trigger_upd_parcel_via_ parcelmailingaddress"
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.parcelmailingaddress
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_parcel_via_mailingaddress();
+
+COMMENT ON TRIGGER "trigger_upd_parcel_via_ parcelmailingaddress" ON public.parcelmailingaddress
+    IS 'Update the parcel user and last upd date when the parcelamailingaddress table is updated';

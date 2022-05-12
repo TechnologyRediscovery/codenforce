@@ -1,15 +1,15 @@
-FROM jboss/wildfly:14.0.1.Final
+#syntax=docker/dockerfile:1
+FROM ubuntu:16.04 
+WORKDIR /codenforce
+#RUN docker exec -ti pwd 
+#RUN docker exec -ti ls
+CMD sudo docker exec --rm -P --name jl_test codenforce_db  
+COPY ./init.sql .
+#RUN docker exec run --rm -P --name codenforce_db 
+#RUN docker exec ps
+#RUN docker run codenforce_db
+#RUN psql -h localhost -p 5432 -d cogdb  -U changeme --password changeme
+CMD sudo docker exec psql -h localhost -p 5432 -d cogdb  -U changeme --password changeme 
+#sudo docker exec -ti jl_test  psql -h localhost -p 5432 -d cogdb  -U changeme --password changeme -c \"$FUN_SQL2\" ??
+CMD sudo docker exec ./codenforce/init.sql
 
-# server configuration
-COPY codeconnect/server/standalone-full-docker.xml /opt/jboss/wildfly/standalone/configuration/standalone.xml
-
-# get postgresql plugin
-RUN curl https://jdbc.postgresql.org/download/postgresql-42.2.5.jar -o postgresql-42.2.5.jar
-RUN mkdir -p /opt/jboss/wildfly/modules/system/layers/base/org/postgresql/main/
-RUN mv postgresql-42.2.5.jar /opt/jboss/wildfly/modules/system/layers/base/org/postgresql/main/
-COPY codeconnect/server/module.xml /opt/jboss/wildfly/modules/system/layers/base/org/postgresql/main/
-
-
-EXPOSE 8080
-EXPOSE 9990
-EXPOSE 8787

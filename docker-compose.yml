@@ -1,18 +1,18 @@
 version: "3"
 services:
   db:
-    build: db
-    ports:
-      - "5432:5432"
+    image: codenforce_db
+    environment: 
+      POSTGRES_DB: cog_db
+      POSTGRES_USER: changeme
+      POSTGRES_PASSWORD: changeme
     volumes:
-      - ./db/pg-data/pg-data:/pg-data
-  wildfly:
-    build: .
+     - ./db/pg-data/pg-data:/pg-data
+     - cnf:/home/techred4/codenforce/
+ #   - ./db/docker-entrypoint-initdb.d/test.sh
     ports:
-      - "8080:8080"
-      - "9990:9990"
-      - "8787:8787"
-    volumes:
-      - ./target/war/:/opt/jboss/wildfly/standalone/deployments/
-    depends_on:
-      - db
+    - "5432:5432"     
+volumes: 
+  cnf: 
+
+
