@@ -200,18 +200,10 @@
                     <h:form id="pers-search-results-form">
                         
                         <div class="p-grid">
-                            <div class="p-col-12">
+                            <div class="p-col-8">
                                 
                                 <h:outputText value="list contains #{personBB.personList.size()} persons " 
                                               styleClass="italic"/>
-                            </div>
-                            <div class="p-col-8">
-
-                                <p:outputLabel for="pers-query-appendresults-chkbx">
-                                    <h:outputText value="Append incoming to working list? "
-                                                  styleClass="bold"/>
-                                </p:outputLabel>
-                                
                             </div>
                             
                             <div class="p-col-4">
@@ -226,9 +218,20 @@
                             </div>
                             <div class="p-col-6">
 
+                                <p:outputLabel for="pers-query-appendresults-chkbx">
+                                    <h:outputText value="Append incoming to working list? "
+                                                  styleClass="bold"/>
+                                </p:outputLabel>
+                                
+                            </div>
+                            <div class="p-col-6">
+
                                 <p:selectBooleanCheckbox   id="pers-query-appendresults-chkbx" 
                                                            value="#{personBB.appendResultsToList}" 
-                                                           disabled="false" />
+                                                           disabled="false" 
+                                                           >
+                                    <p:ajax />
+                                </p:selectBooleanCheckbox>
                                 
                             </div>
                             <div class="p-col-6">
@@ -239,15 +242,8 @@
                                                     value="queue entire list"
                                                     update="pers-selected-form
                                                     persontools-growl-form"/>
-                                
-                                
                             </div>
-                            
-                            
                         </div>
-                        
-                        
-                        
 
                         <p:dataTable
                             id="personTable"
@@ -1085,7 +1081,7 @@
                                               icon="fa fa-plus"
                                               actionListener="#{personBB.onHumanLinkAddInitButtonChange}"
                                               disabled="true"
-                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                              rendered="false"
                                               oncomplete="PF('human-createlink-dialog-var').show();"
                                               update="human-createlink-dialog
                                               human-createlink-form
@@ -1137,7 +1133,8 @@
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                     oncomplete="PF('humanlink-viewedit-dialog-var').show();"
                                                     update="humanlink-viewedit-dialog
-                                                    humanlink-viewedit-form"
+                                                    humanlink-viewedit-form
+                                                    humanlink-notes-form"
                                                     />
 
                             </p:column>
@@ -1363,7 +1360,7 @@
                 </div>
             </div>
         </h:form>
-        <h:form id="personlink-note-form">
+        <h:form id="humanlink-notes-form">
             <div class="p-grid">
                 
                 <div class="p-col-4">

@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -121,9 +122,10 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return a list, not empty if there are linked humans
      * @throws IntegrationException 
      */
-    public List<HumanLink> getHumanLinks(IFace_humanListHolder hlh) throws IntegrationException{
+    public List<HumanLink> getHumanLinks(IFace_humanListHolder hlh) throws IntegrationException, BObStatusException{
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
+        PersonCoordinator pc = getPersonCoordinator();
         ResultSet rs = null;
         if(hlh == null){
             throw new IntegrationException("Cannot get linked humans with null list holder object!!");
@@ -152,7 +154,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             while (rs.next()) {
                 HumanLink hl = generateHumanLink(rs, getHuman(rs.getInt("human_humanid")));
                 hl.setParentObjectID(hlh.getHostPK());
-                
+//                pc.configureContactable(hl);
                 linkedHumans.add(hl);
             }
 

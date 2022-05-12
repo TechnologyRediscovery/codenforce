@@ -302,7 +302,7 @@
                                 <p:commandLink  id="person-view-commandlink"
                                                 ajax="true" 
                                                 value="view"
-                                                actionListener="#{personBB.explorePerson(per)}"
+                                                actionListener="#{personBB.onHumanLinkEditInitButtonChange(per, propertyProfileBB.currentPropertyUnit)}"
                                                 oncomplete="PF('person-profile-dialog-var').show();"
                                                 update="person-info-form
                                                 person-profile-addresses-form

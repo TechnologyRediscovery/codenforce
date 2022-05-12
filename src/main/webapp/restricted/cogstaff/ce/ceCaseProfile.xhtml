@@ -586,6 +586,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </h:form>
                                             </div>
                                         </div>
+                                        
+                                          <h:form id="case-refresh-trigger-form">
+                                              <h:outputText value="#{ceCaseBB.reloadCECaseTrigger}" />
+                                          </h:form>
+                                              
+        
 
                                     </p:panel>
 
@@ -767,6 +773,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             styleClass="noFill button-size-small"
                                                                             action="#{ceCaseBB.onEventViewButtonChange(eventfuture)}"
                                                                             value="View"
+                                                                            rendered="false"
                                                                             oncomplete="PF('event-profile-dialog-var').show()"
                                                                             update="event-profile-dialog
                                                                             event-profile-form"
@@ -783,6 +790,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                             styleClass="noFill button-size-small link-button"
                                                                             action="#{ceCaseBB.onEventViewButtonChange(eventfuture)}"
                                                                             value="Update"
+                                                                            rendered="false"
                                                                             oncomplete="PF('event-profile-dialog-var').show()"
                                                                             update="event-profile-dialog
                                                                             event-profile-form"
@@ -793,6 +801,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <div class="restrict-main-contents-io-link link-button">
                                                         <p:commandLink      id="event-dismiss0-button"
                                                                             ajax="true"
+                                                                            rendered="false"
                                                                             styleClass="noFill button-size-small"
                                                                             action="#{ceCaseBB.onEventViewButtonChange(eventfuture)}"
                                                                             value="Dismiss and deactivate"

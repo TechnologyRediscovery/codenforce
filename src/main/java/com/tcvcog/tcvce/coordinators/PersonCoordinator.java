@@ -31,6 +31,8 @@ import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.HumanLink;
+import com.tcvcog.tcvce.entities.IFace_addressListHolder;
+import com.tcvcog.tcvce.entities.IFace_contactable;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -127,7 +129,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * Note the caller will probably want to cast back to the original type
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public List<HumanLink> getHumanLinkList(IFace_humanListHolder hlh) throws IntegrationException{
+    public List<HumanLink> getHumanLinkList(IFace_humanListHolder hlh) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
         List<HumanLink> hll = null;
         
@@ -150,7 +152,9 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
            throw new BObStatusException("Cannot get link without nonzero ID and non null link enum");
        }
        PersonIntegrator pi = getPersonIntegrator();
-       return pi.getHumanLink(linkID, lose);
+       HumanLink hl = pi.getHumanLink(linkID, lose);
+       configureContactable(hl);
+       return hl;
    }
     
     /**
@@ -354,7 +358,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             return null;
         }
         Person p = new Person(hum);
-        p = configurePerson(p);
+        p = (Person) configureContactable(p);
         return p;
     }
     
@@ -439,7 +443,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param p
      * @return the configured person
      */
-    private Person configurePerson(Person p) throws IntegrationException, BObStatusException{
+    public IFace_contactable configureContactable(IFace_contactable p) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
         
@@ -468,13 +472,12 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
-    
     /**
      * Internal logic for building an HTML string
      * of the mailing addresses linked to this person
      * @param p 
      */
-    private void generateMADLinkListPretty(Person p){
+    private void generateMADLinkListPretty(IFace_contactable p){
         if(p != null && p.getMailingAddressLinkList() != null && !p.getMailingAddressLinkList().isEmpty()){
             StringBuilder sb = new StringBuilder("");
             for(MailingAddressLink madlink: p.getMailingAddressLinkList()){
@@ -484,8 +487,6 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             }
             p.setMailingAddressListPretty(sb.toString());
         }
-        
-        
     }
     
     /**
@@ -493,7 +494,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * breaks and type, etc.
      * @param p 
      */
-    private void generatePhoneListPretty(Person p){
+    private void generatePhoneListPretty(IFace_contactable p){
         if(p != null && p.getPhoneList() != null && !p.getPhoneList().isEmpty()){
             StringBuilder sb = new StringBuilder("");
             for(ContactPhone ph: p.getPhoneList()){
@@ -504,7 +505,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
                 if(ph.getExtension() != 0){
                     sb.append("[ext. ");
                     sb.append(ph.getExtension());
-                    sb.append("[ext.] ");
+                    sb.append("] ");
                 }
                 sb.append("<br />");
             }
@@ -518,7 +519,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * of a person's email list.
      * @param p 
      */
-    private void generateEmailListPretty(Person p){
+    private void generateEmailListPretty(IFace_contactable p){
          if(p != null && p.getEmailList()!= null && !p.getEmailList().isEmpty()){
             StringBuilder sb = new StringBuilder("");
             for(ContactEmail ce: p.getEmailList()){
@@ -528,8 +529,6 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             p.setMailingAddressListPretty(sb.toString());
         }
     }
-    
-   
     
     
     /**

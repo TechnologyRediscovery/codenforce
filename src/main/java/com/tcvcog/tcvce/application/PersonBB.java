@@ -298,11 +298,12 @@ public class PersonBB extends BackingBeanUtils {
             Person per = pc.getPerson(p);
             getSessionBean().setSessPerson(per);
             currentPerson = per;
+            onLoadHumanLinksToCurrentPerson(null);
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Person history logging is broken!",""));
+                        "Person exploring is broken",""));
         }
     }
     
@@ -461,6 +462,8 @@ public class PersonBB extends BackingBeanUtils {
         currentHumanLink = hl;
         if(hlh != null){
             currentHumanListHolder = hlh;
+            currentNoteHolder = hl;
+            
         }
         extractHumanLinkListComponentIDFromHTTPRequest();
         try {
@@ -1163,7 +1166,7 @@ public class PersonBB extends BackingBeanUtils {
         if(currentHumanListHolder != null){
             try {
                 hllist = pc.getHumanLinkList(currentHumanListHolder);
-            } catch (IntegrationException ex) {
+            } catch (IntegrationException | BObStatusException ex) {
                 System.out.println(ex);
             }
             getSessionBean().setSessHumanListRefreshedList(hllist);
@@ -1427,7 +1430,7 @@ public class PersonBB extends BackingBeanUtils {
             try {
                 currentHumanListHolder.setHumanLinkList(pc.getHumanLinkList(currentHumanListHolder));
                 getSessionBean().setSessHumanListHolder(currentHumanListHolder);
-            } catch (IntegrationException ex) {
+            } catch (IntegrationException | BObStatusException ex) {
                 System.out.println(ex);
             }
         }

@@ -340,7 +340,7 @@ public class CECaseBB
         LocalDateTime trigger = getSessionBean().getSessCECaseRefreshTrigger();
         if(trigger != null){
             reloadCurrentCase();
-            System.out.println("CECaseSearchProfileBB.getReloadCECaseTrigger: "+ getPrettyDateNoTime(trigger));
+            System.out.println("ceCaseBB.getReloadCECaseTrigger: "+ getPrettyDateNoTime(trigger));
             trigger = null;
             getSessionBean().setSessCECaseRefreshTrigger(trigger);
         }
@@ -359,6 +359,8 @@ public class CECaseBB
     public String getReloadCECaseComponentIDToUpdate(){
         return "case-refresh-trigger-form";
     }
+    
+    
     
     
     /**
@@ -470,7 +472,7 @@ public class CECaseBB
    
     
     public void onHowToNextStepButtonChange(ActionEvent ev){
-        System.out.println("ceCaseSearchProfileBB.onHowToNextStepButtonChange");
+        System.out.println("ceCaseBB.onHowToNextStepButtonChange");
         
     }
     
@@ -510,7 +512,7 @@ public class CECaseBB
     public List<BlobLight> getManagedBlobLightListFromCECase(){
         List<BlobLight> sessBlobListForUpdate = getSessionBean().getSessBlobLightListForRefreshUptake();
         if(sessBlobListForUpdate != null && currentCase != null){
-            System.out.println("CECaseSearchProfileBB.getBlobLightListFromCECase | found non-null session blob list for uptake: " + sessBlobListForUpdate.size());
+            System.out.println("ceCaseBB.getBlobLightListFromCECase | found non-null session blob list for uptake: " + sessBlobListForUpdate.size());
             getCurrentCase().setBlobList(sessBlobListForUpdate);
             // clear session since we have the new list
             getSessionBean().setSessBlobLightListForRefreshUptake(null);
@@ -775,7 +777,7 @@ public class CECaseBB
                                     "Success! Violation attached to case.", ""));
                     // Removed for batch processing
                     //            getSessionBean().getSessionBean().setSessCodeViolation(currentViolation);
-                    System.out.println("CECaseSearchProfileBB.onViolationAddCommmitButtonChange | attached violation to case");
+                    System.out.println("ceCaseBB.onViolationAddCommmitButtonChange | attached violation to case");
                     if(cv.isMakeFindingsDefault()){
                         makeViolationFindingsDefault(cv);
                     }
@@ -862,7 +864,7 @@ public class CECaseBB
      * @param ev 
      */
     public void onViolationUpdateDORInitButtonChange(ActionEvent ev){
-        System.out.println("CECaseSearchProfileBB.onViolationUpdateDORInitButtonChange");
+        System.out.println("ceCaseBB.onViolationUpdateDORInitButtonChange");
         // nothing to do here yet
         
     }
@@ -915,7 +917,7 @@ public class CECaseBB
      * @param ev 
      */
     public void onViolationUpdateStipDateInitButtonChange(ActionEvent ev){
-        System.out.println("CECaseSearchProfileBB.onViolationUpdateStipDateInitButtonChange");
+        System.out.println("ceCaseBB.onViolationUpdateStipDateInitButtonChange");
         // nothing to do here yet
         
     }
@@ -1201,7 +1203,7 @@ public class CECaseBB
      * @return 
      */
     public String generateReportCECase() {
-        System.out.println("CECaseSearchProfileBB.generateReportCECase");
+        System.out.println("ceCaseBB.generateReportCECase");
         CaseCoordinator cc = getCaseCoordinator();
 
         reportCECase.setCreator(getSessionBean().getSessUser());

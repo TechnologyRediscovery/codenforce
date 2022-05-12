@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Attachment metatdata container for Humans connected to any number of BOBs
@@ -25,10 +26,11 @@ import java.time.LocalDateTime;
  */
 public class        HumanLink 
         extends     Human
-        implements  IFace_trackedEntityLink{
+        implements  IFace_trackedEntityLink,
+                    IFace_contactable{
     
     protected int linkID;
-    
+     
     protected LinkedObjectRole linkRole;
     protected BOBSource linkSource;
     
@@ -44,6 +46,16 @@ public class        HumanLink
     protected String linkNotes;
     
     protected int parentObjectID;
+    
+    
+    // CONTACTABLE STUFF
+    protected List<MailingAddressLink> mailingAddressLinkList;
+    protected List<ContactEmail> emailList;
+    protected List<ContactPhone> phoneList;
+    
+    private String mailingAddressListPretty;
+    private String emailListPretty;
+    private String phoneListPretty;
     
     public HumanLink(Human h){
         
@@ -255,6 +267,85 @@ public class        HumanLink
 
     public void setParentObjectID(int pid){
         parentObjectID = pid;
+    }
+
+    @Override
+    public List<ContactEmail> getEmailList() {
+        return emailList;
+    }
+
+    @Override
+    public List<ContactPhone> getPhoneList() {
+        return phoneList;
+    }
+
+    @Override
+    public String getMailingAddressListPretty() {
+        return mailingAddressListPretty;
+    }
+
+    @Override
+    public String getPhoneListPretty() {
+        return phoneListPretty;
+    }
+
+    @Override
+    public String getEmailListPretty() {
+        return emailListPretty;
+    }
+
+    @Override
+    public void setEmailList(List<ContactEmail> eml) {
+        emailList = eml;
+    }
+
+    @Override
+    public void setPhoneList(List<ContactPhone> phl) {
+        phoneList = phl;
+    }
+
+    @Override
+    public List<MailingAddressLink> getMailingAddressLinkList() {
+        return mailingAddressLinkList;
+    }
+
+    @Override
+    public void setMailingAddressLinkList(List<MailingAddressLink> ll) {
+        mailingAddressLinkList = ll;
+    }
+
+    @Override
+    public LinkedObjectSchemaEnum getLinkedObjectSchemaEnum() {
+        return linkRole.schema;
+    }
+
+    @Override
+    public int getTargetObjectPK() {
+        return humanID;
+    }
+
+    /**
+     * @param mailingAddressListPretty the mailingAddressListPretty to set
+     */
+    @Override
+    public void setMailingAddressListPretty(String mailingAddressListPretty) {
+        this.mailingAddressListPretty = mailingAddressListPretty;
+    }
+
+    /**
+     * @param emailListPretty the emailListPretty to set
+     */
+    @Override
+    public void setEmailListPretty(String emailListPretty) {
+        this.emailListPretty = emailListPretty;
+    }
+
+    /**
+     * @param phoneListPretty the phoneListPretty to set
+     */
+    @Override
+    public void setPhoneListPretty(String phoneListPretty) {
+        this.phoneListPretty = phoneListPretty;
     }
    
 }

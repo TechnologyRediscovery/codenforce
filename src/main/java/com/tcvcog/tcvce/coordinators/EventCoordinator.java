@@ -87,7 +87,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         EventCnF ev = ei.getEvent(eventID);
         try {
             configureEvent(ev);
-        } catch (EventException ex) {
+        } catch (EventException | BObStatusException  ex) {
             System.out.println(ex);
         }
         return ev;
@@ -374,7 +374,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return a nicely configured EventCEEcase
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    private EventCnF configureEvent(EventCnF ev) throws IntegrationException, EventException{
+    private EventCnF configureEvent(EventCnF ev) throws IntegrationException, EventException, BObStatusException{
         PersonCoordinator pc = getPersonCoordinator();
         
         if(ev == null){
