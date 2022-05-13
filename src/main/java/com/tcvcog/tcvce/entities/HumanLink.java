@@ -17,7 +17,6 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * Attachment metatdata container for Humans connected to any number of BOBs
@@ -25,9 +24,8 @@ import java.util.List;
  * @author Ellen Bascomb of Apartment 31Y
  */
 public class        HumanLink 
-        extends     Human
-        implements  IFace_trackedEntityLink,
-                    IFace_contactable{
+        extends     Person
+        implements  IFace_trackedEntityLink{
     
     protected int linkID;
      
@@ -48,36 +46,35 @@ public class        HumanLink
     protected int parentObjectID;
     
     
-    // CONTACTABLE STUFF
-    protected List<MailingAddressLink> mailingAddressLinkList;
-    protected List<ContactEmail> emailList;
-    protected List<ContactPhone> phoneList;
-    
-    private String mailingAddressListPretty;
-    private String emailListPretty;
-    private String phoneListPretty;
     
     public HumanLink(Human h){
+        super(h);
         
-        this.humanID = h.humanID;
-        this.name = h.name;
-        this.dob = h.dob;
-        this.under18 = h.under18;
-        this.jobTitle = h.jobTitle;
-        this.businessEntity = h.businessEntity;
-        this.multiHuman = h.multiHuman;
-        this.source = h.source;
-        this.deceasedDate = h.deceasedDate;
-        this.deceasedBy = h.deceasedBy;
-        this.cloneOfHumanID = h.cloneOfHumanID;
-        this.notes = h.notes;
+    }
+ 
+    public HumanLink(HumanLink hl){
+        super(hl);
         
-        this.createdTS = h.createdTS;
-        this.createdBy = h.createdBy;
-        this.lastUpdatedTS = h.lastUpdatedTS;
-        this.lastUpdatedBy = h.lastUpdatedBy;
-        this.deactivatedTS = h.deactivatedTS;
-        this.deactivatedBy = h.deactivatedBy;
+        this.humanID = hl.humanID;
+        this.name = hl.name;
+        this.dob = hl.dob;
+        this.under18 = hl.under18;
+        this.jobTitle = hl.jobTitle;
+        this.businessEntity = hl.businessEntity;
+        this.multiHuman = hl.multiHuman;
+        this.source = hl.source;
+        this.deceasedDate = hl.deceasedDate;
+        this.deceasedBy = hl.deceasedBy;
+        this.cloneOfHumanID = hl.cloneOfHumanID;
+        this.notes = hl.notes;
+        
+        this.createdTS = hl.createdTS;
+        this.createdBy = hl.createdBy;
+        this.lastUpdatedTS = hl.lastUpdatedTS;
+        this.lastUpdatedBy = hl.lastUpdatedBy;
+        this.deactivatedTS = hl.deactivatedTS;
+        this.deactivatedBy = hl.deactivatedBy;
+    
     }
     
      /**
@@ -269,83 +266,7 @@ public class        HumanLink
         parentObjectID = pid;
     }
 
-    @Override
-    public List<ContactEmail> getEmailList() {
-        return emailList;
-    }
-
-    @Override
-    public List<ContactPhone> getPhoneList() {
-        return phoneList;
-    }
-
-    @Override
-    public String getMailingAddressListPretty() {
-        return mailingAddressListPretty;
-    }
-
-    @Override
-    public String getPhoneListPretty() {
-        return phoneListPretty;
-    }
-
-    @Override
-    public String getEmailListPretty() {
-        return emailListPretty;
-    }
-
-    @Override
-    public void setEmailList(List<ContactEmail> eml) {
-        emailList = eml;
-    }
-
-    @Override
-    public void setPhoneList(List<ContactPhone> phl) {
-        phoneList = phl;
-    }
-
-    @Override
-    public List<MailingAddressLink> getMailingAddressLinkList() {
-        return mailingAddressLinkList;
-    }
-
-    @Override
-    public void setMailingAddressLinkList(List<MailingAddressLink> ll) {
-        mailingAddressLinkList = ll;
-    }
-
-    @Override
-    public LinkedObjectSchemaEnum getLinkedObjectSchemaEnum() {
-        return linkRole.schema;
-    }
-
-    @Override
-    public int getTargetObjectPK() {
-        return humanID;
-    }
-
-    /**
-     * @param mailingAddressListPretty the mailingAddressListPretty to set
-     */
-    @Override
-    public void setMailingAddressListPretty(String mailingAddressListPretty) {
-        this.mailingAddressListPretty = mailingAddressListPretty;
-    }
-
-    /**
-     * @param emailListPretty the emailListPretty to set
-     */
-    @Override
-    public void setEmailListPretty(String emailListPretty) {
-        this.emailListPretty = emailListPretty;
-    }
-
-    /**
-     * @param phoneListPretty the phoneListPretty to set
-     */
-    @Override
-    public void setPhoneListPretty(String phoneListPretty) {
-        this.phoneListPretty = phoneListPretty;
-    }
+  
+   
    
 }

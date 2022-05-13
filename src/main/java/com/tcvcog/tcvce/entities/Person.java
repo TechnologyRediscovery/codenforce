@@ -30,7 +30,7 @@ import java.util.List;
 public  class       Person 
         extends     Human
         implements  IFace_Loggable,
-                    IFace_contactable,
+                    IFace_addressListHolder,
                     IFace_ActivatableBOB{
     
     final static LinkedObjectSchemaEnum PERSON_ADDRESS_LOSE = LinkedObjectSchemaEnum.MailingaddressHuman;

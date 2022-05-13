@@ -32,7 +32,6 @@ import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_addressListHolder;
-import com.tcvcog.tcvce.entities.IFace_contactable;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -110,7 +109,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     public HumanLink createHumanLinkSkeleton(Human hu){
         if(hu != null){
-            return new HumanLink(hu);
+            return new HumanLink(new Person(hu));
             
         } else {
             return null;
@@ -153,7 +152,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
        }
        PersonIntegrator pi = getPersonIntegrator();
        HumanLink hl = pi.getHumanLink(linkID, lose);
-       configureContactable(hl);
+       configurePerson(hl);
        return hl;
    }
     
@@ -358,7 +357,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             return null;
         }
         Person p = new Person(hum);
-        p = (Person) configureContactable(p);
+        p = (Person) configurePerson(p);
         return p;
     }
     
@@ -442,8 +441,10 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * 
      * @param p
      * @return the configured person
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public IFace_contactable configureContactable(IFace_contactable p) throws IntegrationException, BObStatusException{
+    public Person configurePerson(Person p) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();
         
@@ -451,7 +452,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             throw new BObStatusException("Cannot configure null person");
         }
         
-        // sort our contacts.
+        
         p.setMailingAddressLinkList(pc.getMailingAddressLinkList(p));
         List<ContactPhone> phl = pi.getContactPhoneList(p.getHumanID());
         if(phl != null && phl.size() >= 2){
@@ -477,7 +478,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * of the mailing addresses linked to this person
      * @param p 
      */
-    private void generateMADLinkListPretty(IFace_contactable p){
+    private void generateMADLinkListPretty(Person p){
         if(p != null && p.getMailingAddressLinkList() != null && !p.getMailingAddressLinkList().isEmpty()){
             StringBuilder sb = new StringBuilder("");
             for(MailingAddressLink madlink: p.getMailingAddressLinkList()){
@@ -494,7 +495,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * breaks and type, etc.
      * @param p 
      */
-    private void generatePhoneListPretty(IFace_contactable p){
+    private void generatePhoneListPretty(Person p){
         if(p != null && p.getPhoneList() != null && !p.getPhoneList().isEmpty()){
             StringBuilder sb = new StringBuilder("");
             for(ContactPhone ph: p.getPhoneList()){
@@ -519,7 +520,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * of a person's email list.
      * @param p 
      */
-    private void generateEmailListPretty(IFace_contactable p){
+    private void generateEmailListPretty(Person p){
          if(p != null && p.getEmailList()!= null && !p.getEmailList().isEmpty()){
             StringBuilder sb = new StringBuilder("");
             for(ContactEmail ce: p.getEmailList()){
