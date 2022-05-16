@@ -1,0 +1,69 @@
+--UPDATE citation SET notes SET notes = 'this is a test 513v1' WHERE citationid = 1044;      
+
+--UPDATE contactemail SET notes = 'this is a test 513v2parcel' WHERE emailid = 104;  
+--UPDATE contactphone SET notes = 'this is a test 513v2parcel' WHERE phoneid = 116;
+--UPDATE humanmuni SET notes = 'this is a test 513v2parcel' WHERE linkid = 1044;
+--UPDATE humancecase SET notes = 'this is a test 513v2 parcel' WHERE cecase_caseid = 1044; 
+--UPDATE humanparcel SET notes = 'this is a test 513v2' WHERE linkid = 61987;  
+--UPDATE humanoccperiod SET notes = 'this is a test 513v2 parcel' WHERE linkid = 1044;
+--UPDATE humanparcelunit SET notes = 'this is a test 513v2 parcel' WHERE linkid = 1044; 
+
+--UPDATE citation SET notes SET notes = 'this is a test 513v1' WHERE citationid = 1044;      
+
+SELECT human_humanid FROM contactemail INNER JOIN human ON (human_humanid = humanid and emailid = 104);  
+SELECT human_humanid FROM contactphone INNER JOIN human ON (human_humanid = humanid and phoneid = 116);
+SELECT human_humanid FROM humanmuni     INNER JOIN human ON  (human_humanid = humanid and linkid = 1044);
+SELECT human_humanid FROM humancecase  INNER JOIN human ON (human_humanid = humanid  and cecase_caseid = 1044);
+SELECT human_humanid FROM humanparcel  INNER JOIN human ON  (human_humanid = humanid and linkid = 61987);
+SELECT human_humanid FROM humanoccperiod INNER JOIN human ON  (human_humanid = humanid and linkid = 1044);
+SELECT human_humanid FROM humanparcelunit INNER JOIN human ON  (human_humanid = humanid and linkid = 1044); 
+
+
+--SELECT humanid, lastupdatedts from human
+--ORDER BY lastupdatedts DESC;
+
+
+UPDATE parcelinfo SET notes = 'this is a test 513v1' WHERE parcelinfoid = 29171; 
+UPDATE parcelunit SET notes = 'this is a test 513v1' WHERE unitid = 1044; 
+UPDATE humanparcel  SET notes = 'this is a test 513v1' WHERE linkid = 61997;
+UPDATE parcelmailingaddress SET notes = 'this is a test 513v1' WHERE mailingparcel_parcelid = 130055;  
+UPDATE parcelphotodoc SET photdoc_photodocid = 98 WHERE parcel_parcelkey = 1044; 
+UPDATE parcel SET notes = 'this is a test 513v1' WHERE parcelkey = 2387; 
+
+SELECT parcel_parcelkey FROM parcelinfo INNER JOIN parcel ON  (parcel_parcelkey = parcelkey and parcelinfoid = 29171); 
+SELECT parcel_parcelkey FROM parcelmailingaddress INNER JOIN parcelunit ON (mailingparcel_mailingid = address_parcelmailingid and address_parcelmailingid = 130055);
+SELECT parcel_parcelkey FROM humanparcel  INNER JOIN parcel ON (parcel_parcelkey = parcelkey and linkid = 61987);
+SELECT parcel_parcelkey FROM parcelphotodoc INNER JOIN parcel ON (parcel_parcelkey = parcelkey and parcel_parcelkey = 1044);
+SELECT parcelkey FROM parcel WHERE parcelkey = 2387; 
+
+UPDATE occpermit SET notes = 'this is a test 514v1' WHERE unitid = 1044; 
+UPDATE occperiod SET notes = 'this is a test 514v1' WHERE periodid = 1006; 
+UPDATE occperiodpermitapplication SET notes = 'this is a test 514v1' WHERE applicationid = 1011; 
+UPDATE occperiodphotodoc SET photodoc_photodocid = 102 WHERE unitid = 1044;
+UPDATE occinspection SET notes = 'this is a test 514v1' WHERE inspectionid = 15;
+--UPDATE occperiod to get event trigger to occur
+
+
+SELECT occperiod_periodid FROM occpermit WHERE (permitid = 1044);
+SELECT occperiod periodid FROM occperiod WHERE (periodid = 1006);
+SELECT occperiod_periodid FROM occperiodpermitapplication WHERE (occperiod_periodid = 29171);
+SELECT occperiod_periodid FROM occperiodphotodoc  WHERE photodoc_photodocid = 1044;
+SELECT occperiod_periodid FROM occinspection WHERE inspectionid = 15;
+
+
+UPDATE codeviolation SET notes = 'this is a test 514v1' WHERE violationid = 1026; 
+UPDATE citationviolation SET notes = 'this is a test 514v1' WHERE citationviolationid = 1026; 
+UPDATE citation SET notes = 'this is a test 514v1' WHERE citationid = 1035; 
+UPDATE citationcitationstatus SET notes = 'this is a test 514v1' WHERE citationstatusid = 1026;   
+UPDATE citationdocketno SET notes = 'this is a test 514v1' WHERE docketid = 102; 
+UPDATE citationdocketnohuman SET notes = 'this is a test 514v2' WHERE linkid = 1026;  
+UPDATE citationcitationstatus SET notes = 'test of new trigr' WHERE citation_citationid = 1044;
+
+SELECT caseid FROM cecase INNER JOIN codeviolation ON  (caseid = cecase_caseid and caseid = 1013);
+SELECT cecase_caseid FROM codeviolation INNER JOIN citationviolation ON (violationid = codeviolation_violationid and cecase_caseid = 1027;
+SELECT cecase_caseid FROM codeviolation INNER JOIN citation ON (citation_citationid = citationid and linkid = 61987);			     
+SELECT cecase_caseid FROM codeviolation INNER JOIN citationdocketno ON (citation_citationid = citationid and docketid=102);
+SELECT cecase_caseid lastupdatedts FROM codeviolation INNER JOIN citationdocketno ON (citation_citationid = citation_citationid and docketid=102);
+SELECT cecase_caseid lastupdatedts FROM codeviolation INNER JOIN citationdocketno ON (citation_citationid = citation_citationid and docketid=102);
+SELECT cecase_caseid  FROM codeviolation INNER JOIN citationdocketno ON (citation_citationid = citation_citationid and docketid=102);
+SELECT cecase_caseid FROM codeviolation INNER JOIN citationcitationstatus ON (citation_citationid = citation_citationid and citation_citation = 1004);

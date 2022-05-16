@@ -6,4 +6,7 @@ CREATE TRIGGER trigger_upd_human_via_humanparcel
     AFTER INSERT OR DELETE OR UPDATE 
     ON public.humanparcel
     FOR EACH ROW
-    EXECUTE PROCEDURE public.trigger_upd_parcel_via_humanparcel();
+    EXECUTE PROCEDURE public.trigger_upd_human_via_humanparcel();
+
+COMMENT ON TRIGGER trigger_upd_human_via_humanparcel ON public.humanparcel
+    IS 'update the human table user and lastupd date when action is taken on humanparcel. (add,upd,del)';

@@ -1,0 +1,26 @@
+DECLARE			
+	temp_periodid integer; 		
+    temp_user integer; 
+ 
+    BEGIN
+
+        -- Update the occperiod lastupdate and user when occperiodohotodoc table is has action taken.		
+        -- 	   RETURN(SELECT CAST ( current_user AS text ));
+        temp_user = 99;
+        IF (TG_OP = 'DELETE') THEN 			
+	        UPDATE occperiod SET lastupdatedts = now(),lastupdatedby_userid = temp_user
+            WHERE periodid  = OLD.occperiod_periodid;
+			      RETURN OLD;	
+        ELSEIF 			
+        (TG_OP = 'INSERT') THEN			
+            UPDATE occperiod SET lastupdatedts = now(),lastupdatedby_userid = temp_user
+            WHERE periodid  =  NEW.occperiod_periodid;
+			      RETURN NEW;		
+             
+        ELSIF 
+        (TG_OP = 'UPDATE') THEN	
+            UPDATE occperiod SET lastupdatedts = now(),lastupdatedby_userid = temp_user
+            WHERE periodid  = NEW.occperiod_periodid;
+			      RETURN NEW;	
+     	END IF;	   
+    END;  

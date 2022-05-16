@@ -1,0 +1,12 @@
+-- Trigger: trigger_upd_parcel_via_cecase
+
+DROP TRIGGER IF EXISTS trigger_upd_parcel_via_cecase ON public.parcel;
+
+CREATE TRIGGER trigger_upd_parcel_via_cecase
+    AFTER INSERT OR DELETE OR UPDATE 
+    ON public.parcel
+    FOR EACH ROW
+    EXECUTE PROCEDURE public.trigger_upd_parcel_via_cecase();
+
+COMMENT ON TRIGGER trigger_upd_parcel_via_cecase ON public.parcel
+    IS 'This trigger will update the parcel table when an action is taken on the cecase (upd,del, or insert)';
