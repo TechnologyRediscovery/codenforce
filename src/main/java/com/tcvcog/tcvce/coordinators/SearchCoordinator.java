@@ -7,6 +7,7 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -192,7 +193,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                  // add each batch of OccPeriod objects from the SearchParam run to our
                  // ongoing list
                  q.addToResults(ec.assembleEventCnFPropUnitCasePeriodHeavyList(evTempList));
-             } catch (EventException | IntegrationException | BObStatusException ex) {
+             } catch (EventException | IntegrationException | BObStatusException | BlobException ex) {
                  System.out.println(ex);
              }
             q.appendToQueryLog(sp);

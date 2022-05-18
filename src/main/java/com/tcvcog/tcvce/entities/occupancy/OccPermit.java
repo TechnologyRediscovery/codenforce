@@ -18,25 +18,104 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.CodeSource;
+import com.tcvcog.tcvce.entities.HumanLink;
+import com.tcvcog.tcvce.entities.ParcelInfo;
 import com.tcvcog.tcvce.entities.Person;
+import com.tcvcog.tcvce.entities.TextBlock;
+import com.tcvcog.tcvce.entities.TrackedEntity;
 import com.tcvcog.tcvce.entities.User;
+import j2html.TagCreator;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
  * @author ellen bascomb of apt 31y
  */
-public class OccPermit {
+public class OccPermit extends TrackedEntity {
+    
+    final static String TABLE_NAME = "occpermit";
+    final static String PERMIT_PK = "permitid";
     
     private int permitID;
     // used for storing municipality-generated IDs associated with the permit
     private String referenceNo;
     private int periodID;
-    private User issuedBy;
-    private Person issuedTo;
-    private LocalDateTime dateIssued;
+
     private String permitAdditionalText;
     private String notes;
+    
+    private LocalDateTime finalizedts;
+    private User finalizedBy;
+    
+    
+    
+    
+    
+    // ********************************************************************
+    // ********************** DYNAMIC FIELDS ******************************
+    // ***** USED DURING THE CONFIGURATION OF THE PERMIT AND THESE  *******
+    // ***** ARE READ INTO THE STATIC FIELDS BY THE COORDINATOR'S   *******
+    // ***** updateOccPermitStaticFields(...) method                *******
+    // ********************************************************************
+    
+    private List<HumanLink> ownerSellerLinkList;
+    private List<HumanLink> buyerTenantLinkList;
+    private List<HumanLink> managerLinkList;
+    private List<HumanLink> tenantLinkList;
+    private ParcelInfo parcelInfo;
+    private User issuingOfficer;
+    private CodeSource issuingCodeSource;
+    
+    private List<TextBlock> textBlocks_stipulations;
+    private List<TextBlock> textBlocks_notice;
+    // both combined for the comments static field
+    private List<TextBlock> textBlocks_comments;
+    private String text_comments;
+    
+    private LocalDateTime dynamicdateofapplication;
+    private LocalDateTime dynamicinitialinspection;
+    private LocalDateTime dynamicreinspectiondate;
+    private LocalDateTime dynamicfinalinspection;
+    private LocalDateTime dynamicdateofissue;
+    
+    
+    // ********************************************************************
+    // ********************** STATIC FIELDS *******************************
+    // ********************************************************************
+    
+    
+    private LocalDateTime staticdateofapplication;
+    private LocalDateTime staticinitialinspection;
+    private LocalDateTime staticreinspectiondate;
+    private LocalDateTime staticfinalinspection;
+    private LocalDateTime staticdateofissue;
+    
+    private String statictitle;
+    private String staticmuniaddress;
+    private String staticpropertyinfo;
+    private String staticownerseller;
+    
+    private String staticcolumnlink;
+    private String staticbuyertenant;
+    private String staticproposeduse;   // from period type
+    private String staticusecode;       // from parcel info
+    private String staticconstructiontype;  // from parcelinfo
+    
+    private String staticpropclass;     // from parcelinfo
+    private String staticofficername; // from dynamic field on permit
+    private String staticissuedundercodesourceid;   // from chosen code source
+    private String staticstipulations;
+    
+    private String staticcomments;
+    private String staticmanager;
+    private String statictenants;
+    private String staticleaseterm;
+    
+    private String staticleasestatus;
+    private String staticpaymentstatus;
+    private String staticnotice;
+
     
     /**
      * @return the permitID
@@ -54,12 +133,6 @@ public class OccPermit {
 
    
 
-    /**
-     * @return the dateIssued
-     */
-    public LocalDateTime getDateIssued() {
-        return dateIssued;
-    }
 
   
 
@@ -92,13 +165,7 @@ public class OccPermit {
     }
 
     
-    /**
-     * @param dateIssued the dateIssued to set
-     */
-    public void setDateIssued(LocalDateTime dateIssued) {
-        this.dateIssued = dateIssued;
-    }
-
+    
    
 
     /**
@@ -130,32 +197,623 @@ public class OccPermit {
         this.periodID = periodID;
     }
 
+   
+
     /**
-     * @return the issuedBy
+     * @return the finalizedts
      */
-    public User getIssuedBy() {
-        return issuedBy;
+    public LocalDateTime getFinalizedts() {
+        return finalizedts;
     }
 
     /**
-     * @param issuedBy the issuedBy to set
+     * @return the staticdateofapplication
      */
-    public void setIssuedBy(User issuedBy) {
-        this.issuedBy = issuedBy;
+    public LocalDateTime getStaticdateofapplication() {
+        return staticdateofapplication;
     }
 
     /**
-     * @return the issuedTo
+     * @return the staticinitialinspection
      */
-    public Person getIssuedTo() {
-        return issuedTo;
+    public LocalDateTime getStaticinitialinspection() {
+        return staticinitialinspection;
     }
 
     /**
-     * @param issuedTo the issuedTo to set
+     * @return the staticreinspectiondate
      */
-    public void setIssuedTo(Person issuedTo) {
-        this.issuedTo = issuedTo;
+    public LocalDateTime getStaticreinspectiondate() {
+        return staticreinspectiondate;
+    }
+
+    /**
+     * @return the staticfinalinspection
+     */
+    public LocalDateTime getStaticfinalinspection() {
+        return staticfinalinspection;
+    }
+
+    /**
+     * @return the staticdateofissue
+     */
+    public LocalDateTime getStaticdateofissue() {
+        return staticdateofissue;
+    }
+
+    /**
+     * @return the statictitle
+     */
+    public String getStatictitle() {
+        return statictitle;
+    }
+
+    /**
+     * @return the staticmuniaddress
+     */
+    public String getStaticmuniaddress() {
+        return staticmuniaddress;
+    }
+
+    /**
+     * @return the staticpropertyinfo
+     */
+    public String getStaticpropertyinfo() {
+        return staticpropertyinfo;
+    }
+
+    /**
+     * @return the staticownerseller
+     */
+    public String getStaticownerseller() {
+        return staticownerseller;
+    }
+
+    /**
+     * @return the staticcolumnlink
+     */
+    public String getStaticcolumnlink() {
+        return staticcolumnlink;
+    }
+
+    /**
+     * @return the staticbuyertenant
+     */
+    public String getStaticbuyertenant() {
+        return staticbuyertenant;
+    }
+
+    /**
+     * @return the staticproposeduse
+     */
+    public String getStaticproposeduse() {
+        return staticproposeduse;
+    }
+
+    /**
+     * @return the staticusecode
+     */
+    public String getStaticusecode() {
+        return staticusecode;
+    }
+
+    /**
+     * @return the staticpropclass
+     */
+    public String getStaticpropclass() {
+        return staticpropclass;
+    }
+
+    /**
+     * @return the staticofficername
+     */
+    public String getStaticofficername() {
+        return staticofficername;
+    }
+
+    /**
+     * @return the staticissuedundercodesourceid
+     */
+    public String getStaticissuedundercodesourceid() {
+        return staticissuedundercodesourceid;
+    }
+
+    /**
+     * @return the staticstipulations
+     */
+    public String getStaticstipulations() {
+        return staticstipulations;
+    }
+
+    /**
+     * @return the staticcomments
+     */
+    public String getStaticcomments() {
+        return staticcomments;
+    }
+
+    /**
+     * @return the staticmanager
+     */
+    public String getStaticmanager() {
+        return staticmanager;
+    }
+
+    /**
+     * @return the statictenants
+     */
+    public String getStatictenants() {
+        return statictenants;
+    }
+
+    /**
+     * @return the staticleaseterm
+     */
+    public String getStaticleaseterm() {
+        return staticleaseterm;
+    }
+
+    /**
+     * @return the staticleasestatus
+     */
+    public String getStaticleasestatus() {
+        return staticleasestatus;
+    }
+
+    /**
+     * @return the staticpaymentstatus
+     */
+    public String getStaticpaymentstatus() {
+        return staticpaymentstatus;
+    }
+
+    /**
+     * @return the staticnotice
+     */
+    public String getStaticnotice() {
+        return staticnotice;
+    }
+
+    /**
+     * @param finalizedts the finalizedts to set
+     */
+    public void setFinalizedts(LocalDateTime finalizedts) {
+        this.finalizedts = finalizedts;
+    }
+
+    /**
+     * @param staticdateofapplication the staticdateofapplication to set
+     */
+    public void setStaticdateofapplication(LocalDateTime staticdateofapplication) {
+        this.staticdateofapplication = staticdateofapplication;
+    }
+
+    /**
+     * @param staticinitialinspection the staticinitialinspection to set
+     */
+    public void setStaticinitialinspection(LocalDateTime staticinitialinspection) {
+        this.staticinitialinspection = staticinitialinspection;
+    }
+
+    /**
+     * @param staticreinspectiondate the staticreinspectiondate to set
+     */
+    public void setStaticreinspectiondate(LocalDateTime staticreinspectiondate) {
+        this.staticreinspectiondate = staticreinspectiondate;
+    }
+
+    /**
+     * @param staticfinalinspection the staticfinalinspection to set
+     */
+    public void setStaticfinalinspection(LocalDateTime staticfinalinspection) {
+        this.staticfinalinspection = staticfinalinspection;
+    }
+
+    /**
+     * @param staticdateofissue the staticdateofissue to set
+     */
+    public void setStaticdateofissue(LocalDateTime staticdateofissue) {
+        this.staticdateofissue = staticdateofissue;
+    }
+
+    /**
+     * @param statictitle the statictitle to set
+     */
+    public void setStatictitle(String statictitle) {
+        this.statictitle = statictitle;
+    }
+
+    /**
+     * @param staticmuniaddress the staticmuniaddress to set
+     */
+    public void setStaticmuniaddress(String staticmuniaddress) {
+        this.staticmuniaddress = staticmuniaddress;
+    }
+
+    /**
+     * @param staticpropertyinfo the staticpropertyinfo to set
+     */
+    public void setStaticpropertyinfo(String staticpropertyinfo) {
+        this.staticpropertyinfo = staticpropertyinfo;
+    }
+
+    /**
+     * @param staticownerseller the staticownerseller to set
+     */
+    public void setStaticownerseller(String staticownerseller) {
+        this.staticownerseller = staticownerseller;
+    }
+
+    /**
+     * @param staticcolumnlink the staticcolumnlink to set
+     */
+    public void setStaticcolumnlink(String staticcolumnlink) {
+        this.staticcolumnlink = staticcolumnlink;
+    }
+
+    /**
+     * @param staticbuyertenant the staticbuyertenant to set
+     */
+    public void setStaticbuyertenant(String staticbuyertenant) {
+        this.staticbuyertenant = staticbuyertenant;
+    }
+
+    /**
+     * @param staticproposeduse the staticproposeduse to set
+     */
+    public void setStaticproposeduse(String staticproposeduse) {
+        this.staticproposeduse = staticproposeduse;
+    }
+
+    /**
+     * @param staticusecode the staticusecode to set
+     */
+    public void setStaticusecode(String staticusecode) {
+        this.staticusecode = staticusecode;
+    }
+
+    /**
+     * @param staticpropclass the staticpropclass to set
+     */
+    public void setStaticpropclass(String staticpropclass) {
+        this.staticpropclass = staticpropclass;
+    }
+
+    /**
+     * @param staticofficername the staticofficername to set
+     */
+    public void setStaticofficername(String staticofficername) {
+        this.staticofficername = staticofficername;
+    }
+
+    /**
+     * @param staticissuedundercodesourceid the staticissuedundercodesourceid to set
+     */
+    public void setStaticissuedundercodesourceid(String staticissuedundercodesourceid) {
+        this.staticissuedundercodesourceid = staticissuedundercodesourceid;
+    }
+
+    /**
+     * @param staticstipulations the staticstipulations to set
+     */
+    public void setStaticstipulations(String staticstipulations) {
+        this.staticstipulations = staticstipulations;
+    }
+
+    /**
+     * @param staticcomments the staticcomments to set
+     */
+    public void setStaticcomments(String staticcomments) {
+        this.staticcomments = staticcomments;
+    }
+
+    /**
+     * @param staticmanager the staticmanager to set
+     */
+    public void setStaticmanager(String staticmanager) {
+        this.staticmanager = staticmanager;
+    }
+
+    /**
+     * @param statictenants the statictenants to set
+     */
+    public void setStatictenants(String statictenants) {
+        this.statictenants = statictenants;
+    }
+
+    /**
+     * @param staticleaseterm the staticleaseterm to set
+     */
+    public void setStaticleaseterm(String staticleaseterm) {
+        this.staticleaseterm = staticleaseterm;
+    }
+
+    /**
+     * @param staticleasestatus the staticleasestatus to set
+     */
+    public void setStaticleasestatus(String staticleasestatus) {
+        this.staticleasestatus = staticleasestatus;
+    }
+
+    /**
+     * @param staticpaymentstatus the staticpaymentstatus to set
+     */
+    public void setStaticpaymentstatus(String staticpaymentstatus) {
+        this.staticpaymentstatus = staticpaymentstatus;
+    }
+
+    /**
+     * @param staticnotice the staticnotice to set
+     */
+    public void setStaticnotice(String staticnotice) {
+        this.staticnotice = staticnotice;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return PERMIT_PK;
+    }
+
+    @Override
+    public int getDBKey() {
+        return permitID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return TABLE_NAME;
+    }
+
+    /**
+     * @return the finalizedBy
+     */
+    public User getFinalizedBy() {
+        return finalizedBy;
+    }
+
+    /**
+     * @param finalizedBy the finalizedBy to set
+     */
+    public void setFinalizedBy(User finalizedBy) {
+        this.finalizedBy = finalizedBy;
+    }
+
+    /**
+     * @return the staticconstructiontype
+     */
+    public String getStaticconstructiontype() {
+        return staticconstructiontype;
+    }
+
+    /**
+     * @param staticconstructiontype the staticconstructiontype to set
+     */
+    public void setStaticconstructiontype(String staticconstructiontype) {
+        this.staticconstructiontype = staticconstructiontype;
+    }
+
+    /**
+     * @return the ownerSellerLinkList
+     */
+    public List<HumanLink> getOwnerSellerLinkList() {
+        return ownerSellerLinkList;
+    }
+
+    /**
+     * @return the buyerTenantLinkList
+     */
+    public List<HumanLink> getBuyerTenantLinkList() {
+        return buyerTenantLinkList;
+    }
+
+    /**
+     * @return the managerLinkList
+     */
+    public List<HumanLink> getManagerLinkList() {
+        return managerLinkList;
+    }
+
+    /**
+     * @return the tenantLinkList
+     */
+    public List<HumanLink> getTenantLinkList() {
+        return tenantLinkList;
+    }
+
+    /**
+     * @return the parcelInfo
+     */
+    public ParcelInfo getParcelInfo() {
+        return parcelInfo;
+    }
+
+    /**
+     * @return the issuingOfficer
+     */
+    public User getIssuingOfficer() {
+        return issuingOfficer;
+    }
+
+    /**
+     * @return the textBlocks_stipulations
+     */
+    public List<TextBlock> getTextBlocks_stipulations() {
+        return textBlocks_stipulations;
+    }
+
+    /**
+     * @return the textBlocks_notice
+     */
+    public List<TextBlock> getTextBlocks_notice() {
+        return textBlocks_notice;
+    }
+
+    /**
+     * @return the textBlocks_comments
+     */
+    public List<TextBlock> getTextBlocks_comments() {
+        return textBlocks_comments;
+    }
+
+    /**
+     * @return the text_comments
+     */
+    public String getText_comments() {
+        return text_comments;
+    }
+
+    /**
+     * @return the dynamicdateofapplication
+     */
+    public LocalDateTime getDynamicdateofapplication() {
+        return dynamicdateofapplication;
+    }
+
+    /**
+     * @return the dynamicinitialinspection
+     */
+    public LocalDateTime getDynamicinitialinspection() {
+        return dynamicinitialinspection;
+    }
+
+    /**
+     * @return the dynamicreinspectiondate
+     */
+    public LocalDateTime getDynamicreinspectiondate() {
+        return dynamicreinspectiondate;
+    }
+
+    /**
+     * @return the dynamicfinalinspection
+     */
+    public LocalDateTime getDynamicfinalinspection() {
+        return dynamicfinalinspection;
+    }
+
+    /**
+     * @return the dynamicdateofissue
+     */
+    public LocalDateTime getDynamicdateofissue() {
+        return dynamicdateofissue;
+    }
+
+    /**
+     * @param ownerSellerLinkList the ownerSellerLinkList to set
+     */
+    public void setOwnerSellerLinkList(List<HumanLink> ownerSellerLinkList) {
+        this.ownerSellerLinkList = ownerSellerLinkList;
+    }
+
+    /**
+     * @param buyerTenantLinkList the buyerTenantLinkList to set
+     */
+    public void setBuyerTenantLinkList(List<HumanLink> buyerTenantLinkList) {
+        this.buyerTenantLinkList = buyerTenantLinkList;
+    }
+
+    /**
+     * @param managerLinkList the managerLinkList to set
+     */
+    public void setManagerLinkList(List<HumanLink> managerLinkList) {
+        this.managerLinkList = managerLinkList;
+    }
+
+    /**
+     * @param tenantLinkList the tenantLinkList to set
+     */
+    public void setTenantLinkList(List<HumanLink> tenantLinkList) {
+        this.tenantLinkList = tenantLinkList;
+    }
+
+    /**
+     * @param parcelInfo the parcelInfo to set
+     */
+    public void setParcelInfo(ParcelInfo parcelInfo) {
+        this.parcelInfo = parcelInfo;
+    }
+
+    /**
+     * @param issuingOfficer the issuingOfficer to set
+     */
+    public void setIssuingOfficer(User issuingOfficer) {
+        this.issuingOfficer = issuingOfficer;
+    }
+
+    /**
+     * @param textBlocks_stipulations the textBlocks_stipulations to set
+     */
+    public void setTextBlocks_stipulations(List<TextBlock> textBlocks_stipulations) {
+        this.textBlocks_stipulations = textBlocks_stipulations;
+    }
+
+    /**
+     * @param textBlocks_notice the textBlocks_notice to set
+     */
+    public void setTextBlocks_notice(List<TextBlock> textBlocks_notice) {
+        this.textBlocks_notice = textBlocks_notice;
+    }
+
+    /**
+     * @param textBlocks_comments the textBlocks_comments to set
+     */
+    public void setTextBlocks_comments(List<TextBlock> textBlocks_comments) {
+        this.textBlocks_comments = textBlocks_comments;
+    }
+
+    /**
+     * @param text_comments the text_comments to set
+     */
+    public void setText_comments(String text_comments) {
+        this.text_comments = text_comments;
+    }
+
+    /**
+     * @param dynamicdateofapplication the dynamicdateofapplication to set
+     */
+    public void setDynamicdateofapplication(LocalDateTime dynamicdateofapplication) {
+        this.dynamicdateofapplication = dynamicdateofapplication;
+    }
+
+    /**
+     * @param dynamicinitialinspection the dynamicinitialinspection to set
+     */
+    public void setDynamicinitialinspection(LocalDateTime dynamicinitialinspection) {
+        this.dynamicinitialinspection = dynamicinitialinspection;
+    }
+
+    /**
+     * @param dynamicreinspectiondate the dynamicreinspectiondate to set
+     */
+    public void setDynamicreinspectiondate(LocalDateTime dynamicreinspectiondate) {
+        this.dynamicreinspectiondate = dynamicreinspectiondate;
+    }
+
+    /**
+     * @param dynamicfinalinspection the dynamicfinalinspection to set
+     */
+    public void setDynamicfinalinspection(LocalDateTime dynamicfinalinspection) {
+        this.dynamicfinalinspection = dynamicfinalinspection;
+    }
+
+    /**
+     * @param dynamicdateofissue the dynamicdateofissue to set
+     */
+    public void setDynamicdateofissue(LocalDateTime dynamicdateofissue) {
+        this.dynamicdateofissue = dynamicdateofissue;
+    }
+
+    /**
+     * @return the issuingCodeSource
+     */
+    public CodeSource getIssuingCodeSource() {
+        return issuingCodeSource;
+    }
+
+    /**
+     * @param issuingCodeSource the issuingCodeSource to set
+     */
+    public void setIssuingCodeSource(CodeSource issuingCodeSource) {
+        this.issuingCodeSource = issuingCodeSource;
     }
     
     

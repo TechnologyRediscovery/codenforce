@@ -46,6 +46,8 @@ import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.awt.image.BufferedImage;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
+import com.tcvcog.tcvce.integration.SystemIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -142,6 +144,36 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         }
         
         return typeList;
+    }
+    
+    /**
+     * Returns the bloblight of the default broadview photo for a parcel
+     * @return 
+     */
+    public BlobLight getDefaultBroadviewPhoto() throws IntegrationException, BlobException{
+       
+        BlobLight defBV = getBlobLight(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString("defaultbroadviewphotodocid")));
+        return defBV;
+        
+    }
+    
+
+    /**
+     * takes in a list of BlobLights and only returns those who are browser viewable (i.e. photos)
+     * @param blobList
+     * @return a list, perhaps containing a blob or more
+     */
+    public List<BlobLight> assembleBrowserViewableBlobs(List<BlobLight> blobList){
+        List<BlobLight> blist = new ArrayList<>();
+        if(blobList != null && !blobList.isEmpty()){
+            for(BlobLight blob: blobList){
+                if(blob.getType().isBrowserViewable()){
+                    blist.add(blob);
+                }
+            }
+        }
+        return blist;
     }
     
     /**
@@ -519,7 +551,6 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
             } else {
                 throw new BlobException(ex);
             }
-            
         }
         
         //We are now clear to return the blob
@@ -541,7 +572,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         List<BlobLight> blobList = new ArrayList<>();
         
         for(int id : idList){
-            blobList.add(getBlobLight(id));
+            if(id != 0){
+                blobList.add(getBlobLight(id));
+            }
         }
         return blobList;
     }
@@ -1035,13 +1068,13 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         List<BlobLight> blobList = new ArrayList<>();
         
         for(Integer id : idList){
-            
-            BlobLight result = getBlobLight(id);
-            
-            if(result != null) {
-            
-                blobList.add(result);
-            
+            if(id != 0){
+                BlobLight result = getBlobLight(id);
+                if(result != null) {
+
+                    blobList.add(result);
+
+                }
             }
         }
         

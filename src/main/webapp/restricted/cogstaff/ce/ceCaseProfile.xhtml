@@ -151,19 +151,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                  update="@form
                                                                  cecase-growl-form"/>
                                             </div>
-                                            
+
                                             <p:spacer height="5px" />
 
 
                                             <div class="p-grid">
 
+
                                                 <div class="p-col-4 restrict-data-field-label-inline">
                                                     <h:outputText value="Property" />    
                                                 </div>
-
                                                 <div class="p-col-8 restrict-data-field-value-inline">
                                                     <h:outputText value="#{ceCaseBB.currentCase.property.address.addressPretty2LineEscapeFalse}"
-                                                                  escape="false"/>
+                                                                  escape="false" />
+                                                </div>
+                                                <div class="p-col-4 restrict-data-field-label-inline">
+                                                    <h:outputText value="Broadview" />    
+                                                </div>
+
+                                                <div class="p-col-8 restrict-data-field-value-inline">
+                                                    <p:graphicImage value="#{blobsterBB.image}"
+                                                                    alt="no preview available" 
+                                                                    style="width: 150px" 
+                                                                    cache="false"
+                                                                    rendered="#true">
+                                                        <f:param name="blobid" value="#{sessionBean.sessProperty.broadviewPhoto.photoDocID}"/>
+                                                    </p:graphicImage>
                                                 </div>
 
 
@@ -240,7 +253,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <h:outputText value="Update to: " 
                                                                   rendered="#{ceCaseBB.editModeCurrentCase}"/>
-                                                    
+
                                                     <p:spacer height="4px" />
                                                     <h:selectOneMenu id="cecase-add-origevent-som"
                                                                      value="#{ceCaseBB.formCECaseOriginationEventCat}"
@@ -328,18 +341,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                   rendered="#{empty ceCaseBB.currentCase.closingDate and !ceCaseBB.editModeCurrentCase}"/>
 
                                                     <p:datePicker 	id="cecase-date-origination-cal"
-                                                                        value="#{ceCaseBB.currentCase.originationDate}"
-                                                                        rendered="#{ceCaseBB.editModeCurrentCase}"
-                                                                        style="width: 100%;"
-                                                                        pattern="MM/dd/yyyy HH:mm"
-                                                                        disabled="false"
-                                                                        hideOnDateTimeSelect="true"
-                                                                        showOnFocus="false"
-                                                                        showIcon="true"
-                                                                        showButtonBar="true"
-                                                                        mask="true"
-                                                                        timeInput="true" 
-                                                                        required="true" />
+                                                                   value="#{ceCaseBB.currentCase.originationDate}"
+                                                                   rendered="#{ceCaseBB.editModeCurrentCase}"
+                                                                   style="width: 100%;"
+                                                                   pattern="MM/dd/yyyy HH:mm"
+                                                                   disabled="false"
+                                                                   hideOnDateTimeSelect="true"
+                                                                   showOnFocus="false"
+                                                                   showIcon="true"
+                                                                   showButtonBar="true"
+                                                                   mask="true"
+                                                                   timeInput="true" 
+                                                                   required="true" />
                                                 </div>
                                             </div>
                                         </h:form>
@@ -353,14 +366,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <h:outputText id="selcase-cdate-it" 
                                                                   value="#{ceCaseBB.getPrettyDateNoTime(ceCaseBB.currentCase.closingDate)}"
                                                                   rendered="#{!ceCaseBB.editModeCurrentCloseCase}"/>
-                                                    
+
                                                     <p:spacer height="3px" />
-                                                    
+
                                                     <h:outputText id="selcase-closing-evcat" 
                                                                   value="#{ceCaseBB.currentCase.closingEvent.category.eventCategoryTitle}"
                                                                   rendered="#{!empty ceCaseBB.currentCase.closingEvent}"/>
                                                     <p:spacer height="3px" />
-                                                    
+
                                                     <p:commandLink      id="cecase-forceclose-init-cb" 
                                                                         value="#{!empty ceCaseBB.currentCase.closingDate and !ceCaseBB.currentCase.statusBundle.phase.allowCaseClosure ? 'close case' : 'case closure not allowed'}"
                                                                         ajax="true" 
@@ -369,8 +382,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                         rendered="#{!ceCaseBB.editModeCurrentCloseCase}"
                                                                         style="color: blue; font-weight: bold; "
                                                                         update="@form"/>
-                                                    
-                                                  
+
+
 
                                                     <f:subview id="case-close-form-subview"
                                                                rendered="#{ceCaseBB.editModeCurrentCloseCase}">
@@ -451,7 +464,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         </div>
                                                     </f:subview>
                                                 </h:form>
-                                               
+
                                             </div>
 
 
@@ -466,13 +479,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <h:outputText id="case-manager-ot" 
                                                                   value="#{ceCaseBB.currentCase.caseManager.human.name}"
                                                                   rendered="#{!ceCaseBB.editModeCurrentCaseManager}"/>  
-                                                    
+
                                                     <p:spacer height="4px" />
-                                                    
+
                                                     <h:outputText id="case-manager-username"
                                                                   value="(User:#{ceCaseBB.currentCase.caseManager.username})"
                                                                   rendered="#{!ceCaseBB.editModeCurrentCaseManager}"/>
-                                                    
+
                                                     <p:spacer height="4px" />
 
                                                     <div class="restrict-main-contents-io-link link-button">
@@ -540,7 +553,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                   styleClass="inline-space-single"/>
                                                     <h:outputText id="cecase-id-ot"
                                                                   value="(ID:#{ceCaseBB.currentCase.caseID})" />
-                                                 
+
                                                     <p:spacer height="3px" />
 
                                                     <h:outputText value="Last updated: #{ceCaseBB.getPrettyDate(ceCaseBB.currentCase.lastUpdatedTS)}" />
@@ -586,12 +599,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </h:form>
                                             </div>
                                         </div>
-                                        
-                                          <h:form id="case-refresh-trigger-form">
-                                              <h:outputText value="#{ceCaseBB.reloadCECaseTrigger}" />
-                                          </h:form>
-                                              
-        
+
+                                        <h:form id="case-refresh-trigger-form">
+                                            <h:outputText value="#{ceCaseBB.reloadCECaseTrigger}" />
+                                        </h:form>
+
+
 
                                     </p:panel>
 
@@ -621,7 +634,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                >
                                                 <f:param name="person-list-component-to-update"
                                                          value="cecase-persons-panel-form" />
-                                                
+
                                             </p:commandButton>
 
                                             <p:spacer height="5px" />
@@ -1353,16 +1366,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                 <div class="p-col-6">
                                     <div class="p-grid">
                                         <div class="p-col-12">
-                                            <h2>Case profile report options</h2>
+                                            <h2>General code enforcement case options</h2>
                                         </div>
 
                                         <div class="p-col-8 restrict-data-field-label-inline">
-                                            <h:outputLabel value="Include full letter text of notices of violation: " 
-                                                           for="report-case-profile-noticetext-chkbox" />
+                                            <h:outputLabel value="Include case name" 
+                                                           for="report-case-profile-casename-chkbox" />
                                         </div>
                                         <div class="p-col-4 restrict-main-contents-io-content">                    
-                                            <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" 
-                                                                     value="#{ceCaseBB.reportCECase.includeNoticeFullText}" />
+                                            <p:selectBooleanCheckbox id="report-case-profile-casename-chkbox" 
+                                                                     value="#{ceCaseBB.reportCECase.includeCaseName}" />
+                                        </div>
+
+                                        <div class="p-col-12">
+                                            <h2>Notices of violation</h2>
                                         </div>
 
 
@@ -1375,6 +1392,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      value="#{ceCaseBB.reportCECase.includeAllNotices}" />
                                         </div>
 
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Include full letter text of notices of violation: " 
+                                                           for="report-case-profile-noticetext-chkbox" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:selectBooleanCheckbox id="report-case-profile-noticetext-chkbox" 
+                                                                     value="#{ceCaseBB.reportCECase.includeNoticeFullText}" />
+                                        </div>
+
+
+                                        <div class="p-col-12">
+                                            <h2>Code violations</h2>
+                                        </div>
+
 
                                         <div class="p-col-8 restrict-data-field-label-inline">
                                             <h:outputLabel value="Include full ordinance text in violations" 
@@ -1385,9 +1416,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      value="#{ceCaseBB.reportCECase.includeFullOrdinanceText}" />
                                         </div>
 
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Include violation photos" 
+                                                           for="report-case-profile-violatios-photos-chkbox" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:selectBooleanCheckbox id="report-case-profile-violatios-photos-chkbox" 
+                                                                     value="#{ceCaseBB.reportCECase.includeViolationPhotos}" />
+                                        </div>
 
                                         <div class="p-col-8 restrict-data-field-label-inline">
-                                            <h:outputLabel value="Include field inspection reports" 
+                                            <h:outputLabel value="Include violation notes" 
+                                                           for="report-case-profile-violation-notes-chkbox" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:selectBooleanCheckbox id="report-case-profile-violation-notes-chkbox" 
+                                                                     value="#{ceCaseBB.reportCECase.includeViolationNotes}" />
+                                        </div>
+
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Photo column count (between 1 and 4)" 
+                                                           for="report-case-profile-photos-violation-cols" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:inputNumber id="report-case-profile-photos-violation-cols" 
+                                                           minValue="1"
+                                                           maxValue="4"
+                                                           validatorMessage="Column count must be between 1 and 4"
+                                                           value="#{ceCaseBB.reportCECase.violationPhotoColumnCount}" />
+                                        </div>
+
+
+                                        <div class="p-col-12">
+                                            <h2>Field inspection reports</h2>
+                                        </div>
+
+
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Include full field inspection reports" 
                                                            for="report-case-profile-firs-chkbox" />
                                         </div>
                                         <div class="p-col-4 restrict-main-contents-io-content">                    
@@ -1404,14 +1470,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      value="#{ceCaseBB.reportCECase.includeFieldInspectionReportsWithPhotos}" />
                                         </div>
 
+
+                                        <div class="p-col-12">
+                                            <h2>File uploads</h2>
+                                        </div>
+
+
                                         <div class="p-col-8 restrict-data-field-label-inline">
-                                            <h:outputLabel value="Include case name" 
-                                                           for="report-case-profile-casename-chkbox" />
+                                            <h:outputLabel value="Include links to download attachments from report tab directly" 
+                                                           for="report-case-profile-broadview-chkbox" />
                                         </div>
                                         <div class="p-col-4 restrict-main-contents-io-content">                    
-                                            <p:selectBooleanCheckbox id="report-case-profile-casename-chkbox" 
-                                                                     value="#{ceCaseBB.reportCECase.includeCaseName}" />
+                                            <p:selectBooleanCheckbox id="report-case-profile-broadview-chkbox" 
+                                                                     value="#{ceCaseBB.reportCECase.includePropertyBroadviewPhoto}" />
                                         </div>
+
+
                                         <div class="p-col-8 restrict-data-field-label-inline">
                                             <h:outputLabel value="Include links to download attachments from report tab directly" 
                                                            for="report-case-profile-downloadlinks-chkbox" />
@@ -1420,6 +1494,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:selectBooleanCheckbox id="report-case-profile-downloadlinks-chkbox" 
                                                                      value="#{ceCaseBB.reportCECase.includeDocDownloadLinks}" />
                                         </div>
+
+
+
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Include links to download attachments from report tab directly" 
+                                                           for="report-case-profile-caseblobpool-chkbox" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:selectBooleanCheckbox id="report-case-profile-caseblobpool-chkbox" 
+                                                                     value="#{ceCaseBB.reportCECase.includeCECasePhotoPool}" />
+                                        </div>
+
+
+                                        <div class="p-col-12">
+                                            <h2>Action requests</h2>
+                                        </div>
                                         <div class="p-col-8 restrict-data-field-label-inline">
                                             <h:outputLabel value="Include linked action requests" 
                                                            for="report-case-profile-cears-chkbox" />
@@ -1427,6 +1517,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <div class="p-col-4 restrict-main-contents-io-content">                    
                                             <p:selectBooleanCheckbox id="report-case-profile-cears-chkbox" 
                                                                      value="#{ceCaseBB.reportCECase.includeActionRequsts}" />
+                                        </div>
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Include action request photos" 
+                                                           for="report-case-profile-cears-photos-chkbox" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:selectBooleanCheckbox id="report-case-cears-photos-chkbox" 
+                                                                     value="#{ceCaseBB.reportCECase.includeActionRequestPhotos}" />
+                                        </div>
+
+
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Include action request photos" 
+                                                           for="report-case-cear-photos-cols" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:inputNumber id="report-case-cear-photos-cols" 
+                                                           minValue="1"
+                                                           maxValue="4"
+                                                           validatorMessage="Column count must be between 1 and 4"
+                                                           value="#{ceCaseBB.reportCECase.cearColumnCount}" />
+                                        </div>
+                                        <div class="p-col-12">
+                                            <h2>Fees and payments</h2>
                                         </div>
                                         <div class="p-col-8 restrict-data-field-label-inline">
                                             <h:outputLabel value="Include fee and payment records" 
@@ -1438,6 +1552,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </div>
 
                                         <div class="p-col-4 restrict-data-field-label-inline">
+
+                                            <div class="p-col-12">
+                                                <h2>Report notes</h2>
+                                            </div>
                                             <h:outputLabel for="report-case-profile-notes-ita" 
                                                            value="Report notes"/>
                                         </div>
@@ -1451,9 +1569,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 This text will appear in the report header.
                                             </p>
                                         </div>
-
-
-
                                     </div>
                                 </div>
                                 <div class="p-col-6">
@@ -1461,14 +1576,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <div class="p-col-12">
                                             <h2>Photo options</h2>
                                         </div>
-                                        <div class="p-col-8 restrict-data-field-label-inline">
-                                            <h:outputLabel value="Include violation photos" 
-                                                           for="report-case-profile-photo-chkbox" />
-                                        </div>
-                                        <div class="p-col-4 restrict-main-contents-io-content">                    
-                                            <p:selectBooleanCheckbox id="report-case-profile-photo-chkbox" 
-                                                                     value="#{ceCaseBB.reportCECase.includeViolationPhotos}" />
-                                        </div>
+
                                         <div class="p-col-8 restrict-data-field-label-inline">
                                             <h:outputLabel value="Include cecase photo pool" 
                                                            for="report-case-profile-photos-case" />
@@ -1476,6 +1584,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <div class="p-col-4 restrict-main-contents-io-content">                    
                                             <p:selectBooleanCheckbox id="report-case-profile-photos-case" 
                                                                      value="#{ceCaseBB.reportCECase.includeCECasePhotoPool}" />
+                                        </div>
+
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Include case photo filenames" 
+                                                           for="report-case-profile-photos-filenames" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:selectBooleanCheckbox id="report-case-profile-photos-filenames" 
+                                                                     value="#{ceCaseBB.reportCECase.includeCECasePhotoPool}" />
+                                        </div>
+
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Include cecase photo pool" 
+                                                           for="report-case-profile-photos-case-cols" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:inputNumber id="report-case-profile-photos-case-cols" 
+                                                           minValue="1"
+                                                           maxValue="4"
+                                                           validatorMessage="Column count must be between 1 and 4"
+                                                           value="#{ceCaseBB.reportCECase.ceCasePhotoPoolColumnCount}" />
                                         </div>
 
                                         <div class="p-col-12 restrict-data-field-label-inline">
@@ -1509,12 +1638,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      value="#{ceCaseBB.reportCECase.includePersonAddrPhoneEmail}" />
                                         </div>
 
-
-
                                         <div class="p-col-12 restrict-data-field-label-inline">
-                                            <h2>Case event history report options</h2>
+                                            <h2>Event history report options</h2>
                                         </div>
 
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Include code officer only events: " 
+                                                           for="report-case-profile-events-officer-chkbox" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:selectBooleanCheckbox id="report-case-profile-events-officer-chkbox" 
+                                                                     value="#{ceCaseBB.reportCECase.includeOfficerOnlyEvents}" />
+                                        </div>
+
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Include municipality disclsoed events: " 
+                                                           for="report-case-profile-events-muni-chkbox" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:selectBooleanCheckbox id="report-case-profile-events-muni-chkbox" 
+                                                                     value="#{ceCaseBB.reportCECase.includeMunicipalityDiclosedEvents}" />
+                                        </div>
                                         <div class="p-col-8 restrict-data-field-label-inline">
                                             <h:outputLabel value="Include hidden events: " 
                                                            for="report-case-profile-hidden-chkbox" />
@@ -1541,6 +1685,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         <div class="p-col-4 restrict-main-contents-io-content">                    
                                             <p:selectBooleanCheckbox id="report-case-profile-eventnotes-chkbox" 
                                                                      value="#{ceCaseBB.reportCECase.includeEventNotes}" />
+                                        </div>
+
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+
+                                            <h:outputLabel value="Include event metadata " 
+                                                           for="report-case-profile-eventmeta-chkbox" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:selectBooleanCheckbox id="report-case-profile-eventmeta-chkbox" 
+                                                                     value="#{ceCaseBB.reportCECase.includeEventMetadata}" />
+                                        </div>
+
+                                        <div class="p-col-8 restrict-data-field-label-inline">
+
+                                            <h:outputLabel value="Include event person associations " 
+                                                           for="report-case-profile-event-personlinks" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:selectBooleanCheckbox id="report-case-profile-event-personlinks" 
+                                                                     value="#{ceCaseBB.reportCECase.includeEventPersonLinks}" />
                                         </div>
                                     </div>
                                 </div>

@@ -85,7 +85,9 @@ public class PropertyProfileBB
     private List<IntensityClass> conditionIntensityList;
     private List<IntensityClass> landBankProspectIntensityList;
     private List<BOBSource> sourceList;
-
+    
+    private List<BlobLight> broadViewPhotoCandidates;
+    private BlobLight selectedBoadviewPhoto;
 
     private String formNoteText;
 
@@ -155,7 +157,7 @@ public class PropertyProfileBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             int newID = oc.insertOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
-            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessUser().getMyCredential()));
+            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessUser()));
         } catch (IntegrationException | BObStatusException | EventException | SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -176,7 +178,7 @@ public class PropertyProfileBB
        OccupancyCoordinator oc = getOccupancyCoordinator();
        if(op != null){
            try {
-               getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessUser().getMyCredential()));
+               getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessUser()));
            } catch (IntegrationException | BObStatusException | SearchException ex) {
                System.out.println(ex);
            }
@@ -207,7 +209,7 @@ public class PropertyProfileBB
         occPeriodOriginiationEventCandidateList = ec.determinePermittedEventCategories(EventType.Occupancy, getSessionBean().getSessUser());
         
         try {
-            currentPropertyUnit = pc.getPropertyUnitWithLists(pu, getSessionBean().getSessUser().getKeyCard());
+            currentPropertyUnit = pc.getPropertyUnitDataHeavy(pu, getSessionBean().getSessUser());
         } catch (IntegrationException | AuthorizationException | BObStatusException | EventException  ex) {
             System.out.println(ex);
         } 
@@ -224,9 +226,53 @@ public class PropertyProfileBB
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
             currentProperty = pc.assemblePropertyDataHeavy(pc.generatePropertySkeleton(getSessionBean().getSessMuni()),getSessionBean().getSessUser());
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException | BlobException ex) {
             System.out.println(ex);
         } 
+    }
+    
+    /**
+     * Listener for user requests to start the broadview photo update process
+     * @param ev 
+     */
+    public void onChangeBroadviewPhotoInitLinkClick(ActionEvent ev){
+        BlobCoordinator bc = getBlobCoordinator();
+        
+        broadViewPhotoCandidates = bc.assembleBrowserViewableBlobs(currentProperty.getBlobList());
+        try {
+            broadViewPhotoCandidates.add(bc.getDefaultBroadviewPhoto());
+        } catch (IntegrationException | BlobException ex) {
+            System.out.println(ex);
+        } 
+    
+    }
+    
+    
+    /**
+     * Listener for user requests to commit the new broadview photo
+     * @param blight    
+     */
+    public void onChangeBroadviewPhotoCommitLinkClick(BlobLight blight){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        selectedBoadviewPhoto = blight;
+        if(selectedBoadviewPhoto != null){
+            currentProperty.setBroadviewPhoto(selectedBoadviewPhoto);
+            try {
+                pc.updatePropertyDataHeavyBroadviewPhoto(currentProperty, getSessionBean().getSessUser());
+                reloadCurrentPropertyDataHeavy();
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                           "ERROR updating photo", ""));
+            } 
+        } else {
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Cannot update broadview photo to null", ""));
+        }
+        
+        
     }
     
     /**
@@ -249,7 +295,7 @@ public class PropertyProfileBB
                                 + ", which is now your 'active property'", ""));
             
             
-        } catch (IntegrationException | BObStatusException | SearchException | AuthorizationException | EventException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException | AuthorizationException | EventException | BlobException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
@@ -274,7 +320,7 @@ public class PropertyProfileBB
              getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Reloaded property id " + currentProperty.getPropertyID(), ""));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException | BlobException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -349,7 +395,7 @@ public class PropertyProfileBB
         SystemCoordinator sc = getSystemCoordinator();
         try {
 //            currentProperty.setAbandonedDateStart(pc.configureDateTime(currentProperty.getAbandonedDateStart().to));
-            pc.updateParcel(currentProperty, getSessionBean().getSessUser());
+            pc.updatePropertyDataHeavyBroadviewPhoto(currentProperty, getSessionBean().getSessUser());
             reloadCurrentPropertyDataHeavy();
             sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
             getFacesContext().addMessage(null,
@@ -653,7 +699,7 @@ public class PropertyProfileBB
       public void onUnitViewEditLinkClick(PropertyUnit pu){
           PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            currentPropertyUnit = pc.getPropertyUnitWithLists(pu, getSessionBean().getSessUser().getKeyCard());
+            currentPropertyUnit = pc.getPropertyUnitDataHeavy(pu, getSessionBean().getSessUser());
         } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -669,7 +715,7 @@ public class PropertyProfileBB
       public void onUnitAddInitButtonChange(ActionEvent ev){
           PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            currentPropertyUnit = pc.getPropertyUnitWithLists(pc.getPropertyUnitSkeleton(currentProperty), getSessionBean().getSessUser().getKeyCard());
+            currentPropertyUnit = pc.getPropertyUnitDataHeavy(pc.getPropertyUnitSkeleton(currentProperty), getSessionBean().getSessUser());
             unitEditMode = true;
         } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
             System.out.println(ex);
@@ -714,7 +760,7 @@ public class PropertyProfileBB
             int freshID = pc.insertPropertyUnit(currentPropertyUnit, currentProperty, getSessionBean().getSessUser());
             if(freshID != 0){
 
-                currentPropertyUnit = pc.getPropertyUnitWithLists(pc.getPropertyUnit(freshID), getSessionBean().getSessUser().getKeyCard());
+                currentPropertyUnit = pc.getPropertyUnitDataHeavy(pc.getPropertyUnit(freshID), getSessionBean().getSessUser());
 
                 getFacesContext().addMessage(null,
                       new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -750,7 +796,7 @@ public class PropertyProfileBB
           currentPropertyUnit.setNotes(sc.appendNoteBlock(mbp));
         try {
             pc.updatePropertyUnit(currentPropertyUnit, getSessionBean().getSessUser());
-            currentPropertyUnit = pc.getPropertyUnitWithLists(currentPropertyUnit, getSessionBean().getSessUser().getKeyCard());
+            currentPropertyUnit = pc.getPropertyUnitDataHeavy(currentPropertyUnit, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                   new FacesMessage(FacesMessage.SEVERITY_INFO,
                           "Unit note update succses! Great work!", ""));
@@ -770,7 +816,7 @@ public class PropertyProfileBB
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
             pc.updatePropertyUnit(currentPropertyUnit,getSessionBean().getSessUser());
-            currentPropertyUnit = pc.getPropertyUnitWithLists(pc.getPropertyUnit(currentPropertyUnit.getUnitID()), getSessionBean().getSessUser().getKeyCard());
+            currentPropertyUnit = pc.getPropertyUnitDataHeavy(pc.getPropertyUnit(currentPropertyUnit.getUnitID()), getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                   new FacesMessage(FacesMessage.SEVERITY_INFO,
                           "Unit update success!", ""));
@@ -1206,6 +1252,34 @@ public class PropertyProfileBB
      */
     public void setFormUnitNoteText(String formUnitNoteText) {
         this.formUnitNoteText = formUnitNoteText;
+    }
+
+    /**
+     * @return the selectedBoadviewPhoto
+     */
+    public BlobLight getSelectedBoadviewPhoto() {
+        return selectedBoadviewPhoto;
+    }
+
+    /**
+     * @param selectedBoadviewPhoto the selectedBoadviewPhoto to set
+     */
+    public void setSelectedBoadviewPhoto(BlobLight selectedBoadviewPhoto) {
+        this.selectedBoadviewPhoto = selectedBoadviewPhoto;
+    }
+
+    /**
+     * @return the broadViewPhotoCandidates
+     */
+    public List<BlobLight> getBroadViewPhotoCandidates() {
+        return broadViewPhotoCandidates;
+    }
+
+    /**
+     * @param broadViewPhotoCandidates the broadViewPhotoCandidates to set
+     */
+    public void setBroadViewPhotoCandidates(List<BlobLight> broadViewPhotoCandidates) {
+        this.broadViewPhotoCandidates = broadViewPhotoCandidates;
     }
 
   

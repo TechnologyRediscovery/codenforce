@@ -44,9 +44,8 @@ ALTER TABLE public.municipality ADD COLUMN officeparcel_parcelid INTEGER
 	CONSTRAINT municipality_parcelid_fk REFERENCES parcel (parcelkey);
 
 
--- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
---- SNAPPER UPDATES ----------------
+--- SNAPPER UPDATES ---------------- -- HAVEN"T RUN ON SERVER SNAPPER
 
 
 --BEGIN; -- not needed during 11-MAY-2022 updates
@@ -104,11 +103,74 @@ ALTER TABLE mailingstreet
 
 
 
--- ******************************* run on LOCAL TEST system up to here *******************************
+
+
+ALTER TABLE parcel ADD COLUMN broadview_photodocid INTEGER 
+	CONSTRAINT parcel_broadview_photodicid_fk REFERENCES photodoc (photodocid);
+
+
 
 ALTER TABLE photodoc ADD COLUMN dateofrecord TIMESTAMP WITH TIME ZONE DEFAULT now();
 ALTER TABLE photodoc ADD COLUMN courtdocument boolean DEFAULT TRUE;
 
+
+
+-- Changes for occupancy permitting
+ALTER TABLE public.occpermit ADD COLUMN finalizedts TIMESTAMP WITH TIME ZONE;
+
+ALTER TABLE public.occpermit ADD COLUMN finalizedby_userid INTEGER 
+	CONSTRAINT occpermit_finalizedby_userid_fk REFERENCES login (userid);
+
+ALTER TABLE public.occpermit ADD COLUMN statictitle TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticmuniaddress TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticpropertyinfo TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticownerseller TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticcolumnlink TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticbuyertenant TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticproposeduse TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticusecode TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticpropclass TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticdateofapplication TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occpermit ADD COLUMN staticinitialinspection TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occpermit ADD COLUMN staticreinspectiondate TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occpermit ADD COLUMN staticfinalinspection TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occpermit ADD COLUMN staticdateofissue TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occpermit ADD COLUMN staticofficername TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticissuedundercodesourceid TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticstipulations TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticcomments TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticmanager TEXT;
+ALTER TABLE public.occpermit ADD COLUMN statictenants TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticleaseterm TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticleasestatus TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticpaymentstatus TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticnotice TEXT;
+
+
+ALTER TABLE public.occpermit ADD COLUMN createdts TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occpermit ADD COLUMN createdby_userid INTEGER 
+	CONSTRAINT occpermit_createdby_fk REFERENCES login (userid);
+
+ALTER TABLE public.occpermit ADD COLUMN lastupdatedts TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occpermit ADD COLUMN lastupdatedby_userid INTEGER 
+	CONSTRAINT occpermit_lastupdatedby_fk REFERENCES login (userid);
+
+
+
+ALTER TABLE public.occpermit ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occpermit ADD COLUMN deactivatedby_userid INTEGER 
+	CONSTRAINT occpermit_deactivatedby_fk REFERENCES login (userid);
+
+ALTER TABLE public.occpermit DROP COLUMN issuedto_personid;
+ALTER TABLE public.occpermit DROP COLUMN issuedby_userid;
+ALTER TABLE public.occpermit DROP COLUMN dateissued;
+ALTER TABLE public.occpermit RENAME COLUMN permitadditionaltext TO staticpermitadditionaltext ;
+
+
+
+
+-- ******************************* run on LOCAL TEST system up to here *******************************
+-- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
 
 

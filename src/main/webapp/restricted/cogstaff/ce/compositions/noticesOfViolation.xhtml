@@ -247,7 +247,7 @@
                     <!--NESTED DATA VALUE VERTICAL -->
                     <div class="restrict-data-field-value-vertical" >
                         <h:outputText id="nov-dor-ot"
-                                      value="#{noticeOfViolationBB.currentNotice.dateOfRecordPretty}" />
+                                      value="#{noticeOfViolationBB.getPrettyDate(noticeOfViolationBB.currentNotice.dateOfRecord)}" />
                     </div>
                     <!--NESTED DATA VALUE VERTICAL -->
                     <div class="restrict-data-field-value-vertical" >
@@ -272,7 +272,7 @@
                     <!--NESTED DATA VALUE VERTICAL -->
                     <div class="restrict-data-field-value-vertical" >
                         <h:outputText   id="nov-queued-ot"
-                                        value="#{noticeOfViolationBB.currentNotice.lockedAndQueuedTSPretty}"/>
+                                        value="#{noticeOfViolationBB.getPrettyDate(noticeOfViolationBB.currentNotice.lockedAndQueuedTS)}"/>
                     </div>
                     <!--NESTED DATA VALUE VERTICAL -->
                     <div class="restrict-data-field-value-vertical" >
@@ -295,7 +295,7 @@
                     <!--NESTED DATA VALUE VERTICAL -->
                     <div class="restrict-data-field-value-vertical" >
                         <h:outputText   id="nov-sent-ot"
-                                        value="#{noticeOfViolationBB.currentNotice.sentTSPretty}"/>
+                                        value="#{noticeOfViolationBB.getPrettyDate(noticeOfViolationBB.currentNotice.sentTS)}"/>
                     </div>
                     <!--NESTED DATA VALUE VERTICAL -->
                     <div class="restrict-data-field-value-vertical" >
@@ -318,7 +318,7 @@
                     <!--NESTED DATA VALUE VERTICAL -->
                     <div class="restrict-data-field-value-vertical" >
                         <h:outputText   id="nov-returned-ot"
-                                        value="#{noticeOfViolationBB.currentNotice.returnedTSPretty}"/>
+                                        value="#{noticeOfViolationBB.getPrettyDate(noticeOfViolationBB.currentNotice.returnedTS)}"/>
                     </div>
                     <!--NESTED DATA VALUE VERTICAL -->
                     <div class="restrict-data-field-value-vertical" >
@@ -753,7 +753,7 @@
                     <f:facet name="header">
                         <h:outputText value="Stip Comp Date" />
                     </f:facet>
-                    <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
+                    <h:outputText value="#{noticeOfViolationBB.getPrettyDateNoTime(v.stipulatedComplianceDate)}"/>
                 </p:column>
 
                 <p:column width="5%">

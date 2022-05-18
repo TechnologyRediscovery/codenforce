@@ -146,8 +146,11 @@
                                         value="view/edit"
                                         actionListener="#{ceCaseBB.onViolationView(v)}"
                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                        update="violation-details-dialog
-                                        violation-details-form"
+                                        update="violation-category-header-form
+                                        violation-details-dialog
+                                        violation-details-form
+                                        violation-blobs-form
+                                        violation-notes-form"
                                         oncomplete="PF('violation-details-dialog-var').show()"/>
                     </div>
                 </p:column>

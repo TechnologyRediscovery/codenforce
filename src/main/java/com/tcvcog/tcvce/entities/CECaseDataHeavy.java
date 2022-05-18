@@ -56,54 +56,22 @@ public class CECaseDataHeavy
     
    
     public CECaseDataHeavy(CECase cse) {
-        if(cse != null){
-            
-           this.caseID = cse.caseID;
-            this.publicControlCode = cse.publicControlCode;
-            this.paccEnabled = cse.paccEnabled;
-
-            this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
-
-            this.parcelKey = cse.parcelKey;
-            this.propertyUnitID = cse.propertyUnitID;
-
-            this.caseManager = cse.caseManager;
-            this.caseName = cse.caseName;
-
-            this.originationDate = cse.originationDate;
-            this.closingDate = cse.closingDate;
-            this.creationTimestamp = cse.creationTimestamp;
-
-            this.notes = cse.notes;
-
-            this.source = cse.source;
-
-            this.citationList = cse.citationList;
-            this.noticeList = cse.noticeList;
-            this.violationList = cse.violationList;
-
-            this.active = cse.active;
-            this.propertyInfoCase = cse.propertyInfoCase;
-            this.personInfoPersonID = cse.getPersonInfoPersonID();
-
-            this.lastUpdatedBy = cse.getLastUpdatedBy();
-            this.lastUpdatedTS = cse.getLastUpdatedTS();
-            this.statusBundle = cse.getStatusBundle();
-
-            this.eventList = cse.eventList;
-            this.statusAssignmentLog = cse.statusAssignmentLog;
-            
-            this.originationEvent = cse.originationEvent;
-            this.closingEvent = cse.closingEvent;
-            
-            this.daysSinceLastEvent = cse.daysSinceLastEvent;
-            
-            
-
-        } else {
-            System.out.println("CECaseDataHeavy.const: null input case");
-        }
+       super(cse);
         
+    }
+    
+    public CECaseDataHeavy(CECaseDataHeavy csedh){
+        super(csedh);
+        this.property = csedh.property;
+        this.propertyUnit = csedh.propertyUnit;
+        this.humanLinkList = csedh.humanLinkList;
+        this.inspectionList = csedh.inspectionList;
+        this.proposalList = csedh.proposalList;
+        this.eventRuleList = csedh.eventRuleList;
+        this.ceActionRequestList = csedh.ceActionRequestList;
+        this.feeList = csedh.feeList;
+        this.paymentList = csedh.paymentList;
+        this.blobList = csedh.blobList;
     }
 
 

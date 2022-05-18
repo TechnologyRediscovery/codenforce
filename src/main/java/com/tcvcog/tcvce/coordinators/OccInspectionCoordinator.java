@@ -1213,7 +1213,14 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         
         
         MunicipalityCoordinator mc = getMuniCoordinator();
-        MunicipalityDataHeavy mdh = mc.assembleMuniDataHeavy(muniTarget, ua);
+        MunicipalityDataHeavy mdh;
+        try {
+            mdh = mc.assembleMuniDataHeavy(muniTarget, ua);
+        } catch (BlobException ex) {
+            throw new BObStatusException("Cannot get MuniDH because of blob exception");
+
+        }
+        
         
         CodeSet codeSet = mdh.getCodeSet();
         

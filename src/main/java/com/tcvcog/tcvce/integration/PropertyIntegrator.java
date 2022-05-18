@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.coordinators.*;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.search.SearchParamsMailingCityStateZip;
@@ -66,7 +67,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         Parcel p = null;
         String query =  "SELECT parcelkey, muni_municode, parcelidcnty, source_sourceid, createdts, createdby_userid, \n" +
                         "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
-                        "       notes, lotandblock \n" +
+                        "       notes, lotandblock, broadview_photodocid \n" +
                         "  FROM public.parcel WHERE parcelkey=?;";
 
         Connection con = getPostgresCon();
@@ -115,13 +116,13 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 parcel.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
             }
             parcel.setLotAndBlock(rs.getString("lotandblock"));
+            parcel.setBroadviewPhotoID(rs.getInt("broadview_photodocid"));
+          
             si.populateTrackedFields(parcel, rs, false);
             return parcel;
-        } catch (BObStatusException ex) {
+        } catch (BObStatusException  ex) {
             throw new IntegrationException(ex.getMessage());
-            
         }
-        
     }
     
     /**
@@ -133,7 +134,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     public Parcel getParcelByParID(int countyParcelID) throws IntegrationException{
         
         Parcel p = null;
-        PropertyCoordinator pc = getPropertyCoordinator();
         String query = "SELECT parcelkey, muni_municode, parcelidcnty, source_sourceid, createdts, createdby_userid, \n" +
                         "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
                         "       notes, lotandblock \n" +
@@ -773,7 +773,55 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
+            
+         
+            
             stmt.setInt(6, pcl.getParcelKey());
+            
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to updaet Parcel info in DB, sorry!", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+           if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+    }
+    
+    
+       /**
+     * Creates a new record in the parcel table
+     * @param pcl
+     * @throws IntegrationException 
+     */
+    public void updatePropertyDataHeavyBroadviewPhoto(PropertyDataHeavy pdh) throws IntegrationException{
+          
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            
+            String s =  "UPDATE public.parcel\n" +
+                        "   SET broadview_photodocid=?, lastupdatedts=now(), lastupdatedby_userid=?   " +
+                        " WHERE parcelkey=?;";
+            
+            stmt = con.prepareStatement(s);
+            
+           if(pdh.getBroadviewPhoto() != null){
+               stmt.setInt(1, pdh.getBroadviewPhoto().getPhotoDocID());
+           } else {
+               stmt.setNull(1, java.sql.Types.NULL);
+           }
+           
+           if(pdh.getLastUpdatedBy() != null){
+               stmt.setInt(2, pdh.getLastUpdatedBy().getUserID());
+           } else {
+               stmt.setNull(2, java.sql.Types.NULL);
+           }
+            stmt.setInt(3, pdh.getParcelKey());
             
             stmt.execute();
             
@@ -2812,8 +2860,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         PersonCoordinator pc = getPersonCoordinator();
         
         PropertyUnitDataHeavy pudh = new PropertyUnitDataHeavy(getPropertyUnit(unitID));
-        pudh.setPeriodList(oi.getOccPeriodList(unitID));
-        pudh.setHumanLinkList(pc.getHumanLinkList(pudh));
+   
         
         
         // Disabled for parcelization and simplification of unit editing process

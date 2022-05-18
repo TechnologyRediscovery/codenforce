@@ -147,7 +147,7 @@ public class    SessionBean
      * @throws BObStatusException
      * @throws IntegrationException 
      */
-    public void setSessProperty(int propID) throws BObStatusException, IntegrationException{
+    public void setSessProperty(int propID) throws BObStatusException, IntegrationException, BlobException{
         PropertyCoordinator pc = getPropertyCoordinator();
         if(propID == 0){
             throw new BObStatusException("Prop ID cannot be 0");
@@ -166,7 +166,7 @@ public class    SessionBean
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
             sessProperty = pc.assemblePropertyDataHeavy(prop, sessUser);
-        } catch (BObStatusException | IntegrationException | SearchException ex) {
+        } catch (BObStatusException | IntegrationException | SearchException | BlobException ex) {
             System.out.println("SessionBean.setSessionProperty: error setting session prop");
             System.out.println(ex);
         }
@@ -619,7 +619,7 @@ public class    SessionBean
                 throw new BObStatusException("Unsupported instance of ActivatableBOB sent with call to setSessionActiveObject");
             }
 
-        } catch (BObStatusException | IntegrationException | SearchException | EventException ex) {
+        } catch (BObStatusException | IntegrationException | SearchException | EventException | BlobException ex) {
             System.out.println(ex);
             
         } 
@@ -920,7 +920,7 @@ public class    SessionBean
             for(CECaseDataHeavy csedh: cseldh){
                 try {
                     cseListPDH.add(cc.cecase_assembleCECasePropertyUnitHeavy(csedh));
-                } catch (IntegrationException | SearchException ex) {
+                } catch (IntegrationException | SearchException | BObStatusException | BlobException ex) {
                     System.out.println(ex);
                 }
             }
@@ -1490,7 +1490,7 @@ public class    SessionBean
                 this.sessOccPeriod = sop;
             } else {
                 OccupancyCoordinator oc = getOccupancyCoordinator();
-                this.sessOccPeriod = oc.assembleOccPeriodDataHeavy(sessOccPeriod, sessUser.getKeyCard());
+                this.sessOccPeriod = oc.assembleOccPeriodDataHeavy(sessOccPeriod, sessUser);
             }
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
@@ -1507,7 +1507,7 @@ public class    SessionBean
         // Convert occPeriodBase to a heavy data class (because it can be modified, presumably)
         OccPeriodDataHeavy occPeriodHeavy = null;
         try {
-            occPeriodHeavy = oc.assembleOccPeriodDataHeavy(occPeriodBase, sessUser.getKeyCard());
+            occPeriodHeavy = oc.assembleOccPeriodDataHeavy(occPeriodBase, sessUser);
         } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
         }

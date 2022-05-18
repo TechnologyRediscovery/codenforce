@@ -42,6 +42,8 @@ public  class Parcel
     protected String notes;
     
     protected ParcelInfo parcelInfo;
+    protected int broadviewPhotoID;
+    
     
     public Parcel(){
         
@@ -56,6 +58,7 @@ public  class Parcel
             this.source = p.source;
             this.notes = p.notes;
             this.parcelInfo = p.parcelInfo;
+            this.broadviewPhotoID = p.broadviewPhotoID;
         }
     }
     
@@ -229,6 +232,20 @@ public  class Parcel
         return HF_NAME;
     }
 
-   
+    /**
+     * @return the broadviewPhotoID
+     */
+    public int getBroadviewPhotoID() {
+        return broadviewPhotoID;
+    }
+
+    /**
+     * @param broadviewPhotoID the broadviewPhotoID to set
+     */
+    public void setBroadviewPhotoID(int broadviewPhotoID) {
+        this.broadviewPhotoID = broadviewPhotoID;
+    }
+
+    
     
 }

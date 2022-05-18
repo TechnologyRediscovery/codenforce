@@ -225,7 +225,7 @@ public class DirectiveChoiceConfigBB extends BackingBeanUtils implements Seriali
     public void reloadCurrentOccPeriodDataHeavy(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            setCurrentOccPeriod(oc.assembleOccPeriodDataHeavy(getCurrentOccPeriod(), getSessionBean().getSessUser().getMyCredential()));
+            setCurrentOccPeriod(oc.assembleOccPeriodDataHeavy(getCurrentOccPeriod(), getSessionBean().getSessUser()));
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                 "Reloaded occ period ID " + getCurrentOccPeriod().getPeriodID(), ""));

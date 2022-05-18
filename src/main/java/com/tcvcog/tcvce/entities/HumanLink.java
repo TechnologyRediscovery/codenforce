@@ -46,12 +46,20 @@ public class        HumanLink
     protected int parentObjectID;
     
     
-    
-    public HumanLink(Human h){
-        super(h);
+    /**
+     * Constructor of current class given supertype
+     * No population of this classes members occurs
+     * @param per 
+     */
+    public HumanLink(Person per){
+        super(per);
         
     }
  
+    /**
+     * Clones a HumanLink object
+     * @param hl 
+     */
     public HumanLink(HumanLink hl){
         super(hl);
         

@@ -19,49 +19,16 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
-import com.tcvcog.tcvce.entities.DomainEnum;
-import com.tcvcog.tcvce.entities.FeeAssigned;
-import com.tcvcog.tcvce.entities.HumanLink;
-import com.tcvcog.tcvce.entities.Payment;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyDataHeavy;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitDataHeavy;
-import com.tcvcog.tcvce.entities.PublicInfoBundle;
-import com.tcvcog.tcvce.entities.PublicInfoBundleCEActionRequest;
-import com.tcvcog.tcvce.entities.PublicInfoBundleCECase;
-import com.tcvcog.tcvce.entities.PublicInfoBundleCodeViolation;
-import com.tcvcog.tcvce.entities.PublicInfoBundleEventCnF;
-import com.tcvcog.tcvce.entities.PublicInfoBundleFeeAssigned;
-import com.tcvcog.tcvce.entities.PublicInfoBundleOccInspection;
-import com.tcvcog.tcvce.entities.PublicInfoBundleOccPeriod;
-import com.tcvcog.tcvce.entities.PublicInfoBundleOccPermitApplication;
-import com.tcvcog.tcvce.entities.PublicInfoBundlePayment;
-import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
-import com.tcvcog.tcvce.entities.PublicInfoBundlePersonOccApplication;
-import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
-import com.tcvcog.tcvce.entities.PublicInfoBundlePropertyUnit;
-import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
-import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
+import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.occupancy.*;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
@@ -72,6 +39,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -567,7 +536,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         if (input.isActive()) {
             OccupancyCoordinator oc = getOccupancyCoordinator();
             setPublicUser();
-            OccPeriodDataHeavy opdh = oc.assembleOccPeriodDataHeavy(input, publicUser.getMyCredential());
+            OccPeriodDataHeavy opdh = oc.assembleOccPeriodDataHeavy(input, publicUser);
 
             pib.setBundledPeriod(input);
 
@@ -775,7 +744,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         PublicInfoBundlePropertyUnit pib = new PublicInfoBundlePropertyUnit();
         PropertyCoordinator pc = getPropertyCoordinator();
         setPublicUser();
-        PropertyUnitDataHeavy heavyUnit = pc.getPropertyUnitWithLists(input, publicUser.getMyCredential());
+        PropertyUnitDataHeavy heavyUnit = pc.getPropertyUnitDataHeavy(input, publicUser);
 
         ArrayList<PublicInfoBundleOccPeriod> periodHorde = new ArrayList<>();
 
@@ -945,7 +914,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         try {
 
-            exportable = pc.getPropertyUnitWithLists(unbundled, publicUser.getMyCredential());
+            exportable = pc.getPropertyUnitDataHeavy(unbundled, publicUser);
 
             exportable.setUnitNumber(unbundled.getUnitNumber());
             exportable.setNotes(unbundled.getNotes());
@@ -1005,7 +974,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             throws IntegrationException, 
             EventException, 
             SearchException, 
-            BObStatusException{
+            BObStatusException,
+            BlobException{
 
         EventCoordinator ec = getEventCoordinator();
         EventCnF unbundled = input.getBundledEvent();
@@ -1161,7 +1131,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         OccPeriod unbundled = input.getBundledPeriod();
         setPublicUser();
-        OccPeriodDataHeavy exportable = oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(unbundled.getPeriodID()), publicUser.getMyCredential());
+        OccPeriodDataHeavy exportable = oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(unbundled.getPeriodID()), publicUser);
 
         ArrayList<Person> skeletonHorde = new ArrayList<>();
 
@@ -1633,8 +1603,15 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             CaseCoordinator cc = getCaseCoordinator();
             EventCoordinator ec = getEventCoordinator();
             setPublicUser();
-            PropertyDataHeavy heavyProp = pc.assemblePropertyDataHeavy(currentProp, publicUser);
-            
+            PropertyDataHeavy heavyProp = null;
+            try {
+                heavyProp = pc.assemblePropertyDataHeavy(currentProp, publicUser);
+            } catch (BlobException ex) {
+                System.out.println(ex);
+            }
+            if(heavyProp == null){
+                throw new BObStatusException("Cannot assemble data heavy property");
+            }
             //determine the governing property info case and then assemble a CECaseDataHeavy with it
             CECaseDataHeavy propertyInfoCase = cc.cecase_assembleCECaseDataHeavy(pc.determineGoverningPropertyInfoCase(heavyProp, publicUser), publicUser);
             

@@ -71,11 +71,6 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        CaseCoordinator cc = getCaseCoordinator();
-        List<CECasePropertyUnitHeavy> csel =  getSessionBean().getSessCECaseList();
-       
-        
-        DataCoordinator dc = getDataCoordinator();
         
 //        if(caseList != null && !caseList.isEmpty()){
 //            
@@ -100,7 +95,6 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
             currentReport = reportCECaseList;
         }
         System.out.println("ReportingBB.intiBean");
-        
         
     }
     

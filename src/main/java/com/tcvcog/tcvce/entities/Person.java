@@ -38,35 +38,35 @@ public  class       Person
     protected List<MailingAddressLink> mailingAddressLinkList;
     protected List<ContactEmail> emailList;
     protected List<ContactPhone> phoneList;
-    
-    private String mailingAddressListPretty;
-    private String emailListPretty;
-    private String phoneListPretty;
+    protected String mailingAddressListPretty;
+    protected String emailListPretty;
+    protected String phoneListPretty;
   
 
     /**
      * Method for cloning Person objects
      * 
-     * @param p The person we would like to clone
+     * @param per The person we would like to clone
      */
-    public Person(Person p) {
-       super(p);
-       this.mailingAddressLinkList = p.mailingAddressLinkList;
-       this.emailList = p.emailList;
-       this.phoneList = p.phoneList;
+    public Person(Person per) {
+       super(per);
+       this.mailingAddressLinkList = per.mailingAddressLinkList;
+       this.emailList = per.emailList;
+       this.phoneList = per.phoneList;
         
-       this.mailingAddressListPretty = p.mailingAddressListPretty;
-       this.emailListPretty = p.emailListPretty;
-       this.phoneListPretty = p.phoneListPretty;
+       this.mailingAddressListPretty = per.mailingAddressListPretty;
+       this.emailListPretty = per.emailListPretty;
+       this.phoneListPretty = per.phoneListPretty;
     }
     
     /**
      * Creates a person out of a human
+     * With none of this class's person fields populated
      * @param h 
      */
     public Person(Human h){
       super(h);
-      
+        
         
     }
 

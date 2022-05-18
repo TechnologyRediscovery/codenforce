@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.InspectionException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -341,7 +342,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
             getSessionBean().setSessOccPeriod(
                     oc.assembleOccPeriodDataHeavy(
                             selectedApplication.getConnectedPeriod(),
-                            getSessionBean().getSessUser().getMyCredential()));
+                            getSessionBean().getSessUser()));
 
             return "occPeriodWorkflow";
         } catch (BObStatusException | IntegrationException | SearchException ex) {
@@ -597,7 +598,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "An error occured while trying to attach the application to an Occ Period!", ""));
-        } catch (BObStatusException ex) {
+        } catch (BObStatusException | BlobException ex) {
             System.out.println("OccPermitManageBB.attachToOccPeriod() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

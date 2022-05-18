@@ -89,7 +89,7 @@ public class PropertySearchBB extends BackingBeanUtils{
             // and put on the SessionBean for us to get here
             queryList = sc.buildQueryPropertyList(getSessionBean().getSessUser().getMyCredential());
             putList = pi.getPropertyUseTypeList();
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException | BlobException ex) {
             System.out.println(ex);
         }
     
@@ -252,7 +252,7 @@ public class PropertySearchBB extends BackingBeanUtils{
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
             currentProperty = (pc.assemblePropertyDataHeavy(pc.generatePropertySkeleton(getSessionBean().getSessMuni()),getSessionBean().getSessUser()));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException | BlobException ex) {
             System.out.println(ex);
         }
     }
@@ -292,7 +292,7 @@ public class PropertySearchBB extends BackingBeanUtils{
                             + ", which is now your 'active property'", ""));
             return "propertyInfo";
             
-        } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
+        } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | SearchException | BlobException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

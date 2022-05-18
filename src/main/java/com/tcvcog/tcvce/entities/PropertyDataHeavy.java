@@ -52,6 +52,8 @@ public  class       PropertyDataHeavy
     
     private String credentialSignature;
     
+    private BlobLight broadviewPhoto;
+    
     public PropertyDataHeavy(Property prop){
         super(prop);
     }
@@ -265,6 +267,20 @@ public  class       PropertyDataHeavy
     @Override
     public int getBlobUpstreamPoolEnumPoolFeederID() {
         return 0;
+    }
+
+    /**
+     * @return the broadviewPhoto
+     */
+    public BlobLight getBroadviewPhoto() {
+        return broadviewPhoto;
+    }
+
+    /**
+     * @param broadviewPhoto the broadviewPhoto to set
+     */
+    public void setBroadviewPhoto(BlobLight broadviewPhoto) {
+        this.broadviewPhoto = broadviewPhoto;
     }
 
    

@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -38,6 +39,8 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
 import java.io.Serializable;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.*;
@@ -93,7 +96,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     @PostConstruct
-    public void initBean() throws BObStatusException {
+    public void initBean() {
         selectedFeeType = new Fee();
 
         PaymentCoordinator pc = getPaymentCoordinator();
@@ -110,13 +113,17 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             redirected = true;
             
-            refreshFeeAssignedList();
+            try {
+                refreshFeeAssignedList();
+            } catch (BObStatusException ex) {
+                System.out.println(ex);
+            }
 
             if (allFees == null) {
 
                 try {
                     allFees = pc.getFeeList();
-                } catch (IntegrationException ex) {
+                } catch (IntegrationException  ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                     "Oops! We encountered a problem trying to fetch the list of fee templates!", ""));
@@ -948,7 +955,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             OccupancyCoordinator oc = getOccupancyCoordinator();
 
             try {
-                currentOccPeriod = oc.assembleOccPeriodDataHeavy(getSessionBean().getFeeManagementOccPeriod(), getSessionBean().getSessUser().getMyCredential());
+                currentOccPeriod = oc.assembleOccPeriodDataHeavy(getSessionBean().getFeeManagementOccPeriod(), getSessionBean().getSessUser());
             } catch (BObStatusException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
@@ -1254,7 +1261,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         try {
             return cc.cecase_assembleCECasePropertyUnitHeavy(currentCase).getProperty().getAddressString();
-        } catch (IntegrationException | SearchException ex) {
+        } catch (IntegrationException | SearchException | BObStatusException | BlobException ex) {
             System.out.println(ex);
         }
         return null;

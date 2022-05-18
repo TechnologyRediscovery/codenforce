@@ -539,7 +539,7 @@ public class CECaseBB
     public String exploreProperty(){
         try {
             getSessionBean().setSessProperty(currentCase.getParcelKey());
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException | BlobException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1212,8 +1212,8 @@ public class CECaseBB
         reportCECase.setCse(currentCase);
         
         try {
-            setReportCECase(cc.report_transformCECaseForReport(reportCECase, getSessionBean().getSessUser()));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+            setReportCECase(cc.report_prepareCECaseReport(reportCECase, getSessionBean().getSessUser()));
+        } catch (IntegrationException | BObStatusException | SearchException | BlobException ex) {
             System.out.println(ex);
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

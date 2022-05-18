@@ -145,6 +145,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param lose
      * @return 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
    public HumanLink getHumanLink(int linkID, LinkedObjectSchemaEnum lose) throws BObStatusException, IntegrationException{
        if(linkID == 0 || lose == null){
@@ -152,7 +153,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
        }
        PersonIntegrator pi = getPersonIntegrator();
        HumanLink hl = pi.getHumanLink(linkID, lose);
-       configurePerson(hl);
+       
        return hl;
    }
     

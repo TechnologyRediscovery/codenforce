@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -113,7 +114,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             OccupancyCoordinator oc = getOccupancyCoordinator();
 
             try {
-                currentOccPeriod = oc.assembleOccPeriodDataHeavy(getSessionBean().getFeeManagementOccPeriod(), getSessionBean().getSessUser().getMyCredential());
+                currentOccPeriod = oc.assembleOccPeriodDataHeavy(getSessionBean().getFeeManagementOccPeriod(), getSessionBean().getSessUser());
             } catch (IntegrationException | BObStatusException | SearchException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -454,7 +455,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             CaseCoordinator cc = getCaseCoordinator();
             try {
                 address = cc.cecase_assembleCECasePropertyUnitHeavy(currentCase).getProperty().getAddressString();
-            } catch (IntegrationException | SearchException ex) {
+            } catch (IntegrationException | SearchException | BObStatusException |  BlobException ex) {
                 System.out.println(ex);
             }
 

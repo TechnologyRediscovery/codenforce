@@ -424,7 +424,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
                 // force the bean to go to the integrator and fetch a fresh, updated
                 // list of action requests
                 ceari.updateActionRequestNotes(selectedRequest);
-            } catch (IntegrationException ex) {
+            } catch (IntegrationException  | BlobException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,

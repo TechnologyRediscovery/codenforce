@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -137,7 +138,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return evList;
     }
     
-    public List<EventCnFPropUnitCasePeriodHeavy> getEventHistoryList(UserAuthorized ua) throws IntegrationException, EventException, SearchException, BObStatusException{
+    public List<EventCnFPropUnitCasePeriodHeavy> getEventHistoryList(UserAuthorized ua) 
+            throws IntegrationException, EventException, SearchException, BObStatusException, BlobException{
         EventIntegrator ei = getEventIntegrator();
         return assembleEventCnFPropUnitCasePeriodHeavyList(getEventList(ei.getEventHistory(ua.getUserID())));
         
@@ -155,7 +157,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
     public EventCnFPropUnitCasePeriodHeavy assembleEventCnFPropUnitCasePeriodHeavy(EventCnF ev) 
-                           throws EventException, IntegrationException, SearchException, BObStatusException{
+                           throws EventException, IntegrationException, SearchException, BObStatusException, BlobException{
 
         OccupancyCoordinator oc = getOccupancyCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -185,9 +187,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws EventException
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.SearchException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.BlobException 
      */
     public List<EventCnFPropUnitCasePeriodHeavy> assembleEventCnFPropUnitCasePeriodHeavyList(List<EventCnF> evList) 
-            throws EventException, IntegrationException, SearchException, BObStatusException{
+            throws EventException, IntegrationException, SearchException, BObStatusException, BlobException{
         List<EventCnFPropUnitCasePeriodHeavy> edhList = new ArrayList<>();
         if(evList != null && !evList.isEmpty() ){
             for(EventCnF ev: evList){

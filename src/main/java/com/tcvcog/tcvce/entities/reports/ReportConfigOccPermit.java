@@ -29,6 +29,9 @@ public class ReportConfigOccPermit
     private boolean includeAdditionalText;
     private boolean includeListingOfTenantPersons;
     private boolean includeListingOfOwnerPersons;
+    
+    
+    
 
     /**
      * @return the permit

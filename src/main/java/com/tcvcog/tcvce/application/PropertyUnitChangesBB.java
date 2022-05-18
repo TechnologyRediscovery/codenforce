@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -83,7 +84,7 @@ public class PropertyUnitChangesBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.toString(), ""));
             currProp = getSessionBean().getSessProperty();
-        } catch (IntegrationException | SearchException ex) {
+        } catch (IntegrationException | SearchException | BlobException ex) {
             System.out.println("PropertyUnitChangesBB.refreshCurrentObjects() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

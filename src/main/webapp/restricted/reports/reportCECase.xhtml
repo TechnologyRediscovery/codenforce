@@ -10,131 +10,277 @@
         <title>Case Report</title>
     </h:head>
     <h:body>
-        <ui:composition template="./../report_template.xhtml">
+        <ui:composition template="./../report_template_simple.xhtml">
             <ui:define name="print-content">
                 <f:view id="report-cecase-view">
 
                     <h:form id="case-details-form">
-                        
+
+
+                        <div class="report-trailblaze-headerbox">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Code Enforcement Case Profile: (ID:#{reportingBB.reportCECase.cse.caseID})" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value="INV!"/>
+                            </div>
+                        </div>
+
                         <div class="p-grid">
-                            <div class="p-col-6">
+
+                            <div class="p-col-6 report-property-addresss">
+
+                                <h:outputText id="header-addr-ot"
+                                              value="#{reportingBB.reportCECase.cse.property.address.addressPretty2LineEscapeFalse}"
+                                              escape="false"/>  
+                                <p:spacer height="2px" />
+                                <h:outputText value="#{reportingBB.reportCECase.cse.property.countyParcelID}" />
+                            </div> 
+
+                            <div class="p-col-6 nested-grid">
                                 <div class="p-grid">
-                                    <div class="p-col-12">
-                                        <h:outputText id="header-id-ot" 
-                                                      style="font-style: italic;"
-                                                      value=" Code enforcement case (ID: #{reportingBB.reportCECase.cse.caseID}) at"/>
-                                        
-                                        <h1>
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputLabel value="Origination"/>
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
 
-                                            <h:outputText id="header-addr-ot" 
-                                                          value="#{reportingBB.reportCECase.cse.property.address.addressPretty2LineEscapeFalse}"
-                                                          escape="false"/>  
-                                        </h1>
+                                        <h:outputText id="selcase-odate-it" 
+                                                      value="Oopened on #{ceCaseBB.getPrettyDateNoTime(reportingBB.reportCECase.cse.originationDate)}"
+                                                      rendered="true"/>
+                                        <h:outputText id="selcase-age-it" 
+                                                      value=" (#{reportingBB.reportCECase.cse.caseAge} days ago)" 
+                                                      rendered="true"/>
+                                        <p:spacer height="3px" />
+
+                                        <h:outputText value="Opening event: " 
+                                                      rendered="true"/>
+                                        <h:outputText value="#{!empty reportingBB.reportCECase.cse.originationEvent ? reportingBB.reportCECase.cse.originationEvent.category.eventCategoryTitle : 'no orig event'}" 
+                                                      rendered="true"/>
                                     </div>
-                                    <div class="p-col-12">
-                                        <p>Broadview photo here</p>
+                                </div>
+                            </div> 
+                        </div>
+
+                        <div class="report-trailblaze-headerbox">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Case Details" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value="inv"/>
+                            </div>
+                        </div>
+
+                        <div class="p-grid">
+                            <div class="p-col-6 nested-grid">
+                                <div class="p-grid">
+
+                                    <f:subview id="rpt-cecase-casename-subview"
+                                               rendered="#{reportingBB.reportCECase.includeCaseName}">
+
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Name "/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputLabel id="case-name-ot"
+                                                           value="#{reportingBB.reportCECase.cse.caseName}"
+                                                           rendered="true"/>
+                                        </div>
+                                    </f:subview>
+
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText value="Case status"/>
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                        <h:outputLabel id="case-status-ot"
+                                                       value="#{reportingBB.reportCECase.cse.statusBundle.phase.caseOpen ? 'Open' : 'Closed'}"/>
+                                        <p:spacer height="2px" />
+                                        <h:outputText id="case-phase-ot" 
+                                                      value="#{reportingBB.reportCECase.cse.statusBundle.phase.label}"/>
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText value="Property Unit associated?" />
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                        <h:outputText value="#{empty reportingBB.reportCECase.cse.propertyUnit 
+                                                               ? 'None specified'
+                                                               : reportingBB.reportCECase.cse.propertyUnit.unitNumber}"
+                                                      rendered="true"/>
                                     </div>
 
-                                    <div class="p-col-12">
-                                        <h2>Property info</h2>
+
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText value="Manager"/>
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+
+                                        <h:outputText id="case-manager-ot" 
+                                                      value="#{reportingBB.reportCECase.cse.caseManager.human.name}"
+                                                      rendered="true"/>  
+                                        <p:spacer height="2px" />
+                                        <h:outputText value="#{reportingBB.reportCECase.caseManagerPerson.primaryPhone.phoneNumber}" 
+                                                      rendered="#{!empty reportingBB.reportCECase.caseManagerPerson}" />
+                                        <p:spacer height="2px" />
+                                        <h:outputText value="#{reportingBB.reportCECase.caseManagerPerson.primaryEmail.emailaddress}" 
+                                                      rendered="#{!empty reportingBB.reportCECase.caseManagerPerson}" />
+
+
                                     </div>
 
-                                    <div class="p-col-4 data_field_label">
-                                        <h:outputText value="Parcel ID (County)"  />
+
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText value="Violations"/>
                                     </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{reportingBB.reportCECase.propDH.countyParcelID} "
-                                                      rendered="true" />
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                        <ui:repeat id="cecase-violations-unresolved-uir"
+                                                   value="#{reportingBB.reportCECase.cse.violationList}"
+                                                   var="urv">
+                                            <h:outputText value="#{urv.violatedEnfElement.headerString}" 
+                                                          escape="false"/>
+                                            <p:spacer height="2px" />
+                                            <h:outputText value="#{urv.status.label}" 
+                                                          styleClass="report-indented-line italic"/>
+                                            <p:spacer height="2px" />
+                                        </ui:repeat>
                                     </div>
 
-                                    <div class="p-col-4 data_field_label">
-                                        <h:outputText value="InternalID" />
+
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight" >
+                                        <h:outputLabel value="Notices (#{reportingBB.reportCECase.cse.noticeList.size()})  "/>
                                     </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{reportingBB.reportCECase.propDH.propertyID} "/>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight" >
+                                        <ui:repeat id="case-nov-scroller"
+                                                   value="#{reportingBB.reportCECase.cse.noticeList}"
+                                                   var="nov">
+
+                                            <h:outputText value="Mailed on: " 
+                                                          rendered="#{!(empty nov.sentTS)}"/>
+                                            <h:outputText value="#{nov.sentTSPretty}"
+                                                          rendered="#{!(empty nov.sentTS)}"/>
+
+                                            <p:spacer height="2px" />
+                                        </ui:repeat>
                                     </div>
 
-                                    <div class="p-col-4 data_field_label">
-                                        <h:outputText value="Property Source" />
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight" >
+                                        <h:outputLabel value="Citations "/>
+                                        <h:outputText value=" (#{reportingBB.reportCECase.cse.citationList.size()})" />
                                     </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{reportingBB.reportCECase.propDH.source.title} "
-                                                      />
-                                    </div>
-
-                                    <div class="p-col-4 data_field_label">
-                                        <h:outputLabel value="County"/>
-                                    </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{reportingBB.reportCECase.propDH.parcelInfo.countyCode}"  />
-                                    </div>
-
-                                    <div class="p-col-4 data_field_label">
-                                        <h:outputLabel value="Condition"/>
-                                    </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{!(empty reportingBB.reportCECase.propDH.parcelInfo.condition) ? reportingBB.reportCECase.propDH.parcelInfo.condition.title : ''}" />
+                                    <div class="p-col-12  restrict-data-field-value-inline report-data-value-tight" >
+                                        <ui:repeat id="case-citations-scroller"
+                                                   value="#{reportingBB.reportCECase.cse.citationList}"
+                                                   var="cit"
+                                                   >
+                                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(cit.dateOfRecord)}: "/>
+                                            <h:outputText value="#{cit.origin_courtentity.courtEntityName}" />
+                                            <p:spacer height="2px" />
+                                        </ui:repeat>
                                     </div>
 
-                                    <div class="p-col-4 data_field_label">
-                                        <h:outputLabel value="Use Type"/>
+
+
+
+
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText value="Source"/>
                                     </div>
-                                    <div class="p-col-8">
-                                        <h:outputText value="#{reportingBB.reportCECase.propDH.parcelInfo.useType.name}"  />
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                        <h:outputText value="#{!empty reportingBB.reportCECase.cse.source? reportingBB.reportCECase.cse.source.title : ''}" />
+                                    </div>
+
+
+
+                                    <f:subview id="cecase-closing-subview" 
+                                               rendered="#{!empty reportingBB.reportCECase.cse.closingDate}">
+
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputLabel value="Closing date"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText id="selcase-cdate-it" 
+                                                          value="#{ceCaseBB.getPrettyDateNoTime(reportingBB.reportCECase.cse.closingDate)}"
+                                                          rendered="true"/>
+
+                                            <p:spacer height="3px" />
+
+                                            <h:outputText value="Closing event: " 
+                                                          rendered="true"/>
+                                            <h:outputText value="#{!empty reportingBB.reportCECase.cse.closingEvent ? reportingBB.reportCECase.cse.closingEvent.category.eventCategoryTitle : 'no closing event'}" 
+                                                          rendered="true"/>
+
+                                            <h:outputText id="selcase-closing-evcat" 
+                                                          value="#{reportingBB.reportCECase.cse.closingEvent.category.eventCategoryTitle}"
+                                                          rendered="true"/>
+                                        </div>
+
+                                    </f:subview>
+
+
+
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+
+                                        <h:outputText value="Record"  />
+                                    </div>
+
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                        <h:outputText      id="cecase-record-ot"
+                                                           value="#{reportingBB.reportCECase.cse.active ? 'Active record':'Deactivated record'}"  />
+                                        <h:outputText id="cecase-id-ot"
+                                                      value="(ID:#{reportingBB.reportCECase.cse.caseID})" />
+                                        <p:spacer height="3px" />
+
+                                        <h:outputText value="Last updated: #{ceCaseBB.getPrettyDate(reportingBB.reportCECase.cse.lastUpdatedTS)}" />
+
+                                        <p:spacer height="3px" />
+
+                                        <h:outputText      id="cecase-propinfo-ot"
+                                                           value="#{reportingBB.reportCECase.cse.propertyInfoCase ? 'Property info case':'Normal Code Enf Case'}"  />
                                     </div>
                                 </div>
                             </div>
-                            <div class="p-col-6">
+                            <div class="p-col-6 nested-grid">
                                 <f:subview id="rpt-cecase-persons-subview"
                                            rendered="#{reportingBB.reportCECase.includeAssociatedPersons}">
-
-                                    <div class="p-grid nested-grid">
+                                    <div class="p-grid">
                                         <div class="p-col-12">
-                                            <h2>Person connections</h2>
+                                            <h2>CECase-Person Connections</h2>
                                         </div>
                                         <ui:repeat id="person-con-uir"
                                                    value="#{reportingBB.reportCECase.cse.humanLinkList}" 
                                                    var="csehl">
-                                            <div class="p-grid">
 
-                                                <div class="p-col-4">
-                                                    <h:outputText value="#{csehl.name}" />
-                                                </div>
-                                                <div class="p-col-8">
-                                                    <h:outputText value="#{csehl.linkedObjectRole.title}" />
-                                                    <h:outputText value=" " />
-                                                    <h:outputText value="#{csehl.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME}" />
-                                                    <h:outputText value=" " />
-                                                    <h:outputText value="(ID: #{csehl.parentObjectID})" />
-                                                    
-                                                </div>
+                                            <div class="p-col-12">
+                                                <h:outputText value="#{csehl.name}" styleClass="bold"/>
+                                                <h:outputText value=" " />
+                                                <h:outputText value="#{csehl.linkedObjectRole.title}" />
+                                                <h:outputText value=" " />
+                                                <h:outputText value="#{csehl.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME}" />
+                                                <h:outputText value=" " />
+                                                <h:outputText value="(ID: #{csehl.parentObjectID})" />
+
                                             </div>
-                                                <f:subview id="rpt-cecase-person-contact"
-                                                           rendered="#{reportingBB.reportCECase.includePersonAddrPhoneEmail}">
-                                                <div class="p-grid">
-                                                    <div class="p-col-4">
-                                                        <h:outputText value="address(s)" />
-                                                    </div>
-                                                    <div class="p-col-8">
-                                                        <h:outputText value="#{csehl.mailingAddressListPretty}"
-                                                                      escape="false"/>
-                                                    </div>
-                                                    <div class="p-col-4">
-                                                        <h:outputText value="phone number(s)" />
-                                                    </div>
-                                                    <div class="p-col-8">
-                                                        <h:outputText value="#{csehl.phoneListPretty}"
-                                                                      escape="false"/>
-                                                    </div>
-                                                    <div class="p-col-4">
-                                                        <h:outputText value="email address(es)" />
-                                                    </div>
-                                                    <div class="p-col-8">
-                                                        <h:outputText value="#{csehl.emailListPretty}"
-                                                                      escape="false"/>
-                                                    </div>
+                                            <f:subview id="rpt-cecase-person-contact"
+                                                       rendered="#{reportingBB.reportCECase.includePersonAddrPhoneEmail}">
+                                                <div class="p-col-12 
+                                                     restrict-data-field-value-inline report-data-value-tight
+                                                     report-indented-line">
+                                                    <h:outputText value="#{csehl.mailingAddressListPretty}"
+                                                                  escape="false"
+                                                                  />
                                                 </div>
-
+                                                <div class="p-col-12 
+                                                     restrict-data-field-value-inline report-data-value-tight
+                                                     report-indented-line">
+                                                    <h:outputText value="#{csehl.phoneListPretty}"
+                                                                  escape="false"
+                                                                  />
+                                                </div>
+                                                <div class="p-col-12 
+                                                     restrict-data-field-value-inline report-data-value-tight
+                                                     report-indented-line">
+                                                    <h:outputText value="#{csehl.emailListPretty}"
+                                                                  escape="false"
+                                                                  />
+                                                </div>
                                             </f:subview>
                                         </ui:repeat>
                                     </div>
@@ -142,342 +288,852 @@
                             </div>
                         </div>
 
-
-                        <p>
-                            <a href="#event-history">event history <h:outputText value=" (#{reportingBB.reportCECase.cse.eventList.size()})" /></a> | 
-                            <a href="#violations">violations <h:outputText value=" (#{reportingBB.reportCECase.cse.violationList.size()})" /></a> | 
-                            <a href="#notices">notices <h:outputText value=" (#{reportingBB.reportCECase.cse.noticeList.size()})" /></a> | 
-                            <a href="#citations">citations <h:outputText value=" (#{reportingBB.reportCECase.cse.citationList.size()})" /></a> | 
-                            <a href="#requests">enforcement requests <h:outputText value=" (#{reportingBB.reportCECase.cse.ceActionRequestList.size()})" /></a>  
-                        </p>
-
-
-
-                        <div class="report-trailblaze-headerbox">
+                        <div class="report-trailblaze-headerbox printing-page-break-before">
                             <div class="report-trailblaze-headerbox-title">
-                                <h:outputText value="Code Violations" />
+                                <h:outputText value="Property Details" />
                             </div>
                             <div class="report-trailblaze-headerbox-tail">
-                                <h:outputText value="I'm invisible !"/>
+                                <h:outputText value="inv"/>
                             </div>
                         </div>
 
+                        <div class="p-grid">
 
-                        <p:dataScroller
+                            <div class="p-col-6 nested-grid">
+
+                                <div class="p-grid">
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+
+                                        <p:graphicImage value="#{blobsterBB.image}"
+                                                        alt="no preview available" 
+                                                        style="width: 300px;" 
+                                                        cache="false"
+                                                        rendered="true">
+                                            <f:param name="blobid" value="#{reportingBB.reportCECase.propDH.broadviewPhoto.photoDocID}"/>
+                                        </p:graphicImage>
+
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText value="Address"  />
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                        <h:outputText value="#{reportingBB.reportCECase.propDH.address.addressPretty2LineEscapeFalse} "
+                                                      escape="false"
+                                                      rendered="true" />
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText value="Parcel ID (County)"  />
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                        <h:outputText value="#{reportingBB.reportCECase.propDH.countyParcelID} "
+                                                      rendered="true" />
+                                    </div>
+
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText value="InternalID" />
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight-inline">
+                                        <h:outputText value="#{reportingBB.reportCECase.propDH.propertyID} "/>
+                                    </div>
+
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText value="Property Source" />
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight-inline">
+                                        <h:outputText value="#{reportingBB.reportCECase.propDH.source.title} "
+                                                      />
+                                    </div>
+
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputLabel value="County"/>
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                        <h:outputText value="#{reportingBB.reportCECase.propDH.parcelInfo.countyCode}"  />
+                                    </div>
+
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputLabel value="Condition"/>
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                        <h:outputText value="#{!(empty reportingBB.reportCECase.propDH.parcelInfo.condition) ? reportingBB.reportCECase.propDH.parcelInfo.condition.title : ''}" />
+                                    </div>
+
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputLabel value="Use Type"/>
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                        <h:outputText value="#{reportingBB.reportCECase.propDH.parcelInfo.useType.name}"  />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-col-6 nested-grid">
+
+                                <f:subview id="rpt-prop-persons-subview"
+                                           rendered="#{reportingBB.reportCECase.includeAssociatedPersonsOnParentProperty}">
+                                    <div class="p-grid nested-grid">
+                                        <div class="p-col-12">
+                                            <h2>Property-Person Connections</h2>
+                                        </div>
+                                        <ui:repeat id="person-con-uir"
+                                                   value="#{reportingBB.reportCECase.propDH.humanLinkList}" 
+                                                   var="prophl">
+
+                                            <div class="p-col-12">
+                                                <h:outputText value="#{prophl.name}" styleClass="bold"/>
+                                                <h:outputText value=" " />
+                                                <h:outputText value="#{prophl.linkedObjectRole.title}" />
+                                                <h:outputText value=" " />
+                                                <h:outputText value="#{prophl.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME}" />
+                                                <h:outputText value=" " />
+                                                <h:outputText value="(ID: #{prophl.parentObjectID})" />
+
+                                            </div>
+                                            <f:subview id="rpt-cecase-person-contact"
+                                                       rendered="#{reportingBB.reportCECase.includePersonAddrPhoneEmail}">
+                                                <div class="p-col-12 
+                                                     restrict-data-field-value-inline report-data-value-tight
+                                                     report-indented-line">
+                                                    <h:outputText value="#{prophl.mailingAddressListPretty}"
+                                                                  escape="false"
+                                                                  />
+                                                </div>
+                                                <div class="p-col-12 
+                                                     restrict-data-field-value-inline report-data-value-tight
+                                                     report-indented-line">
+                                                    <h:outputText value="#{prophl.phoneListPretty}"
+                                                                  escape="false"
+                                                                  />
+                                                </div>
+                                                <div class="p-col-12 
+                                                     restrict-data-field-value-inline report-data-value-tight
+                                                     report-indented-line">
+                                                    <h:outputText value="#{prophl.emailListPretty}"
+                                                                  escape="false"
+                                                                  />
+                                                </div>
+                                            </f:subview>
+                                        </ui:repeat>
+                                    </div>
+                                </f:subview>
+                            </div>
+                        </div>
+
+                        <div class="report-trailblaze-headerbox printing-page-break-before">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Code Violations (#{reportingBB.reportCECase.cse.violationList.size()})" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value="inv"/>
+                            </div>
+                        </div>
+                        <ui:repeat
                             id="violation-table"
                             var="v"
                             value="#{reportingBB.reportCECase.cse.violationList}">
 
+                            <div class="p-grid nested-grid">
+                                <div class="p-col-12">
+                                    <h2>
+                                        <h:outputLabel value="#{v.violatedEnfElement.headerString}"
+                                                       escape="false" />
+                                    </h2>
+                                </div>
+                                <f:subview id="viol-ord-fulltext"
+                                           rendered="#{reportingBB.reportCECase.includeFullOrdinanceText}">
+                                    <div class="p-col-2 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputLabel value="Ordinance text: "/>
+                                    </div>
+                                    <div class="p-col-10">
+                                        <div class="ord-text">
+                                            <h:outputText value="#{v.violatedEnfElement.ordTechnicalText}"/>
+                                        </div>
+                                    </div>
+                                </f:subview>
 
-                            <h2>
-                                <h:outputLabel styleClass="mono" value="#{v.violatedEnfElement.headerString}"
-                                               escape="false" />
-                                <h:outputText value="Violation ID:  #{v.violationID}"/><h:outputText id="violation-compactlist-line-ot-resolved" value="#{v}"/>
-                                <h:outputText id="sep-compactlist-line-ot-resolved" value=" | "/>
-                                <h:outputText id="status-compactlist-line-ot-resolved" styleClass="italic" value="#{v.status.label}"/>
-                            </h2>
+                                <div class="p-col-6">
+                                    <div class="p-grid">
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Status" />
 
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{v.status.label}" />
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Date of record" />
 
-                            <h:outputLabel styleClass="bold" value="Ordindance: "  />
-                            <p:spacer height="5px" />
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(v.dateOfRecord)}" />
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Stipulated Compliance Date" />
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(v.stipulatedComplianceDate)}" />
+                                            <p:spacer height="3px" rendered="#{empty v.actualComplianceDate}"/>
+                                            <h:outputText value="Days Remaining: " 
+                                                          rendered="#{empty v.actualComplianceDate}"/>
+                                            <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"
+                                                          rendered="#{empty v.actualComplianceDate}"/>
 
-                            <h:outputLabel styleClass="bold" value="Full ordinance text: "/>
-                            <div class="ord-text">
-                                <h:outputText value="#{v.violatedEnfElement.ordTechnicalText}"/>
-                            </div>
-                            <p:spacer height="5px"/>
-                            <h:outputLabel styleClass="bold" value="Description of violation: "/>
-                            <h:outputText styleClass="weight-normal" value="#{v.description}"/>
-                            <h:outputText styleClass="bold" value="Violation ID: " />
-                            <h:outputText value="#{v.violationID}"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Actual compliance Date" />
 
-                            <p:spacer height="5px"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(v.actualComplianceDate)}" />
+                                            <p:spacer height="3px" 
+                                                      rendered="#{!empty v.actualComplianceDate}"/>
+                                            <h:outputText value="Logged by: #{v.complianceUser.human.name}" 
+                                                          rendered="#{!empty v.actualComplianceDate}"
+                                                          styleClass="report-indented-line"/>
 
-                            <h:outputText styleClass="bold" value="Date of record: " />
-                            <h:outputText value="#{v.dateOfRecord}"/>
-                            <p:spacer height="5px"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Violation Internal ID" />
 
-                            <h:outputText styleClass="bold" value="Stipulated Compliance Date: " />
-                            <h:outputText value="#{v.stipulatedComplianceDatePretty}"/>
-                            <p:spacer height="5px"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{v.violationID}"/>
+                                        </div>
+                                        <f:subview id="violation-nullified-subview"
+                                                   rendered="#{!empty v.nullifiedTS}">
 
-                            <h:outputText styleClass="bold" value="Days left: " />
-                            <h:outputText value="#{empty v.actualComplianceDate ? v.daysUntilStipulatedComplianceDate: null}"/>
-                            <p:spacer height="5px"/>
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Nullified" />
 
-                            <h:outputText styleClass="bold" value="Actual Comp Date: " />
-                            <h:outputText value="#{v.actualComplianceDatePretty}"/>
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText value="#{reportingBB.getPrettyDateNoTime(v.nullifiedTS)}"/>
+                                                <p:spacer height="3px" />
+                                                <h:outputText value="#{v.transferredBy.human.name}" />
+                                            </div>
+                                        </f:subview>
+                                        <f:subview id="violation-transferred-subview"
+                                                   rendered="#{!empty v.transferredTS}">
 
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Transferred" />
 
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText value="#{reportingBB.getPrettyDateNoTime(v.transferredTS)}"/>
+                                                <p:spacer height="3px" />
+                                                <h:outputText value="#{v.nullifiedUser.human.name}" />
+                                            </div>
+                                        </f:subview>
+                                    </div>
+                                </div>
+                                <div class="p-col-6">
+                                    <div class="p-grid">
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputLabel value="Findings"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{v.description}"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputLabel value="Severity"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{v.severityIntensity.title}"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputLabel value="Penalty"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{v.penalty}"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputLabel value="Citations"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{v.citationListAsString}"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputLabel value="Photo count"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{v.blobList.size()}"/>
+                                        </div>
+                                        <f:subview id="violation-notes-subview"
+                                                   rendered="#{reportingBB.reportCECase.includeViolationNotes}">
 
-                            <h:outputText value="Photo count: " />
-                            <h:outputText value="#{empty v.blobList ? '0' : v.blobList.size()}"/>
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputLabel value="Notes"/>
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText value="#{v.notes}"
+                                                              escape="false"/>
+                                            </div>
+                                        </f:subview>
+                                    </div>
+                                </div>
+                                <div class="p-col-12 nested-grid">
+                                    <f:subview id="violation-photos-subview"
+                                               rendered="#{reportingBB.reportCECase.includeViolationPhotos}">
 
-                            <p:spacer height="5px"/>
+                                        <div class="p-grid">
 
-                            <h:outputText class="bold" value="Citations: " />
-                            <h:outputText value="#{v.citationListAsString}"/>
-                            <p:spacer height="5px"/>
+                                            <ui:repeat value="#{v.blobList}"
+                                                       var="vblob" >
+                                                <div class="p-col-#{reportingBB.reportCECase.violationPhotoGridSquares}">
+                                                    <div class="report-photo-header">
+                                                        <h:outputText value="#{vblob.title}"
+                                                                      rendered="true"/>
 
-                            <h:outputLabel styleClass="bold" value="Penalty:"/>
-                            <h:outputText value="#{v.penalty}"/>
+                                                        <h:outputText value=" (Photo ID:#{vblob.photoDocID})"
+                                                                      rendered="#{reportingBB.reportConfigFieldInspection.includePhotoIDs}"/>
 
+                                                        <h:outputText value=" | "
+                                                                      rendered="#{reportingBB.reportCECase.includePhotoFilenames}"/>
 
-                            <p:spacer height="5px"/>
+                                                        <h:outputText value="Filename: #{vblob.filename}"
+                                                                      rendered="#{reportingBB.reportCECase.includePhotoFilenames}"
+                                                                      />
+                                                    </div>
+                                                    <p:graphicImage value="#{blobsterBB.image}"
+                                                                    alt="no preview available" 
+                                                                    style="width: 100%;"
+                                                                    cache="false"
+                                                                    rendered="#{vblob.type.browserViewable}">
+                                                        <f:param name="blobid" value="#{vblob.photoDocID}"/>
+                                                    </p:graphicImage>
 
-                            <h:outputLabel styleClass="bold" value="Officer Notes: "/>
-                            <h:outputText value="#{v.notes}" escape="false"/>
+                                                    <div class="report-photo-caption">
+                                                        <h:outputText value="Description: #{vblob.description}" />
+                                                    </div>
+                                                </div>
+                                            </ui:repeat>
+                                        </div>
 
-
-                            <h4>Photos</h4>
-                            <ui:repeat value="#{v.blobList}"
-                                       var="vblob" >
-                                <h4>
-                                    <h:outputText value=" Photo ID:#{vblob.photoDocID}"
-                                                  rendered="#{reportingBB.reportConfigFieldInspection.includePhotoIDs}"/>
-
-                                    <h:outputText value=": #{vblob.title}"
-                                                  rendered="#{reportingBB.reportConfigFieldInspection.includePhotoTitles}"/>
-                                </h4>
-                                <h:outputText value="Description: #{vblob.description}"
-                                              rendered="#{reportingBB.reportConfigFieldInspection.includePhotoDescriptions and vblob.description ne ''}"
-                                              />
-                                <p:spacer height="3px" />
-                                <h:outputText value="Filename: #{vblob.filename}"
-                                              rendered="#{reportingBB.reportConfigFieldInspection.includePhotoOriginalFileNames}"
-                                              />
-                                <p:spacer height="3px" />
-
-                                <p:graphicImage value="#{blobsterBB.image}"
-                                                alt="no preview available" 
-                                                style="width: #{reportingBB.reportConfigFieldInspection.unifiedPhotoWidth}px" 
-                                                cache="false"
-                                                rendered="#{vblob.type.browserViewable}">
-                                    <f:param name="blobid" value="#{vblob.photoDocID}"/>
-                                </p:graphicImage>
-
-                                <h:outputText value="no preview available; download to view"
-                                              rendered="#{!vblob.type.browserViewable}" />
-                                <p:divider />
-                            </ui:repeat>
-                        </p:dataScroller>
-
-
-                        <div class="report-trailblaze-headerbox">
-                            <div class="report-trailblaze-headerbox-title">
-                                <h:outputText value="Event Log" />
-                            </div>
-                            <div class="report-trailblaze-headerbox-tail">
-                                <h:outputText value="I'm invisible !"/>
-                            </div>
-                        </div>
-
-                        <h2 id="event-history" class="printing-page-break-before">Event history</h2>
-
-                        <p:dataScroller
-                            id="events-datascroller"
-                            var="e"
-                            value="#{reportingBB.reportCECase.cse.eventList}"
-                            widgetVar="ceevent-ds-var">
-
-                            <div class="action-request-icon">
-                                <i class="material-icons"><h:outputText id="action-request-display-icon-ot-evhist" value="#{e.category.icon.materialIcon}"/></i>
-                            </div>
-                            <div class="status-display-status-list-container">
-                                <div class="action-request-header">
-                                    <h:outputText value="#{e.category.eventType.label}: #{e.category.eventCategoryTitle} "/>
+                                    </f:subview>
                                 </div>
                             </div>
-                            <h:outputText styleClass="weight-normal" value="#{e.description}"/>
-                            <p>
-                                <h:outputText value="Owner: " styleClass="bold" />
-                                <h:outputText value="#{e.userCreator.human.name}"/>
-                                <br />
-                                <h:outputText styleClass="bold" value="Date of record: "/>
-                                <h:outputText value="#{reportingBB.getPrettyDate(e.timeStart)}"/>
-                                <br />
-                                <h:outputText styleClass="bold" value="Event ID: "/>
-                                <h:outputText value="#{e.eventID}"/>
-                                <br />
-                            </p>
+                        </ui:repeat>
 
-                            <h:outputLabel styleClass="bold" style="text-align: left" value="Event notes"/>
-                            <p:spacer height="15px"/>
-                            <div class="rowExpansion" style="text-align: left">
-                                <h:outputText escape="false" value="#{e.notes}"/>
-                            </div>
-
-                        </p:dataScroller>
-
-
-
-                        <div class="report-trailblaze-headerbox">
+                        <div class="report-trailblaze-headerbox printing-page-break-before">
                             <div class="report-trailblaze-headerbox-title">
-                                <h:outputText value="Notices of Violation" />
+                                <h:outputText value="Event Log (#{reportingBB.reportCECase.cse.eventList.size()})" />
                             </div>
                             <div class="report-trailblaze-headerbox-tail">
-                                <h:outputText value="I'm invisible !"/>
+                                <h:outputText value="inv"/>
                             </div>
                         </div>
 
-                        <p:dataScroller
-                            id="notices-ds"
-                            value="#{reportingBB.reportCECase.cse.noticeList}"
-                            var="notice"
-                            rendered="true">
+                        <p:dataTable id="events-table"
+                                     var="event"
+                                     sortMode="multiple"
+                                     value="#{reportingBB.reportCECase.cse.eventList}"
+                                     tableStyleClass="primeDataTable"
+                                     rowKey="#{event.eventID}"
+                                     reflow="true">
 
-                            <h:outputText styleClass="bold" style="font-size:1.5em;"  value="Notice ID:" />
-                            <h:outputText style="font-size:1.5em;"   value="#{notice.noticeID}"/>
+                            <p:column headerText="Category"
+                                      width="20%"
+                                      styleClass="centeredColumnContent">
 
-                            <p:spacer height="5px"/>
+                                <div class="#{event.category.icon.styleClass}">
+                                    <i class="material-icons status-display-icon-i"><h:outputText value="#{event.category.icon.materialIcon}"/></i>
+                                </div>
 
-                            <h:outputText styleClass="bold"   value="Date of Record: " />
-                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(notice.dateOfRecord)}"/>
+                                <h:outputText value="#{event.category.eventType.label}:"/>
 
-                            <p:spacer height="5px"/>
+                                <p:spacer height="1px" />
 
-                            <h:outputText styleClass="bold"   value="Queued for Mailing: " />
-                            <h:outputText id="nov-queued-ot" value="#{reportingBB.getPrettyDateNoTime(notice.lockedAndqueuedTS)}"/>
-                            <p:spacer height="5px"/>
-
-                            <h:outputText styleClass="bold"  value="Sent Date: " />
-                            <h:outputText id="nov-sent-date" value="#{reportingBB.getPrettyDateNoTime(notice.sentTS)}"/>
-
-                            <p:spacer height="5px"/>
-                            <h:outputText styleClass="bold"  value="Returned? " />
-                            <h:outputText id="nov-returned-date" value="#{!empty notice.returnedTS ? 'Yes' : 'No'}"/>
-
-                            <p:spacer height="5px"/>
-                            <h:outputText styleClass="bold"  value="Recipient" />
-                            <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedRecipientName}"/>
-                            <br />
-                            <h:outputText escape="false" value="#{noticeOfViolationBB.currentNotice.fixedRecipientBldgNo}"/>
-                            <h:outputText escape="false" value=" "/>
-                            <h:outputText escape="false" value="#{noticeOfViolationBB.currentNotice.fixedRecipientStreet}"/>
-                            <br />
-                            <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedRecipientCity}, #{noticeOfViolationBB.currentNotice.fixedRecipientState} #{noticeOfViolationBB.currentNotice.fixedRecipientZip}"/>
+                                <h:outputText value="#{event.category.eventCategoryTitle}"/>
+                            </p:column>
+                            <p:column headerText="Date"
+                                      width="20%"
+                                      styleClass="centeredColumnContent">
+                                <h:outputText value="#{empty event.timeStart ? reportingBB.getPrettyDate(event.creationts) : reportingBB.getPrettyDate(event.timeStart) }"/>
+                            </p:column>
+                            <p:column headerText="Creator"
+                                      width="20%"
+                                      styleClass="centeredColumnContent">
+                                <h:outputText value="#{event.userCreator.human.name}"/>
+                            </p:column>
 
 
+                            <p:column headerText="Description"
+                                      width="40%"
+                                      styleClass="centeredColumnContent wrapText">
 
-                        </p:dataScroller>
+                                <h:outputText value="#{event.description}"/>
 
-                        <div class="report-trailblaze-headerbox">
+                            </p:column>
+
+                        </p:dataTable>
+
+                        <div class="report-trailblaze-headerbox printing-page-break-before">
                             <div class="report-trailblaze-headerbox-title">
-                                <h:outputText value="Citations" />
+                                <h:outputText value="Notices of Violation (#{reportingBB.reportCECase.cse.noticeList.size()})" />
                             </div>
                             <div class="report-trailblaze-headerbox-tail">
-                                <h:outputText value="I'm invisible !"/>
+                                <h:outputText value="inv"/>
                             </div>
                         </div>
-                        <p:dataScroller
+
+
+                        <p:dataTable id="cecase-report-novs-table"
+                                     value="#{reportingBB.reportCECase.cse.noticeList}"
+                                     var="notice"
+                                     rendered="true" >
+
+                            <p:column   headerText="Date of Record"
+                                        width="20%">
+                                <h:outputText value="#{reportingBB.getPrettyDateNoTime(notice.dateOfRecord)}"/>
+                                <p:spacer height="2px" />
+                                <h:outputText value="(ID:#{notice.noticeID})"/>
+
+                            </p:column>
+
+                            <p:column   headerText="Sending Officer"
+                                        width="20%">
+                                <h:outputText value="#{notice.fixedNotifyingOfficerName}"/>
+
+                            </p:column>
+                            <p:column   headerText="Recipient"
+                                        width="35%">
+                                <h:outputText value="#{notice.fixedRecipientName}"/>
+                                <br />
+                                <h:outputText escape="false" value="#{notice.fixedRecipientBldgNo}"/>
+                                <h:outputText escape="false" value=" "/>
+                                <h:outputText escape="false" value="#{notice.fixedRecipientStreet}"/>
+                                <br />
+                                <h:outputText value="#{notice.fixedRecipientCity}, #{notice.fixedRecipientState} #{notice.fixedRecipientZip}"/>
+
+                            </p:column>
+                            <p:column   headerText="Logged dates"
+                                        width="45%">
+
+                                <div class="p-grid">
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText styleClass="bold"   value="Queued for Mailing: " />
+                                        <h:outputText id="nov-queued-ot" 
+                                                      value="#{reportingBB.getPrettyDateNoTime(notice.lockedAndqueuedTS)}"
+                                                      style="font-weight:normal;"/>
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText styleClass="bold"  value="Sent Date: " />
+                                        <h:outputText id="nov-sent-date" 
+                                                      value="#{reportingBB.getPrettyDateNoTime(notice.sentTS)}"
+                                                      style="font-weight:normal;"/>
+                                    </div>
+                                    <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                        <h:outputText styleClass="bold"  value="Returned:" />
+                                        <h:outputText id="nov-returned-date" 
+                                                      value="#{!empty notice.returnedTS ? 'Yes' : 'No'}"
+                                                      style="font-weight:normal;"/>
+                                    </div>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+
+
+                        <div class="report-trailblaze-headerbox printing-page-break-before">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Field Inspections (#{reportingBB.reportCECase.cse.inspectionList.size()})" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value="inv"/>
+                            </div>
+                        </div>
+
+                        <p:dataTable    id="cecase-inspections-table"
+                                        var="inspection"
+                                        value="#{reportingBB.reportCECase.cse.inspectionList}"
+                                        rowKey="#{inspection.inspectionID}"
+                                        reflow="true"
+                                        resizableColumns="true"
+                                        lazy="false">
+
+                            <p:column headerText="Date"
+                                      style="width:20%;">
+                                <h:outputText value="#{reportingBB.getPrettyDate(inspection.effectiveDateOfRecord)}" />
+                            </p:column>
+                            <p:column headerText="Inspector"
+                                      style="width:25%;">
+                                <h:outputText value="#{inspection.inspector.human.name}" />
+                            </p:column>
+                            <p:column headerText="Determination"
+                                      style="width:30%;">
+                                <h:outputText value="#{empty inspection.determination ? '(in process)':inspection.determination.title}" />
+                            </p:column>
+
+                        </p:dataTable>
+
+
+                        <div class="report-trailblaze-headerbox printing-page-break-before">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Citations (#{reportingBB.reportCECase.cse.citationList.size()})" />
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value="inv"/>
+                            </div>
+                        </div>
+
+                        <ui:repeat
                             id="citation-table"
                             var="citation"
                             value="#{reportingBB.reportCECase.cse.citationList}">
 
-                            <h:outputText value="Filing date: " />
-                            <h:outputText value="#{citation}"/>
-                            <p:spacer height="5px" />
-                            <h:outputText value="Issued by: " />
-                            <h:outputText value="#{citation.filingOfficer.human.name}"/>
-                            <p:spacer height="5px" />
-                            <h:outputText value="Court entity: " />
-                            <h:outputText value="#{citation.origin_courtentity.courtEntityName}"/>
+                            <h2>
+                                <h:outputText value="Citation ID: #{citation.citationNo}"/>
+                            </h2>
+                            <div class="p-grid">
+                                <div class="p-col-6 nested-grid">
+                                    <div class="p-grid">
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Date of record" />
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(citation.dateOfRecord)}"/>
+                                            <p:spacer height="2px" />
+                                            <h:outputText value="(DB ID: #{citation.citationID})"/>
 
-                            
-                            <p:spacer height="5px" />
-                            <h:outputText value="Citation ID (internal)" />
-                            <h:outputText value="#{citation.citationID}"/>
-                            <p:spacer height="5px" />
-                            <h:outputLabel value="Citation text: "/>
-                            <div class="rowExpansion">
-                                <h:outputText value="#{citation.notes}"/>
+                                        </div>
+
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Filing" />
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{citation.filingType.title}"/>
+                                            <p:spacer height="2px" />
+                                            <h:outputText value="#{citation.origin_courtentity.courtEntityName}"/>
+                                        </div>
+
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Violations" />
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <ui:repeat id="citation-violations-uir"
+                                                       value="#{citation.violationList}"
+                                                       var="cv">
+
+                                                <h:outputText value="#{cv.violatedEnfElement.headerString}" />
+                                                <p:spacer height="2px" />
+                                                <h:outputText value="#{cv.citVStatus.label}" 
+                                                              class="   report-citation-violation-status
+                                                              report-indented-line"/>
+                                                <p:spacer height="2px" />
+                                            </ui:repeat>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Issuing Officer" />
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <h:outputText value="#{citation.filingOfficer.human.name}"/>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-col-6 nested-grid">
+                                    <div class="p-grid">
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Docket Numbers" />
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <ui:repeat id="citation-dockets-uir"
+                                                       value="#{citation.docketNos}"
+                                                       var="docket">
+                                                <h:outputText value="#{docket.docketNumber} (#{docket.courtEntity.courtEntityName})"/>
+                                                <p:spacer height="3px" />
+                                            </ui:repeat>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Status Log" />
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <ui:repeat id="citation-status-uir"
+                                                       value="#{citation.statusLog}"
+                                                       var="logentry">
+                                                <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
+                                                <p:spacer height="3px" />
+                                            </ui:repeat>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            <h:outputText value="Persons" />
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            <div class="p-grid nested-grid">
+                                                <div class="p-col-12">
+                                                    <h2>Citation-Person Connections</h2>
+                                                </div>
+                                                <ui:repeat id="person-con-uir"
+                                                           value="#{citation.humanLinkList}" 
+                                                           var="cithl">
+
+                                                    <div class="p-col-12">
+                                                        <h:outputText value="#{cithl.name}" styleClass="bold"/>
+                                                        <h:outputText value=" " />
+                                                        <h:outputText value="#{cithl.linkedObjectRole.title}" />
+                                                        <h:outputText value=" " />
+                                                        <h:outputText value="#{cithl.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME}" />
+                                                        <h:outputText value=" " />
+                                                        <h:outputText value="(ID: #{cithl.parentObjectID})" />
+
+                                                    </div>
+                                                    <f:subview id="rpt-cecase-person-contact"
+                                                               rendered="#{reportingBB.reportCECase.includePersonAddrPhoneEmail}">
+                                                        <div class="p-col-12 
+                                                             restrict-data-field-value-inline report-data-value-tight
+                                                             report-indented-line">
+                                                            <h:outputText value="#{cithl.mailingAddressListPretty}"
+                                                                          escape="false"
+                                                                          />
+                                                        </div>
+                                                        <div class="p-col-12 
+                                                             restrict-data-field-value-inline report-data-value-tight
+                                                             report-indented-line">
+                                                            <h:outputText value="#{cithl.phoneListPretty}"
+                                                                          escape="false"
+                                                                          />
+                                                        </div>
+                                                        <div class="p-col-12 
+                                                             restrict-data-field-value-inline report-data-value-tight
+                                                             report-indented-line">
+                                                            <h:outputText value="#{cithl.emailListPretty}"
+                                                                          escape="false"
+                                                                          />
+                                                        </div>
+                                                    </f:subview>
+                                                </ui:repeat>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p:divider type="solid" />
+                        </ui:repeat>
+                        <f:subview id="cecase-report-documents-subview"
+                                   rendered="#{reportingBB.reportCECase.includeDocDownloadLinks}" >
+
+                            <div class="report-trailblaze-headerbox printing-page-break-before">
+                                <div class="report-trailblaze-headerbox-title">
+                                    <h:outputText value="Documents (#{reportingBB.reportCECase.cse.blobList.size()})" />
+                                </div>
+                                <div class="report-trailblaze-headerbox-tail">
+                                    <h:outputText value="inv"/>
+                                </div>
                             </div>
 
-                            <h:outputLabel value="Violations: "/>
-                            <p:dataScroller 
-                                id="citation-violations-datascroller"
-                                value="#{citation.violationList}"
-                                var="citv"
-                                widgetVar="citation-violation-compactlist-widgetvar">
-                                <h:outputText id="v-source-name-compactlist-ot" value="#{citv.violatedEnfElement.headerString}"/>
-                            </p:dataScroller>
-                            <ui:repeat id="citation-status-uir"
-                                       value="#{cit.statusLog}"
-                                       var="logentry">
-                                <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
-                                <p:spacer height="3px" />
+
+                            <p:dataTable
+                                id="case-profile-blobs-table"
+                                var="blob"
+                                value="#{reportingBB.reportCECase.cse.blobList}"
+                                rowKey="#{blob.photoDocID}"
+                                tableStyleClass="primeDataTable"
+                                resizableColumns="true"
+                                draggableRows="false" tabindex="6">
+
+                                <p:column width="15%">
+                                    <f:facet name="header">
+                                        <h:outputText value="File Type"/>
+                                    </f:facet>
+                                    <h:outputText value="#{blob.type.title}"/>
+                                    <!-- type icon here -->
+                                </p:column>
+
+                                <p:column width="15%">
+                                    <f:facet name="header">
+                                        <h:outputText value="IDs"/>
+                                    </f:facet>
+                                    <h:outputText value="linkID: #{blob.photoDocID}"/>
+                                    <br/>
+                                    <h:outputText value="bytesID: #{blob.bytesID}"/>
+
+                                </p:column>
+
+                                <p:column width="45%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Info"/>
+                                    </f:facet>
+                                    <div class="rowExpansion">
+                                        <h:outputText value="title: #{blob.title}"/>
+                                        <br/>
+                                        <h:outputText value="descr: #{blob.description}"/>
+                                        <br/>
+                                        <h:outputText value="filename: #{blob.filename}"/>
+                                        <br/>
+                                        <h:outputText value="created: #{ceCaseBB.getPrettyDateNoTime(blob.createdTS)}"/>
+                                    </div>
+                                </p:column>
+
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Actions"/>
+                                    </f:facet>
+                                    <p:commandButton 
+                                        value="Download" 
+                                        ajax="false"
+                                        icon="fa fa-arrow-down" 
+                                        styleClass="ui-button-outlined">
+                                        <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}"
+                                                        />
+                                    </p:commandButton>
+                                    <br/>
+
+                                </p:column>
+                            </p:dataTable>
+                        </f:subview>
+
+                        <f:subview id="report-cecase-cear-subview"
+                                   rendered="#{reportingBB.reportCECase.includeActionRequsts}" >
+                            <div class="report-trailblaze-headerbox printing-page-break-before">
+                                <div class="report-trailblaze-headerbox-title">
+                                    <h:outputText value="Action Requests (#{reportingBB.reportCECase.cse.ceActionRequestList.size()})" />
+                                </div>
+                                <div class="report-trailblaze-headerbox-tail">
+                                    <h:outputText value="inv"/>
+                                </div>
+                            </div>
+
+                            <ui:repeat
+                                id="actionRequestTable"
+                                var="r"
+                                value="#{reportingBB.reportCECase.cse.ceActionRequestList}">
+
+
+                                <h2>
+                                    <h:outputText value="Action Request: #{reportingBB.getPrettyDate(r.dateOfRecord)}"/>
+                                </h2>
+                                <div class="p-grid">
+                                    <div class="p-col-6 nested-grid">
+                                        <div class="p-grid">
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Issue Type" />
+                                                <p:spacer height="2px" />
+                                                <h:outputText value="(ID: #{r.requestID})"/>
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText value="#{r.issue.name}"/>
+                                            </div>
+
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Status" />
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText value="#{r.requestStatus.statusTitle}"/>
+                                            </div>
+
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Requestor" />
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText value="#{r.requestor.name}"/>
+                                            </div>
+
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Case attachment date" />
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText value="#{reportingBB.getPrettyDate(r.caseAttachmentTimestamp)}"/>
+                                            </div>
+
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Human safety hazard?" />
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText value="#{r.urgent ? 'Yes':'No'}"/>
+                                            </div>
+
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Anonymity requested?" />
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText value="#{r.anonymitiyRequested ? 'Yes':'No'}"/>
+                                            </div>
+
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="p-col-6 nested-grid">
+                                        <div class="p-grid">
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Description" />
+
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText escape="false" 
+                                                              value="#{r.requestDescription}"/>
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Internal notes" />
+
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText escape="false" 
+                                                              value="#{r.cogInternalNotes}"/>
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Muni notes" />
+
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText escape="false" 
+                                                              value="#{r.muniNotes}"/>
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-label-inline report-data-label-tight">
+                                                <h:outputText value="Public notes" />
+
+                                            </div>
+                                            <div class="p-col-12 restrict-data-field-value-inline report-data-value-tight">
+                                                <h:outputText escape="false" 
+                                                              value="#{r.publicExternalNotes}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-col-12">
+                                        <f:subview id="cear-photos-subview"
+                                                   rendered="#{reportingBB.reportCECase.includeActionRequestPhotos}">
+
+                                            <ui:repeat value="#{r.blobList}"
+                                                       var="vblob" >
+                                                <div class="p-col-#{reportingBB.reportCECase.cearPhotoGridSquares}">
+                                                    <div class="report-photo-header">
+                                                        <h:outputText value="#{vblob.title}"
+                                                                      rendered="true"/>
+
+                                                        <h:outputText value=" (Photo ID:#{vblob.photoDocID})"
+                                                                      rendered="#{reportingBB.reportConfigFieldInspection.includePhotoIDs}"/>
+
+                                                        <h:outputText value=" | "
+                                                                      rendered="#{reportingBB.reportCECase.includePhotoFilenames}"/>
+
+                                                        <h:outputText value="Filename: #{vblob.filename}"
+                                                                      rendered="#{reportingBB.reportCECase.includePhotoFilenames}"
+                                                                      />
+                                                    </div>
+                                                    <p:graphicImage value="#{blobsterBB.image}"
+                                                                    alt="no preview available" 
+                                                                    style="width: 100%" 
+                                                                    cache="false"
+                                                                    rendered="#{vblob.type.browserViewable}">
+                                                        <f:param name="blobid" value="#{vblob.photoDocID}"/>
+                                                    </p:graphicImage>
+
+                                                    <div class="report-photo-caption">
+                                                        <h:outputText value="Description: #{vblob.description}" />
+                                                    </div>
+                                                </div>
+                                            </ui:repeat>
+
+                                        </f:subview>
+                                    </div>
+                                </div>
                             </ui:repeat>
-                        </p:dataScroller>
-
-
-
-                        <div class="report-trailblaze-headerbox">
-                            <div class="report-trailblaze-headerbox-title">
-                                <h:outputText value="Action Requests" />
-                            </div>
-                            <div class="report-trailblaze-headerbox-tail">
-                                <h:outputText value="I'm invisible !"/>
-                            </div>
-                        </div>
-                        <p:dataScroller
-                            id="actionRequestTable"
-                            var="r"
-                            value="#{reportingBB.reportCECase.cse.ceActionRequestList}">
-
-                            <h3>Code Enforcement Action Request</h3>
-                            <h:outputLabel class="bold" value="Issue Type" />
-                            <p:spacer height="5px"/>
-                            <div class="wrapText">
-                                <h:outputText value="#{r.issue.name}"/>
-                            </div>
-                            <h:outputLabel class="bold" value="Address" />
-                            <p:spacer height="5px"/>
-                            <div class="rowExpansion">
-                                <h:outputText value="#{r.requestProperty.address}"/>
-                            </div>
-
-                            <h:outputLabel class="bold" value="Date Submitted" />
-                            <p:spacer height="5px"/>
-                            <div class="wrapText">
-                                <h:outputText value="#{r.formattedSubmittedTimeStamp}"/>
-                            </div>
-
-                            <h:outputLabel styleClass="bold" value="ID"/>
-                            <p:spacer height="5px"/>
-                            <div class="wrapText">
-                                <h:outputText value="#{r.requestID}"/>
-                            </div>
-
-                            <div class="wrapText">
-                                <h:outputLabel styleClass="bold" value="Human safety issue?"/>
-                                <p:spacer height="5px"/>
-                                <h:outputText value="#{r.isUrgent}"/>
-                            </div>
-                            <p:spacer height="5px"/>
-                            <h:outputText value="Age: " />
-                            <h:outputText value="#{r.daysSinceDateOfRecord}"/>
-
-                            <div class="wrapText">
-                                <h:outputLabel styleClass="bold" value="Requestor (#{r.requestor.personType.label}): "/>
-                                <p:spacer height="5px"/>
-
-                                <h:outputText value="#{r.requestor.firstName} "/> 
-                                <h:outputText value="#{r.requestor.lastName}" />
-                                <br />
-                                <h:outputText value="#{r.requestor.addressStreet}" />                                    
-                                <h:outputText value="#{r.requestor.addressCity}" />                                    
-                                <h:outputText value="#{r.requestor.addressState}" />                                    
-                                <h:outputText value="#{r.requestor.addressZip}" />          
-                            </div>
-
-                           
-                            <h:outputLabel styleClass="bold" value="Request description"/>
-                            <p:spacer height="15px"/>
-                            <div class="rowExpansion" style="leftalign">
-                                <h:outputText escape="false" value="#{r.requestDescription}"/>
-                            </div>
-
-                        </p:dataScroller>
+                        </f:subview>
                     </h:form>
                 </f:view>
             </ui:define>

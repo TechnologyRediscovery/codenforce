@@ -70,6 +70,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      */
     final CasePhaseEnum initialCECasePphase = CasePhaseEnum.PrelimInvestigationPending;
 
+    final static int GRIDSQAURES_COLS_1 = 12;
+    final static int GRIDSQAURES_COLS_2 = 6;
+    final static int GRIDSQAURES_COLS_3 = 4;
+    final static int GRIDSQAURES_COLS_4 = 3;
     /**
      * Unspecified days to comply in an ordinance will mean draw from this
      * member TODO: make a municipality setting on a muniprofile
@@ -481,7 +485,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.SearchException
      */
-    public CECasePropertyUnitHeavy cecase_assembleCECasePropertyUnitHeavy(CECase cse) throws IntegrationException, SearchException, BObStatusException {
+    public CECasePropertyUnitHeavy cecase_assembleCECasePropertyUnitHeavy(CECase cse) throws IntegrationException, SearchException, BObStatusException, BlobException {
         PropertyCoordinator pc = getPropertyCoordinator();
 
         CECasePropertyUnitHeavy csepuh = null;
@@ -515,7 +519,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 for (CECase cse : cseList) {
                     try {
                         cspudhList.add(cecase_assembleCECasePropertyUnitHeavy(cse));
-                    } catch (IntegrationException | SearchException ex) {
+                    } catch (IntegrationException | SearchException | BObStatusException | BlobException  ex) {
                         System.out.println(ex);
 
                     }
@@ -526,7 +530,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 for (CECase cse : cseList) {
                     try {
                         cspudhList.add(cecase_assembleCECasePropertyUnitHeavy(cse));
-                    } catch (IntegrationException | SearchException ex) {
+                    } catch (IntegrationException | SearchException  | BObStatusException | BlobException ex) {
                         System.out.println(ex);
                     }
                 }
@@ -555,7 +559,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 for (CECase cse : cseList) {
                     try {
                         cspudhList.add(cecase_assembleCECasePropertyUnitHeavy(cse));
-                    } catch (IntegrationException | SearchException ex) {
+                    } catch (IntegrationException | SearchException | BObStatusException | BlobException ex) {
                         System.out.println(ex);
 
                     }
@@ -566,7 +570,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 for (CECase cse : cseList) {
                     try {
                         cspudhList.add(cecase_assembleCECasePropertyUnitHeavy(cse));
-                    } catch (IntegrationException | SearchException ex) {
+                    } catch (IntegrationException | SearchException | BObStatusException | BlobException ex) {
                         System.out.println(ex);
                     }
                 }
@@ -828,7 +832,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 cse = pdh.getPropInfoCaseList().get(0);
             }
 
-        } catch (AuthorizationException | BObStatusException | EventException | IntegrationException ex) {
+        } catch (AuthorizationException | BObStatusException | EventException | IntegrationException | BlobException ex) {
             System.out.println("CaseCoordinator: Exception selecting default CECase from MuniPropDH; using arbitrary case");
         }
         if (cse != null) {
@@ -1164,23 +1168,50 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public ReportConfigCECase report_getDefaultReportConfigCECase(CECaseDataHeavy c) {
         ReportConfigCECase rpt = new ReportConfigCECase();
 
+        rpt.setMaximumOutputForUserRank(false);
+        
         // general
-        rpt.setIncludeCaseName(false);
+        rpt.setIncludeCaseName(true);
 
         // events
-        rpt.setIncludeEventNotes(true);
-        rpt.setIncludeHiddenEvents(false);
-        rpt.setIncludeInactiveEvents(false);
-        rpt.setIncludeRequestedActionFields(false);
+        rpt.setIncludeOfficerOnlyEvents(true);
         rpt.setIncludeMunicipalityDiclosedEvents(true);
-        rpt.setIncludeOfficerOnlyEvents(false);
-
+        rpt.setIncludeHiddenEvents(false);
+        rpt.setIncludeEventNotes(true);
+        rpt.setIncludeInactiveEvents(false);
+        rpt.setIncludeEventMetadata(true); 
+        rpt.setIncludeEventPersonLinks(true);
+        
         // notices of violation
-        rpt.setIncludeAllNotices(false);
         rpt.setIncludeNoticeFullText(true);
+        rpt.setIncludeAllNotices(true);
+
+        // CEARS and $$
+        rpt.setIncludeActionRequsts(true);
+        rpt.setIncludeActionRequestPhotos(true);
+        rpt.setCearColumnCount(2);
+        rpt.setIncludeFeeAndPaymentInfo(true);
+        
+        // FIRs
+        rpt.setIncludeFieldInspectionReports(true);
+        rpt.setIncludeFieldInspectionReportsWithPhotos(true);
+        
         // violations
         rpt.setIncludeFullOrdinanceText(true);
         rpt.setIncludeViolationPhotos(true);
+        rpt.setViolationPhotoColumnCount(2);
+        rpt.setIncludeViolationNotes(true);
+        
+        // photos and blobs
+        rpt.setIncludePropertyBroadviewPhoto(true);
+        rpt.setIncludeCECasePhotoPool(true);
+        rpt.setIncludeDocDownloadLinks(true);
+        rpt.setCeCasePhotoPoolColumnCount(2);
+        
+        //perons
+        rpt.setIncludeAssociatedPersons(true);
+        rpt.setIncludeAssociatedPersonsOnParentProperty(true);
+        rpt.setIncludePersonAddrPhoneEmail(true);
 
         return rpt;
     }
@@ -1791,16 +1822,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public ReportConfigCECase report_transformCECaseForReport(ReportConfigCECase rptCse, UserAuthorized ua) throws IntegrationException, BObStatusException, SearchException {
-        CaseIntegrator ci = getCaseIntegrator();
+    public ReportConfigCECase report_prepareCECaseReport(ReportConfigCECase rptCse, UserAuthorized ua) throws IntegrationException, BObStatusException, SearchException, BlobException {
         PropertyCoordinator pc = getPropertyCoordinator();
+        PersonCoordinator persC = getPersonCoordinator();
+        
         if(rptCse == null || rptCse.getCse() == null){
             throw new BObStatusException("Cannot generate report with null config or case inside that config");
-            
         }
         // we actually get an entirely new object instead of editing the 
         // one we used throughout the ceCases.xhtml
         CECaseDataHeavy c = rptCse.getCse();
+        
+        if(c.getManager() != null){
+            rptCse.setCaseManagerPerson(persC.getPerson(c.getManager().getHuman()));
+        }
         
         rptCse.setPropDH(pc.assemblePropertyDataHeavy(rptCse.getCse().getProperty(), ua));
         
@@ -1837,7 +1872,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             noticeList.add(nov);
         }
         rptCse.setNoticeListForReport(noticeList);
+        
+        // convert columns to CSS grid size
+        rptCse.setCeCasePhotoPoolGridSquares(report_ceCase_setGridSquaresFromColCount(rptCse.getCeCasePhotoPoolColumnCount()));
+        rptCse.setViolationPhotoGridSquares(report_ceCase_setGridSquaresFromColCount(rptCse.getViolationPhotoColumnCount()));
+        rptCse.setCearPhotoGridSquares(report_ceCase_setGridSquaresFromColCount(rptCse.getCearColumnCount()));
+        
         return rptCse;
+    }
+    
+    /**
+     * Translates colmn counts to grid squares for CSS display (divides 12 by col count)
+     */
+    private int report_ceCase_setGridSquaresFromColCount(int colCount){
+        switch(colCount){
+            case 1: 
+                return GRIDSQAURES_COLS_1;
+            case 2:
+                return GRIDSQAURES_COLS_2;
+            case 3:
+                return GRIDSQAURES_COLS_3;
+            case 4:
+                return GRIDSQAURES_COLS_4;
+            default:
+                return GRIDSQAURES_COLS_2;
+        }
     }
 
     // *************************************************************************
@@ -3574,7 +3633,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             }
             
             cvms.getViolationListSuccessfullyMigrated().addAll(violation_getCodeViolations(freshViolationList));
-        } catch (ViolationException | BObStatusException | EventException | IntegrationException | SearchException ex) {
+        } catch (ViolationException | BObStatusException | EventException | IntegrationException | SearchException | BlobException ex) {
             System.out.println(ex);
             String exname = "Exception caught: " + ex.getClass().getName();
             cvms.appendToMigrationLog(exname);
@@ -3652,7 +3711,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cvms not null
      */
     private void violation_migration_configureTargetCase(CodeViolationMigrationSettings cvms)
-            throws ViolationException, IntegrationException, BObStatusException, SearchException {
+            throws ViolationException, IntegrationException, BObStatusException, SearchException, BlobException {
         if (cvms == null) {
             throw new ViolationException("Cannot configure case with null cvms");
         }

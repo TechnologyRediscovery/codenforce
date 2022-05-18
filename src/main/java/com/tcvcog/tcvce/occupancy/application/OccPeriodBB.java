@@ -35,6 +35,8 @@ import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermit;
+import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
@@ -59,6 +61,10 @@ public class OccPeriodBB
     private OccPeriod lastSavedOccPeriod;
     private OccPeriodDataHeavy currentOccPeriod;
     private PropertyUnit currentPropertyUnit;
+    
+    private OccPermit currentOccPermit;
+    private ReportConfigOccPermit currentOccPermitConfig;
+    private boolean editModeOccPermit;
 
 //  *******************************
 //  ************ WORKFLOW**********
@@ -113,7 +119,7 @@ public class OccPeriodBB
     public void reloadCurrentOccPeriodDataHeavy() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessUser().getMyCredential());
+            currentOccPeriod = oc.assembleOccPeriodDataHeavy(currentOccPeriod, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Reloaded occ period ID " + currentOccPeriod.getPeriodID(), ""));
@@ -311,10 +317,10 @@ public class OccPeriodBB
         Credential cred = getSessionBean().getSessUser().getMyCredential();
 
         try {
-            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, cred));
+            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessUser()));
             getSessionBean().setSessProperty(pc.getPropertyDataHeavyByUnit(op.getPropertyUnitID(), getSessionBean().getSessUser()));
             sc.logObjectView(getSessionBean().getSessUser(), op);
-        } catch (IntegrationException | BObStatusException | AuthorizationException | EventException | SearchException ex) {
+        } catch (IntegrationException | BObStatusException | AuthorizationException | EventException | SearchException | BlobException  ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -365,7 +371,143 @@ public class OccPeriodBB
             return new ArrayList<>();
         }
     }
+    
+    
+    
+    
+    // *************************************************************************
+    // ********************* OCC PERMITS   ************************************
+    // *************************************************************************
+    
+    
+    /**
+     * Listener for user requests to start a new occ permit
+     * @param ev 
+     */
+    public void onOccPermitInitButtonChange(ActionEvent ev){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        currentOccPermit = oc.getOccPermitSkeleton(getSessionBean().getSessUser());
+    }
+    
+    /**
+     * Listener to commit the new permit process
+     * @param ev 
+     */
+    public void onOccPermitInitCommitButtonChange(ActionEvent ev){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.insertOccPermit(currentOccPermit, getSessionBean().getSessUser());
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        } 
+    }
+    
+    /**
+     * Listener for user requests to view the config fields on an occ permit
+     * @param permit 
+     */
+    public void onOccpermitConfigLinkClick(OccPermit permit){
+        currentOccPermit = permit;
+    }
+    
+    /**
+     * Begins finalization process
+     * @param ev 
+     */
+    public void onOccPermitFinalizeInitButtonChange(ActionEvent ev){
+        System.out.println("OccPeriodBB.OccPermitFinalizeInitButtonChange");
+    }
+    
+    /**
+     * Sends the current occ period and permit with all the goodies injected to the 
+     * coordinator for static String extraction
+     * @param ev 
+     */
+    public void onOccPermitGenerateStaticFields(ActionEvent ev){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.updateOccPermitStaticFields(currentOccPeriod, currentOccPermit, getSessionBean().getSessUser(), getSessionBean().getSessMuni());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Finalized Occ permit No " + currentOccPermit.getReferenceNo(), ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        } 
+        
+        
+        
+    }
+    
+    /**
+     * Writes finalization fields to DB on an occ permit
+     * @param ev 
+     */
+    public void onOccpermitFinalizeCommitButtonChange(ActionEvent ev){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.occPermitFinalize(currentOccPermit, getSessionBean().getSessUser(),getSessionBean().getSessMuni());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Finalized Occ permit No " + currentOccPermit.getReferenceNo(), ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        } 
+    }
+    
+    /**
+     * Starts the deactivation process
+     * @param op 
+     */
+    public void onOccPermitDeactivateInit(OccPermit op){
+        System.out.println("OccPeriodBB.onOccPermitDeactivateInit");
+        
+    }
+    
+    /**
+     * concludes the deactivation process
+     * @param op 
+     */
+    public void onOccPermitDeactivateCommit(OccPermit op){
+         OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            System.out.println("OccPeriodBB.onOccPermitDeactivateCommit");
+            oc.occPermitDeactivate(currentOccPermit, getSessionBean().getSessUser());
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        } 
+    }
+    
+    /**
+     * Redirects user to page to print occ permit
+     * @param op
+     * @return 
+     */
+    public String onOccPermitPrintLinkClick(OccPermit op){
+        
+        
+        return "occPermit";
+        
+    }
 
+    
+    
+    
+    // *************************************************************************
+    // ********************* GETTERS AND SETTERS *******************************
+    // *************************************************************************
+    
 
    
     /**
@@ -487,5 +629,49 @@ public class OccPeriodBB
     public void setPropertyUnitCandidateList(List<PropertyUnit> propertyUnitCandidateList) {
         this.propertyUnitCandidateList = propertyUnitCandidateList;
     }
+
+    /**
+     * @return the currentOccPermit
+     */
+    public OccPermit getCurrentOccPermit() {
+        return currentOccPermit;
+    }
+
+    /**
+     * @return the currentOccPermitConfig
+     */
+    public ReportConfigOccPermit getCurrentOccPermitConfig() {
+        return currentOccPermitConfig;
+    }
+
+    /**
+     * @return the editModeOccPermit
+     */
+    public boolean isEditModeOccPermit() {
+        return editModeOccPermit;
+    }
+
+    /**
+     * @param currentOccPermit the currentOccPermit to set
+     */
+    public void setCurrentOccPermit(OccPermit currentOccPermit) {
+        this.currentOccPermit = currentOccPermit;
+    }
+
+    /**
+     * @param currentOccPermitConfig the currentOccPermitConfig to set
+     */
+    public void setCurrentOccPermitConfig(ReportConfigOccPermit currentOccPermitConfig) {
+        this.currentOccPermitConfig = currentOccPermitConfig;
+    }
+
+    /**
+     * @param editModeOccPermit the editModeOccPermit to set
+     */
+    public void setEditModeOccPermit(boolean editModeOccPermit) {
+        this.editModeOccPermit = editModeOccPermit;
+    }
+
+   
 
 }

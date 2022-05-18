@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
@@ -29,6 +30,7 @@ import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.HumanLink;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PropertyUnit;
 import com.tcvcog.tcvce.entities.PublicInfoBundleOccPermitApplication;
@@ -76,26 +78,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     }
 
     
-    /**
-     * Typesafe adaptor for getOccPeriodList()
-     * @param pu
-     * @param u
-     * @return
-     * @throws IntegrationException
-     * @throws AuthorizationException
-     * @throws EventException
-     * @throws BObStatusException
-     * @throws ViolationException 
-     */
-    public List<OccPeriod> getOccPeriodList(PropertyUnit pu, UserAuthorized u) 
-            throws  IntegrationException, 
-                    AuthorizationException, 
-                    EventException, 
-                    BObStatusException, 
-                    ViolationException {
-        return getOccPeriodList(pu.getUnitID());
-    }
-    
+   
     
     /**
      * Extracts all active occ periods from the DB using a unitID
@@ -107,8 +90,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      * @throws BObStatusException
      * @throws ViolationException 
      */
-    public List<OccPeriod> getOccPeriodList(int unitID) throws IntegrationException, EventException, AuthorizationException, BObStatusException, ViolationException {
-        List<OccPeriod> opList = new ArrayList<>();
+    public List<Integer> getOccPeriodIDListByUnitID(int unitID) throws IntegrationException, EventException, AuthorizationException, BObStatusException, ViolationException {
+        List<Integer> opIDList = new ArrayList<>();
         String query = "SELECT periodid FROM public.occperiod WHERE parcelunit_unitid=? AND deactivatedts IS NULL;";
 
         Connection con = getPostgresCon();
@@ -120,7 +103,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(1, unitID);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                opList.add(getOccPeriod(rs.getInt("periodid")));
+                opIDList.add(rs.getInt("periodid"));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -130,7 +113,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return opList;
+        return opIDList;
     }
 
   
@@ -485,7 +468,13 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         System.out.println("OccIntegrator Retrieved period of size: " + al.size());
         return al;
 
-    }   
+    }  
+ 
+ 
+ // **********************************************************
+ // ******************** OCCUPANCY PERMITS *******************
+ // **********************************************************
+ 
 
  /**
   * Extracts a single occ period by ID
@@ -496,9 +485,17 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
   */
     public OccPermit getOccPermit(int permitID) throws IntegrationException, BObStatusException {
         OccPermit op = null;
-        String query = "SELECT permitid, occperiod_periodid, referenceno, issuedto_personid, \n"
-                + "       issuedby_userid, dateissued, permitadditionaltext, notes\n"
-                + "  FROM public.occpermit WHERE permitid=?;";
+        String query = "SELECT permitid, occperiod_periodid, referenceno, staticpermitadditionaltext, \n" +
+                        "       notes, finalizedts, finalizedby_userid, statictitle, staticmuniaddress, \n" +
+                        "       staticpropertyinfo, staticownerseller, staticcolumnlink, staticbuyertenant, \n" +
+                        "       staticproposeduse, staticusecode, staticpropclass, staticdateofapplication, \n" +
+                        "       staticinitialinspection, staticreinspectiondate, staticfinalinspection, \n" +
+                        "       staticdateofissue, staticofficername, staticissuedundercodesourceid, \n" +
+                        "       staticstipulations, staticcomments, staticmanager, statictenants, \n" +
+                        "       staticleaseterm, staticleasestatus, staticpaymentstatus, staticnotice, \n" +
+                        "       createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
+                        "       deactivatedts, deactivatedby_userid, staticconstructiontype \n" +
+                        "  FROM public.occpermit WHERE permitid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -530,26 +527,63 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      * @throws BObStatusException 
      */
     private OccPermit generateOccPermit(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         OccPermit permit = new OccPermit();
-        PersonIntegrator pi = getPersonIntegrator();
-        PersonCoordinator pc = getPersonCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
 
         permit.setPermitID(rs.getInt("permitid"));
         permit.setPeriodID(rs.getInt("occperiod_periodid"));
         permit.setReferenceNo(rs.getString("referenceno"));
 
-        if (rs.getTimestamp("dateissued") != null) {
-            permit.setDateIssued(rs.getTimestamp("dateissued").toLocalDateTime());
-        }
-
-        permit.setIssuedBy(ui.getUser(rs.getInt("issuedby_userid")));
-        
-        permit.setIssuedTo(pc.getPerson(pc.getHuman(rs.getInt("issuedto_personid"))));
-
-        permit.setPermitAdditionalText(rs.getString("permitadditionaltext"));
+        permit.setPermitAdditionalText(rs.getString("staticpermitadditionaltext"));
         permit.setNotes(rs.getString("notes"));
 
+        if(rs.getTimestamp("finalizedts") != null){
+            permit.setFinalizedts(rs.getTimestamp("finalizedts").toLocalDateTime());
+        }
+        permit.setFinalizedBy(uc.user_getUser(rs.getInt("finalizedby_userid")));
+       
+        permit.setStatictitle(rs.getString("statictitle"));
+        permit.setStaticmuniaddress(rs.getString("staticmuniaddress"));
+        permit.setStaticpropertyinfo(rs.getString("staticpropertyinfo"));
+        permit.setStaticownerseller(rs.getString("staticownerseller"));
+        
+        permit.setStaticcolumnlink(rs.getString("staticcolumnlink"));
+        permit.setStaticbuyertenant(rs.getString("staticbuyertenant"));
+        permit.setStaticproposeduse(rs.getString("staticproposeduse"));
+        permit.setStaticusecode(rs.getString("staticusecode"));
+        permit.setStaticpropclass(rs.getString("staticpropclass"));
+        if(rs.getTimestamp("staticdateofapplication") != null){
+            permit.setStaticdateofapplication(rs.getTimestamp("staticdateofapplication").toLocalDateTime());
+        }
+        if(rs.getTimestamp("staticinitialinspection") != null){
+            permit.setStaticinitialinspection(rs.getTimestamp("staticinitialinspection").toLocalDateTime());
+        }
+        if(rs.getTimestamp("staticreinspectiondate") != null){
+            permit.setStaticreinspectiondate(rs.getTimestamp("staticreinspectiondate").toLocalDateTime());
+        }
+        if(rs.getTimestamp("staticfinalinspection") != null){
+            permit.setStaticfinalinspection(rs.getTimestamp("staticfinalinspection").toLocalDateTime());
+        }
+        if(rs.getTimestamp("staticdateofissue") != null){
+            permit.setStaticdateofissue(rs.getTimestamp("staticdateofissue").toLocalDateTime());
+        }
+        
+        permit.setStaticofficername(rs.getString("staticofficername"));
+        permit.setStaticissuedundercodesourceid(rs.getString("staticissuedundercodesourceid"));
+        permit.setStaticstipulations(rs.getString("staticstipulations"));
+        permit.setStaticcomments(rs.getString("staticcomments"));
+        permit.setStaticmanager(rs.getString("staticmanager"));
+        
+        permit.setStatictenants(rs.getString("statictenants"));
+        permit.setStaticleaseterm(rs.getString("staticleaseterm"));
+        permit.setStaticleasestatus(rs.getString("staticleasestatus"));
+        permit.setStaticpaymentstatus(rs.getString("staticpaymentstatus"));
+        permit.setStaticnotice(rs.getString("staticnotice"));
+        permit.setStaticconstructiontype(rs.getString("staticconstructiontype"));
+        
+        si.populateTrackedFields(permit, rs, true);
+        
         return permit;
     }
 
@@ -560,9 +594,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      * @throws IntegrationException
      * @throws BObStatusException 
      */
-    public List<OccPermit> getOccPermitList(OccPeriod period) throws IntegrationException, BObStatusException {
-        List<OccPermit> permitList = new ArrayList<>();
-        String query = "SELECT permitid FROM public.occpermit WHERE occperiod_periodid=?;";
+    public List<Integer> getOccPermitIDList(OccPeriod period) throws IntegrationException, BObStatusException {
+        List<Integer> permitIDList = new ArrayList<>();
+        String query = "SELECT permitid FROM public.occpermit WHERE occperiod_periodid=? AND deactivatedts IS NULL;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -571,19 +605,289 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(1, period.getPeriodID());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                permitList.add(getOccPermit(rs.getInt("permitid")));
+                permitIDList.add(rs.getInt("permitid"));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to build occ permit list", ex);
+            throw new IntegrationException("Unable to build occ permit ID list", ex);
         } finally {
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return permitList;
+        return permitIDList;
     }
 
+    /**
+     * Entry point for OccPermit objects into the database. 
+     * Only called by coordinator. BUT remember, 
+     * you can only write to the metadata fields here. Actual permit static fields
+     * are written specially through the updateOccPermitStaticFields
+     * @param permit
+     * @return ID of the skeleton. 
+     */
+    public int insertOccPermit(OccPermit permit) throws BObStatusException, IntegrationException{
+        if(permit == null){
+            throw new BObStatusException("Cannot insert null occ permit");
+        }
+        
+        String query = "INSERT INTO public.occpermit(\n" +
+                         "            permitid, occperiod_periodid, referenceno,  notes)\n" +
+                         "    VALUES (DEFAULT, ?, ?, ?);"; 
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatement stmt = null;
+        int freshPermitID = 0;
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+        
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, permit.getPeriodID());
+            stmt.setString(2, permit.getReferenceNo());
+            stmt.setString(3, permit.getNotes());
+            
+            stmt.execute();
+
+            String lastIDNumSQL = "SELECT currval('occupancypermit_permitid_seq'::regclass)";
+
+            stmt = con.prepareStatement(lastIDNumSQL);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                freshPermitID = rs.getInt("currval");
+            }
+            
+        } catch (SQLException ex) {
+            throw new IntegrationException("OccupancyIntegrator.insertOccPermit"
+                    + "| IntegrationError: unable to insert occupancy permit", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        return freshPermitID;
+    }
+    
+    
+    /**
+     * Asks DB for the count of finalized permits by muni
+     * @param muni
+     * @return 
+     */
+    public int countFinalizedPermitsByMuni(Municipality muni) throws BObStatusException, IntegrationException{
+        if(muni == null){
+            throw new BObStatusException("Cannot get permit count by muni with null muni");
+        }
+        
+        String query = "SELECT count(permitid) AS pcount\n" +
+                        "FROM occpermit INNER JOIN occperiod ON (occperiod.periodid = occpermit.occperiod_periodid)\n" +
+                        "INNER JOIN parcelunit ON (occperiod.parcelunit_unitid = parcelunit.unitid)\n" +
+                        "INNER JOIN parcel ON (parcelunit.parcel_parcelkey = parcel.parcelkey)\n" +
+                        "WHERE parcel.muni_municode=? AND finalizedts IS NOT NULL;"; 
+        ResultSet rs = null;
+        Connection con = null;
+        PreparedStatement stmt = null;
+        int finalizedPermitCount = 0;
+
+        PaymentCoordinator pc = getPaymentCoordinator();
+        
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, muni.getMuniCode());
+            
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                finalizedPermitCount = rs.getInt("pcount");
+            }
+            
+        } catch (SQLException ex) {
+            throw new IntegrationException("OccupancyIntegrator.countFinalizePermitsByMuni");
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        return finalizedPermitCount;
+        
+        
+        
+        
+    }
+    
+    /**
+     * Updates an occ permit's metadata, including notes and deactivationts and decativatedby_userid
+     * @param permit
+     * @throws IntegrationException 
+     */
+    public void updateOccPermit(OccPermit permit) throws IntegrationException {
+        String query = "UPDATE public.occpermit\n" +
+                        "   SET referenceno=?,  \n" +
+                        "       notes=?, finalizedts=?, finalizedby_userid=?, lastupdatedts=now(), \n" +
+                        "       lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?, occperiod_periodid=?\n" +
+                        " WHERE permitid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, permit.getReferenceNo());
+            stmt.setString(2, permit.getNotes());
+            if(permit.getFinalizedts() != null){
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(permit.getFinalizedts()));
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            if(permit.getFinalizedBy() != null){
+                stmt.setInt(4, permit.getFinalizedBy().getUserID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            if(permit.getLastUpdatedBy() != null){
+                stmt.setInt(5, permit.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+            if(permit.getDeactivatedTS() != null){
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(permit.getFinalizedts()));
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
+            if(permit.getDeactivatedBy() != null){
+                stmt.setInt(7, permit.getDeactivatedBy().getUserID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            stmt.setInt(8, permit.getPeriodID());
+            
+            stmt.setInt(9, permit.getPermitID());
+            
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("OccupancyIntegrator.updateOccpermit | Unable to update occupancy permit metadata", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        }
+    }
+    
+    
+    /**
+     * I update the special permit static fields on an occ permit
+     * @param permit     
+     * @throws IntegrationException 
+     */
+    public void updateOccPermitStaticFields(OccPermit permit) throws IntegrationException {
+        String query = "UPDATE public.occpermit\n" +
+                        "   SET staticpermitadditionaltext=?, statictitle=?, \n" +
+                        "       staticmuniaddress=?, staticpropertyinfo=?, staticownerseller=?, \n" +
+                        "       staticcolumnlink=?, staticbuyertenant=?, staticproposeduse=?, \n" +
+                        "       staticusecode=?, staticpropclass=?, staticdateofapplication=?, \n" +
+                        "       staticinitialinspection=?, staticreinspectiondate=?, staticfinalinspection=?, \n" +
+                        "       staticdateofissue=?, staticofficername=?, staticissuedundercodesourceid=?, \n" +
+                        "       staticstipulations=?, staticcomments=?, staticmanager=?, statictenants=?, \n" +
+                        "       staticleaseterm=?, staticleasestatus=?, staticpaymentstatus=?, \n" +
+                        "       staticnotice=?, lastupdatedts=now(), \n" +
+                        "       lastupdatedby_userid=?, staticconstructiontype=?  " +
+                        " WHERE permitid = ?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setString(1, permit.getPermitAdditionalText());
+            stmt.setString(2, permit.getStatictitle());
+            
+            stmt.setString(3, permit.getStaticmuniaddress());
+            stmt.setString(4, permit.getStaticpropertyinfo());
+            stmt.setString(5, permit.getStaticownerseller());
+            
+            stmt.setString(6, permit.getStaticcolumnlink());
+            stmt.setString(7, permit.getStaticbuyertenant());
+            stmt.setString(8, permit.getStaticproposeduse());
+            
+            stmt.setString(9, permit.getStaticusecode());
+            stmt.setString(10, permit.getStaticpropclass());
+            if(permit.getStaticdateofapplication() != null){
+                stmt.setTimestamp(11, java.sql.Timestamp.valueOf(permit.getStaticdateofapplication()));
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
+            }
+            
+            if(permit.getStaticinitialinspection() != null){
+                stmt.setTimestamp(12, java.sql.Timestamp.valueOf(permit.getStaticinitialinspection()));
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL);
+            }
+            if(permit.getStaticreinspectiondate() != null){
+                stmt.setTimestamp(13, java.sql.Timestamp.valueOf(permit.getStaticreinspectiondate()));
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            if(permit.getStaticfinalinspection() != null){
+                stmt.setTimestamp(14, java.sql.Timestamp.valueOf(permit.getStaticfinalinspection()));
+            } else {
+                stmt.setNull(14, java.sql.Types.NULL);
+            }
+            
+            if(permit.getStaticdateofissue() != null){
+                stmt.setTimestamp(15, java.sql.Timestamp.valueOf(permit.getStaticdateofissue()));
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
+            stmt.setString(16, permit.getStaticofficername());
+            stmt.setString(17, permit.getStaticissuedundercodesourceid());
+            
+            stmt.setString(18, permit.getStaticstipulations());
+            stmt.setString(19, permit.getStaticcomments());
+            stmt.setString(20, permit.getStaticmanager());
+            stmt.setString(21, permit.getStatictenants());
+            
+            stmt.setString(22, permit.getStaticleaseterm());
+            stmt.setString(23, permit.getStaticleasestatus());
+            stmt.setString(24, permit.getStaticpaymentstatus());
+            
+            stmt.setString(25, permit.getStaticnotice());
+            if(permit.getLastUpdatedBy() != null){
+                stmt.setInt(26, permit.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(26, java.sql.Types.NULL);
+            }
+            stmt.setString(27, permit.getStaticconstructiontype());
+            stmt.setInt(28, permit.getPermitID());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("OccupancyIntegrator.updateOccpermitStaticFields | Unable to update occupancy permit static fields", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        }
+    }
+    
+   
+    
+    //**************************************************************
+    //**************************** OCC PERIOD TYPE STUFF ***********
+    //**************************************************************
+    
+    
+    
+    
+    
+    
+    
     /**
      * TODO: Finish me!
      * @param opt
@@ -903,6 +1207,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
         return newPeriodId;
     }
+    
+    
 
     /**
      * Updates an occ period 

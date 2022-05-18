@@ -99,7 +99,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             while (rs.next()) {
                 // note that rs.next() is called and the cursor
                 // is advanced to the first row in the rs
-                hl = generateHumanLink(rs, null);
+                hl = generateHumanLink(rs);
             }
 
         } catch (SQLException ex) {
@@ -152,9 +152,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                HumanLink hl = generateHumanLink(rs, getHuman(rs.getInt("human_humanid")));
+                HumanLink hl = generateHumanLink(rs);
                 hl.setParentObjectID(hlh.getHostPK());
-//                pc.configureContactable(hl);
                 linkedHumans.add(hl);
             }
 
@@ -178,8 +177,9 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * @return the HumanLinks associated with the given human in the object family of the Enum
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public List<HumanLink> getHumanLinksByLinkedObjectEnum(LinkedObjectSchemaEnum lose, Human hum) throws IntegrationException{
+    public List<HumanLink> getHumanLinksByLinkedObjectEnum(LinkedObjectSchemaEnum lose, Human hum) throws IntegrationException, BObStatusException{
          Connection con = getPostgresCon();
+         PersonCoordinator pc = getPersonCoordinator();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         if(lose == null || hum == null){
@@ -208,7 +208,7 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                HumanLink hl = generateHumanLink(rs, getHuman(rs.getInt("human_humanid")));
+                HumanLink hl = generateHumanLink(rs);
                 hl.setParentObjectID(rs.getInt(lose.getTargetTableFKField()));
                 linkedHumans.add(hl);
             }
@@ -320,21 +320,23 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
      * the link source and the linked object role
      * 
      * @param rs containing fields for the standard linked tables
-     * @param h the human whose linked metadata is desired; can be null, if so, 
-     * the resultset will be asked for the human id
      * @return the HumanLink which is a human with link metadata attached
      * @throws SQLException
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public HumanLink generateHumanLink(ResultSet rs, Human h) throws SQLException, IntegrationException{
+    public HumanLink generateHumanLink(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         SystemIntegrator si = getSystemIntegrator();
+        PersonCoordinator pc = getPersonCoordinator();
         HumanLink hl = null;
-        if(h == null){
-            h = getHuman(rs.getInt("human_humanid"));
+        if(rs == null){
+            throw new BObStatusException("cannot generate human link with null rs");
         }
-        if(rs != null && h != null){
+        Person per = pc.getPerson(pc.getHuman(rs.getInt("human_humanid")));
+        
+        if(per != null){
             try {
-                hl = new HumanLink(h);
+                hl = new HumanLink(per);
                 si.populateTrackedLinkFields(hl, rs);
                 hl.setLinkID(rs.getInt("linkid"));
                 hl.setNotes(rs.getString("notes"));
@@ -1507,7 +1509,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, application.getId());
             rs = stmt.executeQuery();
             while(rs.next()){
-                personList.add(generatePersonOccPeriod(rs));
+                // TODO: Fix with occ application 
+//                personList.add(generatePersonOccPeriod(rs));
                 
             }
 
@@ -1576,7 +1579,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(2, personID);
             rs = stmt.executeQuery();
             while(rs.next()){
-                output = generatePersonOccPeriod(rs);
+                // TODO: fix with occ applicat
+//                output = generatePersonOccPeriod(rs);
             }
 
         } catch (SQLException ex) {
@@ -1614,7 +1618,8 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, application.getId());
             rs = stmt.executeQuery();
             while(rs.next()){
-                personList.add(generatePersonOccPeriod(rs));
+                // TODO: Fix with occ application
+//                personList.add(generatePersonOccPeriod(rs));
                 
             }
 
@@ -1631,18 +1636,6 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
         return personList;
     }
     
-    private HumanLink generatePersonOccPeriod(ResultSet rs) throws SQLException, IntegrationException{
-        HumanLink pop = new HumanLink(getHuman(rs.getInt("person_personid")));
-        // TODO: fix this with Occ
-
-//        pop.setApplicationID(rs.getInt("occpermitapplication_applicationid"));
-//        pop.setApplicant(rs.getBoolean("applicant"));
-//        pop.setPreferredContact(rs.getBoolean("preferredcontact"));
-//        pop.setApplicationPersonType(PersonType.valueOf(rs.getString("applicationpersontype")));
-//        pop.setLinkActive(rs.getBoolean("active"));
-        return pop;        
-    }   
-
     public List<Integer> getPersonHistory(int userID) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;

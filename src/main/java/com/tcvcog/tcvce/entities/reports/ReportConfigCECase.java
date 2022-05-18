@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.entities.reports;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
+import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
@@ -21,42 +22,61 @@ import java.util.List;
 public class ReportConfigCECase extends Report{
     
     private CECaseDataHeavy cse;
+    private Person caseManagerPerson;
     private PropertyDataHeavy propDH;
     
     private List<EventCnF> eventListForReport;
     private List<NoticeOfViolation> noticeListForReport;
     
+    private boolean maximumOutputForUserRank; 
+    // general
     private boolean includeCaseName; // add to ui
     
-    private boolean includeAssociatedPersons;
-    private boolean includeAssociatedPersonsOnParentProperty;
-    private boolean includePersonAddrPhoneEmail;
-    
+    // events
+    private boolean includeOfficerOnlyEvents;
+    private boolean includeMunicipalityDiclosedEvents;
     private boolean includeHiddenEvents;
     private boolean includeInactiveEvents;
-    
-    private boolean includeMunicipalityDiclosedEvents;
-    private boolean includeOfficerOnlyEvents;
-    
     private boolean includeEventNotes;
-    private boolean includeRequestedActionFields;
     private boolean includeEventMetadata; // add to ui
+    private boolean includeEventPersonLinks;
     
+    // NOVs
     private boolean includeAllNotices;
     private boolean includeNoticeFullText;
+    
+    // CEARS
     private boolean includeActionRequsts;
+    private boolean includeActionRequestPhotos;
+    private int cearColumnCount;
+    private int cearPhotoGridSquares;
+    
+    // fees and payments
     private boolean includeFeeAndPaymentInfo;
     
+    // FIRS
     private boolean includeFieldInspectionReports;
     private boolean includeFieldInspectionReportsWithPhotos;
      
+    // violations
     private boolean includeFullOrdinanceText;
-    private boolean includeViolationPhotos;  // add to 
+    private boolean includeViolationPhotos;
+    private int violationPhotoColumnCount;
+    private int violationPhotoGridSquares;
     private boolean includeViolationNotes;
-    private boolean includeCECasePhotoPool;
     
+    // photos and blobs
+    private boolean includePhotoFilenames;
+    private boolean includePropertyBroadviewPhoto;
     private boolean includeDocDownloadLinks;
-
+    private boolean includeCECasePhotoPool;
+    private int ceCasePhotoPoolColumnCount;
+    private int ceCasePhotoPoolGridSquares;
+    
+    // persons
+    private boolean includeAssociatedPersons;
+    private boolean includeAssociatedPersonsOnParentProperty;
+    private boolean includePersonAddrPhoneEmail;
     /**
      * @return the cse
      */
@@ -83,13 +103,6 @@ public class ReportConfigCECase extends Report{
      */
     public boolean isIncludeEventNotes() {
         return includeEventNotes;
-    }
-
-    /**
-     * @return the includeRequestedActionFields
-     */
-    public boolean isIncludeRequestedActionFields() {
-        return includeRequestedActionFields;
     }
 
     /**
@@ -132,13 +145,6 @@ public class ReportConfigCECase extends Report{
      */
     public void setIncludeEventNotes(boolean includeEventNotes) {
         this.includeEventNotes = includeEventNotes;
-    }
-
-    /**
-     * @param includeRequestedActionFields the includeRequestedActionFields to set
-     */
-    public void setIncludeRequestedActionFields(boolean includeRequestedActionFields) {
-        this.includeRequestedActionFields = includeRequestedActionFields;
     }
 
     /**
@@ -420,7 +426,178 @@ public class ReportConfigCECase extends Report{
     public void setPropDH(PropertyDataHeavy propDH) {
         this.propDH = propDH;
     }
-    
+
+    /**
+     * @return the maximumOutputForUserRank
+     */
+    public boolean isMaximumOutputForUserRank() {
+        return maximumOutputForUserRank;
+    }
+
+    /**
+     * @param maximumOutputForUserRank the maximumOutputForUserRank to set
+     */
+    public void setMaximumOutputForUserRank(boolean maximumOutputForUserRank) {
+        this.maximumOutputForUserRank = maximumOutputForUserRank;
+    }
+
+    /**
+     * @return the includePropertyBroadviewPhoto
+     */
+    public boolean isIncludePropertyBroadviewPhoto() {
+        return includePropertyBroadviewPhoto;
+    }
+
+    /**
+     * @param includePropertyBroadviewPhoto the includePropertyBroadviewPhoto to set
+     */
+    public void setIncludePropertyBroadviewPhoto(boolean includePropertyBroadviewPhoto) {
+        this.includePropertyBroadviewPhoto = includePropertyBroadviewPhoto;
+    }
+
+   
+
+    /**
+     * @param includePhotoFilenames the includePhotoFilenames to set
+     */
+    public void setIncludePhotoFilenames(boolean includePhotoFilenames) {
+        this.includePhotoFilenames = includePhotoFilenames;
+    }
+
+    /**
+     * @return the violationPhotoColumnCount
+     */
+    public int getViolationPhotoColumnCount() {
+        return violationPhotoColumnCount;
+    }
+
+    /**
+     * @return the violationPhotoGridSquares
+     */
+    public int getViolationPhotoGridSquares() {
+        return violationPhotoGridSquares;
+    }
+
+    /**
+     * @return the includePhotoFilenames
+     */
+    public boolean isIncludePhotoFilenames() {
+        return includePhotoFilenames;
+    }
+
+    /**
+     * @return the ceCasePhotoPoolColumnCount
+     */
+    public int getCeCasePhotoPoolColumnCount() {
+        return ceCasePhotoPoolColumnCount;
+    }
+
+    /**
+     * @return the ceCasePhotoPoolGridSquares
+     */
+    public int getCeCasePhotoPoolGridSquares() {
+        return ceCasePhotoPoolGridSquares;
+    }
+
+    /**
+     * @param violationPhotoColumnCount the violationPhotoColumnCount to set
+     */
+    public void setViolationPhotoColumnCount(int violationPhotoColumnCount) {
+        this.violationPhotoColumnCount = violationPhotoColumnCount;
+    }
+
+    /**
+     * @param violationPhotoGridSquares the violationPhotoGridSquares to set
+     */
+    public void setViolationPhotoGridSquares(int violationPhotoGridSquares) {
+        this.violationPhotoGridSquares = violationPhotoGridSquares;
+    }
+
+    /**
+     * @param ceCasePhotoPoolColumnCount the ceCasePhotoPoolColumnCount to set
+     */
+    public void setCeCasePhotoPoolColumnCount(int ceCasePhotoPoolColumnCount) {
+        this.ceCasePhotoPoolColumnCount = ceCasePhotoPoolColumnCount;
+    }
+
+    /**
+     * @param ceCasePhotoPoolGridSquares the ceCasePhotoPoolGridSquares to set
+     */
+    public void setCeCasePhotoPoolGridSquares(int ceCasePhotoPoolGridSquares) {
+        this.ceCasePhotoPoolGridSquares = ceCasePhotoPoolGridSquares;
+    }
+
+    /**
+     * @return the includeEventPersonLinks
+     */
+    public boolean isIncludeEventPersonLinks() {
+        return includeEventPersonLinks;
+    }
+
+    /**
+     * @param includeEventPersonLinks the includeEventPersonLinks to set
+     */
+    public void setIncludeEventPersonLinks(boolean includeEventPersonLinks) {
+        this.includeEventPersonLinks = includeEventPersonLinks;
+    }
+
+    /**
+     * @return the caseManagerPerson
+     */
+    public Person getCaseManagerPerson() {
+        return caseManagerPerson;
+    }
+
+    /**
+     * @param caseManagerPerson the caseManagerPerson to set
+     */
+    public void setCaseManagerPerson(Person caseManagerPerson) {
+        this.caseManagerPerson = caseManagerPerson;
+    }
+
+    /**
+     * @return the includeActionRequestPhotos
+     */
+    public boolean isIncludeActionRequestPhotos() {
+        return includeActionRequestPhotos;
+    }
+
+    /**
+     * @return the cearColumnCount
+     */
+    public int getCearColumnCount() {
+        return cearColumnCount;
+    }
+
+    /**
+     * @return the cearPhotoGridSquares
+     */
+    public int getCearPhotoGridSquares() {
+        return cearPhotoGridSquares;
+    }
+
+    /**
+     * @param includeActionRequestPhotos the includeActionRequestPhotos to set
+     */
+    public void setIncludeActionRequestPhotos(boolean includeActionRequestPhotos) {
+        this.includeActionRequestPhotos = includeActionRequestPhotos;
+    }
+
+    /**
+     * @param cearColumnCount the cearColumnCount to set
+     */
+    public void setCearColumnCount(int cearColumnCount) {
+        this.cearColumnCount = cearColumnCount;
+    }
+
+    /**
+     * @param cearPhotoGridSquares the cearPhotoGridSquares to set
+     */
+    public void setCearPhotoGridSquares(int cearPhotoGridSquares) {
+        this.cearPhotoGridSquares = cearPhotoGridSquares;
+    }
+
+   
     
 }
 

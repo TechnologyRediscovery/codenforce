@@ -169,7 +169,7 @@ public class PersonBB extends BackingBeanUtils {
                 upstreamPersonPoolList.add(sb.getSessProperty());
                 CECase cse = (CECase) currentHumanListHolder;
                 if(cse.getPropertyUnitID() != 0){
-                    upstreamPersonPoolList.add(pc.getPropertyUnitWithLists(sb.getSessPropertyUnit(), sb.getSessUser().getKeyCard()));
+                    upstreamPersonPoolList.add(pc.getPropertyUnitDataHeavy(sb.getSessPropertyUnit(), sb.getSessUser()));
                 }
             } else if(currentHumanListHolder instanceof PropertyUnit){
                 upstreamPersonPoolList.add(sb.getSessProperty());
@@ -1462,9 +1462,9 @@ public class PersonBB extends BackingBeanUtils {
         PropertyCoordinator pc = getPropertyCoordinator();
         if(selectedUnitForHumanLinkTarget != null){
             try {
-                selectedUnitForHumanLinkTargetDataHeavy = pc.getPropertyUnitWithLists(
+                selectedUnitForHumanLinkTargetDataHeavy = pc.getPropertyUnitDataHeavy(
                         selectedUnitForHumanLinkTarget,
-                        getSessionBean().getSessUser().getKeyCard());
+                        getSessionBean().getSessUser());
             } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
                 System.out.println(ex);
             } 

@@ -96,7 +96,6 @@
                             <div class="p-col">
 
 
-
                                 <!-- OBJECT DATA PANEL--> 
                                 <p:panel id="parcel-id-panel"
                                          toggleable="true"
@@ -104,118 +103,139 @@
                                          header="Parcel #{propertyProfileBB.currentProperty.countyParcelID} (#{propertyProfileBB.currentProperty.muni.muniName})"
                                          rendered="true"
                                          >
-                                    <h:form id="parcel-id-form">
+                                    <div class="p-grid nested-grid">
+                                        <div class="p-col-4">
+                                            <h:form id="parcel-photo-form">
+                                                <div class="p-grid">
 
+                                                    <div class="p-col-12">
+                                                        <p:graphicImage value="#{blobsterBB.image}"
+                                                                        alt="no preview available" 
+                                                                        style="width: 100%; margin-right: 10px;" 
+                                                                        cache="false"
+                                                                        rendered="true">
+                                                            <f:param name="blobid" value="#{propertyProfileBB.currentProperty.broadviewPhoto.photoDocID}"/>
+                                                        </p:graphicImage>
+                                                        <p:spacer height="2px" />
+                                                        <p:commandLink      id="prop-broadviewphoto-change-cl"
+                                                                            ajax="true"
+                                                                            actionListener="#{propertyProfileBB.onChangeBroadviewPhotoInitLinkClick}"
+                                                                            style="color:blue; font-weight: bold;"
+                                                                            oncomplete="PF('property-broadview-dialog-var').show()"
+                                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                                                            update="property-broadview-dialog
+                                                                            property-broadview-form"
+                                                                            value="change broadview photo" >
 
-                                        <p:commandButton id="parcel-id-edit-button"
-                                                         value="#{propertyProfileBB.currentPropertyEditMode ? 'Save changes' : 'Edit'}"
-                                                         rendered="true"
-                                                         ajax="true"
-                                                         icon="fa #{propertyProfileBB.currentPropertyEditMode ? 'fa-check' : 'fa-pencil'}"
-                                                         actionListener="#{propertyProfileBB.onPropertyEditModeToggleButtonChange}"
-                                                         update="@form
-                                                         property-messages-global"
-                                                         />
-
-
-                                        <div class="restrict-main-contents-io-button gray_button">
-
-                                            <p:commandButton    id="parcel-id-edit-abort-button"
-                                                                ajax="true"
-                                                                rendered="#{propertyProfileBB.currentPropertyEditMode}"
-                                                                value="Abort edit"
-                                                                actionListener="#{propertyProfileBB.onPropertyEditModeOperationAbortButtonChange}"
-                                                                update="property-messages-global
-                                                                @form"
-                                                                icon="fa fa-stop" />
-
+                                                        </p:commandLink>
+                                                    </div>
+                                                </div>
+                                            </h:form>
                                         </div>
+                                        <div class="p-col-8">
+                                            <h:form id="parcel-id-form">
+                                                <div class="p-grid">
+                                                    <div class="p-col-12">
 
-                                        <p:spacer height="5px"/>    
-
-
-
-
-                                        <div class="p-grid">
-
-                                            <div class="p-col-4 data_field_label">
-                                                <h:outputText value="Parcel ID (County)"  />
-                                            </div>
-                                            <div class="p-col-8">
-                                                <h:outputText value="#{propertyProfileBB.currentProperty.countyParcelID} "
-                                                              rendered="#{!propertyProfileBB.currentPropertyEditMode}" />
-
-                                                <p:spacer height="3px" />
-
-                                                <p>
-                                                    <a href="https://www2.alleghenycounty.us/RealEstate/GeneralInfo.aspx?ParcelID=#{propertyProfileBB.currentProperty.countyParcelID}"
-                                                       target="_blank"
-                                                       style="color:blue;">Visit county profile</a>
-                                                </p>
-
-                                                <p:spacer height="3px" />
+                                                        <p:commandButton id="parcel-id-edit-button"
+                                                                         value="#{propertyProfileBB.currentPropertyEditMode ? 'Save changes' : 'Edit'}"
+                                                                         rendered="true"
+                                                                         ajax="true"
+                                                                         icon="fa #{propertyProfileBB.currentPropertyEditMode ? 'fa-check' : 'fa-pencil'}"
+                                                                         actionListener="#{propertyProfileBB.onPropertyEditModeToggleButtonChange}"
+                                                                         update="@form
+                                                                         property-messages-global"
+                                                                         />
 
 
+                                                        <div class="restrict-main-contents-io-button gray_button">
 
-                                                <p:inputText value="#{propertyProfileBB.currentProperty.countyParcelID}"
-                                                             rendered="#{propertyProfileBB.currentPropertyEditMode}" />
+                                                            <p:commandButton    id="parcel-id-edit-abort-button"
+                                                                                ajax="true"
+                                                                                rendered="#{propertyProfileBB.currentPropertyEditMode}"
+                                                                                value="Abort edit"
+                                                                                actionListener="#{propertyProfileBB.onPropertyEditModeOperationAbortButtonChange}"
+                                                                                update="property-messages-global
+                                                                                @form"
+                                                                                icon="fa fa-stop" />
 
-                                            </div>
+                                                        </div>
+                                                    </div>
 
+                                                    <div class="p-col-6 data_field_label">
+                                                        <h:outputText value="Parcel ID (County)"  />
+                                                    </div>
+                                                    <div class="p-col-6">
+                                                        <h:outputText value="#{propertyProfileBB.currentProperty.countyParcelID} "
+                                                                      rendered="#{!propertyProfileBB.currentPropertyEditMode}" />
 
-                                            <div class="p-col-4 data_field_label">
-                                                <h:outputText value="Municipality" />
-                                            </div>
-                                            <div class="p-col-8">
-                                                <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName} (Muni Code:#{propertyProfileBB.currentProperty.muni.muniCode}) "/>
-                                            </div>
+                                                        <p:spacer height="3px" />
+                                                        <p>
+                                                            <a href="https://www2.alleghenycounty.us/RealEstate/GeneralInfo.aspx?ParcelID=#{propertyProfileBB.currentProperty.countyParcelID}"
+                                                               target="_blank"
+                                                               style="color:blue;">Visit county profile</a>
+                                                        </p>
+                                                        <p:spacer height="3px" />
 
-                                            <div class="p-col-4 data_field_label">
-                                                <h:outputText value="InternalID" />
-                                            </div>
-                                            <div class="p-col-8">
-                                                <h:outputText value="#{propertyProfileBB.currentProperty.propertyID} "/>
-                                            </div>
+                                                        <p:inputText value="#{propertyProfileBB.currentProperty.countyParcelID}"
+                                                                     rendered="#{propertyProfileBB.currentPropertyEditMode}" />
 
-                                            <div class="p-col-4 data_field_label">
-                                                <h:outputText value="Property Source" />
-                                            </div>
-                                            <div class="p-col-8">
-                                                <h:outputText value="#{propertyProfileBB.currentProperty.source.title} "
-                                                              rendered="#{!propertyProfileBB.currentPropertyEditMode}" />
+                                                    </div>
 
-                                                <h:selectOneMenu id="property-id-source-som"
-                                                                 value="#{propertyProfileBB.currentProperty.source}" style="width:175px;height:25px"
-                                                                 rendered="#{propertyProfileBB.currentPropertyEditMode}" >
+                                                    <div class="p-col-6 data_field_label">
+                                                        <h:outputText value="Municipality" />
+                                                    </div>
+                                                    <div class="p-col-6">
+                                                        <h:outputText value="#{propertyProfileBB.currentProperty.muni.muniName} (Muni Code:#{propertyProfileBB.currentProperty.muni.muniCode}) "/>
+                                                    </div>
 
-                                                    <f:converter converterId="bobSourceConverter"/>
+                                                    <div class="p-col-6 data_field_label">
+                                                        <h:outputText value="InternalID" />
+                                                    </div>
+                                                    <div class="p-col-6">
+                                                        <h:outputText value="#{propertyProfileBB.currentProperty.propertyID} "/>
+                                                    </div>
 
-                                                    <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
+                                                    <div class="p-col-6 data_field_label">
+                                                        <h:outputText value="Property Source" />
+                                                    </div>
+                                                    <div class="p-col-6">
+                                                        <h:outputText value="#{propertyProfileBB.currentProperty.source.title} "
+                                                                      rendered="#{!propertyProfileBB.currentPropertyEditMode}" />
 
-                                                    <f:selectItems id="parcel-info-source-selitems"
-                                                                   value="#{propertyProfileBB.sourceList}"
-                                                                   var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
+                                                        <h:selectOneMenu id="property-id-source-som"
+                                                                         value="#{propertyProfileBB.currentProperty.source}" style="width:175px;height:25px"
+                                                                         rendered="#{propertyProfileBB.currentPropertyEditMode}" >
 
-                                                </h:selectOneMenu>
-                                            </div>
+                                                            <f:converter converterId="bobSourceConverter"/>
 
-                                            <div class="p-col-4 data_field_label">
-                                                <h:outputText value="Created" />
-                                            </div>
-                                            <div class="p-col-8">
-                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.createdTS)} "/>
-                                                <h:outputText value="#{!empty propertyProfileBB.currentProperty.createdBy ? propertyProfileBB.currentProperty.createdBy.username : ''}"/>
-                                            </div>
+                                                            <f:selectItem itemLabel="select a source..." noSelectionOption="true" />
 
-                                            <div class="p-col-4 data_field_label">
-                                                <h:outputText value="Last Updated" />
-                                            </div>
-                                            <div class="p-col-8">
-                                                <h:outputText value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.lastUpdatedTS)}" />
-                                            </div>
+                                                            <f:selectItems id="parcel-info-source-selitems"
+                                                                           value="#{propertyProfileBB.sourceList}"
+                                                                           var="bs" itemValue="#{bs}" itemLabel="#{bs.title}"/>
 
+                                                        </h:selectOneMenu>
+                                                    </div>
+
+                                                    <div class="p-col-6 data_field_label">
+                                                        <h:outputText value="Created" />
+                                                    </div>
+                                                    <div class="p-col-6">
+                                                        <h:outputText value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.createdTS)} "/>
+                                                        <h:outputText value="#{!empty propertyProfileBB.currentProperty.createdBy ? propertyProfileBB.currentProperty.createdBy.username : ''}"/>
+                                                    </div>
+
+                                                    <div class="p-col-6 data_field_label">
+                                                        <h:outputText value="Last Updated" />
+                                                    </div>
+                                                    <div class="p-col-6">
+                                                        <h:outputText value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.lastUpdatedTS)}" />
+                                                    </div>
+                                                </div>
+                                            </h:form>
                                         </div>
-                                    </h:form>
+                                    </div>
                                 </p:panel>
 
                                 <p:panel id="property-adresses-panel"
@@ -223,7 +243,7 @@
                                          collapsed="false"
                                          header="Addresses links">
                                     <h:form id="property-profile-addresses-form">
-                                        
+
                                         <p:commandButton        id="prop-addresses-add-cb"
                                                                 value="Link a new address to property" 
                                                                 ajax="true"
@@ -234,7 +254,7 @@
                                                                 update="address-search-dialog">
                                             <f:param name="initiating-address-list-component-id" value="property-profile-addresses-form" />
                                         </p:commandButton>
-                                        
+
                                         <p:spacer height="5px"/>
 
                                         <p:dataTable    id="property-addresses-table"
@@ -504,8 +524,8 @@
                                                               pattern="MM/dd/yyyy"
                                                               monthNavigator="true"
                                                               hideOnDateTimeSelect="true"
-                                                                showOnFocus="false"
-                                                                showIcon="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
                                                               showTime="false"
                                                               yearNavigator="true"
                                                               mask="true"
@@ -531,8 +551,8 @@
                                                               monthNavigator="true"
                                                               yearNavigator="true"
                                                               hideOnDateTimeSelect="true"
-                                                                showOnFocus="false"
-                                                                showIcon="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
                                                               showTime="false"
                                                               mask="true"
                                                               tabindex="16" >
@@ -557,8 +577,8 @@
                                                               monthNavigator="true"
                                                               yearNavigator="true"
                                                               hideOnDateTimeSelect="true"
-                                                                showOnFocus="false"
-                                                                showIcon="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
                                                               showTime="false"
                                                               mask="true"
                                                               tabindex="16"
@@ -587,8 +607,8 @@
                                                               pattern="MM/dd/yyyy"
                                                               monthNavigator="true"
                                                               hideOnDateTimeSelect="true"
-                                                                showOnFocus="false"
-                                                                showIcon="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
                                                               yearNavigator="true"
                                                               showTime="false"
                                                               mask="true"
@@ -614,8 +634,8 @@
                                                               monthNavigator="true"
                                                               yearNavigator="true"
                                                               hideOnDateTimeSelect="true"
-                                                                showOnFocus="false"
-                                                                showIcon="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
                                                               showTime="false"
                                                               mask="true"
                                                               tabindex="16"
@@ -640,8 +660,8 @@
                                                               monthNavigator="true"
                                                               yearNavigator="true"
                                                               hideOnDateTimeSelect="true"
-                                                            showOnFocus="false"
-                                                            showIcon="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
                                                               showTime="false"
                                                               mask="true"
                                                               tabindex="16"
@@ -730,13 +750,13 @@
                                                      tableStyleClass="primeDataTable"
                                                      rowKey="#{human.humanID}"
                                                      >
-                                            
+
 
                                             <p:column headerText="Name"
                                                       width="35%"
                                                       styleClass="centeredColumnContent">
                                                 <h:outputText value="#{human.name}" />
-                                                
+
                                             </p:column>
 
                                             <p:column headerText="Role"
@@ -908,12 +928,12 @@
                                                     <h:outputText value="Actions"/>
                                                 </f:facet>
                                                 <p:commandLink          id="occperiodtable-exploreperiod-cl"
-                                                                       value="view period"  
-                                                                       style="color:blue; font-weight: bold;"
-                                                                       ajax="false" 
-                                                                       action="#{propertyProfileBB.onViewOccPeriodButtonChange(period)}"
-                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                                       />
+                                                                        value="view period"  
+                                                                        style="color:blue; font-weight: bold;"
+                                                                        ajax="false" 
+                                                                        action="#{propertyProfileBB.onViewOccPeriodButtonChange(period)}"
+                                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                                        />
                                             </p:column>
                                         </p:dataTable>
                                     </h:form>
@@ -921,7 +941,7 @@
                                 </p:panel>
 
                                 <ui:include src="compositions/unitTools.xhtml" />
-
+                                <ui:include src="/restricted/compositions/blobTools.xhtml" />
                                 <p:panel id="prop-blobs-panel"
                                          toggleable="true"
                                          collapsed="false"
@@ -931,14 +951,19 @@
 
                                     <h:form id="prop-blobs-form">
 
-                                        <p:commandButton    id="prop-blob-add-button"
+                                        <p:commandButton    id="property-blob-add-button"
                                                             ajax="true"
                                                             styleClass="noFill button-size-small"
-                                                            actionListener="#{propertyProfileBB.onBlobAddButtonChange}"
-
-                                                            value="Add Photos or Documents"
+                                                            actionListener="#{blobUtilitiesBB.onUploadBlobInitButtonChange(propertyProfileBB.currentProperty)}"
+                                                            oncomplete="PF('blob-upload-dialog-var').show()"
+                                                            update="blob-upload-dialog
+                                                            blob-uploadconnect-tabview"
+                                                            value="Upload photo or document"
                                                             icon="fa fa-upload"
-                                                            />
+                                                            >
+                                            <f:param name="blob-list-component-to-update" value="prop-blobs-form" />
+                                        </p:commandButton>
+
 
                                         <p:spacer height="5px" />
 
@@ -990,16 +1015,6 @@
                                                     <h:outputText value="Actions"/>
                                                 </f:facet>
                                                 <p:commandButton 
-                                                    value="View in tab" 
-                                                    ajax="false"
-                                                    icon="fa fa-eye" 
-                                                    styleClass="ui-button-outlined">
-                                                    <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}"
-                                                                    contentDisposition="inline"
-                                                                    />
-                                                </p:commandButton>
-                                                <br/>
-                                                <p:commandButton 
                                                     value="Download" 
                                                     ajax="false"
                                                     icon="fa fa-arrow-down" 
@@ -1013,23 +1028,36 @@
                                                     <p:commandLink      id="blob-update-button"
                                                                         ajax="true"
                                                                         styleClass="noFill button-size-small"
-                                                                        action="#{propertyProfileBB.onBlobSelectButtonChange(blob)}"
-                                                                        value="edit"
-
+                                                                        action="#{blobUtilitiesBB.onViewBlobLinkClick(blob, propertyProfileBB.currentProperty)}"
+                                                                        value="view"
+                                                                        oncomplete="PF('blobs-viewblob-dialog-var').show()"
+                                                                        update="blobs-viewblob-dialog
+                                                                        blob-viewblob-form"
                                                                         />
-                                                </div>
-
-
-                                                <h:outputText value="&nbsp;&nbsp;|" />
-                                                <div class="restrict-main-contents-io-link link-button">
-
+                                                    <p:spacer height="3px" />
+                                                    <p:commandLink      id="blob-edit-button"
+                                                                        ajax="true"
+                                                                        styleClass="noFill button-size-small"
+                                                                        action="#{blobUtilitiesBB.onBlobEditMetaDataInitLinkClick(blob, propertyProfileBB.currentProperty)}"
+                                                                        value="edit"
+                                                                        oncomplete="PF('blobs-vieweditmetadata-dialog-var').show()"
+                                                                        update="blob-vieweditmetadata-dialog
+                                                                        blob-veweditmetadata-form"
+                                                                        >
+                                                        <f:param name="blob-list-component-to-update" value="prop-blobs-form" />
+                                                    </p:commandLink>
+                                                    <p:spacer height="3px" />
                                                     <p:commandLink      id="blob-remove-button"
                                                                         ajax="true"
                                                                         styleClass="noFill button-size-small"
-                                                                        action="#{propertyProfileBB.onBlobRemoveInitButtonChange(blob)}"
+                                                                        action="#{blobUtilitiesBB.onDeactivateBlobInitLinkClick(blob, propertyProfileBB.currentProperty)}"
+                                                                        oncomplete="PF('blobs-deactivate-dialog-var').show();"
                                                                         value="remove"
-
-                                                                        />
+                                                                        update="blob-deactivate-dialog
+                                                                        blob-deactivate-form"
+                                                                        >
+                                                        <f:param name="blob-list-component-to-update" value="prop-blobs-form" />
+                                                    </p:commandLink>
                                                 </div>
                                             </p:column>
                                         </p:dataTable>
@@ -1109,7 +1137,94 @@
                         </div>
                     </div>
 
+                    <p:dialog id="property-broadview-dialog"
+                              modal="true"
+                              height="500" 
+                              width="800"
+                              widgetVar="property-broadview-dialog-var"
+                              closable="true"
+                              closeOnEscape="true"
+                              responsive="true"
+                              resizable="true"
+                              dynamic="true"
+                              header="Change the broadview photo on Parcel ID: #{propertyProfileBB.currentProperty.countyParcelID}"
+                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                              >
 
+                        <h:form id="property-broadview-form">
+
+
+                            <p:spacer height="5px" />
+
+                            <p:dataTable id="blob-table"
+                                         value="#{propertyProfileBB.broadViewPhotoCandidates}"
+                                         var="bvblob"
+                                         rowKey="#{bvblob.photoDocID}"
+                                         resizableColumns="true"
+                                         >
+
+                                <p:column headerText="PhotoDoc ID"
+                                          style="width:5%;">
+                                    <h:outputText value="#{bvblob.photoDocID}" />
+                                </p:column>
+                                <p:column headerText="Blob ID"
+                                          style="width:5%;">
+                                    <h:outputText value="#{bvblob.bytesID}" />
+                                </p:column>
+
+                                <p:column headerText="Type"
+                                          style="width:10%;">
+                                    <h:outputText value="#{bvblob.type.title}" />
+                                </p:column>
+                                <p:column headerText="Timestamp"
+                                          style="width:15%;">
+                                    <h:outputText value="#{bvblob.createdTS}" />
+                                </p:column>
+                                <p:column headerText="Title / Descr"
+                                          style="width:20%;">
+                                    <h:outputText value="#{bvblob.title}" />
+                                    <p:spacer height="5px" />
+                                    <h:outputText value="#{bvblob.description}" />
+                                </p:column>
+                                <p:column headerText="Preview"
+                                          style="width:30%;">
+                                    <p:graphicImage value="#{blobsterBB.image}"
+                                                    alt="no preview available" 
+                                                    style="width: 150px" 
+                                                    cache="false"
+                                                    rendered="#{bvblob.type.browserViewable}">
+                                        <f:param name="blobid" value="#{bvblob.photoDocID}"/>
+                                    </p:graphicImage>
+
+                                    <h:outputText value="no preview available; download to view"
+                                                  rendered="#{!bvblob.type.browserViewable}" />
+                                </p:column>
+                                <p:column headerText="Actions"
+                                          style="width:15%;">
+                                    <p:commandLink id="bvblob-viewblob-cl"
+                                                   actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(bvblob, propertyProfileBB.currentProperty)}"
+                                                   value="view"
+                                                   style="color:blue; font-weight: bold;"
+                                                   rendered="#{bvblob.type.browserViewable}"
+                                                   update="blobs-viewblob-dialog
+                                                   blob-viewblob-form"
+                                                   oncomplete="PF('blobs-viewblob-dialog-var').show();" />
+
+                                    <h:outputText value=" | "/>
+
+                                    <p:commandLink id="bvblob-select-cl"
+                                                   actionListener="#{propertyProfileBB.onChangeBroadviewPhotoCommitLinkClick(bvblob)}"
+                                                   value="select"
+                                                   style="color:blue; font-weight: bold;"
+                                                   rendered="true"
+                                                   update="property-messages-global
+                                                   parcel-photo-form" 
+                                                   oncomplete="PF('property-broadview-dialog-var').hide();"/>
+
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+                    </p:dialog>
 
 
                     <p:dialog id="cecase-add-dialog"
@@ -1133,20 +1248,20 @@
                                     <h:outputLabel value="Case Name" 
                                                    for="caseNameIT"/>
                                     <p:commandButton id="casename-help-button"
-                                             icon="fa fa-question-circle-o"
-                                             styleClass="button-help"
-                                             type="button" />
-                            
-                                <p:overlayPanel for="casename-help-button"
-                                                style="width:350px;" 
-                                                dismissable="true"
-                                                showCloseIcon="true">
-                                    <h3>Code enforcement case names</h3>
-                                    <p>A case's name is a text field for INTERNAL office use only that allows managers to label a case something memorable,
-                                    such as 'deer feeding lady' or 'fridge in front yard' or 'imploded garage'. The case name appears on the dashboard's
-                                    case list for easy ID but does not by default print on case list reports .</p>
-                                </p:overlayPanel>
-                                    
+                                                     icon="fa fa-question-circle-o"
+                                                     styleClass="button-help"
+                                                     type="button" />
+
+                                    <p:overlayPanel for="casename-help-button"
+                                                    style="width:350px;" 
+                                                    dismissable="true"
+                                                    showCloseIcon="true">
+                                        <h3>Code enforcement case names</h3>
+                                        <p>A case's name is a text field for INTERNAL office use only that allows managers to label a case something memorable,
+                                            such as 'deer feeding lady' or 'fridge in front yard' or 'imploded garage'. The case name appears on the dashboard's
+                                            case list for easy ID but does not by default print on case list reports .</p>
+                                    </p:overlayPanel>
+
                                 </div>
                                 <div class="p-col-8">
                                     <p:inputText    id="caseNameIT" 
@@ -1195,25 +1310,25 @@
                                 <div class="p-col-4">
                                     <h:outputLabel value="Origination category" 
                                                    for="cecase-add-origevent-som"/>
-                                   
+
                                     <p:commandButton id="case-originationevent-help-button"
-                                             icon="fa fa-question-circle-o"
-                                             styleClass="button-help"
-                                             type="button" />
-                            
-                                <p:overlayPanel for="case-originationevent-help-button"
-                                                style="width:350px;" 
-                                                dismissable="true"
-                                                showCloseIcon="true">
-                                    <h3>Origination events</h3>
-                                    <p>An origination event is automatically attached to a code enforcement case to signal 
-                                    where the case came from, such as resulting from an officer's routine patrol or from
-                                    a lapsed occupancy permit inspection with outstanding violation.</p>
-                                    
-                                    <p>By selecting an accurate event category from this list now, 
-                                    the case's even history will be accurate from the beginning.</p>
-                                </p:overlayPanel>
-                                    
+                                                     icon="fa fa-question-circle-o"
+                                                     styleClass="button-help"
+                                                     type="button" />
+
+                                    <p:overlayPanel for="case-originationevent-help-button"
+                                                    style="width:350px;" 
+                                                    dismissable="true"
+                                                    showCloseIcon="true">
+                                        <h3>Origination events</h3>
+                                        <p>An origination event is automatically attached to a code enforcement case to signal 
+                                            where the case came from, such as resulting from an officer's routine patrol or from
+                                            a lapsed occupancy permit inspection with outstanding violation.</p>
+
+                                        <p>By selecting an accurate event category from this list now, 
+                                            the case's even history will be accurate from the beginning.</p>
+                                    </p:overlayPanel>
+
                                 </div>
                                 <div class="p-col-8">
                                     <h:selectOneMenu id="cecase-add-origevent-som"

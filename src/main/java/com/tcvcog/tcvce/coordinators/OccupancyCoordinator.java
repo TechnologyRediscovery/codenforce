@@ -118,6 +118,15 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return oppu;
     }
 
+    /**
+     * Assembles a list of OccPeriodPropertyUnitHeavy objects that are handy because
+     * you can ask them all about their parent property and unit, the periods of which normally
+     * cannot look up the tree.
+     * 
+     * @param perList
+     * @return
+     * @throws IntegrationException 
+     */
     public List<OccPeriodPropertyUnitHeavy> getOccPeriodPropertyUnitHeavyList(List<OccPeriod> perList) throws IntegrationException {
         List<OccPeriodPropertyUnitHeavy> oppuList = new ArrayList<>();
         for (OccPeriod op : perList) {
@@ -127,17 +136,53 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return oppuList;
 
     }
+    
+     /**
+     * Typesafe adaptor for getOccPeriodIDListByUnitID()
+     * @param pu
+     * @param u
+     * @return
+     * @throws IntegrationException
+     * @throws AuthorizationException
+     * @throws EventException
+     * @throws BObStatusException
+     * @throws ViolationException 
+     */
+    public List<OccPeriod> getOccPeriodList(PropertyUnit pu, UserAuthorized u) 
+            throws  IntegrationException, 
+                    AuthorizationException, 
+                    EventException, 
+                    BObStatusException, 
+                    ViolationException {
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        
+        if(pu == null || u == null){
+            throw new BObStatusException("Cannot get Occ Perid list with null prop unit or user");
+        }
+        
+        
+        List<Integer> opidl = oi.getOccPeriodIDListByUnitID(pu.getUnitID());
+        List<OccPeriod> occPeriodList = new ArrayList<>();
+        if(opidl != null && !opidl.isEmpty()){
+            for(Integer i: opidl){
+                occPeriodList.add(configureOccPeriod(oi.getOccPeriod(i)));
+            }
+        }
+        
+        return occPeriodList;
+    }
+    
 
     /**
      * Retrieval point for Data-rich occupancy periods
      *
      * @param per
-     * @param cred
+     * @param ua
      * @return
      * @throws IntegrationException
      */
-    public OccPeriodDataHeavy assembleOccPeriodDataHeavy(OccPeriod per, Credential cred) throws IntegrationException, BObStatusException, SearchException {
-        if (per == null || cred == null) {
+    public OccPeriodDataHeavy assembleOccPeriodDataHeavy(OccPeriod per, UserAuthorized ua) throws IntegrationException, BObStatusException, SearchException {
+        if (per == null || ua == null) {
             throw new BObStatusException("Cannot assemble an OccPeriod data heavy without base period or Credential");
         }
 
@@ -168,7 +213,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
             // EVENT LIST
 
-            QueryEvent qe = sc.initQuery(QueryEventEnum.OCCPERIOD, cred);
+            QueryEvent qe = sc.initQuery(QueryEventEnum.OCCPERIOD, ua.getKeyCard());
             if (!qe.getParamsList().isEmpty()) {
                 qe.getParamsList().get(0).setEventDomainPK_val(per.getPeriodID());
             }
@@ -178,11 +223,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
             // PROPOSAL LIST
             // Potentially turn off proposal process? if its broken or erroring?
-            opdh.setProposalList(chc.getProposalList(opdh, cred));
+            opdh.setProposalList(chc.getProposalList(opdh, ua.getKeyCard()));
 
             // EVENT RULE LIST
             // Potentially turn off this thingy? if its broken or erroring?
-            opdh.setEventRuleList(chc.rules_getEventRuleImpList(opdh, cred));
+            opdh.setEventRuleList(chc.rules_getEventRuleImpList(opdh, ua.getKeyCard()));
 
             // INSPECTION LIST
 
@@ -194,7 +239,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 //            opdh.setFeeList(pai.getFeeAssigned(opdh));
 
             // PERMIT LIST
-            opdh.setPermitList(oi.getOccPermitList(opdh));
+            opdh.setPermitList(getOccPermitList(per, ua));
             // BLOB LIST
             opdh.setBlobList(bc.getBlobLightList(opdh));
 
@@ -285,6 +330,22 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return period;
 
     }
+    
+    
+    
+    /**
+     * Logic intermediary for occ permits
+     * @param permit
+     * @return 
+     */
+    public OccPermit configureOccPermit(OccPermit permit){
+        
+        
+        return permit;
+        
+        
+    }
+    
     
     /**
      * Generator method for creating a new occ period skeleton for
@@ -409,7 +470,15 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
     }
 
-   
+   /**
+    * An occ permit report is the container that prints an occ permit, it's not a 
+    * report about occ permits, for that see reportOccupancyList
+    * @param permit
+    * @param period
+    * @param propUnit
+    * @param u
+    * @return with sensible defaults
+    */
     public ReportConfigOccPermit getOccPermitReportConfigDefault(OccPermit permit,
 
                                                                  OccPeriod period,
@@ -431,19 +500,359 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return rpt;
     }
 
+    
+    // *************************************************************************
+    // ********************* OCC PERMITS   ************************************
+    // *************************************************************************
+    
     /**
      * Factory for OccPermits
+     * @param mdh
      * @param usr
      * @return 
      */
     public OccPermit getOccPermitSkeleton(User usr) {
         OccPermit permit = new OccPermit();
-        permit.setDateIssued(LocalDateTime.now());
-        permit.setIssuedBy(usr);
+        permit.setReferenceNo("GENERATED ON FINALIZATION");
+        permit.setCreatedBy(usr);
         return permit;
 
     }
+    
+    /**
+     * Getter for occupancy permits
+     * @param permitID
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public OccPermit getOccPermit(int permitID) throws IntegrationException, BObStatusException{
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        if(permitID == 0){
+            throw new BObStatusException("OccupancyCoordinator.getOccPermit | Cannot fetch a permit with ID 0");
+        }
+        return configureOccPermit(oi.getOccPermit(permitID));
+    }
 
+    
+    /**
+     * 
+     * @param op
+     * @param ua
+     * @return
+     * @throws BObStatusException 
+     */
+    public List<OccPermit> getOccPermitList(OccPeriod op, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        
+        
+       if(op == null || ua == null){
+            throw new BObStatusException("OccupancyCoordinator.getOccPermitList | Cannot get occ permit list with null occ period or user");
+        }
+       if(op.getPeriodID() == 0){
+            throw new BObStatusException("OccupancyCoordinator.getOccPermitList | Cannot get occ permit list with occ period whose ID == 0");
+           
+       }
+        
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        List<Integer> opermitIDList = oi.getOccPermitIDList(op);
+        List<OccPermit> occPermitList = new ArrayList<>();
+        if(opermitIDList != null && !opermitIDList.isEmpty()){
+            for(Integer i: opermitIDList){
+                occPermitList.add(getOccPermit(i));
+            }
+        }
+        
+        return occPermitList;
+    
+    }
+    
+    /**
+     * insertion pathway for occ permits
+     * @param permit
+     * @param ua
+     * @return
+     * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public int insertOccPermit(OccPermit permit, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(permit == null || ua == null){
+            throw new BObStatusException("Cannot insert occ permit with null permit or user");
+            
+        }
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        permit.setCreatedBy(ua);
+        permit.setLastUpdatedBy(ua);
+        return oi.insertOccPermit(permit);
+        
+    }
+    
+    /**
+     * Updates the meta data of an occ permit only. Use separate method for static fields
+     * @param permit
+     * @param ua
+     * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateOccPermit(OccPermit permit, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(permit == null || ua == null){
+            throw new BObStatusException("Cannot insert occ permit with null permit or user");
+        }
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        permit.setLastUpdatedBy(ua);
+        oi.updateOccPermit(permit);
+        
+    }
+    
+    
+    /**
+     * Updates the meta data of an occ permit only. Use separate method for static fields
+     * @param permit
+     * @param ua
+     * @param m
+     * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void occPermitFinalize(OccPermit permit, UserAuthorized ua, Municipality m) throws BObStatusException, IntegrationException{
+        if(permit == null || ua == null){
+            throw new BObStatusException("Cannot finalize occ permit with null permit or user");
+        }
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        permit.setLastUpdatedBy(ua);
+        permit.setFinalizedBy(ua);
+        permit.setFinalizedts(LocalDateTime.now());
+        permit.setReferenceNo(generateOccPermitReferenceNumber(permit, m));
+        
+        oi.updateOccPermit(permit);
+        
+    }
+    
+    /**
+     * Deactivates an occ permit only. Use separate method for static fields
+     * @param permit Cannot be finalized
+     * @param ua
+     * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void occPermitDeactivate(OccPermit permit, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(permit == null || ua == null){
+            throw new BObStatusException("Cannot finalize occ permit with null permit or user");
+        }
+        if(permit.getFinalizedts() != null){
+            throw new BObStatusException("Umm, you aren't allowed to deactivate a finalized permit");
+        }
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        permit.setLastUpdatedBy(ua);
+        permit.setDeactivatedBy(ua);
+        permit.setDeactivatedTS(LocalDateTime.now());
+        
+        oi.updateOccPermit(permit);
+        
+    }
+    
+    
+    /**
+     * The lifeblood logic house for extracting the objects from the OccPermit's
+     * non static fields and extracting the appropriate data and writing
+     * fixed String/Date values to the OccPermit's static fields and then writing those
+     * changes to the DB
+     * @param period
+     * @param permit
+     * @param ua
+     * @param mdh
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void updateOccPermitStaticFields(OccPeriodDataHeavy period, OccPermit permit, UserAuthorized ua, MunicipalityDataHeavy mdh) throws BObStatusException, IntegrationException{
+        if(permit == null || ua == null || period == null || mdh == null){
+            throw new BObStatusException("Cannot insert occ permit with null permit or user or period or munidh");
+        }
+        if(permit.getFinalizedts() != null){
+            throw new BObStatusException("Cannot update static fields of a finalized permit!");
+        }
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();       
+        StringBuilder sb;
+        
+        
+        
+         // now do property and unit static fields
+        PropertyUnitWithProp puwp = pc.getPropertyUnitWithProp(period.getPropertyUnitID());
+        sb = new StringBuilder();
+        if(puwp != null){
+            if(!puwp.getUnitNumber().equals(pc.DEFAULTUNITNUMBER)){
+                sb.append(puwp.getUnitNumber());
+                sb.append(Constants.FMT_HTML_BREAK);
+            }
+            sb.append(puwp.getProperty().getAddress().getAddressPretty2LineEscapeFalse());
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(puwp.getProperty().getCountyParcelID());
+        }
+        // muni addresss
+        permit.setStaticmuniaddress(mdh.getMuniPropertyDH().getAddress().getAddressPretty2LineEscapeFalse());
+
+        // move over dates
+        permit.setStaticdateofapplication(permit.getDynamicdateofapplication());
+        permit.setStaticinitialinspection(permit.getDynamicfinalinspection());
+        permit.setStaticreinspectiondate(permit.getDynamicreinspectiondate());
+        permit.setStaticfinalinspection(permit.getDynamicfinalinspection());
+        permit.setStaticdateofissue(permit.getDynamicdateofissue());
+        
+        // based on parcel info, populate parcel info static fields
+        if(permit.getParcelInfo() == null){
+            throw new BObStatusException("Cannot populate occ permit with null parcel info in occ permit");
+        }
+        if(permit.getIssuingCodeSource() == null){
+            throw new BObStatusException("Cannot populate occ permit with null code source");
+        }
+        if(permit.getIssuingOfficer()== null){
+            throw new BObStatusException("Cannot populate occ permit with null issuing officer");
+        }
+        // inject parcel info fields
+        permit.setStaticpropclass(permit.getParcelInfo().getPropClass());
+        permit.setStaticusecode(permit.getParcelInfo().getUseGroup());
+        permit.setStaticproposeduse(period.getType().getAuthorizeduses());
+        permit.setStaticconstructiontype(permit.getParcelInfo().getConstructionType());
+        
+        // build code source string
+        sb = new StringBuilder();
+        sb.append(permit.getIssuingCodeSource().getSourceName());
+        sb.append(" (");
+        sb.append(permit.getIssuingCodeSource().getSourceYear());
+        sb.append(")");
+        permit.setStaticissuedundercodesourceid(sb.toString());
+        
+        // issuing officer
+        permit.setStaticofficername(permit.getIssuingOfficer().getHuman().getName());
+        
+       // now deal with person links
+       if(permit.getOwnerSellerLinkList() != null && !permit.getOwnerSellerLinkList().isEmpty()){
+           sb = new StringBuilder();
+           for(HumanLink hl: permit.getOwnerSellerLinkList()){
+                sb.append(buildPersonContactString(hl));
+           }
+           permit.setStaticownerseller(sb.toString());
+       }
+        
+       if(permit.getBuyerTenantLinkList() != null && !permit.getBuyerTenantLinkList().isEmpty()){
+           sb = new StringBuilder();
+           for(HumanLink hl: permit.getBuyerTenantLinkList()){
+                sb.append(buildPersonContactString(hl));
+           }
+           permit.setStaticbuyertenant(sb.toString());
+           
+       }
+        
+       if(permit.getManagerLinkList() != null && !permit.getManagerLinkList().isEmpty()){
+           sb = new StringBuilder();
+           for(HumanLink hl: permit.getManagerLinkList()){
+                sb.append(buildPersonContactString(hl));
+           }
+           permit.setStaticmanager(sb.toString());
+       }
+        
+       if(permit.getTenantLinkList() != null && !permit.getTenantLinkList().isEmpty()){
+           sb = new StringBuilder();
+           for(HumanLink hl: permit.getTenantLinkList()){
+                sb.append(buildPersonContactString(hl));
+           }
+           permit.setStatictenants(sb.toString());
+       }
+
+       // Now do text lists injection
+       permit.setStaticstipulations(buildSingleStringFromTextBlockList(permit.getTextBlocks_stipulations()));
+       permit.setStaticnotice(buildSingleStringFromTextBlockList(permit.getTextBlocks_notice()));
+       sb = new StringBuilder();
+       if(permit.getTextBlocks_comments() != null && !permit.getTextBlocks_comments().isEmpty()){
+           sb.append(buildSingleStringFromTextBlockList(permit.getTextBlocks_comments()));
+           sb.append(Constants.FMT_HTML_BREAK);
+       }
+       if(permit.getText_comments() != null){
+           
+           sb.append(permit.getText_comments());
+       }
+       permit.setStaticcomments(sb.toString());
+       
+        permit.setLastUpdatedBy(ua);
+        oi.updateOccPermitStaticFields(permit);
+    }
+    
+    /**
+     * Utility method for weaving together name and contact into a string for printing
+     * @param hl
+     * @return
+     * @throws BObStatusException 
+     */
+    private String buildPersonContactString(HumanLink hl) throws BObStatusException{
+        StringBuilder sb = new StringBuilder();
+        if(hl == null){
+            throw new BObStatusException("cannot build person string with null link");
+        }
+        
+        sb.append(hl.getName());
+        if(hl.getMailingAddressListPretty() != null){
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(hl.getMailingAddressListPretty());
+        }
+        if(hl.getPhoneListPretty() != null){
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(hl.getPhoneListPretty());
+        }
+        
+        if(hl.getEmailListPretty() != null){
+            sb.append(Constants.FMT_HTML_BREAK);
+            sb.append(hl.getEmailListPretty());
+        }
+        return sb.toString();
+    }
+    /**
+     * Takes in a list of text blocks and spits out a single string
+     * with breaks in between blocks
+     * @param tbl
+     * @return 
+     */
+    private String buildSingleStringFromTextBlockList(List<TextBlock> tbl){
+        if(tbl == null){
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        if(!tbl.isEmpty()){
+            for(TextBlock tb: tbl){
+                sb.append(tb.getTextBlockText());
+                sb.append(Constants.FMT_HTML_BREAK);
+            }
+        }
+        return sb.toString();
+    }
+    
+    
+    /**
+     * Builds a custom reference number for the permit of the form
+     * MUNICODE-YY-SEQ
+     * eg. 814-22-1
+     * @param permit
+     * @param ua
+     * @return 
+     */
+    private String generateOccPermitReferenceNumber(OccPermit permit, Municipality m) throws BObStatusException, IntegrationException{
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        StringBuilder sb = new StringBuilder();
+        sb.append(m.getMuniCode());
+        sb.append(Constants.FMT_DTYPE_KEY_SEP_DESC);
+        sb.append(LocalDateTime.now().getYear());
+        sb.append(Constants.FMT_DTYPE_KEY_SEP_DESC);
+        sb.append("CNF");
+        sb.append(Constants.FMT_DTYPE_KEY_SEP_DESC);
+        
+        int currentCount = oi.countFinalizedPermitsByMuni(m);
+        int increcount = currentCount + 1;
+        sb.append(increcount);
+        return sb.toString();
+        
+   }
+    
+    // *************************************************************************
+    // ********************* OCC LOCATION DESCRIPTORS **************************
+    // *************************************************************************
     
     /**
      * Logic intermediary for Location Descriptors
@@ -609,6 +1018,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     /**
      * Attaches a note to the given Occ Period.
      *
+     * @param mbp
      * @param period whose note field contains the properly formatted note that
      *               includes all old note text. This is best done by a call to the
      *               SystemCoordinator's appendNoteBlock() method
@@ -694,7 +1104,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      */
     public int insertOccPermitApplication(OccPermitApplication application)
             throws IntegrationException, AuthorizationException,
-            BObStatusException, EventException {
+            BObStatusException, EventException, BlobException {
 
         OccupancyIntegrator opi = getOccupancyIntegrator();
 
@@ -737,11 +1147,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @throws EventException
      * @throws InspectionException
      * @throws ViolationException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
     public int attachApplicationToNewOccPeriod(OccPermitApplication application, String notes)
             throws IntegrationException, AuthorizationException,
             BObStatusException, EventException,
-            InspectionException, ViolationException {
+            InspectionException, ViolationException, BlobException {
 
         PropertyIntegrator pri = getPropertyIntegrator();
         MunicipalityCoordinator mc = getMuniCoordinator();

@@ -437,6 +437,7 @@ div.headerLink a:before, a:visited{
 
 .report-trailblaze-headerbox{
     margin-top:10px;
+    margin-bottom: 10px;
     display: flex;
     flex-wrap: nowrap;
     flex-direction: row;
@@ -478,13 +479,12 @@ div.headerLink a:before, a:visited{
     
 }
 
-.report-trailblaze-datalabel {
-    
+div.report-data-label-tight {
+    padding-bottom: 2px;
 }
 
-.report-trailblaze-datavalue {
-    
-    
+div.report-data-value-tight{
+    padding-top: 2px;
 }
 
 .report-kpi-aggregate-container{
@@ -647,6 +647,37 @@ div.printer-friendly-report .ui-widget-content{
     font-weight: bold;
     font-size: 1.3em;
 }
+
+.report-photo-header{
+    font-weight: bold;
+    margin-bottom: 2px;
+    
+}
+
+.report-photo-caption{
+    margin-top:  2px;
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+.report-citation-violation-status{
+    font-style: italic;
+}
+
+.report-indented-line{
+    margin-left: 25px;
+}
+
+.report-property-addresss{
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.report-text-rightaligned{
+    text-align: right;
+}
+
+
 /* *********** end Printing and reports******** */
 
 
@@ -1101,12 +1132,11 @@ div.headerLinks{
 
 .ord-text{
     font-weight: normal;
-    font-style: italic;
-    font-family: Heebo;
+    font-family: monospace;
     white-space: normal;
     overflow-wrap: normal;
     padding: 5px;
-    line-height: 100%;
+    text-align:  left;
 
 }
 

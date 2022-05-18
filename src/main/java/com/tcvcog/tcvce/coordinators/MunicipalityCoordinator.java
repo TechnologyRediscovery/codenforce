@@ -20,6 +20,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -52,7 +53,8 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
     public MunicipalityCoordinator() {
     }
 
-    public MunicipalityDataHeavy assembleMuniDataHeavy(Municipality muni, UserAuthorized ua) throws IntegrationException, AuthorizationException, BObStatusException, EventException {
+    public MunicipalityDataHeavy assembleMuniDataHeavy(Municipality muni, UserAuthorized ua) 
+            throws IntegrationException, AuthorizationException, BObStatusException, EventException, BlobException {
         MunicipalityDataHeavy mdh = null;
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         mdh = mi.getMunDataHeavy(muni.getMuniCode());
@@ -69,7 +71,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
      * @throws AuthorizationException
      * @throws EventException 
      */
-    private MunicipalityDataHeavy configureMuniDataHeavy(MunicipalityDataHeavy mdh, UserAuthorized ua) throws IntegrationException, BObStatusException, AuthorizationException, EventException {
+    private MunicipalityDataHeavy configureMuniDataHeavy(MunicipalityDataHeavy mdh, UserAuthorized ua) throws IntegrationException, BObStatusException, AuthorizationException, EventException, BlobException {
         if(mdh != null && ua != null){
             PropertyCoordinator pc = getPropertyCoordinator();
             CourtEntityIntegrator cei = getCourtEntityIntegrator();
@@ -105,7 +107,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
         if (ua != null) {
             try {
                 mdh = assembleMuniDataHeavy(ua.getMyCredential().getGoverningAuthPeriod().getMuni(), ua);
-            } catch (BObStatusException | EventException ex) {
+            } catch (BObStatusException | EventException | AuthorizationException | BlobException ex) {
                 System.out.println(ex);
             }
             if (mdh != null && mdh.getDefaultOccPeriodID() != 0) {

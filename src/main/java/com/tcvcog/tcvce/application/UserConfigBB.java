@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
@@ -560,7 +561,7 @@ public class UserConfigBB extends BackingBeanUtils{
             try {
                 getSessionBean().setSessMuni(mc.assembleMuniDataHeavy(mc.getMuni(umap.getMuni().getMuniCode()), ua));
                 getSessionBean().setUserForReInit(uc.user_getUser(umap.getUserID()));
-            } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
+            } catch (IntegrationException | AuthorizationException | BObStatusException | EventException | BlobException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,

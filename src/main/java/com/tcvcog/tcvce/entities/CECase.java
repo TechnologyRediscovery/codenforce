@@ -90,7 +90,7 @@ public class        CECase
         
     }
 
-    public CECase(CECaseDataHeavy input){
+    public CECase(CECase input){
         caseID = input.getCaseID();
         publicControlCode = input.getPublicControlCode();
         paccEnabled = input.isPaccEnabled();
@@ -117,6 +117,7 @@ public class        CECase
         eventList = input.getEventList();
         originationEvent = input.originationEvent;
         closingEvent = input.closingEvent;
+        daysSinceLastEvent = input.daysSinceLastEvent;
     }
     
     @Override

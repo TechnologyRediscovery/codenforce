@@ -17,38 +17,14 @@
 package com.tcvcog.tcvce.occupancy.application;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
-import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.PublicInfoCoordinator;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.EventException;
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.NavigationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.entities.HumanLink;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonChangeOrder;
-import com.tcvcog.tcvce.entities.PersonType;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.PropertyUnitChangeOrder;
-import com.tcvcog.tcvce.entities.PublicInfoBundlePerson;
-import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
-import com.tcvcog.tcvce.entities.PublicInfoBundlePropertyUnit;
-import com.tcvcog.tcvce.entities.search.SearchParamsPerson;
+import com.tcvcog.tcvce.coordinators.*;
+import com.tcvcog.tcvce.domain.*;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitApplicationReason;
-import com.tcvcog.tcvce.entities.search.QueryPerson;
-import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
-import com.tcvcog.tcvce.entities.search.QueryProperty;
-import com.tcvcog.tcvce.entities.search.QueryPropertyEnum;
-import com.tcvcog.tcvce.entities.search.SearchParamsProperty;
+import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -789,7 +765,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             getSessionBean().setSessOccPermitApplication(currentApplication);
             
-        } catch (IntegrationException | AuthorizationException | EventException | SearchException ex) {
+        } catch (IntegrationException | AuthorizationException | EventException | SearchException | BlobException ex) {
             System.out.println("OccPermitApplicationBB.submitApplication() | ERROR: " + ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

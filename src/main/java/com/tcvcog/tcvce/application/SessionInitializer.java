@@ -27,6 +27,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.ExceptionSeverityEnum;
 import com.tcvcog.tcvce.domain.SessionException;
@@ -462,7 +463,7 @@ public  class       SessionInitializer
         MunicipalityDataHeavy muniHeavy;
         try {
             muniHeavy = mc.assembleMuniDataHeavy(ua.getMyCredential().getGoverningAuthPeriod().getMuni(), ua);
-        } catch (IntegrationException | AuthorizationException | BObStatusException | EventException ex) {
+        } catch (IntegrationException | AuthorizationException | BObStatusException | EventException | BlobException ex) {
             System.out.println(ex);
             throw new SessionException("Error creating muni data heavy", ex, ss, ExceptionSeverityEnum.SESSION_FATAL);
         }

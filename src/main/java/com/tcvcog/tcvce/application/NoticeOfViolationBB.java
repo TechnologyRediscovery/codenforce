@@ -169,7 +169,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
           PropertyDataHeavy pdh = null;
         try {
             pdh = pc.assemblePropertyDataHeavy(currentCase.getProperty(), getSessionBean().getSessUser());
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
+        } catch (IntegrationException | BObStatusException | SearchException | BlobException ex) {
             System.out.println(ex);
         } 
         if(pdh != null){
