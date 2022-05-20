@@ -12,118 +12,180 @@
     <h:body>
         <ui:composition template="./../report_template.xhtml">
             <ui:define name="print-content">
-                <h:form id="occpermit-form">
-                    <div class="occpermit-borderbox">
+                
+                   <h:form id="permit-draft-form">
+            
+            <div class="p-grid">
+                <div class="p-col-12 centeredColumnContent">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.statictitle}" />
+                    <p:spacer height="3px" />
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticmuniaddress}"
+                                  escape="false"/>
+                </div>
+                <div class="p-col-4 restrict-data-field-label-inline">
+                    <h:outputText value="Property:" />
+                </div>
+                <div class="p-col-8 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticpropertyinfo}" 
+                                  escape="false"/>
+                </div>
+                <div class="p-col-5">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticownerseller}" 
+                                  escape="false"/>
 
-                        <div class="occpermit-muniheader">
-                            <h:outputText value="Municipality of #{reportingBB.reportConfigOccPermit.propUnitWithProp.property.muni.muniName}"/>
-                        </div>
-                        <div class="occpermit-title">
-                            <h:outputText value="#{reportingBB.reportConfigOccPermit.period.type.permitTitle}"/>
-                        </div>
-                        <div class="occpermit-titlesub">
-                            <h:outputText value="#{reportingBB.reportConfigOccPermit.period.type.permitTitleSub}"/>
-                        </div>
+                </div>
+                <div class="p-col-2">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticcolumnlink}" />
+                </div>
+                <div class="p-col-5">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticbuyertenant}"
+                                  escape="false" />
+                </div>
+                <div class="p-col-2">
+                    <h:outputText value="Proposed use:" />
 
-                        <h:panelGrid columns="2" 
-                                     cellpadding="10" 
-                                     styleClass="occpermit-datagrid" 
-                                     footerClass="gridFooter"
-                                     columnClasses="gridTd-permit, gridTd-permit">
-                            <h:panelGroup>
+                </div>
+                <div class="p-col-2">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticproposeduse}" />
 
-                                <h:outputText   value="Property:" 
-                                                class="occpermit-criticaldata-label"/>
+                </div>
+                <div class="p-col-2">
+                    <h:outputText value="Use code:" />
 
-                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.property.address} " 
-                                                class="occpermit-criticaldata-value"/>
-                                <p:spacer height="0px" />
-                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.property.address_city} " 
-                                                class="occpermit-criticaldata-value"/>
-                                <h:outputText   value=", "
-                                                class="occpermit-criticaldata-value"/>
-                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.property.address_state} " 
-                                                class="occpermit-criticaldata-value"/>
-                                    <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.property.address_zip} " 
-                                                    class="occpermit-criticaldata-value"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <h:outputText   value="County parcel ID: " 
-                                                class="occpermit-criticaldata-label"/>
-                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.property.parID} " 
-                                                class="occpermit-criticaldata-value"/>
+                </div>
+                <div class="p-col-2">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticusecode}" />
 
-                                <h:outputText   value="Occuapncy unit:" 
-                                                class="occpermit-criticaldata-label"/>
+                </div>
+                <div class="p-col-2">
+                    <h:outputText value="Property class:" />
 
-                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.unitNumber} " 
-                                                class="occpermit-criticaldata-value"/>
+                </div>
+                <div class="p-col-2">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticpropclass}" />
 
-                                <h:outputText   value="(Unit ID: " 
-                                                class="occpermit-criticaldata-value"/>
-                                <h:outputText   value="#{reportingBB.reportConfigOccPermit.propUnitWithProp.unitID} " 
-                                                class="occpermit-criticaldata-value"/>
-                                <h:outputText   value=")" 
-                                                class="occpermit-criticaldata-value"/>
-                            </h:panelGroup>
+                </div>
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Date of Application:" />
+                </div>
+                <div class="p-col-3 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticdateofapplication}" />
+                </div>
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Initial Inspection:" />
+                </div>
+                <div class="p-col-3 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticinitialinspection}" />
+                </div>
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Reinspection Date:" />
+                </div>
+                <div class="p-col-3 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticreinspectiondate}" />
+                </div>
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Final inspection:" />
+                </div>
+                <div class="p-col-3 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticfinalinspection}" />
+                </div>
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Date of Issuance:" />
+                </div>
+                <div class="p-col-3 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticdateofissue}" />
+                </div>
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="   " />
+                </div>
+                <div class="p-col-3 restrict-data-field-value-inline">
+                    <h:outputText value="   " />
+                </div>
+                
+                
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Code Enforcement Officer:" />
+                </div>
+                <div class="p-col-3 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticofficername}" />
+                </div>
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Issued Under:" />
+                </div>
+                <div class="p-col-3 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticissuedundercodesourceid}" />
+                </div>
+                
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Special conditions and stipulations:" />
+                </div>
+                <div class="p-col-9 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticstipulations}"
+                                  escape="false"/>
+                </div>
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Comments:" />
+                </div>
+                <div class="p-col-3 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticcomments}" 
+                                  escape="false"/>
+                </div>
 
-                            <h:panelGroup>
-                                <h:outputText   value="Validity start date:" 
-                                                class="occpermit-criticaldata-label"/>
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Construction type:" />
+                </div>
+                <div class="p-col-9 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticconstructiontype}" />
+                </div>
 
-                                <h:outputText   value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportConfigOccPermit.period.startDate)}" 
-                                                class="occpermit-criticaldata-label"/>
+                <div class="p-col-6 restrict-data-field-label-inline">
+                    <h:outputText value="Property Manager(s)" />
+                </div>
+                <div class="p-col-6 restrict-data-field-label-inline">
+                    <h:outputText value="Property Tenant(s):" />
+                </div>
+                <div class="p-col-6 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticmanager}"
+                                  escape="false"/>
+                </div>
+                <div class="p-col-6 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.statictenants}"
+                                  escape="false"/>
+                </div>
 
-                                <f:subview id="occpermit-validuntil-subview"
-                                           rendered="#{!empty reportingBB.reportConfigOccPermit.period.endDate}">
-                                    <h:outputText   value="Validity end date: " 
-                                                    class="occpermit-criticaldata-label"/>
-                                    <h:outputText   value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportConfigOccPermit.period.endDate)}" 
-                                                    class="occpermit-criticaldata-value"/>
-                                </f:subview>
-
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <h:outputText value="Permit ID" 
-                                              class="occpermit-criticaldata-label"/>
-                                <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.permitID}"/>
-                                <h:outputText value="Date issued: " 
-                                              class="occpermit-criticaldata-label"/>
-                                <h:outputText value="#{occInspectionBB.getPrettyDate(reportingBB.reportConfigOccPermit.permit.dateIssued)}"/>
+                <div class="p-col-4 restrict-data-field-label-inline">
+                    <h:outputText value="Lease Term:" />
+                </div>
+                <div class="p-col-8 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticleaseterm}" />
+                </div>
 
 
-                                <f:subview id="occpermit-issuedto-subview"
-                                           rendered="#{!empty reportingBB.reportConfigOccPermit.permit.issuedTo}">
-                                    <h:outputText value="Issued to: " 
-                                                  class="occpermit-criticaldata-label"/>
-                                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedTo.firstName}"/>
-                                    <h:outputText value=" "/>
-                                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedTo.lastName}"/>
-                                    <h:outputText value="("/>
-                                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedTo.personType.label}"/>
-                                    <h:outputText value=", codeNforce ID:"/>
-                                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedTo.personID}"/>
-                                    <h:outputText value=")"/>
-                                </f:subview>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <h:outputText value="Issuer" 
-                                              class="occpermit-criticaldata-label"/>
-                                <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedBy.person.firstName}"/>
-                                <h:outputText value=""/>
-                                <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedBy.person.lastName}"/>
+                <div class="p-col-4 restrict-data-field-label-inline">
+                    <h:outputText value="Lease:" />
+                </div>
+                <div class="p-col-8 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticleasestatus}" />
+                </div>
 
-                                <p:spacer height="0px" />
-                                
-                                <h:outputText value=" (codeNforce userID:"/>
-                                <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.issuedBy.userID}"/>
-                                <h:outputText value=")"/>
-                            </h:panelGroup>
 
-                        </h:panelGrid>
-                    </div>
-                </h:form>
+                <div class="p-col-4 restrict-data-field-label-inline">
+                    <h:outputText value="Payment:" />
+                </div>
+                <div class="p-col-8 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticpaymentstatus}" />
+                </div>
+
+                <div class="p-col-4 restrict-data-field-label-inline">
+                    <h:outputText value="Notices: " />
+                </div>
+                <div class="p-col-8 restrict-data-field-value-inline">
+                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticnotice}"
+                                  escape="false" />
+                </div>
+            </div>
+        </h:form>
+                
             </ui:define>
         </ui:composition>
     </h:body>

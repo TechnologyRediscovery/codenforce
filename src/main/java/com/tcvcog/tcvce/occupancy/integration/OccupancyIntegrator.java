@@ -625,6 +625,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      * are written specially through the updateOccPermitStaticFields
      * @param permit
      * @return ID of the skeleton. 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
     public int insertOccPermit(OccPermit permit) throws BObStatusException, IntegrationException{
         if(permit == null){
@@ -632,8 +634,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
         
         String query = "INSERT INTO public.occpermit(\n" +
-                         "            permitid, occperiod_periodid, referenceno,  notes)\n" +
-                         "    VALUES (DEFAULT, ?, ?, ?);"; 
+                         "            permitid, occperiod_periodid, referenceno,  notes, createdts, createdby_userid, lastupdatedts, lastupdatedby_userid)\n" +
+                         "    VALUES (DEFAULT, ?, NULL, ?, now(), ?, now(), ?);"; 
         ResultSet rs = null;
         Connection con = null;
         PreparedStatement stmt = null;
@@ -645,8 +647,18 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, permit.getPeriodID());
-            stmt.setString(2, permit.getReferenceNo());
-            stmt.setString(3, permit.getNotes());
+            stmt.setString(2, permit.getNotes());
+            if(permit.getCreatedBy() != null){
+                stmt.setInt(3, permit.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            // on creation, the last updator is the creator
+            if(permit.getCreatedBy() != null){
+                stmt.setInt(4, permit.getCreatedBy().getUserID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
             
             stmt.execute();
 
@@ -661,6 +673,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             }
             
         } catch (SQLException ex) {
+            System.out.println(ex);
             throw new IntegrationException("OccupancyIntegrator.insertOccPermit"
                     + "| IntegrationError: unable to insert occupancy permit", ex);
         } finally {
@@ -706,6 +719,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             }
             
         } catch (SQLException ex) {
+            System.out.println(ex);
             throw new IntegrationException("OccupancyIntegrator.countFinalizePermitsByMuni");
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

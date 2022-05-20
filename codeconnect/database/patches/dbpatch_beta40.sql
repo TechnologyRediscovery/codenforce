@@ -145,6 +145,7 @@ ALTER TABLE public.occpermit ADD COLUMN staticleaseterm TEXT;
 ALTER TABLE public.occpermit ADD COLUMN staticleasestatus TEXT;
 ALTER TABLE public.occpermit ADD COLUMN staticpaymentstatus TEXT;
 ALTER TABLE public.occpermit ADD COLUMN staticnotice TEXT;
+ALTER TABLE public.occpermit ADD COLUMN staticconstructiontype TEXT;
 
 
 ALTER TABLE public.occpermit ADD COLUMN createdts TIMESTAMP WITH TIME ZONE;
@@ -165,6 +166,43 @@ ALTER TABLE public.occpermit DROP COLUMN issuedto_personid;
 ALTER TABLE public.occpermit DROP COLUMN issuedby_userid;
 ALTER TABLE public.occpermit DROP COLUMN dateissued;
 ALTER TABLE public.occpermit RENAME COLUMN permitadditionaltext TO staticpermitadditionaltext ;
+
+
+
+
+
+INSERT INTO public.textblockcategory(
+            categoryid, categorytitle, icon_iconid, muni_municode)
+    VALUES (200, 'Occ Permit Stipulations', NULL, 999);
+
+INSERT INTO public.textblockcategory(
+            categoryid, categorytitle, icon_iconid, muni_municode)
+    VALUES (201, 'Occ Permit Notices', NULL, 999);
+
+INSERT INTO public.textblockcategory(
+            categoryid, categorytitle, icon_iconid, muni_municode)
+    VALUES (202, 'Occ Permit Comments', NULL, 999);
+
+
+INSERT INTO public.textblock(
+            blockid, blockcategory_catid, muni_municode, blockname, blocktext, 
+            placementorderdefault, injectabletemplate)
+    VALUES (DEFAULT, 201, 999, 'Non-transferrable', 'This Occupancy permit is issued to the listed OWNER only and is not transferable to another Buyer. The Occupancy Permit is issued as/for the authorized use listed above only for the LISTED tenant(s)/occupant(s), Buyers and is not transferable to another tenant(s)/occupant(s) or Buyers. Should ANY information included on this Occupancy permit change a NEW Certificate of Occupancy will need to be obtained.', 
+            1, NULL);
+
+INSERT INTO public.textblock(
+            blockid, blockcategory_catid, muni_municode, blockname, blocktext, 
+            placementorderdefault, injectabletemplate)
+    VALUES (DEFAULT, 200, 999, 'Construction', 'All permits are required when required for construction purposes to remedy noted violations as described in FIR', 
+            1, NULL);
+
+
+
+INSERT INTO public.textblock(
+            blockid, blockcategory_catid, muni_municode, blockname, blocktext, 
+            placementorderdefault, injectabletemplate)
+    VALUES (DEFAULT, 201, 999, 'Non-transferrable-TCO','This Occupancy permit is issued to the listed Buyer only and is not transferable to another Buyer. The Occupancy Permit is issued as a Temporary Occupancy Permit (TCO) to CLOSE. The TCO will expire in 30 days of the issue date. No habitability or occupation of the subject property is permitted. Should ANY information included on this Occupancy permit change a NEW Certificate of Occupancy will need to be obtained. REFER TO THE FIELD INSPECTION REPORT FOR DETAILS OF INSPECTION FINDINGS. Violations may result in an NOV for compliance, and a re-inspection will be required. TCO will expire on the date listed above.' , 
+            1, NULL);
 
 
 

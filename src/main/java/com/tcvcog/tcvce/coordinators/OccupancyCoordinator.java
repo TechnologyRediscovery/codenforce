@@ -58,6 +58,8 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * King of all business logic implementation for the entire Occupancy object
@@ -336,9 +338,34 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     /**
      * Logic intermediary for occ permits
      * @param permit
+     * @param ua
      * @return 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public OccPermit configureOccPermit(OccPermit permit){
+    public OccPermit configureOccPermit(OccPermit permit, UserAuthorized ua) throws BObStatusException{
+        if(permit == null || ua == null){
+            throw new BObStatusException("Cannot configure occ permit with null permit or ua");
+        }
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        
+        if(permit.getFinalizedts() == null){
+            try {
+                OccPeriod op = getOccPeriod(permit.getPeriodID());
+                PropertyDataHeavy pdh = pc.assemblePropertyDataHeavy(pc.getPropertyByPropUnitID(op.getPropertyUnitID()), ua);
+                permit.setParcelInfo(pdh.getParcelInfo());
+            } catch (SearchException | BObStatusException | BlobException | IntegrationException ex) {
+                throw new BObStatusException("Unable to configure parcel info on permit");
+            } 
+            
+            permit.setBuyerTenantLinkList(new ArrayList<>());
+            permit.setManagerLinkList(new ArrayList<>());
+            permit.setTenantLinkList(new ArrayList<>());
+            permit.setTextBlocks_stipulations(new ArrayList<>());
+            permit.setTextBlocks_notice(new ArrayList<>());
+            permit.setTextBlocks_comments(new ArrayList<>());               
+    
+        }
         
         
         return permit;
@@ -507,7 +534,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     
     /**
      * Factory for OccPermits
-     * @param mdh
      * @param usr
      * @return 
      */
@@ -515,6 +541,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccPermit permit = new OccPermit();
         permit.setReferenceNo("GENERATED ON FINALIZATION");
         permit.setCreatedBy(usr);
+
+        
         return permit;
 
     }
@@ -522,16 +550,17 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     /**
      * Getter for occupancy permits
      * @param permitID
+     * @param ua
      * @return 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public OccPermit getOccPermit(int permitID) throws IntegrationException, BObStatusException{
+    public OccPermit getOccPermit(int permitID, UserAuthorized ua) throws IntegrationException, BObStatusException{
         OccupancyIntegrator oi = getOccupancyIntegrator();
         if(permitID == 0){
             throw new BObStatusException("OccupancyCoordinator.getOccPermit | Cannot fetch a permit with ID 0");
         }
-        return configureOccPermit(oi.getOccPermit(permitID));
+        return configureOccPermit(oi.getOccPermit(permitID), ua);
     }
 
     
@@ -555,10 +584,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         OccupancyIntegrator oi = getOccupancyIntegrator();
         List<Integer> opermitIDList = oi.getOccPermitIDList(op);
+        
         List<OccPermit> occPermitList = new ArrayList<>();
         if(opermitIDList != null && !opermitIDList.isEmpty()){
             for(Integer i: opermitIDList){
-                occPermitList.add(getOccPermit(i));
+                occPermitList.add(getOccPermit(i, ua));
             }
         }
         
@@ -569,17 +599,19 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     /**
      * insertion pathway for occ permits
      * @param permit
+     * @param per
      * @param ua
      * @return
      * @throws BObStatusException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public int insertOccPermit(OccPermit permit, UserAuthorized ua) throws BObStatusException, IntegrationException{
-        if(permit == null || ua == null){
-            throw new BObStatusException("Cannot insert occ permit with null permit or user");
+    public int insertOccPermit(OccPermit permit, OccPeriod per, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(permit == null || ua == null || per == null){
+            throw new BObStatusException("Cannot insert occ permit with null permit or user or period");
             
         }
         OccupancyIntegrator oi = getOccupancyIntegrator();
+        permit.setPeriodID(per.getPeriodID());
         permit.setCreatedBy(ua);
         permit.setLastUpdatedBy(ua);
         return oi.insertOccPermit(permit);
@@ -672,8 +704,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();       
         StringBuilder sb;
-        
-        
         
          // now do property and unit static fields
         PropertyUnitWithProp puwp = pc.getPropertyUnitWithProp(period.getPropertyUnitID());

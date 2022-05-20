@@ -40,6 +40,7 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -58,14 +59,36 @@ import javax.faces.event.ActionEvent;
 public class OccPeriodBB
         extends BackingBeanUtils {
 
+    
+    final static String PERMIT_BLOCKS_STIPULATIONS = "textblock_cat_permit_stipulations";
+    final static String PERMIT_BLOCKS_NOTICES = "textblock_cat_permit_notices";
+    final static String PERMIT_BLOCKS_COMMENTS = "textblock_cat_permit_comments";
+    
+    final static String PERMIT_BLOCK_CATEGORY_PARAM_KEY = "permit-block-cat";
+    final static String PERMIT_PERSON_LIST_PARAM_KEY = "permit-person-list";
+    
     private OccPeriod lastSavedOccPeriod;
     private OccPeriodDataHeavy currentOccPeriod;
-    private PropertyUnit currentPropertyUnit;
+    private PropertyUnitDataHeavy currentPropertyUnit;
     
     private OccPermit currentOccPermit;
     private ReportConfigOccPermit currentOccPermitConfig;
     private boolean editModeOccPermit;
-
+    private PropertyDataHeavy currentPropertyDH;
+    
+    private List<TextBlock> permitBlockCandidatesStipulations;
+    private List<TextBlock> permitBlockCandidatesNotices;
+    private List<TextBlock> permitBlockCandidatesComments;
+    private List<TextBlock> permitBlocksActiveCandidateList;
+    private List<TextBlock> permitBlocksSelectedList;
+    private TextBlock currentTextBlock;
+    private TextBlockPermitFieldEnum currentTextBlockPermitFieldEnum;
+    
+    private List<HumanLink> occPermitCandidateHumanLinkList;
+    private List<HumanLink> occPermitSelectedHumanLinkList;
+    private HumanLink occPermitSelectedHumanLink;
+    private OccPermitPersonListEnum occPermitCurrentPersonLinkEnum;
+    
 //  *******************************
 //  ************ WORKFLOW**********
 //  *******************************
@@ -94,23 +117,28 @@ public class OccPeriodBB
         System.out.printf("OccPeriodSearchWorkflowBB constructed");
         OccupancyCoordinator oc = getOccupancyCoordinator();
         SessionBean sb = getSessionBean();
+        PropertyCoordinator pc = getPropertyCoordinator();
 
         currentOccPeriod = sb.getSessOccPeriod();
         if(currentOccPeriod != null){
             occPeriodTypeList = sb.getSessMuni().getProfile().getOccPeriodTypeList();
             setLastSavedOccPeriod(new OccPeriod(currentOccPeriod));
-            PropertyIntegrator pi = getPropertyIntegrator();
 
             setOccPeriodTypeList(sb.getSessMuni().getProfile().getOccPeriodTypeList());
 
             try {
-                currentPropertyUnit = pi.getPropertyUnitWithProp(currentOccPeriod.getPropertyUnitID());
+                currentPropertyUnit = pc.getPropertyUnitDataHeavy(currentOccPeriod.getPropUnitProp(), getSessionBean().getSessUser());
+                currentPropertyDH = getSessionBean().getSessProperty();
                 setPropertyUnitCandidateList(sb.getSessProperty().getUnitList());
-            } catch (IntegrationException | BObStatusException ex) {
+                
+                setupPermitTextBlockCandidateLists(null);
+            } catch (IntegrationException | BObStatusException | AuthorizationException | EventException ex) {
                 System.out.println(ex);
             }
         }
     }
+    
+   
 
 
     /**
@@ -386,40 +414,66 @@ public class OccPeriodBB
      */
     public void onOccPermitInitButtonChange(ActionEvent ev){
         OccupancyCoordinator oc = getOccupancyCoordinator();
+        
         currentOccPermit = oc.getOccPermitSkeleton(getSessionBean().getSessUser());
+        onOccPermitInitCommitButtonChange(ev);
     }
     
+    
     /**
-     * Listener to commit the new permit process
+     * Writes a skeleton occ permit into the db
      * @param ev 
      */
     public void onOccPermitInitCommitButtonChange(ActionEvent ev){
         OccupancyCoordinator oc = getOccupancyCoordinator();
+        
+        int freshPermitID;
         try {
-            oc.insertOccPermit(currentOccPermit, getSessionBean().getSessUser());
+        freshPermitID = oc.insertOccPermit(currentOccPermit, currentOccPeriod, getSessionBean().getSessUser());
+        currentOccPermit = oc.getOccPermit(freshPermitID, getSessionBean().getSessUser());
+        System.out.println("OccPeriodBB.onOccPermitInitCommitButtonChange | current occ permit ID: " + currentOccPermit.getPermitID());
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
               getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
         } 
+        
+        
     }
     
+    /**
+     * Grabs a new copy of the curent occ permit, if it's ID is not zero
+     * @param ev 
+     */
+    public void refreshCurrentOccPermit(ActionEvent ev){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        if(currentOccPermit != null && currentOccPermit.getPermitID() != 0){
+            System.out.println("OccPeriodBB.refreshCurrentOccPermit | current occ permit ID: " + currentOccPermit.getPermitID());
+            try {
+                currentOccPermit = oc.getOccPermit(currentOccPermit.getPermitID(), getSessionBean().getSessUser());
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+                
+            } 
+        }
+        
+        
+    }
+    
+   
     /**
      * Listener for user requests to view the config fields on an occ permit
      * @param permit 
      */
-    public void onOccpermitConfigLinkClick(OccPermit permit){
+    public void onOccpermitViewConfigLinkClick(OccPermit permit){
         currentOccPermit = permit;
     }
     
-    /**
-     * Begins finalization process
-     * @param ev 
-     */
-    public void onOccPermitFinalizeInitButtonChange(ActionEvent ev){
-        System.out.println("OccPeriodBB.OccPermitFinalizeInitButtonChange");
-    }
+ 
     
     /**
      * Sends the current occ period and permit with all the goodies injected to the 
@@ -430,6 +484,7 @@ public class OccPeriodBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.updateOccPermitStaticFields(currentOccPeriod, currentOccPermit, getSessionBean().getSessUser(), getSessionBean().getSessMuni());
+            refreshCurrentOccPermit(null);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Finalized Occ permit No " + currentOccPermit.getReferenceNo(), ""));
@@ -439,10 +494,17 @@ public class OccPeriodBB
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
         } 
-        
-        
-        
     }
+    
+    
+    /**
+     * Begins finalization process
+     * @param ev 
+     */
+    public void onOccPermitFinalizeInitButtonChange(ActionEvent ev){
+        System.out.println("OccPeriodBB.OccPermitFinalizeInitButtonChange");
+    }
+    
     
     /**
      * Writes finalization fields to DB on an occ permit
@@ -495,12 +557,275 @@ public class OccPeriodBB
      * @return 
      */
     public String onOccPermitPrintLinkClick(OccPermit op){
-        
-        
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        currentOccPermitConfig = oc.getOccPermitReportConfigDefault(currentOccPermit, currentOccPeriod, currentPropertyUnit, getSessionBean().getSessUser());
+        getSessionBean().setReportConfigOccPermit(currentOccPermitConfig);
         return "occPermit";
         
     }
 
+     /**
+     * Internal organ for loading candidate text blocks for occ permit
+     * generation
+     */
+    private void setupPermitTextBlockCandidateLists(Municipality m) throws IntegrationException{
+        SystemCoordinator sc = getSystemCoordinator();
+        
+        permitBlockCandidatesStipulations = sc.getTextBlockList(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString(PERMIT_BLOCKS_STIPULATIONS)), m);
+        
+        permitBlockCandidatesNotices = sc.getTextBlockList(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString(PERMIT_BLOCKS_NOTICES)), m);
+        
+        permitBlockCandidatesComments = sc.getTextBlockList(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                .getString(PERMIT_BLOCKS_COMMENTS)), m);
+        
+        permitBlocksSelectedList = new ArrayList<>();
+    }
+    
+    
+    
+    /**
+     * Listener for user requests to look at an individual text block for a permit
+     * @param tb 
+     */
+    public void onOccPermitViewTextBlock(TextBlock tb){
+        currentTextBlock = tb;
+    }
+    
+    /**
+     * Listener for user requests to remove a text block from one of the three
+     * fields that can hold the contents of a text bock.
+     * This method asks the request param for the value of the key: permit-block-cat
+     * @param tb 
+     */
+    public void onOccPermitRemoveTextBlockFromQueue(TextBlock tb){
+        
+        String cat = getFacesContext().getExternalContext().getRequestParameterMap().get(PERMIT_BLOCK_CATEGORY_PARAM_KEY);
+        currentTextBlockPermitFieldEnum = TextBlockPermitFieldEnum.valueOf(cat);
+        System.out.println("OccPeriodBB.onOccPermitRemoveTextBlockFromQueue | block enum selected: " + currentTextBlockPermitFieldEnum.getLabel());
+         switch(currentTextBlockPermitFieldEnum){
+            case STIPULATIONS:
+                currentOccPermit.getTextBlocks_stipulations().remove(tb);
+                break;
+            case NOTICES:
+                currentOccPermit.getTextBlocks_notice().remove(tb);
+                break;
+            case COMMENTS:
+                currentOccPermit.getTextBlocks_comments().remove(tb);
+                break;
+        }
+        
+    }
+    
+    /**
+     * Listener for user requests to start the block choice process
+     * This method asks the request param for the value of the key: permit-block-cat
+     * which it then uses to figure out which candidate block list to load into the
+     * primary active list. 
+     * @param ev 
+     */
+    public void onOccPermitExtractBlockListEnumAndConfigureCandidatesLinkClick(ActionEvent ev){
+        String cat = getFacesContext().getExternalContext().getRequestParameterMap().get(PERMIT_BLOCK_CATEGORY_PARAM_KEY);
+        currentTextBlockPermitFieldEnum = TextBlockPermitFieldEnum.valueOf(cat);
+        System.out.println("OccPeriodBB.onOccPermitChooseBlocksForPermitLinkClick | block enum selected: " + currentTextBlockPermitFieldEnum.getLabel());
+        if(permitBlocksActiveCandidateList == null){
+            permitBlocksActiveCandidateList = new ArrayList<>();
+        }
+        permitBlocksActiveCandidateList.clear();
+        switch(currentTextBlockPermitFieldEnum){
+            case STIPULATIONS:
+                if(permitBlockCandidatesStipulations != null && !permitBlockCandidatesStipulations.isEmpty()){
+                    permitBlocksActiveCandidateList.addAll(permitBlockCandidatesStipulations);
+                }
+                break;
+            case NOTICES:
+                if(permitBlockCandidatesNotices != null && !permitBlockCandidatesNotices.isEmpty()){
+                    permitBlocksActiveCandidateList.addAll(permitBlockCandidatesNotices);
+                }
+                break;
+            case COMMENTS:
+                if(permitBlockCandidatesComments != null && !permitBlockCandidatesComments.isEmpty()){                    
+                    permitBlocksActiveCandidateList.addAll(permitBlockCandidatesComments);
+                }
+                break;
+        }
+    }
+    
+    /**
+     * Listener for user requests to add the selected blocks to the correct permit field.
+     * This method uses the value of the bean's currentTextBlockPermitFieldEnum
+     * to figure out which list to add the selected ones to
+     * @param ev 
+     */
+    public void onOccPermitAddSelectedBlocksToPermit(ActionEvent ev){
+        System.out.println("OccPeriodBB.onOccPermitAddSelectedBlocksToPermit | permitBlocksSelectedList: " + permitBlocksSelectedList.size());
+        switch(currentTextBlockPermitFieldEnum){
+            case STIPULATIONS:
+                currentOccPermit.getTextBlocks_stipulations().addAll(permitBlocksSelectedList);
+                break;
+            case NOTICES:
+                currentOccPermit.getTextBlocks_notice().addAll(permitBlocksSelectedList);
+                break;
+            case COMMENTS:
+                currentOccPermit.getTextBlocks_comments().addAll(permitBlocksSelectedList);
+                break;
+        }
+         getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Added " + permitBlocksSelectedList.size() + " text blocks to occ permit text field: " + currentTextBlockPermitFieldEnum.getLabel(), ""));
+        permitBlocksSelectedList.clear();
+    }
+    
+    /**
+     * Listener for user requests to start the process of picking people to link
+     * to the current permit's person fields
+     * @param ev 
+     */
+    public void onOccPermitPersonLinkingInitButtonChange(ActionEvent ev){
+        String cat = getFacesContext().getExternalContext().getRequestParameterMap().get(PERMIT_PERSON_LIST_PARAM_KEY);
+        occPermitCurrentPersonLinkEnum = OccPermitPersonListEnum.valueOf(cat);
+        System.out.println("OccPeriodBB.onOccPermitPersonLinkingInitButtonChange | selected person link enum: " + occPermitCurrentPersonLinkEnum.getLabel());
+        configureOccPermitSelectedHumanLinkList(occPermitCurrentPersonLinkEnum);
+        
+        occPermitCandidateHumanLinkList = new ArrayList<>();
+        if(currentOccPeriod.getHumanLinkList() != null && !currentOccPeriod.getHumanLinkList().isEmpty()){
+            occPermitCandidateHumanLinkList.addAll(currentOccPeriod.getHumanLinkList());
+        }
+        if(currentPropertyDH != null && currentPropertyDH.getHumanLinkList() != null && !currentPropertyDH.getHumanLinkList().isEmpty()){
+            occPermitCandidateHumanLinkList.addAll(currentPropertyDH.getHumanLinkList());
+        }
+        
+        if(currentPropertyUnit != null && currentPropertyUnit.getHumanLinkList() != null && !currentPropertyUnit.getHumanLinkList().isEmpty()){
+            occPermitCandidateHumanLinkList.addAll(currentPropertyUnit.getHumanLinkList());
+        }
+        
+        System.out.println("OccPeriodBB.onOccPermitPersonLinkingInitButtonChange | person candidate size " + occPermitCandidateHumanLinkList.size());
+        
+    }
+    
+    /**
+     * Utility for making the single queued list reflect the chosen occ permit human list
+     * @param opple 
+     */
+    private void configureOccPermitSelectedHumanLinkList(OccPermitPersonListEnum opple){
+        
+        if(opple != null){
+            occPermitCurrentPersonLinkEnum = opple;
+        }
+        
+        occPermitSelectedHumanLinkList = new ArrayList<>();
+        occPermitSelectedHumanLinkList.clear();
+        
+        if(occPermitCurrentPersonLinkEnum != null){
+            switch(occPermitCurrentPersonLinkEnum){
+                case CURRENT_OWNER:
+                    if(currentOccPermit.getOwnerSellerLinkList() != null && !currentOccPermit.getOwnerSellerLinkList().isEmpty()){
+                        occPermitSelectedHumanLinkList.addAll(currentOccPermit.getOwnerSellerLinkList());
+                    }
+                    break;
+                case MANAGERS:
+                    if(currentOccPermit.getManagerLinkList() != null && !currentOccPermit.getManagerLinkList().isEmpty()){
+                        occPermitSelectedHumanLinkList.addAll(currentOccPermit.getManagerLinkList());
+                    }
+                    break;
+                case NEW_OWNER:
+                    if(currentOccPermit.getBuyerTenantLinkList()!= null && !currentOccPermit.getBuyerTenantLinkList().isEmpty()){
+                        occPermitSelectedHumanLinkList.addAll(currentOccPermit.getBuyerTenantLinkList());
+                        
+                    }
+                    break;
+                case TENANTS:
+                    if(currentOccPermit.getTenantLinkList() != null && !currentOccPermit.getTenantLinkList().isEmpty()){
+                        occPermitSelectedHumanLinkList.addAll(currentOccPermit.getTenantLinkList());
+                    }
+                    break;
+            }
+        }
+    }
+    
+    
+    /**
+     * Listener to switch between the four person link lists on the permit
+     * @param ev 
+     */
+    public void onOCcPermitPersonLinkListChooseLinkClick(ActionEvent ev){
+        String cat = getFacesContext().getExternalContext().getRequestParameterMap().get(PERMIT_PERSON_LIST_PARAM_KEY);
+        occPermitCurrentPersonLinkEnum = OccPermitPersonListEnum.valueOf(cat);
+        System.out.println("OccPeriodBB.onOCcPermitPersonLinkListChooseLinkClick | selected person link enum: " + occPermitCurrentPersonLinkEnum.getLabel());
+        configureOccPermitSelectedHumanLinkList(occPermitCurrentPersonLinkEnum);
+    }
+    
+    /**
+     * Listener for user requests to queue their chosen person to the
+     * bean's currently selected person link list represented by the enum
+     * value 
+     * @param hl 
+     */
+    public void onOccPermitPersonLinkQueuePerson(HumanLink hl){
+        System.out.println("OccPeriodBB.onOccPermitPersonLinkQueuePerson | queuing Person ID  " + hl.getHumanID());
+        System.out.println("OccPeriodBB.onOccPermitPersonLinkQueuePerson | currentPersonLinkEnum  " + occPermitCurrentPersonLinkEnum.getLabel());
+        if(currentOccPermit != null){
+
+            switch(occPermitCurrentPersonLinkEnum){
+                    case CURRENT_OWNER:
+                        if(currentOccPermit.getOwnerSellerLinkList() == null){
+                            currentOccPermit.setOwnerSellerLinkList(new ArrayList<>());
+                        }
+                        currentOccPermit.getOwnerSellerLinkList().add(hl);
+                        break;
+                    case MANAGERS:
+                        if(currentOccPermit.getManagerLinkList()== null){
+                            currentOccPermit.setManagerLinkList(new ArrayList<>());
+                        }
+                        currentOccPermit.getManagerLinkList().add(hl);
+                        break;
+                    case NEW_OWNER:
+                        if(currentOccPermit.getBuyerTenantLinkList()== null){
+                            currentOccPermit.setBuyerTenantLinkList(new ArrayList<>());
+                        }
+                        currentOccPermit.getBuyerTenantLinkList().add(hl);
+                        break;
+                    case TENANTS:
+                        if(currentOccPermit.getTenantLinkList()== null){
+                            currentOccPermit.setTenantLinkList(new ArrayList<>());
+                        }
+                        currentOccPermit.getTenantLinkList().add(hl);
+                        break;
+            }
+            configureOccPermitSelectedHumanLinkList(occPermitCurrentPersonLinkEnum);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Added person ID " + hl.getHumanID() + " to occ permit person list:  " + occPermitCurrentPersonLinkEnum.getLabel(), ""));
+        } else {
+            System.out.println("OccPeriodBB.onOccPermitPersonLinkQueuePerson | NULL currentOccPermit");
+        }
+        
+        
+        
+    }
+    
+    /**
+     * Listener for user requests to remove the chosen human link from
+     * the bean's currently selected person link list
+     * @param hl 
+     */
+    public void onOccPermitPersonLinkRemove(HumanLink hl){
+         switch(occPermitCurrentPersonLinkEnum){
+                case CURRENT_OWNER:
+                    currentOccPermit.getOwnerSellerLinkList().remove(hl);
+                    break;
+                case MANAGERS:
+                    currentOccPermit.getManagerLinkList().remove(hl);
+                    break;
+                case NEW_OWNER:
+                    currentOccPermit.getBuyerTenantLinkList().remove(hl);
+                    break;
+                case TENANTS:
+                    currentOccPermit.getTenantLinkList().remove(hl);
+                    break;
+            }
+    }
     
     
     
@@ -670,6 +995,174 @@ public class OccPeriodBB
      */
     public void setEditModeOccPermit(boolean editModeOccPermit) {
         this.editModeOccPermit = editModeOccPermit;
+    }
+
+    /**
+     * @return the currentPropertyDH
+     */
+    public PropertyDataHeavy getCurrentPropertyDH() {
+        return currentPropertyDH;
+    }
+
+    /**
+     * @param currentPropertyDH the currentPropertyDH to set
+     */
+    public void setCurrentPropertyDH(PropertyDataHeavy currentPropertyDH) {
+        this.currentPropertyDH = currentPropertyDH;
+    }
+
+    /**
+     * @return the permitBlockCandidatesStipulations
+     */
+    public List<TextBlock> getPermitBlockCandidatesStipulations() {
+        return permitBlockCandidatesStipulations;
+    }
+
+    /**
+     * @return the permitBlockCandidatesNotices
+     */
+    public List<TextBlock> getPermitBlockCandidatesNotices() {
+        return permitBlockCandidatesNotices;
+    }
+
+    /**
+     * @return the permitBlockCandidatesComments
+     */
+    public List<TextBlock> getPermitBlockCandidatesComments() {
+        return permitBlockCandidatesComments;
+    }
+
+    /**
+     * @param permitBlockCandidatesStipulations the permitBlockCandidatesStipulations to set
+     */
+    public void setPermitBlockCandidatesStipulations(List<TextBlock> permitBlockCandidatesStipulations) {
+        this.permitBlockCandidatesStipulations = permitBlockCandidatesStipulations;
+    }
+
+    /**
+     * @param permitBlockCandidatesNotices the permitBlockCandidatesNotices to set
+     */
+    public void setPermitBlockCandidatesNotices(List<TextBlock> permitBlockCandidatesNotices) {
+        this.permitBlockCandidatesNotices = permitBlockCandidatesNotices;
+    }
+
+    /**
+     * @param permitBlockCandidatesComments the permitBlockCandidatesComments to set
+     */
+    public void setPermitBlockCandidatesComments(List<TextBlock> permitBlockCandidatesComments) {
+        this.permitBlockCandidatesComments = permitBlockCandidatesComments;
+    }
+
+    /**
+     * @return the currentTextBlock
+     */
+    public TextBlock getCurrentTextBlock() {
+        return currentTextBlock;
+    }
+
+    /**
+     * @param currentTextBlock the currentTextBlock to set
+     */
+    public void setCurrentTextBlock(TextBlock currentTextBlock) {
+        this.currentTextBlock = currentTextBlock;
+    }
+
+    /**
+     * @return the currentTextBlockPermitFieldEnum
+     */
+    public TextBlockPermitFieldEnum getCurrentTextBlockPermitFieldEnum() {
+        return currentTextBlockPermitFieldEnum;
+    }
+
+    /**
+     * @param currentTextBlockPermitFieldEnum the currentTextBlockPermitFieldEnum to set
+     */
+    public void setCurrentTextBlockPermitFieldEnum(TextBlockPermitFieldEnum currentTextBlockPermitFieldEnum) {
+        this.currentTextBlockPermitFieldEnum = currentTextBlockPermitFieldEnum;
+    }
+
+    /**
+     * @return the permitBlocksActiveCandidateList
+     */
+    public List<TextBlock> getPermitBlocksActiveCandidateList() {
+        return permitBlocksActiveCandidateList;
+    }
+
+    /**
+     * @param permitBlocksActiveCandidateList the permitBlocksActiveCandidateList to set
+     */
+    public void setPermitBlocksActiveCandidateList(List<TextBlock> permitBlocksActiveCandidateList) {
+        this.permitBlocksActiveCandidateList = permitBlocksActiveCandidateList;
+    }
+
+    /**
+     * @return the permitBlocksSelectedList
+     */
+    public List<TextBlock> getPermitBlocksSelectedList() {
+        return permitBlocksSelectedList;
+    }
+
+    /**
+     * @param permitBlocksSelectedList the permitBlocksSelectedList to set
+     */
+    public void setPermitBlocksSelectedList(List<TextBlock> permitBlocksSelectedList) {
+        this.permitBlocksSelectedList = permitBlocksSelectedList;
+    }
+
+    /**
+     * @return the occPermitSelectedHumanLinkList
+     */
+    public List<HumanLink> getOccPermitSelectedHumanLinkList() {
+        return occPermitSelectedHumanLinkList;
+    }
+
+    /**
+     * @return the occPermitSelectedHumanLink
+     */
+    public HumanLink getOccPermitSelectedHumanLink() {
+        return occPermitSelectedHumanLink;
+    }
+
+    /**
+     * @return the occPermitCurrentPersonLinkEnum
+     */
+    public OccPermitPersonListEnum getOccPermitCurrentPersonLinkEnum() {
+        return occPermitCurrentPersonLinkEnum;
+    }
+
+    /**
+     * @param occPermitSelectedHumanLinkList the occPermitSelectedHumanLinkList to set
+     */
+    public void setOccPermitSelectedHumanLinkList(List<HumanLink> occPermitSelectedHumanLinkList) {
+        this.occPermitSelectedHumanLinkList = occPermitSelectedHumanLinkList;
+    }
+
+    /**
+     * @param occPermitSelectedHumanLink the occPermitSelectedHumanLink to set
+     */
+    public void setOccPermitSelectedHumanLink(HumanLink occPermitSelectedHumanLink) {
+        this.occPermitSelectedHumanLink = occPermitSelectedHumanLink;
+    }
+
+    /**
+     * @param occPermitCurrentPersonLinkEnum the occPermitCurrentPersonLinkEnum to set
+     */
+    public void setOccPermitCurrentPersonLinkEnum(OccPermitPersonListEnum occPermitCurrentPersonLinkEnum) {
+        this.occPermitCurrentPersonLinkEnum = occPermitCurrentPersonLinkEnum;
+    }
+
+    /**
+     * @return the occPermitCandidateHumanLinkList
+     */
+    public List<HumanLink> getOccPermitCandidateHumanLinkList() {
+        return occPermitCandidateHumanLinkList;
+    }
+
+    /**
+     * @param occPermitCandidateHumanLinkList the occPermitCandidateHumanLinkList to set
+     */
+    public void setOccPermitCandidateHumanLinkList(List<HumanLink> occPermitCandidateHumanLinkList) {
+        this.occPermitCandidateHumanLinkList = occPermitCandidateHumanLinkList;
     }
 
    

@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import java.time.LocalDate;
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * Note that we might have thought that this class should
@@ -80,6 +81,64 @@ public class ParcelInfo
     protected int taxYear;
     
     protected String notes;
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.useType);
+        hash = 67 * hash + this.parcelInfoID;
+        hash = 67 * hash + this.parcelInternalID;
+        hash = 67 * hash + Objects.hashCode(this.useGroup);
+        hash = 67 * hash + Objects.hashCode(this.constructionType);
+        hash = 67 * hash + Objects.hashCode(this.countyCode);
+        hash = 67 * hash + Objects.hashCode(this.ownerCode);
+        hash = 67 * hash + Objects.hashCode(this.propClass);
+        hash = 67 * hash + Objects.hashCode(this.locationDescriptor);
+        hash = 67 * hash + Objects.hashCode(this.bobSource);
+        hash = 67 * hash + Objects.hashCode(this.unfitDateStart);
+        hash = 67 * hash + Objects.hashCode(this.unfitDateStop);
+        hash = 67 * hash + Objects.hashCode(this.unfitBy);
+        hash = 67 * hash + Objects.hashCode(this.abandonedDateStart);
+        hash = 67 * hash + Objects.hashCode(this.abandonedDateStop);
+        hash = 67 * hash + Objects.hashCode(this.abandonedBy);
+        hash = 67 * hash + Objects.hashCode(this.vacantDateStart);
+        hash = 67 * hash + Objects.hashCode(this.vacantDateStop);
+        hash = 67 * hash + Objects.hashCode(this.vacantBy);
+        hash = 67 * hash + Objects.hashCode(this.condition);
+        hash = 67 * hash + Objects.hashCode(this.landBankProspect);
+        hash = 67 * hash + (this.LandBankHeld ? 1 : 0);
+        hash = 67 * hash + (this.active ? 1 : 0);
+        hash = 67 * hash + (this.nonAddressable ? 1 : 0);
+        hash = 67 * hash + this.saleYear;
+        hash = 67 * hash + this.salePrice;
+        hash = 67 * hash + this.landValue;
+        hash = 67 * hash + this.buildingValue;
+        hash = 67 * hash + this.assessmentYear;
+        hash = 67 * hash + this.yearBuilt;
+        hash = 67 * hash + this.livingArea;
+        hash = 67 * hash + (this.taxStatus ? 1 : 0);
+        hash = 67 * hash + this.taxYear;
+        hash = 67 * hash + Objects.hashCode(this.notes);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ParcelInfo other = (ParcelInfo) obj;
+        if (this.parcelInfoID != other.parcelInfoID) {
+            return false;
+        }
+        return true;
+    }
     
 
     /**

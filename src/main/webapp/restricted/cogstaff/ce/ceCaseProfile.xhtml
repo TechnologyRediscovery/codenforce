@@ -714,7 +714,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                actionListener="#{ceCaseBB.prepareReportCECase}"
                                                                icon="fa fa-print"
                                                                oncomplete="PF('report-case-profile-diaglog-var').show()"
-                                                               value="print case profile (under construction)"
+                                                               value="Print case profile "
                                                                update="report-case-profile-form"/>
                                         </h:form>
 
@@ -1435,7 +1435,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </div>
 
                                         <div class="p-col-8 restrict-data-field-label-inline">
-                                            <h:outputLabel value="Photo column count (between 1 and 4)" 
+                                            <h:outputLabel value="Photo column count (min: 1, max:4)" 
                                                            for="report-case-profile-photos-violation-cols" />
                                         </div>
                                         <div class="p-col-4 restrict-main-contents-io-content">                    
@@ -1529,7 +1529,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                         <div class="p-col-8 restrict-data-field-label-inline">
-                                            <h:outputLabel value="Include action request photos" 
+                                            <h:outputLabel value="Action request photo column count (min: 1, max:4)" 
                                                            for="report-case-cear-photos-cols" />
                                         </div>
                                         <div class="p-col-4 restrict-main-contents-io-content">                    
@@ -1578,6 +1578,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </div>
 
                                         <div class="p-col-8 restrict-data-field-label-inline">
+                                            <h:outputLabel value="Include photo filenames" 
+                                                           for="report-case-profile-photos-filenames" />
+                                        </div>
+                                        <div class="p-col-4 restrict-main-contents-io-content">                    
+                                            <p:selectBooleanCheckbox id="report-case-profile-photos-filenames" 
+                                                                     value="#{ceCaseBB.reportCECase.includePhotoFilenames}" />
+                                        </div>
+                                        <div class="p-col-8 restrict-data-field-label-inline">
                                             <h:outputLabel value="Include cecase photo pool" 
                                                            for="report-case-profile-photos-case" />
                                         </div>
@@ -1586,17 +1594,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                      value="#{ceCaseBB.reportCECase.includeCECasePhotoPool}" />
                                         </div>
 
-                                        <div class="p-col-8 restrict-data-field-label-inline">
-                                            <h:outputLabel value="Include case photo filenames" 
-                                                           for="report-case-profile-photos-filenames" />
-                                        </div>
-                                        <div class="p-col-4 restrict-main-contents-io-content">                    
-                                            <p:selectBooleanCheckbox id="report-case-profile-photos-filenames" 
-                                                                     value="#{ceCaseBB.reportCECase.includeCECasePhotoPool}" />
-                                        </div>
 
                                         <div class="p-col-8 restrict-data-field-label-inline">
-                                            <h:outputLabel value="Include cecase photo pool" 
+                                            <h:outputLabel value="Case photo column count (min: 1, max:4)" 
                                                            for="report-case-profile-photos-case-cols" />
                                         </div>
                                         <div class="p-col-4 restrict-main-contents-io-content">                    

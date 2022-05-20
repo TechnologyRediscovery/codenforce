@@ -2692,16 +2692,18 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      /**
       * Creates a new entry in the textblock table
       * @param tb
+     * @return 
       * @throws IntegrationException 
       */
-     public void insertTextBlock(TextBlock tb) throws IntegrationException{
+     public int insertTextBlock(TextBlock tb) throws IntegrationException{
         String query =  "INSERT INTO public.textblock(\n" +
                         " blockid, blockcategory_catid, muni_municode, blockname, "
                         + "blocktext, placementorderdefault, injectabletemplate)\n" +
                         " VALUES (DEFAULT, ?, ?, ?, ?, ?, ?);";
         PreparedStatement stmt = null;
         Connection con = null;
-        
+        ResultSet rs = null;
+        int insertedBlockID = 0;
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
@@ -2715,6 +2717,14 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             
             stmt.execute(); 
             
+             String retrievalQuery = "SELECT currval('textblock_blockid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                insertedBlockID = rs.getInt(1);
+            }
+            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Text Block Integration Module: cannot insert text block into DB, sorry", ex);
@@ -2724,7 +2734,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
           
-         
+         return insertedBlockID;
          
      }
      

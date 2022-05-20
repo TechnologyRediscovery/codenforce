@@ -63,6 +63,7 @@ public class OccPermit extends TrackedEntity {
     private List<HumanLink> buyerTenantLinkList;
     private List<HumanLink> managerLinkList;
     private List<HumanLink> tenantLinkList;
+    
     private ParcelInfo parcelInfo;
     private User issuingOfficer;
     private CodeSource issuingCodeSource;
@@ -71,6 +72,7 @@ public class OccPermit extends TrackedEntity {
     private List<TextBlock> textBlocks_notice;
     // both combined for the comments static field
     private List<TextBlock> textBlocks_comments;
+    
     private String text_comments;
     
     private LocalDateTime dynamicdateofapplication;

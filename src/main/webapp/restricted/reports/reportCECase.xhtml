@@ -575,18 +575,19 @@
                                 <div class="p-col-12 nested-grid">
                                     <f:subview id="violation-photos-subview"
                                                rendered="#{reportingBB.reportCECase.includeViolationPhotos}">
-
+                                        <h2>Photos</h2>
                                         <div class="p-grid">
 
                                             <ui:repeat value="#{v.blobList}"
                                                        var="vblob" >
                                                 <div class="p-col-#{reportingBB.reportCECase.violationPhotoGridSquares}">
                                                     <div class="report-photo-header">
+                                                        
                                                         <h:outputText value="#{vblob.title}"
                                                                       rendered="true"/>
 
                                                         <h:outputText value=" (Photo ID:#{vblob.photoDocID})"
-                                                                      rendered="#{reportingBB.reportConfigFieldInspection.includePhotoIDs}"/>
+                                                                      rendered="true"/>
 
                                                         <h:outputText value=" | "
                                                                       rendered="#{reportingBB.reportCECase.includePhotoFilenames}"/>
@@ -604,7 +605,8 @@
                                                     </p:graphicImage>
 
                                                     <div class="report-photo-caption">
-                                                        <h:outputText value="Description: #{vblob.description}" />
+                                                        <h:outputText value="Description: #{vblob.description}"
+                                                                      rendered="#{!empty vblob.description}"/>
                                                     </div>
                                                 </div>
                                             </ui:repeat>

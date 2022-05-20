@@ -36,6 +36,7 @@ import com.tcvcog.tcvce.entities.PrintStyle;
 import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -77,7 +78,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     public void initBean() {
 
     }
-
+    
     /**
      * Logic pass through method for calls to the system integrator which will
      * make database inserts recording any exploration of one of our BObs
@@ -531,6 +532,122 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     public void setMuniCodeNameMap(Map<Integer, String> muniCodeNameMap) {
         this.muniCodeNameMap = muniCodeNameMap;
     }
+    
+    // *********************************************************************
+    // ******************** TEXT BLOCK INFRASTRUCTURE  *********************
+    // *********************************************************************
+    
+    
+    /**
+     * Gets a text block from the DB by ID
+     * @param blockid
+     * @return
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public TextBlock getTextBlock(int blockid) throws IntegrationException, BObStatusException{
+        CaseIntegrator ci = getCaseIntegrator();
+        if(blockid == 0){
+            throw new BObStatusException("cannot get a text block with ID 0");
+        }
+        return ci.getTextBlock(blockid);
+    }
+    
+    /**
+     * Extracts text blocks from the DB for user selection;
+     * @param catid if zero, all blocks are returned
+     * @param m if null, all muni's blocks are returned
+     * @return a list, perhaps containing 1 or more text blocks
+     */
+    public List<TextBlock> getTextBlockList(int catid, Municipality m) throws IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        List<TextBlock> blockListRaw;
+        List<TextBlock> blockListFinal = new ArrayList<>();
+        if(catid == 0 && m == null){
+            return ci.getAllTextBlocks();
+        }
+        if(catid != 0 && m != null){
+            blockListRaw = ci.getTextBlocksByCategory(catid);
+            if(blockListRaw != null && !blockListRaw.isEmpty()){
+                for(TextBlock tb: blockListRaw){
+                    if(tb.getMuni().getMuniCode() == m.getMuniCode()){
+                        blockListFinal.add(tb);
+                        
+                    }
+                }
+            }
+        }
+        if(catid != 0 && m == null){
+            return ci.getTextBlocksByCategory(catid);
+        }
+        
+        return blockListFinal;
+        
+    }
+    
+    /**
+     * Primary insertion point for text blocks
+     * @param tb
+     * @param ua
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public int insertTextBlock(TextBlock tb, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        if(tb == null || ua == null){
+            throw new BObStatusException("Cannot insert text block with null block or null user");
+        }
+        
+        return ci.insertTextBlock(tb);
+        
+    }
+    
+    
+    /**
+     * Logic and permissions check for updates to a text block
+     * @param tb
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void updateTextBlock(TextBlock tb, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        CaseIntegrator ci = getCaseIntegrator();
+        if(tb == null || ua == null){
+            throw new BObStatusException("Cannot insert text block with null block or null user");
+        }
+        
+        ci.updateTextBlock(tb);
+        
+    }
+
+    /**
+     * Logic and permissions check for deactivation of TextBlocks
+     * TODO: Finish me!
+     * 
+     * @param tb
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void deactivateTextBlock(TextBlock tb, UserAuthorized ua) throws BObStatusException{
+        if(tb == null || ua == null){
+            throw new BObStatusException("Cannot insert text block with null block or null user");
+        }
+        
+        
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    // *********************************************************************
+    // ******************** NAVIGATION INFRASTRUCTURE *********************
+    // *********************************************************************
 
     //xiaohong add
     //Store SubNav Items into List: Dashboard
