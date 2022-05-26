@@ -151,13 +151,24 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * Logic container for updating space element data on all elements in an inspection
      
      * @param osi
+     * @param ua
+     * @param oi
+     * @param statusFilter if provided, this method will filter by this status and only update ordinances coming in with that status
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public void inspectionAction_updateSpaceElementData(OccInspectedSpace osi) throws IntegrationException {
-        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+    public void inspectionAction_updateSpaceElementData(OccInspectedSpace osi, UserAuthorized ua, FieldInspection oi, OccInspectionStatusEnum statusFilter) 
+            throws IntegrationException, AuthorizationException, BObStatusException {
         if(osi != null && osi.getInspectedElementList() != null && !osi.getInspectedElementList().isEmpty()){
             for(OccInspectedSpaceElement oise: osi.getInspectedElementList()){
-                oii.updateInspectedSpaceElement(oise);
+                if(statusFilter != null){
+                    if(oise.getStatusEnum() == statusFilter){
+                        inspectionAction_recordElementInspectionByStatusEnum(oise, ua, oi, COMMENCE_SPACE_WITH_DEF_FAIL_FINDINGS);
+                    }
+                } else {
+                    inspectionAction_recordElementInspectionByStatusEnum(oise, ua, oi, COMMENCE_SPACE_WITH_DEF_FAIL_FINDINGS);
+                }
             }
         }
     }
@@ -659,11 +670,12 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @param ua the user doing the inspecting; must have CEO or better permissions
      * @param oi the inspection in which the element lives
      * @param useDefFindOnFail if true is passed in, the default findings will be appended to any findings
+     * @return 
      * @throws AuthorizationException
      * @throws BObStatusException
      * @throws IntegrationException 
      */
-    public void inspectionAction_recordElementInspectionByStatusEnum(OccInspectedSpaceElement oise,
+    public OccInspectedSpaceElement inspectionAction_recordElementInspectionByStatusEnum(OccInspectedSpaceElement oise,
                                                                      UserAuthorized ua,
                                                                      FieldInspection oi,
                                                                      boolean useDefFindOnFail) throws AuthorizationException, BObStatusException, IntegrationException{
@@ -686,8 +698,9 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                 inspectionAction_configureElementForCompliance(oise, ua, oi);
                 break;
         }
-        // write changes to db
+        // write changes to db // test without writing
         oii.updateInspectedSpaceElement(oise);
+        return oise;
 
     }
     

@@ -19,7 +19,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 /**
- *
+ * This enum is used to assign a status to an inspected element
  * @author ellen bascomb of apt 31y
  */
 public enum OccInspectionStatusEnum {

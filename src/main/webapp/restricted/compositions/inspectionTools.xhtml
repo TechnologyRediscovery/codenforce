@@ -277,7 +277,7 @@
                             <div class="p-col-4">
                                 Determination
                                 <p:spacer height="3px" />
-                               
+
                             </div>
 
                             <div class="p-col-8">
@@ -491,18 +491,18 @@
                                                     />
 
                             </div>
-                            
+
                             <div class="p-col-4">
                                 <p:commandButton id="determination-init-button"
-                                                  actionListener="#{fieldInspectionBB.onCertifyInspectionInitButtonChange}"
-                                                  ajax="true"
-                                                  icon="fa fa-check"
-                                                  oncomplete="PF('inspection-finalize-dialog-var').show()"
-                                                  disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
-                                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                  update="  inspection-finalize-form
-                                                           inspection-finalize-dialog"
-                                                  value="#{!empty fieldInspectionBB.currentInspection.determination ? 'edit determination':'finalize inspection'}">
+                                                 actionListener="#{fieldInspectionBB.onCertifyInspectionInitButtonChange}"
+                                                 ajax="true"
+                                                 icon="fa fa-check"
+                                                 oncomplete="PF('inspection-finalize-dialog-var').show()"
+                                                 disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                 update="  inspection-finalize-form
+                                                 inspection-finalize-dialog"
+                                                 value="#{!empty fieldInspectionBB.currentInspection.determination ? 'edit determination':'finalize inspection'}">
                                 </p:commandButton>
                             </div>
                         </div>
@@ -980,8 +980,8 @@
               dynamic="true"
               modal="true"
               resizable="true"
-              closable="true"
-              closeOnEscape="true">
+              closable="false"
+              closeOnEscape="false">
 
         <div class="p-d-flex p-jc-between">
 
@@ -1056,14 +1056,29 @@
         <h:form id="inspections-entryscreen-form">
 
             <p:commandButton id="inspections-saveandclose"
-                             value="Save all space data"
+                             value="Save and confirm"
                              disabled="false"
                              rendered="true"
                              icon="fa fa-save"
+                             style="margin-right:10px;"
                              actionListener="#{fieldInspectionBB.onSavCurrentSpaceChanges}"
-                             oncomplete="PF('inspections-entryscreen-var').show()"
-                             update="@form:@parent:inspection-inspectedspaces-form
+                             oncomplete="PF('ois-violation-confirm-dialog-var').show();
+                             PF('inspections-entryscreen-var').hide();"
+                             update="@form:@parent:ois-violation-confirm-dialog
+                             @form:@parent:ois-violation-confirm-form
                              @form:@parent:inspectiontools-growl-form"/>
+
+            <div class="gray_button">
+
+                <p:commandButton id="inspections-cancel"
+                                 value="Cancel and discard changes"
+                                 disabled="false"
+                                 rendered="true"
+                                 icon="fa fa-stop"
+                                 actionListener="#{fieldInspectionBB.onAbortSpaceInspectionEntry}"
+                                 oncomplete="PF('inspections-entryscreen-var').hide();"
+                                 update="@form:@parent:inspectiontools-growl-form"/>
+            </div>
 
             <p:spacer height="5px" />
 
@@ -1115,24 +1130,14 @@
 
                                                 <p:selectOneButton id="inspections-entryscreen-statussel" 
                                                                    value="#{spaceElement.statusEnum}" 
-                                                                   unselectable="false"
-                                                                   >
-                                                    <!-- Strangely this element needs to update itself to call the setter -->
-                                                    <p:ajax listener="#{fieldInspectionBB.onElementInspectionStatusButtonChange(spaceElement)}" />
-                                                    <p:ajax update="inspections-entryscreen-statussel"/>
-                                                    <!--<p:ajax update="@form:element-accordion"/>-->
-                                                    <p:ajax update="@form:@parent:inspectiontools-growl-form"/>
-                                                    <p:ajax update="@form"/>
+                                                                   unselectable="false" >
                                                     <f:selectItems value="#{fieldInspectionBB.statuses}" 
                                                                    var="status" 
                                                                    itemLabel="#{status.label}"/>
                                                 </p:selectOneButton>
                                             </div>
                                             <div class="p-col-12>">
-                                                <p:selectBooleanCheckbox    id="insp-ele-excludefromnov-cb"
-                                                                            itemLabel="Include in code enf. case"
-                                                                            rendered="#{(!empty spaceElement.lastInspectedTS) and (empty spaceElement.complianceGrantedTS)}"
-                                                                            value="#{spaceElement.migrateToCaseOnFail}"/>
+
                                                 <p:spacer height="5px" />
                                                 <p>
                                                     <h:outputText id="inspectedby-user"
@@ -1154,31 +1159,10 @@
                                                     <h:outputText id="inspectedby-comp-ts"
                                                                   value="on #{fieldInspectionBB.getPrettyDate(spaceElement.complianceGrantedTS)}" 
                                                                   rendered="#{!empty spaceElement.complianceGrantedTS}"/>
-
                                                 </p>
+
                                             </div>
-                                            <div class="p-col-12">
 
-                                                <p:outputLabel  for="fail-severity-som"
-                                                                rendered="#{!empty spaceElement.lastInspectedTS and empty spaceElement.complianceGrantedTS}">
-                                                    <h:outputText value="Violation severity" />
-                                                </p:outputLabel>
-
-                                                <h:selectOneMenu id="fail-severity-som"
-                                                                 value="#{spaceElement.faillureSeverity}" 
-                                                                 rendered="#{!empty spaceElement.lastInspectedTS and empty spaceElement.complianceGrantedTS}">
-                                                    <f:converter converterId="intensityClassConverter"/>
-
-                                                    <f:selectItem itemLabel="select a severity" 
-                                                                  noSelectionOption="true" />
-
-                                                    <f:selectItems id="fail-severity-selitems"
-                                                                   value="#{fieldInspectionBB.failSeverityList}"
-                                                                   var="ic" itemValue="#{ic}" 
-                                                                   itemLabel="#{ic.numericRating}: #{ic.title}"/>
-
-                                                </h:selectOneMenu>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1228,10 +1212,8 @@
                                                    var="oiseblob">
                                             <h:outputText value="#{oiseblob.photoDocID}: #{oiseblob.filename}" />
                                             <p:spacer height="2px" />
-                                            
+
                                         </ui:repeat>
-                                        
-                                        
                                     </div>
                                 </div>
                             </div>
@@ -1241,9 +1223,123 @@
                 </p:tab>
             </p:accordionPanel>
         </h:form>
-
     </p:dialog>
 
+    <p:dialog id="ois-violation-confirm-dialog"
+              widgetVar="ois-violation-confirm-dialog-var"
+              header="Confirm violated ordinance details"
+              closable="false"
+              closeOnEscape="false"
+              dynamic="true"
+              modal="true"
+              height="600"
+              width="1000"
+              resizable="true"
+              responsive="true">
+
+        <h:form id="ois-violation-confirm-form">
+
+            <p:commandButton id="oise-bacl"
+                             value="Return to space manager" 
+                             icon="fa fa-backward"
+                             actionListener="#{fieldInspectionBB.onReturnToSpaceInspectionEntry}"
+                             oncomplete="PF('inspections-entryscreen-var').show();
+                             PF('ois-violation-confirm-dialog-var').hide();">
+
+            </p:commandButton>
+
+            <p:commandButton id="oise-confirm"
+                             value="Save violation details" 
+                             icon="fa fa-save"
+                             oncomplete="PF('ois-violation-confirm-dialog-var').hide();"
+                             actionListener="#{fieldInspectionBB.onSaveViolatedOrdinanceConfirmationSettings}"
+                             update="@form:@parent:inspectiontools-growl-form
+                             @form:@parent:inspection-inspectedspaces-form">
+
+            </p:commandButton>
+
+            <p:spacer height="3px" />
+
+            <h3>
+                <h:outputText value="Confirm (#{fieldInspectionBB.currentInspectedSpace.elementListFail.size()}) Ordinances marked with violation in #{fieldInspectionBB.currentInspectedSpace.type.spaceTypeTitle}" />
+            </h3>
+            <p:spacer height="3px" />
+            <p:dataTable id="ois-violations-table"
+                         value="#{fieldInspectionBB.currentInspectedSpace.elementListFail}" 
+                         var="oise"
+                         rowKey="#{oise.inspectedSpaceElementID}"
+                         expandedRow="false"
+                         rowExpandMode="true">
+
+                <p:column headerText="Exp"
+                          width="10%">
+                    <p:rowToggler />
+
+                </p:column>
+                <p:column headerText="Ordinance"
+                          width="35%">
+                    <h:outputText value="#{oise.headerString}"
+                                  escape="false" />
+                </p:column>
+
+                <p:column headerText="Severity"
+                          width="45%">
+
+                    <h:selectOneMenu id="fail-severity-som-table"
+                                     value="#{oise.faillureSeverity}" 
+                                     >
+                        <f:converter converterId="intensityClassConverter"/>
+
+                        <f:selectItem itemLabel="select a severity" 
+                                      noSelectionOption="true" />
+
+                        <f:selectItems id="fail-severity-selitems-table"
+                                       value="#{fieldInspectionBB.failSeverityList}"
+                                       var="ic" itemValue="#{ic}" 
+                                       itemLabel="#{ic.numericRating}: #{ic.title}"/>
+                    </h:selectOneMenu>
+                </p:column>
+                <p:column headerText="Migrate to Case"
+                          width="10%">
+                    <p:selectBooleanCheckbox     value="#{oise.migrateToCaseOnFail}"/>
+                </p:column>
+                <p:rowExpansion>
+                    <div class="p-grid nested-grid" >
+                        <div class="p-col-4 restrict-data-field-label-inline">
+                            Findings
+                        </div>
+                        <div class="p-col-8 restrict-data-field-value-inline">
+                            <h:outputText value="#{oise.inspectionNotes}" />
+                        </div>
+                        <div class="p-col-4 restrict-data-field-label-inline">
+                            Photos
+                        </div>
+                        <div class="p-col-8 restrict-data-field-value-inline nested-grid">
+                            <div class="p-grid">
+                                <ui:repeat id="oise-confirm-blobs-uir"
+                                           value="#{oise.blobList}"
+                                           var="oiseblob">
+                                    <div class="p-col-4">
+                                        <h:outputText value="#{oiseblob.photoDocID}" />
+                                        <p:spacer height="2px" />
+                                        <p:graphicImage value="#{blobsterBB.image}"
+                                                        alt="no preview available" 
+                                                        style="width: 100%" 
+                                                        cache="false"
+                                                        rendered="#{oiseblob.type.browserViewable}">
+                                            <f:param name="blobid" value="#{oiseblob.photoDocID}"/>
+                                        </p:graphicImage>
+                                    </div>
+                                </ui:repeat>
+                            </div>
+                        </div>
+                    </div>
+                </p:rowExpansion>
+            </p:dataTable>
+
+
+        </h:form>
+    </p:dialog>
 
     <p:confirmDialog    id="confirmdialog-global"
                         global="true">
@@ -1259,7 +1355,6 @@
                              icon="ui-icon-check" />
         </h:form>
     </p:confirmDialog>
-
 
     <p:dialog id="codeelement-fulltext-dialog"
               widgetVar="codeelement-fulltext-dialog-var"
@@ -1392,7 +1487,7 @@
                                            itemValue="#{det}"/>
                             <p:ajax update="inspection-finalize-commit-cb" />
                         </p:selectOneMenu>
-                        
+
 
                     </div>
 
@@ -1424,10 +1519,10 @@
                                               rendered="#{!empty fieldInspectionBB.currentInspection.determinationTS}"
                                               value="Remove finalization of inspection ID #{fieldInspectionBB.currentInspection.inspectionID}" 
                                               update="  @form:@parent:inspectiontools-growl-form
-                                                        @form:@parent:inspection-actions-form
-                                                        @form:@parent:inspection-profile-form
-                                                        @form:@parent:inspection-inspectedspaces-form:insp-addspace-comlink
-                                                        #{fieldInspectionBB.inspectionListComponentForUpdate}"
+                                              @form:@parent:inspection-actions-form
+                                              @form:@parent:inspection-profile-form
+                                              @form:@parent:inspection-inspectedspaces-form:insp-addspace-comlink
+                                              #{fieldInspectionBB.inspectionListComponentForUpdate}"
                                               >
                             </p:commandButton>
                         </div>

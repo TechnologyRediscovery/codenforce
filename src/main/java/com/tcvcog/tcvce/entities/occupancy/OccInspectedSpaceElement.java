@@ -52,6 +52,10 @@ public class OccInspectedSpaceElement
     
     private int inspectedSpaceElementID;
 
+    // Hacky attempt at not updating database but still having a responsive UI
+    private boolean inspected;
+    private boolean inspectedWithCompliance;
+    
     // Here lies the remains of composition replaced by inheritance! 2-AUG-19 on occbeta
 //    private OccSpaceElement spaceElement;
 
@@ -355,6 +359,8 @@ public class OccInspectedSpaceElement
         return getStatus().getStatusEnum();
     }
 
+   
+    
     public void setStatusEnum(OccInspectionStatusEnum statusEnum) {
         setStatus(new OccInspectableStatus(statusEnum));
     }
@@ -465,6 +471,34 @@ public class OccInspectedSpaceElement
     public String getDBTableName() {
         return TRANSFER_ENUM.getTargetTableID();
         
+    }
+
+    /**
+     * @return the inspected
+     */
+    public boolean isInspected() {
+        return inspected;
+    }
+
+    /**
+     * @return the inspectedWithCompliance
+     */
+    public boolean isInspectedWithCompliance() {
+        return inspectedWithCompliance;
+    }
+
+    /**
+     * @param inspected the inspected to set
+     */
+    public void setInspected(boolean inspected) {
+        this.inspected = inspected;
+    }
+
+    /**
+     * @param inspectedWithCompliance the inspectedWithCompliance to set
+     */
+    public void setInspectedWithCompliance(boolean inspectedWithCompliance) {
+        this.inspectedWithCompliance = inspectedWithCompliance;
     }
 
    

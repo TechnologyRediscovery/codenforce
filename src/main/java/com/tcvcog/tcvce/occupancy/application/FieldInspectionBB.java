@@ -535,12 +535,12 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         System.out.println("OccInspectionBB.onElementInspectionStatusButtonChange | oise: " + oise.getInspectedSpaceElementID() + " status: " + oise.getStatusEnum().getLabel());
         try {
-            oic.inspectionAction_recordElementInspectionByStatusEnum(oise, getSessionBean().getSessUser(), currentInspection, useDefaultFindingsOnCurrentOISE);
-            refreshCurrentInspectionAndRestoreSelectedSpace();
+            oise = oic.inspectionAction_recordElementInspectionByStatusEnum(oise, getSessionBean().getSessUser(), currentInspection, useDefaultFindingsOnCurrentOISE);
+//            refreshCurrentInspectionAndRestoreSelectedSpace();
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Recorded status of element ID: " + oise.getInspectedSpaceElementID(), ""));
-        } catch (AuthorizationException | BObStatusException | IntegrationException | BlobException ex) {
+        } catch (AuthorizationException | BObStatusException | IntegrationException ex) {
             System.out.println(ex);
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -588,18 +588,66 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     public void onSavCurrentSpaceChanges(ActionEvent ev){
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         try {
-            oic.inspectionAction_updateSpaceElementData(currentInspectedSpace);
+            oic.inspectionAction_updateSpaceElementData(currentInspectedSpace, getSessionBean().getSessUser(), currentInspection, null);
             refreshCurrentInspectionAndRestoreSelectedSpace();
             getFacesContext().addMessage(null,
                    new FacesMessage(FacesMessage.SEVERITY_INFO,
                            "Saved changes to space: " + currentInspectedSpace.getType().getSpaceTypeTitle() + " id " + currentInspectedSpace.getInspectedSpaceID(), ""));
-        } catch (IntegrationException | BObStatusException | BlobException ex) {
+        } catch (IntegrationException | BObStatusException | BlobException | AuthorizationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
                            ex.getMessage(), ""));
             
         }
+    }
+    
+    /**
+     * LIstener for user requests to abandon the space editing endeavor complete
+     * @param ev 
+     */
+    public void onAbortSpaceInspectionEntry(ActionEvent ev){
+        System.out.println("OccPeriodBB.onAbortSpaceInspectionEntry");
+          getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Operation aborted", ""));
+            
+        
+    }
+     
+    /**
+     * Listener for user requests to go back and manage a space's ordinances
+     * @param ev 
+     */
+    public void onReturnToSpaceInspectionEntry(ActionEvent ev){
+        System.out.println("OccPeriodBB.onReturnToSpaceInspectionEntry");
+    }
+    
+    
+    /**
+     * Listener for user requests to save their confirmations of violated
+     * ordinances in the space
+     * @param ev 
+     */
+    public void onSaveViolatedOrdinanceConfirmationSettings(ActionEvent ev){
+        System.out.println("FieldInspectionBB.onSaveViolatedOrdinanceConfirmationSettings");
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        try {
+            oic.inspectionAction_updateSpaceElementData(currentInspectedSpace, getSessionBean().getSessUser(), currentInspection, OccInspectionStatusEnum.VIOLATION);
+            refreshCurrentInspectionAndRestoreSelectedSpace();
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Saved changes to space: " + currentInspectedSpace.getType().getSpaceTypeTitle() + " id " + currentInspectedSpace.getInspectedSpaceID(), ""));
+        } catch (IntegrationException | BObStatusException | BlobException | AuthorizationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                           ex.getMessage(), ""));
+            
+        }
+        
+        
+        
     }
     
     /**
@@ -752,6 +800,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
                     ins,
                     getSessionBean().getSessUser());
                     reportConfigFIN.setInspection(currentInspection);
+            reportConfigFIN.setInspectedProperty(getSessionBean().getSessProperty());
 
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
