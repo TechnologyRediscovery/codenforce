@@ -41,7 +41,7 @@
             <p:commandButton    id="cecase-violation-migrate-showpathwayoptions"
                                 ajax="true"
                                 styleClass="noFill button-size-small"
-                                actionListener="#{migrationBB.onMIgrationInitButtonChange}"
+                                actionListener="#{migrationBB.onMigrationInitButtonChange}"
                                 value="Transfer violations"
                                 disabled="#{ceCaseBB.currentCase.violationList.size() eq 0}"
                                 oncomplete="PF('violation-migrate-choosepath-dialog-var').show()"
@@ -1513,11 +1513,8 @@
             <h2>
                 <h:outputText  value="Notes on violatio ID #{ceCaseBB.currentViolation.violationID}" />
             </h2>
-
         </h:form>
-
     </p:dialog>
-
 
     <p:dialog   id="violation-selectelement-dialog"
                 height="800" width="1600"

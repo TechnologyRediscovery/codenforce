@@ -824,6 +824,11 @@
                                                       sortBy="#{cse.originationDate}">
                                                 <h:outputText value="#{!(empty cse.originationDate) ? propertyProfileBB.getPrettyDate(cse.originationDate) : ''}"/>
                                             </p:column>
+                                            <p:column headerText="Unit"
+                                                      sortBy="#{cse.propUnit.unitNumber}"
+                                                      styleClass="centeredColumnContent">
+                                                <h:outputText value="#{!empty cse.propUnit ? cse.propUnit.unitNumber:'-'}" />
+                                            </p:column>
 
                                             <p:column headerText="Status"
                                                       styleClass="centeredColumnContent"
@@ -840,10 +845,6 @@
                                                       styleClass="centeredColumnContent">
                                                 <h:outputText value="#{!(empty cse.caseManager) ? cse.caseManager.human.name:'No manager '}"/>
                                             </p:column>
-                                            <p:column headerText="ID"
-                                                      styleClass="centeredColumnContent">
-                                                <h:outputText value="#{cse.caseID}"/>
-                                            </p:column>
 
                                             <p:column headerText="Options"
                                                       styleClass="centeredColumnContent">
@@ -854,6 +855,7 @@
                                                                     icon="fa fa-folder-open-o"
                                                                     value="View"
                                                                     />
+                                                <h:outputText value="(ID: #{cse.caseID})"/>
                                             </p:column>
                                         </p:dataTable>
                                     </h:form>

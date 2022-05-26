@@ -816,7 +816,8 @@
                                                        value="#{citation.violationList}"
                                                        var="cv">
 
-                                                <h:outputText value="#{cv.violatedEnfElement.headerString}" />
+                                                <h:outputText value="#{cv.violatedEnfElement.headerString}" 
+                                                              escape="false"/>
                                                 <p:spacer height="2px" />
                                                 <h:outputText value="#{cv.citVStatus.label}" 
                                                               class="   report-citation-violation-status

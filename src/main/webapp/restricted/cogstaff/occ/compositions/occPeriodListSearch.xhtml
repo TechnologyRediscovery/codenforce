@@ -14,14 +14,14 @@
               widgetVar="occperiod-list-panel-var"
               collapsed="false"
               style="width:100%;"
-              header="Occupancy Periods">
+              header="Permit File Search">
         
         <h:form id="occperiod-query-form">
             
 
 
         <h:outputLabel styleClass="bold" 
-                       value="Select an occupancy period query:" 
+                       value="Select a Permit File query:" 
                        for="occperiod-query-desc-ot" />
 
         <p:selectOneMenu id="occperiod-query-som" 
@@ -99,7 +99,7 @@
                                actionListener="#{occPeriodSearchBB.loadOccPeriodHistory}"
                                icon="fa fa-clock-o" 
                                styleClass="button"
-                               value="load period history" 
+                               value="load file history" 
                                update=" occperiod-messages-form
                                         @form"/>
             <p:spacer height="5px" />
@@ -182,7 +182,7 @@
                         <p:commandLink id="violation-ord-details-cl" 
                                        ajax="false"
                                        action="#{missionControlBB.onViewOccPeriodButtonChange(period)}"
-                                       value="view" 
+                                       value="view file" 
                                        style="color:blue;"
                                        type="button" />
                     </div>

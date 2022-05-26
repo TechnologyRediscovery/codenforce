@@ -587,7 +587,7 @@ public class    SessionBean
 
 
                 // Set current property to match the sessOccPeriod's propertyUnit
-//                setSessProperty(sessOccPeriod.getPropUnitProp().getProperty());
+                setSessProperty(sessOccPeriod.getPropUnitProp().getProperty());
 
 
                 // Set person--copied from CECase

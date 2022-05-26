@@ -26,6 +26,7 @@ public class OccInspectionDetermination {
     private String description;
 
     private String notes;
+    private boolean qualifiesAsPassed;
 
     // This could be the ID? depends if the object is too heavy with it's icon and stuff
     private EventCategory eventCategory;
@@ -89,5 +90,19 @@ public class OccInspectionDetermination {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    /**
+     * @return the qualifiesAsPassed
+     */
+    public boolean isQualifiesAsPassed() {
+        return qualifiesAsPassed;
+    }
+
+    /**
+     * @param qualifiesAsPassed the qualifiesAsPassed to set
+     */
+    public void setQualifiesAsPassed(boolean qualifiesAsPassed) {
+        this.qualifiesAsPassed = qualifiesAsPassed;
     }
 }

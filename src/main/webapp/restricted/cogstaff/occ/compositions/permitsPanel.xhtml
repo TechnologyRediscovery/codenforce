@@ -3,12 +3,12 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns="http://www.w3.org/1999/xhtml">
-
+    <!--growl-->
     <h:form id="permits-growl-form">
         <p:growl id="permits-growl" />
     </h:form>
 
-
+    <!--panel:root permit list table-->
     <p:panel id="occperiod-permits-panel"
              toggleable="true"
              widgetVar="occperiod-permits-panel-var"
@@ -39,7 +39,7 @@
 
                 <p:column width="20%">
                     <f:facet name="header">
-                        <h:outputText value="ID"/>
+                        <h:outputText value="ID and Reference no."/>
                     </f:facet>
 
                     <h:outputText value="#{permit.permitID}"/>
@@ -52,7 +52,26 @@
                     <f:facet name="header">
                         <h:outputText value="Status"/>
                     </f:facet>
-                    <h:outputText value="#{empty permit.finalizedts ? 'draft only':'finalized' }"/>
+                    <h:outputText value="#{empty permit.finalizedts ? 'draft only (not issued)':'Finalized at ' }"/>
+                    <h:outputText value="#{empty permit.finalizedts ? '': occPeriodBB.getPrettyDateNoTime(permit.finalizedts) }"/>
+                    <h:outputText value="#{empty permit.finalizedBy ? '':' by ' }"/>
+                    <h:outputText value="#{empty permit.finalizedBy ? '': permit.finalizedBy.human.name }"/>
+                    <p:spacer height="3px" />
+                    <h:outputText value="Nullified at "
+                                  rendered="#{!empty permit.nullifiedTS}"
+                                  style="color:darkred;"/>
+
+                    <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(permit.nullifiedTS)}"
+                                  rendered="#{!empty permit.nullifiedTS}"
+                                  style="color:darkred;"/>
+
+                    <h:outputText value=" by "
+                                  rendered="#{!empty permit.nullifiedTS}"
+                                  style="color:darkred;"/>
+
+                    <h:outputText value="#{permit.nullifiedBy.human.name}"
+                                  rendered="#{!empty permit.nullifiedTS}"
+                                  style="color:darkred;"/>
                 </p:column>
 
                 <p:column width="20%">
@@ -60,37 +79,86 @@
                         <h:outputText value="Actions"/>
                     </f:facet>
 
-                    <p:commandLink  id="permit-print-cl" 
-                                    ajax="false"
-                                     action="#{occPeriodBB.onOccPermitPrintLinkClick(permit)}"
-                                     value="print"
-                                     style="color:blue; font-weight: bold;"
-                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+
+                    <p:commandLink  id="permit-config-init-cl" 
+                                    ajax="true"
+                                    actionListener="#{occPeriodBB.onOccpermitViewConfigLinkClick(permit)}"
+                                    value="configure"
+                                    disabled="#{!empty permit.finalizedts}"
+                                    style="color:blue; font-weight: bold;"
+                                    oncomplete="PF('occperiod-createpermit-occpermit-var').show();"
+                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
 
                     <p:spacer height="5px" />
 
                     <p:commandLink  id="permit-viewdraft-cl" 
                                     ajax="true"
-                                     actionListener="#{occPeriodBB.onOccpermitViewConfigLinkClick(permit)}"
-                                     value="view draft and finalize"
-                                     style="color:blue; font-weight: bold;"
-                                     oncomplete="PF('permit-draft-dialog-var').show();"
-                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                                    actionListener="#{occPeriodBB.onOccpermitViewConfigLinkClick(permit)}"
+                                    value="view draft #{empty permit.finalizedts ? 'and finalize':''}"
+                                    style="color:blue; font-weight: bold;"
+                                    oncomplete="PF('permit-draft-dialog-var').show();"
+                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
 
                     <p:spacer height="5px" />
-                    <p:commandLink  id="permit-config-init-cl" 
+
+                    <p:commandLink  id="permit-print-cl" 
+                                    ajax="false"
+                                    action="#{occPeriodBB.onOccPermitPrintLinkClick(permit)}"
+                                    value="print permit"
+                                    style="color:blue; font-weight: bold;"
+                                    disabled="#{(!empty permit.nullifiedTS) or (!empty permit.deactivatedTS)}"
+                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+
+                    <p:spacer height="5px" />
+
+                    <p:commandLink  id="permit-nullify-init-cl" 
                                     ajax="true"
-                                     actionListener="#{occPeriodBB.onOccpermitViewConfigLinkClick(permit)}"
-                                     value="configure"
-                                     style="color:blue; font-weight: bold;"
-                                     oncomplete="PF('occperiod-createpermit-occpermit-var').show();"
-                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                                    action="#{occPeriodBB.onOccPermitNullifyInitLinkClick(permit)}"
+                                    value="nullify permit"
+                                    style="color:blue; font-weight: bold;"
+                                    disabled="false"
+                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions and (!empty permit.finalizedts)}"
+                                    update="permits-growl-form
+                                    permit-nullify-form"
+                                    oncomplete="PF('permit-nullify-confirm-dialog-var').show();"/>
+
+                    <p:spacer height="5px" />
+                    <h:outputText value="(ID: #{permit.permitID})" />
                 </p:column>
             </p:dataTable>
         </h:form>
+
+
     </p:panel>
 
-    <!-- Dialog used when making a new permit -->
+    <!--p:dialog|permit-nullify-confirm-dialog-->
+    <p:dialog id="permit-nullify-confirm-dialog"
+              widgetVar="permit-nullify-confirm-dialog-var"
+              header="Confirm Permit Nullification"
+              closable="true"
+              closeOnEscape="true">
+
+        <h:form id="permit-nullify-form">
+
+            <p>Nullification occurs AFTER permit finalization but BEFORE distribution <br /> and marks that a
+                permit was inaccurate and SHALL NEVER be distributed to a property owner. <br /> This 
+                action will be logged with an automatically generated event in this file's log.</p>
+            <p:spacer height="3px" />
+            <p:commandButton  id="permit-nullify-commit-cl" 
+                              ajax="true"
+                              actionListener="#{occPeriodBB.onOccPermitNullifyCommitLinkClick}"
+                              value="Commit nullification of permit #{occPeriodBB.currentOccPermit.permitID}"
+                              icon="fa fa-trash"
+                              disabled="#{!empty permit.finalizedts}"
+                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                              update="permits-growl-form
+                              occperiod-permits-form"
+                              oncomplete="PF('permit-nullify-confirm-dialog-var').hide();"/>
+
+        </h:form>
+    </p:dialog>
+
+    <!-- p:dialog|dynamic configuration -->
     <p:dialog id="occperiod-createpermit-occpermit-dialog"
               height="750" width="1200"
               widgetVar="occperiod-createpermit-occpermit-var"
@@ -102,28 +170,37 @@
               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}">
 
         <h:form id="occperiod-createpermit-occpermit-form">
+            <div class="p-grid">
+                <div class="p-col-6 nested-grid">
+                    <p:panel id="permit-tools-panel"
+                             header="Permit Toolbox">
 
-            <p:commandButton id="occperiod-createpermit-occpermit-button-cancel"
-                             ajax="true"
-                             value="Cancel" icon="fa fa-stop"
-                             onclick="PF('occperiod-createpermit-occpermit-var').hide()"/>
-
-            <p:commandButton id="occperiod-createpermit-occpermit-button-generate"
-                             ajax="true"
-                             actionListener="#{occPeriodBB.onOccPermitGenerateStaticFields}"
-                             value="Generate draft permit" icon="fa fa-plus"
-                             disabled="false"
-                             oncomplete="PF('occperiod-createpermit-occpermit-var').hide; PF('permit-draft-dialog-var').show();"
-                             update="permit-draft-dialog
-                             permit-draft-form"
-                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                        <p:commandButton id="occperiod-createpermit-occpermit-button-generate"
+                                         ajax="true"
+                                         actionListener="#{occPeriodBB.onOccPermitGenerateStaticFields}"
+                                         value="Generate draft permit" icon="fa fa-plus"
+                                         disabled="false"
+                                         oncomplete="PF('occperiod-createpermit-occpermit-var').hide; PF('permit-draft-dialog-var').show();"
+                                         update="permits-growl-form
+                                         permit-draft-dialog
+                                         permit-draft-form"
+                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
 
 
-            <p:panel id="permit-metadata-panel"
-                     header="Permit info">
+                        <p:commandLink  id="permit-deactivate-init-cl" 
+                                        ajax="true"
+                                        actionListener="#{occPeriodBB.onOccPermitDeactivateInit}"
+                                        value="deactivate permit draft"
+                                        style="color:blue; font-weight: bold; display: inline-block; margin-left:15px;"
+                                        disabled="#{(!empty permit.finalizedts) or (!empty permit.nullifiedTS)}"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                        update="permits-growl-form
+                                        @form:@parent:permit-deactivate-form"
+                                        oncomplete="PF('permit-deactivate-confirm-dialog-var').show();"/>
+                    </p:panel>
 
-                <div class="p-grid">
-                    <div class="p-col-6 nested-grid">
+                    <p:panel id="permit-metadata-panel"
+                             header="Permit Settings: Metadata">
                         <div class="p-grid">
                             <div class="p-col-4 restrict-data-field-label-inline">
                                 <h:outputText value="Issuing officer" />
@@ -141,13 +218,38 @@
                                                    itemValue="#{user}"/>
                                 </p:selectOneMenu>
                             </div>
+
+                            <div class="p-col-4 restrict-data-field-label-inline">
+                                <h:outputText value="Issuing code source(s)" />
+                            </div>
+                            <div class="p-col-8 restrict-data-field-value-inline">
+                                <p:selectManyMenu 
+                                    id="occpermit-codesource-som" 
+                                    style="width: 100%"
+                                    showCheckbox="true"
+                                    scrollHeight="120"
+                                    metaKeySelection="false"
+                                    required="false"
+                                    validatorMessage="At least one code source is required for permit issuance"
+                                    value="#{occPeriodBB.currentOccPermit.issuingCodeSourceList}">
+                                    <f:selectItems value="#{codeSetBB.codeSourceList}" 
+                                                   var="source" itemLabel="#{source.sourceName} (#{source.sourceYear})"/>
+                                    <f:converter converterId="codeSourceConverter" />
+                                </p:selectManyMenu>
+                            </div>
+                        </div>
+                    </p:panel>
+
+                    <p:panel id="permit-dates-panel"
+                             header="Permit Settings: Dates">
+                        <div class="p-grid">
                             <div class="p-col-4 restrict-data-field-label-inline">
                                 <h:outputText value="Date of application" />
                             </div>
                             <div class="p-col-8 restrict-data-field-value-inline">
                                 <p:datePicker 	id="occpermit-dynamic-date-application"
                                                rendered="true"
-                                               value="#{occPeriodBB.currentOccPermit.dynamicdateofapplication}" 
+                                               value="#{occPeriodBB.currentOccPermit.dynamicDateOfApplication}" 
                                                style="width: 100%;"
                                                pattern="MM/dd/yyyy HH:mm"
                                                disabled="false"
@@ -158,6 +260,15 @@
                                                mask="true"
                                                timeInput="true" 
                                                required="false" />    
+
+                                <p:spacer height="3px" />
+
+                                <h:outputText value="#{!empty occPeriodBB.currentOccPermit.dynamicsDateOfApplicationAppRef ? 'pre-populated based on most recent permit':'cNf found 0 permit applications'}" />
+
+                                <p:spacer height="3px" />
+
+                                <h:outputText value="Application ID:#{occPeriodBB.currentOccPermit.dynamicsDateOfApplicationAppRef.id}"
+                                              rendered="#{!empty occPeriodBB.currentOccPermit.dynamicsDateOfApplicationAppRef}" />
                             </div>
 
                             <div class="p-col-4 restrict-data-field-label-inline">
@@ -167,7 +278,7 @@
                             <div class="p-col-8 restrict-data-field-value-inline">
                                 <p:datePicker 	id="occpermit-dynamic-date-initial"
                                                rendered="true"
-                                               value="#{occPeriodBB.currentOccPermit.dynamicinitialinspection}" 
+                                               value="#{occPeriodBB.currentOccPermit.dynamicInitialInspection}" 
                                                style="width: 100%;"
                                                pattern="MM/dd/yyyy HH:mm"
                                                disabled="false"
@@ -178,6 +289,19 @@
                                                mask="true"
                                                timeInput="true" 
                                                required="false" />    
+
+                                <p:spacer height="3px" />
+
+                                <h:outputText value="#{!empty occPeriodBB.currentOccPermit.dynamicInitialInspection ? 'pre-populated':'cNf unable to allocate field inspection'}" />
+
+                                <p:spacer height="3px" />
+
+                                <h:outputText value="Inspection ID:#{occPeriodBB.currentOccPermit.dynamicInitialInspectionFINRef.inspectionID}"
+                                              rendered="#{!empty occPeriodBB.currentOccPermit.dynamicInitialInspectionFINRef}" />
+
+
+                                <h:outputText value=" by inspector: #{occPeriodBB.currentOccPermit.dynamicInitialInspectionFINRef.inspector.human.name}"
+                                              rendered="#{!empty occPeriodBB.currentOccPermit.dynamicInitialInspectionFINRef.inspector}" />
 
                             </div>
 
@@ -200,6 +324,19 @@
                                                mask="true"
                                                timeInput="true" 
                                                required="false" />    
+
+                                <p:spacer height="3px" />
+
+                                <h:outputText value="#{!empty occPeriodBB.currentOccPermit.dynamicReInspectionFINRef ? 'pre-populated':'cNf unable to allocate field inspection'}" />
+
+                                <p:spacer height="3px" />
+
+                                <h:outputText value="Inspection ID:#{occPeriodBB.currentOccPermit.dynamicReInspectionFINRef.inspectionID}"
+                                              rendered="#{!empty occPeriodBB.currentOccPermit.dynamicReInspectionFINRef}" />
+
+                                <h:outputText value=" by inspector: #{occPeriodBB.currentOccPermit.dynamicReInspectionFINRef.inspector.human.name}"
+                                              rendered="#{!empty occPeriodBB.currentOccPermit.dynamicReInspectionFINRef.inspector}" />
+
                             </div>
 
                             <div class="p-col-4 restrict-data-field-label-inline">
@@ -220,6 +357,18 @@
                                                mask="true"
                                                timeInput="true" 
                                                required="false" />    
+
+                                <p:spacer height="3px" />
+
+                                <h:outputText value="#{!empty occPeriodBB.currentOccPermit.dynamicfinalinspection ? 'pre-populated':'cNf unable to allocate field inspection'}" />
+
+                                <p:spacer height="3px" />
+
+                                <h:outputText value="Inspection ID:#{occPeriodBB.currentOccPermit.dynamicFinalInspectionFINRef.inspectionID}"
+                                              rendered="#{!empty occPeriodBB.currentOccPermit.dynamicFinalInspectionFINRef}" />
+
+                                <h:outputText value="by inspector: #{occPeriodBB.currentOccPermit.dynamicFinalInspectionFINRef.inspector.human.name}"
+                                              rendered="#{!empty occPeriodBB.currentOccPermit.dynamicFinalInspectionFINRef}" />
                             </div>
 
                             <div class="p-col-4 restrict-data-field-label-inline">
@@ -242,40 +391,55 @@
                                                required="false" />    
                             </div>
                         </div>
-                    </div>
-                    <div class="p-col-6 nested-grid">
+                    </p:panel>
+
+                    <p:panel id="permit-log-dynamicpopulation"
+                             header="Automatic value injection log">
+                        <h2>
+                            <h:outputText id="permit-auditresult-ot"
+                                          value="Audit results: #{!empty occPeriodBB.currentOccPermit.dynamicPopulationReadyForFinalizationTS ? 'Study log below and check all fields for accuracy':'Automated audit failed - cNf recommends NOT to issue permit '}" />
+                        </h2>
+                        <p:accordionPanel id="permit-log-dp-accpanel">
+                            <p:tab id="tab-log"
+                                   title="Dynamic generation log">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.dynamicPopulationLog}"
+                                              escape="false" />
+                            </p:tab>
+                        </p:accordionPanel>
+
+                    </p:panel>
+                </div>
+
+                <div class="p-col-6 nested-grid">
+                    <p:panel id="permit-property-panel"
+                             header="Permit Settings: Property">
                         <div class="p-grid">
                             <div class="p-col-4 restrict-data-field-label-inline">
                                 <h:outputText value="Parcel Info" />
                             </div>
                             <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText value="Info Bundle ID: #{occPeriodBB.currentOccPermit.parcelInfo.parcelInfoID}" />
+                                <p:spacer height="3px" />
+                                <h:outputText value="Attached to property: #{occPeriodBB.currentPropertyDH.address.addressPretty2LineEscapeFalse}"
+                                              escape="false"/>
+                                <h:outputText value="(ID: #{occPeriodBB.currentPropertyDH.parcelKey}" />
+                                <p:spacer height="3px" />
+                                <h:outputText value="Parcel ID: #{occPeriodBB.currentPropertyDH.countyParcelID}" />
                             </div>
+                        </div>
+                    </p:panel>
 
-                            <div class="p-col-4 restrict-data-field-label-inline">
-                                <h:outputText value="Issuing code source" />
-                            </div>
-                            <div class="p-col-8 restrict-data-field-value-inline">
-                                <p:selectOneMenu 
-                                    id="occpermit-codesource-som" 
-                                    style="width: 100%"
-                                    value="#{occPeriodBB.currentOccPermit.issuingCodeSource}">
+                    <p:panel id="permit-persons-panel"
+                             header="Permit Settings: Persons">
 
-                                    <f:selectItems value="#{codeSetBB.codeSourceList}" 
-                                                   var="source" itemLabel="#{source.sourceName} (#{source.sourceYear})"/>
-                                    <f:converter converterId="codeSourceConverter" />
-
-                                </p:selectOneMenu>
-                            </div>
-
+                        <div class="p-grid">
                             <div class="p-col-4 restrict-data-field-label-inline">
                                 <h:outputText value="Owner(s)/Seller(s)" />
-
                             </div>
                             <div class="p-col-8 restrict-data-field-value-inline">
 
                                 <p:commandLink id="permit-choosepersons-seller-init-cl"
-                                               value="assign persons"
+                                               value="configure persons"
                                                actionListener="#{occPeriodBB.onOccPermitPersonLinkingInitButtonChange}"
                                                style="color:blue; font-weight: bold;"
                                                oncomplete="PF('permit-choosepersons-dialog-var').show()"
@@ -293,15 +457,14 @@
                                     <p:spacer height="3px" />
                                 </ui:repeat>
                             </div>
+
                             <div class="p-col-4 restrict-data-field-label-inline">
                                 <h:outputText value="Buyer(s)/Tenant(s)" />
-
-
                             </div>
                             <div class="p-col-8 restrict-data-field-value-inline">
 
                                 <p:commandLink id="permit-choosepersons-buyer-init-cl"
-                                               value="assign persons"
+                                               value="configure persons"
                                                actionListener="#{occPeriodBB.onOccPermitPersonLinkingInitButtonChange}"
                                                oncomplete="PF('permit-choosepersons-dialog-var').show()"
                                                style="color:blue; font-weight: bold;"
@@ -319,16 +482,13 @@
                                     <p:spacer height="3px" />
                                 </ui:repeat>
                             </div>
+
                             <div class="p-col-4 restrict-data-field-label-inline">
                                 <h:outputText value="Manager(s)" />
-
-
                             </div>
                             <div class="p-col-8 restrict-data-field-value-inline">
-
-
                                 <p:commandLink id="permit-choosepersons-manager-init-cl"
-                                               value="assign persons"
+                                               value="configure persons"
                                                actionListener="#{occPeriodBB.onOccPermitPersonLinkingInitButtonChange}"
                                                style="color:blue; font-weight: bold;"
                                                oncomplete="PF('permit-choosepersons-dialog-var').show()"
@@ -352,7 +512,7 @@
                             <div class="p-col-8 restrict-data-field-value-inline">
 
                                 <p:commandLink id="permit-choosepersons-tenants-init-cl"
-                                               value="assign persons"
+                                               value="configure persons"
                                                actionListener="#{occPeriodBB.onOccPermitPersonLinkingInitButtonChange}"
                                                style="color:blue; font-weight: bold;"
                                                oncomplete="PF('permit-choosepersons-dialog-var').show()"
@@ -369,10 +529,18 @@
                                     <p:spacer height="3px" />
                                 </ui:repeat>
                             </div>
+                        </div>
+                    </p:panel>
 
+                    <p:panel id="permit-textblocks-panel"
+                             header="Permit Settings: Text Blocks and Custom Comments">
+
+                        <!--grid-->
+                        <div class="p-grid">
                             <div class="p-col-4 restrict-data-field-label-inline">
                                 <h:outputText value="Prefabricated stipulations" />
                             </div>
+                            <!--stip-->
                             <div class="p-col-8 restrict-data-field-value-inline">
                                 <p:commandLink id="permit-block-choose-stipulations-cl"
                                                actionListener="#{occPeriodBB.onOccPermitExtractBlockListEnumAndConfigureCandidatesLinkClick}"
@@ -383,7 +551,7 @@
                                                oncomplete="PF('permit-chooseblock-dialog-var').show();">
                                     <f:param name="permit-block-cat" value="STIPULATIONS" />
                                 </p:commandLink>
-                                
+
                                 <p:spacer height="5px" />
 
                                 <h4>Selected Stipulation blocks</h4>
@@ -393,7 +561,7 @@
                                     <h:outputText value="#{block.textBlockCategoryTitle}" />
                                     <h:outputText value=" | " />
                                     <h:outputText value="#{block.textBlockName}" />
-                                    <p:spacer height="3px" />
+                                    <h:outputText value=" | " />
                                     <p:commandLink id="permit-block-view-cl"
                                                    actionListener="#{occPeriodBB.onOccPermitViewTextBlock(block)}"
                                                    value="view"
@@ -411,6 +579,7 @@
                                                    update="@form" >
                                         <f:param name="permit-block-cat" value="STIPULATIONS" />
                                     </p:commandLink>
+                                    <p:spacer height="3px" />
                                 </ui:repeat>
                             </div>
 
@@ -435,7 +604,7 @@
                                     <h:outputText value="#{block.textBlockCategoryTitle}" />
                                     <h:outputText value=" | " />
                                     <h:outputText value="#{block.textBlockName}" />
-                                    <p:spacer height="3px" />
+                                    <h:outputText value=" | " />
 
                                     <p:commandLink id="permit-block-view-notices-cl"
                                                    actionListener="#{occPeriodBB.onOccPermitViewTextBlock(block)}"
@@ -454,6 +623,7 @@
                                                    update="@form" >
                                         <f:param name="permit-block-cat" value="NOTICES" />
                                     </p:commandLink>
+                                    <p:spacer height="3px" />
                                 </ui:repeat>
                             </div>
 
@@ -481,7 +651,7 @@
                                     <h:outputText value="#{block.textBlockCategoryTitle}" />
                                     <h:outputText value=" | " />
                                     <h:outputText value="#{block.textBlockName}" />
-                                    <p:spacer height="3px" />
+                                    <h:outputText value=" | " />
                                     <p:commandLink id="permit-block-view-comments-cl"
                                                    actionListener="#{occPeriodBB.onOccPermitViewTextBlock(block)}"
                                                    value="view"
@@ -499,6 +669,7 @@
                                                    update="@form" >
                                         <f:param name="permit-block-cat" value="COMMENTS" />
                                     </p:commandLink>
+                                    <p:spacer height="3px" />
                                 </ui:repeat>
 
                             </div>
@@ -507,18 +678,51 @@
                                 <h:outputText value="Custom comments" />
                             </div>
                             <div class="p-col-8 restrict-data-field-value-inline">
-                                <p:inputTextarea value="#{occPeriodBB.currentOccPermit.text_comments}" 
-                                                 id="permit-comments-ita"
+                                <p:inputTextarea id="permit-customcomments-ita"
+                                                 value="#{occPeriodBB.currentOccPermit.text_comments}"
                                                  rows="5"
-                                                 cols="35" />
+                                                 cols="45" />
                             </div>
+
+
                         </div>
-                    </div>
+                    </p:panel>
                 </div>
-            </p:panel>
+            </div>
         </h:form>
     </p:dialog>
 
+
+    <!--p:dialog|permit-deactivate-->
+    <p:confirmDialog id="permit-deactivate-confirm-dialog"
+                     widgetVar="permit-deactivate-confirm-dialog-var"
+                     header="Confirm permit deactivation"
+                     closable="true"
+                     closeOnEscape="true">
+
+        <h:form id="permit-deactivate-form">
+
+            <p>Deactivation occurs BEFORE permit finalization and therefore pertains 
+                <br />only to non-numbered permit objects,  allowing you to start permit generation over. 
+                <br />Also, this event is NOT logged on the permit file's event log. </p>
+
+            <p:spacer height="3px" />
+
+            <p:commandButton  id="permit-deactivate-commit-cl" 
+                              ajax="true"
+                              actionListener="#{occPeriodBB.onOccpermitDeactivateCommit}"
+                              value="Commit deactivation of permit #{occPeriodBB.currentOccPermit.permitID}"
+                              icon="fa fa-trash"
+                              disabled="#{(!empty permit.finalizedts) or (!empty permit.nullifiedTS)}"
+                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                              update="permits-growl-form
+                              occperiod-permits-form"
+                              oncomplete="PF('permit-deactivate-confirm-dialog-var').hide();
+                              PF('occperiod-createpermit-occpermit-var').hide();"/>
+
+        </h:form>
+    </p:confirmDialog>
+    <!--p:dialog|permit-choose text block-->
     <p:dialog id="permit-chooseblock-dialog"
               height="650" width="600"
               widgetVar="permit-chooseblock-dialog-var"
@@ -541,18 +745,25 @@
                              value="Add selected blocks to #{occPeriodBB.currentTextBlockPermitFieldEnum.label}"
                              oncomplete="PF('permit-chooseblock-dialog-var').hide();" />
             <p:spacer height="3px" />
+            <div class="italic">
+                (note: select multiple text blocks by holding down the Ctrl key and clicking the desired rows.)
+            </div>
+            <p:spacer height="3px" />
+
 
             <p:dataTable id="permit-blockchoice-table"
-                         value="#{occPeriodBB.permitBlocksActiveCandidateList}"
                          var="block"
+                         value="#{occPeriodBB.permitBlocksActiveCandidateList}"
                          rowKey="#{block.blockID}"
-                         selection="#{occPeriodBB.permitBlocksSelectedList}"
                          selectionMode="multiple"
                          rowExpandMode="multiple"
-                         expandedRow="true">
-
-                <p:column   selectionMode="multiple"
-                            style="width:16px;text-align:center"/>
+                         scrollable="true"
+                         draggableColumns="true"
+                         resizableColumns="true"
+                         selection="#{occPeriodBB.permitBlocksSelectedList}"
+                         filteredValue="#{occPeriodBB.permitBlocksFilteredList}"
+                         expandedRow="false"
+                         widgetVar="permit-blockchoice-table-var">
 
                 <p:column width="10%"
                           headerText="Expand">
@@ -560,6 +771,7 @@
                 </p:column>
 
                 <p:column width="30%"
+                          filterBy="#{block.textBlockCategoryTitle}"
                           headerText="Category">
                     <h:outputText value="#{block.textBlockCategoryTitle}" />
                 </p:column>
@@ -570,21 +782,25 @@
                 </p:column>
 
                 <p:column width="20%"
+                          filterBy="#{block.muni.muniName}"
+                          sortBy="#{block.muni.muniName}"
                           headerText="Muni">
-                    <h:outputText value="#{block.textBlockName}" />
+                    <h:outputText value="#{block.muni.muniName}" />
                 </p:column>
 
                 <p:rowExpansion>
+                    <div class="wrapText">
 
-                    <h:outputText value="#{block.textBlockText}"
-                                  styleClass="monospace" />
+                        <h:outputText value="#{block.textBlockText}"
+                                      styleClass="monospace" />
+                    </div>
                 </p:rowExpansion>
 
             </p:dataTable>
         </h:form>
     </p:dialog>
 
-
+    <!--p:dialog|permit-view text block-->
     <p:dialog id="permit-viewblock-dialog"
               height="650" width="600"
               widgetVar="permit-viewblock-dialog-var"
@@ -605,7 +821,7 @@
 
     </p:dialog>
 
-
+    <!--p:dialog|chooseperson-->
     <p:dialog id="permit-choosepersons-dialog"
               height="700" width="1000"
               widgetVar="permit-choosepersons-dialog-var"
@@ -724,9 +940,10 @@
                         <f:param name="permit-person-list" value="TENANTS" />
                     </p:commandLink>
 
-
                     <h2>
-                        <h:outputText value="Persons added to permit category:  #{occPeriodBB.occPermitCurrentPersonLinkEnum.label}" />
+                        <h:outputText value="Persons currently added to permit category:" />
+                        <p:spacer height="5px" />
+                        <h:outputText value="#{occPeriodBB.occPermitCurrentPersonLinkEnum.label}" />
                     </h2>
 
                     <ui:repeat id="permit-chosenpersons-uir"
@@ -739,21 +956,23 @@
                         <p:commandLink id="permit-person-remove-cl"
                                        value="remove"
                                        ajax="true"
+                                       style="color:blue; font-weight: bold;"
                                        actionListener="#{occPeriodBB.onOccPermitPersonLinkRemove(chosenPerson)}"
-                                       update="@form" />
+                                       update="@form
+                                       permits-growl-form
+                                       permit-chosenpersons-form
+                                       occperiod-createpermit-occpermit-form"
+                                       />
 
                         <p:divider type="solid" />
                     </ui:repeat>
                 </h:form> 
             </div>
         </div>
-
     </p:dialog>
-
-
-
+    <!--p:dialog|finalize permit-->
     <p:dialog id="permit-finalize-commit-dialog"
-              height="700" width="1000"
+              height="300" width="900"
               widgetVar="permit-finalize-commit-dialog-var"
               closable="true"
               closeOnEscape="true"
@@ -764,22 +983,84 @@
               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
 
         <h:form id="permit-finalize-commit-form">
-            
-            
-            <p:commandButton id="permit-finalize-commit-cb"
-                             actionListener="#{occPeriodBB.onOccpermitFinalizeCommitButtonChange}"
-                             update="permit-finalize-commit-form
-                             permit-finalize-commit-dialog"
-                             ajax="true"
-                             icon="fa fa-plus"
-                             value="Finalize occ permit"
-                             oncomplete="PF('permit-finalize-commit-dialog-var').hide();" />
+
+
+            <div class="p-grid">
+                <div class="p-col-3 restrict-data-field-label-inline">
+
+                    <h:outputText value="Audit results" />
+                </div>
+                <div class="p-col-12 restrict-data-field-value-inline">
+
+                    <h:outputText value="#{occPeriodBB.currentOccPermit.finalizationAuditLog}"
+                                  escape="false" />
+                </div>
+
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Finalization" />
+
+                    <p:commandButton id="finalization-help-button"
+                                     icon="fa fa-question-circle-o"
+                                     styleClass="button-help"
+                                     type="button" />
+
+                    <p:overlayPanel for="finalization-help-button"
+                                    style="width:350px;" 
+                                    dismissable="true"
+                                    showCloseIcon="true">
+                        <h3>About finalization</h3>
+                        <p>Finalization of an Occupancy Permit only when all fields appear correct on the draft. 
+                        Once finalized, NONE of the fields can be edited and the permit is assigned a formal tracking number. 
+                        The only way to recover from an error found on a finalized permit is to nullify that permit 
+                        and create a new draft with the corrected values.</p>
+                        
+                    </p:overlayPanel>
+                </div>
+                <div class="p-col-9 restrict-data-field-value-inline">
+                    <p:commandButton id="permit-finalize-commit-cb"
+                                     actionListener="#{occPeriodBB.onOccpermitFinalizeCommitButtonChange}"
+                                     update="   permits-growl-form
+                                    occperiod-permits-form"
+                                     ajax="true"
+                                     disabled="#{empty occPeriodBB.currentOccPermit.finalizationAuditPassTS}"
+                                     icon="fa fa-plus"
+                                     value="#{!empty occPeriodBB.currentOccPermit.finalizationAuditPassTS ? 'Complete finalization' : 'Cannot finalize without a passed audit'}"
+                                     oncomplete="PF('permit-finalize-commit-dialog-var').hide();
+                                     PF('permit-draft-dialog-var').hide();
+                                     PF('occperiod-createpermit-occpermit-var').hide();" />
+
+                </div>
+
+               
+                <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="Failed audit override" />
+                </div>
+                <div class="p-col-9 restrict-data-field-value-inline" >
+                    <p:commandButton id="permit-finalize-commit-overridecb"
+                                     actionListener="#{occPeriodBB.onOccPermitFinalizeOverride}"
+                                     update="   permits-growl-form
+                                     occperiod-permits-form"
+                                     ajax="true"
+                                     disabled="false"
+                                     icon="fa fa-plus"
+                                     rendered="#{empty occPeriodBB.currentOccPermit.finalizationAuditPassTS}"
+                                     value="OVERRIDE FAILED AUDIT!!"
+                                     oncomplete="PF('permit-finalize-commit-dialog-var').hide();
+                                     PF('permit-draft-dialog-var').hide();
+                                     PF('occperiod-createpermit-occpermit-var').hide();" />
+
+                </div>
+
+            </div>
+            <p:spacer height="3px" />
+
         </h:form>
     </p:dialog>
 
 
+    <!--p:dialog|permit-draft-dialog-->
     <p:dialog id="permit-draft-dialog"
-              height="700" width="1000"
+              height="800" width="1300"
               widgetVar="permit-draft-dialog-var"
               closable="true"
               closeOnEscape="true"
@@ -790,22 +1071,24 @@
               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
 
         <h:form id="permit-draft-form">
-            
-            
+
+
             <p:commandButton id="permit-finalize-init-cb"
-                             actionListener="#{occPeriodBB.onOccPermitFinalizeInitButtonChange}"
-                             update="permit-finalize-commit-form
+                             actionListener="#{occPeriodBB.onOccPermitAuditForFinalization}"
+                             update="   permits-growl-form
+                             permit-finalize-commit-form
                              permit-finalize-commit-dialog"
                              ajax="true"
                              icon="fa fa-plus"
-                             value="#{!empty occPeriodBB.currentOccPermit.finalizedts ? 'Already finalized!' : 'Finalize permit'}"
+                             value="#{!empty occPeriodBB.currentOccPermit.finalizedts ? 'Already finalized!' : 'Audit permit for finalization'}"
                              disabled="#{!empty occPeriodBB.currentOccPermit.finalizedts}"
                              oncomplete="PF('permit-finalize-commit-dialog-var').show();" />
-            
-            
+
+
             <div class="p-grid">
                 <div class="p-col-12 centeredColumnContent">
-                    <h:outputText value="#{occPeriodBB.currentOccPermit.statictitle}" />
+                    <h:outputText value="#{occPeriodBB.currentOccPermit.statictitle}" 
+                                  style="font-weight: bold; font-size:1.4em;"/>
                     <p:spacer height="3px" />
                     <h:outputText value="#{occPeriodBB.currentOccPermit.staticmuniaddress}"
                                   escape="false"/>
@@ -817,19 +1100,32 @@
                     <h:outputText value="#{occPeriodBB.currentOccPermit.staticpropertyinfo}" 
                                   escape="false"/>
                 </div>
+                <div class="p-col-4 restrict-data-field-label-inline">
+                    <h:outputText value="Permit Number:" />
+                </div>
+                <div class="p-col-8 restrict-data-field-value-inline">
+                    <h:outputText value="#{occPeriodBB.currentOccPermit.referenceNo}" />
+                </div>
                 <div class="p-col-5">
+                    <h:outputText value="Property Owner/Seller(s):"
+                                  styleClass="bold" />
+                    <p:spacer height="2px" />
                     <h:outputText value="#{occPeriodBB.currentOccPermit.staticownerseller}" 
                                   escape="false"/>
 
                 </div>
                 <div class="p-col-2">
+                    <p:spacer height="15px" />
                     <h:outputText value="#{occPeriodBB.currentOccPermit.staticcolumnlink}" />
                 </div>
                 <div class="p-col-5">
+                    <h:outputText value="Property buyer(s)/tenant(s)"
+                                  styleClass="bold" />
+                    <p:spacer height="2px" />
                     <h:outputText value="#{occPeriodBB.currentOccPermit.staticbuyertenant}"
                                   escape="false" />
                 </div>
-                <div class="p-col-2">
+                <div class="p-col-2 restrict-data-field-label-inline">
                     <h:outputText value="Proposed use:" />
 
                 </div>
@@ -837,7 +1133,7 @@
                     <h:outputText value="#{occPeriodBB.currentOccPermit.staticproposeduse}" />
 
                 </div>
-                <div class="p-col-2">
+                <div class="p-col-2 restrict-data-field-label-inline">
                     <h:outputText value="Use code:" />
 
                 </div>
@@ -845,7 +1141,7 @@
                     <h:outputText value="#{occPeriodBB.currentOccPermit.staticusecode}" />
 
                 </div>
-                <div class="p-col-2">
+                <div class="p-col-2 restrict-data-field-label-inline">
                     <h:outputText value="Property class:" />
 
                 </div>
@@ -857,31 +1153,31 @@
                     <h:outputText value="Date of Application:" />
                 </div>
                 <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{occPeriodBB.currentOccPermit.staticdateofapplication}" />
+                    <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticdateofapplication)}" />
                 </div>
                 <div class="p-col-3 restrict-data-field-label-inline">
                     <h:outputText value="Initial Inspection:" />
                 </div>
                 <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{occPeriodBB.currentOccPermit.staticinitialinspection}" />
+                    <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticinitialinspection)}" />
                 </div>
                 <div class="p-col-3 restrict-data-field-label-inline">
                     <h:outputText value="Reinspection Date:" />
                 </div>
                 <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{occPeriodBB.currentOccPermit.staticreinspectiondate}" />
+                    <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticreinspectiondate)}" />
                 </div>
                 <div class="p-col-3 restrict-data-field-label-inline">
                     <h:outputText value="Final inspection:" />
                 </div>
                 <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{occPeriodBB.currentOccPermit.staticfinalinspection}" />
+                    <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticfinalinspection)}" />
                 </div>
                 <div class="p-col-3 restrict-data-field-label-inline">
                     <h:outputText value="Date of Issuance:" />
                 </div>
                 <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{occPeriodBB.currentOccPermit.staticdateofissue}" />
+                    <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticdateofissue)}" />
                 </div>
                 <div class="p-col-3 restrict-data-field-label-inline">
                     <h:outputText value="   " />
@@ -889,8 +1185,8 @@
                 <div class="p-col-3 restrict-data-field-value-inline">
                     <h:outputText value="   " />
                 </div>
-                
-                
+
+
                 <div class="p-col-3 restrict-data-field-label-inline">
                     <h:outputText value="Code Enforcement Officer:" />
                 </div>
@@ -901,9 +1197,10 @@
                     <h:outputText value="Issued Under:" />
                 </div>
                 <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{occPeriodBB.currentOccPermit.staticissuedundercodesourceid}" />
+                    <h:outputText value="#{occPeriodBB.currentOccPermit.staticissuedundercodesourceid}"
+                                  escape="false"/>
                 </div>
-                
+
                 <div class="p-col-3 restrict-data-field-label-inline">
                     <h:outputText value="Special conditions and stipulations:" />
                 </div>

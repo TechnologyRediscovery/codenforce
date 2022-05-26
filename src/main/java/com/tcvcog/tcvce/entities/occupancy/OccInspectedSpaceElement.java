@@ -333,15 +333,17 @@ public class OccInspectedSpaceElement
         this.migrateToCaseOnFail = migrateToCaseOnFail;
     }
 
+    /**
+     * Sorts by ordinance chapter
+     * @param o
+     * @return 
+     */
     @Override
     public int compareTo(OccInspectedSpaceElement o) {
-        if(inspectedSpaceElementID > o.getInspectedSpaceElementID()){
-            return 1;
-        } else if(inspectedSpaceElementID == o.getInspectedSpaceElementID()){
+        if(ordSecTitle == null || o == null || o.ordSecTitle == null){
             return 0;
-        } else {
-            return -1;
         }
+        return ordSecTitle.compareTo(o.ordSecTitle);
     }
 
     /**

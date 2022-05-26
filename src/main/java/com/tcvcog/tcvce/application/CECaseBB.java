@@ -486,6 +486,8 @@ public class CECaseBB
         List<FieldInspection> finlist = getSessionBean().getSessFieldInspectionListForRefresh();
         if(finlist != null){
             currentCase.setInspectionList(finlist);
+            getSessionBean().setSessFieldInspectionListForRefresh(null);
+            reloadCurrentCase();
         } else {
             return currentCase.getInspectionList();
         }

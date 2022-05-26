@@ -81,6 +81,7 @@ public class OccPeriodBB
     private List<TextBlock> permitBlockCandidatesComments;
     private List<TextBlock> permitBlocksActiveCandidateList;
     private List<TextBlock> permitBlocksSelectedList;
+    private List<TextBlock> permitBlocksFilteredList;
     private TextBlock currentTextBlock;
     private TextBlockPermitFieldEnum currentTextBlockPermitFieldEnum;
     
@@ -128,11 +129,11 @@ public class OccPeriodBB
 
             try {
                 currentPropertyUnit = pc.getPropertyUnitDataHeavy(currentOccPeriod.getPropUnitProp(), getSessionBean().getSessUser());
-                currentPropertyDH = getSessionBean().getSessProperty();
+                currentPropertyDH = pc.getPropertyDataHeavy(currentPropertyUnit.getParcelKey(), getSessionBean().getSessUser());
                 setPropertyUnitCandidateList(sb.getSessProperty().getUnitList());
                 
                 setupPermitTextBlockCandidateLists(null);
-            } catch (IntegrationException | BObStatusException | AuthorizationException | EventException ex) {
+            } catch (IntegrationException | BObStatusException | AuthorizationException | EventException | SearchException | BlobException ex) {
                 System.out.println(ex);
             }
         }
@@ -317,20 +318,7 @@ public class OccPeriodBB
 
     }
 
-    /**
-     * Listener for requests to reload the current OccPeriodDataHeavy
-     * Concept copied from CECaseSearchProfile
-     *
-     * @return
-     */
-    public String refreshCurrentPeriod() {
-        return "occPeriodWorkflow";
-
-    }
-    
-    
-
-
+  
     /**
      * Loads an OccPeriodDataHeavy and injects it into the session bean
      * and sends the user to the Workflow/status page
@@ -391,6 +379,7 @@ public class OccPeriodBB
                 System.out.println("OccPeriodBB.getManagedFieldInspectionList() | session filist size: " + filist.size());
                 currentOccPeriod.setInspectionList(filist);
                 getSessionBean().setSessFieldInspectionListForRefresh(null);
+                reloadCurrentOccPeriodDataHeavy();
                 return currentOccPeriod.getInspectionList();
             } else {
                 return currentOccPeriod.getInspectionList();
@@ -431,6 +420,7 @@ public class OccPeriodBB
         try {
         freshPermitID = oc.insertOccPermit(currentOccPermit, currentOccPeriod, getSessionBean().getSessUser());
         currentOccPermit = oc.getOccPermit(freshPermitID, getSessionBean().getSessUser());
+        configureCurrentOccPermitForOfficerReview();
         System.out.println("OccPeriodBB.onOccPermitInitCommitButtonChange | current occ permit ID: " + currentOccPermit.getPermitID());
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
@@ -464,6 +454,32 @@ public class OccPeriodBB
         
     }
     
+    /**
+     * Internal organ for asking the coordinator to make sensible
+     * occ permit injections such as dates of various inspections
+     * and human links if they can be deciphered.
+     * 
+     */
+    private void configureCurrentOccPermitForOfficerReview(){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        // SHIP all we have to the coordinator for logic check and AUDIT
+        // for PERMIT ISSUANCE CLEARANCE CLARENCE, WHAT?
+        try {
+            oc.occPermitAssignSensibleDynamicValuesAndAudit(currentOccPermit,
+                    currentOccPeriod,
+                    getSessionBean().getSessUser(),
+                    currentPropertyDH);
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+            
+        }
+        
+        
+    }
+    
    
     /**
      * Listener for user requests to view the config fields on an occ permit
@@ -471,6 +487,8 @@ public class OccPeriodBB
      */
     public void onOccpermitViewConfigLinkClick(OccPermit permit){
         currentOccPermit = permit;
+        configureCurrentOccPermitForOfficerReview();
+        
     }
     
  
@@ -483,7 +501,7 @@ public class OccPeriodBB
     public void onOccPermitGenerateStaticFields(ActionEvent ev){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.updateOccPermitStaticFields(currentOccPeriod, currentOccPermit, getSessionBean().getSessUser(), getSessionBean().getSessMuni());
+            oc.occPermitPopulateStaticFieldsFromDynamicFields(currentOccPeriod, currentOccPermit, getSessionBean().getSessUser(), getSessionBean().getSessMuni());
             refreshCurrentOccPermit(null);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -501,8 +519,28 @@ public class OccPeriodBB
      * Begins finalization process
      * @param ev 
      */
-    public void onOccPermitFinalizeInitButtonChange(ActionEvent ev){
-        System.out.println("OccPeriodBB.OccPermitFinalizeInitButtonChange");
+    public void onOccPermitAuditForFinalization(ActionEvent ev) {
+        System.out.println("OccPeriodBB.onOccPermitAuditForFinalization");
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        
+        try {
+            if(oc.occPermitAuditForFinalization(currentOccPermit, getSessionBean().getSessUser())){
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "This permit PASSED and is ready for finalization", ""));
+                
+            } else {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "This permit did NOT pass audit!", ""));
+                
+            }
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            ex.getMessage(), ""));
+        }
     }
     
     
@@ -517,6 +555,26 @@ public class OccPeriodBB
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Finalized Occ permit No " + currentOccPermit.getReferenceNo(), ""));
+            reloadCurrentOccPeriodDataHeavy();
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            ex.getMessage(), ""));
+        } 
+    }
+    /**
+     * Writes finalization fields to DB on an occ permit
+     * @param ev 
+     */
+    public void onOccPermitFinalizeOverride(ActionEvent ev){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.occPermitFinalizeOverrideAudit(currentOccPermit, getSessionBean().getSessUser(),getSessionBean().getSessMuni());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Finalized Occ permit No " + currentOccPermit.getReferenceNo(), ""));
+            reloadCurrentOccPeriodDataHeavy();
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
               getFacesContext().addMessage(null,
@@ -527,29 +585,41 @@ public class OccPeriodBB
     
     /**
      * Starts the deactivation process
-     * @param op 
+     * @param ev 
      */
-    public void onOccPermitDeactivateInit(OccPermit op){
+    public void onOccPermitDeactivateInit(ActionEvent ev){
         System.out.println("OccPeriodBB.onOccPermitDeactivateInit");
         
     }
     
-    /**
-     * concludes the deactivation process
-     * @param op 
+        /**
+     * Listener for user requests to deactivate the current non-finalized occ permit
+     * @param ev 
      */
-    public void onOccPermitDeactivateCommit(OccPermit op){
-         OccupancyCoordinator oc = getOccupancyCoordinator();
-        try {
-            System.out.println("OccPeriodBB.onOccPermitDeactivateCommit");
-            oc.occPermitDeactivate(currentOccPermit, getSessionBean().getSessUser());
-        } catch (BObStatusException | IntegrationException ex) {
-            System.out.println(ex);
-              getFacesContext().addMessage(null,
+    public void onOccpermitDeactivateCommit(ActionEvent ev){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        if(currentOccPermit != null){
+            currentOccPermit.setDeactivatedBy(getSessionBean().getSessUser());
+            currentOccPermit.setDeactivatedTS(LocalDateTime.now());
+            try {
+                oc.updateOccPermit(currentOccPermit, getSessionBean().getSessUser());
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Occ Permit ID " + currentOccPermit.getPermitID() + " has been deactivated! ", ""));
+                refreshCurrentOccPermit(null);
+                reloadCurrentOccPeriodDataHeavy();
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
-        } 
+                
+            } 
+        }
+        
+        
     }
+    
     
     /**
      * Redirects user to page to print occ permit
@@ -581,6 +651,7 @@ public class OccPeriodBB
                 .getString(PERMIT_BLOCKS_COMMENTS)), m);
         
         permitBlocksSelectedList = new ArrayList<>();
+        permitBlocksFilteredList = new ArrayList<>();
     }
     
     
@@ -660,21 +731,24 @@ public class OccPeriodBB
      */
     public void onOccPermitAddSelectedBlocksToPermit(ActionEvent ev){
         System.out.println("OccPeriodBB.onOccPermitAddSelectedBlocksToPermit | permitBlocksSelectedList: " + permitBlocksSelectedList.size());
-        switch(currentTextBlockPermitFieldEnum){
-            case STIPULATIONS:
-                currentOccPermit.getTextBlocks_stipulations().addAll(permitBlocksSelectedList);
-                break;
-            case NOTICES:
-                currentOccPermit.getTextBlocks_notice().addAll(permitBlocksSelectedList);
-                break;
-            case COMMENTS:
-                currentOccPermit.getTextBlocks_comments().addAll(permitBlocksSelectedList);
-                break;
+        if(currentOccPermit != null){
+
+            switch(currentTextBlockPermitFieldEnum){
+                case STIPULATIONS:
+                    currentOccPermit.getTextBlocks_stipulations().addAll(permitBlocksSelectedList);
+                    break;
+                case NOTICES:
+                    currentOccPermit.getTextBlocks_notice().addAll(permitBlocksSelectedList);
+                    break;
+                case COMMENTS:
+                    currentOccPermit.getTextBlocks_comments().addAll(permitBlocksSelectedList);
+                    break;
+            }
+             getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Added " + permitBlocksSelectedList.size() + " text blocks to occ permit text field: " + currentTextBlockPermitFieldEnum.getLabel(), ""));
+            permitBlocksSelectedList.clear();
         }
-         getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Added " + permitBlocksSelectedList.size() + " text blocks to occ permit text field: " + currentTextBlockPermitFieldEnum.getLabel(), ""));
-        permitBlocksSelectedList.clear();
     }
     
     /**
@@ -825,8 +899,44 @@ public class OccPeriodBB
                     currentOccPermit.getTenantLinkList().remove(hl);
                     break;
             }
+         configureOccPermitSelectedHumanLinkList(null);
     }
     
+    /**
+     * Listener for userers to start the nullification process
+     * @param op 
+     */
+    public void onOccPermitNullifyInitLinkClick(OccPermit op){
+        System.out.println("OccPeriodBB.onOccPermitNullifyInitLinkClick");
+        currentOccPermit = op;
+        
+    }
+    
+    
+    /**
+     * Listener for user requests to nullify a passed in occ permit
+     * @param ev
+     * @param op 
+     */
+    public void onOccPermitNullifyCommitLinkClick(ActionEvent ev){
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        try {
+            oc.nullifyOccPermit(currentOccPermit, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_INFO,
+                      "Occ Permit ID " + currentOccPermit.getPermitID() + " has been nullified! ", ""));
+            refreshCurrentOccPermit(null);
+            reloadCurrentOccPeriodDataHeavy();
+        } catch (BObStatusException | IntegrationException  ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+               new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                       ex.getMessage(), ""));
+        } 
+        
+    }
+    
+
     
     
     // *************************************************************************
@@ -1163,6 +1273,20 @@ public class OccPeriodBB
      */
     public void setOccPermitCandidateHumanLinkList(List<HumanLink> occPermitCandidateHumanLinkList) {
         this.occPermitCandidateHumanLinkList = occPermitCandidateHumanLinkList;
+    }
+
+    /**
+     * @return the permitBlocksFilteredList
+     */
+    public List<TextBlock> getPermitBlocksFilteredList() {
+        return permitBlocksFilteredList;
+    }
+
+    /**
+     * @param permitBlocksFilteredList the permitBlocksFilteredList to set
+     */
+    public void setPermitBlocksFilteredList(List<TextBlock> permitBlocksFilteredList) {
+        this.permitBlocksFilteredList = permitBlocksFilteredList;
     }
 
    

@@ -72,7 +72,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     private final int MINIMUM_RANK_INSPECTOREVENTS = 5;
     private final int MINIMUM_RANK_STAFFEVENTS = 3;
     private final int DEFAULT_OCC_PERIOD_START_DATE_OFFSET = 30;
-
+    private final String OCCPERMIT_DEFAULT_COL_SEP = "-TO-";
+    private final int OCCPERMIT_INSPECTION_COUNT_THREE_REPORTED_INSPECTIONS = 3;
+    
+    
     /**
      * Creates a new instance of OccupancyCoordinator
      */
@@ -367,9 +370,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     
         }
         
-        
         return permit;
-        
         
     }
     
@@ -539,13 +540,124 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      */
     public OccPermit getOccPermitSkeleton(User usr) {
         OccPermit permit = new OccPermit();
-        permit.setReferenceNo("GENERATED ON FINALIZATION");
+        permit.setReferenceNo("[generated at finalization]");
         permit.setCreatedBy(usr);
-
-        
         return permit;
-
     }
+
+    /**
+     * Logic organ for taking in a bunch of objects and making sensible assignments
+     * to dynamic fields for the code officer to review before permit finalization.
+     * 
+     * This method will explain the results of its check by writing HTML to the
+     * configurationLog member on OccPermit for the user to review.
+     * 
+     * @param permit cannot be null, cannot be finalized or nullified
+     * @param per null is okay
+     * @param ua cannot be null
+     * @param pdh null is okay
+     * @return a reference to the passed in permit with sensible dynamic values
+     * applied based on incoming objects.
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public OccPermit occPermitAssignSensibleDynamicValuesAndAudit(  OccPermit permit, 
+                                                                    OccPeriodDataHeavy per, 
+                                                                    UserAuthorized ua, 
+                                                                    PropertyDataHeavy pdh) throws BObStatusException{
+        if(permit == null || ua == null) {
+            throw new BObStatusException("OccupancyCoordinator.occPermitAssignSensibleDynamicValuesAndAudit | Cannot assign sensible dynamic values with null permit or user");
+        }
+        boolean pass = true;
+       permit.clearDynamicPopulationLog();
+        
+        List<FieldInspection> finList = per.getInspectionList();
+        // if we don't have any inspections, log and deny permit creation
+        if(finList == null || finList.isEmpty()){
+            permit.appendToDynamicPopulationLog("Inspections: [Fatal] Occ Period contains zero field inspections");
+            permit.appendToDynamicPopulationLog(Constants.FMT_HTML_BREAK);
+            pass = false;
+        // okay, we've got at least one field inspection , so check if it's finalized
+        } else {
+            List<FieldInspection> finalizedFINs = new ArrayList<>();
+            for(FieldInspection fin: finList){
+                if(fin.getDetermination() != null){
+                    finalizedFINs.add(fin);
+                }
+            }
+            // if we have no finalized FINs, log and deny
+            if(finalizedFINs.isEmpty()){
+                permit.appendToDynamicPopulationLog("Inspections: [FATAL] Occ period contains zero finalized inspections. Review your inspections and finalize them and try again");
+                pass = false;
+            } else {
+                // get newest to oldest.
+                // we still need 
+                Collections.sort(finalizedFINs);
+                Collections.reverse(finalizedFINs);
+                // get our Final inspection
+                FieldInspection inspectionFinal = finalizedFINs.get(0);
+                // The only of the three inspection dates needs to come from
+                // an inspection whose finalization determination qualifies as passing
+                
+                if(inspectionFinal.getDetermination().isQualifiesAsPassed()){
+                    permit.setDynamicFinalInspectionFINRef(inspectionFinal);
+                    permit.setDynamicfinalinspection(inspectionFinal.getEffectiveDateOfRecord());
+                    
+                } else {
+                    // TODO: What kind of checks do we want here?
+                    permit.appendToDynamicPopulationLog("Inspections: [FATAL] Most recent field inspection has a determination that does not qualify as a passed inspection: ");
+                        
+                    pass = false;
+                }
+                // Get the initial inspection
+                FieldInspection inspectionInitial = finList.get(finalizedFINs.size()-1);
+                permit.setDynamicInitialInspectionFINRef(inspectionInitial);
+                permit.setDynamicInitialInspection(inspectionInitial.getEffectiveDateOfRecord());
+                
+                // We need a reinspection date, which if there are three or more 
+                // is our second to last
+                int inspectionCount = finList.size();
+                FieldInspection inspeectionReinspetion = null;
+                switch(inspectionCount){
+                    case 0:
+                        permit.appendToDynamicPopulationLog("Inspections: [FATAL] Inspection assignment logic error OPFIN1: --zero inspection count impossible in count case 0");
+                        break;
+                    case 1:
+                        inspeectionReinspetion = null;
+                        permit.appendToDynamicPopulationLog("Inspections: [INFO] Reinspection assigned same inspection as Final Inspection (ID:"+inspectionFinal.getInspectionID()+")");
+                        break;
+                    case 2: 
+                        inspeectionReinspetion = inspectionFinal;
+                        permit.appendToDynamicPopulationLog("Inspections: [INFO] Reinspection assigned same inspection as Initial Inspection (ID:"+inspectionInitial.getInspectionID()+")");
+                        break;
+                    case 3:
+                        // gt>3: no break--fall through to default
+                    default:
+                        inspeectionReinspetion = finalizedFINs.get(1); // get second most recent inspection and call it the reinspection
+                        permit.appendToDynamicPopulationLog("Inspections: [INFO] Reinspection assigned same inspection as Second most recent Inspection (ID:"+inspectionInitial.getInspectionID()+")");
+                }
+                // inject into the permit
+                permit.setDynamicReInspectionFINRef(inspeectionReinspetion);
+                if(inspeectionReinspetion != null){
+                    permit.setDynamicreinspectiondate(inspeectionReinspetion.getEffectiveDateOfRecord());
+                } else {
+                        permit.appendToDynamicPopulationLog("Inspections: [INFO] No reinspection assigned, probably because there was only one finalized inspection");
+                        
+                }
+            }
+        } // done setting inspeections and their dates
+        
+        // configure date of issuance to today
+        permit.setDynamicdateofissue(LocalDateTime.now());
+        
+        
+        // Hold off on persons here;
+        
+        if(pass){
+            permit.setDynamicPopulationReadyForFinalizationTS(LocalDateTime.now());
+        }
+        return permit;
+    }
+    
     
     /**
      * Getter for occupancy permits
@@ -573,15 +685,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      */
     public List<OccPermit> getOccPermitList(OccPeriod op, UserAuthorized ua) throws BObStatusException, IntegrationException{
         
-        
        if(op == null || ua == null){
             throw new BObStatusException("OccupancyCoordinator.getOccPermitList | Cannot get occ permit list with null occ period or user");
         }
        if(op.getPeriodID() == 0){
             throw new BObStatusException("OccupancyCoordinator.getOccPermitList | Cannot get occ permit list with occ period whose ID == 0");
-           
        }
-        
         OccupancyIntegrator oi = getOccupancyIntegrator();
         List<Integer> opermitIDList = oi.getOccPermitIDList(op);
         
@@ -591,9 +700,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 occPermitList.add(getOccPermit(i, ua));
             }
         }
-        
         return occPermitList;
-    
     }
     
     /**
@@ -629,9 +736,39 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         if(permit == null || ua == null){
             throw new BObStatusException("Cannot insert occ permit with null permit or user");
         }
+        
+        if(permit.getFinalizedts() != null){
+            throw new BObStatusException("Cannot update an already finalized occ permit");
+        }
+        if(permit.getNullifiedTS() != null){
+            throw new BObStatusException("OccupancyCoordinator.updateOccPermit: Cannot update a nullified permit");
+        }
+        
         OccupancyIntegrator oi = getOccupancyIntegrator();
         permit.setLastUpdatedBy(ua);
         oi.updateOccPermit(permit);
+        
+    }
+    
+    /**
+     * Writes a name and timestamp to the nullification fields a permit
+     * @param permit
+     * @param ua
+     * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void nullifyOccPermit(OccPermit permit, UserAuthorized ua) throws BObStatusException, IntegrationException{
+         if(permit == null || ua == null){
+            throw new BObStatusException("OccupancyCoordinator.nullifyOccPermit | Cannot nullify occ permit with null permit or user");
+        }
+        if(permit.getFinalizedts() == null){
+            throw new BObStatusException("OccupancyCoordinator.nullifyOccPermit | Cannot nullify an occ permit that has NOT yet been finlized. You can deactivate a draft, though!");
+        }
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        permit.setNullifiedBy(ua);
+        permit.setNullifiedTS(LocalDateTime.now());
+        permit.setLastUpdatedBy(ua);
+        oi.nullifyOccupancyPermit(permit);
         
     }
     
@@ -649,13 +786,137 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             throw new BObStatusException("Cannot finalize occ permit with null permit or user");
         }
         OccupancyIntegrator oi = getOccupancyIntegrator();
+        permit.setReferenceNo(generateOccPermitReferenceNumber(permit, m));
+        if(permit.getFinalizationAuditPassTS() == null){
+            throw new BObStatusException("Finalization cannot occur with a failed audit");
+        }
+        
         permit.setLastUpdatedBy(ua);
         permit.setFinalizedBy(ua);
         permit.setFinalizedts(LocalDateTime.now());
-        permit.setReferenceNo(generateOccPermitReferenceNumber(permit, m));
         
         oi.updateOccPermit(permit);
         
+    }
+    
+    /**
+     * Updates the meta data of an occ permit only. Use separate method for static fields
+     * @param permit
+     * @param ua
+     * @param m
+     * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void occPermitFinalizeOverrideAudit(OccPermit permit, UserAuthorized ua, Municipality m) throws BObStatusException, IntegrationException{
+        if(permit == null || ua == null){
+            throw new BObStatusException("Cannot finalize occ permit with null permit or user");
+        }
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        permit.setReferenceNo(generateOccPermitReferenceNumber(permit, m));
+        if(permit.getFinalizationAuditPassTS() == null){
+            System.out.println("OccupancyCoordinator.occPermitFinalizeOverrideAudit | Overriding failed permit audit by " + ua.getUsername());
+        }
+        
+        permit.setLastUpdatedBy(ua);
+        permit.setFinalizedBy(ua);
+        permit.setFinalizedts(LocalDateTime.now());
+        
+        oi.updateOccPermit(permit);
+        
+    }
+    
+    /**
+     * Logic mechanism for checking a permit's readiness for finalization
+     * This reviews permit static fields, after the user has had a chance to review
+     * the automatically populated fields
+     * 
+     * @param permit
+     * @param ua 
+     * @return  
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public boolean occPermitAuditForFinalization(OccPermit permit, UserAuthorized ua) throws BObStatusException{
+       boolean auditPass = true;
+       
+        if(permit == null || ua == null){
+           auditPass = false;
+           throw new BObStatusException("Cannot aduit a null pointer or user");
+       
+        } 
+        
+        permit.clearFinalizationAuditLog();
+        // Officer, muni, ids
+        if(permit.getPermitID() == 0){
+           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPF0: Permit ID cannot be zero");
+           auditPass = false;
+        }
+       if(permit.getStaticofficername() == null){
+           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPF2: null officer");
+           auditPass = false;
+       }
+       // TURN OFF THIS SINCE REF no not generated until the very end
+//       if(permit.getReferenceNo() == null){
+//           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPF3: no reference number");
+//           auditPass = false;
+//       }
+       
+       
+       // DATE AUDITS
+       if(permit.getStaticdateofapplication() == null){
+           auditPass = false;
+           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD1: missing date of application ");
+       }
+       if(permit.getStaticinitialinspection() == null){
+           auditPass = false;
+           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD2: missing date of static initial inspection ");
+       }
+       // reinspection CAN be null if there is only one total inspection
+       if(permit.getStaticfinalinspection() == null){
+           auditPass = false;
+           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD4: missing date of final inspection ");
+       }
+       if(permit.getStaticdateofissue() == null){
+           auditPass = false;
+           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD5: missing date of issuance");
+       }
+       
+       // DATE SEQUENCE AUDITS
+       if(permit.getStaticdateofissue().isBefore(permit.getStaticdateofapplication())){
+           auditPass = false;
+           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD6: date of application cannot be BEFORE date of issuance");
+       }
+       if(permit.getStaticdateofissue().isBefore(permit.getStaticinitialinspection())){
+           auditPass = false;
+           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD7: date of initial inspection cannot be BEFORE date of issuance");
+       }
+       if(permit.getStaticdateofissue().isBefore(permit.getStaticreinspectiondate())){
+           auditPass = false;
+           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD8: date of re-inspection cannot be BEFORE date of issuance");
+       }
+       if(permit.getStaticdateofissue().isBefore(permit.getStaticfinalinspection())){
+           auditPass = false;
+           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD9: date of final inspection cannot be BEFORE date of issuance");
+       }
+       if(permit.getStaticreinspectiondate() != null){
+            if(permit.getStaticreinspectiondate().isBefore(permit.getStaticinitialinspection())){
+                auditPass = false;
+                permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD10: date of reinspeection cannot be BEFORE date of initial inspection");
+            }
+       }
+       if(permit.getStaticfinalinspection().isBefore(permit.getStaticinitialinspection())){
+                auditPass = false;
+                permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD11: date of final inspection cannot be BEFORE date of initial inspection");
+       }
+       
+       
+       
+       if(auditPass){
+           permit.setFinalizationAuditPassTS(LocalDateTime.now());
+           permit.appendToFinalizationAuditLog("Audit result: Pass timestamp injected!");
+       }  else {
+           permit.appendToFinalizationAuditLog("Audit result: FAILURE - No timestamp for you");
+       }
+        return auditPass;
     }
     
     /**
@@ -694,7 +955,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @throws BObStatusException
      * @throws IntegrationException 
      */
-    public void updateOccPermitStaticFields(OccPeriodDataHeavy period, OccPermit permit, UserAuthorized ua, MunicipalityDataHeavy mdh) throws BObStatusException, IntegrationException{
+    public void occPermitPopulateStaticFieldsFromDynamicFields(OccPeriodDataHeavy period, OccPermit permit, UserAuthorized ua, MunicipalityDataHeavy mdh) throws BObStatusException, IntegrationException{
         if(permit == null || ua == null || period == null || mdh == null){
             throw new BObStatusException("Cannot insert occ permit with null permit or user or period or munidh");
         }
@@ -702,7 +963,13 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             throw new BObStatusException("Cannot update static fields of a finalized permit!");
         }
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        PropertyCoordinator pc = getPropertyCoordinator();       
+        PropertyCoordinator pc = getPropertyCoordinator();     
+        
+        
+        permit.setStatictitle(period.getType().getPermitTitle());
+        permit.setStaticcolumnlink(OCCPERMIT_DEFAULT_COL_SEP);
+        
+        
         StringBuilder sb;
         
          // now do property and unit static fields
@@ -716,13 +983,20 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             sb.append(puwp.getProperty().getAddress().getAddressPretty2LineEscapeFalse());
             sb.append(Constants.FMT_HTML_BREAK);
             sb.append(puwp.getProperty().getCountyParcelID());
+            permit.setStaticpropertyinfo(sb.toString());
         }
         // muni addresss
-        permit.setStaticmuniaddress(mdh.getMuniPropertyDH().getAddress().getAddressPretty2LineEscapeFalse());
+        System.out.println("OccupancyCoordinator.setStaticFields: Setting muni address: " + mdh.getMuniPropertyDH().getAddress().getAddressPretty2LineEscapeFalse());
+        sb = new StringBuilder();
+        sb.append(mdh.getMuniName());
+        sb.append(Constants.FMT_HTML_BREAK);
+        sb.append(mdh.getMuniPropertyDH().getAddress().getAddressPretty2LineEscapeFalse());
+        
+        permit.setStaticmuniaddress(sb.toString());
 
         // move over dates
-        permit.setStaticdateofapplication(permit.getDynamicdateofapplication());
-        permit.setStaticinitialinspection(permit.getDynamicfinalinspection());
+        permit.setStaticdateofapplication(permit.getDynamicDateOfApplication());
+        permit.setStaticinitialinspection(permit.getDynamicInitialInspection());
         permit.setStaticreinspectiondate(permit.getDynamicreinspectiondate());
         permit.setStaticfinalinspection(permit.getDynamicfinalinspection());
         permit.setStaticdateofissue(permit.getDynamicdateofissue());
@@ -731,7 +1005,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         if(permit.getParcelInfo() == null){
             throw new BObStatusException("Cannot populate occ permit with null parcel info in occ permit");
         }
-        if(permit.getIssuingCodeSource() == null){
+        if(permit.getIssuingCodeSourceList() == null){
             throw new BObStatusException("Cannot populate occ permit with null code source");
         }
         if(permit.getIssuingOfficer()== null){
@@ -745,10 +1019,21 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         // build code source string
         sb = new StringBuilder();
-        sb.append(permit.getIssuingCodeSource().getSourceName());
-        sb.append(" (");
-        sb.append(permit.getIssuingCodeSource().getSourceYear());
-        sb.append(")");
+        if(permit.getIssuingCodeSourceList() == null || permit.getIssuingCodeSourceList().isEmpty()){
+            throw new BObStatusException("Cannot populate occ permit static fields with null or empty source list");
+        }
+        int sourcecount = 0;
+        for(CodeSource src: permit.getIssuingCodeSourceList()){
+            sb.append(src.getSourceName());
+            sb.append(" (");
+            sb.append(src.getSourceYear());
+            sb.append(")");
+            sourcecount += 1;
+            // only add breaks if there are 2 or more sources and this is NOT the last source in the list
+            if(permit.getIssuingCodeSourceList().size() > 1 && sourcecount < permit.getIssuingCodeSourceList().size()){
+                sb.append(Constants.FMT_HTML_BREAK);
+            }
+        }
         permit.setStaticissuedundercodesourceid(sb.toString());
         
         // issuing officer
@@ -803,6 +1088,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
        permit.setStaticcomments(sb.toString());
        
         permit.setLastUpdatedBy(ua);
+        
         oi.updateOccPermitStaticFields(permit);
     }
     

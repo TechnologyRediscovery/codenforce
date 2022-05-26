@@ -277,17 +277,7 @@
                             <div class="p-col-4">
                                 Determination
                                 <p:spacer height="3px" />
-                                <p:commandLink id="determination-init-button"
-                                               actionListener="#{fieldInspectionBB.onCertifyInspectionInitButtonChange}"
-                                               ajax="true"
-                                               style="color:blue; font-weight: bold;"
-                                               oncomplete="PF('inspection-finalize-dialog-var').show()"
-                                               disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
-                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                               update="inspection-finalize-form
-                                               inspection-finalize-dialog"
-                                               value="#{!empty fieldInspectionBB.currentInspection.determination ? 'edit determination':'finalize inspection'}">
-                                </p:commandLink>
+                               
                             </div>
 
                             <div class="p-col-8">
@@ -424,7 +414,7 @@
                 <p:panel id="inspection-tools-panel"
                          toggleable="true"
                          collapsed="false"
-                         header="Inspection Tools">
+                         header="Inspection Toolbox">
 
                     <h:form id="inspection-actions-form">
 
@@ -489,10 +479,10 @@
                             </div>
                             <div class="p-col-4">
                                 <p:commandButton    id="insp-extractviolations-button"
-                                                    value="Transfer Violated Elements"
+                                                    value="Transfer Violated Elements #{empty fieldInspectionBB.currentInspection.determination ? '[Finalize inspection to enable migration]' : ''}"
                                                     ajax="true"
-                                                    disabled="false"
-                                                    actionListener="#{migrationBB.onMIgrationInitButtonChange}"
+                                                    disabled="#{empty fieldInspectionBB.currentInspection.determination}"
+                                                    actionListener="#{migrationBB.onMigrationInitButtonChange}"
                                                     oncomplete="PF('faileditems-migrate-choosepath-dialog-var').show()"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                     icon="fa fa-gavel"
@@ -501,7 +491,20 @@
                                                     />
 
                             </div>
-
+                            
+                            <div class="p-col-4">
+                                <p:commandButton id="determination-init-button"
+                                                  actionListener="#{fieldInspectionBB.onCertifyInspectionInitButtonChange}"
+                                                  ajax="true"
+                                                  icon="fa fa-check"
+                                                  oncomplete="PF('inspection-finalize-dialog-var').show()"
+                                                  disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                  update="  inspection-finalize-form
+                                                           inspection-finalize-dialog"
+                                                  value="#{!empty fieldInspectionBB.currentInspection.determination ? 'edit determination':'finalize inspection'}">
+                                </p:commandButton>
+                            </div>
                         </div>
                     </h:form>
                 </p:panel>
@@ -1053,12 +1056,12 @@
         <h:form id="inspections-entryscreen-form">
 
             <p:commandButton id="inspections-saveandclose"
-                             value="Save space data and close"
+                             value="Save all space data"
                              disabled="false"
                              rendered="true"
                              icon="fa fa-save"
                              actionListener="#{fieldInspectionBB.onSavCurrentSpaceChanges}"
-                             oncomplete="PF('inspections-entryscreen-var').hide()"
+                             oncomplete="PF('inspections-entryscreen-var').show()"
                              update="@form:@parent:inspection-inspectedspaces-form
                              @form:@parent:inspectiontools-growl-form"/>
 
@@ -1069,8 +1072,7 @@
                               var="elegrp" multiple="true"
                               >
                 <p:ajax/>
-                <p:tab title="#{elegrp.groupTitle}"
-                       >
+                <p:tab title="#{elegrp.groupTitle}" >
                     <p:repeat   id="elements-repeat"
                                 value="#{elegrp.elementList}" 
                                 var="spaceElement"
@@ -1386,10 +1388,11 @@
                                           itemLabel="choose a determination" />
                             <f:selectItems value="#{fieldInspectionBB.determinationList}" 
                                            var="det"
-                                           itemLabel="#{det.title}"
+                                           itemLabel="#{det.title} (#{det.qualifiesAsPassed ? 'PASS' : 'FAIL'})"
                                            itemValue="#{det}"/>
                             <p:ajax update="inspection-finalize-commit-cb" />
                         </p:selectOneMenu>
+                        
 
                     </div>
 
@@ -1402,6 +1405,7 @@
                                            disabled="#{!empty fieldInspectionBB.currentInspection.determinationTS}"
                                            actionListener="#{fieldInspectionBB.onCertifyInspectionCommitButtonChange}"
                                            update=" @form:@parent:inspection-profile-form
+                                           @form:@parent:inspection-actions-form
                                            @form:@parent:inspectiontools-growl-form
                                            @form:@parent:inspection-inspectedspaces-form:insp-addspace-comlink
                                            #{fieldInspectionBB.inspectionListComponentForUpdate}" 
@@ -1420,7 +1424,7 @@
                                               rendered="#{!empty fieldInspectionBB.currentInspection.determinationTS}"
                                               value="Remove finalization of inspection ID #{fieldInspectionBB.currentInspection.inspectionID}" 
                                               update="  @form:@parent:inspectiontools-growl-form
-                                                        @form
+                                                        @form:@parent:inspection-actions-form
                                                         @form:@parent:inspection-profile-form
                                                         @form:@parent:inspection-inspectedspaces-form:insp-addspace-comlink
                                                         #{fieldInspectionBB.inspectionListComponentForUpdate}"

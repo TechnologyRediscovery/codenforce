@@ -546,6 +546,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             Map<String, List<OccInspectedSpaceElement>> oismap = new HashMap<>();
             
             if(!ois.getInspectedElementList().isEmpty()){
+                Collections.sort(ois.getInspectedElementList());
                 for(OccInspectedSpaceElement oise: ois.getInspectedElementList()){
                     String cat = null;
                     if(oise.getGuideEntry() != null){
@@ -563,11 +564,16 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                     }
                 }
             }
+            
             // now unpack the map and build our groupings for display
             
             Set<String> catSet = oismap.keySet();
+            List<String> catList = new ArrayList<>();
+            catList.addAll(catSet);
+            Collections.sort(catList);
+            
             List<OccInsElementGroup> groupList = new ArrayList<>();
-            for(String c: catSet){
+            for(String c: catList){
                 OccInsElementGroup grp = new OccInsElementGroup(c, oismap.get(c));
                 groupList.add(grp);
             }

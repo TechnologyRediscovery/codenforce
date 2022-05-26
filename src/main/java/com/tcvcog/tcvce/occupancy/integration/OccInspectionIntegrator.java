@@ -1358,6 +1358,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
     }
 
   
+    /**
+     * See if a determination has been used in the DB and if not, it can be deleted
+     * @param d
+     * @return
+     * @throws IntegrationException 
+     */
     public int determinationCheckForUse(OccInspectionDetermination d) throws IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
         int uses = 0;
@@ -1369,13 +1375,19 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return uses;
     }
     
+    /**
+     * Create a determination object from the db
+     * @param determinationID
+     * @return
+     * @throws IntegrationException 
+     */
     public OccInspectionDetermination getDetermination(int determinationID) throws IntegrationException {
         EventIntegrator ei = new EventIntegrator();
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT determinationid, title, description, notes, eventcat_catid, active ");
+        sb.append("SELECT determinationid, title, description, notes, eventcat_catid, active, qualifiesaspassed ");
         sb.append("FROM public.occinspectiondetermination WHERE determinationid=?;");
         OccInspectionDetermination d = null;
 
@@ -1395,6 +1407,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                     d.setEventCategory(ei.getEventCategory(rs.getInt("eventcat_catid")));
                 }
                 d.setActive(rs.getBoolean("active"));
+                d.setQualifiesAsPassed(rs.getBoolean("qualifiesaspassed"));
 
             }
         } catch (SQLException ex) {
@@ -1409,6 +1422,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         return d;
     }
 
+    /**
+     * Deactivates an occ inspection determination 
+     * @param d
+     * @throws IntegrationException 
+     */
     public void deactivateDetermination(OccInspectionDetermination d) throws IntegrationException {
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1434,7 +1452,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
-        sb.append("UPDATE public.occinspectiondetermination SET title=?, description=?, notes=?, eventcat_catid=?, active=? ");
+        sb.append("UPDATE public.occinspectiondetermination SET title=?, description=?, notes=?, eventcat_catid=?, active=?, qualifiesaspassed=? ");
         sb.append("WHERE determinationid = ?;");
 
         try {
@@ -1444,7 +1462,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt.setString(3, d.getNotes());
             stmt.setInt(4, d.getEventCategory().getCategoryID());
             stmt.setBoolean(5, d.isActive());
-            stmt.setInt(6, d.getDeterminationID());
+            stmt.setBoolean(6, d.isQualifiesAsPassed());
+            stmt.setInt(7, d.getDeterminationID());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -1461,8 +1480,8 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO public.occinspectiondetermination(");
-        sb.append("determinationid, title, description, notes, eventcat_catid, active) ");
-        sb.append("VALUES (DEFAULT, ?, ?, ?, ?, ?);");
+        sb.append("determinationid, title, description, notes, eventcat_catid, active, qualifiesaspassed) ");
+        sb.append("VALUES (DEFAULT, ?, ?, ?, ?, ?, ?);");
 
         try {
             stmt = con.prepareStatement(sb.toString());
@@ -1471,6 +1490,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             stmt.setString(3, d.getNotes());
             stmt.setInt(4, d.getEventCategory().getCategoryID());
             stmt.setBoolean(5, true);
+            stmt.setBoolean(6, d.isQualifiesAsPassed());
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());

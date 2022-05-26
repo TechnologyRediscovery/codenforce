@@ -48,7 +48,42 @@
                                                 <p:spacer height="20px" />
                                                 <h2>Release notes</h2>
                                                 <p:accordionPanel id="release-panel">
-                                                    <p:tab title="Release Alpha 0.8.4.3: Wednesday, 18-May-2022 @ 1245h">
+                                                    <p:tab title="Release Alpha 0.851: Thursday, 26-May-2022 @ 11:30h">
+                                                            <li><span style="font-weight: bold;">Field inspection ordinance category and ordinance element sorting</span> is now in effect on the 
+                                                                field inspection checklist data entry form! 
+                                                            </li>
+                                                        
+                                                        
+                                                    </p:tab>
+                                                    <p:tab title="Release Alpha 0.850: Wednesday, 25-May-2022 @ 1020h">
+                                                        <ul>
+                                                            <li><span style="font-weight: bold;">Occupancy permit draft</span> is live for testing. Find a Permit File (the new name of an occupancy period)
+                                                                and click "Create new permit" and behold the form. Note that only finalized field inspections will be considered for permit generation.
+                                                                And since Occupancy Permit applications are not currently live in CNF, you'll need to manually enter the date of application.
+                                                            </li>
+                                                            <li><span style="font-weight: bold;">No more case average age: </span> Ticket 1225 completed
+                                                            </li>
+                                                            <li><span style="font-weight: bold;">Property unit associations </span> appear in the property profile case list (ticket 1239 completed--thanks alex!); Add note is now deactivated on person add until that person has an ID (ticket no. 1237 completed--thanks Anny!)
+                                                            </li>
+                                                            <li><span style="font-weight: bold;">Notes are now working on person links: </span> Ticket 1237 completed--thanks Anny! Emails can be entered for a person without marking a bounce date (the field was previously required, oops).
+                                                            </li>
+                                                            <li><span style="font-weight: bold;">Permit file auditing</span> is now in place and occurs after user enters permit data and before finalization. There is a 
+                                                                TEMPORARY override button in place in case the audit logic is flaky (The desired long-term behavior is that a passed audit must be on file for permit generation).
+                                                                So now don't go getting used to just ignoring the audit fail messages--log a ticket if it's wrong!
+                                                            </li>
+                                                        </ul>
+                                                        
+                                                        <h3>Work in progress</h3>
+                                                        <ul>
+                                                            <li>Lease object complete with start, end dates and person links and document links</li>
+                                                            <li>Permit file type change and start/end dates are not working</li>
+                                                            <li>Reworking UI for field inspection items</li>
+                                                            
+                                                        </ul>
+                                                        
+                                                        
+                                                    </p:tab>
+                                                    <p:tab title="Release Alpha 0.843: Wednesday, 18-May-2022 @ 1245h">
                                                         <ul>
                                                             <li><span style="font-weight: bold;">Case profile/docket report </span> is in testable condition. Not each and every
                                                                 customization button/option works, but the main case content should be transferring to the report okay. 
@@ -64,10 +99,10 @@
                                                         
                                                         
                                                     </p:tab>
-                                                    <p:tab title="Release Alpha 0.8.4.4: Thursday, 12-May-2022 @ 1545h">
+                                                    <p:tab title="Release Alpha 0.844: Thursday, 12-May-2022 @ 1545h">
                                                         <p>Quick pack update: citations were not visible after change of CECaseSearchProfileBB to CECaseBB!</p>
                                                     </p:tab>
-                                                    <p:tab title="Release Alpha 0.8.4.3: Tuesday, 10-May-2022 @ 0837h">
+                                                    <p:tab title="Release Alpha 0.843: Tuesday, 10-May-2022 @ 0837h">
                                                         <ul>
                                                             <li><span style="font-weight: bold;">Photo/document pooling is now functioning</span> for field inspections on CECases and perhaps Occ Periods. Meaning: you can upload
                                                             photos/docs to the field inspection itself and access them via the "upload from pool" tab in the file upload dialog for any given ordinance.
@@ -94,7 +129,7 @@
                                                         </ul>
                                                         
                                                     </p:tab>
-                                                    <p:tab title="Release Alpha 0.8.4.2.1: Thursday, 28-April-2022 @ 0652h">
+                                                    <p:tab title="Release Alpha 0.8421: Thursday, 28-April-2022 @ 0652h">
                                                         
                                                         <ul>
                                                             <li>Mini release to fix a broken violation update stipulated compliance date dialog (thanks for phoning it in Alex).</li>

@@ -207,8 +207,15 @@ INSERT INTO public.textblock(
 
 
 
+ALTER TABLE public.occpermit ADD COLUMN nullifiedts TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occpermit ADD COLUMN nullifiedby_userid INTEGER
+	CONSTRAINT occpermit_nullifiedby_userid REFERENCES login (userid);
+
+ALTER TABLE public.occinspectiondetermination ADD COLUMN qualifiesaspassed boolean DEFAULT FALSE;
+
 -- ******************************* run on LOCAL TEST system up to here *******************************
 -- ******************************* run on LIVE DEPLOYED system up to here *******************************
+
 
 
 

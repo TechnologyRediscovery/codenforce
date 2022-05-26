@@ -502,14 +502,14 @@
                                                                           rendered="#{!(empty cse.propUnit)}"/>
                                                             <h:outputText value="Unit: #{cse.propUnit.unitNumber}" />
                                                     </f:subview>
-                                                        <p:spacer height="2px"
-                                                                      rendered="#{!(empty cse.originationEvent)}"/>
-                                                    
-                                                        <h:outputText value="Origin: #{cse.originationEvent.category.eventCategoryTitle}"
-                                                                      rendered="#{!empty cse.originationEvent}"/>
-                                                        <p:spacer height="2px" />
-                                                        <h:outputText value="Name: #{cse.caseName}"/>
-                                                        
+                                                    <p:spacer height="2px"
+                                                                  rendered="#{!(empty cse.originationEvent)}"/>
+
+                                                    <h:outputText value="Origin: #{cse.originationEvent.category.eventCategoryTitle}"
+                                                                  rendered="#{!empty cse.originationEvent}"/>
+                                                    <p:spacer height="2px" />
+                                                    <h:outputText value="Name: #{cse.caseName}"/>
+
                                                 
                                             
                                             </p:column>

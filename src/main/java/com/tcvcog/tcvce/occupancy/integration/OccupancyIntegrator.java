@@ -494,7 +494,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                         "       staticstipulations, staticcomments, staticmanager, statictenants, \n" +
                         "       staticleaseterm, staticleasestatus, staticpaymentstatus, staticnotice, \n" +
                         "       createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
-                        "       deactivatedts, deactivatedby_userid, staticconstructiontype \n" +
+                        "       deactivatedts, deactivatedby_userid, staticconstructiontype, nullifiedts, nullifiedby_userid  \n" +
                         "  FROM public.occpermit WHERE permitid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -582,6 +582,13 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         permit.setStaticnotice(rs.getString("staticnotice"));
         permit.setStaticconstructiontype(rs.getString("staticconstructiontype"));
         
+        if(rs.getTimestamp("nullifiedts") != null){
+            permit.setNullifiedTS(rs.getTimestamp("nullifiedts").toLocalDateTime());
+        }
+        if(rs.getInt("nullifiedby_userid") != 0){
+            permit.setNullifiedBy(uc.user_getUser(rs.getInt("nullifiedby_userid")));
+        }
+        
         si.populateTrackedFields(permit, rs, true);
         
         return permit;
@@ -621,8 +628,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     /**
      * Entry point for OccPermit objects into the database. 
      * Only called by coordinator. BUT remember, 
-     * you can only write to the metadata fields here. Actual permit static fields
-     * are written specially through the updateOccPermitStaticFields
+ you can only write to the metadata fields here. Actual permit static fields
+ are written specially through the occPermitPopulateStaticFieldsFromDynamicFields
      * @param permit
      * @return ID of the skeleton. 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
@@ -750,7 +757,11 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setString(1, permit.getReferenceNo());
+            if(permit.getReferenceNo() != null){
+                stmt.setString(1, permit.getReferenceNo());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
             stmt.setString(2, permit.getNotes());
             if(permit.getFinalizedts() != null){
                 stmt.setTimestamp(3, java.sql.Timestamp.valueOf(permit.getFinalizedts()));
@@ -769,7 +780,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             }
             
             if(permit.getDeactivatedTS() != null){
-                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(permit.getFinalizedts()));
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(permit.getDeactivatedTS()));
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
@@ -782,6 +793,48 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setInt(8, permit.getPeriodID());
             
             stmt.setInt(9, permit.getPermitID());
+            
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("OccupancyIntegrator.updateOccpermit | Unable to update occupancy permit metadata", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        }
+    }
+    
+     
+    /**
+     * Nullifed an occ permit
+     * @param permit
+     * @throws IntegrationException 
+     */
+    public void nullifyOccupancyPermit(OccPermit permit) throws IntegrationException {
+        String query = "UPDATE public.occpermit\n" +
+                        "   SET nullifiedts=now(), nullifiedby_userid=?, lastupdatedts=now(), \n" +
+                        "       lastupdatedby_userid=? \n" +
+                        " WHERE permitid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            if(permit.getNullifiedBy() != null){
+                stmt.setInt(1, permit.getNullifiedBy().getUserID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            
+            if(permit.getLastUpdatedBy() != null){
+                stmt.setInt(2, permit.getLastUpdatedBy().getUserID());
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(3, permit.getPermitID());
             
             stmt.executeUpdate();
         } catch (SQLException ex) {

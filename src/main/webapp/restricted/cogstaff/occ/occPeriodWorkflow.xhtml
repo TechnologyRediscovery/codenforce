@@ -88,6 +88,7 @@
                                                             lazy="true">
 
                                                 <p:column headerText="Date"
+                                                          sortBy="#{inspection.effectiveDateOfRecord}"
                                                           style="width:20%;">
                                                     <h:outputText value="#{occPeriodBB.getPrettyDate(inspection.effectiveDateOfRecord)}" />
                                                 </p:column>
@@ -98,6 +99,8 @@
                                                 <p:column headerText="Determination"
                                                           style="width:30%;">
                                                     <h:outputText value="#{empty inspection.determination ? '(in process)':inspection.determination.title}" />
+                                                    <h:outputText value="#{inspection.determination.qualifiesAsPassed ? ' (QUALIFIES AS PASS)':' (NOT pass)'}" 
+                                                                  rendered="#{!empty inspection.determination}"/>
                                                 </p:column>
                                                 <p:column headerText="Actions"
                                                           style="width:25%;">
@@ -105,7 +108,7 @@
                                                                     value="view/edit"
                                                                     actionListener="#{fieldInspectionBB.onViewEditInspectionLinkClick(occPeriodBB.currentOccPeriod, inspection)}"
                                                                     ajax="true"
-                                                                    style="color:blue;"
+                                                                    style="color:blue; font-weight: bold;"
                                                                     oncomplete="PF('inspection-profile-dialog-var').show()"
                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                                     update="inspectiontools-growl-form

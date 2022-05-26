@@ -616,6 +616,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         if(currentInspection != null){
             currentInspection = oic.getOccInspection(currentInspection.getInspectionID());
+            getSessionBean().setSessFieldInspection(currentInspection);
             System.out.println("OccInspectionBB.refreshCurrentInspectionAndRestoreSelectedSpace | " + currentInspection.getInspectionID() );
             if(currentInspectedSpace != null){
                 // go find my current space in the inspection and make it the selected one

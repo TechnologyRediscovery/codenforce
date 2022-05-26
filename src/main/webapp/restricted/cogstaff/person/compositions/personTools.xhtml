@@ -780,11 +780,11 @@
                                                     actionListener="#{personBB.onNoteAppendUniversalInitLinkClick(personBB.currentPerson)}"
                                                     style="color:blue;"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                    disabled="#{personBB.currentPersonHumanFieldsEditMode}"
+                                                    disabled="#{personBB.currentPersonHumanFieldsEditMode or personBB.currentPerson.personID eq 0}"
                                                     oncomplete="PF('universal-note-dialog-var').show()"
                                                     update="universal-note-dialog
                                                     universal-note-form"
-                                                    value="add note" >
+                                                    value="add note #{personBB.currentPerson.personID eq 0 ? '[save new person to add note]':''}" >
                                     <f:param name="component-to-update" value="person-info-form" />
                                 </p:commandLink>
 
@@ -1376,7 +1376,7 @@
                                         oncomplete="PF('universal-note-dialog-var').show()"
                                         value="add note" 
                                         update="universal-note-form">
-                        <f:param name="component-to-update" value="personlink-note-form" />
+                        <f:param name="component-to-update" value="humanlink-notes-form" />
                     </p:commandLink>
                     <p:spacer height="3px" />
                     <h:outputText value="#{personBB.currentNoteHolder.notes}"
@@ -1925,7 +1925,7 @@
                                         showButtonBar="true"
                                         mask="true"
                                         timeInput="true" 
-                                        required="true" />
+                                        required="false" />
 
 
 
@@ -2089,7 +2089,7 @@
                              ajax="true"
                              actionListener="#{personBB.onNoteCommitOnNoteHolder}"
                              oncomplete="PF('universal-note-dialog-var').hide()"
-                             update="#{personBB.pageComponentToUpdateAfterNoteCommit}
+                             update="@form:@parent:#{personBB.pageComponentToUpdateAfterNoteCommit}
                              persontools-growl-form"/>
         </h:form>
     </p:dialog>

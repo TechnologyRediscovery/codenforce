@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.entities.TrackedEntity;
 import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.util.Constants;
 import j2html.TagCreator;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +38,13 @@ public class OccPermit extends TrackedEntity {
     final static String TABLE_NAME = "occpermit";
     final static String PERMIT_PK = "permitid";
     
+    
+    public OccPermit(){
+        dynamicPopulationLog = new String();
+        finalizationAuditLog = new String();
+    }
+    
+    
     private int permitID;
     // used for storing municipality-generated IDs associated with the permit
     private String referenceNo;
@@ -48,6 +56,8 @@ public class OccPermit extends TrackedEntity {
     private LocalDateTime finalizedts;
     private User finalizedBy;
     
+    private LocalDateTime nullifiedTS;
+    private User nullifiedBy;
     
     
     
@@ -59,6 +69,55 @@ public class OccPermit extends TrackedEntity {
     // ***** updateOccPermitStaticFields(...) method                *******
     // ********************************************************************
     
+    private String dynamicPopulationLog;
+    private String finalizationAuditLog;
+    
+    /**
+     * Tacks whatever String is passed in and appends it to the config log
+     * @param s 
+     */
+    public void appendToDynamicPopulationLog(String s){
+        if(dynamicPopulationLog != null && s != null){
+            StringBuilder sb = new StringBuilder(dynamicPopulationLog);
+            sb.append(s);
+            sb.append(Constants.FMT_HTML_BREAK);
+            dynamicPopulationLog = sb.toString();
+            
+        }
+    }
+
+    /**
+     * Clears the dynamic population log
+     */
+    public void clearDynamicPopulationLog(){
+        dynamicPopulationLog = new String();
+    }
+    
+    /**
+     * Tacks on input to the finalization audit log
+     * @param s 
+     */
+    public void appendToFinalizationAuditLog(String s){
+        if(finalizationAuditLog != null && s != null){
+            StringBuilder sb = new StringBuilder(finalizationAuditLog);
+            sb.append(s);
+            sb.append(Constants.FMT_HTML_BREAK);
+            finalizationAuditLog = sb.toString();
+        }
+        
+    }
+    
+    /**
+     * Clears finalization audit log
+     */
+    public void clearFinalizationAuditLog(){
+        finalizationAuditLog = new String();
+    }
+    
+    private LocalDateTime dynamicPopulationReadyForFinalizationTS;
+    private LocalDateTime finalizationAuditPassTS;
+    
+    
     private List<HumanLink> ownerSellerLinkList;
     private List<HumanLink> buyerTenantLinkList;
     private List<HumanLink> managerLinkList;
@@ -66,19 +125,29 @@ public class OccPermit extends TrackedEntity {
     
     private ParcelInfo parcelInfo;
     private User issuingOfficer;
-    private CodeSource issuingCodeSource;
+    private List<CodeSource> issuingCodeSourceList;
     
     private List<TextBlock> textBlocks_stipulations;
     private List<TextBlock> textBlocks_notice;
     // both combined for the comments static field
     private List<TextBlock> textBlocks_comments;
     
+    
+    
     private String text_comments;
     
-    private LocalDateTime dynamicdateofapplication;
-    private LocalDateTime dynamicinitialinspection;
+    private LocalDateTime dynamicDateOfApplication;
+    private OccPermitApplication dynamicsDateOfApplicationAppRef;
+    
+    private LocalDateTime dynamicInitialInspection;
+    private FieldInspection dynamicInitialInspectionFINRef;
+            
     private LocalDateTime dynamicreinspectiondate;
+    private FieldInspection dynamicReInspectionFINRef;
+    
     private LocalDateTime dynamicfinalinspection;
+    private FieldInspection dynamicFinalInspectionFINRef;
+    
     private LocalDateTime dynamicdateofissue;
     
     
@@ -665,17 +734,17 @@ public class OccPermit extends TrackedEntity {
     }
 
     /**
-     * @return the dynamicdateofapplication
+     * @return the dynamicDateOfApplication
      */
-    public LocalDateTime getDynamicdateofapplication() {
-        return dynamicdateofapplication;
+    public LocalDateTime getDynamicDateOfApplication() {
+        return dynamicDateOfApplication;
     }
 
     /**
-     * @return the dynamicinitialinspection
+     * @return the dynamicInitialInspection
      */
-    public LocalDateTime getDynamicinitialinspection() {
-        return dynamicinitialinspection;
+    public LocalDateTime getDynamicInitialInspection() {
+        return dynamicInitialInspection;
     }
 
     /**
@@ -770,17 +839,17 @@ public class OccPermit extends TrackedEntity {
     }
 
     /**
-     * @param dynamicdateofapplication the dynamicdateofapplication to set
+     * @param dynamicDateOfApplication the dynamicDateOfApplication to set
      */
-    public void setDynamicdateofapplication(LocalDateTime dynamicdateofapplication) {
-        this.dynamicdateofapplication = dynamicdateofapplication;
+    public void setDynamicDateOfApplication(LocalDateTime dynamicDateOfApplication) {
+        this.dynamicDateOfApplication = dynamicDateOfApplication;
     }
 
     /**
-     * @param dynamicinitialinspection the dynamicinitialinspection to set
+     * @param dynamicInitialInspection the dynamicInitialInspection to set
      */
-    public void setDynamicinitialinspection(LocalDateTime dynamicinitialinspection) {
-        this.dynamicinitialinspection = dynamicinitialinspection;
+    public void setDynamicInitialInspection(LocalDateTime dynamicInitialInspection) {
+        this.dynamicInitialInspection = dynamicInitialInspection;
     }
 
     /**
@@ -805,18 +874,160 @@ public class OccPermit extends TrackedEntity {
     }
 
     /**
-     * @return the issuingCodeSource
+     * @return the issuingCodeSourceList
      */
-    public CodeSource getIssuingCodeSource() {
-        return issuingCodeSource;
+    public List<CodeSource> getIssuingCodeSourceList() {
+        return issuingCodeSourceList;
     }
 
     /**
-     * @param issuingCodeSource the issuingCodeSource to set
+     * @param issuingCodeSourceList the issuingCodeSourceList to set
      */
-    public void setIssuingCodeSource(CodeSource issuingCodeSource) {
-        this.issuingCodeSource = issuingCodeSource;
+    public void setIssuingCodeSourceList(List<CodeSource> issuingCodeSourceList) {
+        this.issuingCodeSourceList = issuingCodeSourceList;
     }
+
+    /**
+     * @return the nullifiedTS
+     */
+    public LocalDateTime getNullifiedTS() {
+        return nullifiedTS;
+    }
+
+    /**
+     * @return the nullifiedBy
+     */
+    public User getNullifiedBy() {
+        return nullifiedBy;
+    }
+
+    /**
+     * @param nullifiedTS the nullifiedTS to set
+     */
+    public void setNullifiedTS(LocalDateTime nullifiedTS) {
+        this.nullifiedTS = nullifiedTS;
+    }
+
+    /**
+     * @param nullifiedBy the nullifiedBy to set
+     */
+    public void setNullifiedBy(User nullifiedBy) {
+        this.nullifiedBy = nullifiedBy;
+    }
+
+    /**
+     * @return the dynamicPopulationLog
+     */
+    public String getDynamicPopulationLog() {
+        return dynamicPopulationLog;
+    }
+
+    /**
+     * @param dynamicPopulationLog the dynamicPopulationLog to set
+     */
+    public void setDynamicPopulationLog(String dynamicPopulationLog) {
+        this.dynamicPopulationLog = dynamicPopulationLog;
+    }
+
+    /**
+     * @return the dynamicPopulationReadyForFinalizationTS
+     */
+    public LocalDateTime getDynamicPopulationReadyForFinalizationTS() {
+        return dynamicPopulationReadyForFinalizationTS;
+    }
+
+    /**
+     * @param dynamicPopulationReadyForFinalizationTS the dynamicPopulationReadyForFinalizationTS to set
+     */
+    public void setDynamicPopulationReadyForFinalizationTS(LocalDateTime dynamicPopulationReadyForFinalizationTS) {
+        this.dynamicPopulationReadyForFinalizationTS = dynamicPopulationReadyForFinalizationTS;
+    }
+
+    /**
+     * @return the dynamicsDateOfApplicationAppRef
+     */
+    public OccPermitApplication getDynamicsDateOfApplicationAppRef() {
+        return dynamicsDateOfApplicationAppRef;
+    }
+
+    /**
+     * @return the dynamicInitialInspectionFINRef
+     */
+    public FieldInspection getDynamicInitialInspectionFINRef() {
+        return dynamicInitialInspectionFINRef;
+    }
+
+    /**
+     * @return the dynamicReInspectionFINRef
+     */
+    public FieldInspection getDynamicReInspectionFINRef() {
+        return dynamicReInspectionFINRef;
+    }
+
+    /**
+     * @return the dynamicFinalInspectionFINRef
+     */
+    public FieldInspection getDynamicFinalInspectionFINRef() {
+        return dynamicFinalInspectionFINRef;
+    }
+
+    /**
+     * @param dynamicsDateOfApplicationAppRef the dynamicsDateOfApplicationAppRef to set
+     */
+    public void setDynamicsDateOfApplicationAppRef(OccPermitApplication dynamicsDateOfApplicationAppRef) {
+        this.dynamicsDateOfApplicationAppRef = dynamicsDateOfApplicationAppRef;
+    }
+
+    /**
+     * @param dynamicInitialInspectionFINRef the dynamicInitialInspectionFINRef to set
+     */
+    public void setDynamicInitialInspectionFINRef(FieldInspection dynamicInitialInspectionFINRef) {
+        this.dynamicInitialInspectionFINRef = dynamicInitialInspectionFINRef;
+    }
+
+    /**
+     * @param dynamicReInspectionFINRef the dynamicReInspectionFINRef to set
+     */
+    public void setDynamicReInspectionFINRef(FieldInspection dynamicReInspectionFINRef) {
+        this.dynamicReInspectionFINRef = dynamicReInspectionFINRef;
+    }
+
+    /**
+     * @param dynamicFinalInspectionFINRef the dynamicFinalInspectionFINRef to set
+     */
+    public void setDynamicFinalInspectionFINRef(FieldInspection dynamicFinalInspectionFINRef) {
+        this.dynamicFinalInspectionFINRef = dynamicFinalInspectionFINRef;
+    }
+
+    /**
+     * @return the finalizationAuditLog
+     */
+    public String getFinalizationAuditLog() {
+        return finalizationAuditLog;
+    }
+
+    /**
+     * @param finalizationAuditLog the finalizationAuditLog to set
+     */
+    public void setFinalizationAuditLog(String finalizationAuditLog) {
+        this.finalizationAuditLog = finalizationAuditLog;
+    }
+
+    /**
+     * @return the finalizationAuditPassTS
+     */
+    public LocalDateTime getFinalizationAuditPassTS() {
+        return finalizationAuditPassTS;
+    }
+
+    /**
+     * @param finalizationAuditPassTS the finalizationAuditPassTS to set
+     */
+    public void setFinalizationAuditPassTS(LocalDateTime finalizationAuditPassTS) {
+        this.finalizationAuditPassTS = finalizationAuditPassTS;
+    }
+
+  
     
     
     

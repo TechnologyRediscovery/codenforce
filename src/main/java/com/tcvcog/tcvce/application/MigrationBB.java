@@ -84,7 +84,7 @@ public class MigrationBB extends BackingBeanUtils{
      * Listener for user requests to view migration options
      * @param ev 
      */
-    public void onMIgrationInitButtonChange(ActionEvent ev){
+    public void onMigrationInitButtonChange(ActionEvent ev){
         System.out.println("MigrationBB.onOpenMigrationOptionsDialog");
     }
     
