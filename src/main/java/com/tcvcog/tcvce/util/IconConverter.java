@@ -48,7 +48,7 @@ public class IconConverter extends EntityConverter implements Converter {
         }
         
         Icon i = (Icon) o;
-        String title = i.getTitle();
+        String title = i.getName();
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;

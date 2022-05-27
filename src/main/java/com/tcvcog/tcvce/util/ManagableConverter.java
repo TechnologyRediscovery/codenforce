@@ -17,7 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.Managed;
+import com.tcvcog.tcvce.entities.Manageable;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -36,7 +36,7 @@ public class ManagableConverter extends EntityConverter implements Converter {
         if(titleS.isEmpty()) {
             return null; 
         }
-        Managed o = (Managed) this.getViewMap(fc).get(titleS);
+        Manageable o = (Manageable) this.getViewMap(fc).get(titleS);
         return o;
     }
 
@@ -47,8 +47,8 @@ public class ManagableConverter extends EntityConverter implements Converter {
             return "";
         }
         
-        Managed i = (Managed) o;
-        String title = i.getTitle();
+        Manageable i = (Manageable) o;
+        String title = i.getName();
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;

@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -23,14 +24,15 @@ import java.util.Objects;
  * 
  * @author sylvia
  */
-public class PropertyUseType {
+public class PropertyUseType implements Manageable{
     
     private int typeID;
     private String name;
     private String description;
     private Icon icon;
     private String zoneClass;
-    private Boolean active;
+    private LocalDateTime deactivatedts;
+    private final static ManagedSchemaEnum MANAGABLE_SCHEMA = ManagedSchemaEnum.PropertyUseType;
     
     @Override
     public int hashCode() {
@@ -40,7 +42,6 @@ public class PropertyUseType {
         hash = 73 * hash + Objects.hashCode(this.description);
         hash = 73 * hash + Objects.hashCode(this.icon);
         hash = 73 * hash + Objects.hashCode(this.zoneClass);
-        hash = 73 * hash + Objects.hashCode(this.getActive());
         return hash;
     }
 
@@ -71,11 +72,9 @@ public class PropertyUseType {
         if (!Objects.equals(this.zoneClass, other.zoneClass)) {
             return false;
         }
-        if (!Objects.equals(this.active, other.active)) {
-            return false;
-        }
         return true;
     }
+    
     /**
      * @return the typeID
      */
@@ -86,6 +85,7 @@ public class PropertyUseType {
     /**
      * @return the name
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -100,6 +100,7 @@ public class PropertyUseType {
     /**
      * @return the icon
      */
+    @Override
     public Icon getIcon() {
         return icon;
     }
@@ -121,6 +122,7 @@ public class PropertyUseType {
     /**
      * @param name the name to set
      */
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -146,20 +148,35 @@ public class PropertyUseType {
         this.zoneClass = zoneClass;
     }
 
-    /**
-     * @return the active
-     */
-    public Boolean getActive() {
-        return active;
+
+    @Override
+    public ManagedSchemaEnum getMANAGEABLE_SCHEMA() {
+        return MANAGABLE_SCHEMA;
+    }
+
+    @Override
+    public int getID() {
+         return typeID;
+    }
+
+    @Override
+    public void setID(int ID) {
+        this.typeID = ID;
     }
 
     /**
-     * @param active the active to set
+     * @return the deactivatedts
      */
-    public void setActive(Boolean active) {
-        this.active = active;
+    @Override
+    public LocalDateTime getDeactivatedts() {
+        return deactivatedts;
     }
-    
-    
-    
+
+    /**
+     * @param deactivatedts the deactivatedts to set
+     */
+    @Override
+    public void setDeactivatedts(LocalDateTime deactivatedts) {
+        this.deactivatedts = deactivatedts;
+    }
 }

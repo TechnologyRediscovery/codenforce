@@ -20,7 +20,7 @@ import javax.faces.event.ActionEvent;
  *
  * @author sylvia
  */
-public class IconBB extends BackingBeanUtils implements Serializable{
+public class deprecated_IconBB extends BackingBeanUtils implements Serializable{
 
     private List<Icon> iconList;
     private Icon currentIcon;
@@ -29,7 +29,7 @@ public class IconBB extends BackingBeanUtils implements Serializable{
      * Creates a new 
      * instance of IconBB
      */
-    public IconBB() {
+    public deprecated_IconBB() {
         
         
     }
@@ -50,7 +50,6 @@ public class IconBB extends BackingBeanUtils implements Serializable{
     
     public void editIcon(Icon i){
         currentIcon = i;
-        
     }
     
     public void commitUpdates(ActionEvent ev){
@@ -85,9 +84,9 @@ public class IconBB extends BackingBeanUtils implements Serializable{
     
     public void commitRemove(ActionEvent ev) {
         SystemCoordinator sc = getSystemCoordinator();
-        if(currentIcon.getIconID() > 0){             
+        if(currentIcon.getID() > 0){             
             try {
-                int uses = sc.iconCheckForUse(currentIcon);
+                int uses = sc.checkForUse(currentIcon);
                 if(uses == 0){
                     sc.deactivateIcon(currentIcon);
                     getFacesContext().addMessage(null,
@@ -107,7 +106,7 @@ public class IconBB extends BackingBeanUtils implements Serializable{
         } else {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Invalid IconID: " + currentIcon.getIconID(), ""));
+                                "Invalid IconID: " + currentIcon.getID(), ""));
         }
     }
     

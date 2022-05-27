@@ -6,245 +6,81 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
-    <h:head>
-        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>PUT Manager</title>
-    </h:head>
-    <h:body>
-        <ui:composition template="/restricted/navContainer_restricted.xhtml">
-            <ui:define name="content">
-                <div class="mainContainer">
-                    <h:form id="putmanage-messages-form">
-                        <p:growl id="growl" showDetail="true"/>
-                    </h:form>
-                            
-                    <h1>Property Use Type Manager</h1>
-                    <f:view>
-                        <h:form id="put-manage-form">
-                            
-                            <p:outputLabel for="@next" value="Icon"/>
-                                    <p:selectOneMenu id="advanced" value="#{manageBB.currentPut.icon}"
-                                                     panelStyle="width:180px" var="i" converter="mSchemaEnumConverter"
-                                                    filter="true" filterMatchMode="startsWith">
 
-                                        <f:selectItems value="#{ManagedSchemaEnum.values}" var="schemaEnum"
-                                                    itemLabel="#{schemaEnum.getTARGET_OBJECT_FRIENDLY_NAME}" itemValue="#{managedSchemaEnum}"/>
+    <ui:composition 
+        template="layout-manage.xhtml">
 
-                                        <p:column style="width:10%">
-                                            <i class="material-icons"><h:outputText value="#{i.materialIcon}"/></i>
-                                        </p:column>
+        <ui:define name="Dialog">
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Name"/>
-                                            </f:facet>
-                                            <h:outputText value="#{i.name}"/>
-                                        </p:column>
 
-                                        <f:facet name="footer">
-                                            <h:outputText value="#{manageBB.iconList.size()} icons" 
-                                                       style="font-weight:bold;" styleClass="p-py-1 p-d-block"/>
-                                         </f:facet>
-                                    </p:selectOneMenu>
-                            
-                            
-                            
-                            
-                            
-                            
-                            <p:commandButton ajax="true" value="Add New Put" icon="fa fa-plus" 
-                                             actionListener="#{manageBB.createNewPut}"
-                                             oncomplete="PF('put-addupdate-dialog').show()"
-                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
-                                             update="put-add-update-form"/>
-                            
-                            <p:spacer height="15px"/>
-                            
-                             <p:dataTable
-                                id="put-table"
-                                var="managed"
-                                value="#{manageBB.putList}"
-                                rowKey="#{managed.typeID}"
-                                tableStyleClass="primeDataTable">
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="ID" />
-                                    </f:facet>
-                                    <h:outputText value="#{managed.typeID}"/>
-                                </p:column>
-                                
-                                <p:column width="8%">
-                                    <p:commandButton ajax="true"
-                                                     id="update-put-cb" value="edit" icon="#{managed.icon.fontAwesome}"
-                                        styleClass="multiButtonLineButton" 
-                                        actionListener="#{manageBB.editPut(managed)}"
-                                        oncomplete="PF('put-addupdate-dialog').show()"
-                                        update="put-add-update-form" />
-                                </p:column>
-                                
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Name" />
-                                    </f:facet>
-                                    <h:outputText value="#{managed.name}"/>
-                                </p:column>
-                                 
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Description " />
-                                    </f:facet>
-                                    <h:outputText value="#{managed.description}"/>
-                                </p:column>
-                                
-                                
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Icon " />
-                                    </f:facet>
-                                    <i class="material-icons"><h:outputText value="#{managed.icon.materialIcon}"/></i>
-                                </p:column>
-                                 
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Zoneclass" />
-                                    </f:facet>
-                                    <h:outputText value="#{managed.zoneClass}"/>
-                                </p:column>
-                                 
-                            
-                            </p:dataTable>
-                            
-                        <p:spacer height="15px"/>
-                        <hr/>
-                        <p:spacer height="15px"/>
-                        
+            <c:if test="${!manageBB.currentSchema.SCHEMA_TYPE_STRING == 'Icon'}">
+                <p:outputLabel for="@next" value="Icon"/>
+                <p:selectOneMenu id="advanced" value="#{manageBB.current.icon}"
+                                 panelStyle="width:180px" var="i" converter="iconConverter"
+                                 filter="true" filterMatchMode="startsWith">
 
-                        </h:form>
-                        
-                    <p:dialog      height="650" width="800"
-                                   widgetVar="user-info-dialog"
-                                   closable="true" 
-                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
-                        
+                    <f:selectItems value="#{manageBB.iconList}" var="icon"
+                                   itemLabel="#{icon.name}" itemValue="#{icon}"/>
 
-                    </p:dialog>
-                        
-                        
-                        
-                    <p:dialog   height="750" width="1000"
-                                widgetVar="put-addupdate-dialog"
-                                closable="true" 
-                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}">
-                        <h:form id="put-add-update-form">
-                            
-                            <h2>Add/update Property Use Type</h2>
-                            <p><h:outputText id="put-id-ot" value="userid: #{manageBB.currentPut.typeID}"/></p>
-                            
-                            
-                            <div class="p-grid">
-                                <div class="p-col-6">
-                                    <h:outputLabel  id="put-name-ol"
-                                                    value="Name" 
-                                                    for="put-name-it"/>
-                                    <p:inputText id="put-name-it" 
-                                                 value="#{manageBB.currentPut.name}" 
-                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    <h:message for="put-name-it" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </div>
-                                <div class="p-col-6">
-                                    <h:outputLabel  id="put-describe-ol"
-                                                    value="Description" 
-                                                    for="put-describe-it"/>
-                                    <p:inputText id="put-describe-it" 
-                                                 value="#{manageBB.currentPut.description}" 
-                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    <h:message for="put-describe-it" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </div>
-                                <div class="p-col-6">
-                                    <p:outputLabel for="@next" value="Icon"/>
-                                    <p:selectOneMenu id="advanced" value="#{manageBB.currentPut.icon}"
-                                                     panelStyle="width:180px" var="i" converter="iconConverter"
-                                                    filter="true" filterMatchMode="startsWith">
+                    <p:column style="width:10%">
+                        <i class="material-icons"><h:outputText value="#{i.materialIcon}"/></i>
+                    </p:column>
 
-                                        <f:selectItems value="#{manageBB.iconList}" var="icon"
-                                                    itemLabel="#{icon.name}" itemValue="#{icon}"/>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Name"/>
+                        </f:facet>
+                        <h:outputText value="#{i.name}"/>
+                    </p:column>
 
-                                        <p:column style="width:10%">
-                                            <i class="material-icons"><h:outputText value="#{i.materialIcon}"/></i>
-                                        </p:column>
+                    <f:facet name="footer">
+                        <h:outputText value="#{manageBB.iconList.size()} icons" 
+                                      style="font-weight:bold;" styleClass="p-py-1 p-d-block"/>
+                    </f:facet>
+                </p:selectOneMenu>
+            </c:if>
 
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Name"/>
-                                            </f:facet>
-                                            <h:outputText value="#{i.name}"/>
-                                        </p:column>
+            <c:choose>
+                <c:when test="${manageBB.currentSchema.SCHEMA_TYPE_STRING == 'Icon'}">
+                    <div class="p-col-4">Style Class</div>
+                    <div class="p-col-8">
+                        <h:outputText value="#{manageBB.current.styleClass}"
+                                      rendered="#{!manageBB.editMode}" />
+                        <p:inputText value="#{manageBB.current.styleClass}"
+                                     rendered="#{manageBB.editMode}" />
+                    </div>
 
-                                        <f:facet name="footer">
-                                            <h:outputText value="#{manageBB.iconList.size()} icons" 
-                                                       style="font-weight:bold;" styleClass="p-py-1 p-d-block"/>
-                                         </f:facet>
-                                    </p:selectOneMenu>
-                                </div>
-                                <div class="p-col-6">
-                                    <h:outputLabel  id="put-zoneclass-ol"
-                                                    value="Zone Class" 
-                                                    for="put-zoneclass-it"/>
-                                    <p:inputText id="put-zoneclass-it" 
-                                                 value="#{manageBB.currentPut.zoneClass}" 
-                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    <h:message for="put-zoneclass-it" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </div>
-                            </div>
+                    <div class="p-col-4">Font Awesome <i class="#{manageBB.current.fontAwesome}"/></div>
+                    <div class="p-col-8">
+                        <h:outputText value="#{manageBB.current.fontAwesome}"
+                                      rendered="#{!manageBB.editMode}" />
+                        <p:inputText value="#{manageBB.current.fontAwesome}"
+                                     rendered="#{manageBB.editMode}" />
+                    </div>
 
-                            <p:spacer height="15px"/>
-                             <p:commandButton ajax="true" tabindex="2"
-                                                 value="Cancel" icon="fa fa-stop" 
-                                                 onclick="PF('put-addupdate-dialog').hide()"/>
-                             
-                             <p:commandButton    id="put-commitupdates-cb"
-                                                ajax="true" value="Update Put data" icon="fa fa-plus" 
-                                             tabindex="11" 
-                                             actionListener="#{manageBB.commitUpdates}"
-                                             disabled="#{!(manageBB.currentPut.typeID != 0)}"
-                                             oncomplete="PF('put-addupdate-dialog').hide()"
-                                             update="put-manage-form:put-table
-                                             putmanage-messages-form"
-                                             />
-                            
-                             <p:commandButton    id="put-commitinsert-cb"
-                                                ajax="true" value="Add new Put" icon="fa fa-plus" 
-                                                tabindex="11" actionListener="#{manageBB.commitInsert}"
-                                                disabled="#{!(manageBB.currentPut.typeID == 0)}"
-                                             oncomplete="PF('put-addupdate-dialog').hide()"
-                                             update="put-manage-form:put-table
-                                             putmanage-messages-form"
-                                             
-                                             />
-                             
-                             <p:commandButton    id="put-commitremove-cb"
-                                                ajax="true" value="Remove Put" icon="fa fa-trash" 
-                                                tabindex="11" actionListener="#{manageBB.commitRemove}"
-                                                disabled="#{!(manageBB.currentPut.typeID != 0)}"
-                                             oncomplete="PF('put-addupdate-dialog').hide()"
-                                             update="put-manage-form:put-table
-                                             putmanage-messages-form"
-                                             />
-                                             
+                    <div class="p-col-4">Material Icon <i class="material-icons"><h:outputText value="#{manageBB.current.materialIcon}"/></i></div>
+                    <div class="p-col-8">
+                        <h:outputText value="#{manageBB.current.materialIcon}"
+                                      rendered="#{!manageBB.editMode}" />
+                        <p:inputText value="#{manageBB.current.materialIcon}"
+                                     rendered="#{manageBB.editMode}" />
+                    </div>
+                </c:when>
 
-                        </h:form>
 
-                    </p:dialog>
-                        
-                        
-                        
-                    </f:view>
-                </div>
-            </ui:define>
-        </ui:composition>
-    </h:body>
+                <c:when test="${'#{manageBB.currentSchema.SCHEMA_TYPE_STRING}' == 'PropertyUseType'}">
+                    <div class="p-col-4">Description</div>
+                    <div class="p-col-8">
+                        <h:outputText value="#{manageBB.current.description}"
+                                      rendered="#{!manageBB.editMode}" />
+                        <p:inputText value="#{manageBB.current.description}"
+                                     rendered="#{manageBB.editMode}" />
+                    </div>
+                </c:when>
+            </c:choose>
+
+
+        </ui:define>
+
+    </ui:composition>
 </html>
-

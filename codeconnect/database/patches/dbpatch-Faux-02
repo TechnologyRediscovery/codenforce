@@ -12,8 +12,19 @@ ALTER TABLE icon
 ADD deactivatedts timestamp with time zone;
 
 UPDATE icon 
-SET deactivated = '2022-04-14 12:00:00.000000+00'
+SET deactivatedts = '2022-04-14 12:00:00.000000+00'
 WHERE active = FALSE;
 
 ALTER TABLE icon
+DROP COLUMN active;
+
+
+ALTER TABLE propertyusetype
+ADD deactivatedts timestamp with time zone;
+
+UPDATE propertyusetype 
+SET deactivatedts = '2022-04-14 12:00:00.000000+00'
+WHERE active = FALSE;
+
+ALTER TABLE propertyusetype
 DROP COLUMN active;

@@ -3,20 +3,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.tcvcog.tcvce.entities;
-
 import java.time.LocalDateTime;
 
 /**
  *
  * @author Mike-Faux
  */
-public interface Managable {
-//NOT IN USE
-    
-    
+public interface Manageable {
     public LocalDateTime getDeactivatedts();
     public void setDeactivatedts(LocalDateTime deactivatedts);
-    public ManagedSchemaEnum getMANAGABLE_SCHEMA();
-    public String getTitle();
-    public void setTitle(String title);
+    public ManagedSchemaEnum getMANAGEABLE_SCHEMA();
+    public String getName();
+    public void setName(String name);
+    public int getID();
+    public void setID(int ID);
+    public Icon getIcon();
 }

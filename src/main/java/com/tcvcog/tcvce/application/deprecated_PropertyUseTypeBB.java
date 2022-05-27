@@ -21,7 +21,7 @@ import javax.faces.event.ActionEvent;
  *
  * @author sylvia
  */
-public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
+public class deprecated_PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
 
     private List<PropertyUseType> putList;
     private PropertyUseType currentPut;
@@ -32,7 +32,7 @@ public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
      * Creates a new 
      * instance of PropertyUseTypeBB
      */
-    public PropertyUseTypeBB() {
+    public deprecated_PropertyUseTypeBB() {
         
         
     }

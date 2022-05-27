@@ -352,6 +352,117 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
         return bt;
     }
     
+    /**
+     * Updates the DB with BlobType b
+     * @param b the BlobType to update
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void updateBlobType(BlobType b) throws IntegrationException{
+          Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "UPDATE public.blobtype" +
+                        "SET typetitle=?, icon_iconid=?, contenttypestring=?, browserviewable=?, \n" +
+                        " notes=?, fileextensionsarr=?, deactivatedts=?\n" +
+                        " WHERE typeid=?";
+        
+        PreparedStatement stmt = null;
+        BlobType bt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, b.getTitle());
+            stmt.setInt(2, b.getIcon().getID());
+            stmt.setString(3, b.getContentTypeString());
+            stmt.setBoolean(4, b.isBrowserViewable());
+            stmt.setString(5, b.getNotes());
+            stmt.setArray(6, con.createArrayOf("String", b.getFileExtensionsPermitted().toArray()));
+            stmt.setTimestamp(7, Timestamp.valueOf(b.getDeactivatedts()));
+            stmt.setInt(8, b.getTypeID());
+            stmt.executeQuery();
+            
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error updating blob type. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * Updates the DB with BlobType b
+     * @param b the BlobType to update
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void deactivateBlobType(BlobType b) throws IntegrationException{
+          Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "UPDATE public.blobtype" +
+                        "SET deactivatedts=?\n" +
+                        " WHERE typeid=?";
+        
+        PreparedStatement stmt = null;
+        BlobType bt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setInt(2, b.getTypeID());
+            stmt.executeQuery();
+            
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error deactivating blob type. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * Inserts BlobType b into the DB
+     * @param b the BlobType to update
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void insertBlobType(BlobType b) throws IntegrationException{
+          Connection con = getPostgresCon();
+        ResultSet rs = null;
+        String query = "INSERT INTO public.blobtype (typetitle, icon_iconid, contenttypestring, "
+                + "browserviewable, notes, fileextensionsarr, deactivatedts)\n" +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?);";
+        
+        PreparedStatement stmt = null;
+        BlobType bt = null;
+        
+        try {
+            
+            stmt = con.prepareStatement(query);
+            stmt.setString(1, b.getTitle());
+            stmt.setInt(2, b.getIcon().getID());
+            stmt.setString(3, b.getContentTypeString());
+            stmt.setBoolean(4, b.isBrowserViewable());
+            stmt.setString(5, b.getNotes());
+            stmt.setArray(6, con.createArrayOf("String", b.getFileExtensionsPermitted().toArray()));
+            stmt.setTimestamp(7, Timestamp.valueOf(b.getDeactivatedts()));
+            stmt.executeQuery();
+            
+            
+        } catch (SQLException ex) {
+            //System.out.println(ex);
+            throw new IntegrationException("Error inserting blob type. ", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
     
     /**
      * Generator for cute little BLOBType objects

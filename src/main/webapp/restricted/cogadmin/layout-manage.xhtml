@@ -8,209 +8,204 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>PUT Manager</title>
+        <title>Utility Manager</title>
     </h:head>
     <h:body>
         <ui:composition template="/restricted/navContainer_restricted.xhtml">
             <ui:define name="content">
                 <div class="mainContainer">
-                    <h:form id="putmanage-messages-form">
+                    <h:form id="manage-messages-form">
                         <p:growl id="growl" showDetail="true"/>
                     </h:form>
-                            
-                    <h1>Property Use Type Manager</h1>
+                    <h:outputText value="Utility Manager"/>
                     <f:view>
-                        <h:form id="put-manage-form">
-                            
-                            <p:commandButton ajax="true" value="Add New Put" icon="fa fa-plus" 
-                                             actionListener="#{propertyUseTypeBB.createNewPut}"
-                                             oncomplete="PF('put-addupdate-dialog').show()"
-                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
-                                             update="put-add-update-form"/>
-                            
+                        <h:form id="manage-form">
+                            <div class="p-grid">
+                                <div class="p-col-2">
+                                    <p:selectOneMenu id="advanced" value="#{manageBB.currentSchema}"
+                                                     panelStyle="width:180px" var="m" converter="mSchemaEnumConverter"
+                                                     onchange="#{manageBB.refreshMList()}">
+
+                                        <f:selectItems value="#{manageBB.enumList}" var="schemaEnum"
+                                                       itemLabel="#{schemaEnum.TARGET_OBJECT_FRIENDLY_NAME}" 
+                                                       itemValue="#{currentSchema}"/>
+
+                                            <p:column style="width:10%">
+                                                <h:outputText value="#{m.TARGET_OBJECT_FRIENDLY_NAME}"/>
+                                            </p:column>
+
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-col-2">
+                                    <p:commandButton ajax="true" value="Refresh" 
+                                                     icon="fa fa-plus" 
+                                                     actionListener="#{manageBB.refreshMList()}"
+                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                     update="m-table"/>
+
+
+
+
+                                    <p:commandButton ajax="true" value="Add New #{manageBB.currentSchema.TARGET_OBJECT_FRIENDLY_NAME}" 
+                                                     icon="fa fa-plus" 
+                                                     actionListener="#{manageBB.createNew()}"
+                                                     oncomplete="PF('addupdate-dialog').show()"
+                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                     update="add-update-form"/>
+                                </div>
+                                <div class="p-col-2">
+                                    <p:outputLabel value="Show deactivated"/>
+                                    <p:toggleSwitch value="#{manageBB.showDeactivated}">
+                                        <p:ajax listener="#{manageBB.onShowDeactivatedToggle()}" update="m-table"/>
+                                    </p:toggleSwitch>
+                                </div>
+                            </div>
                             <p:spacer height="15px"/>
-                            
-                             <p:dataTable
-                                id="put-table"
-                                var="propertyUseType"
-                                value="#{propertyUseTypeBB.putList}"
-                                rowKey="#{propertyUseType.typeID}"
+
+                            <p:dataTable
+                                id="m-table"
+                                var="manageable"
+                                value="#{manageBB.mList}"
+                                rowKey="#{manageable.ID}"
                                 tableStyleClass="primeDataTable">
-                                <p:column>
+                                <p:column width="5%">
                                     <f:facet name="header">
                                         <h:outputText value="ID" />
                                     </f:facet>
-                                    <h:outputText value="#{propertyUseType.typeID}"/>
+                                    <h:outputText value="#{manageable.ID}"/>
                                 </p:column>
-                                
+
                                 <p:column width="8%">
                                     <p:commandButton ajax="true"
-                                                     id="update-put-cb" value="edit" icon="#{propertyUseType.icon.fontAwesome}"
-                                        styleClass="multiButtonLineButton" 
-                                        actionListener="#{propertyUseTypeBB.editPut(propertyUseType)}"
-                                        oncomplete="PF('put-addupdate-dialog').show()"
-                                        update="put-add-update-form" />
+                                                     id="update-cb" value="edit"
+                                                     styleClass="multiButtonLineButton" 
+                                                     actionListener="#{manageBB.edit(manageable)}"
+                                                     oncomplete="PF('addupdate-dialog').show()"
+                                                     update="add-update-form" />
                                 </p:column>
-                                
+
                                 <p:column>
                                     <f:facet name="header">
                                         <h:outputText value="Name" />
                                     </f:facet>
-                                    <h:outputText value="#{propertyUseType.name}"/>
+                                    <h:outputText value="#{manageable.name}"/>
                                 </p:column>
-                                 
+
+                                <c:if test="#{manageBB.showDeactivated}">
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Deactivated " />
+                                        </f:facet>
+                                        <h:outputText value="#{manageBB.getPrettyDateNoTime(manageable.deactivatedts)}"/>
+                                    </p:column>
+                                </c:if>
+
+
                                 <p:column>
                                     <f:facet name="header">
-                                        <h:outputText value="Description " />
+                                        <h:outputText value="Material Icon" />
                                     </f:facet>
-                                    <h:outputText value="#{propertyUseType.description}"/>
+                                    <i class="material-icons"><h:outputText value="#{manageable.icon.materialIcon}"/></i>
                                 </p:column>
-                                
-                                
+
                                 <p:column>
                                     <f:facet name="header">
-                                        <h:outputText value="Icon " />
+                                        <h:outputText value="Font Awesome Icon" />
                                     </f:facet>
-                                    <i class="material-icons"><h:outputText value="#{propertyUseType.icon.materialIcon}"/></i>
+                                    <i class="#{manageable.icon.fontAwesome}"/>
                                 </p:column>
-                                 
-                                <p:column>
-                                    <f:facet name="header">
-                                        <h:outputText value="Zoneclass" />
-                                    </f:facet>
-                                    <h:outputText value="#{propertyUseType.zoneClass}"/>
-                                </p:column>
-                                 
-                            
+
                             </p:dataTable>
-                            
-                        <p:spacer height="15px"/>
-                        <hr/>
-                        <p:spacer height="15px"/>
-                        
-
-                        </h:form>
-                        
-                    <p:dialog      height="650" width="800"
-                                   widgetVar="user-info-dialog"
-                                   closable="true" 
-                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
-                        
-
-                    </p:dialog>
-                        
-                        
-                        
-                    <p:dialog   height="750" width="1000"
-                                widgetVar="put-addupdate-dialog"
-                                closable="true" 
-                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}">
-                        <h:form id="put-add-update-form">
-                            
-                            <h2>Add/update Property Use Type</h2>
-                            <p><h:outputText id="put-id-ot" value="userid: #{propertyUseTypeBB.currentPut.typeID}"/></p>
-                            
-                            
-                            <div class="p-grid">
-                                <div class="p-col-6">
-                                    <h:outputLabel  id="put-name-ol"
-                                                    value="Name" 
-                                                    for="put-name-it"/>
-                                    <p:inputText id="put-name-it" 
-                                                 value="#{propertyUseTypeBB.currentPut.name}" 
-                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    <h:message for="put-name-it" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </div>
-                                <div class="p-col-6">
-                                    <h:outputLabel  id="put-describe-ol"
-                                                    value="Description" 
-                                                    for="put-describe-it"/>
-                                    <p:inputText id="put-describe-it" 
-                                                 value="#{propertyUseTypeBB.currentPut.description}" 
-                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    <h:message for="put-describe-it" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </div>
-                                <div class="p-col-6">
-                                    <p:outputLabel for="@next" value="Icon"/>
-                                    <p:selectOneMenu id="advanced" value="#{propertyUseTypeBB.currentPut.icon}"
-                                                     panelStyle="width:180px" var="i" converter="iconConverter"
-                                                    filter="true" filterMatchMode="startsWith">
-
-                                        <f:selectItems value="#{propertyUseTypeBB.iconList}" var="icon"
-                                                    itemLabel="#{icon.name}" itemValue="#{icon}"/>
-
-                                        <p:column style="width:10%">
-                                            <i class="material-icons"><h:outputText value="#{i.materialIcon}"/></i>
-                                        </p:column>
-
-                                        <p:column>
-                                            <f:facet name="header">
-                                                <h:outputText value="Name"/>
-                                            </f:facet>
-                                            <h:outputText value="#{i.name}"/>
-                                        </p:column>
-
-                                        <f:facet name="footer">
-                                            <h:outputText value="#{propertyUseTypeBB.iconList.size()} icons" 
-                                                       style="font-weight:bold;" styleClass="p-py-1 p-d-block"/>
-                                         </f:facet>
-                                    </p:selectOneMenu>
-                                </div>
-                                <div class="p-col-6">
-                                    <h:outputLabel  id="put-zoneclass-ol"
-                                                    value="Zone Class" 
-                                                    for="put-zoneclass-it"/>
-                                    <p:inputText id="put-zoneclass-it" 
-                                                 value="#{propertyUseTypeBB.currentPut.zoneClass}" 
-                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
-                                    <h:message for="put-zoneclass-it" showDetail="false" showSummary="true" 
-                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </div>
-                            </div>
 
                             <p:spacer height="15px"/>
-                             <p:commandButton ajax="true" tabindex="2"
-                                                 value="Cancel" icon="fa fa-stop" 
-                                                 onclick="PF('put-addupdate-dialog').hide()"/>
-                             
-                             <p:commandButton    id="put-commitupdates-cb"
-                                                ajax="true" value="Update Put data" icon="fa fa-plus" 
-                                             tabindex="11" 
-                                             actionListener="#{propertyUseTypeBB.commitUpdates}"
-                                             disabled="#{!(propertyUseTypeBB.currentPut.typeID != 0)}"
-                                             oncomplete="PF('put-addupdate-dialog').hide()"
-                                             update="put-manage-form:put-table
-                                             putmanage-messages-form"
-                                             />
-                            
-                             <p:commandButton    id="put-commitinsert-cb"
-                                                ajax="true" value="Add new Put" icon="fa fa-plus" 
-                                                tabindex="11" actionListener="#{propertyUseTypeBB.commitInsert}"
-                                                disabled="#{!(propertyUseTypeBB.currentPut.typeID == 0)}"
-                                             oncomplete="PF('put-addupdate-dialog').hide()"
-                                             update="put-manage-form:put-table
-                                             putmanage-messages-form"
-                                             
-                                             />
-                             
-                             <p:commandButton    id="put-commitremove-cb"
-                                                ajax="true" value="Remove Put" icon="fa fa-trash" 
-                                                tabindex="11" actionListener="#{propertyUseTypeBB.commitRemove}"
-                                                disabled="#{!(propertyUseTypeBB.currentPut.typeID != 0)}"
-                                             oncomplete="PF('put-addupdate-dialog').hide()"
-                                             update="put-manage-form:put-table
-                                             putmanage-messages-form"
-                                             />
-                                             
+                            <hr/>
+                            <p:spacer height="15px"/>
+
 
                         </h:form>
 
-                    </p:dialog>
-                        
-                        
-                        
+                        <p:dialog      height="650" width="800"
+                                       widgetVar="user-info-dialog"
+                                       closable="true" 
+                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
+
+
+                        </p:dialog>
+
+
+
+                        <p:dialog   height="750" width="1000"
+                                    widgetVar="addupdate-dialog"
+                                    closable="true" 
+                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}">
+
+                            <h:form id="add-update-form">
+
+
+
+
+                                <div class="p-grid">
+                                    <div class="p-col-4">
+                                        <h:outputText value="Add/Update #{manageBB.currentSchema.TARGET_OBJECT_FRIENDLY_NAME}"/>
+                                    </div>
+                                    <div class="p-col-4"/>
+                                    <div class="p-col-4">
+                                        <p:commandButton id="add-update-info-edit-button"
+                                                         value="#{manageBB.editMode ? 'Save' : 'Edit'}" 
+                                                         icon="fa #{manageBB.editMode ? 'fa-check' : 'fa-pencil'}"
+                                                         actionListener="#{manageBB.onEditModeToggle}"
+                                                         update="add-update-form"
+                                                         />
+                                    </div>
+
+                                    <div class="p-col-4"><h:outputText value="#{manageBB.currentSchema.TARGET_OBJECT_FRIENDLY_NAME} ID:"/></div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{manageBB.current.ID}"/>
+                                    </div>
+
+                                    <div class="p-col-4">Name</div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{manageBB.current.name}"
+                                                      rendered="#{!manageBB.editMode}" />
+                                        <p:inputText value="#{manageBB.current.name}"
+                                                     rendered="#{manageBB.editMode}" />
+                                    </div>
+
+
+
+
+
+                                    <ui:insert name="Dialog"/>
+
+
+
+
+                                    <div class="p-col-4" renedered="${manageableBB.showDeactivated}">Deactivated Time Stamp</div>
+                                    <div class="p-col-8" renedered="${manageableBB.showDeactivated}">
+                                        <h:outputText value="#{manageBB.getPrettyDateNoTime(manageBB.current.deactivatedts)}"/>
+                                    </div>
+
+
+
+                                    <div class="p-col-12">
+                                        <p:commandButton id="add-update-cancel-button"
+                                                         value="#{manageBB.editMode ? 'Cancel' : 'Close'}" 
+                                                         icon="fa #{manageBB.editMode ? 'fa-check' : 'fa-pencil'}"
+                                                         onclick="PF('addupdate-dialog').hide()"
+                                                         />
+                                        <p:commandButton id="add-update-remove-button"
+                                                         value="#{(manageBB.current.deactivatedts == null) ? 'Remove' : 'Restore'}" 
+                                                         icon="fa fa-x"
+                                                         onclick="PF('addupdate-dialog').hide()"
+                                                         actionListener="#{manageBB.onRemoveRestore()}"
+                                                         />
+                                    </div>
+                                </div>
+                            </h:form>
+                        </p:dialog>
+
+
+
                     </f:view>
                 </div>
             </ui:define>
