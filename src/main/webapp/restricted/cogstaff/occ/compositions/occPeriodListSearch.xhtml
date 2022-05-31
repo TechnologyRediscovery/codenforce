@@ -116,9 +116,16 @@
                 tableStyleClass="primeDataTable"
                 resizableColumns="true"
                 widgetVar="occperiods-table-var"
+                rowExpandMode="multiple"
+                expandedRow="false"
                 >
                 <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
 
+                <p:column width="15%" 
+                          headerText="exp">
+                    <p:rowToggler />
+                    
+                </p:column> 
                 <p:column width="20%" 
                           sortable="true"
                           sortBy="#{period.propUnitProp.property.primaryAddressLink.street.name}">
@@ -145,16 +152,6 @@
                     <h:outputText value="#{period.propUnitProp.unitNumber}" />
                 </p:column>
 
-                <p:column width="15%" 
-                          sortable="true"
-                          sortBy="#{period.type.title}">
-                    <f:facet name="header">
-                        <h:outputText value="Type" />
-                    </f:facet>
-                    <h:outputText value="#{period.type.title}" />
-                    <p:spacer height="1px" />
-                    <h:outputText value="(Per ID: #{period.periodID})" />
-                </p:column>
 
                 <p:column width="20%"
                           sortable="true"
@@ -189,6 +186,20 @@
 
 
                 </p:column>
+                
+                <p:rowExpansion>
+                    <h3>Permits</h3>
+                    <ui:repeat value="#{period.permitList}"
+                               var="permit">
+                    
+                        <h:outputText value="#{permit.permitID}" />
+                        <br />
+                    
+                    </ui:repeat>                               
+                    
+                    
+                    
+                </p:rowExpansion>
 
             </p:dataTable>
         </h:form>

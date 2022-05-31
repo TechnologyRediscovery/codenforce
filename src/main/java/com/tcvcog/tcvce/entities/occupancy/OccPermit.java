@@ -149,6 +149,7 @@ public class OccPermit extends TrackedEntity {
     private FieldInspection dynamicFinalInspectionFINRef;
     
     private LocalDateTime dynamicdateofissue;
+    private LocalDateTime dynamicDateExpiry;
     
     
     // ********************************************************************
@@ -161,6 +162,7 @@ public class OccPermit extends TrackedEntity {
     private LocalDateTime staticreinspectiondate;
     private LocalDateTime staticfinalinspection;
     private LocalDateTime staticdateofissue;
+    private LocalDateTime staticdateofexpiry;
     
     private String statictitle;
     private String staticmuniaddress;
@@ -1025,6 +1027,34 @@ public class OccPermit extends TrackedEntity {
      */
     public void setFinalizationAuditPassTS(LocalDateTime finalizationAuditPassTS) {
         this.finalizationAuditPassTS = finalizationAuditPassTS;
+    }
+
+    /**
+     * @return the dynamicDateExpiry
+     */
+    public LocalDateTime getDynamicDateExpiry() {
+        return dynamicDateExpiry;
+    }
+
+    /**
+     * @param dynamicDateExpiry the dynamicDateExpiry to set
+     */
+    public void setDynamicDateExpiry(LocalDateTime dynamicDateExpiry) {
+        this.dynamicDateExpiry = dynamicDateExpiry;
+    }
+
+    /**
+     * @return the staticdateofexpiry
+     */
+    public LocalDateTime getStaticdateofexpiry() {
+        return staticdateofexpiry;
+    }
+
+    /**
+     * @param staticdateofexpiry the staticdateofexpiry to set
+     */
+    public void setStaticdateofexpiry(LocalDateTime staticdateofexpiry) {
+        this.staticdateofexpiry = staticdateofexpiry;
     }
 
   

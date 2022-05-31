@@ -80,6 +80,7 @@ public  class       OccPeriod
     
     // Used during initiation to store the origination event
     protected EventCategory originationEventCategory;
+    protected List<OccPermit> permitList;
 
     public OccPeriod() {
     }
@@ -548,5 +549,19 @@ public  class       OccPeriod
      */
     public void setOriginationEventCategory(EventCategory originationEventCategory) {
         this.originationEventCategory = originationEventCategory;
+    }
+
+    /**
+     * @return the permitList
+     */
+    public List<OccPermit> getPermitList() {
+        return permitList;
+    }
+
+    /**
+     * @param permitList the permitList to set
+     */
+    public void setPermitList(List<OccPermit> permitList) {
+        this.permitList = permitList;
     }
 }

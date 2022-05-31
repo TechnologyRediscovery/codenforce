@@ -58,7 +58,6 @@ public  class       OccPeriodDataHeavy
     private List<EventRuleImplementation> eventRuleList;
     
     private List<FieldInspection> inspectionList;
-    private List<OccPermit> permitList;
     
     private List<Integer> blobIDList;
     
@@ -299,13 +298,9 @@ public  class       OccPeriodDataHeavy
     public List<FieldInspection> getInspectionList() {
         return inspectionList;
     }
-
     /**
      * @return the permitList
      */
-    public List<OccPermit> getPermitList() {
-        return permitList;
-    }
 
     /**
      * @return the blobIDList
@@ -335,13 +330,9 @@ public  class       OccPeriodDataHeavy
     public void setInspectionList(List<FieldInspection> inspectionList) {
         this.inspectionList = inspectionList;
     }
-
     /**
      * @param permitList the permitList to set
      */
-    public void setPermitList(List<OccPermit> permitList) {
-        this.permitList = permitList;
-    }
 
     /**
      * @param blobIDList the blobIDList to set

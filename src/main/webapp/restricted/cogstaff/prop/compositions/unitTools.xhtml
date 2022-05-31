@@ -323,7 +323,7 @@
                             toggleable="true"
                             widgetVar="unit-periods-panel-var"
                             collapsed="false"
-                            header="Occupancy Periods">
+                            header="Permit files">
                     <h:form id="unit-periods-form">
                         <p:dataScroller
                             id="scroller-periodlist"
@@ -333,7 +333,7 @@
                             value="#{propertyProfileBB.currentPropertyUnit.periodList}"
                             >                                         
                             <div style="datum">
-                                <h:outputText value="Type: " 
+                                <h:outputText value="Permit File Type: " 
                                               styleClass="ui-label-inline" />
                                 <h:outputText value="#{period.type.title}" 
                                               styleClass="data-text"/>
@@ -349,11 +349,17 @@
                             </div>
 
                             <div style="datum">
-                                <h:outputText value="End Date: " 
+                                <h:outputText value="Permit Status" 
                                               styleClass="ui-label-inline" />
 
-                                <h:outputText value="#{PropertyUnitsBB.getPrettyDate(period.endDate)}" 
-                                              styleClass="data-text"/>
+                                <ui:repeat id="permit-uir"
+                                           value="#{period.permitList}"
+                                           var="permit">
+                                    <h:outputText value="ID: #{permit.permitID}" 
+                                                  styleClass="data-text"/>
+                                    <h:outputText value="Status: #{!empty permit.referenceNo ? 'Finalized!':'Draft only'}" 
+                                                  styleClass="data-text"/>
+                                </ui:repeat>
                             </div>
                             <div style="datum">
                                 <h:outputText value="Authorization" 
@@ -452,7 +458,7 @@
 
 
     <p:dialog    id="occperiod-add-dialog"
-                 height="400" width="600"
+                 height="600" width="1000"
                  widgetVar="occperiod-add-dialog-var"
                  closable="true"
                  closeOnEscape="true"
@@ -460,7 +466,7 @@
                  responsive="true"
                  dynamic="true"
                  modal="true"
-                 header="Add New Occupancy Period">
+                 header="Create new permit file">
 
 
         <h:form id="occperiod-add-form">
@@ -485,20 +491,83 @@
                     <h:outputText value="#{propertyProfileBB.currentPropertyUnit.unitNumber}" />
                 </div>
 
-                <div class="p-col-4">
+                <div class="p-col-12">
                     <h:outputLabel styleClass="ui-label" 
                                    for="som-occperiodtype" 
-                                   value="Occupancy type" />
+                                   value="Permit file type" />
                 </div>
-                <div class="p-col-8">
+                <div class="p-col-12">
+                    
+                    <p:dataTable id="permit-add-types-table"
+                                value="#{propertyProfileBB.occPeriodTypeList}"
+                                var="permitType"
+                                rowKey="#{permitType.typeID}"
+                                selection="#{propertyProfileBB.currentOccPeriod.type}"
+                                selectionMode="single"
+                                rowSelectMode="add"
+                                resizableColumns="true"
+                                rowExpandMode="single"
+                                expandedRow="false">
+                        
+                        <p:column headerText="exp"
+                                  width="10%">
+                            <p:rowToggler />
+                        </p:column>
+                    
+                        <p:column headerText="Title"
+                                  width="20%">
+                            <h:outputText value="#{permitType.title}" />
+                            
+                        </p:column>
+                    
+                        <p:column headerText="Municipality"
+                                  width="20%">
+                            <h:outputText value="#{permitType.muni.muniName}" />
+                            
+                        </p:column>
+                    
+                        <p:column headerText="Permit title">
+                            <h:outputText value="#{permitType.permitTitle}" />
+                            
+                        </p:column>
+                        <p:column headerText="Expires?"
+                                  width="20%">
+                            <h:outputText value="#{permitType.expires? 'Yes':'No'}" />
+                            <h:outputText value=" (#{permitType.defaultValidityPeriodDays} days)"
+                                          rendered="#{permitType.expires}"/>
+                            
+                        </p:column>
+                        <p:column headerText="Fees"
+                                  width="20%">
+                            <ui:repeat id="permitfile-type-feelist"
+                                       value="#{permitType.permittedFees}"
+                                       var="fee">
+                                <h:outputText value="#{fee.name}" />
+                                <h:outputText value=" ($#{fee.amount}" />
+                                <p:spacer height="3px" />
+                            
+                            </ui:repeat>
+                            
+                        </p:column>
+                        
+                        <p:rowExpansion>
+                            <div class="p-grid">
+                                <div class="p-col-4">
+                                </div>
+                                <div class="p-col-8">
+                                    
+                                    <h:outputText value="#{permitType.authorizeduses}" />
+                                </div>
+                            </div>
+                        </p:rowExpansion>
+                    </p:dataTable>
+                    
                     <p:selectOneMenu
                         id="som-occperiodtype" tabindex="1" required="true"
-                        value="#{propertyProfileBB.currentOccPeriod.type}">
 
                         <f:converter converterId="occPeriodTypeConverter"/>
                         <f:selectItem itemLabel="Select a period type..." itemDisabled="true" noSelectionOption="true"/>
                         <f:selectItems id="si-typelist"
-                                       value="#{propertyProfileBB.occPeriodTypeList}"
                                        var ="opt"
                                        itemValue="#{opt}"
                                        itemLabel="#{opt.title}" />
@@ -508,7 +577,7 @@
 
 
                 <div class="p-col-4">
-                    <h:outputLabel value="Period manager" />
+                    <h:outputLabel value="File manager" />
                 </div>
                 <div class="p-col-8">
 
@@ -564,7 +633,7 @@
                              action="#{propertyProfileBB.onAddOccperiodCommitButtonChange}"
                              icon="fa fa-plus-square"
                              styleClass="inline-button"
-                             value="Create new period and go to profile"
+                             value="Create new permit and go to file"
                              tabindex="3"/>
 
         </h:form>

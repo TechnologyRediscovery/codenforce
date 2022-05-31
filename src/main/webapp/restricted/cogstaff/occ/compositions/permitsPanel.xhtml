@@ -390,6 +390,29 @@
                                                timeInput="true" 
                                                required="false" />    
                             </div>
+                            <f:subview id="permit-config-expirydate-subiew"
+                                       rendered="#{occPeriodBB.currentOccPeriod.type.expires}">
+
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <h:outputText value="Date of Expiry" />
+
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:datePicker 	id="occpermit-dynamic-date-expiry"
+                                                   rendered="true"
+                                                   value="#{occPeriodBB.currentOccPermit.dynamicDateExpiry}" 
+                                                   style="width: 100%;"
+                                                   pattern="MM/dd/yyyy HH:mm"
+                                                   disabled="false"
+                                                   showButtonBar="true"
+                                                   hideOnDateTimeSelect="true"
+                                                   showOnFocus="false"
+                                                   showIcon="true"
+                                                   mask="true"
+                                                   timeInput="true" 
+                                                   required="false" />    
+                                </div>
+                            </f:subview>
                         </div>
                     </p:panel>
 
@@ -1180,10 +1203,10 @@
                     <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticdateofissue)}" />
                 </div>
                 <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="   " />
+                    <h:outputText value="#{empty occPeriodBB.currentOccPermit.staticdateofexpiry ? ' ' : 'Date of Expiry:'}" />
                 </div>
                 <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="   " />
+                    <h:outputText value="#{empty occPeriodBB.currentOccPermit.staticdateofexpiry ? ' ' : occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticdateofexpiry)}" />
                 </div>
 
 

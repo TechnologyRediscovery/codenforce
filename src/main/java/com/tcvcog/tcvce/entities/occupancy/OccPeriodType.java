@@ -64,6 +64,7 @@ public class OccPeriodType implements Cloneable {
     
     private String permitTitle;
     private String permitTitleSub;
+    private boolean expires;
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -453,6 +454,20 @@ public class OccPeriodType implements Cloneable {
      */
     public void setBaseRuleSetID(int baseRuleSetID) {
         this.baseRuleSetID = baseRuleSetID;
+    }
+
+    /**
+     * @return the expires
+     */
+    public boolean isExpires() {
+        return expires;
+    }
+
+    /**
+     * @param expires the expires to set
+     */
+    public void setExpires(boolean expires) {
+        this.expires = expires;
     }
     
 }

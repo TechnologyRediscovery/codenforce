@@ -494,7 +494,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                         "       staticstipulations, staticcomments, staticmanager, statictenants, \n" +
                         "       staticleaseterm, staticleasestatus, staticpaymentstatus, staticnotice, \n" +
                         "       createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
-                        "       deactivatedts, deactivatedby_userid, staticconstructiontype, nullifiedts, nullifiedby_userid  \n" +
+                        "       deactivatedts, deactivatedby_userid, staticconstructiontype, nullifiedts, nullifiedby_userid, staticdateexpiry  \n" +
                         "  FROM public.occpermit WHERE permitid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -567,6 +567,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
         if(rs.getTimestamp("staticdateofissue") != null){
             permit.setStaticdateofissue(rs.getTimestamp("staticdateofissue").toLocalDateTime());
+        }
+        if(rs.getTimestamp("staticdateexpiry") != null){
+            permit.setStaticdateofexpiry(rs.getTimestamp("staticdateexpiry").toLocalDateTime());
         }
         
         permit.setStaticofficername(rs.getString("staticofficername"));
@@ -863,7 +866,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                         "       staticstipulations=?, staticcomments=?, staticmanager=?, statictenants=?, \n" +
                         "       staticleaseterm=?, staticleasestatus=?, staticpaymentstatus=?, \n" +
                         "       staticnotice=?, lastupdatedts=now(), \n" +
-                        "       lastupdatedby_userid=?, staticconstructiontype=?  " +
+                        "       lastupdatedby_userid=?, staticconstructiontype=?, staticdateexpiry=?  " +
                         " WHERE permitid = ?;";
 
         Connection con = getPostgresCon();
@@ -931,7 +934,11 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 stmt.setNull(26, java.sql.Types.NULL);
             }
             stmt.setString(27, permit.getStaticconstructiontype());
-            stmt.setInt(28, permit.getPermitID());
+            if(permit.getStaticdateofexpiry() != null){
+                stmt.setTimestamp(28, java.sql.Timestamp.valueOf(permit.getStaticdateofexpiry()));
+            }
+            stmt.setInt(29, permit.getPermitID());
+            
 
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -1025,7 +1032,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                         "       requiredpersontypes, commercial, requirepersontypeentrycheck, \n" +
                         "       defaultpermitvalidityperioddays, occchecklist_checklistlistid, \n" +
                         "       asynchronousinspectionvalidityperiod, defaultinspectionvalidityperiod, \n" +
-                        "       eventruleset_setid, inspectable, permittitle, permittitlesub\n" +
+                        "       eventruleset_setid, inspectable, permittitle, permittitlesub, expires \n" +
                         "  FROM public.occperiodtype WHERE typeid=?;";
 
         Connection con = getPostgresCon();
@@ -1440,6 +1447,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setInspectable(rs.getBoolean("inspectable"));
             opt.setPermitTitle(rs.getString("permittitle"));
             opt.setPermitTitleSub(rs.getString("permittitlesub"));
+            opt.setExpires(rs.getBoolean("expires"));
 
             opt.setPermittedFees(pi.getFeeList(opt));
         } catch (SQLException ex) {

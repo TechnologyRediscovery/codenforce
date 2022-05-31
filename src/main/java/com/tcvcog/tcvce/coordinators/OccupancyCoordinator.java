@@ -74,6 +74,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     private final int DEFAULT_OCC_PERIOD_START_DATE_OFFSET = 30;
     private final String OCCPERMIT_DEFAULT_COL_SEP = "-TO-";
     private final int OCCPERMIT_INSPECTION_COUNT_THREE_REPORTED_INSPECTIONS = 3;
+    private final int DEFAULT_PERMIT_EXPIRY_WINDOW_DAYS = 30;
     
     
     /**
@@ -648,6 +649,13 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         // configure date of issuance to today
         permit.setDynamicdateofissue(LocalDateTime.now());
+        if(per.getType().isExpires()){
+            if(per.getType().getDefaultValidityPeriodDays() == 0){
+                permit.setDynamicDateExpiry(LocalDateTime.now().plusDays(DEFAULT_PERMIT_EXPIRY_WINDOW_DAYS));
+            } else {
+                permit.setDynamicDateExpiry(LocalDateTime.now().plusDays(per.getType().getDefaultValidityPeriodDays()));
+            }
+        }
         
         
         // Hold off on persons here;
@@ -907,6 +915,13 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 auditPass = false;
                 permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD11: date of final inspection cannot be BEFORE date of initial inspection");
        }
+       // TCO
+       if(permit.getStaticdateofexpiry() != null){
+           if(permit.getStaticdateofexpiry().isBefore(permit.getStaticdateofissue())){
+               auditPass = false;
+               permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization erro code OPFD12: date of expiry must come AFTER the date of issuance");
+           }
+       }
        
        
        
@@ -1000,6 +1015,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         permit.setStaticreinspectiondate(permit.getDynamicreinspectiondate());
         permit.setStaticfinalinspection(permit.getDynamicfinalinspection());
         permit.setStaticdateofissue(permit.getDynamicdateofissue());
+        if(period.getType().isExpires()){
+            permit.setStaticdateofexpiry(permit.getDynamicDateExpiry());
+        }
         
         // based on parcel info, populate parcel info static fields
         if(permit.getParcelInfo() == null){

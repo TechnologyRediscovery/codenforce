@@ -262,9 +262,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 //            skeletonHorde.add(skeleton);
 //
 //        }
-
         return skeletonHorde;
-
     }
 
     public void updateFee(Fee input) throws IntegrationException {
@@ -273,9 +271,11 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
+    // YIKES!!!
+    
     public void insertFee(Fee input) throws IntegrationException {
         PaymentIntegrator pi = getPaymentIntegrator();
-        pi.deleteOccupancyInspectionFee(input);
+//        pi.insertOccPeriodFee(input);
     }
 
     public void removeFee(Fee input) throws IntegrationException {

@@ -217,6 +217,9 @@ ALTER TABLE public.occinspectiondetermination ADD COLUMN qualifiesaspassed boole
 -- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
 
+ALTER TABLE occperiodtype ADD COLUMN expires BOOLEAN DEFAULT FALSE;
+
+
 
 
 ALTER TABLE public.cecase RENAME COLUMN login_userid TO manager_userid;

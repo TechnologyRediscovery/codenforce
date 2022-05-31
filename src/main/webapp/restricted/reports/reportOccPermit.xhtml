@@ -95,12 +95,13 @@
                 <div class="p-col-3 restrict-data-field-value-inline">
                     <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticdateofissue}" />
                 </div>
-                <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="   " />
+               <div class="p-col-3 restrict-data-field-label-inline">
+                    <h:outputText value="#{empty occPeriodBB.currentOccPermit.staticdateofexpiry ? ' ' : 'Date of Expiry:'}" />
                 </div>
                 <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="   " />
+                    <h:outputText value="#{empty occPeriodBB.currentOccPermit.staticdateofexpiry ? ' ' : occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticdateofexpiry)}" />
                 </div>
+
                 
                 
                 <div class="p-col-3 restrict-data-field-label-inline">
