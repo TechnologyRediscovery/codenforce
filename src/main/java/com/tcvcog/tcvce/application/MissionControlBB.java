@@ -346,7 +346,6 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
     public String onViewPropertyButtonChange(Property prop){
         getSessionBean().setSessProperty(prop);
         return "propertySearchProfile";
-        
     }
     
     
@@ -359,9 +358,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
                 System.out.println();
             }
         }
-        
         return "";
-        
     }
     
     /**

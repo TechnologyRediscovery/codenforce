@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +39,8 @@ public class MuniProfile {
     private int novDefaultDaysForFollowup;
     
     private EventRuleSet eventRuleSetCE;
-    private List<OccPeriodType> occPeriodTypeList;
+    private List<OccPermitType> occPeriodTypeList;
+    private List<Fee> feeList;
 
     /**
      * @return the profileID
@@ -170,14 +171,14 @@ public class MuniProfile {
     /**
      * @return the occPeriodTypeList
      */
-    public List<OccPeriodType> getOccPeriodTypeList() {
+    public List<OccPermitType> getOccPeriodTypeList() {
         return occPeriodTypeList;
     }
 
     /**
      * @param occPeriodTypeList the occPeriodTypeList to set
      */
-    public void setOccPeriodTypeList(List<OccPeriodType> occPeriodTypeList) {
+    public void setOccPeriodTypeList(List<OccPermitType> occPeriodTypeList) {
         this.occPeriodTypeList = occPeriodTypeList;
     }
     
@@ -238,5 +239,19 @@ public class MuniProfile {
      */
     public void setNovDefaultDaysForFollowup(int novDefaultDaysForFollowup) {
         this.novDefaultDaysForFollowup = novDefaultDaysForFollowup;
+    }
+
+    /**
+     * @return the feeList
+     */
+    public List<Fee> getFeeList() {
+        return feeList;
+    }
+
+    /**
+     * @param feeList the feeList to set
+     */
+    public void setFeeList(List<Fee> feeList) {
+        this.feeList = feeList;
     }
 }

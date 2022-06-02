@@ -15,7 +15,7 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class    OccPeriodSearchBB
 //  *******************************
 //  ************ SEARCH ***********
 //  *******************************
-    private List<OccPeriodType> search_occPeriodTypeList;
+    private List<OccPermitType> search_occPeriodTypeList;
 
     private List<QueryOccPeriod> occPeriodQueryList;
     private QueryOccPeriod occPeriodQuerySelected;
@@ -179,7 +179,7 @@ public class    OccPeriodSearchBB
     /**
      * @return the search_occPeriodTypeList
      */
-    public List<OccPeriodType> getSearch_occPeriodTypeList() {
+    public List<OccPermitType> getSearch_occPeriodTypeList() {
         return search_occPeriodTypeList;
     }
 
@@ -242,7 +242,7 @@ public class    OccPeriodSearchBB
     /**
      * @param search_occPeriodTypeList the search_occPeriodTypeList to set
      */
-    public void setSearch_occPeriodTypeList(List<OccPeriodType> search_occPeriodTypeList) {
+    public void setSearch_occPeriodTypeList(List<OccPermitType> search_occPeriodTypeList) {
         this.search_occPeriodTypeList = search_occPeriodTypeList;
     }
 

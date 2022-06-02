@@ -20,7 +20,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import java.io.Serializable;
 import java.util.ArrayList;
 import javax.inject.Named;
@@ -38,15 +38,15 @@ import javax.faces.event.ActionEvent;
 @ViewScoped
 public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializable {
     
-    private ArrayList<OccPeriodType> occupancyPermitTypeList;
-    private OccPeriodType selectedOccupancyPermitType;
+    private ArrayList<OccPermitType> occupancyPermitTypeList;
+    private OccPermitType selectedOccupancyPermitType;
     private int formOccupancyPermitTypeID;
     private int formOccupancyPermitTypeMuniCodeID;
     private String formOccupancyPermitTypeName;
     private String formOccupancyPermitTypeDescription; 
     
     //create data fields for user editing/updating of permit types
-    private OccPeriodType newFormSelectedOccupancyPermitType;
+    private OccPermitType newFormSelectedOccupancyPermitType;
     private int newFormOccupancyPermitTypeID;
     private Municipality formMuni;
     
@@ -62,7 +62,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
     
     public void addNewOccupancyPermitType(ActionEvent e){
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        OccPeriodType o = new OccPeriodType();
+        OccPermitType o = new OccPermitType();
         
 //        o.setOccupancyPermitTypeID(newFormOccupancyPermitTypeID);
 //        o.setMuni(formMuni);
@@ -70,7 +70,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
 //        o.setOccupancyPermitTypeDescription(newFormOccupancyPermitTypeDescription);
 //        
         try{
-            oi.insertOccPeriodType(o);
+            oi.insertOccPermitType(o);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Occupancy Permit Type updated!", ""));
@@ -122,7 +122,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
     
     public void commitUpdates(ActionEvent e){
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        OccPeriodType o = selectedOccupancyPermitType;
+        OccPermitType o = selectedOccupancyPermitType;
         
         //o.setOccupancyPermitTypeID(getFormOccupancyPermitTypeID());
         //o.setOccupancyPermitTypeMuniCodeID(getFormOccupancyPermitTypeMuniCodeID());
@@ -144,7 +144,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
     
     
     public String addOccupancyPermitType(){
-        OccPeriodType o = new OccPeriodType();
+        OccPermitType o = new OccPermitType();
         OccupancyIntegrator oi = new OccupancyIntegrator();
 //        o.setOccupancyPermitTypeID(formOccupancyPermitTypeID);
 //        o.setMuni(getFormMuni());
@@ -152,7 +152,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
 //        o.setOccupancyPermitTypeDescription(formOccupancyPermitTypeDescription);
         
         try {
-            oi.insertOccPeriodType(o);
+            oi.insertOccPermitType(o);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Successfully added occupancy permit type to database!", ""));
@@ -173,10 +173,10 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
     /**
      * @return the occupancyPermitTypeList
      */
-    public ArrayList<OccPeriodType> getOccupancyPermitTypeList() {
+    public ArrayList<OccPermitType> getOccupancyPermitTypeList() {
 //        try {
 //            OccupancyIntegrator oi = getOccupancyIntegrator();
-//            occupancyPermitTypeList = oi.getCompleteOccPeriodTypeList();
+//            occupancyPermitTypeList = oi.getCompleteOccPermitTypeList();
 //        } catch (IntegrationException ex) {
 //            getFacesContext().addMessage(null, 
 //                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -195,7 +195,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
     /**
      * @param occupancyPermitTypeList the occupancyPermitTypeList to set
      */
-    public void setOccupancyPermitTypeList(ArrayList<OccPeriodType> occupancyPermitTypeList) {
+    public void setOccupancyPermitTypeList(ArrayList<OccPermitType> occupancyPermitTypeList) {
         this.occupancyPermitTypeList = occupancyPermitTypeList;
     }
 
@@ -258,28 +258,28 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
     /**
      * @return the selectedOccupancyPermitType
      */
-    public OccPeriodType getSelectedOccupancyPermitType() {
+    public OccPermitType getSelectedOccupancyPermitType() {
         return selectedOccupancyPermitType;
     }
 
     /**
      * @param selectedOccupancyPermitType the selectedOccupancyPermitType to set
      */
-    public void setSelectedOccupancyPermitType(OccPeriodType selectedOccupancyPermitType) {
+    public void setSelectedOccupancyPermitType(OccPermitType selectedOccupancyPermitType) {
         this.selectedOccupancyPermitType = selectedOccupancyPermitType;
     }
 
     /**
      * @return the newFormSelectedOccupancyPermitType
      */
-    public OccPeriodType getNewFormSelectedOccupancyPermitType() {
+    public OccPermitType getNewFormSelectedOccupancyPermitType() {
         return newFormSelectedOccupancyPermitType;
     }
 
     /**
      * @param newFormSelectedOccupancyPermitType the newFormSelectedOccupancyPermitType to set
      */
-    public void setNewFormSelectedOccupancyPermitType(OccPeriodType newFormSelectedOccupancyPermitType) {
+    public void setNewFormSelectedOccupancyPermitType(OccPermitType newFormSelectedOccupancyPermitType) {
         this.newFormSelectedOccupancyPermitType = newFormSelectedOccupancyPermitType;
     }
 

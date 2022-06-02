@@ -34,7 +34,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.integration.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
@@ -284,12 +284,22 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
     }
 
-    public List<OccPeriodType> getOccPeriodTypesFromProfileID(int profileID) {
-
+    
+    /**
+     * Creates a list of allowed permit types by muni profile
+     * @param profile
+     * @return
+     * @throws BObStatusException 
+     */
+    public List<OccPermitType> getOccPeriodTypesFromProfileID(MuniProfile profile) throws BObStatusException {
+        if(profile == null){
+            throw new BObStatusException("Cannot get permit type list with null muni profile");
+            
+        }
         OccupancyIntegrator oi = getOccupancyIntegrator();
-        List<OccPeriodType> typeList = new ArrayList<>();
+        List<OccPermitType> typeList = new ArrayList<>();
         try {
-            typeList = oi.getOccPeriodTypeList(profileID);
+            typeList = oi.getOccPermitTypeList(profile.getProfileID());
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
         }
@@ -649,11 +659,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         // configure date of issuance to today
         permit.setDynamicdateofissue(LocalDateTime.now());
-        if(per.getType().isExpires()){
-            if(per.getType().getDefaultValidityPeriodDays() == 0){
+        if(permit.getPermitType().isExpires()){
+            if(permit.getPermitType().getDefaultValidityPeriodDays() == 0){
                 permit.setDynamicDateExpiry(LocalDateTime.now().plusDays(DEFAULT_PERMIT_EXPIRY_WINDOW_DAYS));
             } else {
-                permit.setDynamicDateExpiry(LocalDateTime.now().plusDays(per.getType().getDefaultValidityPeriodDays()));
+                permit.setDynamicDateExpiry(LocalDateTime.now().plusDays(permit.getPermitType().getDefaultValidityPeriodDays()));
             }
         }
         
@@ -981,7 +991,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         PropertyCoordinator pc = getPropertyCoordinator();     
         
         
-        permit.setStatictitle(period.getType().getPermitTitle());
+        permit.setStatictitle(permit.getPermitType().getPermitTitle());
         permit.setStaticcolumnlink(OCCPERMIT_DEFAULT_COL_SEP);
         
         
@@ -1015,7 +1025,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         permit.setStaticreinspectiondate(permit.getDynamicreinspectiondate());
         permit.setStaticfinalinspection(permit.getDynamicfinalinspection());
         permit.setStaticdateofissue(permit.getDynamicdateofissue());
-        if(period.getType().isExpires()){
+        if(permit.getPermitType().isExpires()){
             permit.setStaticdateofexpiry(permit.getDynamicDateExpiry());
         }
         
@@ -1032,7 +1042,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         // inject parcel info fields
         permit.setStaticpropclass(permit.getParcelInfo().getPropClass());
         permit.setStaticusecode(permit.getParcelInfo().getUseGroup());
-        permit.setStaticproposeduse(period.getType().getAuthorizeduses());
+        permit.setStaticproposeduse(permit.getPermitType().getAuthorizeduses());
         permit.setStaticconstructiontype(permit.getParcelInfo().getConstructionType());
         
         // build code source string
@@ -1277,7 +1287,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         SystemIntegrator si = getSystemIntegrator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
         
-        if(period == null || period.getPropertyUnitID() == 0 || period.getType() == null || ua == null){
+        if(period == null || period.getPropertyUnitID() == 0 ||  ua == null){
             throw new BObStatusException("cannot create new occ period with null period, type, unit of id 0, or user");
         }
         
@@ -1286,12 +1296,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
 
         period.setStartDate(LocalDateTime.now().plusDays(DEFAULT_OCC_PERIOD_START_DATE_OFFSET));
+        period.setEndDate(null);
         period.setStartDateCertifiedBy(null);
         period.setStartDateCertifiedTS(null);
 
-        if (period.getStartDate() != null) {
-            period.setEndDate(period.getStartDate().plusDays(period.getType().getDefaultValidityPeriodDays()));
-        }
         period.setEndDateCertifiedBy(null);
         period.setEndDateCertifiedTS(null);
 

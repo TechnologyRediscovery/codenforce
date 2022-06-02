@@ -34,7 +34,7 @@ import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import com.tcvcog.tcvce.entities.occupancy.OccPermit;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccPermit;
 import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
@@ -71,6 +71,8 @@ public class OccPeriodBB
     private OccPeriodDataHeavy currentOccPeriod;
     private PropertyUnitDataHeavy currentPropertyUnit;
     
+    private List<OccPermitType> permitTypeCandidateList;
+    
     private OccPermit currentOccPermit;
     private ReportConfigOccPermit currentOccPermitConfig;
     private boolean editModeOccPermit;
@@ -93,8 +95,8 @@ public class OccPeriodBB
 //  *******************************
 //  ************ WORKFLOW**********
 //  *******************************
-    private List<OccPeriodType> occPeriodTypeList;
-    private OccPeriodType selectedOccPeriodType;
+    private List<OccPermitType> occPeriodTypeList;
+    private OccPermitType selectedOccPeriodType;
 
     private List<PropertyUnit> propertyUnitCandidateList;
     private PropertyUnit selectedPropertyUnit;
@@ -133,6 +135,7 @@ public class OccPeriodBB
                 setPropertyUnitCandidateList(sb.getSessProperty().getUnitList());
                 
                 setupPermitTextBlockCandidateLists(null);
+                permitTypeCandidateList = oc.getOccPeriodTypesFromProfileID(getSessionBean().getSessMuni().getProfile());
             } catch (IntegrationException | BObStatusException | AuthorizationException | EventException | SearchException | BlobException ex) {
                 System.out.println(ex);
             }
@@ -405,7 +408,6 @@ public class OccPeriodBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         
         currentOccPermit = oc.getOccPermitSkeleton(getSessionBean().getSessUser());
-        onOccPermitInitCommitButtonChange(ev);
     }
     
     
@@ -977,7 +979,7 @@ public class OccPeriodBB
     /**
      * @return the occPeriodTypeList
      */
-    public List<OccPeriodType> getOccPeriodTypeList() {
+    public List<OccPermitType> getOccPeriodTypeList() {
         return occPeriodTypeList;
     }
 
@@ -1012,7 +1014,7 @@ public class OccPeriodBB
     /**
      * @param occPeriodTypeList the occPeriodTypeList to set
      */
-    public void setOccPeriodTypeList(List<OccPeriodType> occPeriodTypeList) {
+    public void setOccPeriodTypeList(List<OccPermitType> occPeriodTypeList) {
         this.occPeriodTypeList = occPeriodTypeList;
     }
 
@@ -1040,7 +1042,7 @@ public class OccPeriodBB
     /**
      * @return the selectedOccPeriodType
      */
-    public OccPeriodType getSelectedOccPeriodType() {
+    public OccPermitType getSelectedOccPeriodType() {
         return selectedOccPeriodType;
     }
 
@@ -1054,7 +1056,7 @@ public class OccPeriodBB
     /**
      * @param selectedOccPeriodType the selectedOccPeriodType to set
      */
-    public void setSelectedOccPeriodType(OccPeriodType selectedOccPeriodType) {
+    public void setSelectedOccPeriodType(OccPermitType selectedOccPeriodType) {
         this.selectedOccPeriodType = selectedOccPeriodType;
     }
 
@@ -1287,6 +1289,20 @@ public class OccPeriodBB
      */
     public void setPermitBlocksFilteredList(List<TextBlock> permitBlocksFilteredList) {
         this.permitBlocksFilteredList = permitBlocksFilteredList;
+    }
+
+    /**
+     * @return the permitTypeCandidateList
+     */
+    public List<OccPermitType> getPermitTypeCandidateList() {
+        return permitTypeCandidateList;
+    }
+
+    /**
+     * @param permitTypeCandidateList the permitTypeCandidateList to set
+     */
+    public void setPermitTypeCandidateList(List<OccPermitType> permitTypeCandidateList) {
+        this.permitTypeCandidateList = permitTypeCandidateList;
     }
 
    

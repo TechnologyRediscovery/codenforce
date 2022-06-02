@@ -36,7 +36,7 @@ import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.Fee;
 import com.tcvcog.tcvce.entities.FeeAssigned;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Level;
@@ -72,9 +72,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private ArrayList<FeeAssigned> filteredFeeAssignedList;
 
     //feePermissions.xhtml fields
-    private ArrayList<OccPeriodType> typeList;
-    private ArrayList<OccPeriodType> filteredTypeList;
-    private OccPeriodType selectedPeriodType;
+    private ArrayList<OccPermitType> typeList;
+    private ArrayList<OccPermitType> filteredTypeList;
+    private OccPermitType selectedPeriodType;
 
     private ArrayList<EnforcableCodeElement> elementList;
     private ArrayList<EnforcableCodeElement> filteredElementList;
@@ -251,7 +251,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * @param currentType
      * @throws IntegrationException
      */
-    public void onOccPeriodTypeSelectedButtonChange(OccPeriodType currentType) throws IntegrationException, BObStatusException {
+    public void onOccPeriodTypeSelectedButtonChange(OccPermitType currentType) throws IntegrationException, BObStatusException {
 
         if (currentFeeSelected == true) {
 
@@ -283,7 +283,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             //turn to default setting
             currentFeeSelected = false;
 
-            selectedPeriodType = new OccPeriodType();
+            selectedPeriodType = new OccPermitType();
 
             refreshFeeAssignedList();
 
@@ -971,7 +971,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 try {
                     feeAssignedList = (ArrayList<FeeAssigned>) pc.getAssignedFees(currentOccPeriod);
 
-                    feeList = (ArrayList<Fee>) currentOccPeriod.getType().getPermittedFees();
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1019,8 +1018,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         CaseCoordinator cc = getCaseCoordinator();
         OccupancyCoordinator oc = getOccupancyCoordinator();
         CodeCoordinator ec = getCodeCoordinator();
+        try {
 
-        typeList = (ArrayList<OccPeriodType>) oc.getOccPeriodTypesFromProfileID(getSessionBean().getSessMuni().getProfile().getProfileID());
+        typeList = (ArrayList<OccPermitType>) oc.getOccPeriodTypesFromProfileID(getSessionBean().getSessMuni().getProfile());
 
         ArrayList<CodeSet> codeSetList = (ArrayList<CodeSet>) ec.getCodeSetsFromMuniID(getSessionBean().getSessMuni().getMuniCode());
 
@@ -1032,7 +1032,6 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         }
 
-        try {
             currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
 
         } catch (BObStatusException | SearchException ex) {
@@ -1170,27 +1169,27 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         return (getSessionBean().getNavStack().peekLastPage() != null && currentCase != null && currentDomain == DomainEnum.CODE_ENFORCEMENT);
     }
 
-    public ArrayList<OccPeriodType> getTypeList() {
+    public ArrayList<OccPermitType> getTypeList() {
         return typeList;
     }
 
-    public void setTypeList(ArrayList<OccPeriodType> typeList) {
+    public void setTypeList(ArrayList<OccPermitType> typeList) {
         this.typeList = typeList;
     }
 
-    public OccPeriodType getSelectedPeriodType() {
+    public OccPermitType getSelectedPeriodType() {
         return selectedPeriodType;
     }
 
-    public void setSelectedPeriodType(OccPeriodType selectedPeriodType) {
+    public void setSelectedPeriodType(OccPermitType selectedPeriodType) {
         this.selectedPeriodType = selectedPeriodType;
     }
 
-    public ArrayList<OccPeriodType> getFilteredTypeList() {
+    public ArrayList<OccPermitType> getFilteredTypeList() {
         return filteredTypeList;
     }
 
-    public void setFilteredTypeList(ArrayList<OccPeriodType> filteredTypeList) {
+    public void setFilteredTypeList(ArrayList<OccPermitType> filteredTypeList) {
         this.filteredTypeList = filteredTypeList;
     }
 

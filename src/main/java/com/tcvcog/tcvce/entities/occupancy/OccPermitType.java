@@ -27,7 +27,7 @@ import java.util.Objects;
  *
  * @author Adam Gutonski and Sylvia
  */
-public class OccPeriodType implements Cloneable {
+public class OccPermitType implements Cloneable {
     private int typeID;
     private Municipality muni;
     private String title;
@@ -374,7 +374,7 @@ public class OccPeriodType implements Cloneable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final OccPeriodType other = (OccPeriodType) obj;
+        final OccPermitType other = (OccPermitType) obj;
         return this.typeID == other.typeID;
     }
 

@@ -48,7 +48,7 @@ public  class       OccPeriod
     protected int periodID;
     protected int propertyUnitID;
     
-    protected OccPeriodType type;
+    
     protected List<HumanLink> humans;
     
     protected FieldInspection governingInspection;
@@ -90,17 +90,13 @@ public  class       OccPeriod
 
             this.periodID = otherPeriod.getPeriodID();
             this.propertyUnitID = otherPeriod.getPropertyUnitID();
-
-            this.type = otherPeriod.getType();
-
             this.governingInspection = otherPeriod.getGoverningInspection();
 
             this.manager = otherPeriod.getManager();
-
             this.periodTypeCertifiedBy = otherPeriod.getPeriodTypeCertifiedBy();
             this.periodTypeCertifiedTS = otherPeriod.getPeriodTypeCertifiedTS();
-            this.eventList = otherPeriod.getEventList();
 
+            this.eventList = otherPeriod.getEventList();
             this.source = otherPeriod.getSource();
 
             this.startDate = otherPeriod.getStartDate();
@@ -115,9 +111,7 @@ public  class       OccPeriod
             this.authorizedTS = otherPeriod.getAuthorizedTS();
 
             this.overrideTypeConfig = otherPeriod.isOverrideTypeConfig();
-
             this.notes = otherPeriod.getNotes();
-
         }
     }
 
@@ -161,13 +155,6 @@ public  class       OccPeriod
      */
     public User getManager() {
         return manager;
-    }
-
-    /**
-     * @return the type
-     */
-    public OccPeriodType getType() {
-        return type;
     }
 
     /**
@@ -317,13 +304,6 @@ public  class       OccPeriod
      */
     public void setManager(User manager) {
         this.manager = manager;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(OccPeriodType type) {
-        this.type = type;
     }
 
     /**

@@ -16,15 +16,15 @@
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
 /**
- * Converter to convert between String representations of OccPeriodType objects
- * and object types
+ * Converter to convert between String representations of OccPermitType objects
+ and object types
  * @author echocharliedelta
  */
 @FacesConverter(value="occPeriodTypeConverter")
@@ -35,7 +35,7 @@ public class OccPeriodTypeConverter extends EntityConverter implements Converter
         if(titleS.isEmpty()) {
             return null; 
         }
-        OccPeriodType o = (OccPeriodType) this.getViewMap(fc).get(titleS);
+        OccPermitType o = (OccPermitType) this.getViewMap(fc).get(titleS);
         return o;
     }
 
@@ -46,7 +46,7 @@ public class OccPeriodTypeConverter extends EntityConverter implements Converter
             return "";
         }
         
-        OccPeriodType opt = (OccPeriodType) o;
+        OccPermitType opt = (OccPermitType) o;
         String title = opt.getTitle();
         if (title != null){
             this.getViewMap(fc).put(title,o);

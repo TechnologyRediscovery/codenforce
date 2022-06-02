@@ -31,7 +31,7 @@ import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.*;
@@ -308,7 +308,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         return feeList;
     }
 
-    public List<Fee> getFeeList(OccPeriodType type) throws IntegrationException {
+    public List<Fee> getFeeList(OccPermitType type) throws IntegrationException {
 
         List<Fee> feeList = new ArrayList<>();
 
@@ -1167,7 +1167,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public void insertFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
+    public void insertFeePeriodTypeJoin(Fee fee, OccPermitType type) throws IntegrationException {
         String query = "INSERT INTO public.moneyoccperiodtypefee(\n"
                 + "    fee_feeid, occperiodtype_typeid, autoassign, active)\n"
                 + "    VALUES (?, ?, ?, true);";
@@ -1202,7 +1202,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
     }
 
-    public void deactivateFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
+    public void deactivateFeePeriodTypeJoin(Fee fee, OccPermitType type) throws IntegrationException {
 
         String query = "UPDATE public.moneyoccperiodtypefee\n"
                 + "   SET active=false\n"
@@ -1238,7 +1238,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
         } // close finally
     }
 
-    public void reactivateFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
+    public void reactivateFeePeriodTypeJoin(Fee fee, OccPermitType type) throws IntegrationException {
 
         String query = "UPDATE public.moneyoccperiodtypefee\n"
                 + "   SET active=true\n"
@@ -1275,7 +1275,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     }
 
-    public void updateFeePeriodTypeJoin(Fee fee, OccPeriodType type) throws IntegrationException {
+    public void updateFeePeriodTypeJoin(Fee fee, OccPermitType type) throws IntegrationException {
 
         String query = "UPDATE public.moneyoccperiodtypefee\n"
                 + "   SET autoassign=?\n"

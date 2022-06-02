@@ -19,11 +19,11 @@
                              value="Configure new permit"
                              ajax="true"
                              actionListener="#{occPeriodBB.onOccPermitInitButtonChange}"
-                             oncomplete="PF('occperiod-createpermit-occpermit-var').show()"
+                             oncomplete="PF('permit-add-choosetype-dialog-var').hide();"
                              disabled="false"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                              icon="fa fa-plus"
-                             update="occperiod-createpermit-occpermit-form
+                             update="permit-add-choosetype-form
                              @form"/>
 
             <p:spacer height="5px"/>
@@ -37,6 +37,15 @@
                          resizableColumns="true">
 
 
+                <p:column width="15%">
+                    <f:facet name="header">
+                        <h:outputText value="Type"/>
+                    </f:facet>
+
+                    <h:outputText value="#{permit.permitType.title}"/>
+
+                </p:column>
+
                 <p:column width="20%">
                     <f:facet name="header">
                         <h:outputText value="ID and Reference no."/>
@@ -48,7 +57,16 @@
 
                 </p:column>
 
-                <p:column width="40%">
+                <p:column width="20%">
+                    <f:facet name="header">
+                        <h:outputText value="Issued"/>
+                    </f:facet>
+
+                    <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(permit.staticdateofissue)}"/>
+
+                </p:column>
+
+                <p:column width="30%">
                     <f:facet name="header">
                         <h:outputText value="Status"/>
                     </f:facet>
@@ -127,9 +145,59 @@
                 </p:column>
             </p:dataTable>
         </h:form>
-
-
     </p:panel>
+
+
+    <p:dialog id="permit-add-choosetype-dialog"
+              widgetVar="permit-add-choosetype-dialog-var"
+              header="Choose permit type"
+              closable="true"
+              closeOnEscape="true">
+
+        <h:form id="permit-add-choosetype-form">
+
+            <p:commandButton id="permit-add-commit-button"
+                             ajax="true"
+                             actionListener="#{occPeriodBB.onOccPermitInitCommitButtonChange}"
+                             value="Initialize permit of selected type" 
+                             icon="fa fa-plus"
+                             oncomplete="   PF('permit-add-choosetype-dialog-var').hide();
+                             PF('occperiod-createpermit-occpermit-var').show()"
+                             update="occperiod-createpermit-occpermit-form"/>
+
+            <p:spacer height="3px" />
+            
+            <div class="p-grid" >
+                <div class="p-col-4">
+                    <h:outputLabel styleClass="ui-label" 
+                                   for="som-occperiodtype" 
+                                   value="Permit type" />
+                </div>
+                <div class="p-col-8">
+
+
+                    <p:selectOneMenu
+                        id="som-occperiodtype" 
+                        tabindex="1" 
+                        required="true"
+                        validatorMessage="An occ permit type is required to start the permit process."
+                        value="#{occPeriodBB.currentOccPermit.permitType}"
+
+                        <f:converter converterId="occPeriodTypeConverter"/>
+                        <f:selectItem itemLabel="Select a permit type..." itemDisabled="true" noSelectionOption="true"/>
+                        <f:selectItems id="si-typelist"
+                                       value="#{occPeriodBB.permitTypeCandidateList}"
+                                       var ="opt"
+                                       itemValue="#{opt}"
+                                       itemLabel="#{opt.title}" />
+                    </p:selectOneMenu>
+                </div>
+            </div>
+        </h:form>
+
+    </p:dialog>
+
+
 
     <!--p:dialog|permit-nullify-confirm-dialog-->
     <p:dialog id="permit-nullify-confirm-dialog"
@@ -202,6 +270,13 @@
                     <p:panel id="permit-metadata-panel"
                              header="Permit Settings: Metadata">
                         <div class="p-grid">
+                            <div class="p-col-4 restrict-data-field-label-inline">
+                                <h:outputText value="Permit type" />
+                            </div>
+                            <div class="p-col-8 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.permitType.title}"
+                                              rendered="#{!empty occPeriodBB.currentOccPermit.permitType}" />
+                            </div>
                             <div class="p-col-4 restrict-data-field-label-inline">
                                 <h:outputText value="Issuing officer" />
                             </div>
@@ -1033,17 +1108,17 @@
                                     showCloseIcon="true">
                         <h3>About finalization</h3>
                         <p>Finalization of an Occupancy Permit only when all fields appear correct on the draft. 
-                        Once finalized, NONE of the fields can be edited and the permit is assigned a formal tracking number. 
-                        The only way to recover from an error found on a finalized permit is to nullify that permit 
-                        and create a new draft with the corrected values.</p>
-                        
+                            Once finalized, NONE of the fields can be edited and the permit is assigned a formal tracking number. 
+                            The only way to recover from an error found on a finalized permit is to nullify that permit 
+                            and create a new draft with the corrected values.</p>
+
                     </p:overlayPanel>
                 </div>
                 <div class="p-col-9 restrict-data-field-value-inline">
                     <p:commandButton id="permit-finalize-commit-cb"
                                      actionListener="#{occPeriodBB.onOccpermitFinalizeCommitButtonChange}"
                                      update="   permits-growl-form
-                                    occperiod-permits-form"
+                                     occperiod-permits-form"
                                      ajax="true"
                                      disabled="#{empty occPeriodBB.currentOccPermit.finalizationAuditPassTS}"
                                      icon="fa fa-plus"
@@ -1054,7 +1129,7 @@
 
                 </div>
 
-               
+
                 <div class="p-col-3 restrict-data-field-label-inline">
                     <h:outputText value="Failed audit override" />
                 </div>

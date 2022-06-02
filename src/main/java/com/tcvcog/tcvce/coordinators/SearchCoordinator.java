@@ -1970,10 +1970,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setPropertyUnit_ctl(false);
         params.setPropertyUnit_val(null);
         
-        // filter OCC-3
-        params.setPeriodType_ctl(false);
-        params.setPeriodType_val(null);
-        
         // filter OCC-4
         params.setPermitIssuance_ctl(false);
         params.setPermitIssuance_val(false);

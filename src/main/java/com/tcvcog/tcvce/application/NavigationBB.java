@@ -127,8 +127,8 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         SessionBean s = getSessionBean();
         try {
             String periodId = String.valueOf(s.getSessOccPeriod().getPeriodID());
-            String periodType = s.getSessOccPeriod().getType().getTitle();
-            return "Current Period: " + periodType + " | ID: " + periodId;
+//            String periodType = s.getSessOccPeriod().getType().getTitle();
+            return "Current Permit file ID: " + periodId;
         } catch (Exception ex) {
             return "Current Period: " + " | ID: ";
         }

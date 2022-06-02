@@ -20,7 +20,7 @@ import com.tcvcog.tcvce.coordinators.*;
 import com.tcvcog.tcvce.domain.*;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
@@ -72,7 +72,7 @@ public class PropertyProfileBB
     
     
     private OccPeriod currentOccPeriod;
-    private List<OccPeriodType> occPeriodTypeList;
+    private List<OccPermitType> occPeriodTypeList;
     private List<EventCategory> occPeriodOriginiationEventCandidateList;
     
     private Municipality muniSelected;
@@ -871,7 +871,7 @@ public class PropertyProfileBB
     /**
      * @return the occPeriodTypeList
      */
-    public List<OccPeriodType> getOccPeriodTypeList() {
+    public List<OccPermitType> getOccPeriodTypeList() {
         return occPeriodTypeList;
     }
 
@@ -880,7 +880,7 @@ public class PropertyProfileBB
     /**
      * @param occPeriodTypeList the occPeriodTypeList to set
      */
-    public void setOccPeriodTypeList(List<OccPeriodType> occPeriodTypeList) {
+    public void setOccPeriodTypeList(List<OccPermitType> occPeriodTypeList) {
         this.occPeriodTypeList = occPeriodTypeList;
     }
 

@@ -1164,7 +1164,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
                 temp.setOccPeriodID(exportable.getPeriodID());
 
-                temp.setOccPeriodTypeID(exportable.getType().getTypeID());
+                // TODO: update for occ periods not having any more types
+//                temp.setOccPeriodTypeID(exportable.getType().getTypeID());
 
                 feeHorde.add(temp);
 

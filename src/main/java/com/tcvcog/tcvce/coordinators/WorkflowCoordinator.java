@@ -983,7 +983,8 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
      */
     public void rules_attachEventRuleAbstractToOccPeriodTypeRuleSet(EventRuleAbstract era, OccPeriod period) throws IntegrationException {
         WorkflowIntegrator wi = getWorkflowIntegrator();
-        wi.rules_addEventRuleAbstractToRuleSet(era, period.getType().getBaseRuleSetID());
+        // TODO: Update after resurrecting workflow
+        wi.rules_addEventRuleAbstractToRuleSet(era, 0);
     }
 
     /**

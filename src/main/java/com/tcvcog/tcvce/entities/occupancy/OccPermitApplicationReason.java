@@ -31,7 +31,7 @@ public class OccPermitApplicationReason {
     private boolean active;
     private OccAppPersonRequirement personsRequirement;
     private String humanFriendlyDescription;
-    private OccPeriodType proposalPeriodType;
+    private OccPermitType proposalPeriodType;
 
     public int getId() {
         return id;
@@ -121,11 +121,11 @@ public class OccPermitApplicationReason {
         this.humanFriendlyDescription = humanFriendlyDescription;
     }
 
-    public OccPeriodType getProposalPeriodType() {
+    public OccPermitType getProposalPeriodType() {
         return proposalPeriodType;
     }
 
-    public void setProposalPeriodType(OccPeriodType proposalPeriodType) {
+    public void setProposalPeriodType(OccPermitType proposalPeriodType) {
         this.proposalPeriodType = proposalPeriodType;
     }
     

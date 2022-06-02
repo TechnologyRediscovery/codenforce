@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.entities.Payment;
 import com.tcvcog.tcvce.entities.PaymentType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -72,8 +72,10 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
         PaymentIntegrator pi = getPaymentIntegrator();
 
-        ArrayList<Fee> feeList = (ArrayList<Fee>) pi.getFeeList(period.getType());
+                // TODO: update for change from occ period type to occ permit type
+//        ArrayList<Fee> feeList = (ArrayList<Fee>) pi.getFeeList(period.getType());
 
+        List<Fee> feeList = new ArrayList<>();
         for (Fee fee : feeList) {
 
             if (fee.isAutoAssigned()) {
@@ -82,7 +84,8 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
                 skeleton.setDomain(DomainEnum.OCCUPANCY);
                 skeleton.setOccPeriodID(period.getPeriodID());
-                skeleton.setOccPeriodTypeID(period.getType().getTypeID());
+                // TODO: update for change from occ period type to occ permit type
+//                skeleton.setOccPeriodTypeID(period.getType().getTypeID());
                 skeleton.setAssignedBy(getSessionBean().getSessUser());
                 skeleton.setAssigned(LocalDateTime.now());
                 skeleton.setLastModified(LocalDateTime.now());
@@ -175,7 +178,8 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
         input.setDomain(DomainEnum.OCCUPANCY);
         input.setOccPeriodID(currentOccPeriod.getPeriodID());
-        input.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
+        
+//        input.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
 
         PaymentIntegrator pi = getPaymentIntegrator();
         pi.insertOccPeriodFee(input);
@@ -218,7 +222,8 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
         input.setDomain(DomainEnum.OCCUPANCY);
         input.setOccPeriodID(currentOccPeriod.getPeriodID());
-        input.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
+        // don't set type after change from occ period type to permit type
+//        input.setOccPeriodTypeID(currentOccPeriod.getType().getTypeID());
 
         pi.updateOccPeriodFee(input);
 
@@ -304,7 +309,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
 
     }
 
-    public void activateFeeJoin(Fee input, OccPeriodType type) throws IntegrationException {
+    public void activateFeeJoin(Fee input, OccPermitType type) throws IntegrationException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
 
@@ -330,7 +335,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
         }
     }
 
-    public void deactivateFeeJoin(Fee input, OccPeriodType type) throws IntegrationException {
+    public void deactivateFeeJoin(Fee input, OccPermitType type) throws IntegrationException {
         PaymentIntegrator pi = getPaymentIntegrator();
         pi.deactivateFeePeriodTypeJoin(input, type);
 
@@ -341,7 +346,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
         pi.deactivateFeeCodeElementJoin(input, element);
     }
     
-    public void updateFeeJoin(Fee input, OccPeriodType type) throws IntegrationException {
+    public void updateFeeJoin(Fee input, OccPermitType type) throws IntegrationException {
 
         PaymentIntegrator pi = getPaymentIntegrator();
         pi.updateFeePeriodTypeJoin(input, type);

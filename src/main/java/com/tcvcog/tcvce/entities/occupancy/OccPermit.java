@@ -49,6 +49,7 @@ public class OccPermit extends TrackedEntity {
     // used for storing municipality-generated IDs associated with the permit
     private String referenceNo;
     private int periodID;
+    private OccPermitType permitType;
 
     private String permitAdditionalText;
     private String notes;
@@ -1055,6 +1056,20 @@ public class OccPermit extends TrackedEntity {
      */
     public void setStaticdateofexpiry(LocalDateTime staticdateofexpiry) {
         this.staticdateofexpiry = staticdateofexpiry;
+    }
+
+    /**
+     * @return the permitType
+     */
+    public OccPermitType getPermitType() {
+        return permitType;
+    }
+
+    /**
+     * @param permitType the permitType to set
+     */
+    public void setPermitType(OccPermitType permitType) {
+        this.permitType = permitType;
     }
 
   

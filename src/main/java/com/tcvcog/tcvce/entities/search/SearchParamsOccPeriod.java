@@ -8,7 +8,7 @@ package com.tcvcog.tcvce.entities.search;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUnit;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriodType;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import java.io.Serializable;
 
 /**
@@ -27,10 +27,6 @@ public class        SearchParamsOccPeriod
     // filter OCC-2
     private boolean propertyUnit_ctl;
     private PropertyUnit propertyUnit_val;
-    
-    // filter OCC-3
-    private boolean periodType_ctl;
-    private OccPeriodType periodType_val;
     
     // filter OCC-4
     private boolean permitIssuance_ctl;
@@ -65,34 +61,7 @@ public class        SearchParamsOccPeriod
    }
     
     
-    /**
-     * @return the periodType_ctl
-     */
-    public boolean isPeriodType_ctl() {
-        return periodType_ctl;
-    }
-
-    /**
-     * @return the periodType_val
-     */
-    public OccPeriodType getPeriodType_val() {
-        return periodType_val;
-    }
-
-    /**
-     * @param periodType_ctl the periodType_ctl to set
-     */
-    public void setPeriodType_ctl(boolean periodType_ctl) {
-        this.periodType_ctl = periodType_ctl;
-    }
-
-    /**
-     * @param periodType_val the periodType_val to set
-     */
-    public void setPeriodType_val(OccPeriodType periodType_val) {
-        this.periodType_val = periodType_val;
-    }
-
+  
     /**
      * @return the permitIssuance_ctl
      */
