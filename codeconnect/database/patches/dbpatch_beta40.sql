@@ -213,11 +213,11 @@ ALTER TABLE public.occpermit ADD COLUMN nullifiedby_userid INTEGER
 
 ALTER TABLE public.occinspectiondetermination ADD COLUMN qualifiesaspassed boolean DEFAULT FALSE;
 
--- ******************************* run on LOCAL TEST system up to here *******************************
--- ******************************* run on LIVE DEPLOYED system up to here *******************************
-
 
 ALTER TABLE occperiodtype ADD COLUMN expires BOOLEAN DEFAULT FALSE;
+
+-- ******************************* run on LOCAL TEST system up to here *******************************
+-- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
 
 

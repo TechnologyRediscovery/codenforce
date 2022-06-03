@@ -478,11 +478,11 @@
                                                         <h:outputText value="date_range"/>
                                                     </i>
                                                 </div>
-                                                <h:outputText value="Occupancy Period"/>
+                                                <h:outputText value="Permit File"/>
                                             </div>
 
                                             <div class="aob-container aob-container-objectstring">
-                                                <h:outputText value="#{!empty sessionBean.sessOccPeriod ? sessionBean.sessOccPeriod.type.title : 'no period'} | Unit #{sessionBean.sessOccPeriod.propUnitProp.unitNumber} (ID:#{sessionBean.sessOccPeriod.periodID})"/>
+                                                <h:outputText value="Unit #{sessionBean.sessOccPeriod.propUnitProp.unitNumber} (ID:#{sessionBean.sessOccPeriod.periodID})"/>
                                                 <h:outputText value="| Unit #{!empty sessionBean.sessOccPeriod ? sessionBean.sessOccPeriod.propUnitProp.unitNumber : ''}"/>
                                                 <h:outputText value="(ID:#{!empty sessionBean.sessOccPeriod ? sessionBean.sessOccPeriod.periodID : ''})"/>
                                             </div>

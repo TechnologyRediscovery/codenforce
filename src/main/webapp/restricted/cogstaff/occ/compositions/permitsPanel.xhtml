@@ -8,18 +8,38 @@
         <p:growl id="permits-growl" />
     </h:form>
 
+   
+    
+      <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+
+    <p:dialog widgetVar="statusDialog" 
+              modal="true"
+              height="100px"
+              width="250px"
+              draggable="false" 
+              closable="false" 
+              resizable="false" 
+              showHeader="false">
+        <div class="p-text-center">
+            <h:outputText value="Stand by...crunching....crunching" />
+        </div>
+    </p:dialog>
+
+
     <!--panel:root permit list table-->
     <p:panel id="occperiod-permits-panel"
              toggleable="true"
              widgetVar="occperiod-permits-panel-var"
              collapsed="false"
              header="Permits">
+
+
         <h:form id="occperiod-permits-form">
             <p:commandButton id="occperiod-permits-button-newpermit"
                              value="Configure new permit"
                              ajax="true"
                              actionListener="#{occPeriodBB.onOccPermitInitButtonChange}"
-                             oncomplete="PF('permit-add-choosetype-dialog-var').hide();"
+                             oncomplete="PF('permit-add-choosetype-dialog-var').show();"
                              disabled="false"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                              icon="fa fa-plus"
@@ -166,7 +186,7 @@
                              update="occperiod-createpermit-occpermit-form"/>
 
             <p:spacer height="3px" />
-            
+
             <div class="p-grid" >
                 <div class="p-col-4">
                     <h:outputLabel styleClass="ui-label" 
@@ -180,8 +200,9 @@
                         id="som-occperiodtype" 
                         tabindex="1" 
                         required="true"
+                        style="width: 100%;"
                         validatorMessage="An occ permit type is required to start the permit process."
-                        value="#{occPeriodBB.currentOccPermit.permitType}"
+                        value="#{occPeriodBB.currentOccPermit.permitType}" >
 
                         <f:converter converterId="occPeriodTypeConverter"/>
                         <f:selectItem itemLabel="Select a permit type..." itemDisabled="true" noSelectionOption="true"/>
@@ -189,7 +210,7 @@
                                        value="#{occPeriodBB.permitTypeCandidateList}"
                                        var ="opt"
                                        itemValue="#{opt}"
-                                       itemLabel="#{opt.title}" />
+                                       itemLabel="#{opt.title} (Temporary:#{opt.expires ? 'Yes':'No'})" />
                     </p:selectOneMenu>
                 </div>
             </div>
@@ -466,7 +487,7 @@
                                                required="false" />    
                             </div>
                             <f:subview id="permit-config-expirydate-subiew"
-                                       rendered="#{occPeriodBB.currentOccPeriod.type.expires}">
+                                       rendered="#{occPeriodBB.currentOccPermit.permitType.expires}">
 
                                 <div class="p-col-4 restrict-data-field-label-inline">
                                     <h:outputText value="Date of Expiry" />
