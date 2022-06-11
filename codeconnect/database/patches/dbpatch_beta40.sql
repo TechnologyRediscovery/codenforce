@@ -247,8 +247,10 @@ DROP TABLE public.moneycodesetelementfee CASCADE;
 
 
 
--- ******************************* run on LOCAL TEST system up to here *******************************
 -- ******************************* run on LIVE DEPLOYED system up to here *******************************
+
+
+
 
 CREATE TYPE transactiontype AS ENUM ('charge','payment', 'adjustment');
 
@@ -309,6 +311,10 @@ CREATE TABLE public.chargeschedule
       REFERENCES public.municipality (municode) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
+
+
+-- ******************************* run on LOCAL TEST system up to here *******************************
+
 
 CREATE TABLE public.moneychargeledger
 (
