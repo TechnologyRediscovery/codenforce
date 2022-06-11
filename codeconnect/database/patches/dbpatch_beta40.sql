@@ -227,6 +227,23 @@ ALTER TABLE public.occpermit
       ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 
+DROP TABLE public.moneycecasefeepayment CASCADE;
+DROP TABLE public.moneycecasefeeassigned CASCADE;
+
+DROP TABLE public.moneycodesetelementfee CASCADE;
+ 
+ DROP TABLE public.moneyoccperiodfeeassigned CASCADE;
+ DROP TABLE public.moneyoccperiodfeepayment CASCADE;
+ DROP TABLE public.moneyoccperiodtypefee CASCADE;
+ DROP TABLE public.moneypayment CASCADE;
+ DROP TABLE public.moneyfee CASCADE;
+
+--  NOTICE:  drop cascades to constraint moneyoccpermittypefeepayment_occperassignedfee_fk on table moneyoccperiodfeepayment
+-- NOTICE:  drop cascades to 2 other objects
+-- DETAIL:  drop cascades to constraint codesetelement_feeid_fk on table codesetelement
+-- drop cascades to constraint muniprofilefee__feeid_fk on table muniprofilefee
+-- Query returned successfully with no result in 184 msec.
+
 
 
 
