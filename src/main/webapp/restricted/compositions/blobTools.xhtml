@@ -1,0 +1,517 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="blobs-growl-form">
+        <p:growl id="blobs-growl"
+                 keepAlive="true"
+                 life="4000"/>
+    </h:form>
+
+    <p:dialog   id="blob-upload-dialog"
+                height="600" width="800"
+                widgetVar="blob-upload-dialog-var"
+                responsive="true"
+                dynamic="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                header="Upload Photos and Documents on #{blobUtilitiesBB.currentBlobHolder.blobLinkEnum.objectParentTitle} (ID:#{blobUtilitiesBB.currentBlobHolder.parentObjectID})"
+                rendered="true"
+                > 
+
+        <p:tabView id="blob-uploadconnect-tabview">
+            <p:tab title="Upload files">
+
+
+                <h:form id="blob-upload-form" 
+                        enctype="multipart/form-data">
+                    <h2>
+                        <h:outputText  value="Upload Photos/Docs to #{blobUtilitiesBB.currentBlobHolder.blobLinkEnum.objectParentTitle} (ID:#{blobUtilitiesBB.currentBlobHolder.parentObjectID})" />
+                    </h2>
+                    <p>Allowed file types: pdf, jpeg, png, gif (Limit: 50 files)</p>
+
+                    <p:fileUpload 
+                        mode="advanced" 
+                        listener="#{blobUtilitiesBB.onBlobUploadCommitButtonChange}"
+                        multiple="true"
+                        fileLimit="50"
+                        sizeLimit="9999999999999" 
+                        allowTypes="/(\.|\/)(jpe?g|JPG|JPE?G|png|gif|GIF|PNG|pdf|PDF)$/"
+                        rendered="true"
+                        maxChunkSize="1485760"
+                        invalidFileMessage="You have chosen to upload a file type that is not permitted."
+                        update="blobs-growl-form
+                        blobs-gallery-dialog
+                        gallery-form
+                        #{blobUtilitiesBB.blobListComponentToUpdateAfterChanges}"
+                        oncomplete="PF('blob-upload-dialog-var').hide(); PF('blobs-gallery-dialog-var').show();"/>    
+                </h:form>
+
+            </p:tab>
+
+            <p:tab title="Choose from upstream photo/doc pool" 
+                   rendered="#{!empty blobUtilitiesBB.currentBlobHolder.blobUpstreamPoolEnum}">
+
+                <h:form id="blobs-choosefrompool-form">
+
+                    <h2>
+                        <h:outputText value="Choose a photo/doc from the upstream pool of #{sessionBean.sessBlobHolderPool.poolLinkEnum.objectParentTitle} (ID:#{sessionBean.sessBlobHolderPool.blobParentID})" />
+                    </h2>
+
+                    <p:commandButton id="blob-linkfromblobpool-button"
+                                     value="Link selected photos/documents"
+                                     disabled="false"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                     icon="fa fa-link"
+                                     actionListener="#{blobUtilitiesBB.linkCurrentBlobHolderToPooledBlobs}"
+                                     oncomplete="PF('blob-upload-dialog-var').hide(); PF('blobs-gallery-dialog-var').show();"
+                                     update="   blobs-growl-form
+                                     blobs-gallery-dialog
+                                     gallery-form
+                                     #{blobUtilitiesBB.blobListComponentToUpdateAfterChanges}"/>
+
+                    <p:spacer height="5px" />
+
+                    <p:dataTable id="blob-upstreampool-table"
+                                 value="#{sessionBean.sessBlobHolderPool.blobList}"
+                                 var="blob"
+                                 selection="#{blobUtilitiesBB.selectedBlobList}"
+                                 rowKey="#{blob.photoDocID}">
+
+                        <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+
+                        <p:column headerText="PhotoDoc ID"
+                                  style="width:5%;">
+                            <h:outputText value="#{blob.photoDocID}" />
+                        </p:column>
+                        <p:column headerText="Blob ID"
+                                  style="width:5%;">
+                            <h:outputText value="#{blob.bytesID}" />
+                        </p:column>
+
+                        <p:column headerText="Type"
+                                  style="width:10%;">
+                            <h:outputText value="#{blob.type.title}" />
+                        </p:column>
+                        <p:column headerText="Timestamp"
+                                  style="width:15%;">
+                            <h:outputText value="#{blob.createdTS}" />
+                        </p:column>
+                        <p:column headerText="Title / Descr"
+                                  style="width:20%;">
+                            <h:outputText value="#{blob.title}" />
+                            <p:spacer height="5px" />
+                            <h:outputText value="#{blob.description}" />
+                        </p:column>
+
+                        <p:column headerText="Preview"
+                                  style="width:25%;">
+                            <p:graphicImage value="#{blobsterBB.image}"
+                                            alt="no preview available" 
+                                            style="width: 150px" 
+                                            cache="false"
+                                            rendered="#{blob.type.browserViewable}">
+                                <f:param name="blobid" value="#{blob.photoDocID}"/>
+                            </p:graphicImage>
+
+                            <h:outputText value="no preview available; download to view"
+                                          rendered="#{!blob.type.browserViewable}" />
+                        </p:column>
+                        <p:column headerText="Actions"
+                                  style="width:10%;">
+                            <p:commandLink id="blob-viewblob-cl"
+                                           actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob, blobUtilitiesBB.currentBlobHolder)}"
+                                           value="view"
+                                           style="color:blue;"
+                                           update="blobs-viewblob-dialog
+                                           blob-viewblob-form"
+                                           oncomplete="PF('blobs-viewblob-dialog-var').show();" />
+
+                            <h:outputText value=" | "/>
+
+                            <p:commandLink id="blob-editblob-cl"
+                                           actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob, blobUtilitiesBB.currentBlobHolder)}"
+                                           value="edit"
+                                           style="color:blue;"
+                                           update="blob-veweditmetadata-form
+                                           blob-vieweditmetadata-dialog"
+                                           oncomplete="PF('blobs-vieweditmetadata-dialog-var').show();" />
+
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </p:tab>
+        </p:tabView>
+
+    </p:dialog>
+
+    <p:dialog   id="blobs-gallery-dialog"
+                height="800" width="1000"
+                widgetVar="blobs-gallery-dialog-var"
+                responsive="true"
+                dynamic="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                header="Photos and Documents on #{blobUtilitiesBB.currentBlobHolder.blobLinkEnum.objectParentTitle} (ID:#{blobUtilitiesBB.currentBlobHolder.parentObjectID})"
+                rendered="true"
+                > 
+        <h:form id="gallery-form">
+
+            <p:dataTable id="blob-table"
+                         value="#{blobUtilitiesBB.currentBlobHolder.blobList}"
+                         var="blob"
+                         rowKey="#{blob.photoDocID}">
+
+                <p:column headerText="PhotoDoc ID"
+                          style="width:5%;">
+                    <h:outputText value="#{blob.photoDocID}" />
+                </p:column>
+                <p:column headerText="Blob ID"
+                          style="width:5%;">
+                    <h:outputText value="#{blob.bytesID}" />
+                </p:column>
+
+                <p:column headerText="Type"
+                          style="width:10%;">
+                    <h:outputText value="#{blob.type.title}" />
+                </p:column>
+                <p:column headerText="Timestamp"
+                          style="width:15%;">
+                    <h:outputText value="#{blob.createdTS}" />
+                </p:column>
+                <p:column headerText="Title / Descr"
+                          style="width:20%;">
+                    <h:outputText value="#{blob.title}" />
+                    <p:spacer height="5px" />
+                    <h:outputText value="#{blob.description}" />
+                </p:column>
+                <p:column headerText="Preview"
+                          style="width:30%;">
+                    <p:graphicImage value="#{blobsterBB.image}"
+                                    alt="no preview available" 
+                                    style="width: 150px" 
+                                    cache="false"
+                                    rendered="#{blob.type.browserViewable}">
+                        <f:param name="blobid" value="#{blob.photoDocID}"/>
+                    </p:graphicImage>
+
+                    <h:outputText value="no preview available; download to view"
+                                  rendered="#{!blob.type.browserViewable}" />
+                </p:column>
+                <p:column headerText="Actions"
+                          style="width:15%;">
+                    <p:commandLink id="blob-viewblob-cl"
+                                   actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob, blobUtilitiesBB.currentBlobHolder)}"
+                                   value="view"
+                                   style="color:blue;"
+                                   rendered="#{blob.type.browserViewable}"
+                                   update="blobs-viewblob-dialog
+                                   blob-viewblob-form"
+                                   oncomplete="PF('blobs-viewblob-dialog-var').show();" />
+
+                    <h:outputText value=" | "/>
+
+                    <p:commandLink id="blob-editblob-cl"
+                                   actionListener="#{blobUtilitiesBB.onViewBlobLinkClick(blob, blobUtilitiesBB.currentBlobHolder)}"
+                                   value="details"
+                                   style="color:blue;"
+                                   update="blob-veweditmetadata-form
+                                   blob-vieweditmetadata-dialog"
+                                   oncomplete="PF('blobs-vieweditmetadata-dialog-var').show();" />
+
+                    <h:outputText value=" | "/>
+
+                    <p:commandLink id="blob-download-cl"
+                                   value="download"
+                                   ajax="false"
+                                   style="color:blue;">
+                        <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}" />
+                    </p:commandLink>
+
+                </p:column>
+
+            </p:dataTable>
+
+            <p:spacer height="5px" />
+
+        </h:form>
+    </p:dialog>
+
+
+
+    <p:dialog   id="blobs-viewblob-dialog"
+                height="800" width="800"
+                widgetVar="blobs-viewblob-dialog-var"
+                responsive="true"
+                dynamic="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                header="Viewing Photo/Doc: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
+                rendered="true"
+                > 
+        <h:form id="blob-viewblob-form">
+            
+            <h2>
+                <h:outputText value="#{blobUtilitiesBB.currentBlobLight.title}" />
+                <h:outputText value=" | " />
+                <h:outputText value="#{blobUtilitiesBB.currentBlobLight.type.title}" />
+                
+            </h2>
+            
+            <h:outputText value="Description: #{blobUtilitiesBB.currentBlobLight.description}" />
+            <p:spacer height="5px" />
+            <p:commandLink id="blob-view-download-cl"
+                           value="download"
+                           ajax="false"
+                           style="color:blue;">
+                <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blobUtilitiesBB.currentBlobLight)}" />
+            </p:commandLink>
+
+            <p:spacer height="5px" />
+
+            <p:graphicImage value="#{blobsterBB.image}"
+                            alt="canot display" 
+                            style="width: 100%" 
+                            rendered="#{blobUtilitiesBB.currentBlobLight.type.browserViewable}">
+                <f:param name="blobid" value="#{blobUtilitiesBB.currentBlobLight.photoDocID}"/>
+            </p:graphicImage>
+
+        </h:form>
+
+    </p:dialog>
+
+    <p:dialog   id="blob-vieweditmetadata-dialog"
+                height="800" width="800"
+                widgetVar="blobs-vieweditmetadata-dialog-var"
+                responsive="true"
+                dynamic="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                header="View or edit Photo/Doc: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
+                rendered="true"
+                > 
+        <h:form id="blob-veweditmetadata-form">
+
+            <p:commandButton id="blob-editmetadata-button"
+                             value="#{blobUtilitiesBB.editModeBlobMetadata ? 'Save Changes' : 'Edit'}"
+                             disabled="false"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             icon="fa #{blobUtilitiesBB.editModeBlobMetadata ? 'fa-check' : 'fa-pencil'}"
+                             actionListener="#{blobUtilitiesBB.toggleEditModeBlobMetadata}"
+                             oncomplete="PF('blobs-vieweditmetadata-dialog-var').show();"
+                             update="@form
+                             blobs-growl-form
+                             gallery-form
+                             #{blobUtilitiesBB.blobListComponentToUpdateAfterChanges}"/>
+
+            <div class="gray_button">
+
+                <p:commandButton id="inspections-inspectiondetails-abort"
+                                 value="Cancel"
+                                 styleClass="gray-button"
+                                 rendered="#{blobUtilitiesBB.editModeBlobMetadata}"
+                                 icon="fa fa-stop"
+                                 actionListener="#{blobUtilitiesBB.onBlobEditMetadataAbortButtonClick}"
+                                 oncomplete="PF('blobs-vieweditmetadata-dialog-var').hide();"
+                                 update="blobs-growl-form"
+                                 />
+            </div>
+
+
+
+            <p:spacer height="5px"/>
+
+            <p:panel id="blob-metadata-panel"
+                     toggleable="true"
+                     collapsed="false"
+                     header="Photo/Doc Details">
+
+                <div class="p-grid">
+
+                    <div class="p-col-6">MetaData ID</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{blobUtilitiesBB.currentBlobLight.photoDocID}" />
+                    </div>
+
+                    <div class="p-col-6">File Bytes ID</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{blobUtilitiesBB.currentBlobLight.bytesID}" />
+                    </div>
+
+                    <div class="p-col-6">Original Filename</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{blobUtilitiesBB.currentBlobLight.filename}" />
+                    </div>
+
+                    <div class="p-col-6">Creator</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{blobUtilitiesBB.currentBlobLight.createdBy.human.name} 
+                                      (#{blobUtilitiesBB.currentBlobLight.createdBy.username})" 
+                                      rendered="#{!empty blobUtilitiesBB.currentBlobLight.createdBy}"/>
+                        <p:spacer height="3px" />
+
+                        <h:outputText value="at "
+                                      rendered="#{!empty blobUtilitiesBB.currentBlobLight.createdTS}" />
+
+                        <h:outputText value="#{blobUtilitiesBB.getPrettyDate(blobUtilitiesBB.currentBlobLight.createdTS)}" 
+                                      rendered="#{!empty blobUtilitiesBB.currentBlobLight.createdTS}"/>
+
+                    </div>
+                    <div class="p-col-6">Updates</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{blobUtilitiesBB.currentBlobLight.lastUpdatedBy.human.name} 
+                                      (#{blobUtilitiesBB.currentBlobLight.lastUpdatedBy.username})" 
+                                      rendered="#{!empty blobUtilitiesBB.currentBlobLight.lastUpdatedBy}"/>
+                        <p:spacer height="3px" />
+
+                        <h:outputText value="at "
+                                      rendered="#{!empty blobUtilitiesBB.currentBlobLight.lastUpdatedTS}" />
+
+                        <h:outputText value="#{blobUtilitiesBB.getPrettyDate(blobUtilitiesBB.currentBlobLight.lastUpdatedTS)}" 
+                                      rendered="#{!empty blobUtilitiesBB.currentBlobLight.lastUpdatedTS}"/>
+
+                    </div>
+
+                    <div class="p-col-6">File type</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{blobUtilitiesBB.currentBlobLight.type.title}"
+                                      rendered="#{!blobUtilitiesBB.editModeBlobMetadata}"/>
+
+                        <p:selectOneMenu       id="inspections-entryscreen-statussel" 
+                                               value="#{blobUtilitiesBB.currentBlobLight.type}" 
+                                               rendered="#{blobUtilitiesBB.editModeBlobMetadata}"
+                                               converter="blobTypeConverter"
+                                               >
+                            <!-- Strangely this element needs to update itself to call the setter -->
+                            <f:selectItem noSelectionOption="true"
+                                          itemDisabled="true"
+                                          itemLabel="choose photo doc type" />
+                            <f:selectItems value="#{blobUtilitiesBB.blobTypeList}" 
+                                           var="tpe" 
+                                           itemLabel="#{tpe.title}"/>
+                        </p:selectOneMenu>
+
+
+                    </div>
+
+                    <div class="p-col-6">Title</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{blobUtilitiesBB.currentBlobLight.title}" 
+                                      rendered="#{!blobUtilitiesBB.editModeBlobMetadata}"/>
+
+                        <p:inputText value="#{blobUtilitiesBB.currentBlobLight.title}"
+                                     rendered="#{blobUtilitiesBB.editModeBlobMetadata}" />
+                    </div>
+
+                    <div class="p-col-6">Description</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{blobUtilitiesBB.currentBlobLight.description}" 
+                                      rendered="#{!blobUtilitiesBB.editModeBlobMetadata}"/>
+
+                        <p:inputTextarea     value="#{blobUtilitiesBB.currentBlobLight.description}"
+                                             rendered="#{blobUtilitiesBB.editModeBlobMetadata}" 
+                                             cols="25"
+                                             rows="4"/>
+                    </div>
+
+                    <div class="p-col-6">Municipal Parent</div>
+                    <div class="p-col-6">
+                        <h:outputText value="#{blobUtilitiesBB.currentBlobLight.muni.muniName}" 
+                                      rendered="#{!blobUtilitiesBB.editModeBlobMetadata}"/>
+                        <p:selectOneMenu       id="blob-edit-muni-som" 
+                                               value="#{blobUtilitiesBB.currentBlobLight.muni}" 
+                                               rendered="#{blobUtilitiesBB.editModeBlobMetadata}"
+                                               converter="muniConverter"
+                                               >
+                            <!-- Strangely this element needs to update itself to call the setter -->
+                            <f:selectItem noSelectionOption="true"
+                                          itemDisabled="true"
+                                          itemLabel="choose a municipality" />
+                            <f:selectItems value="#{systemServicesBB.municipalityListForSearch}" 
+                                           var="muni" 
+                                           itemLabel="#{muni.muniName}"/>
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+            </p:panel>
+        </h:form>
+    </p:dialog>
+    
+    <p:dialog   id="blob-deactivate-dialog"
+                height="400" width="800"
+                widgetVar="blobs-deactivate-dialog-var"
+                responsive="true"
+                dynamic="true"
+                modal="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                header="Deactivate Photo/Doc: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
+                rendered="true"
+                > 
+        <h:form id="blob-deactivate-form">
+            
+            <div class="p-grid">
+                <div class="p-col-6">
+                    <h2>Remove photo/doc link only</h2>
+                    <p:spacer height="5px" />
+                    <p:commandButton id="blob-deactivatelinks-button"
+                                     value="Remove links only to photo or document ID: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
+                                     disabled="false"
+                                     ajax="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                     icon="fa fa-unlink"
+                                     actionListener="#{blobUtilitiesBB.deactivateLinksBetweenCurrentBlobLightAndCurrentBlobHolder}"
+                                     oncomplete="PF('blobs-deactivate-dialog-var').hide();"
+                                     update="#{blobUtilitiesBB.blobListComponentToUpdateAfterChanges}
+                                     blobs-growl-form"/>
+                    
+                    <p:spacer height="5px" />
+                    <p>
+                        Use this option if you want to keep the photo/document ID:<h:outputText value="#{blobUtilitiesBB.currentBlobLight.photoDocID}" /> 
+                        but just don't want this particular <h:outputText value="#{blobUtilitiesBB.currentBlobHolder.blobLinkEnum.objectParentTitle}" />
+                        to maintain a connection to that photo/document. Note: Choosing this option is reversible only if you still have links to this photo/doc
+                        to some other object in the database.
+                    </p>
+                    
+                </div>
+                
+                <div class="p-col-6">
+                    <h2>Remove actual photo/doc and all links</h2>
+                    <p:spacer height="5px" />
+
+
+                    <p:commandButton id="blob-deactivate-button"
+                                     value="Remove photo or document ID: #{blobUtilitiesBB.currentBlobLight.photoDocID}"
+                                     disabled="false"
+                                     ajax="true"
+                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                     icon="fa fa-eraser"
+                                     style="background-color: darkred;"
+                                     actionListener="#{blobUtilitiesBB.deactivateCurrentBlobLight}"
+                                     oncomplete="PF('blobs-deactivate-dialog-var').hide();"
+                                     update="#{blobUtilitiesBB.blobListComponentToUpdateAfterChanges}
+                                     blobs-growl-form"/>
+                    
+                    <p:spacer height="5px" />
+                    <p>
+                        Use this option when you no longer want the
+                        actual photo/document ID: <h:outputText value="#{blobUtilitiesBB.currentBlobLight.photoDocID}" /> and
+                        don't want any cases, properties, violations, etc., to have links to it. Note: Deactivating a photo/document cannot be reversed by web users!
+                    </p>
+                    
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

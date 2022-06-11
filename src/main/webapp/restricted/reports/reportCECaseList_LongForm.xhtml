@@ -39,8 +39,8 @@
                             <h:panelGroup>
                                 <p>
                                     <h:outputLabel id="report-creator-ol" for="report-creator-ot" styleClass="bold" value="report creator name: " />
-                                    <h:outputText id="report-creator-ot"  value="#{reportingBB.currentReport.creator.person.firstName} 
-                                                  #{reportingBB.currentReport.creator.person.lastName} "/>
+                                    <h:outputText id="report-creator-ot"  value="#{reportingBB.currentReport.creator.human.firstName} 
+                                                  #{reportingBB.currentReport.creator.human.lastName} "/>
                                     <br />
                                     <h:outputLabel id="report-creator-cred-ol" for="report-creator-cred-ot" styleClass="bold" value="creator credentials: " />
                                     <h:outputText id="report-creator-cred-ot"  value="User: #{reportingBB.currentReport.creator.username}, #{reportingBB.currentReport.creator.roleType.label} 
@@ -269,7 +269,7 @@
 
                                         <p:spacer height="5px" />
                                         <h:outputText styleClass="bold" value="Status: " />
-                                        <h:outputText value="#{citation.status.statusTitle}"/>
+                                        <h:outputText value="#{citation.mostRecentStatusLogEntry.statusTitle}"/>
 
                                         <p:spacer height="5px" />
 
@@ -303,7 +303,7 @@
                                             <h:outputText id="v-source-sep-compactlist-ot" value=" "/>
                                             <h:outputText id="v-source-year-compactlist-ot" value="#{citv.violatedEnfElement.source.sourceYear})"/>
                                             <h:outputText id="sep-compactlist-line-ot" value=" | "/>
-                                            <h:outputText id="status-compactlist-line-ot" value="#{citv.status.label}"/>
+                                            <h:outputText id="status-compactlist-line-ot" value="#{citv.mostRecentStatusLogEntry.label}"/>
                                         </p:dataScroller>
                                     </h:panelGroup>
                                 </h:panelGrid>

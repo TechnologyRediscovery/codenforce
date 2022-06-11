@@ -139,7 +139,7 @@
                                             <h:form id="feeManage-form-lookup">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+                                                             
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -226,7 +226,7 @@
                                             <h:form id="feeManage-form-insert">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+                                                             
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -275,15 +275,22 @@
                                                         <p:outputLabel value="Effective Date:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="FeeReadTableOutputLabel">
-                                                            <p:calendar 
-                                                                value="#{feeManagementBB.selectedFeeType.effectiveUtilDate}" 
-                                                            mode="popup" tabindex="7"
-                                                            showOn="button"
-                                                            pattern="EEE, dd MMM, yyyy"
-                                                            navigator="true"
-                                                            showButtonPanel="true"
-                                                            showTodayButton="false"
-                                                            required="true"/>
+                                                            
+                                                                <p:datePicker 	id="feemanage-insert-effectivedate"
+                                                                                value="#{feeManagementBB.selectedFeeType.effective}" 
+                                                                                rendered="true"
+                                                                                style="width: 100%;"
+                                                                                pattern="MM/dd/yyyy HH:mm"
+                                                                                hideOnDateTimeSelect="true"
+                                                                                showOnFocus="false"
+                                                                                showIcon="true"
+                                                                                disabled="false"
+                                                                                showButtonBar="true"
+                                                                                mask="true"
+                                                                                timeInput="true" 
+                                                                                required="true" />
+
+                                                        
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -292,15 +299,22 @@
                                                         <p:outputLabel value="Expiry Date:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="FeeReadTableOutputLabel">
-                                                            <p:calendar 
-                                                                value="#{feeManagementBB.selectedFeeType.expiryUtilDate}" 
-                                                            mode="popup" tabindex="7"
-                                                            showOn="button"
-                                                            pattern="EEE, dd MMM, yyyy"
-                                                            navigator="true"
-                                                            showButtonPanel="true"
-                                                            showTodayButton="false"
-                                                            required="true"/>
+                                                            
+                                                            
+                                                                <p:datePicker 	id="feemanage-insert-expiry-datepicker"
+                                                                                value="#{feeManagementBB.selectedFeeType.expiry}" 
+                                                                                rendered="true"
+                                                                                style="width: 100%;"
+                                                                                pattern="MM/dd/yyyy HH:mm"
+                                                                                disabled="false"
+                                                                                hideOnDateTimeSelect="true"
+                                                                                showOnFocus="false"
+                                                                                showIcon="true"
+                                                                                showButtonBar="true"
+                                                                                mask="true"
+                                                                                timeInput="true" 
+                                                                                required="true" />
+
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -331,124 +345,6 @@
                                         </p:panel>
 
 
-                                        <!--Update Table-->
-                                        <p:panel id="feeManage-panel-update"
-                                                 toggleable="true"
-                                                 collapsed="false"
-                                                 header="LookUp Panel"
-                                                 rendered="#{feeManagementBB.getActiveUpdateMode()}"
-                                                 >
-
-                                            <p:spacer height="10px"/>
-
-                                            <h:form id="feeManage-form-update">
-
-                                                <h:panelGrid columns="4" 
-                                                             layout="grid"
-                                                             columnClasses="gridTd, gridTd, gridTd, gridTd" 
-                                                             >
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="ID:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="FeeReadTableOutputLabel">
-                                                            <p:outputLabel value="#{feeManagementBB.selectedFeeType.feeID}"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Name:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="FeeReadTableOutputLabel">
-                                                            <p:inputText value="#{feeManagementBB.selectedFeeType.name}"
-                                                                         styleClass="FeeTypeReadTableInputText"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Muni:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="FeeReadTableOutputLabel">
-                                                            <p:selectOneMenu id="muniSelectMenu" tabindex="5" required="false" value="#{feeManagementBB.selectedFeeType.muni}">
-                                                                <f:converter converterId="muniConverter"/>
-                                                                <f:selectItems id="muniNameList" value="#{muniBB.muniList}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}"/>
-                                                            </p:selectOneMenu>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Amount:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="FeeReadTableOutputLabel">
-                                                            <p:inputText value="#{feeManagementBB.selectedFeeType.amount}"
-                                                                         styleClass="FeeTypeReadTableInputText"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Effective Date:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="FeeReadTableOutputLabel">
-                                                            <p:calendar 
-                                                                value="#{feeManagementBB.selectedFeeType.effectiveUtilDate}" 
-                                                            mode="popup" tabindex="7"
-                                                            showOn="button"
-                                                            pattern="EEE, dd MMM, yyyy"
-                                                            navigator="true"
-                                                            showButtonPanel="true"
-                                                            showTodayButton="false"
-                                                            required="true"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Expiry Date:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="FeeReadTableOutputLabel">
-                                                            <p:calendar 
-                                                                value="#{feeManagementBB.selectedFeeType.expiryUtilDate}" 
-                                                            mode="popup" tabindex="7"
-                                                            showOn="button"
-                                                            pattern="EEE, dd MMM, yyyy"
-                                                            navigator="true"
-                                                            showButtonPanel="true"
-                                                            showTodayButton="false"
-                                                            required="true"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                    <h:panelGroup>
-                                                        <p:outputLabel value="Notes:"/>
-                                                        <p:spacer height="5px"/>
-                                                        <div class="FeeReadTableOutputLabel">
-                                                            <p:inputText value="#{feeManagementBB.selectedFeeType.notes}"
-                                                                         styleClass="FeeTypeReadTableInputText"/>
-                                                        </div>
-                                                        <p:spacer height="10px"/>
-                                                    </h:panelGroup>
-
-                                                </h:panelGrid>
-
-                                                <p:spacer height="10px" />
-
-                                                <!--Update Button-->
-                                                <p:commandButton icon="fa fa-edit"
-                                                                 ajax="false"
-                                                                 action="#{feeManagementBB.onUpdateFeeButtonChange()}"
-                                                                 value="UPDATE"
-                                                                 />
-
-                                            </h:form>
-
-                                        </p:panel>
-
-
                                         <!--Remove Table-->
                                         <p:panel id="feeManage-panel-remove"
                                                  toggleable="true"
@@ -462,7 +358,7 @@
                                             <h:form id="feeManage-form-remove">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+                                                             
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 

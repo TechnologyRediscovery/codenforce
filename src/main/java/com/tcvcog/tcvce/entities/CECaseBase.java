@@ -40,13 +40,9 @@ public class CECaseBase
     
     protected Icon casePhaseIcon;
     
-    protected java.util.Date originationDateUtilDate;
     protected LocalDateTime originationDate;
-    protected String originiationDatePretty;
     
-    protected java.util.Date closingDateUtilDate;
     protected LocalDateTime closingDate;
-    protected String closingDatePretty;
     
     protected LocalDateTime creationTimestamp;
     protected String notes;
@@ -230,39 +226,7 @@ public class CECaseBase
         this.creationTimestamp = creationTimestamp;
     }
 
-    /**
-     * @return the originiationDatePretty
-     */
-    public String getOriginiationDatePretty() {
-        if(originationDate != null){
-            originiationDatePretty = DateTimeUtil.getPrettyDate(originationDate);
-        }
-        return originiationDatePretty;
-    }
-
-    /**
-     * @return the closingDatePretty
-     */
-    public String getClosingDatePretty() {
-        if(closingDate != null){
-            closingDatePretty = DateTimeUtil.getPrettyDate(closingDate);
-        }
-        return closingDatePretty;
-    }
-
-    /**
-     * @param originiationDatePretty the originiationDatePretty to set
-     */
-    public void setOriginiationDatePretty(String originiationDatePretty) {
-        this.originiationDatePretty = originiationDatePretty;
-    }
-
-    /**
-     * @param closingDatePretty the closingDatePretty to set
-     */
-    public void setClosingDatePretty(String closingDatePretty) {
-        this.closingDatePretty = closingDatePretty;
-    }
+  
 
     /**
      * @return the paccEnabled
@@ -322,9 +286,7 @@ public class CECaseBase
         hash = 53 * hash + Objects.hashCode(this.casePhase);
         hash = 53 * hash + Objects.hashCode(this.casePhaseIcon);
         hash = 53 * hash + Objects.hashCode(this.originationDate);
-        hash = 53 * hash + Objects.hashCode(this.originiationDatePretty);
         hash = 53 * hash + Objects.hashCode(this.closingDate);
-        hash = 53 * hash + Objects.hashCode(this.closingDatePretty);
         hash = 53 * hash + Objects.hashCode(this.creationTimestamp);
         hash = 53 * hash + Objects.hashCode(this.notes);
         return hash;
@@ -350,37 +312,7 @@ public class CECaseBase
 
   
 
-    /**
-     * @return the closingDateUtilDate
-     */
-    public java.util.Date getClosingDateUtilDate() {
-        closingDateUtilDate = DateTimeUtil.convertUtilDate(closingDate);
-        return closingDateUtilDate;
-    }
-
-    /**
-     * @param cd     
-     */
-    public void setClosingDateUtilDate(java.util.Date cd) {
-        closingDate = DateTimeUtil.convertUtilDate(cd);
-        closingDateUtilDate = cd;
-    }
-
-    /**
-     * @return the originationDateUtilDate
-     */
-    public java.util.Date getOriginationDateUtilDate() {
-        originationDateUtilDate = DateTimeUtil.convertUtilDate(originationDate);
-        return originationDateUtilDate;
-    }
-
-    /**
-     * @param od     
-     */
-    public void setOriginationDateUtilDate(java.util.Date od) {
-        originationDate = DateTimeUtil.convertUtilDate(od);
-        this.originationDateUtilDate = od;
-    }
+    
 
     /**
      * @return the source

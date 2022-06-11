@@ -17,40 +17,35 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
 import com.tcvcog.tcvce.entities.CodeSource;
-import com.tcvcog.tcvce.integration.CodeIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /** 
-*
+ * Backing bean for managing code guide entries
  * @author ellen bascomb of apt 31y
  */
 public class CodeElementGuideBB extends BackingBeanUtils implements Serializable {
       
     private CodeElementGuideEntry currentGuideEntry;
-    private List<CodeElementGuideEntry> entryList;
+    private boolean editModeGuideEntry;
+    private List<CodeElementGuideEntry> codeGuideList;
     private List<CodeElementGuideEntry> filteredEntryList;
     
-    private CodeElementGuideEntry selectedGuideEntry;
-    
-    private CodeSource currentSource;
-    
-    
+    private List<CodeSource> codeSourceList;
+    private CodeSource codeSourceSelected;
     private List<CodeElement> elementList;
-    private List<CodeElement> filteredElementList;
-    // no selected elements I don't think
-    private CodeElement selectedElement;
+    private List<CodeElement> elementListFiltered;
+    
     
     
     
@@ -61,154 +56,234 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
     }
     
     
-    public String updateCodeGuideLinks(){
-        CodeIntegrator ci = getCodeIntegrator();
-        ListIterator<CodeElement> eleIterator = elementList.listIterator();
-        CodeElement ce;
-        int guideEntryID;
+     /**
+     * Sets up our master lists and option drop downs
+     */
+    @PostConstruct
+    public void initBean() {
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            setCodeSourceList(cc.getCodeSourceList());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        elementListFiltered = new ArrayList<>();
+        filteredEntryList = new ArrayList<>();
+        setEditModeGuideEntry(false);
         
-        while(eleIterator.hasNext()){
-            ce = eleIterator.next();
-            guideEntryID = ce.getGuideEntryID();
-            if(guideEntryID != 0){
-                try {
-                    ci.linkElementToCodeGuideEntry(ce, guideEntryID );
-                    getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Success! Linked guide entry ID " 
-                                + guideEntryID + " to element ID " + ce.getElementID(), ""));
-                } catch (IntegrationException ex) {
-                    getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+    }
+    
+    /**
+     * Listener for user requests to view the code guide
+     * @param ev 
+     */
+    public void onViewCodeGuideNavLinkClick(ActionEvent ev){
+        System.out.println("CodeElementGuideBB.onViewCodeGuideNavLinkClick");
+        refreshFullCodeGuideAndUpdateSession();
+        
+    }
+    
+    /**
+     * Listener for user requests to turn editing on or off for a guide 
+     * entry
+     * @param ev 
+     */
+    public void onToggleEditModeCurrentGuideEntryButtonPress(ActionEvent ev){
+        toggleEditModeCurrentGuideEntry();
+     
+    }
+    
+    /**
+     * Internal method for responding to edit toggle: if we have a new guide entry
+     * then we insert it, if it's exiting, then we update it, and flip edit mode
+     */
+    private void toggleEditModeCurrentGuideEntry(){
+        
+         CodeCoordinator cc = getCodeCoordinator();
+        try {
+            if (isEditModeGuideEntry()) {
+                if (getCurrentGuideEntry() == null) {
+                    throw new BObStatusException("Cannot edit a null current guide entry");
                 }
+                if(getCurrentGuideEntry().getGuideEntryID() == 0){
+                    cc.insertCodeElementGuideEntry(getCurrentGuideEntry());
+                } else {
+                    cc.updateCodeElementGuideEntry(getCurrentGuideEntry());
+                }
+                refreshCurrentGuideEntry();
+                refreshFullCodeGuideAndUpdateSession();
+
+            } else {
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                               "You are now editing guide entry ID " + getCurrentGuideEntry().getGuideEntryID(), ""));
+            }
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
+        // do the toggle
+        setEditModeGuideEntry(!isEditModeGuideEntry());
+    }
+    
+    public void refreshCurrentGuideEntry(){
+        if(getCurrentGuideEntry() != null){
+            CodeCoordinator cc = getCodeCoordinator();
+            try {
+                setCurrentGuideEntry(cc.getCodeElementGuideEntry(getCurrentGuideEntry().getGuideEntryID()));
+            } catch (BObStatusException | IntegrationException ex) {
+                System.out.println(ex);
+                
+            } 
+        }
+    }
+    
+    /**
+     * Gets a fresh copy of the whole code guide and injects into session
+     */
+    public void refreshFullCodeGuideAndUpdateSession(){
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            codeGuideList = cc.getCodeElementGuideEntryListComplete();
+            getSessionBean().setSessCodeGuideList(codeGuideList);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+    }
+    
+    
+    /**
+     * Listener for user requests to make a new guide entry
+     * @param ev
+     */
+    public void onCodeElementGuideEntryCreateInitButtonPress(ActionEvent ev){
+        CodeCoordinator cc = getCodeCoordinator();
+        setCurrentGuideEntry(cc.getCodeElementGuideEntrySkeleton());
+        setEditModeGuideEntry(true);
+    }
+    
+    /**
+     * listener for user requests to either view, edit, or remove a guide
+     * entry
+     * @param cege to edit, view, or delete
+     */
+    public void onCodeElementGuideEntryViewRemoveInitLinkClick(CodeElementGuideEntry cege){
+        setCurrentGuideEntry(cege);
+    }
+    
+    /**
+     * Listener for user requests to stop the code guide element
+     * update process
+     * @param ev 
+     */
+    public void onEditOperationAbort(ActionEvent ev){
+        editModeGuideEntry = false;
+        System.out.println("CodeElementGuideBB.onEditOperationAbort");
+    }
+    
+
+    /**
+     * Listener to start the guide guide mapping process
+     * @param ev 
+     */
+    public void onLinkElementsToGuideInitButtonPush(ActionEvent ev){
+         elementList = new ArrayList<>();
+    }
+    
+    public void onGetElementsInSourceButtonClick(ActionEvent ev){
+        refreshElementsInSource();
+    }
+    
+    /**
+     * Listener for user requests to get elements from a given source
+     * @param ev 
+     */
+    public void refreshElementsInSource(){
+        System.out.println("CodeGuideEntryBB.refreshElementsInSource");
+        if(codeSourceSelected != null){
+            System.out.println("CodeGuideEntryBB.refreshElementsInSource | source: " + codeSourceSelected.getSourceName());
+            CodeCoordinator cc = getCodeCoordinator();
+            try {
+                elementList = cc.getCodeElemements(codeSourceSelected);
+                if(elementList != null){
+                    System.out.println("CodeGuideEntryBB.refreshElementsInSource | eleListSize: " + elementList.size());
+                }
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Showing all ordinances in source: " + codeSourceSelected.getSourceName(), ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fatal error: Could not load ordinances, sorry!", ""));
             }
         }
-        return "";
+    }
+    
+    /**
+     * Listener for user requests to update all the element categories in a batch
+     */
+    public void updateCodeGuideLinksOnAllElementsInSource(){
+        CodeCoordinator cc = getCodeCoordinator();
+        try {
+            cc.updateAllCodeGuideEntryLinks(getElementList());
+            refreshElementsInSource();
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Success! Updated all code categories", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
+        }
     }
    
     
-    private List<CodeElement> loadCodeElementList(){
-        
-        List<CodeElement> elList = null;
-        CodeSource source = getSessionBean().getSessCodeSource();
-        CodeIntegrator codeIntegrator = getCodeIntegrator();
-        try {
-            if(source != null){
-                elList = codeIntegrator.getCodeElements(source.getSourceID());
-            }
-        } catch (IntegrationException | BObStatusException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Unable to populate list of code elements, sorry!", 
-                            "This error will require administrator attention"));
-        }
-        return elList;
-        
-    }
+  
     
-     public List<CodeElement> getElementList() {
-        if(elementList == null){
-            elementList = loadCodeElementList();
-        } 
-        return elementList;
-    }
-    
-    public String deleteCodeElementGuideEntry(){
-        if(selectedGuideEntry != null){
-            
-            CodeElementGuideEntry cege = selectedGuideEntry;
+     /**
+      * listener for user requests to remove a code guide entry
+      */
+    public void onCodeGuideEntryRemoveCommitButtonClick(){
+        if(getCurrentGuideEntry() != null){
+            CodeCoordinator cc = getCodeCoordinator();
             try {
-                CodeIntegrator ci = getCodeIntegrator();
-                ci.deleteCodeElementGuideEntry(cege);
-
+                cc.removeCodeElementGuideEntry(getCurrentGuideEntry());
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Code guide entry nuked forever!", ""));
-            } catch (IntegrationException ex) {
+                setCurrentGuideEntry(null);
+                refreshFullCodeGuideAndUpdateSession();
+            } catch (IntegrationException | BObStatusException ex) {
                 System.out.println(ex.toString());
 
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            ex.getLocalizedMessage(), 
-                            "This must be corrected by the System Administrator"));
+                            ex.getMessage(), ""));
             }
-            return "codeGuideView";
         } else {
                 getFacesContext().addMessage(null,
                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                             "Please select a gode guide entry to delete it", ""));
-            return "";
         }
     }
-    
-    public String updateSelectedGuideEntry(){
-        if(selectedGuideEntry != null){
-            getSessionBean().setActiveCodeElementGuideEntry(selectedGuideEntry);
-            System.out.println("CodeElementGuideBB.updateSelectedGuideEntry | selectedGuideEntry: " + selectedGuideEntry.getDescription());
-            return "codeGuideEntryUpdate";
-        } else {
-            getFacesContext().addMessage(null,
-               new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Please select a gode guide entry to update it", ""));
-            return "";
-        }
-    }
-    
-    public String addNewCodeGuideEntry(){
-        return "codeGuideEntryAdd";
-    }
-    
+
     /**
      * @return the currentGuideEntry
      */
     public CodeElementGuideEntry getCurrentGuideEntry() {
-        currentGuideEntry = getSessionBean().getActiveCodeElementGuideEntry();
         return currentGuideEntry;
     }
 
     /**
-     * @return the entryList
+     * @return the editModeGuideEntry
      */
-    public List<CodeElementGuideEntry> getEntryList() {
-        System.out.println("CodeElementGuideBB.getEntryList");
-        CodeIntegrator ci = getCodeIntegrator();
-        if(entryList == null){
-            try {
-                entryList = ci.getCodeElementGuideEntries();
-            } catch (IntegrationException ex) {
-                System.out.println("CodeElementGuideBB.getEntryList | " + ex.getMessage());
-            }
-        }
-        return entryList;
+    public boolean isEditModeGuideEntry() {
+        return editModeGuideEntry;
     }
 
     /**
-     * @return the selectedGuideEntry
+     * @return the codeGuideList
      */
-    public CodeElementGuideEntry getSelectedGuideEntry() {
-        return selectedGuideEntry;
-    }
-
-  
-
-    /**
-     * @param currentGuideEntry the currentGuideEntry to set
-     */
-    public void setCurrentGuideEntry(CodeElementGuideEntry currentGuideEntry) {
-        this.currentGuideEntry = currentGuideEntry;
-    }
-
-    /**
-     * @param entryList the entryList to set
-     */
-    public void setEntryList(ArrayList<CodeElementGuideEntry> entryList) {
-        this.entryList = entryList;
-    }
-
-    /**
-     * @param selectedGuideEntry the selectedGuideEntry to set
-     */
-    public void setSelectedGuideEntry(CodeElementGuideEntry selectedGuideEntry) {
-        this.selectedGuideEntry = selectedGuideEntry;
+    public List<CodeElementGuideEntry> getCodeGuideList() {
+        return codeGuideList;
     }
 
     /**
@@ -219,64 +294,89 @@ public class CodeElementGuideBB extends BackingBeanUtils implements Serializable
     }
 
     /**
+     * @return the codeSourceList
+     */
+    public List<CodeSource> getCodeSourceList() {
+        return codeSourceList;
+    }
+
+    /**
+     * @return the codeSourceSelected
+     */
+    public CodeSource getCodeSourceSelected() {
+        return codeSourceSelected;
+    }
+
+    /**
+     * @return the elementList
+     */
+    public List<CodeElement> getElementList() {
+        return elementList;
+    }
+
+    /**
+     * @return the elementListFiltered
+     */
+    public List<CodeElement> getElementListFiltered() {
+        return elementListFiltered;
+    }
+
+    /**
+     * @param currentGuideEntry the currentGuideEntry to set
+     */
+    public void setCurrentGuideEntry(CodeElementGuideEntry currentGuideEntry) {
+        this.currentGuideEntry = currentGuideEntry;
+    }
+
+    /**
+     * @param editModeGuideEntry the editModeGuideEntry to set
+     */
+    public void setEditModeGuideEntry(boolean editModeGuideEntry) {
+        this.editModeGuideEntry = editModeGuideEntry;
+    }
+
+    /**
+     * @param codeGuideList the codeGuideList to set
+     */
+    public void setCodeGuideList(List<CodeElementGuideEntry> codeGuideList) {
+        this.codeGuideList = codeGuideList;
+    }
+
+    /**
      * @param filteredEntryList the filteredEntryList to set
      */
-    public void setFilteredEntryList(ArrayList<CodeElementGuideEntry> filteredEntryList) {
+    public void setFilteredEntryList(List<CodeElementGuideEntry> filteredEntryList) {
         this.filteredEntryList = filteredEntryList;
     }
 
-
     /**
-     * @return the selectedElement
+     * @param codeSourceList the codeSourceList to set
      */
-    public CodeElement getSelectedElement() {
-        return selectedElement;
+    public void setCodeSourceList(List<CodeSource> codeSourceList) {
+        this.codeSourceList = codeSourceList;
     }
 
     /**
-     * @param selectedElement the selectedElement to set
+     * @param codeSourceSelected the codeSourceSelected to set
      */
-    public void setSelectedElement(CodeElement selectedElement) {
-        this.selectedElement = selectedElement;
+    public void setCodeSourceSelected(CodeSource codeSourceSelected) {
+        this.codeSourceSelected = codeSourceSelected;
     }
 
-   
     /**
      * @param elementList the elementList to set
      */
-    public void setElementList(ArrayList<CodeElement> elementList) {
+    public void setElementList(List<CodeElement> elementList) {
         this.elementList = elementList;
     }
 
     /**
-     * @return the filteredElementList
+     * @param elementListFiltered the elementListFiltered to set
      */
-    public List<CodeElement> getFilteredElementList() {
-        return filteredElementList;
+    public void setElementListFiltered(List<CodeElement> elementListFiltered) {
+        this.elementListFiltered = elementListFiltered;
     }
-
-    /**
-     * @param filteredElementList the filteredElementList to set
-     */
-    public void setFilteredElementList(ArrayList<CodeElement> filteredElementList) {
-        this.filteredElementList = filteredElementList;
-    }
-
-    /**
-     * @return the currentSource
-     */
-    public CodeSource getCurrentSource() {
-        currentSource = getSessionBean().getSessCodeSource();
-        return currentSource;
-    }
-
-    /**
-     * @param currentSource the currentSource to set
-     */
-    public void setCurrentSource(CodeSource currentSource) {
-        this.currentSource = currentSource;
-    }
-
+    
    
     
 }

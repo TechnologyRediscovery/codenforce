@@ -18,9 +18,11 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 
+import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.Human;
@@ -81,20 +83,20 @@ public class UserBB extends BackingBeanUtils implements Serializable {
         currentUser = getSessionBean().getSessUser();
         userPersonList = new ArrayList<>();
         if(currentUser != null){
-            userPersonList.add(currentUser.getPerson());
+            userPersonList.add(currentUser.getHuman());
         }
         formSelectedUserPerson = null;
     }
     
     public void generateUserPersonList(ActionEvent ev){
-        SearchCoordinator sc = getSearchCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
         // user our fancy specialized query to get all Persons who are delcared to 
         // be user types
-        QueryPerson qp = sc.initQuery(QueryPersonEnum.USER_PERSONS, currentUser.getMyCredential());
+        
         try {
-            qp = sc.runQuery(qp);
-            userPersonList = qp.getResults();
-        } catch (SearchException ex) {
+        
+            userPersonList = pc.getHumansMappedToUsers();
+        } catch (IntegrationException ex) {
             System.out.println(ex);
         }
     }
@@ -113,7 +115,12 @@ public class UserBB extends BackingBeanUtils implements Serializable {
      * @return 
      */
     public String editUserPersonRecord(){
-        getSessionBean().setSessPersonQueued(currentUser.getPerson());
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            getSessionBean().setSessPersonQueued(pc.getPerson(currentUser.getHuman()));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
         return "persons";
     }
 

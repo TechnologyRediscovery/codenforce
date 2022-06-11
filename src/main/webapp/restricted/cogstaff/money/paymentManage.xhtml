@@ -41,7 +41,7 @@
                                              />
 
                         </h:form>
-                        
+
                         <div class="mainContainer">
 
                             <div class ="two-column-page-flex-container">
@@ -151,7 +151,7 @@
                                             <h:form id="paymentManage-form-lookup">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -307,63 +307,63 @@
                                                                         <h:outputText value="#{fee.fee.effectiveDate}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Expiry: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.fee.expiryDate}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Fee Notes: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.fee.notes}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Assigned By: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.assignedBy.person.firstName} #{fee.assignedBy.person.lastName} (ID: #{fee.assignedBy.userID})"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Last Modified: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.lastModified}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Other Notes: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.notes}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup rendered="#{not empty fee.reducedByUser}">
                                                                     <h:outputLabel styleClass="bold" value="Amount Reduced By: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.reducedBy}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup rendered="#{not empty fee.reducedByUser}">
                                                                     <h:outputLabel styleClass="bold" value="Reduced By: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.reducedByUser.person.firstName} #{fee.reducedByUser.person.lastName} (ID: #{fee.reducedByUser.userID})"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Waived? "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{not empty fee.waivedBy}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup rendered="#{not empty fee.waivedBy}">
                                                                     <h:outputLabel styleClass="bold" value="Waived By: "/>
                                                                     <div class="ord-text">
@@ -378,7 +378,7 @@
                                                 </p:dataTable>
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -414,17 +414,19 @@
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Date Received:"/>
                                                         <p:spacer height="5px"/>
-
-                                                        <p:calendar 
-                                                            value="#{paymentBB.selectedPayment.dateReceivedUtilDate}" 
-                                                            mode="popup" tabindex="7"
-                                                            id="newPaymentDateReceived"
-                                                            showOn="button"
-                                                            pattern="EEE, dd MMM, yyyy"
-                                                            navigator="true"
-                                                            showButtonPanel="true"
-                                                            showTodayButton="false"
-                                                            required="true"/>
+                                                        <p:datePicker 	id="newPaymentDateReceived"
+                                                                       value="#{paymentBB.selectedPayment.dateReceived}" 
+                                                                       rendered="true"
+                                                                       style="width: 100%;"
+                                                                       pattern="MM/dd/yyyy HH:mm"
+                                                                       disabled="false"
+                                                                       hideOnDateTimeSelect="true"
+                                                                        showOnFocus="false"
+                                                                        showIcon="true"
+                                                                       showButtonBar="true"
+                                                                       mask="true"
+                                                                       timeInput="true" 
+                                                                       required="true" />
 
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -432,18 +434,19 @@
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Date Deposited:"/>
                                                         <p:spacer height="5px"/>
-
-                                                        <p:calendar 
-                                                            value="#{paymentBB.selectedPayment.dateDepositedUtilDate}" 
-                                                            styleClass="occInsFeeDateCal"
-                                                            mode="popup" tabindex="8"
-                                                            id="newPaymentDateDeposited"
-                                                            showOn="button"
-                                                            pattern="EEE, dd MMM, yyyy"
-                                                            navigator="true"
-                                                            showButtonPanel="true"
-                                                            showTodayButton="false"
-                                                            required="true"/>
+                                                        <p:datePicker 	value="#{paymentBB.selectedPayment.dateDeposited}" 
+                                                                       id="newPaymentDateDeposited"
+                                                                       rendered="true"
+                                                                       style="width: 100%;"
+                                                                       pattern="MM/dd/yyyy HH:mm"
+                                                                       disabled="false"
+                                                                       hideOnDateTimeSelect="true"
+                                                                        showOnFocus="false"
+                                                                        showIcon="true"
+                                                                       showButtonBar="true"
+                                                                       mask="true"
+                                                                       timeInput="true" 
+                                                                       required="true" />
 
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -570,63 +573,63 @@
                                                                         <h:outputText value="#{fee.fee.effectiveDate}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Expiry: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.fee.expiryDate}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Fee Notes: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.fee.notes}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Assigned By: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.assignedBy.person.firstName} #{fee.assignedBy.person.lastName} (ID: #{fee.assignedBy.userID})"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Last Modified: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.lastModified}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Other Notes: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.notes}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup rendered="#{not empty fee.reducedByUser}">
                                                                     <h:outputLabel styleClass="bold" value="Amount Reduced By: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.reducedBy}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup rendered="#{not empty fee.reducedByUser}">
                                                                     <h:outputLabel styleClass="bold" value="Reduced By: "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{fee.reducedByUser.person.firstName} #{fee.reducedByUser.person.lastName} (ID: #{fee.reducedByUser.userID})"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup>
                                                                     <h:outputLabel styleClass="bold" value="Waived? "/>
                                                                     <div class="ord-text">
                                                                         <h:outputText value="#{not empty fee.waivedBy}"/>
                                                                     </div>
                                                                 </h:panelGroup>
-                                                                
+
                                                                 <h:panelGroup rendered="#{not empty fee.waivedBy}">
                                                                     <h:outputLabel styleClass="bold" value="Waived By: "/>
                                                                     <div class="ord-text">
@@ -639,9 +642,9 @@
                                                         </div>
                                                     </p:rowExpansion>
                                                 </p:dataTable>
-                                                
+
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -677,18 +680,21 @@
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Date Received:"/>
                                                         <p:spacer height="5px"/>
+                                                        <p:datePicker 	value="#{paymentBB.selectedPayment.dateReceived}" 
+                                                                       id="newPaymentDateReceived"
+                                                                       rendered="true"
+                                                                       style="width: 100%;"
+                                                                       pattern="MM/dd/yyyy HH:mm"
+                                                                       disabled="false"
+                                                                       hideOnDateTimeSelect="true"
+                                                                        showOnFocus="false"
+                                                                        showIcon="true"
+                                                                       showButtonBar="true"
+                                                                       mask="true"
+                                                                       timeInput="true" 
+                                                                       required="true" />
 
-                                                        <p:calendar 
-                                                            value="#{paymentBB.selectedPayment.dateReceivedUtilDate}" 
-                                                            styleClass="occInsFeeDateCal"
-                                                            mode="popup" tabindex="7"
-                                                            id="newPaymentDateReceived"
-                                                            showOn="button"
-                                                            pattern="EEE, dd MMM, yyyy"
-                                                            navigator="true"
-                                                            showButtonPanel="true"
-                                                            showTodayButton="false"
-                                                            required="true"/>
+
 
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -696,19 +702,20 @@
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Date Deposited:"/>
                                                         <p:spacer height="5px"/>
-
-                                                        <p:calendar 
-                                                            value="#{paymentBB.selectedPayment.dateDepositedUtilDate}" 
-                                                            styleClass="occInsFeeDateCal"
-                                                            mode="popup" tabindex="8"
-                                                            id="newPaymentDateDeposited"
-                                                            showOn="button"
-                                                            pattern="EEE, dd MMM, yyyy"
-                                                            navigator="true"
-                                                            showButtonPanel="true"
-                                                            showTodayButton="false"
-                                                            required="true"/>
-
+                                                        <p:datePicker 	value="#{paymentBB.selectedPayment.dateDeposited}" 
+                                                                        id="newPaymentDateDeposited"
+                                                                        rendered="true"
+                                                                        style="width: 100%;"
+                                                                        pattern="MM/dd/yyyy HH:mm"
+                                                                        disabled="false"
+                                                                        hideOnDateTimeSelect="true"
+                                                                        showOnFocus="false"
+                                                                        showIcon="true"
+                                                                        showButtonBar="true"
+                                                                        mask="true"
+                                                                        timeInput="true" 
+                                                                        required="true" />
+                                                     
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
 
@@ -791,7 +798,7 @@
                                             <h:form id="paymentManage-form-remove">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
+
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 

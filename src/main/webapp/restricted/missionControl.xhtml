@@ -37,28 +37,28 @@
                                             rendered="true"
                                             header="Activity in #{sessionBean.sessMuni.muniName}" >
                                     <h:form id="event-bar-form">
-                                        
+
                                         <ui:remove>
-                                            
+
                                             <p:pieChart id="event-bar"
                                                         rendered="false"
                                                         model="#{missionControlBB.pieEvents}" />
                                         </ui:remove>
                                     </h:form>
-                                    
+
                                     <h:form id="event-search-form">
                                         <div class="ui-g data_container_nested_restrict">
 
                                             <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
-                                                
+
                                                 <div class="help-link">
 
                                                     <div class="restrict-main-contents-io-link">
 
-                                                      
+
                                                     </div>
                                                 </div>
-                                                
+
                                             </div>
                                             <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field" >
 
@@ -69,64 +69,64 @@
                                                                    for="eventquery-som" />
                                                 </div>
 
-<!--                                                <div class="restrict-data-field-value-inline" >-->
+                                                <!--                                                <div class="restrict-data-field-value-inline" >-->
 
-<!--                                                    <p:selectOneMenu id="eventquery-som" -->
-<!--                                                                     tabindex="1" -->
-<!--                                                                     value="!{eventsBB.querySelected}"-->
-<!--                                                                     style="margin-right: 10px;">-->
-<!--                                                        <f:converter converterId="bOBQueryConverter"/>-->
-<!--                                                        <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>-->
-<!--                                                        <f:selectItems id="querylist-si" value="!{eventsBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />-->
-<!--                                                        <p:ajax listener="!{eventsBB.changeQuerySelected}"-->
-<!--                                                                update="messages-global-form-->
-<!--                                                                @form-->
-<!--                                                                "/>-->
-<!--                                                    </p:selectOneMenu>-->
-<!--                                                </div>-->
+                                                <!--                                                    <p:selectOneMenu id="eventquery-som" -->
+                                                <!--                                                                     tabindex="1" -->
+                                                <!--                                                                     value="!{eventsBB.querySelected}"-->
+                                                <!--                                                                     style="margin-right: 10px;">-->
+                                                <!--                                                        <f:converter converterId="bOBQueryConverter"/>-->
+                                                <!--                                                        <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>-->
+                                                <!--                                                        <f:selectItems id="querylist-si" value="!{eventsBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />-->
+                                                <!--                                                        <p:ajax listener="!{eventsBB.changeQuerySelected}"-->
+                                                <!--                                                                update="messages-global-form-->
+                                                <!--                                                                @form-->
+                                                <!--                                                                "/>-->
+                                                <!--                                                    </p:selectOneMenu>-->
+                                                <!--                                                </div>-->
 
                                             </div>
 
                                             <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field" >
 
-<!--                                                <div class="restrict-main-contents-io-button">-->
-<!--                                                    <p:commandButton icon="fa fa-search"-->
-<!--                                                                     ajax="true"-->
-<!--                                                                     value="Search"-->
-<!--                                                                     style="clear:none; display: block; float: left;"-->
-<!--                                                                     disabled="false"-->
-<!--                                                                     actionListener="!{eventsBB.executeQuery}" -->
-<!--                                                                     update="event-list-form-->
-<!--                                                                     event-search-log-panel-->
-<!--                                                                     messages-global-form"-->
-<!--                                                                     />-->
+                                                <!--                                                <div class="restrict-main-contents-io-button">-->
+                                                <!--                                                    <p:commandButton icon="fa fa-search"-->
+                                                <!--                                                                     ajax="true"-->
+                                                <!--                                                                     value="Search"-->
+                                                <!--                                                                     style="clear:none; display: block; float: left;"-->
+                                                <!--                                                                     disabled="false"-->
+                                                <!--                                                                     actionListener="!{eventsBB.executeQuery}" -->
+                                                <!--                                                                     update="event-list-form-->
+                                                <!--                                                                     event-search-log-panel-->
+                                                <!--                                                                     messages-global-form"-->
+                                                <!--                                                                     />-->
 
-<!--                                                    <p:commandButton   id="event-search-clear-cb" -->
-<!--                                                                       ajax="true" -->
-<!--                                                                       actionListener="!{eventsBB.resetQuery}"-->
-<!--                                                                       icon="fa fa-eraser" -->
-<!--                                                                       style="padding-left: 5px; clear:none; display: block; float:left;"-->
-<!--                                                                       styleClass="button inline-button"-->
-<!--                                                                       value="Reset Query" -->
-<!--                                                                       disabled="false"-->
-<!--                                                                       update="messages-global-form-->
-<!--                                                                       event-list-form-->
-<!--                                                                       event-search-log-form"/>-->
+                                                <!--                                                    <p:commandButton   id="event-search-clear-cb" -->
+                                                <!--                                                                       ajax="true" -->
+                                                <!--                                                                       actionListener="!{eventsBB.resetQuery}"-->
+                                                <!--                                                                       icon="fa fa-eraser" -->
+                                                <!--                                                                       style="padding-left: 5px; clear:none; display: block; float:left;"-->
+                                                <!--                                                                       styleClass="button inline-button"-->
+                                                <!--                                                                       value="Reset Query" -->
+                                                <!--                                                                       disabled="false"-->
+                                                <!--                                                                       update="messages-global-form-->
+                                                <!--                                                                       event-list-form-->
+                                                <!--                                                                       event-search-log-form"/>-->
 
-<!--                                                </div>-->
+                                                <!--                                                </div>-->
                                             </div>
                                         </div>
                                     </h:form>
 
                                     <h:form id="event-list-form">
-<!--                                        <h:outputText id="event-list-info-ot-0"-->
-<!--                                                      rendered="!{!(empty eventsBB.querySelected.BOBResultList)}"-->
-<!--                                                      value="showing !{eventsBB.querySelected.BOBResultList.size()} events" -->
-<!--                                                      style="font-style: italic"/>-->
-<!--                                        <h:outputText id="event-list-info-ot-1"-->
-<!--                                                      rendered="!{eventsBB.querySelected.queryExecuted}"-->
-<!--                                                      value=" | query executed at !{eventsBB.querySelected.executionTimestampPretty} " -->
-<!--                                                      style="font-style: italic"/>-->
+                                        <!--                                        <h:outputText id="event-list-info-ot-0"-->
+                                        <!--                                                      rendered="!{!(empty eventsBB.querySelected.BOBResultList)}"-->
+                                        <!--                                                      value="showing !{eventsBB.querySelected.BOBResultList.size()} events" -->
+                                        <!--                                                      style="font-style: italic"/>-->
+                                        <!--                                        <h:outputText id="event-list-info-ot-1"-->
+                                        <!--                                                      rendered="!{eventsBB.querySelected.queryExecuted}"-->
+                                        <!--                                                      value=" | query executed at !{eventsBB.querySelected.executionTimestampPretty} " -->
+                                        <!--                                                      style="font-style: italic"/>-->
 
                                         <p:dataTable
                                             id="events-table"
@@ -156,7 +156,7 @@
                                                     <h:outputText value="#{e.category.eventType.label}: #{e.category.eventCategoryTitle}"
                                                                   style="font-weight: bold;"/>
                                                     <p:spacer height="5px" />
-<!--                                                    <h:outputText value="!{e.property.address} (!{e.property.muni.muniName}): Case ID: !{e.cecase.caseID}"/>-->
+                                                    <!--                                                    <h:outputText value="!{e.property.address} (!{e.property.muni.muniName}): Case ID: !{e.cecase.caseID}"/>-->
                                                 </div>
                                             </p:column>
 
@@ -165,9 +165,9 @@
                                                     <h:outputText value="Date" />
                                                 </f:facet>
                                                 <div class="rowExpansion">
-                                                    <h:outputText value="#{e.timeStartPretty}"/>
+                                                    <h:outputText value="#{missionControlBB.getPrettyDate(e.timeStart)}"/>
                                                     <p:spacer height="2px" />
-                                                    <h:outputText value="#{e.computeEventDurationMins()} mins"/>
+                                                    <h:outputText value="#{e.duration} mins"/>
                                                 </div>
                                             </p:column>
 
@@ -192,53 +192,55 @@
 
 
                                         </p:dataTable>
-<!--                                        <div class="ui-g data_container_nested_restrict">-->
+                                        <!--                                        <div class="ui-g data_container_nested_restrict">-->
 
-<!--                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">-->
+                                        <!--                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">-->
 
-<!--                                                <div class="restrict-data-field-label-inline" >-->
-<!--                                                    <h:outputLabel  for="event-viewoptions-som">-->
-<!--                                                        <h:outputText value="Filter" />-->
-<!--                                                    </h:outputLabel>-->
-<!--                                                </div>-->
-<!--                                                <div class="restrict-data-field-value-inline" >-->
+                                        <!--                                                <div class="restrict-data-field-label-inline" >-->
+                                        <!--                                                    <h:outputLabel  for="event-viewoptions-som">-->
+                                        <!--                                                        <h:outputText value="Filter" />-->
+                                        <!--                                                    </h:outputLabel>-->
+                                        <!--                                                </div>-->
+                                        <!--                                                <div class="restrict-data-field-value-inline" >-->
 
-<!--                                                    <p:selectOneMenu    id="event-viewoptions-som"-->
-<!--                                                                        value="!{eventsBB.selectedEventView}"-->
-<!--                                                                        tabindex="10">-->
+                                        <!--                                                    <p:selectOneMenu    id="event-viewoptions-som"-->
+                                        <!--                                                                        value="!{eventsBB.selectedEventView}"-->
+                                        <!--                                                                        tabindex="10">-->
 
-<!--                                                        <f:selectItems  id="event-viewoptions-selitems"-->
-<!--                                                                        value="!{eventsBB.eventsViewOptionsCandidates}"-->
-<!--                                                                        var="vo"-->
-<!--                                                                        itemValue="#{vo}"-->
-<!--                                                                        itemLabel="#{vo.label}"/>-->
-<!--                                                        <p:ajax update="events-table"-->
-<!--                                                                immediate="true"/>-->
-<!--                                                    </p:selectOneMenu>-->
-<!--                                                </div>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
+                                        <!--                                                        <f:selectItems  id="event-viewoptions-selitems"-->
+                                        <!--                                                                        value="!{eventsBB.eventsViewOptionsCandidates}"-->
+                                        <!--                                                                        var="vo"-->
+                                        <!--                                                                        itemValue="#{vo}"-->
+                                        <!--                                                                        itemLabel="#{vo.label}"/>-->
+                                        <!--                                                        <p:ajax update="events-table"-->
+                                        <!--                                                                immediate="true"/>-->
+                                        <!--                                                    </p:selectOneMenu>-->
+                                        <!--                                                </div>-->
+                                        <!--                                            </div>-->
+                                        <!--                                        </div>-->
                                     </h:form>
                                 </p:panel>
 
-<!--                                <p:panel  id="event-search-log-panel"-->
-<!--                                          toggleable="true"-->
-<!--                                          widgetVar="event-search-log-panel-var"-->
-<!--                                          collapsed="true"-->
-<!--                                          style="width:100%;"-->
-<!--                                          header="Query log">-->
+                                <!--                                <p:panel  id="event-search-log-panel"-->
+                                <!--                                          toggleable="true"-->
+                                <!--                                          widgetVar="event-search-log-panel-var"-->
+                                <!--                                          collapsed="true"-->
+                                <!--                                          style="width:100%;"-->
+                                <!--                                          header="Query log">-->
 
-<!--                                    <h:form id="event-search-log-form">-->
-<!--                                        <div class='search-query-desc'>-->
-<!--                                            <h:outputText id="event-search-log-ot" -->
-<!--                                                          value="!{eventsBB.querySelected.queryLog}"-->
-<!--                                                          escape="false"/>-->
-<!--                                        </div>-->
-<!--                                    </h:form>-->
-<!--                                </p:panel>-->
-<!--                                -->
-                                
-                                
+                                <!--                                    <h:form id="event-search-log-form">-->
+                                <!--                                        <div class='search-query-desc'>-->
+                                <!--                                            <h:outputText id="event-search-log-ot" -->
+                                <!--                                                          value="!{eventsBB.querySelected.queryLog}"-->
+                                <!--                                                          escape="false"/>-->
+                                <!--                                        </div>-->
+                                <!--                                    </h:form>-->
+                                <!--                                </p:panel>-->
+                                <!--                                -->
+
+                                <ui:include src="cogstaff/occ/compositions/occPeriodListSearch.xhtml"/>
+
+
                                 <p:panel  id="event-future-list-panel"
                                           toggleable="true"
                                           widgetVar="event-future-list-panel-var"
@@ -275,7 +277,7 @@
                                                     <h:outputText value="#{ef.category.eventType.label}: #{ef.category.eventCategoryTitle}"
                                                                   style="font-weight: bold;"/>
                                                     <p:spacer height="5px" />
-                                                    <h:outputText value="#{ef.property.address} (#{ef.property.muni.muniName}): Case ID: #{ef.cecase.caseID}"/>
+                                                    <h:outputText value="#{ef.property.addressString} (#{ef.property.muni.muniName}): Case ID: #{ef.cecase.caseID}"/>
                                                 </div>
                                             </p:column>
 
@@ -284,9 +286,9 @@
                                                     <h:outputText value="Date" />
                                                 </f:facet>
                                                 <div class="rowExpansion">
-                                                    <h:outputText value="#{ef.timeStartPretty}"/>
+                                                    <h:outputText value="#{missionControlBB.getPrettyDate(ef.timeStart)}"/>
                                                     <p:spacer height="2px" />
-                                                    <h:outputText value="#{ef.computeEventDurationMins()} mins"/>
+                                                    <h:outputText value="#{ef.duration} mins"/>
                                                 </div>
                                             </p:column>
 
@@ -310,283 +312,9 @@
 
                                         </p:dataTable>
                                     </h:form>
-                                
+
                                 </p:panel>
 
-                                <p:panel id="prop-search-query-panel"
-                                         toggleable="true"
-                                         widgetVar="prop-search-query-panel-var"
-                                         collapsed="false"
-                                         style="width:100%;"
-                                         header="Property Search"
-                                         rendered="true">
-
-                                    <!--MESSAGES -->
-                                    <h:form id="prop-search-messages-form">
-                                        <p:growl id="prop-search-messages" showDetail="false"/>
-                                    </h:form>
-                                    
-                                    <h:form id="prop-pie-form">
-                                        
-                                        <p:pieChart id="pie-property"
-                                                    model="#{missionControlBB.pieProperty}" />
-                                    </h:form>
-
-                                    <h:form id="prop-search-query-form">
-
-                                        <!-- NESTED DATA CONTAINER -->
-                                        <div class="ui-g data_container_nested_restrict">
-
-                                            <!--NESTED DATA FIELD GRID:12-->
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                                <!-- NESTED DATA TITLE -->
-                                                <div class="restrict-main-contents-io-title">
-                                                    <h:outputLabel value="Select Type of Search"
-                                                                   for="prop-search-query-som" 
-                                                                   />
-                                                </div>
-                                                <!-- NESTED DATA CONTENT -->
-                                                <div class="restrict-main-contents-io-content">
-                                                    <p:selectOneMenu id="prop-search-query-som"
-                                                                     tabindex="1"
-                                                                     value="#{propertySearchBB.querySelected}"
-                                                                     style="width: 100%"
-                                                                     >
-                                                        <f:converter converterId="bOBQueryConverter"/>
-
-                                                        <f:selectItem itemLabel="select one..."
-                                                                      noSelectionOption="true"
-                                                                      itemDisabled="true"
-                                                                      />
-                                                        <f:selectItems id="prop-search-query-si"
-                                                                       value="#{propertySearchBB.queryList}"
-                                                                       var="ql"
-                                                                       itemValue="#{ql}"
-                                                                       itemLabel="#{ql.queryTitle}" 
-                                                                       />
-                                                        <p:ajax update="prop-search-filter-addr-val-0
-                                                                @form
-                                                                prop-search-messages-form"
-                                                                listener="#{propertySearchBB.changeQuerySelected}"
-                                                                />
-                                                    </p:selectOneMenu>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- NESTED DATA CONTAINER -->
-                                        <div class="ui-g data_container_nested_restrict">
-
-                                            <!-- NESTED DATA FIELD GRID:12-->
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                                <!-- NESTED DATA TITLE -->
-                                                <div class="restrict-main-contents-io-title">
-                                                    <h:outputLabel value="Enter Search Criteria"
-                                                                   for="cears-query-desc-ot" />
-                                                    <div class="restrict-main-contents-io-link">
-                                                        <p:commandLink id="prop-search-advanced-button"
-                                                                       ajax="true"
-                                                                       actionListener="#{propertySearchBB.onAdvancedSearchButtonChange}"
-                                                                       oncomplete="PF('prop-search-advanced-var').show()"
-                                                                       rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                                       value="Advanced search"
-                                                                       />
-
-                                                    </div>
-                                                </div>
-
-                                                <!-- NESTED DATA CONTENT -->
-                                                <div class="restrict-main-contents-io-content">
-                                                    <p:inputText id="prop-search-filter-addr-val-0"
-                                                                 value="#{propertySearchBB.searchParamsSelected.address_val}"
-                                                                 style="width: 100%;"
-                                                                 tabindex="2"
-                                                                 disabled="#{!propertySearchBB.searchParamsSelected.address_ctl}"
-                                                                 required="false"
-                                                                 styleClass="data_field_value"
-                                                                 placeholder="#{propertySearchBB.querySelected.queryName.desc}"
-                                                                 />
-
-                                                    <p:message for="prop-search-filter-addr-val-0" showDetail="false" showSummary="true"/>
-                                                </div>
-
-                                                <!-- NESTED DATA FILTER -->
-                                                <div class="restrict-main-contents-io-filter">
-
-                                                    <p:selectBooleanCheckbox class="checkbox"
-                                                                             id="prop-search-filter-addr-ctl-0"
-                                                                             value="#{propertySearchBB.searchParamsSelected.address_ctl}" >
-                                                        <p:ajax update="prop-search-filter-addr-val-0"/>
-                                                    </p:selectBooleanCheckbox>
-
-                                                    <p:outputLabel for="prop-search-filter-addr-ctl-0" 
-                                                                   value="Filter by street/number"
-                                                                   />
-                                                </div>
-
-                                                <!-- NESTED DATA FILTER -->
-                                                <div class="restrict-main-contents-io-filter">
-
-                                                    <p:selectBooleanCheckbox class="checkbox"
-                                                                             id="prop-search-appendresults-chkbox-0"
-                                                                             value="#{propertySearchBB.appendResultsToList}"
-                                                                             disabled="false" />
-
-                                                    <p:outputLabel for="prop-search-appendresults-chkbox-0"
-                                                                   value="Add to results below"
-                                                                   />
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- NESTED DATA CONTAINER -->
-                                        <div class="ui-g data_container_nested_restrict">
-
-                                            <!--NESTED DATA FIELD GRID:12-->
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                                <!-- NESTED DATA BUTTON -->
-                                                <div class="restrict-main-contents-io-button">
-                                                    <p:commandButton id="prop-search-exec-cb-0"
-                                                                     ajax="true"
-                                                                     actionListener="#{propertySearchBB.executeQuery}"
-                                                                     icon="fa fa-search"
-                                                                     value="Search"
-                                                                     style="width: 100%"
-                                                                     disabled="#{propertySearchBB.querySelected.queryExecuted}"
-                                                                     update=" 
-                                                                     @form
-                                                                     messages-global-form
-                                                                     prop-search-messages-form
-                                                                     prop-search-log-form
-                                                                     prop-search-results-panel
-                                                                     prop-search-clear-cb-0"/>
-
-                                                </div>
-
-                                                <!-- NESTED DATA GRAY BUTTON -->
-                                                <div class="restrict-main-contents-io-button gray_button">
-                                                    <p:commandButton id="prop-search-clear-cb-0"
-                                                                     ajax="true"
-                                                                     actionListener="#{propertySearchBB.resetQuery}"
-                                                                     icon="fa fa-eraser"
-                                                                     value="Clear"
-                                                                     style="width: 100%"
-                                                                     disabled="#{!propertySearchBB.querySelected.queryExecuted}"
-                                                                     update=" prop-search-messages-form
-                                                                     prop-search-log-form
-                                                                     prop-search-results-panel
-                                                                     @form
-                                                                     prop-search-query-form"/>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </h:form>
-                                </p:panel>
-
-                                <!-- PANEL CONTAINER -->
-                                <p:panel id="prop-search-results-panel"
-                                         toggleable="true"
-                                         widgetVar="prop-search-query-panel-var"
-                                         collapsed="false"
-                                         style="width:100%;"
-                                         header="Property Search Results"
-                                         rendered="true">
-
-
-                                    <h:form id="prop-search-results-form">
-
-                                        <!-- NESTED DATA CONTAINER -->
-                                        <div class="ui-g data_container_nested_restrict">
-
-                                            <!--NESTED DATA FIELD GRID:12-->
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
-                                                <!-- NESTED DATA BUTTON -->
-                                                <div class="restrict-main-contents-io-button gray_button">
-                                                    <p:commandButton id="prop-search-results-clear"
-                                                                     ajax="true"
-                                                                     actionListener="#{propertySearchBB.clearPropertyList}"
-                                                                     icon="fa fa-eraser"
-                                                                     style="width: 100%"
-                                                                     value="Clear Results "
-                                                                     update=" prop-search-messages-form
-                                                                     prop-search-results-form"/>
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <p:dataTable id="prop-search-results-table"
-                                                     var="prop"
-                                                     value="#{propertySearchBB.propListMaster}"
-                                                     rowKey="#{prop.propertyID}"
-                                                     tableStyleClass="primeDataTable"
-                                                     draggableRows="false"
-                                                     draggableColumns="true"
-                                                     tabindex="6"
-                                                     >
-
-                                            <p:column width="10%;" style="text-align: center">
-                                                <f:facet name="header">
-                                                    <h:outputText value="ID"/>
-                                                </f:facet>
-                                                <h:outputText value="#{prop.propertyID}" />
-                                            </p:column>
-
-                                            <p:column width="35%" style="text-align: center">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Address"/>
-                                                </f:facet>
-                                                <h:outputText value="#{prop.address}" />
-                                            </p:column>
-
-                                            <p:column width="35%" style="text-align: center">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Municipality" />
-                                                </f:facet>
-                                                <h:outputText value="#{prop.muni.muniName}"/>
-                                            </p:column>
-
-                                            <p:column width="20%" style="text-align: center">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Actions"/>
-                                                </f:facet>
-                                                <div class="gray_button">
-                                                    <p:commandButton id="prop-search-loadprop-button"
-                                                                     icon="fa fa-folder-open-o"
-                                                                     value="Details"
-                                                                     action="#{missionControlBB.onViewPropertyButtonChange(prop)}"
-                                                                     ajax="false"
-                                                                     />
-                                                </div>
-                                            </p:column>
-                                        </p:dataTable>
-                                    </h:form>
-                                </p:panel>
-
-
-
-                                <p:panel  id="prop-search-log-panel"
-                                          toggleable="true"
-                                          widgetVar="prop-search-log-panel-var"
-                                          collapsed="true"
-                                          style="width:100%;"
-                                          header="Property Query log"
-                                          rendered="true">
-
-                                    <h:form id="prop-search-log-form">
-                                        <div class='search-query-desc'>
-                                            <h:outputText id="prop-search-log-ot"
-                                                          value="#{propertySearchBB.querySelected.queryLog}"
-                                                          escape="false"/>
-                                        </div>
-                                    </h:form>
-                                </p:panel>
 
 
 
@@ -607,12 +335,12 @@
                                         <div class="restrict-main-contents-help-link">
                                             <a href="https://technologyrediscovery.github.io/codenforce/dashboard/caselistbuilder"
                                                target="_blank">
-                                               <i class="material-icons status-display-icon-i">help_outline</i>
+                                                <i class="material-icons status-display-icon-i">help_outline</i>
                                             </a>
                                         </div>
                                     </h:form>
-                                     
-                                    
+
+
                                     <h:form id="cecase-search-form">
 
                                         <h:outputLabel styleClass="bold" 
@@ -693,7 +421,7 @@
                                                            value="load case history" 
                                                            update="messages-global-form
                                                            cecase-search-results-form"/>
-                                        
+
                                         <p:commandButton   id="cecase-export-excel-button" 
                                                            ajax="false" 
                                                            icon="fa fa-file-text-o" 
@@ -732,11 +460,12 @@
                                             value="#{ceCaseSearchProfileBB.caseList}"
                                             tableStyleClass="primeDataTable">
 
-                                            <p:column width="5%" sortBy="#{c.caseID}">
+                                            <p:column width="10%" sortBy="#{c.caseManager.human.name}"
+                                                      filterBy="#{c.caseManager.human.name}">
                                                 <f:facet name="header">
-                                                    <h:outputText value="ID" />
+                                                    <h:outputText value="Manager" />
                                                 </f:facet>
-                                                <h:outputText value="#{c.caseID}"/>
+                                                <h:outputText value="#{c.caseManager.human.name}"/>
                                             </p:column>
                                             <p:column width="10%" sortBy="#{c.originationDate}">
                                                 <f:facet name="header">
@@ -748,11 +477,12 @@
                                                               style="font-style: italic"/>
 
                                             </p:column>
-                                            <p:column width="12%" sortBy="#{c.property.address}">
+                                            <p:column width="15%" sortBy="#{c.property.address.buildingNo}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Property" />
                                                 </f:facet>
-                                                <h:outputText value="#{c.property.address} "/>
+                                                <h:outputText value="#{c.property.address.addressPretty2LineEscapeFalse} "
+                                                              escape="false"/>
                                                 <p:spacer height="2px"/>
                                                 <h:outputText value=" (#{c.property.muni.muniName})"/>
                                             </p:column>
@@ -769,18 +499,23 @@
                                                 <div class="#{c.statusBundle.phaseIcon.styleClass}">
                                                     <i class="material-icons status-display-icon-i"><h:outputText value="#{c.statusBundle.phaseIcon.materialIcon}"/></i>
                                                 </div>
+                                                <p:spacer height="1px" />
+                                                <h:outputText value="#{c.statusBundle.phase.caseStage.label}" style="font-size:0.7em;" />
+
                                             </p:column>
                                             <p:column width="8%">
                                                 <f:facet name="header">
                                                     <h:outputText value="Actions" />
                                                 </f:facet>
-                                                
+
                                                 <div class="restrict-main-contents-io-link">
 
-                                                        <p:commandLink  id="cecase-search-view-case"
-                                                                        value="view"
-                                                                        action="#{navigationBB.onCECaseListItemSelect(c)}"
-                                                                        ajax="false"/>
+                                                    <p:commandLink  id="cecase-search-view-case"
+                                                                    value="view"
+                                                                    action="#{navigationBB.onCECaseListItemSelect(c)}"
+                                                                    ajax="false"/>
+                                                    <p:spacer height="3px" />
+                                                    <h:outputText value="ID #{c.caseID}" />
 
                                                 </div>
                                             </p:column>
@@ -843,7 +578,7 @@
                                                 <p:column headerText="Address"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{r.requestProperty.address}"/>
+                                                    <h:outputText value="#{r.requestProperty.addressString}"/>
 
                                                 </p:column>
 
@@ -996,14 +731,15 @@
                                 widgetVar="cecase-list-report-dialog-var"
                                 closable="true" 
                                 responsive="true"
+                                header="Configure Code Enforcement Case List Report"
                                 >
 
                         <h:form id="cecase-list-report-form">
 
                             <div class="ui-g data_container_nested_restrict">
-                            
+
                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                                    
+
 
                                     <h:outputLabel for="report-caselist-profile-title-it" value="Report title"/>
 
@@ -1013,52 +749,49 @@
                                     <p:spacer height="5px"/>
                                     <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
 
-                                    <p:spacer height="5px"/>
+                                  
 
-                                    <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCaseNames}" />
+                                    <p:spacer height="5px" />
+                                    <p:outputLabel for="cecase-list-report-date-start-cal" 
+                                                   value="start date"/>
 
-
-                                            <p:outputLabel for="cecase-list-report-date-start-cal" 
-                                                           value="start date"/>
-
-                                            <p:spacer height="1px" />
-
-                                            <p:calendar id="cecase-list-report-date-start-cal" 
-                                                        value="#{ceCaseSearchProfileBB.reportCECaseList.startDate_val_utilDate}" 
-                                                        disabled="false"
-                                                        mode="popup" 
-                                                        showOn="button" 
-                                                        pattern="EEE, dd MMM, yyyy"
-                                                        navigator="true" 
-                                                        tabindex="16" 
-                                                        timeInput="true" 
-                                                        showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                                        showButtonPanel="true" 
-                                                        showTodayButton="true"
-                                                        required="true"/>
+                                    <p:spacer height="1px" />
+                                    <p:datePicker 	 id="cecase-list-report-date-start-cal" 
+                                                    value="#{ceCaseSearchProfileBB.reportCECaseList.date_start_val}" 
+                                                    rendered="true"
+                                                    style="width: 100%;"
+                                                    pattern="MM/dd/yyyy HH:mm"
+                                                    disabled="false"
+                                                    hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                                    showButtonBar="true"
+                                                    mask="true"
+                                                    timeInput="true" 
+                                                    required="true" />
 
 
 
-                                            <p:outputLabel for="cecase-list-report-date-end-cal" 
-                                                           value="end date"/>
 
-                                            <p:spacer height="1px" />
 
-                                            <p:calendar id="cecase-list-report-date-end-cal" 
-                                                        value="#{ceCaseSearchProfileBB.reportCECaseList.endDate_val_utilDate}" 
-                                                        disabled="false"
-                                                        mode="popup" 
-                                                        showOn="button" 
-                                                        pattern="EEE, dd MMM, yyyy"
-                                                        navigator="true" 
-                                                        tabindex="16" 
-                                                        timeInput="true" 
-                                                        showHour="false" showMinute="false" showSecond="false" showMillisec="false"
-                                                        showButtonPanel="true" 
-                                                        showTodayButton="true"
-                                                        required="true"/>
+                                    <p:outputLabel for="cecase-list-report-date-end-cal" 
+                                                   value="end date"/>
 
+                                    <p:spacer height="1px" />
+
+                                    <p:datePicker 	 id="cecase-list-report-date-end-cal" 
+                                                    value="#{ceCaseSearchProfileBB.reportCECaseList.date_end_val}" 
+                                                    rendered="true"
+                                                    style="width: 100%;"
+                                                    pattern="MM/dd/yyyy HH:mm"
+                                                    disabled="false"
+                                                    hideOnDateTimeSelect="true"
+                                              showOnFocus="false"
+                                              showIcon="true"
+                                                    showButtonBar="true"
+                                                    mask="true"
+                                                    timeInput="true" 
+                                                    required="true" />
 
 
                                     <h:outputLabel for="report-caselist-notes-ita" value="Notes"/>
@@ -1066,41 +799,60 @@
                                     <p:inputText id="report-caselist-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchProfileBB.reportCECaseList.notes}"/>
                                 </div>
                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                                    
+
 
                                     <h3>Additional case list report options</h3>
+                                    <div class="p-grid">
+                                        <div class="p-col">
+                                                <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCaseNames}" />
 
-                                    <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeListSummaryFigures}" />
+                                                <p:spacer height="5px"/>
 
-                                    <p:spacer height="5px"/>
+                                                <h:outputLabel class="bold" value="Include street level summary" for="report-caselist-streetsummary-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-streetsummary-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeStreetLevelSummary}" />
 
-                                    <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeViolationList}" />
+                                                <p:spacer height="5px"/>
 
-                                    <p:spacer height="5px"/>
+                                                <h:outputLabel class="bold" value="Include case status pie" for="report-caselist-casestatus-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-casestatus-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeCECaseStatusPie}" />
 
-                                    <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
-                                    <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeEventSummaryByCase}" />
+                                                <p:spacer height="5px"/>
 
-                                    <p:spacer height="5px"/>
+                                                <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeListSummaryFigures}" />
 
-                                    <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
-                                    <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchProfileBB.reportCECaseList.includeExtendedPropertyDetails}" />
+                                        </div>
+                                        <div class="p-col">
+                                                <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeViolationList}" />
 
+                                                <p:spacer height="5px"/>
 
+                                                <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
+                                                <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchProfileBB.reportCECaseList.includeEventSummaryByCase}" />
+
+                                                <p:spacer height="5px"/>
+
+                                                <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
+                                                <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchProfileBB.reportCECaseList.includeExtendedPropertyDetails}" />
+
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                                     <div class="restrict-main-contents-io-link">
+                                        <h2>
 
-                                        <p:commandLink  ajax="false" 
-                                                        action="#{ceCaseSearchProfileBB.generateReportCECaseList}"
-                                                        value="Click to generate report in new tab" 
-                                                        target="_blank"
-                                                        styleClass="font-size:2em;"
-                                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                        />
+                                            <p:commandLink  ajax="false" 
+                                                            action="#{ceCaseSearchProfileBB.generateReportCECaseList}"
+                                                            value="Click to generate report in new tab" 
+                                                            target="_blank"
+                                                            styleClass="font-size:2em;"
+                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                                            />
+                                        </h2>
                                     </div>
                                     <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                                         <div class="ui-button gray_button">

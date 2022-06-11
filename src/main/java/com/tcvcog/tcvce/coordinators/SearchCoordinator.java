@@ -17,8 +17,9 @@ import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.Human;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonType;
+import com.tcvcog.tcvce.entities.MailingCityStateZip;
+import com.tcvcog.tcvce.entities.MailingCityStateZipDefaultTypeEnum;
+import com.tcvcog.tcvce.entities.MailingCityStateZipRecordTypeEnum;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -32,16 +33,14 @@ import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
- *
+ * The home for all search infrastructure! Organized by method family;
+ * Families in no particular order
  * @author sylvia
  */
 public class SearchCoordinator extends BackingBeanUtils implements Serializable{
@@ -59,6 +58,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
     private static final long DAYS_IN_WEEK = 7;
     private static final long HOURS_IN_DAY = 24;
+    
+    private static final int MIN_ZIP_LENGTH = 3;
     
     
     
@@ -400,6 +401,52 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return q;
     }
     
+    /**
+     * The single entry point for queries against the mailingcitystatezip
+     * table. Since this is not custom data, the restrictions are limited
+     * for this data. Let all zip data roam free across the land.
+     * @param q
+     * @return 
+     */
+    public QueryMailingCityStateZip runQuery(QueryMailingCityStateZip q) throws SearchException{
+        PropertyIntegrator pi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        if(q == null){
+            return null;
+        }
+        
+        prepareQueryForRun(q);
+
+        List<SearchParamsMailingCityStateZip> paramsList = q.getParamsList();
+        List<MailingCityStateZip> mcszTempList = new ArrayList<>();
+        
+        for(SearchParamsMailingCityStateZip sp: paramsList){
+            mcszTempList.clear();
+                try {
+                    if(sp.isZip_ctl()){
+                        if(sp.getZip_val() == null){
+                            throw new SearchException("Cannot search for zip by zip with null zip");
+                        }
+                        if(sp.getZip_val().length() < MIN_ZIP_LENGTH){
+                            throw new SearchException("Zip code must be 4 or more digits");
+                        }
+                    }
+                    for(Integer i: pi.searchForMailingCityStateZip(sp)){
+                            mcszTempList.add(pc.getMailingCityStateZip(i));
+                    }
+                } catch (IntegrationException | BObStatusException ex) {
+                    System.out.println(ex);
+                    throw new SearchException("Integration error when querying ZIP Codes!");
+                }
+            q.addToResults(mcszTempList);
+            q.appendToQueryLog(sp);
+        }
+        postRunConfigureQuery(q);
+        return q;
+        
+    }
+    
 //    --------------------------------------------------------------------------
 //    ***************************** UTILITIES **********************************
 //    --------------------------------------------------------------------------
@@ -445,9 +492,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * whose subclasses are passed to the searchForXXX(SearchParamsXXX params) method family spread across the
      * main Integrators. We remove duplication of building these shared search criteria across all 6 searchable
      * BOBs as of the beta: Property, Person, Event, OccPeriod, CECase, and CEActionRequest
+     * 
      * @param params
      * @param muniDBField
-     * @param activeField
+     * @param activeField This method works with both legacy active boolean fields 
+     * and deactivatedts fields. This method distinguishes between them by 
+     * asking the activeField if it contains the letters 'ts'
      * @return the configured apram for      */
     public SearchParams assembleBObSearchSQL_muniDatesUserActive(   SearchParams params, 
                                                                     String muniDBField,
@@ -522,17 +572,36 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             // ****************************
             // **         ACTIVE         **
             // **************************** 
+            
             if(params.isActive_ctl()){
-                    params.appendSQL("AND ");
-                    if(activeField == null){
-                        params.appendSQL("active");
-                    } else {
-                        params.appendSQL(activeField);
-                    }
-                if(params.isActive_val()){
-                    params.appendSQL(" = TRUE ");
+                params.appendSQL("AND ");
+                boolean tsnull = false;
+            // later database tables used a timestamp for deactivation
+            // as the method of marking a record as not active
+            // but earlier tables just used a boolean active flag
+            // so this logic adapts to both versions of the tables
+            // simply by examining the name of the active field as
+            // reported by the integrator method sending in the params
+                if(activeField != null){
+                    tsnull = activeField.contains("ts");
+                }
+                if(activeField == null){
+                    params.appendSQL("active");
                 } else {
-                    params.appendSQL(" = FALSE ");
+                    params.appendSQL(activeField);
+                }
+                if(params.isActive_val()){
+                    if(tsnull){
+                        params.appendSQL(" IS NULL ");
+                    } else {
+                        params.appendSQL(" = TRUE ");
+                    }
+                } else {
+                    if(tsnull){
+                        params.appendSQL(" IS NOT NULL ");
+                    } else {
+                        params.appendSQL(" = FALSE ");
+                    }
                 }
             } 
         
@@ -567,7 +636,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
 
             if(params instanceof SearchParamsProperty){
 //                SearchParamsProperty temp = (SearchParamsProperty) params;
-//                temp.setAddress_val(temp.getAddress_val().replaceAll(" ", "%"));
+//                temp.setAddress_bldgNum_val(temp.getAddress_bldgNum_val().replaceAll(" ", "%"));
 //                params = temp;
                 
             }
@@ -718,16 +787,38 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          
          
          switch(qName){
-            case OPENCECASES_OCCPERIODSINPROCESS:
+            case ADDRESS_BLDG_NUM_ONLY:
+                paramsList.add(genParams_property_address_bldgOnly(params, cred));
+                break;
+            case ADDRESS_STREET_ONLY:
+                paramsList.add(genParams_property_address_streetOnly(params, cred));
+                break;
+            case ADDRESS_BLDGANDSTREET:
+                paramsList.add(genParams_property_address_streetAndBldgNum(params, cred));
+                break;
+            case PARCELID:
+                paramsList.add(genParams_property_parcelID(params, cred));
+                break;
+            case LOTANDBLOCK:
+                paramsList.add(genParams_property_lotAndBlock(params, cred));
+                break;
+            case RECORD_SOURCE:
+                paramsList.add(genParams_property_recordSource(params, cred));
+                break;
+            case LAND_BANK_HELD:
+                paramsList.add(genParams_property_landBankHeld(params, cred));
+                break;
+            case NON_ADDRESSABLE:
+                paramsList.add(genParams_property_nonAddressable(params, cred));
+                break;
+            case UPDATED_PAST_MONTH:
                 paramsList.add(genParams_property_recentlyUpdated(params, cred));
                 break;
-            case HOUSESTREETNUM:
-                paramsList.add(genParams_property_address(params, cred));
-                break;
-            case PERSONS:
-                paramsList.add(genParams_property_persons(params, cred));
+            case PARCELINTERNALID:
+                paramsList.add(genParams_property_internalID(params, cred));
                 break;
             case CUSTOM:
+                paramsList.add(genParams_property_custom(params, cred));
                 break;
          }
          query = new QueryProperty(qName, paramsList, cred);
@@ -749,25 +840,34 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          QueryPerson  query;
          List<SearchParamsPerson> paramsList = new ArrayList<>();
          SearchParamsPerson params = genParams_person_initParams(cred);
+         // humans don't have a muni link in the sense of other objects
+         params.setMuni_ctl(false);
          
          
          switch(qName){
-            case ACTIVE_PERSONS:
-                paramsList.add(generateParams_persons_active(params, cred));
-                break;
-            case USER_PERSONS:
-                paramsList.add(generateParams_persons_users(params, cred));
-                break;
-            case PROPERTY_PERSONS:
-                paramsList.add(generateParams_person_prop(params, cred));
-                break;
-            case OCCPERIOD_PERSONS:
-                paramsList.add(generateParams_persons_occPeriod(params, cred));
-                break;
             case PERSON_NAME:
                 paramsList.add(generateParams_persons_name(params, cred));
                 break;
-                
+            case PHONE:
+                paramsList.add(generateParams_persons_phone(params, cred));
+                break;
+            case EMAIL:
+                paramsList.add(generateParams_persons_email(params, cred));
+                break;
+            case BUSINESSES:
+                paramsList.add(generateParams_persons_business(params, cred));
+                break;
+            case MINORS_ONLY:
+                paramsList.add(generateParams_persons_minors(params, cred));
+                break;
+            case MULIT_HUMANS:
+                paramsList.add(generateParams_persons_multiHuman(params, cred));
+                break;
+            case JOB_TITLE:
+                paramsList.add(generateParams_persons_jobTitle(params, cred));
+            case CUSTOM:
+                paramsList.add(params);
+                break;
          }
          
          query = new QueryPerson(qName, paramsList, cred);
@@ -1044,6 +1144,44 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return (QueryCEAR) initQueryFinalizeInit(query);
     }
     
+    /**
+     * Container for query initialization logic based on the given Enum val
+     * for this method's associated Query subclass. Delegates configuration of
+     * filter-level settings on parameter objects to methods grouped later in this
+     * class prefixed by genParams_XXXX
+     * 
+     * @param qName
+     * @param cred
+     * @return the initialized query
+     */
+    public QueryMailingCityStateZip initQuery(QueryMailingCityStateZipEnum qName, Credential cred) {
+        QueryMailingCityStateZip query = null;
+        List<SearchParamsMailingCityStateZip> paramList = new ArrayList<>();
+        SearchParamsMailingCityStateZip params = generateParams_MCSZ_init();
+              
+        switch(qName){
+            case ALL_RECORDS_BY_ZIPCODE:
+                paramList.add(generateParams_MCSZ_allRecordsByZip(params));
+                break;
+            case DEFAULT_RECORD_BY_ZIPCODE:
+                paramList.add(generateParams_MCSZ_defaultCityByZip(params));
+                break;
+            case VALID_RECORDS_BY_ZIPCODE:
+                paramList.add(generateParams_MCSZ_validByZip(params));
+                break;
+            case ZIPCODES_BY_CITY_AND_STATE:
+                paramList.add(generateParams_MCSZ_zipByCityState(params));
+                break;
+            default:
+                break;
+        }
+        
+        query = new QueryMailingCityStateZip(qName, paramList, cred);
+        return (QueryMailingCityStateZip) initQueryFinalizeInit(query);
+        
+        
+    }
+    
     
     
 //    --------------------------------------------------------------------------
@@ -1211,6 +1349,25 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return queryList;
     }
     
+    /**
+     * Assembles a list of possible queries against our city/state/zip table
+     * @param cred
+     * @return All possible queries
+     */
+    public List<QueryMailingCityStateZip> buildQueryMailingCityStateZipList(Credential cred){
+        
+        QueryMailingCityStateZipEnum[] nameArray = QueryMailingCityStateZipEnum.values();
+        List<QueryMailingCityStateZip> queryList = new ArrayList<>();
+        for(QueryMailingCityStateZipEnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+                queryList.add(initQuery(queryTitle, cred));
+            }
+        }
+        return queryList;
+        
+        
+    }
+    
     
 //    --------------------------------------------------------------------------
 //    ***************************** PARAM GENERATORS ***************************
@@ -1231,6 +1388,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setMuni_rtMin(RoleType.Developer);
         params.setMuni_ctl(true);
         params.setMuni_val(cred.getGoverningAuthPeriod().getMuni());
+        
         
         // Shared param #2
         params.setDate_startEnd_ctl(false);
@@ -1261,6 +1419,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setLimitResultCount_val(RESULT_COUNT_LIMIT_DEFAULT);
 
         // Shared param #7
+        // we by default only want active records
         params.setActive_rtMin(RoleType.MuniStaff);
         params.setActive_ctl(true);
         params.setActive_val(true);
@@ -1290,25 +1449,25 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         // ********* PROPERTY-SPECIFIC PARAMETERS *********
         // ------------------------------------------------
         
-        // Param #PROP-1
-        params.setZip_ctl(false);
-        params.setZip_val(null);
-        
-        // Param #PROP-2
+        // Param #PROP-1: LOB
         params.setLotblock_ctl(false);
-        params.setLotblock_val(null);
+        params.setLotblock_val_num1(null);
         
-        // Param #PROP-3
+        // Param #PROP-2: SOURCE
         params.setBobID_ctl(false);
         params.setBobSource_val(null);
         
-        // Param #PROP-4
+        // Param #PROP-3: parcel ID
         params.setParcelid_ctl(false);
         params.setParcelid_val(null);
         
-        // Param #PROP-5
-        params.setAddress_ctl(false);
-        params.setAddress_val(null);
+        // Param #Prop-4: building number
+        params.setAddress_bldgNum_ctl(false);
+        params.setAddress_bldgNum_val(null);
+        
+        // Param #PROP-5: street name
+        params.setAddressStreetName_ctl(false);
+        params.setAddressStreetName_val(null);
         
         // Param #PROP-6
         params.setCondition_ctl(false);
@@ -1330,47 +1489,141 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setUseType_ctl(false);
         params.setUseType_val(null);
         
-        // Param #PROP-11
-        params.setZoneClass_ctl(false);
-        params.setZoneClass_val(null);
-        
-        // Param #PROP-12
-        params.setTaxStatus_ctl(false);
-        params.setTaxStatus_val(0);
-        
-        // Param #PROP-13
-        params.setPropValue_ctl(false);
-        params.setPropValue_max_val(FILTER_OFF_DEFVALUE_INT);
-        params.setPropValue_min_val(FILTER_OFF_DEFVALUE_INT);
-        
-        // Param #PROP-14
-        params.setConstructionYear_ctl(false);
-        params.setConstructionYear_min_val(FILTER_OFF_DEFVALUE_INT);
-        params.setConstructionYear_max_val(FILTER_OFF_DEFVALUE_INT);
-        
-        // Param #PROP-15
-        params.setPerson_ctl(false);
-        params.setPerson_val(null);
-        
         return params;
     }
     
-    private SearchParamsProperty genParams_property_persons(SearchParamsProperty params, Credential cred){
-        params.setPerson_ctl(true);
-        // downstream injects Person
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_address_bldgOnly(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by building number only");
+        params.setFilterDescription("");
+        params.setAddress_bldgNum_ctl(true);
+        // user enter building number string
+            
         return params;
     }
     
     
-    private SearchParamsProperty genParams_property_address(SearchParamsProperty params, Credential cred){
-        params.setFilterName("Lead parameter bundle for property search by address");
-        params.setFilterDescription("search by address");
-        params.setAddress_ctl(true);
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_address_streetOnly(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by street name only");
+        params.setFilterDescription("");
+        params.setAddressStreetName_ctl(true);
+        // user enters street name String
 
         return params;
-        
     }
     
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_address_streetAndBldgNum(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by building number and street name");
+        params.setFilterDescription("Both bldg number and street name");
+        params.setAddressStreetName_ctl(true);
+        // user enters street name String
+        params.setAddress_bldgNum_ctl(true);
+        // user enters building number
+
+        return params;
+    }
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_parcelID(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by parcel ID");
+        params.setFilterDescription("Parcel ID query");
+        params.setParcelid_ctl(true);
+        // user enters parcelID string
+
+        return params;
+    }
+    
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_lotAndBlock(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by lot and block");
+        params.setFilterDescription("Enter lot number 1, then the letter, then the second number in separate fields");
+        params.setLotblock_ctl(true);
+        // user enters three String fields
+
+        return params;
+    }
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_recordSource(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Search by where the parcel record came from");
+        params.setFilterDescription("Select a record source from the drop down box");
+        params.setBobSource_ctl(true);
+        // user enters three String fields
+
+        return params;
+    }
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_landBankHeld(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Query for a list of all Land bank held properties");
+        params.setFilterDescription("Only land bank held properties will be returned");
+        params.setLandbankheld_ctl(true);
+        params.setLandbankheld_val(true);
+        
+        return params;
+    }
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_nonAddressable(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Query for a list of properties marked nonaddressable");
+        params.setFilterDescription("Only nonaddressable properties returned");
+        params.setNonaddressable_ctl(true);
+        params.setNonaddressable_val(true);
+        
+        return params;
+    }
+    
+    
+    
+    /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
     private SearchParamsProperty genParams_property_recentlyUpdated(SearchParamsProperty params, Credential cred){
         params.setFilterName("Properties updated in the past month");
         params.setFilterDescription("Applies to properties with any field updated");
@@ -1384,6 +1637,41 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return params;
         
     }
+    
+        /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_internalID(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Searches by the internal parcel ID, not county parcel ID");
+        params.setFilterDescription("INTERNAL identifier");
+        params.setBobID_ctl(true);
+        // user enters the internal ID
+        return params;
+    }
+    
+    
+   
+    
+        /**
+     * Logic setter for a specific type of search
+     * @param params
+     * @param cred
+     * @return 
+     */
+    private SearchParamsProperty genParams_property_custom(SearchParamsProperty params, Credential cred){
+        params.setFilterName("Custom search; all param fields available");
+        params.setFilterDescription("Turn on a parameter, and enter a value");
+        // let user turn stuff on and off.
+        
+        return params;
+    }
+    
+    
+   
+    
 
     
     // END V PROPERTY
@@ -1401,50 +1689,31 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params = (SearchParamsPerson) genParams_initParams(params, cred);
         
         // filter PERS-1
-        params.setNames_rtMin(RoleType.MuniStaff);
-        params.setName_first_ctl(false);
-        params.setName_first_val(null);
+        params.setName_ctl(false);
+        params.setName_val(null);
         
         // filter PERS-2
-        params.setName_last_ctl(false);
-        params.setName_last_val(null);
+        params.setUnder18_ctl(false);
         
         // filter PERS-3
-        params.setName_compositeLNameOnly_ctl(false);
-        params.setName_compositeLNameOnly_val(false);
+        params.setBusinessEntity_ctl(false);
         
         // filter PERS-4
+        params.setMultiHuman_ctl(false);
+        
+        // filter PERS-5
+        params.setJobTitle_ctl(false);
+        params.setJobTitle_val(null);
+        
+        // filter PERS-6
         params.setPhoneNumber_rtMin(RoleType.MuniStaff);
         params.setPhoneNumber_ctl(false);
         params.setPhoneNumber_val(null);
         
-        // filter PERS-5
+        // filter PERS-7
         params.setEmail_rtMin(RoleType.MuniStaff);
         params.setEmail_ctl(false);
         params.setEmail_val(null);
-        
-        // filter PERS-6
-        params.setAddress_rtMin(RoleType.MuniStaff);
-        params.setAddress_streetNum_ctl(false);
-        params.setAddress_streetNum_val(null);
-        
-        // filter PERS-7
-        params.setAddress_city_ctl(false);
-        params.setAddress_city_val(null);
-        
-        // filter PERS-8
-        params.setAddress_zip_ctl(false);
-        params.setAddress_zip_val(null);
-        
-        // filter PERS-9
-        params.setPersonType_rtMin(RoleType.MuniStaff);
-        params.setPersonType_ctl(false);
-        params.setPersonType_val(null);
-        
-        // filter PERS-10
-        params.setVerified_rtMin(RoleType.MuniStaff);
-        params.setVerified_ctl(false);
-        params.setVerified_val(false);
        
         // filter PERS-11
         params.setSource_ctl(false);
@@ -1471,45 +1740,57 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     private SearchParamsPerson generateParams_persons_name(SearchParamsPerson params, Credential cred){
-        params.setFilterName("First and last name filters");
-        params.setName_first_ctl(true);
-        params.setName_last_ctl(true);
-        // downstream responsible for name parts
+        params.setFilterName("Name filter");
+        params.setName_ctl(true);
+        // downstream responsible for name String
         return params;
     }
     
-    private SearchParamsPerson generateParams_persons_occPeriod(SearchParamsPerson params, Credential cred){
-        params.setFilterName("Occ period id filter");
-        params.setFilterDescription("Persons whose type is a User");
-        
-        params.setOccPeriod_ctl(true);
-        // user responsible for downstream occ period
-        
+    private SearchParamsPerson generateParams_persons_phone(SearchParamsPerson params, Credential cred){
+        params.setFilterName("Phone number field");
+        params.setPhoneNumber_ctl(true);
+        // downstream sets phone String
         return params;
     }
     
-    private SearchParamsPerson generateParams_persons_users(SearchParamsPerson params, Credential cred){
-        params.setFilterName("User Persons");
-        params.setFilterDescription("Persons whose type is a User");
-        
-        params.setPersonType_ctl(true);
-        params.setPersonType_val(PersonType.User);
-        
+    private SearchParamsPerson generateParams_persons_email(SearchParamsPerson params, Credential cred){
+        params.setFilterName("Email field");
+        params.setEmail_ctl(true);
+        // downstream sets email String
         return params;
     }
     
-    private SearchParamsPerson generateParams_person_prop(SearchParamsPerson params, Credential cred){
-        // turn off muni ctl to try to get query working
-        params.setMuni_ctl(false);
-        params.setFilterName("Persons at property X");
-        params.setFilterDescription("Across all units");
-        
-        params.setProperty_ctl(true);
-        // how do we signal we need downstream data?
-        
+    private SearchParamsPerson generateParams_persons_minors(SearchParamsPerson params, Credential cred){
+        params.setFilterName("Minor filter only");
+        params.setUnder18_ctl(true);
+        params.setUnder18_val(true);
         return params;
     }
-   
+    
+    
+    private SearchParamsPerson generateParams_persons_business(SearchParamsPerson params, Credential cred){
+        params.setFilterName("businesses only ");
+        params.setBusinessEntity_ctl(true);
+        params.setBusinessEntity_val(true);
+        return params;
+    }
+    
+    private SearchParamsPerson generateParams_persons_jobTitle(SearchParamsPerson params, Credential cred){
+        params.setFilterName("Job title field");
+        params.setJobTitle_ctl(true);
+        // downstream sets job title String
+        return params;
+    }
+    
+    
+    private SearchParamsPerson generateParams_persons_multiHuman(SearchParamsPerson params, Credential cred){
+        params.setFilterName("Multi human flag to true");
+        params.setMultiHuman_ctl(true);
+        params.setMultiHuman_val(true);
+        return params;
+    }
+    
+    
     // END IV PERSON
     
     /* --------------------------------------------
@@ -1566,14 +1847,18 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     public SearchParamsEvent genParams_event_occperid(SearchParamsEvent params, Credential cred ){
         params.setEventDomain_ctl(true);
         params.setEventDomain_val(DomainEnum.OCCUPANCY);
-        params.setBobID_ctl(true);
+        params.setBobID_ctl(false);
+        params.setActive_ctl(true);
+        params.setActive_val(false);
         return params;
     }
     
     public SearchParamsEvent genParams_event_cecase(SearchParamsEvent params, Credential cred ){
         params.setEventDomain_ctl(true);
         params.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
-        params.setBobID_ctl(true);
+        params.setBobID_ctl(false);
+        params.setActive_ctl(true);
+        params.setActive_val(false);
         return params;
         
     }
@@ -2529,6 +2814,108 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     // END VIII. CEActionRequest
+     
+     // MAILING CITY STATE AND ZIP
+     
+     /**
+      * Generate for SearchParamsCityStateZip; A lot less config happens on CSZ records since the data
+      * inside them are non-sensitive USPS mappings.
+      * 
+      * @return 
+      */
+     public SearchParamsMailingCityStateZip generateParams_MCSZ_init(){
+         SearchParamsMailingCityStateZip spmcsz = new SearchParamsMailingCityStateZip();
+         
+         return spmcsz;
+     }
+     
+     
+     public SearchParamsMailingCityStateZip generateParams_MCSZ_zipByCityState(SearchParamsMailingCityStateZip params){
+          params.setFilterName("Search for ZIP codes by city and state");
+          
+          params.setZip_ctl(false);
+          
+          params.setState_ctl(true);
+          // client injects value
+          
+          params.setCity_ctl(true);
+          // client injects value
+          
+          params.setRecordType_ctl(true);
+          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT);
+          
+          params.setDefaultType_ctl(false);
+          
+          params.setDefaultCity_ctl(false);
+          
+         return params;
+     }
+     
+     
+     public SearchParamsMailingCityStateZip generateParams_MCSZ_allRecordsByZip(SearchParamsMailingCityStateZip params){
+          params.setFilterName("Search for city and state by zip, including invalid city names");
+          
+          params.setZip_ctl(true);
+          // client injects value
+          
+          params.setState_ctl(false);
+          
+          params.setCity_ctl(false);
+          
+          params.setRecordType_ctl(true);
+          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT);
+          
+          params.setDefaultType_ctl(false);
+          
+          params.setDefaultCity_ctl(false);
+          
+         return params;
+     }
+     
+     
+     public SearchParamsMailingCityStateZip generateParams_MCSZ_validByZip(SearchParamsMailingCityStateZip params){
+          params.setFilterName("Search for city and state by ZIP, valid only");
+          
+          params.setZip_ctl(true);
+          // client injects value
+          
+          params.setState_ctl(false);
+          
+          params.setCity_ctl(false);
+          
+          params.setRecordType_ctl(true);
+          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT);
+          
+          params.setDefaultType_ctl(false);
+          
+          params.setDefaultCity_ctl(false);
+          
+         return params;
+         
+     }
+     
+     
+     public SearchParamsMailingCityStateZip generateParams_MCSZ_defaultCityByZip(SearchParamsMailingCityStateZip params){
+          params.setFilterName("Search for city and state by zip; default only");
+          
+          params.setZip_ctl(true);
+          // client injects value
+          
+          params.setState_ctl(false);
+          
+          params.setCity_ctl(false);
+          
+          params.setRecordType_ctl(true);
+          params.setRecordType_val(MailingCityStateZipRecordTypeEnum.DEFAULT);
+          
+          params.setDefaultType_ctl(true);
+          params.setDefaultType_val(MailingCityStateZipDefaultTypeEnum.STANDARD);
+          
+          params.setDefaultCity_ctl(false);
+         
+         return params;
+     }
+     
     
     
 }

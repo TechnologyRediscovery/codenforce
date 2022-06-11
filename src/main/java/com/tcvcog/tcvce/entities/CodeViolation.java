@@ -25,13 +25,17 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * The premier container representing a violation of an ordinance
  * @author ellen bascomb of apt 31y
  */
 public  class       CodeViolation  
         extends     BOb
         implements  Serializable,
+                    IFace_BlobHolder,
                     Comparable<CodeViolation> {
+    
+    static final BlobLinkEnum VIOLATION_BLOB_LINK_ENUM = BlobLinkEnum.CODE_VIOLATION;
+    static final BlobLinkEnum VIOLATION_BLOB_LINK_ENUM_UPSTREAM_POOL = BlobLinkEnum.CE_CASE;
     
     protected int violationID;
     protected EnforcableCodeElement violatedEnfElement;
@@ -47,11 +51,8 @@ public  class       CodeViolation
     protected String notes;
  
     protected LocalDateTime dateOfRecord;
-    protected java.util.Date dateOfRecordUtilDate;
-    protected String dateOfRecordPretty;
-    
     protected LocalDateTime creationTS;
-    protected String creationTSPretty;
+    
     protected User createdBy;
     
     protected boolean allowHostCaseUpdate;
@@ -62,6 +63,8 @@ public  class       CodeViolation
     protected LocalDateTime dateOfCitation;
     protected List<Integer> citationIDList;
     protected List<Integer> noticeIDList;
+    
+    protected boolean makeFindingsDefault;
     
     // compliance fields
     protected LocalDateTime stipulatedComplianceDate;
@@ -103,10 +106,7 @@ public  class       CodeViolation
         this.description = cv.description;
         this.notes = cv.notes;
         this.dateOfRecord = cv.dateOfRecord;
-        this.dateOfRecordUtilDate = cv.dateOfRecordUtilDate;
-        this.dateOfRecordPretty = cv.dateOfRecordPretty;
         this.creationTS = cv.creationTS;
-        this.creationTSPretty = cv.creationTSPretty;
         this.createdBy = cv.createdBy;
         this.allowHostCaseUpdate = cv.allowHostCaseUpdate;
         this.allowOrdinanceUpdates = cv.allowOrdinanceUpdates;
@@ -355,23 +355,7 @@ public  class       CodeViolation
         return s;
     }
 
-    /**
-     * @return the dateOfRecordPretty
-     */
-    public String getDateOfRecordPretty() {
-        dateOfRecordPretty = DateTimeUtil.getPrettyDate(dateOfRecord);
-        return dateOfRecordPretty;
-    }
-
-    /**
-     * @return the creationTSPretty
-     */
-    public String getCreationTSPretty() {
-        creationTSPretty = DateTimeUtil.getPrettyDate(creationTS);
-        
-        return creationTSPretty;
-    }
-
+    
     /**
      * @return the stipulatedComplianceDatePretty
      */
@@ -387,20 +371,7 @@ public  class       CodeViolation
     }
 
 
-    /**
-     * @param dateOfRecordPretty the dateOfRecordPretty to set
-     */
-    public void setDateOfRecordPretty(String dateOfRecordPretty) {
-        this.dateOfRecordPretty = dateOfRecordPretty;
-    }
-
-    /**
-     * @param creationTSPretty the creationTSPretty to set
-     */
-    public void setCreationTSPretty(String creationTSPretty) {
-        this.creationTSPretty = creationTSPretty;
-    }
-
+ 
     /**
      * @return the leagacyImport
      */
@@ -477,10 +448,7 @@ public  class       CodeViolation
         hash = 73 * hash + Objects.hashCode(this.description);
         hash = 73 * hash + Objects.hashCode(this.notes);
         hash = 73 * hash + Objects.hashCode(this.dateOfRecord);
-        hash = 73 * hash + Objects.hashCode(this.dateOfRecordUtilDate);
-        hash = 73 * hash + Objects.hashCode(this.dateOfRecordPretty);
         hash = 73 * hash + Objects.hashCode(this.creationTS);
-        hash = 73 * hash + Objects.hashCode(this.creationTSPretty);
         hash = 73 * hash + Objects.hashCode(this.createdBy);
         hash = 73 * hash + (this.allowHostCaseUpdate ? 1 : 0);
         hash = 73 * hash + (this.allowOrdinanceUpdates ? 1 : 0);
@@ -521,6 +489,10 @@ public  class       CodeViolation
         if (this.violationID != other.violationID) {
             return false;
         }
+        if(other.getCodeViolated().getCodeSetElementID() != this.getCodeViolated().getCodeSetElementID()){
+            return false;
+        }
+
         return true;
     }
 
@@ -581,27 +553,7 @@ public  class       CodeViolation
         return s;
     }
 
-    /**
-     * @return the dateOfRecordUtilDate
-     */
-    public java.util.Date getDateOfRecordUtilDate() {
-        return DateTimeUtil.convertUtilDate(dateOfRecord);
-    }
-
-    /**
-     * @return the stipulatedComplianceDateUtilDate
-     */
-    public java.util.Date getStipulatedComplianceDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(stipulatedComplianceDate);
-    }
-
-    /**
-     * @return the actualComplianceDateUtilDate
-     */
-    public java.util.Date getActualComplianceDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(actualComplianceDate);
-    }
-
+   
     /**
      * @param noticeIDList the noticeIDList to set
      */
@@ -610,28 +562,9 @@ public  class       CodeViolation
     }
 
 
-    /**
-     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
-     */
-    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-        dateOfRecord = DateTimeUtil.convertUtilDate(dateOfRecordUtilDate);
-    }
+  
 
-    /**
-     * @param stipulatedComplianceDateUtilDate the stipulatedComplianceDateUtilDate to set
-     */
-    public void setStipulatedComplianceDateUtilDate(java.util.Date stipulatedComplianceDateUtilDate) {
-        stipulatedComplianceDate = DateTimeUtil.convertUtilDate(stipulatedComplianceDateUtilDate);
-    }
-
-    /**
-     * @param actualComplianceDateUtilDate the actualComplianceDateUtilDate to set
-     */
-    public void setActualComplianceDateUtilDate(java.util.Date actualComplianceDateUtilDate) {
-        actualComplianceDate = DateTimeUtil.convertUtilDate(actualComplianceDateUtilDate);
-    }
-
+   
     /**
      * @return the status
      */
@@ -840,6 +773,40 @@ public  class       CodeViolation
      */
     public void setNullifiedUser(User nullifiedUser) {
         this.nullifiedUser = nullifiedUser;
+    }
+
+    /**
+     * @return the makeFindingsDefault
+     */
+    public boolean isMakeFindingsDefault() {
+        return makeFindingsDefault;
+    }
+
+    /**
+     * @param makeFindingsDefault the makeFindingsDefault to set
+     */
+    public void setMakeFindingsDefault(boolean makeFindingsDefault) {
+        this.makeFindingsDefault = makeFindingsDefault;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return VIOLATION_BLOB_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return violationID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return VIOLATION_BLOB_LINK_ENUM_UPSTREAM_POOL;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return ceCaseID;
     }
 
    

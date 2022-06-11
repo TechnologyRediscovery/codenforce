@@ -100,7 +100,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <p:column headerText="Date Submitted"
                                                           styleClass="centeredColumnContent">
 
-                                                    <h:outputText value="#{app.submissionDateUtilDate}"/>
+                                                    <h:outputText value="#{app.submissionDate}"/>
 
                                                 </p:column>
 
@@ -156,7 +156,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                                 <h:panelGrid columns="2" 
-                                                             layout="grid"
+
                                                              columnClasses="gridTd, gridTd" 
                                                              >
 
@@ -201,11 +201,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Query start date"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="occPermitSearchTermsLabel">
-                                                            <p:calendar id="eventDateCalStart" value="#{occPermitApplicationManageBB.queryBegin_Util}" 
-                                                                        mode="popup"  
-                                                                        showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                                        navigator="true" tabindex="16"
-                                                                        showButtonPanel="true" showTodayButton="true"/>
+                                                            <p:datePicker 	 id="eventDateCalStart" 
+                                                                            value="#{occPermitApplicationManageBB.queryBegin}" 
+                                                                            rendered="true"
+                                                                            style="width: 100%;"
+                                                                            pattern="MM/dd/yyyy HH:mm"
+                                                                            disabled="false"
+                                                                            hideOnDateTimeSelect="true"
+                                                                            showOnFocus="false"
+                                                                            showIcon="true"
+                                                                            showButtonBar="true"
+                                                                            mask="true"
+                                                                            timeInput="true" 
+                                                                            required="true" />
+
+
+                                                          
                                                             <h:message for="eventDateCalStart" showDetail="false" showSummary="true" 
                                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                         </div>
@@ -216,11 +227,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Query end date"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="occPermitTermsLabel">
-                                                            <p:calendar id="eventDateCalEnd" value="#{occPermitApplicationManageBB.queryEnd_Util}" 
-                                                                        mode="popup" 
-                                                                        showOn="button" pattern="EEE, dd MMM, yyyy"
-                                                                        navigator="true" tabindex="16"
-                                                                        showButtonPanel="true" showTodayButton="true"/>
+                                                                   <p:datePicker 	 id="eventDateCalStop" 
+                                                                                   value="#{occPermitApplicationManageBB.queryEnd}" 
+                                                                            rendered="true"
+                                                                            style="width: 100%;"
+                                                                            pattern="MM/dd/yyyy HH:mm"
+                                                                            disabled="false"
+                                                                            hideOnDateTimeSelect="true"
+                                                                            showOnFocus="false"
+                                                                            showIcon="true"
+                                                                            showButtonBar="true"
+                                                                            mask="true"
+                                                                            timeInput="true" 
+                                                                            required="true" />
                                                             <h:message for="eventDateCalEnd" showDetail="false" showSummary="true" 
                                                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                                         </div>
@@ -304,7 +323,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:form id="occPermitManage-form-actions">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -339,7 +357,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:outputLabel value="Date Submitted:"/>
                                                         <p:spacer height="5px"/>
                                                         <div class="cearActionsTableOutputLabel">
-                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.submissionDateUtilDate.toString()}"/>
+                                                            <p:outputLabel value="&#160;#{occPermitApplicationManageBB.selectedApplication.submissionDate.toString()}"/>
                                                         </div>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
@@ -354,7 +372,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:commandButton value="Go to OccPeriod" icon="fa fa-folder" action="#{occPermitApplicationManageBB.goToOccPeriod()}"/>
                                                         <p:spacer height="10px"/>
                                                     </h:panelGroup>
-                                                    
+
                                                     <h:panelGroup>
                                                         <p:outputLabel value="Public access reference num (PACC):"/>
                                                         <p:spacer height="5px"/>
@@ -448,7 +466,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:form id="occPermitManage-form-objects">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -549,11 +566,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:spacer height="5px"/>
                                                         <div class="cearActionsTableOutputLabel">
                                                             <p:commandButton    id="go-to-unit-change-list-cb"
-                                                                    value="Check for public-proposed changes to units"
-                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                                    disabled="#{empty occPermitApplicationManageBB.selectedApplication}"
-                                                                    action="#{occPermitApplicationManageBB.goToUnitChangeOrders()}"
-                                                                    icon="fa fa-gears"/>
+                                                                                value="Check for public-proposed changes to units"
+                                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                                                disabled="#{empty occPermitApplicationManageBB.selectedApplication}"
+                                                                                action="#{occPermitApplicationManageBB.goToUnitChangeOrders()}"
+                                                                                icon="fa fa-gears"/>
                                                             <p:commandButton    id="edit-unit-list-cb"
                                                                                 value="Edit"
                                                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
@@ -736,7 +753,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                     disabled="#{empty occPermitApplicationManageBB.selectedApplication}"
                                                                     action="#{occPermitApplicationManageBB.editAttachedPersons()}"
                                                                     icon="fa fa-gears"/>
-                                             
+
                                                 <p:spacer height="5px" />
 
                                             </h:form>
@@ -756,7 +773,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:form id="occPermitManage-form-notes">
 
                                                 <h:panelGrid columns="4" 
-                                                             layout="grid"
                                                              columnClasses="gridTd, gridTd, gridTd, gridTd" 
                                                              >
 
@@ -894,7 +910,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                              onclick="PF('override-application-status-dialog').hide()"/>
                         </h:form>
                     </p:confirmDialog>
-                    
+
                     <p:confirmDialog message="Attach internal message" 
                                      severity="alert" widgetVar="internal-message-dialog"
                                      closable="true" responsive="true"

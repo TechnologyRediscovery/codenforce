@@ -33,15 +33,17 @@ public class        HumanLink
     protected BOBSource linkSource;
     
     protected LocalDateTime linkCreatedTS;
-    protected User linkCreatedBy;
+    protected int linkCreatedByUserID;
     
     protected LocalDateTime linkLastUpdatedTS;
-    protected User linkLastUpdatedBy;
+    protected int linkLastUpdatedByUserID;
     
     protected LocalDateTime linkDeactivatedTS;
-    protected User linkDeactivatedBy;
+    protected int linkDeactivatedByUserID;
     
     protected String linkNotes;
+    
+    protected int parentObjectID;
     
     public HumanLink(Human h){
         
@@ -83,11 +85,11 @@ public class        HumanLink
     }
 
     /**
-     * @return the linkCreatedBy
+     * @return the linkCreatedByUserID
      */
     @Override
-    public User getLinkCreatedBy() {
-        return linkCreatedBy;
+    public int getLinkCreatedByUserID() {
+        return linkCreatedByUserID;
     }
 
     /**
@@ -99,11 +101,11 @@ public class        HumanLink
     }
 
     /**
-     * @return the linkLastUpdatedBy
+     * @return the linkLastUpdatedByUserID
      */
     @Override
-    public User getLinkLastUpdatedBy() {
-        return linkLastUpdatedBy;
+    public int getLinkLastUpdatedByUserID() {
+        return linkLastUpdatedByUserID;
     }
 
     /**
@@ -115,11 +117,11 @@ public class        HumanLink
     }
 
     /**
-     * @return the linkDeactivatedBy
+     * @return the linkDeactivatedByUserID
      */
     @Override
-    public User getLinkDeactivatedBy() {
-        return linkDeactivatedBy;
+    public int getLinkDeactivatedByUserID() {
+        return linkDeactivatedByUserID;
     }
 
     /**
@@ -131,27 +133,27 @@ public class        HumanLink
     }
 
     /**
-     * @param linkCreatedBy the linkCreatedBy to set
+     * @param linkCreatedBy the linkCreatedByUserID to set
      */
     @Override
-    public void setLinkCreatedBy(User linkCreatedBy) {
-        this.linkCreatedBy = linkCreatedBy;
+    public void setLinkCreatedByUserID(int linkCreatedBy) {
+        this.linkCreatedByUserID = linkCreatedBy;
     }
 
     /**
-     * @param linkLastUpdatedBy the linkLastUpdatedBy to set
+     * @param linkLastUpdatedBy the linkLastUpdatedByUserID to set
      */
     @Override
-    public void setLinkLastUpdatedBy(User linkLastUpdatedBy) {
-        this.linkLastUpdatedBy = linkLastUpdatedBy;
+    public void setLinkLastUpdatedByUserID(int linkLastUpdatedBy) {
+        this.linkLastUpdatedByUserID = linkLastUpdatedBy;
     }
 
     /**
-     * @param linkDeactivatedBy the linkDeactivatedBy to set
+     * @param linkDeactivatedBy the linkDeactivatedByUserID to set
      */
     @Override
-    public void setLinkDeactivatedBy(User linkDeactivatedBy) {
-        this.linkDeactivatedBy = linkDeactivatedBy;
+    public void setLinkDeactivatedByUserID(int linkDeactivatedBy) {
+        this.linkDeactivatedByUserID = linkDeactivatedBy;
     }
 
     /**
@@ -245,5 +247,14 @@ public class        HumanLink
         this.linkID = linkID;
     }
 
+
+    @Override
+    public int getParentObjectID() {
+        return parentObjectID;
+    }
+
+    public void setParentObjectID(int pid){
+        parentObjectID = pid;
+    }
    
 }

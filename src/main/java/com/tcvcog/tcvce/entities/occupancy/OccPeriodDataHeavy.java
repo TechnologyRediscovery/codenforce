@@ -40,9 +40,13 @@ public  class       OccPeriodDataHeavy
         implements  IFace_EventRuleGoverned, 
                     IFace_CredentialSigned,
                     IFace_PaymentHolder,
-                    IFace_humanListHolder{
+                    IFace_humanListHolder,
+                    IFace_BlobHolder,
+                    IFace_inspectable{
     
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.OCCPERIODHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.OccPeriodHuman;
+    final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.OCC_PERIOD;
+    final static BlobLinkEnum BLOB_UPSTREAMPOOL_ENUM = BlobLinkEnum.PROPERTY;
     
     protected OccPeriodStatusEnum status;
 
@@ -53,13 +57,15 @@ public  class       OccPeriodDataHeavy
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
     
-    private List<OccInspection> inspectionList;
+    private List<FieldInspection> inspectionList;
     private List<OccPermit> permitList;
     
     private List<Integer> blobIDList;
     
     private List<FeeAssigned> feeList;
     private List<Payment> paymentList;
+    
+    private List<BlobLight> blobList;
 
     private LocalDateTime configuredTS;
     private String credentialSignature;
@@ -290,7 +296,7 @@ public  class       OccPeriodDataHeavy
     /**
      * @return the inspectionList
      */
-    public List<OccInspection> getInspectionList() {
+    public List<FieldInspection> getInspectionList() {
         return inspectionList;
     }
 
@@ -326,7 +332,7 @@ public  class       OccPeriodDataHeavy
     /**
      * @param inspectionList the inspectionList to set
      */
-    public void setInspectionList(List<OccInspection> inspectionList) {
+    public void setInspectionList(List<FieldInspection> inspectionList) {
         this.inspectionList = inspectionList;
     }
 
@@ -431,6 +437,51 @@ public  class       OccPeriodDataHeavy
     @Override
     public int getHostPK() {
         return periodID;
+    }
+
+    @Override
+    public void setBlobList(List<BlobLight> bl) {
+        this.blobList = bl;
+    }
+
+    @Override
+    public List<BlobLight> getBlobList() {
+        return blobList;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return BLOB_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return periodID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return BLOB_UPSTREAMPOOL_ENUM;
+    }
+
+    /**
+     * I send back the parcel key of the containing property
+     * so I can use its poool of Blobs, if I want
+     * @return 
+     */
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return this.getPropUnitProp().getParcelKey();
+    }
+
+    @Override
+    public DomainEnum getDomainEnum() {
+        return OCC_DOMAIN;
+    }
+
+    @Override
+    public boolean isNewInspectionsAllowed() {
+        return authorizedTS == null;
     }
 
    

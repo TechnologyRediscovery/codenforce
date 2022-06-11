@@ -33,12 +33,17 @@ import com.tcvcog.tcvce.entities.HumanLink;
  * @author Ellen Bascomb
  */
 public  class       OccPeriod 
-        extends     OccPeriodPublic  
+        extends     TrackedEntity  
         implements  IFace_Loggable,
                     IFace_EventHolder,
                     Comparable<OccPeriod>,
                     IFace_ActivatableBOB,
-                    IFace_NoteHolder {
+                    IFace_noteHolder {
+    
+    final static String OCCPERIOD_TABLE_NAME = "occperiod";
+    final static String OCCPERIOD_PK_FIELD = "periodid";
+    final static String OCCPERIOD_HFNAME = "Occupancy Period";
+    final static DomainEnum OCC_DOMAIN = DomainEnum.OCCUPANCY;
     
     protected int periodID;
     protected int propertyUnitID;
@@ -46,7 +51,7 @@ public  class       OccPeriod
     protected OccPeriodType type;
     protected List<HumanLink> humans;
     
-    protected OccInspection governingInspection;
+    protected FieldInspection governingInspection;
     
     protected User manager;
      
@@ -55,8 +60,6 @@ public  class       OccPeriod
     protected List<EventCnF> eventList;
     
     protected BOBSource source;
-    protected User createdBy;
-    protected LocalDateTime createdTS;
     
     protected LocalDateTime startDate;
     protected LocalDateTime startDateCertifiedTS;
@@ -74,9 +77,9 @@ public  class       OccPeriod
     protected String notes;
     
     protected boolean active;
-
-    protected User lastUpdatedBy;
-    protected LocalDateTime lastUpdatedTS;
+    
+    // Used during initiation to store the origination event
+    protected EventCategory originationEventCategory;
 
     public OccPeriod() {
     }
@@ -98,8 +101,6 @@ public  class       OccPeriod
             this.eventList = otherPeriod.getEventList();
 
             this.source = otherPeriod.getSource();
-            this.createdBy = otherPeriod.getCreatedBy();
-            this.createdTS = otherPeriod.getCreatedTS();
 
             this.startDate = otherPeriod.getStartDate();
             this.startDateCertifiedBy = otherPeriod.getStartDateCertifiedBy();
@@ -116,26 +117,16 @@ public  class       OccPeriod
 
             this.notes = otherPeriod.getNotes();
 
-            this.active = otherPeriod.isActive();
-
-            this.lastUpdatedBy = otherPeriod.getLastUpdatedBy();
-            this.lastUpdatedTS = otherPeriod.getLastUpdatedTS();
         }
-
     }
-
-
 
     @Override
     public int compareTo(OccPeriod op) {
         int c = 0;
         if(this.startDate != null && op.getStartDate() != null){
              c = this.startDate.compareTo(op.startDate);
-        } else if(this.createdTS != null && op.createdTS != null){
-             c = this.createdTS.compareTo(op.createdTS);
         } 
         return c;
-        
     }
 
     public long getPeriodAge() {
@@ -148,7 +139,6 @@ public  class       OccPeriod
 
     public long getPeriodAgeAsOf(LocalDateTime ageEndTime){
         return DateTimeUtil.getTimePeriodAsDays(startDate, ageEndTime);
-
     }
     
     /**
@@ -200,19 +190,6 @@ public  class       OccPeriod
         return source;
     }
 
-    /**
-     * @return the createdBy
-     */
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    /**
-     * @return the createdTS
-     */
-    public LocalDateTime getCreatedTS() {
-        return createdTS;
-    }
 
     /**
      * @return the startDate
@@ -369,19 +346,7 @@ public  class       OccPeriod
         this.source = source;
     }
 
-    /**
-     * @param createdBy the createdBy to set
-     */
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    /**
-     * @param createdTS the createdTS to set
-     */
-    public void setCreatedTS(LocalDateTime createdTS) {
-        this.createdTS = createdTS;
-    }
+   
 
     /**
      * @param startDate the startDate to set
@@ -454,53 +419,18 @@ public  class       OccPeriod
         this.notes = notes;
     }
    
-    /**
-     * @return the startDateUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getStartDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(startDate);
-    }
-
-    /**
-     * @return the endDateUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getEndDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(endDate);
-    }
-
-    /**
-     * @param startDateUtilDate the startDateUtilDate to set
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
-        startDate = DateTimeUtil.convertUtilDate(startDateUtilDate);
-    }
-
-    /**
-     * @param endDateUtilDate the endDateUtilDate to set
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setEndDateUtilDate(java.util.Date endDateUtilDate) {
-        endDate = DateTimeUtil.convertUtilDate(endDateUtilDate);
-    }
-
+    
     /**
      * @return the governingInspection
      */
-    public OccInspection getGoverningInspection() {
+    public FieldInspection getGoverningInspection() {
         return governingInspection;
     }
 
     /**
      * @param governingInspection the governingInspection to set
      */
-    public void setGoverningInspection(OccInspection governingInspection) {
+    public void setGoverningInspection(FieldInspection governingInspection) {
         this.governingInspection = governingInspection;
     }
 
@@ -518,34 +448,7 @@ public  class       OccPeriod
         this.active = active;
     }
 
-    /**
-     * @return the lastUpdatedBy
-     */
-    public User getLastUpdatedBy() {
-        return lastUpdatedBy;
-    }
-
-    /**
-     * @param lastUpdatedBy the lastUpdatedBy to set
-     */
-    public void setLastUpdatedBy(User lastUpdatedBy) {
-        this.lastUpdatedBy = lastUpdatedBy;
-    }
-
-    /**
-     * @return the lastUpdatedTS
-     */
-    public LocalDateTime getLastUpdatedTS() {
-        return lastUpdatedTS;
-    }
-
-    /**
-     * @param lastUpdatedTS the lastUpdatedTS to set
-     */
-    public void setLastUpdatedTS(LocalDateTime lastUpdatedTS) {
-        this.lastUpdatedTS = lastUpdatedTS;
-    }
-
+   
     /**
      *
      * @param lst
@@ -606,5 +509,44 @@ public  class       OccPeriod
     @Override
     public int getBObID() {
         return periodID;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return OCCPERIOD_PK_FIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+        return periodID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return OCCPERIOD_TABLE_NAME;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return OCCPERIOD_HFNAME;
+    }
+
+    @Override
+    public DomainEnum getEventDomain() {
+        return OCC_DOMAIN;
+    }
+
+    /**
+     * @return the originationEventCategory
+     */
+    public EventCategory getOriginationEventCategory() {
+        return originationEventCategory;
+    }
+
+    /**
+     * @param originationEventCategory the originationEventCategory to set
+     */
+    public void setOriginationEventCategory(EventCategory originationEventCategory) {
+        this.originationEventCategory = originationEventCategory;
     }
 }

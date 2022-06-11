@@ -75,7 +75,7 @@
                         <h:outputLabel styleClass="ui-label-inline" value="Assigned By"/>
                         <p:spacer height="15px"/>
                         <div class="rowExpansion">
-                            <h:outputText value="#{fee.assignedBy.person.firstName} #{fee.assignedBy.person.lastName} (ID: #{fee.assignedBy.userID})"/>
+                            <h:outputText value="#{fee.assignedBy.human.firstName} #{fee.assignedBy.human.lastName} (ID: #{fee.assignedBy.userID})"/>
                         </div>
 
                         <h:outputLabel styleClass="ui-label-inline" value="Last Modified"/>
@@ -99,13 +99,13 @@
                         <h:outputLabel styleClass="ui-label-inline" value="Reduced By"/>
                         <p:spacer height="15px"/>
                         <div class="rowExpansion">
-                            <h:outputText value="#{fee.reducedByUser.person.firstName} #{fee.reducedByUser.person.lastName} (ID: #{fee.reducedByUser.userID}"/>
+                            <h:outputText value="#{fee.reducedByUser.human.firstName} #{fee.reducedByUser.human.lastName} (ID: #{fee.reducedByUser.userID}"/>
                         </div>
 
                         <h:outputLabel styleClass="ui-label-inline" value="Waived By"/>
                         <p:spacer height="15px"/>
                         <div class="rowExpansion">
-                            <h:outputText value="#{fee.waivedBy.person.firstName} #{fee.waivedBy.person.lastName} (ID: #{fee.waivedBy.userID}"/>
+                            <h:outputText value="#{fee.waivedBy.human.firstName} #{fee.waivedBy.human.lastName} (ID: #{fee.waivedBy.userID}"/>
                         </div>
 
                         <ui:remove>

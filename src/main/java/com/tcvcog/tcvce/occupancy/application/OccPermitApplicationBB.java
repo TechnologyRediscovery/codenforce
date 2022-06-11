@@ -176,7 +176,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             
             //If there is no working prop or if the working prop's address is not equal to the active prop's address
             if (getSessionBean().getOccPermitAppWorkingProp() == null
-                    || !getSessionBean().getOccPermitAppWorkingProp().getBundledProperty().getAddress().equalsIgnoreCase(selectedProperty.getBundledProperty().getAddress())) {
+                    || !getSessionBean().getOccPermitAppWorkingProp().getBundledProperty().getAddressString().equalsIgnoreCase(selectedProperty.getBundledProperty().getAddressString())) {
 
                 if (selectedProperty.getUnitList() == null) {
 
@@ -310,12 +310,12 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
         QueryProperty qp = null;
 
         try {
-            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.auth_getPublicUserAuthorized().getMyCredential());
+            qp = sc.initQuery(QueryPropertyEnum.ADDRESS_BLDG_NUM_ONLY, uc.auth_getPublicUserAuthorized().getMyCredential());
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsProperty spp = qp.getPrimaryParams();
-                spp.setAddress_ctl(true);
-                spp.setAddress_val(houseNum + " " + streetName);
+                spp.setAddress_bldgNum_ctl(true);
+                spp.setAddress_bldgNum_val(houseNum + " " + streetName);
                 spp.setMuni_ctl(true);
                 spp.setMuni_val(selectedMuni);
                 spp.setLimitResultCount_ctl(true);
@@ -365,7 +365,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
     public void addUnitToNewPropUnits() {
         PropertyCoordinator pc = getPropertyCoordinator();
         PublicInfoCoordinator pic = getPublicInfoCoordinator();
-        PropertyUnit newUnit = pc.initPropertyUnit(selectedProperty.getBundledProperty());
+        PropertyUnit newUnit = pc.getPropertyUnitSkeleton(selectedProperty.getBundledProperty());
         
         try {
             workingPropUnits.add(pic.extractPublicInfo(newUnit));
@@ -504,17 +504,15 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsPerson spp = qp.getPrimaryParams();
-                spp.setName_last_ctl(true);
-                spp.setName_last_val(searchPerson.getLastName());
-                spp.setName_first_ctl(true);
-                spp.setName_first_val(searchPerson.getFirstName());
+                spp.setName_ctl(true);
+                spp.setName_val(searchPerson.getName());
                 spp.setEmail_ctl(true);
                 spp.setEmail_val(searchPerson.getEmail());
                 spp.setPhoneNumber_ctl(true);
                 //  ----->  TODO: Update for Humanization/Parcelization <------
 //                spp.setPhoneNumber_val(searchPerson.getPhoneCell());
-                spp.setAddress_streetNum_ctl(true);
-                spp.setAddress_streetNum_val(searchPerson.getAddressStreet());
+//                spp.setAddress_streetNum_ctl(true);
+//                spp.setAddress_streetNum_val(searchPerson.getAddressStreet());
                 sc.runQuery(qp);
             } else {
                 getFacesContext().addMessage(null,

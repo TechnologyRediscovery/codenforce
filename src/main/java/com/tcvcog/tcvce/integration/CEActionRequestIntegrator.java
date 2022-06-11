@@ -131,7 +131,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     public List<CEActionRequest> getCEActionRequestByControlCode(int controlCode) throws IntegrationException, BObStatusException {
         List<CEActionRequest> requestList = new ArrayList<>();
         String q = "SELECT requestid, requestpubliccc, muni_municode, \n"
-                + "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
+                + "	parcel_parcelkey, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
                 + "	dateofrecord, addressofconcern, notataddress, \n"
                 + "	requestdescription, isurgent, anonymityRequested, \n"
                 + "	cecase_caseid, coginternalnotes, status_id, caseattachmenttimestamp, \n"
@@ -175,7 +175,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         StringBuilder qbuilder = new StringBuilder();
         qbuilder.append("INSERT INTO public.ceactionrequest(\n"
-                + "            requestid, requestpubliccc, muni_municode, property_propertyid, \n"
+                + "            requestid, requestpubliccc, muni_municode, parcel_parcelkey, \n"
                 + "            issuetype_issuetypeid, actrequestor_requestorid, cecase_caseid, \n"
                 + "            submittedtimestamp, dateofrecord, notataddress, addressofconcern, \n"
                 + "            requestdescription, isurgent, anonymityrequested, coginternalnotes, \n"
@@ -200,7 +200,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
             if (actionRequest.isIsAtKnownAddress()) {
                 stmt.setInt(3, actionRequest.getRequestProperty().getParcelKey());
-                actionRequest.setAddressOfConcern(actionRequest.getRequestProperty().getAddress());
+                actionRequest.setAddressOfConcern(actionRequest.getRequestProperty().getAddressString());
             } else {
                 stmt.setNull(3, java.sql.Types.NULL);
             }
@@ -272,7 +272,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         actionRequest.setRequestPublicCC(rs.getInt("requestPubliccc"));
         actionRequest.setMuni(mi.getMuni(rs.getInt("muni_municode")));
         actionRequest.setIsAtKnownAddress(rs.getBoolean("notataddress"));
-        actionRequest.setRequestProperty(pc.getProperty(rs.getInt("property_propertyID")));
+        actionRequest.setRequestProperty(pc.getProperty(rs.getInt("parcel_parcelkey")));
         actionRequest.setRequestor(perc.getPerson(perc.getHuman(rs.getInt("actrequestor_requestorid"))));
 
         actionRequest.setSubmittedTimeStamp(rs.getTimestamp("submittedtimestamp").toLocalDateTime());
@@ -357,7 +357,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
 
         
         sb.append("SELECT requestid, requestpubliccc, public.ceactionrequest.muni_municode AS muni_municode, \n"
-                + "	property_propertyid, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
+                + "	parcel_parcelkey, issuetype_issuetypeid, actrequestor_requestorid, submittedtimestamp, \n"
                 + "	dateofrecord, addressofconcern, status_id, \n"
                 + "	notataddress, requestdescription, isurgent, anonymityRequested, \n"
                 + "	cecase_caseid, coginternalnotes, \n"
@@ -367,20 +367,6 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
                 + "     INNER JOIN ceactionrequestissuetype ON ceactionrequest.issuetype_issuetypeid = ceactionrequestissuetype.issuetypeid ");
         sb.append("WHERE requestid = ?;");
 
-//        
-//        
-//        sb.append("SELECT requestid, requestpubliccc, public.ceactionrequest.muni_municode AS muni_municode, property_propertyid, \n" +
-//                "       issuetype_issuetypeid, actrequestor_requestorid, cecase_caseid, \n" +
-//                "       submittedtimestamp, dateofrecord, notataddress, addressofconcern, \n" +
-//                "       requestdescription, isurgent, anonymityrequested, coginternalnotes, \n" +
-//                "       muniinternalnotes, publicexternalnotes, status_id, caseattachmenttimestamp, \n" +
-//                "       paccenabled, caseattachment_userid\n"
-//                + "	FROM public.ceactionrequest INNER JOIN ceactionrequestissuetype ON ceactionrequest.issuetype_issuetypeid = ceactionrequestissuetype.issuetypeid ");
-//        sb.append(" WHERE requestid = ?;");
-
-        // for degugging
-        // System.out.println("Select Statement: ");
-//         System.out.println(sb.toString());
         Connection con = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -472,7 +458,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
     
     public void updateActionRequestProperty(CEActionRequest req) throws IntegrationException {
 
-        String q = "UPDATE ceactionrequest SET property_propertyid = ? WHERE requestid = ?;";
+        String q = "UPDATE ceactionrequest SET parcel_parcelkey = ? WHERE requestid = ?;";
 
         Connection con = null;
         PreparedStatement stmt = null;
@@ -767,7 +753,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         List<Integer> cearidlst = new ArrayList();
         
         params.appendSQL("SELECT DISTINCT requestid FROM public.ceactionrequest \n");
-        params.appendSQL("LEFT OUTER JOIN public.property ON (ceactionrequest.property_propertyid = property.propertyid) \n");
+        params.appendSQL("LEFT OUTER JOIN public.parcel ON (ceactionrequest.parcel_parcelkey = parcel.parcelkey) \n");
         params.appendSQL("WHERE requestid IS NOT NULL \n"); 
 
         // ****************************

@@ -35,6 +35,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 
 /**
  *
@@ -65,9 +66,9 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public void initBean() {
         // Load Navigation lists from SystemCoordinator and place
         // in member variables here
-        SystemCoordinator ssc = getSystemCoordinator();
-        NavList = ssc.navList();
-        sideBarNavList = ssc.sideBarNavList();
+        SystemCoordinator sc = getSystemCoordinator();
+        NavList = sc.navList();
+        sideBarNavList = sc.sideBarNavList();
 
         System.out.println("NavigationBB.initBean");
 
@@ -87,7 +88,7 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String getCurrentPropertyInfo() {
         SessionBean s = getSessionBean();
         try {
-            String propertyAddress = s.getSessProperty().getAddress();
+            String propertyAddress = s.getSessProperty().getAddressString();
             String propertyId = String.valueOf(s.getSessProperty().getParcelKey());
             return "Current Property: " + propertyAddress + " | ID: " + propertyId;
         } catch (Exception ex) {
@@ -304,6 +305,19 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
     public String onCodebookLinkClick(){
         return "codeSetManage";
         
+    }
+    
+    public String onChecklistsLinkClick(){
+        return "checklistTools";
+        
+    }
+    
+    /**
+     * listener for user requests to see address manager
+     * @param ev 
+     */
+    public void onAddressManagerViewLinkClick(ActionEvent ev){
+        System.out.println("View Addresses!");
     }
 
     /**

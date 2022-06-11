@@ -16,19 +16,30 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.entities.EntityUtils;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Mapped to fields of the spacetype table
  * @author EC Darsow
  */
-public class OccSpaceType {
+public class OccSpaceType 
+        extends EntityUtils 
+        implements Serializable{
     protected int spaceTypeID;
     protected String spaceTypeTitle;
     protected String spaceTypeDescription;
-    protected boolean required;
     
-    List<OccSpaceElement> codeElementList;
+    public OccSpaceType(OccSpaceType ost){
+        this.spaceTypeID = ost.spaceTypeID;
+        this.spaceTypeTitle = ost.spaceTypeTitle;
+        this.spaceTypeDescription = ost.spaceTypeDescription;
+    }
+    
+    public OccSpaceType(){
+        
+    }
 
     /**
      * @return the spaceTypeID
@@ -72,26 +83,30 @@ public class OccSpaceType {
         this.spaceTypeDescription = spaceTypeDescription;
     }
 
-    /**
-     * @return the required
-     */
-    public boolean isRequired() {
-        return required;
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 83 * hash + this.spaceTypeID;
+        return hash;
     }
 
-    /**
-     * @param required the required to set
-     */
-    public void setRequired(boolean required) {
-        this.required = required;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+//        if (getClass() != obj.getClass()) {
+//            return false;
+//        }
+        final OccSpaceType other = (OccSpaceType) obj;
+        if (this.spaceTypeID != other.spaceTypeID) {
+            return false;
+        }
+        return true;
     }
 
-
-    public List<OccSpaceElement> getCodeElementList() {
-        return codeElementList;
-    }
-
-    public void setCodeElementList(List<OccSpaceElement> codeElementList) {
-        this.codeElementList = codeElementList;
-    }
+  
 }

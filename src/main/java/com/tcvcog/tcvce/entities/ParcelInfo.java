@@ -17,7 +17,8 @@
 package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalDate;
 
 /**
  * Note that we might have thought that this class should
@@ -50,16 +51,16 @@ public class ParcelInfo
     protected OccLocationDescriptor  locationDescriptor;
     
     protected BOBSource bobSource;
-    protected LocalDateTime unfitDateStart;
-    protected LocalDateTime unfitDateStop;
+    protected LocalDate unfitDateStart;
+    protected LocalDate unfitDateStop;
     protected User unfitBy;
     
-    protected LocalDateTime abandonedDateStart;
-    protected LocalDateTime abandonedDateStop;
+    protected LocalDate abandonedDateStart;
+    protected LocalDate abandonedDateStop;
     protected User abandonedBy;
-    protected LocalDateTime vacantDateStart;
+    protected LocalDate vacantDateStart;
     
-    protected LocalDateTime vacantDateStop;
+    protected LocalDate vacantDateStop;
     protected User vacantBy;
     protected IntensityClass condition;
     
@@ -77,6 +78,8 @@ public class ParcelInfo
     protected int livingArea;
     protected boolean taxStatus;
     protected int taxYear;
+    
+    protected String notes;
     
 
     /**
@@ -103,14 +106,14 @@ public class ParcelInfo
     /**
      * @return the unfitDateStart
      */
-    public LocalDateTime getUnfitDateStart() {
+    public LocalDate getUnfitDateStart() {
         return unfitDateStart;
     }
 
     /**
      * @return the unfitDateStop
      */
-    public LocalDateTime getUnfitDateStop() {
+    public LocalDate getUnfitDateStop() {
         return unfitDateStop;
     }
 
@@ -124,14 +127,14 @@ public class ParcelInfo
     /**
      * @return the abandonedDateStart
      */
-    public LocalDateTime getAbandonedDateStart() {
+    public LocalDate getAbandonedDateStart() {
         return abandonedDateStart;
     }
 
     /**
      * @return the abandonedDateStop
      */
-    public LocalDateTime getAbandonedDateStop() {
+    public LocalDate getAbandonedDateStop() {
         return abandonedDateStop;
     }
 
@@ -145,14 +148,14 @@ public class ParcelInfo
     /**
      * @return the vacantDateStart
      */
-    public LocalDateTime getVacantDateStart() {
+    public LocalDate getVacantDateStart() {
         return vacantDateStart;
     }
 
     /**
      * @return the vacantDateStop
      */
-    public LocalDateTime getVacantDateStop() {
+    public LocalDate getVacantDateStop() {
         return vacantDateStop;
     }
 
@@ -285,14 +288,14 @@ public class ParcelInfo
     /**
      * @param unfitDateStart the unfitDateStart to set
      */
-    public void setUnfitDateStart(LocalDateTime unfitDateStart) {
+    public void setUnfitDateStart(LocalDate unfitDateStart) {
         this.unfitDateStart = unfitDateStart;
     }
 
     /**
      * @param unfitDateStop the unfitDateStop to set
      */
-    public void setUnfitDateStop(LocalDateTime unfitDateStop) {
+    public void setUnfitDateStop(LocalDate unfitDateStop) {
         this.unfitDateStop = unfitDateStop;
     }
 
@@ -306,14 +309,14 @@ public class ParcelInfo
     /**
      * @param abandonedDateStart the abandonedDateStart to set
      */
-    public void setAbandonedDateStart(LocalDateTime abandonedDateStart) {
+    public void setAbandonedDateStart(LocalDate abandonedDateStart) {
         this.abandonedDateStart = abandonedDateStart;
     }
 
     /**
      * @param abandonedDateStop the abandonedDateStop to set
      */
-    public void setAbandonedDateStop(LocalDateTime abandonedDateStop) {
+    public void setAbandonedDateStop(LocalDate abandonedDateStop) {
         this.abandonedDateStop = abandonedDateStop;
     }
 
@@ -327,14 +330,14 @@ public class ParcelInfo
     /**
      * @param vacantDateStart the vacantDateStart to set
      */
-    public void setVacantDateStart(LocalDateTime vacantDateStart) {
+    public void setVacantDateStart(LocalDate vacantDateStart) {
         this.vacantDateStart = vacantDateStart;
     }
 
     /**
      * @param vacantDateStop the vacantDateStop to set
      */
-    public void setVacantDateStop(LocalDateTime vacantDateStop) {
+    public void setVacantDateStop(LocalDate vacantDateStop) {
         this.vacantDateStop = vacantDateStop;
     }
 
@@ -554,6 +557,20 @@ public class ParcelInfo
     @Override
     public String getDBTableName() {
         return PARCELINFOTABLE;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
    

@@ -33,53 +33,55 @@ public class EnforcableCodeElement
 
     }
     
+    public EnforcableCodeElement(EnforcableCodeElement ece){
+        super(ece);
+        
+        if(ece != null){
+            this.codeSetElementID = ece.codeSetElementID;
+            this.codeSetID = ece.codeSetID;
+            this.maxPenalty = ece.maxPenalty;
+            this.minPenalty = ece.minPenalty;
+            this.normPenalty = ece.normPenalty;
+            this.penaltyNotes = ece.penaltyNotes;
+            this.normDaysToComply = ece.normDaysToComply;
+            this.daysToComplyNotes = ece.daysToComplyNotes;
+            this.muniSpecificNotes = ece.muniSpecificNotes;
+            this.feeList = ece.feeList;
+            this.defaultViolationDescription = ece.defaultViolationDescription;
+            this.injectedValues = ece.injectedValues;
+            this.eceCreatedTS = ece.eceCreatedTS;
+            this.eceCreatedBy = ece.eceCreatedBy;
+            this.eceLastUpdatedTS = ece.eceLastUpdatedTS;
+            this.eceLastupdatedBy = ece.eceLastupdatedBy;
+            this.eceDeactivatedTS = ece.eceDeactivatedTS;
+            this.eceDeactivatedBy = ece.eceDeactivatedBy;
+        }
+        
+    }
+    
     public EnforcableCodeElement(CodeElement ele){
-        this.elementID = ele.elementID;
-        this.guideEntry = ele.guideEntry;
-        this.guideEntryID = ele.guideEntryID;
-        this.source = ele.source;
-        this.ordchapterNo = ele.ordchapterNo;
-        this.ordchapterTitle = ele.ordchapterTitle;
-        this.ordSecNum = ele.ordSecNum;
-        this.ordSecTitle = ele.ordSecTitle;
-        this.ordSubSecNum = ele.ordSubSecNum;
-        this.ordSubSecTitle = ele.ordSubSecTitle;
-        this.ordSubSubSecNum = ele.ordSubSubSecNum;
-        this.ordTechnicalText = ele.ordTechnicalText;
-        this.ordHumanFriendlyText = ele.ordHumanFriendlyText;
-        this.active = ele.active;
-        this.usingInjectedValues = ele.usingInjectedValues;
-        this.resourceURL = ele.resourceURL;
-        this.notes = ele.notes;
-        this.legacyID = ele.legacyID;
-        this.headerString = ele.headerString;
-        this.createdTS = ele.createdTS;
-        this.createdBy = ele.createdBy;
-        this.lastUpdatedTS = ele.lastUpdatedTS;
-        this.lastupdatedBy = ele.lastupdatedBy;
-        this.deactivatedTS = ele.deactivatedTS;
-        this.deactivatedBy = ele.deactivatedBy;
+        super(ele);
+        
         
     }
 
     // code set elements and enforcable code elments are equivalent
     // TODO: unify these names
-    private int codeSetElementID;
+    protected int codeSetElementID;
     protected int codeSetID;
     
-    // THIS SHOULDN'T Be here, inheritance, not composition!!
     
-    private double maxPenalty;
-    private double minPenalty;
-    private double normPenalty;
-    private String penaltyNotes;
-    private int normDaysToComply;
-    private String daysToComplyNotes;
-    private String muniSpecificNotes;
-    private List<Fee> feeList;
-    private String defaultViolationDescription;
+    protected double maxPenalty;
+    protected double minPenalty;
+    protected double normPenalty;
+    protected String penaltyNotes;
+    protected int normDaysToComply;
+    protected String daysToComplyNotes;
+    protected String muniSpecificNotes;
+    protected List<Fee> feeList;
+    protected String defaultViolationDescription;
     
-    private List<String> injectedValues;
+    protected List<String> injectedValues;
     
     
      /** Humanization Object standard fields **/

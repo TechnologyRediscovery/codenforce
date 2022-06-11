@@ -63,7 +63,6 @@ public class PersonWithChanges
 //        this.canExpire = input.isCanExpire();
 //        this.expiryDate = input.getExpiryDate();
 //        this.expireString = input.getExpireString();
-//        this.expiryDateUtilDate = input.getExpiryDateUtilDate();
 //        this.expiryNotes = input.getExpiryNotes();
 //        this.active = input.isActive();
 //        this.linkedUserID = input.getLinkedUserID();

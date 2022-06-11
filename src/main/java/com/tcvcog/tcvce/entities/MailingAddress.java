@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Encapsulates a mailing address
@@ -28,8 +29,11 @@ public  class   MailingAddress
                     IFace_noteHolder{ 
     final static String TABLE_NAME = "mailingaddress";
     final static String PK_FIELD = "addressid";
+    final static String HF_NAME = "Mailing Address";
+    
     
     protected int addressID;
+    protected String addressString;
     protected String buildingNo;
     protected MailingStreet street;
     protected int poBox;
@@ -39,6 +43,16 @@ public  class   MailingAddress
     protected BOBSource source;
     protected String notes;
     
+    
+        
+    protected String addressPretty2LineEscapeFalse;
+    protected String addressPretty1Line;
+    
+    
+    public String getAddressString(){
+        return "Use addressPretty2LineEscapeFalse or addressPretty1Line";
+        
+    }
     
     /**
      * @return the addressID
@@ -182,5 +196,73 @@ public  class   MailingAddress
         this.verifiedSource = verifiedSource;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + this.addressID;
+        hash = 83 * hash + Objects.hashCode(this.buildingNo);
+        hash = 83 * hash + Objects.hashCode(this.street);
+        hash = 83 * hash + this.poBox;
+        hash = 83 * hash + Objects.hashCode(this.verifiedTS);
+        hash = 83 * hash + Objects.hashCode(this.verifiedBy);
+        hash = 83 * hash + Objects.hashCode(this.verifiedSource);
+        hash = 83 * hash + Objects.hashCode(this.source);
+        hash = 83 * hash + Objects.hashCode(this.notes);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MailingAddress other = (MailingAddress) obj;
+        if (this.addressID != other.addressID) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return HF_NAME;
+    }
+
+    /**
+     * @return the addressPretty2LineEscapeFalse
+     */
+    public String getAddressPretty2LineEscapeFalse() {
+        return addressPretty2LineEscapeFalse;
+    }
+
+    /**
+     * @return the addressPretty1Line
+     */
+    public String getAddressPretty1Line() {
+        return addressPretty1Line;
+    }
+
+    /**
+     * @param addressPretty2LineEscapeFalse the addressPretty2LineEscapeFalse to set
+     */
+    public void setAddressPretty2LineEscapeFalse(String addressPretty2LineEscapeFalse) {
+        this.addressPretty2LineEscapeFalse = addressPretty2LineEscapeFalse;
+    }
+
+    /**
+     * @param addressPretty1Line the addressPretty1Line to set
+     */
+    public void setAddressPretty1Line(String addressPretty1Line) {
+        this.addressPretty1Line = addressPretty1Line;
+    }
+
+    
+    
    
 }

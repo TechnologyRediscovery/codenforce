@@ -37,7 +37,14 @@ import com.tcvcog.tcvce.util.DateTimeUtil;
  * @author Eric Darsow
  */
 
-public class CEActionRequest extends BOb implements Serializable, IFace_BlobHolder{
+public class        CEActionRequest 
+        extends     BOb 
+        implements  Serializable,
+                    IFace_BlobHolder{
+    
+    
+    private final static BlobLinkEnum BLOB_LINK = BlobLinkEnum.CEACTION_REQUEST;
+    private final static BlobLinkEnum BLOP_UPSPTREAM_POOL = BlobLinkEnum.PROPERTY;
     
     // requests no longer have a status--remove when fully updated
     // for the full case model
@@ -89,8 +96,8 @@ public class CEActionRequest extends BOb implements Serializable, IFace_BlobHold
     // these are populated on the lookup when the linked
     // tables with the String values are selected
     
-    // list of blob id's associated with this request
-    private List<BlobLight> blobList; //Replace with list of BlobLights 
+    
+    private List<BlobLight> blobList; 
     
     /**
      * Creates a new instance of ActionRequest
@@ -413,20 +420,7 @@ public class CEActionRequest extends BOb implements Serializable, IFace_BlobHold
         this.caseID = i;
     }
 
-    /**
-     * @return the dateOfRecordUtilDate
-     */
-    public java.util.Date getDateOfRecordUtilDate() {        
-        return DateTimeUtil.convertUtilDate(dateOfRecord);
-    }
-
-    /**
-     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
-     */
-    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        dateOfRecord = DateTimeUtil.convertUtilDate(dateOfRecordUtilDate);
-    }
-
+  
     @Override
     public int hashCode() {
         int hash = 7;
@@ -610,6 +604,26 @@ public class CEActionRequest extends BOb implements Serializable, IFace_BlobHold
      */
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return BLOB_LINK;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return requestID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return BLOP_UPSPTREAM_POOL;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return requestProperty.parcelKey;
     }
 
 }

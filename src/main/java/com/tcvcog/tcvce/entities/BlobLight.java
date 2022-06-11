@@ -23,7 +23,11 @@ import java.time.LocalDateTime;
  * Holds only the descriptive fields of a Blob, not the file itself.
  * @author noah 
  */
-public class BlobLight {
+public class BlobLight extends TrackedEntity {
+    
+    private final static String PKFIELD = "photodocid";
+    private final static String DBTABLENAME = "photodoc";
+    
 
     protected int photoDocID;
     protected String description;
@@ -34,8 +38,6 @@ public class BlobLight {
     protected String title;
 
     protected Municipality muni;
-    protected LocalDateTime createdTS;
-    protected User createdBy;
     
     protected Metadata blobMetadata;
     protected String filename;
@@ -183,6 +185,21 @@ public class BlobLight {
      */
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return PKFIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+        return photoDocID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return DBTABLENAME;
     }
     
 }

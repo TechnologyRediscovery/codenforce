@@ -17,59 +17,19 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.BlobCoordinator;
-import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.AuthorizationException;
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.BlobException;
-import com.tcvcog.tcvce.domain.BlobTypeException;
-import com.tcvcog.tcvce.domain.EventException;
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobTypeEnum;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.CodeViolationDisplayable;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.Human;
-import com.tcvcog.tcvce.entities.HumanLink;
-import com.tcvcog.tcvce.entities.HumanMailingAddressLink;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
-import com.tcvcog.tcvce.entities.PageModeEnum;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PrintStyle;
-import com.tcvcog.tcvce.entities.PropertyDataHeavy;
-import com.tcvcog.tcvce.entities.TextBlock;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.util.DateTimeUtil;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.coordinators.*;
+import com.tcvcog.tcvce.domain.*;
+import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.integration.*;
+import com.tcvcog.tcvce.util.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
-import java.io.IOException;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
-import org.primefaces.event.FileUploadEvent;
 
 /**
  *
@@ -98,16 +58,15 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     private List<TextBlock> injectableBlockList;
     private TextBlock currentTemplateBlock;
-    private String formTemplateBlockText;
     
     private Map<String, Integer> blockCatIDMap;
     private String selectedBlockTemplate;
 
     private List<HumanLink> personCandidateList;
-    private List<Person> manualRetrievedPersonList;
+    private List<Person> recipientPersonCandidateList;
 
-    private Human selectedRecipHuman;
-    private HumanMailingAddressLink selectedRecipAddr;
+    private Person selectedRecipientPerson;
+    private MailingAddress selectedRecipAddr;
     
     private List<User> notifyingOfficerCandidateList;
     private User notifyingOfficerCandidateChosen;
@@ -156,28 +115,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
        
         refreshCurrentCase();
 
-        manualRetrievedPersonList = new ArrayList<>();
+        recipientPersonCandidateList = new ArrayList<>();
         showTextBlocksAllMuni = false;
         useManualTextBlockMode = false;
 
-//        setPageModes(new ArrayList<PageModeEnum>());
-//        getPageModes().add(PageModeEnum.LOOKUP);
-//        getPageModes().add(PageModeEnum.INSERT);
-//        getPageModes().add(PageModeEnum.UPDATE);
-//        getPageModes().add(PageModeEnum.REMOVE);
-//        if (getSessionBean().getCeCaseNoticesPageModeRequest() != null) {
-//            setCurrentMode(getSessionBean().getCeCaseNoticesPageModeRequest());
-//        } else {
-//            setCurrentMode(PageModeEnum.LOOKUP);
-//        }
-
-//        viewOptionList = Arrays.asList(ViewOptionsActiveListsEnum.values());
-//        selectedViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
         Municipality m = getSessionBean().getSessMuni();
         
         try {
             injectableBlockList = ci.getTextBlockTemplates(m);
-            formTemplateBlockText = "";
             if(currentTemplateBlock == null){
                 if(injectableBlockList != null && !injectableBlockList.isEmpty()){
                     currentTemplateBlock = injectableBlockList.get(0);
@@ -357,81 +302,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         return categoryList;
     }
 
-    /**
-     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE,
-     * REMOVE
-     *
-     * @param mode
-     */
-    public void setCurrentMode(PageModeEnum mode) {
-
-        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
-        PageModeEnum tempCurMode = this.getCurrentMode();
-        //reset default setting every time the Mode has been selected 
-//        loadDefaultPageConfig();
-        //check the currentMode == null or not
-        if (mode == null) {
-            this.currentMode = tempCurMode;
-        } else {
-            this.currentMode = mode;
-        }
-        switch (currentMode) {
-            case LOOKUP:
-                onModeLookupInit();
-                break;
-            case INSERT:
-//                onModeInsertInit();
-                break;
-            case UPDATE:
-                onModeUpdateInit();
-                break;
-            case REMOVE:
-                onModeRemoveInit();
-                break;
-            default:
-                break;
-        }
-    }
-
-    //check if current mode == Lookup
-    public boolean getActiveLookupMode() {
-        // hard-wired on since there's always a property loaded
-        return PageModeEnum.LOOKUP.equals(currentMode);
-    }
-
-    /**
-     * Provide UI elements a boolean true if the mode is UPDATE
-     *
-     * @return
-     */
-    public boolean getActiveUpdateMode() {
-        return PageModeEnum.UPDATE.equals(currentMode);
-    }
-
-    public boolean getActiveViewMode() {
-        if (PageModeEnum.LOOKUP.equals(currentMode) || PageModeEnum.VIEW.equals(currentMode)) {
-            if (currentNotice != null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //check if current mode == Insert
-    public boolean getActiveInsertUpdateMode() {
-        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
-    }
-
-    //check if current mode == Insert
-    public boolean getActiveInsertMode() {
-        return PageModeEnum.INSERT.equals(getCurrentMode());
-    }
-
-    //check if current mode == Remove
-    public boolean getActiveRemoveMode() {
-        return PageModeEnum.REMOVE.equals(getCurrentMode());
-    }
-
+ 
     
     /**
      * Listener for user requests to go back to case
@@ -461,11 +332,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     }
 
-    /**
-     * Internal logic container for changes to page mode: Lookup
-     */
-    private void onModeLookupInit() {
-    }
     
     public void markNoticeOfViolationAsSentInit(NoticeOfViolation nov){
         currentNotice = nov;
@@ -592,18 +458,13 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
         }
         return "";
-        
-
     }
-    
-    
-    
     
     public void lockNoticeAndQueueForMailing(NoticeOfViolation nov) {
         CaseCoordinator caseCoord = getCaseCoordinator();
 
         try {
-            caseCoord.nov_LockAndQueue(currentCase, nov, selectedRecipAddr,selectedRecipHuman, getSessionBean().getSessUser());
+            caseCoord.nov_LockAndQueue(currentCase, nov, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice is locked and ready to be mailed!", ""));
@@ -624,7 +485,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                             "Unable to queue notice of violatio. "
                             + "Please create an event manually which logs this letter being queued for mailing", ""));
         }
-
     }
     
     /**
@@ -650,7 +510,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             nov.setCreationBy(getSessionBean().getSessUser());
             currentNotice = nov;
             getSessionBean().setSessNotice(currentNotice);
-            setCurrentMode(PageModeEnum.INSERT);
         } catch (AuthorizationException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Database error", ""));
@@ -663,47 +522,12 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "No unresolved violations exist for building a letter.", ""));
         }
-//        if(currentCase.getViolationList() == null || currentCase.getViolationList().isEmpty()){
-//                getFacesContext().addMessage(null,
-//                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                                "This case has no violations; start by adding a code violation: Click Code Enf >> Violations ", ""));
-//        } else{
-//            
-//            try {
-//                currentNotice = cc.nov_GetNewNOVSkeleton(currentCase, getSessionBean().getSessMuni());
-//                getFacesContext().addMessage(null,
-//                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-//                                "Loaded notice skeleton.", ""));
-//            } catch (AuthorizationException ex) {
-//                System.out.println(ex);
-//                getFacesContext().addMessage(null,
-//                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                                ex.getMessage(), ""));
-//            }
-//
-//        }
     }
 
-
-    
     public void onNOVEditTextInitButtonChange(ActionEvent ev) {
 
     }
 
-    /**
-     * Listener for beginning of update process
-     */
-    public void onModeUpdateInit() {
-        // nothign to do here yet since the user is selected
-    }
-
-    /**
-     * Listener for the start of the case remove process
-     */
-    public void onModeRemoveInit() {
-
-    }
-    
     public void onBuildNOVUsingBlocks(){
         CaseCoordinator cc = getCaseCoordinator();
         if(currentNotice != null && selectedBlockTemplate != null){
@@ -735,8 +559,38 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void onTemplateEditButtonChange(TextBlock tb){
         currentTemplateBlock = tb;
-        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
     }
+    
+     /**
+     * Listener for user requests to edit a selected template in a table
+     * @param ev 
+     */
+    public void onTemplateViewSelectedButtonChange(ActionEvent ev){
+        System.out.println("NOVBB.onTemplateViewSelectedButtonChange | currentTemplateBlock " + currentTemplateBlock.getBlockID());
+     }
+    
+    /**
+     * Listener for user requests to bring up the choose person dialog
+     *
+     * @param ev
+     */
+    public void onChoosePersonInitButtonChange(ActionEvent ev) {
+        prepareRecipientPersonList();
+    }
+
+    /**
+     * Converts the session property's human link list to a person list with addresses
+     */
+    private void prepareRecipientPersonList(){
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            System.out.println("NoticeOfViolationBB.prepareRecipientPersonList | property person link size: " + getSessionBean().getSessProperty().getHumanLinkList().size());
+            recipientPersonCandidateList = pc.getPersonListFromHumanLinkList(pc.assembleLinkedHumanLinks(getSessionBean().getSessProperty()));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
+    }
+
     /**
      * Listener for user requests to build NOV with template
      * @param temp 
@@ -746,6 +600,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         currentTemplateBlock = temp;
         try {
             currentNotice = cc.nov_assembleNOVFromTemplate(currentNotice, currentTemplateBlock, currentCase);
+            prepareRecipientPersonList();
             getFacesContext().addMessage(null,
                new FacesMessage(FacesMessage.SEVERITY_INFO,
                        "Assembled block using template", ""));
@@ -755,9 +610,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                        "Unable to build notice from template.", ""));
             System.out.println(ex);
         }
-        
-        
-        
     }
     
     /**
@@ -766,6 +618,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void onTemplateViewButtonChange(TextBlock temp){
         currentTemplateBlock = temp;
+        System.out.println("NoticeOfViolationBB.onTemplateViewButtonChange | block ID: " + currentTemplateBlock.getBlockID());
+
         
     }
 
@@ -813,27 +667,74 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                         "Done: violation ID " + viol.getViolationID() + "will not be included in letter.", ""));
     }
 
-    public void storeRecipient(Person pers) {
-        System.out.println("Store Recipient: " + pers);
-        if (currentNotice != null) {
-            currentNotice.setRecipient(pers);
-            getSessionBean().setSessNotice(currentNotice);
+  
+    
+    /**
+     * listener for user requests to complete the selection process of address and addressee
+     * @param ev 
+     */
+    public void onCompleteRecipientAndAddressSelection(ActionEvent ev){
+        if(currentNotice != null){
+            if(selectedRecipientPerson != null){
+                currentNotice.setRecipient(selectedRecipientPerson);
+            } else {
+                getFacesContext().addMessage(null,
+                      new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                      "Recipient missing! Please select a notice recipient", ""));
+            }   
+            if(getSelectedRecipAddr() != null){
+                currentNotice.setRecipientMailingAddress(selectedRecipAddr);
+            } else {
+                      getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Address missing! Please select an address to continue", ""));
+            }
+            
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Notice recipient is now Person: " + pers.getLastName(), ""));
+                  new FacesMessage(FacesMessage.SEVERITY_INFO,
+                  "Recipient and Address chosen!", ""));
         } else {
             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Notice is null, sorry!", ""));
-
+                  new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                  "Fatal NOV setup fault. sorry!", ""));
         }
+    }
+      /**
+     * Listener for user choice of a recipient person
+     * @param pers 
+     */
+    public void storeRecipient(Person pers) {
+        System.out.println("Store Recipient: " + pers);
+        selectedRecipientPerson = pers;
+        getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Notice recipient is now Person: " + pers.getLastName(), ""));
+
+    }
+    
+    
+    /**
+     * Listener for user requests to store a recipient's mailing address
+     * @param ma
+     */
+    public void storeRecipientAddress(MailingAddress ma){
+        if(ma != null){
+            System.out.println("NoticeOfViolationBB.storeRecipientAddress | address ID " + ma.getAddressID());
+            selectedRecipAddr = ma;
+            currentNotice.setRecipientMailingAddress(selectedRecipAddr);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Notice will be sent to " + ma.getAddressPretty1Line(), ""));
+        }
+        
+        
     }
 
     public void checkNOVRecipient(ActionEvent ev) {
         PersonCoordinator pc = getPersonCoordinator();
         if (recipientPersonID != 0) {
             try {
-                manualRetrievedPersonList.add(pc.getPerson(pc.getHuman(recipientPersonID)));
+                recipientPersonCandidateList.add(pc.getPerson(pc.getHuman(recipientPersonID)));
                 System.out.println("NoticeOfViolationBB.checkNOVRecipient | looked up person: " + getRetrievedManualLookupPerson());
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Search complete", ""));
@@ -846,50 +747,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
     }
 
-    /**
-     * Old NOV builder method using blocks
-     * @deprecated 
-     * @return 
-     */
-    public String assembleNotice() {
-
-        if (currentNotice != null && currentNotice.getRecipient() != null) {
-            CaseCoordinator cc = getCaseCoordinator();
-            int newNoticeId = 0;
-
-            StringBuilder sb = new StringBuilder();
-            Iterator<TextBlock> it = currentNotice.getBlocksBeforeViolations().iterator();
-            while (it.hasNext()) {
-                appendTextBlockAsPara(it.next(), sb);
-            }
-            currentNotice.setNoticeTextBeforeViolations(sb.toString());
-
-            sb = new StringBuilder();
-            it = currentNotice.getBlocksAfterViolations().iterator();
-            while (it.hasNext()) {
-                appendTextBlockAsPara(it.next(), sb);
-            }
-
-            currentNotice.setNoticeTextAfterViolations(sb.toString());
-
-            try {
-                newNoticeId = cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
-            } catch (IntegrationException ex) {
-                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-                System.out.println(ex);
-            }
-            currentNotice.setNoticeID(newNoticeId);
-            getSessionBean().setSessNotice(currentNotice);
-            return "ceCaseNotices";
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "nonselected recipient or null current notice", ""));
-
-            return "";
-        }
-    }
-    
+  
       /**
      * Second gen listener for finalization of notices
      * @return 
@@ -899,7 +757,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         try {
             cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
             
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -926,19 +784,13 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public String onInsertNewNoticeButtonChange() {
         CaseCoordinator cc = getCaseCoordinator();
         try {
-                if(currentNotice.getRecipient() == null){
-                      getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Please select a notice recipient to save draft", ""));
-                } else {
-                    cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
-                    getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Notice saved", ""));
-                    
-                }
+                
+                cc.nov_InsertNotice(currentNotice, currentCase, getSessionBean().getSessUser());
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Notice saved", ""));
             // make sure our person list is up to date
 //            currentCase = getSessionBean().getSessCECase();
 //            refreshCurrentCase();
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
             return "";
@@ -1000,9 +852,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      * @param tb
      */
     public void onTemplateBlockViewChange(TextBlock tb){
-        System.out.println("NoticeOfViolationBB.onTemplateBlockViewChange");
         currentTemplateBlock = tb;
-        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
     }
     
     /**
@@ -1024,10 +874,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to delete template", ""));
         }
-        
     }
-    
-  
     
     /**
      * Listener for user reuqests to manage templates
@@ -1036,8 +883,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void onTemplateManageInitButtonChange(ActionEvent ev){
         CaseCoordinator cc = getCaseCoordinator();
         // only load the a block automatically if not selected
-        
-        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
     }
     
     /**
@@ -1048,14 +893,11 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         CaseCoordinator cc = getCaseCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         currentTemplateBlock = cc.nov_getTemplateBlockSekeleton(getSessionBean().getSessMuni());
-        formTemplateBlockText = currentTemplateBlock.getTextBlockText();
       
         getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "New Template block created", ""));
     }
-    
-    
     
     /**
      * Listener for user requests to add a new template block
@@ -1066,7 +908,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         CaseIntegrator ci = getCaseIntegrator();
         try {
             if(currentTemplateBlock != null){
-                currentTemplateBlock.setTextBlockText(formTemplateBlockText);
                 ci.insertTextBlock(currentTemplateBlock);
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -1076,7 +917,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 "No block to insert!", ""));
             }
-            formTemplateBlockText = currentTemplateBlock.getTextBlockText();
             injectableBlockList = ci.getTextBlockTemplates(getSessionBean().getSessMuni());
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -1084,8 +924,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not insert new text block", ""));
         }
-
-        
     }
     
     /**
@@ -1095,7 +933,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void onTemplateUpdateButtonChange(ActionEvent ev){
         CaseIntegrator ci = getCaseIntegrator();
         try {
-            currentTemplateBlock.setTextBlockText(formTemplateBlockText);
             ci.updateTextBlock(currentTemplateBlock);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -1106,100 +943,18 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not insert new text block", ""));
         }
-
-        
     }
     
-    
-    /**
-     * Attempts to upload new photo for header on NOVs
-     * @param ev 
-     */
-    public void onHeaderUploadRequest(FileUploadEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        if (ev == null) {
-            System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | event: null");
-            return;
-        }
-
-        System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | File: " + ev.getFile().getFileName() + " Type: " + ev.getFile().getContentType());
-
-        BlobCoordinator blobc = getBlobCoordinator();
-        BlobIntegrator blobi = getBlobIntegrator();
-        try {
-            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
-            
-//            blob.setBytes(ev.getFile().getContents());  // set bytes  
-            
-            blob.setFilename(ev.getFile().getFileName());
-            blob.setMuni(getSessionBean().getSessMuni());
-            blob.setDescription("Header image for Notices of Violation in " + getSessionBean().getSessMuni().getMuniName() + " as of " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-            // Write to DB
-            blob = blobc.storeBlob(blob);
-            PrintStyle newStyle = cc.nov_updateStyleHeaderImage(currentNotice.getStyle(), blob);
-            //newStyle should have the header image ID on it.
-            currentNotice.setStyle(newStyle);
-
-        } catch (IntegrationException
-                | BObStatusException
-                | IOException
-                | NoSuchElementException ex) {
-            System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
-            System.out.println(ex);
-        } catch (BlobException | BlobTypeException ex) {
-            System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Incompatible file type. ",
-                            "Please upload image files only (jpg, gif, or png)."));
-    
-        }
-
-        Blob blob = null;
-        try {
-            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
-            // TODO Upgrade on PF https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
-//                blob.setBytes(ev.getFile().getContents());  // set bytes  
-            blob.setType(blobi.getBlobType(BlobTypeEnum.PHOTO.getTypeID()));
-            blob.setFilename(ev.getFile().getFileName());
-
-
-
-                // Write to DB
-//                blob.setBlobID(blobc.storeBlob(blob));
-            cc.nov_updateStyleHeaderImage(currentNotice.getStyle(), blob);
-
-        } catch ( IntegrationException | BObStatusException ex) {
-            System.out.println("NoticeOfViolationBB.onHeaderUploadRequest | " + ex);
-            System.out.println(ex);
-        }
-
-//            blobList.add(blob);
-
-    }
-    
-    /**
-     * Listener for user requests to bring up the choose person dialog
-     *
-     * @param ev
-     */
-    public void onChoosePersonInitButtonChange(ActionEvent ev) {
-
-    }
-
+   
     /**
      * Listener for calls to abort a change operation
      *
      * @return
      */
     public String onAbortOperationButtonChange() {
-
         getSessionBean().setCeCaseNoticesPageModeRequest(PageModeEnum.VIEW);
-
         return "ceCaseNotices";
     }
-
-
 
     /**
      * Listener for commencement of note writing process
@@ -1208,7 +963,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void onNoteInitButtonChange(ActionEvent ev) {
         setFormNoteText(null);
-
     }
 
     /**
@@ -1245,6 +999,27 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     }
 
+     /**
+      * Special getter for person links--I check the session beean's
+      * PersonLinkList to see if there is a new list to send to the UI
+      * 
+     * @return the recipientPersonCandidateList
+     */
+    public List<Person> getRecipientPersonCandidateList() {
+        if(getSessionBean().getSessHumanListRefreshedList() != null){
+            PersonCoordinator pc = getPersonCoordinator();
+            try {
+                recipientPersonCandidateList = pc.getPersonListFromHumanLinkList(getSessionBean().getSessHumanListRefreshedList());
+                getSessionBean().setSessHumanListRefreshedList(null);
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+            } 
+        }
+        return recipientPersonCandidateList;
+    }
+    
+    
+    
     /**
      * @return the currentNotice
      */
@@ -1260,8 +1035,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     public void setCurrentNotice(NoticeOfViolation currentNotice) {
         this.currentNotice = currentNotice;
     }
-
-  
 
     /**
      * @param textBlockListByMuni the textBlockListByMuni to set
@@ -1344,18 +1117,13 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         this.recipientPersonID = recipientPersonID;
     }
 
-    /**
-     * @return the manualRetrievedPersonList
-     */
-    public List<Person> getManualRetrievedPersonList() {
-        return manualRetrievedPersonList;
-    }
+   
 
     /**
-     * @param manualRetrievedPersonList the manualRetrievedPersonList to set
+     * @param recipientPersonCandidateList the recipientPersonCandidateList to set
      */
-    public void setManualRetrievedPersonList(List<Person> manualRetrievedPersonList) {
-        this.manualRetrievedPersonList = manualRetrievedPersonList;
+    public void setRecipientPersonCandidateList(List<Person> recipientPersonCandidateList) {
+        this.recipientPersonCandidateList = recipientPersonCandidateList;
     }
 
     /**
@@ -1652,19 +1420,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         this.formBlockOrder = formBlockOrder;
     }
 
-    /**
-     * @return the formTemplateBlockText
-     */
-    public String getFormTemplateBlockText() {
-        return formTemplateBlockText;
-    }
-
-    /**
-     * @param formTemplateBlockText the formTemplateBlockText to set
-     */
-    public void setFormTemplateBlockText(String formTemplateBlockText) {
-        this.formTemplateBlockText = formTemplateBlockText;
-    }
+   
 
     /**
      * @return the draftNoticeLoaded
@@ -1726,31 +1482,42 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         this.notifyingOfficerCandidateChosen = notifyingOfficerCandidateChosen;
     }
 
+   
+
+   
+
     /**
-     * @return the selectedRecipHuman
+     * @param sr
      */
-    public Human getSelectedRecipHuman() {
-        return selectedRecipHuman;
+    public void setSelectedRecipAddr(MailingAddressLink sr) {
+        this.selectedRecipAddr = sr;
+    }
+
+    /**
+     * @return the selectedRecipientPerson
+     */
+    public Person getSelectedRecipientPerson() {
+        return selectedRecipientPerson;
+    }
+
+    /**
+     * @param selectedRecipientPerson the selectedRecipientPerson to set
+     */
+    public void setSelectedRecipientPerson(Person selectedRecipientPerson) {
+        this.selectedRecipientPerson = selectedRecipientPerson;
     }
 
     /**
      * @return the selectedRecipAddr
      */
-    public HumanMailingAddressLink getSelectedRecipAddr() {
+    public MailingAddress getSelectedRecipAddr() {
         return selectedRecipAddr;
-    }
-
-    /**
-     * @param selectedRecipHuman the selectedRecipHuman to set
-     */
-    public void setSelectedRecipHuman(Human selectedRecipHuman) {
-        this.selectedRecipHuman = selectedRecipHuman;
     }
 
     /**
      * @param selectedRecipAddr the selectedRecipAddr to set
      */
-    public void setSelectedRecipAddr(HumanMailingAddressLink selectedRecipAddr) {
+    public void setSelectedRecipAddr(MailingAddress selectedRecipAddr) {
         this.selectedRecipAddr = selectedRecipAddr;
     }
 

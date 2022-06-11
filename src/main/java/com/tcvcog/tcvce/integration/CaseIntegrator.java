@@ -22,6 +22,7 @@ import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -99,7 +100,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         
         params.appendSQL("SELECT DISTINCT caseid \n");
         params.appendSQL("FROM public.cecase \n");
-        params.appendSQL("INNER JOIN public.property ON (cecase.property_propertyid = property.propertyid) \n");
+        params.appendSQL("INNER JOIN public.parcel ON (cecase.parcel_parcelkey = parcel.parcelkey) \n");
         params.appendSQL("WHERE caseid IS NOT NULL ");
         
         // *******************************
@@ -130,10 +131,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             // *******************************
              if (params.isProperty_ctl()) {
                 if(params.getProperty_val()!= null){
-                    params.appendSQL("AND property_propertyid=? ");
+                    params.appendSQL("AND parcel_parcelkey=? ");
                 } else {
                     params.setProperty_ctl(false);
-                    params.appendToParamLog("PROPERTY: no Property object; prop filter disabled");
+                    params.appendToParamLog("PARCEL: no parcel object; prop filter disabled");
                 }
             }
             
@@ -142,10 +143,10 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             // *******************************
              if (params.isPropertyUnit_ctl()) {
                 if(params.getPropertyUnit_val()!= null){
-                    params.appendSQL("AND propertyunit_unitid=? ");
+                    params.appendSQL("AND parcelunit_unitid=? ");
                 } else {
                     params.setPropertyUnit_ctl(false);
-                    params.appendToParamLog("PROPERTY UNIT: no PropertyUnit object; propunit filter disabled");
+                    params.appendToParamLog("PARCEL UNIT: no parcelunit object; propunit filter disabled");
                 }
             }
             
@@ -288,7 +289,6 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         } // close finally
         
         return cseidlst;
-        
     }
     
     
@@ -312,8 +312,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
 params.appendSQL("SELECT DISTINCT codeviolation.violationid, cecase.caseid, cecase.casename, property.propertyid, property.address, municipality.municode, municipality.muniname ");
 params.appendSQL("FROM public.codeviolation  ");
 params.appendSQL("INNER JOIN public.cecase ON (cecase.caseid = codeviolation.cecase_caseid) ");
-params.appendSQL("INNER JOIN public.property ON (cecase.property_propertyid = property.propertyid) ");
-params.appendSQL("INNER JOIN public.municipality ON (property.municipality_municode = municipality.municode) ");
+params.appendSQL("INNER JOIN public.parcel ON (cecase.parcel_parcelkey = parcel.parcelkey) ");
+params.appendSQL("INNER JOIN public.municipality ON (parcel.muni_municode = municipality.municode) ");
 params.appendSQL("LEFT OUTER JOIN  ");
 params.appendSQL("(	SELECT codeviolation_violationid, citation.citationid, citation.dateofrecord ");
 params.appendSQL("FROM public.citationviolation  ");
@@ -529,7 +529,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public CECase getCECase(int ceCaseID) throws IntegrationException, BObStatusException{
-        String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
+        String query = "SELECT caseid, cecasepubliccc, parcel_parcelkey, parcelunit_unitid, \n" +
                         "       login_userid, casename, originationdate, closingdate, creationtimestamp, \n" +
                         "       notes, paccenabled, allowuplinkaccess, propertyinfocase, personinfocase_personid, \n" +
                         "       bobsource_sourceid, active, lastupdatedby_userid, lastupdatedts \n" +
@@ -573,11 +573,11 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public List<CECase> getCECasesByProp(int propID) throws IntegrationException, BObStatusException{
-        String query = "SELECT caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
+        String query = "SELECT caseid, cecasepubliccc, parcel_parcelkey, parcelunit_unitid, \n" +
                         "       login_userid, casename, originationdate, closingdate, creationtimestamp, \n" +
                         "       notes, paccenabled, allowuplinkaccess, propertyinfocase, personinfocase_personid, \n" +
                         "       bobsource_sourceid, active, lastupdatedby_userid, lastupdatedts \n" +
-                        "  FROM public.cecase WHERE property_propertyid = ?;";
+                        "  FROM public.cecase WHERE parcel_parcelkey = ?;";
         ResultSet rs = null;
         CaseCoordinator cc = getCaseCoordinator();
         PreparedStatement stmt = null;
@@ -626,8 +626,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             cse.setCaseID(rs.getInt("caseid"));
             cse.setPublicControlCode(rs.getInt("cecasepubliccc"));
             
-            cse.setParcelKey(rs.getInt("property_propertyid"));
-            cse.setPropertyUnitID(rs.getInt("propertyunit_unitid"));
+            cse.setParcelKey(rs.getInt("parcel_parcelkey"));
+            cse.setPropertyUnitID(rs.getInt("parcelunit_unitid"));
             
             cse.setCaseManager(uc.user_getUser(rs.getInt("login_userid")));
             
@@ -727,7 +727,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      */
     public int insertNewCECase(CECase ceCase) throws IntegrationException, BObStatusException{
         String query = "INSERT INTO public.cecase(\n" +
-                        "            caseid, cecasepubliccc, property_propertyid, propertyunit_unitid, \n" +
+                        "            caseid, cecasepubliccc, parcel_parcelkey, parcelunit_unitid, \n" +
                         "            login_userid, casename, originationdate, closingdate, creationtimestamp, \n" +
                         "            notes, paccenabled, allowuplinkaccess, propertyinfocase, personinfocase_personid, \n" +
                         "            bobsource_sourceid, active, lastupdatedby_userid, lastupdatedts)\n" +
@@ -832,7 +832,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      */
     public void updateCECaseMetadata(CECase ceCase) throws IntegrationException{
         String query =  "UPDATE public.cecase\n" +
-                        "   SET cecasepubliccc=?, property_propertyid=?, propertyunit_unitid=?, \n" + // 1-3
+                        "   SET cecasepubliccc=?, parcel_parcelkey=?, parcelunit_unitid=?, \n" + // 1-3
                         "       login_userid=?, casename=?, originationdate=?, closingdate=?, \n" + // 4-7
                         "       notes=?, paccenabled=?, allowuplinkaccess=?, \n" + // 5-7
                         "       propertyinfocase=?, personinfocase_personid=?, bobsource_sourceid=?, \n" + // 8-10
@@ -840,9 +840,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                         "  WHERE caseid=?;";
         PreparedStatement stmt = null;
         Connection con = null;
-        
         try {
-            
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCase.getPublicControlCode());
@@ -911,8 +909,6 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         } // close finally
         
     }
-    
-    
     
    
     /**
@@ -1355,6 +1351,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         WorkflowCoordinator wc = getWorkflowCoordinator();
         BlobIntegrator bi = getBlobIntegrator();
         BlobCoordinator bc = getBlobCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
+        
         
         v.setViolationID(rs.getInt("violationid"));
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
@@ -1415,6 +1413,10 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             v.setNullifiedUser(ui.getUser(rs.getInt("nullifiedby")));
         } 
         
+        if(rs.getInt("severity_classid") != 0){
+            v.setSeverityIntensity(si.getIntensityClass(rs.getInt("severity_classid")));
+        }
+        
         List<BlobLight> blobList = new ArrayList<>();
 //        try {
 //            for(int id : bi.getBlobsByCECase(v.getViolationID())){
@@ -1433,6 +1435,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @param violationID
      * @return
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public CodeViolation getCodeViolation(int violationID) 
             throws IntegrationException, BObStatusException {
@@ -1608,17 +1611,15 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @return the id assigned the new notice by the database
      * @throws IntegrationException 
      */
-    public int novInsert(CECaseDataHeavy c, NoticeOfViolation notice) throws IntegrationException {
+    public int novInsert(CECaseDataHeavy c, NoticeOfViolation notice) throws IntegrationException, BObStatusException {
 
         String query =  "INSERT INTO public.noticeofviolation(\n" +
                         "            noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
-                        "            dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
-                        "            lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
-                        "            returnedby, notes, creationby, printstyle_styleid, notifyingofficer_userid)\n" +
+                        "            dateofrecord, recipient_humanid, recipient_mailing, lettertextafterviolations, \n" +
+                        "            notes, creationby, printstyle_styleid, notifyingofficer_userid)\n" +
                         "    VALUES (DEFAULT, ?, ?, now(), \n" +
-                        "            ?, NULL, NULL, ?, ?, \n" +
-                        "            NULL, NULL, NULL, \n" +
-                        "            NULL, ?, ?, ?, ?);";
+                        "            ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1631,20 +1632,30 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setInt(1, c.getCaseID());
             stmt.setString(2, notice.getNoticeTextBeforeViolations());
             stmt.setTimestamp(3, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
-            stmt.setInt(4, notice.getRecipient().getHumanID());
-            stmt.setString(5, notice.getNoticeTextAfterViolations());
-            stmt.setString(6, notice.getNotes());
-            stmt.setInt(7, notice.getCreationBy().getUserID());
-            if(notice.getStyle() != null){
-                stmt.setInt(8, notice.getStyle().getStyleID());
+            
+            if(notice.getRecipient() != null){
+                stmt.setInt(4, notice.getRecipient().getHumanID());
             } else {
-                stmt.setNull(8, java.sql.Types.NULL);
+                throw new BObStatusException("Cannot write notice without a person recipient");
+            }
+            if(notice.getRecipientMailingAddress() != null){
+                stmt.setInt(5, notice.getRecipientMailingAddress().getAddressID());
+            } else {
+                throw new BObStatusException("Cannot write notice without an address");
+            }
+            stmt.setString(6, notice.getNoticeTextAfterViolations());
+            stmt.setString(7, notice.getNotes());
+            stmt.setInt(8, notice.getCreationBy().getUserID());
+            if(notice.getStyle() != null){
+                stmt.setInt(9, notice.getStyle().getStyleID());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
             }
             
              if(notice.getNotifyingOfficer() != null){
-                stmt.setInt(9, notice.getNotifyingOfficer().getUserID());
+                stmt.setInt(10, notice.getNotifyingOfficer().getUserID());
             } else {
-                stmt.setNull(9, java.sql.Types.NULL);
+                throw new BObStatusException("Cannot write notice without a notifying officer");
             }
                     
             stmt.execute();
@@ -1657,8 +1668,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             }
             
             notice.setNoticeID(insertedNOVId);
-            System.out.println("ViolationIntegrator.novInsert | noticeid " + notice.getNoticeID());
-            System.out.println("ViolationIntegrator.novInsert | retrievedid " + insertedNOVId);
+            System.out.println("CaseIntetgrator.novInsert | noticeid " + notice.getNoticeID());
+            System.out.println("CaseIntegrator.novInsert | retrievedid " + insertedNOVId);
             
             List<CodeViolationDisplayable> cvList = notice.getViolationList();
             Iterator<CodeViolationDisplayable> iter = cvList.iterator();
@@ -1808,7 +1819,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                         "       recipient_humanid=?, recipient_mailing=?, \n" +                          // 3-4
                         "       fixedrecipientxferts=now(), fixedrecipientname=?, fixedrecipientbldgno=?, \n" + // 5-6
                         "       fixedrecipientstreet=?, fixedrecipientcity=?, fixedrecipientstate=?, \n" +  // 7-9
-                        "       fixedrecipientzip=? " + // 10
+                        "       fixedrecipientzip=?,  fixednotifyingofficername=?, fixednotifyingofficertitle=?, \n" +
+                        "       fixednotifyingofficerphone=?, fixednotifyingofficeremail=?" + // 10
                         "   WHERE noticeid=?;"; //11
         // note that original time stamp is not altered on an update
 
@@ -1822,7 +1834,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setInt(2, nov.getLockedAndQueuedBy().getUserID());
             
             stmt.setInt(3, nov.getRecipient().getHumanID());
-            stmt.setInt(4, nov.getMailingLink().getLinkID());
+            stmt.setInt(4, nov.getRecipientMailingAddress().getAddressID());
             
             stmt.setString(5, nov.getFixedRecipientName());
             stmt.setString(6, nov.getFixedRecipientBldgNo());
@@ -1831,7 +1843,12 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             stmt.setString(9, nov.getFixedRecipientState());
             stmt.setString(10, nov.getFixedRecipientZip());
             
-            stmt.setInt(11, nov.getNoticeID());
+            stmt.setString(11, nov.getFixedNotifyingOfficerName());
+            stmt.setString(12, nov.getFixedNotifyingOfficerTitle());
+            stmt.setString(13, nov.getFixedNotifyingOfficerPhone());
+            stmt.setString(14, nov.getFixedNotifyingOfficerEmail());
+            
+            stmt.setInt(15, nov.getNoticeID());
 
             stmt.execute();
         } catch (SQLException ex) {
@@ -1945,9 +1962,10 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      */
     public void novUpdateNotice(NoticeOfViolation notice) throws IntegrationException {
         String query = "UPDATE public.noticeofviolation\n"
-                + "   SET lettertextbeforeviolations=?, \n" +
-                "       dateofrecord=?, personid_recipient=?, \n" +
-                "       lettertextafterviolations=?, notifyingofficer_userid=?"
+                + "   SET   lettertextbeforeviolations=?, \n"
+                + "         dateofrecord=?, lettertextafterviolations=?, "
+                + "         recipient_humanid=?, recipient_mailing=?, "
+                + "         notifyingofficer_userid=?, notifyingofficer_humanid=?  "
                 + " WHERE noticeid=?;";
         // note that original time stamp is not altered on an update
 
@@ -1959,14 +1977,30 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             
             stmt.setString(1, notice.getNoticeTextBeforeViolations());
             stmt.setTimestamp(2, java.sql.Timestamp.valueOf(notice.getDateOfRecord()));
-            stmt.setInt(3, notice.getRecipient().getHumanID());
-            stmt.setString(4, notice.getNoticeTextAfterViolations());
-            if(notice.getNotifyingOfficer() != null){
-                stmt.setInt(5, notice.getNotifyingOfficer().getUserID());
+            stmt.setString(3, notice.getNoticeTextAfterViolations());
+            if(notice.getRecipient() != null){
+                stmt.setInt(4, notice.getRecipient().getHumanID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            if(notice.getRecipientMailingAddress() != null){
+                stmt.setInt(5, notice.getRecipientMailingAddress().getAddressID());
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
-            stmt.setInt(6, notice.getNoticeID());
+            if(notice.getNotifyingOfficer() != null){
+                stmt.setInt(6, notice.getNotifyingOfficer().getUserID());
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            
+            if(notice.getNotifyingOfficerPerson()!= null){
+                stmt.setInt(7, notice.getNotifyingOfficerPerson().getHumanID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(8, notice.getNoticeID());
 
             stmt.executeUpdate();
             
@@ -2090,7 +2124,12 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
-                        "       returnedby, notes, creationby, printstyle_styleid, active, followupevent_eventid, notifyingofficer_userid \n" +
+                        "       returnedby, notes, creationby, printstyle_styleid, active, followupevent_eventid, notifyingofficer_userid, " +
+                        "       recipient_humanid, recipient_mailing, \n" +
+                        "       fixedrecipientxferts, fixedrecipientname, fixedrecipientbldgno, \n" +
+                        "       fixedrecipientstreet, fixedrecipientcity, fixedrecipientstate, \n" +
+                        "       fixedrecipientzip, fixednotifyingofficername, fixednotifyingofficertitle, \n" +
+                        "       fixednotifyingofficerphone, fixednotifyingofficeremail \n" +
                         "  FROM public.noticeofviolation WHERE noticeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -2104,7 +2143,6 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
             while (rs.next()) {
                 notice = novGenerate(rs);
-
             }
 
         } catch (SQLException ex) {
@@ -2201,22 +2239,18 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             throws SQLException, 
             IntegrationException,
             BObStatusException {
-//SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, 
-//       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, 
-//       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, 
-//       returnedby, notes
-//  FROM public.noticeofviolation;
 
         UserCoordinator uc = getUserCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         EventCoordinator ec = getEventCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
+        PropertyCoordinator propc = getPropertyCoordinator();
         
         // the magical moment of notice instantiation
         NoticeOfViolation notice = new NoticeOfViolation();
 
         notice.setNoticeID(rs.getInt("noticeid"));
-        notice.setRecipient(pc.getPerson(pc.getHuman(rs.getInt("personid_recipient"))));
+        
         notice.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());
 
         notice.setNoticeTextBeforeViolations(rs.getString("lettertextbeforeviolations"));
@@ -2242,17 +2276,40 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         } 
         
         notice.setStyle(si.getPrintStyle(rs.getInt("printstyle_styleid")));
-        
         notice.setNotes(rs.getString("notes"));
         if(rs.getInt("followupevent_eventid") != 0){
             notice.setFollowupEvent(ec.getEvent(rs.getInt("followupevent_eventid")));
         }
-        
         notice.setActive(rs.getBoolean("active"));
         
         if(rs.getInt("notifyingofficer_userid") != 0){
             notice.setNotifyingOfficer(uc.user_getUser(rs.getInt("notifyingofficer_userid")));
         }
+        if(notice.getNotifyingOfficer() != null && notice.getNotifyingOfficer().getPersonID() != 0){
+            notice.setNotifyingOfficerPerson(pc.getPersonByHumanID(notice.getNotifyingOfficer().getPersonID()));
+        }
+        
+        if(rs.getInt("recipient_humanid") != 0){
+            notice.setRecipient(pc.getPersonByHumanID(rs.getInt("recipient_humanid")));
+        }
+        if(rs.getInt("recipient_mailing") != 0){
+            notice.setRecipientMailingAddress(propc.getMailingAddress(rs.getInt("recipient_mailing")));
+        }
+        if(rs.getTimestamp("fixedrecipientxferts") != null){
+            notice.setFixedAddrXferTS(rs.getTimestamp("fixedrecipientxferts").toLocalDateTime());
+        }
+        
+        notice.setFixedRecipientName(rs.getString("fixedrecipientname"));
+        notice.setFixedRecipientBldgNo(rs.getString("fixedrecipientbldgno"));
+        notice.setFixedRecipientStreet(rs.getString("fixedrecipientstreet"));
+        notice.setFixedRecipientCity(rs.getString("fixedrecipientcity"));
+        notice.setFixedRecipientState(rs.getString("fixedrecipientstate"));
+        notice.setFixedRecipientZip(rs.getString("fixedrecipientzip"));
+        
+        notice.setFixedNotifyingOfficerName(rs.getString("fixednotifyingofficername"));
+        notice.setFixedNotifyingOfficerTitle(rs.getString("fixednotifyingofficertitle"));
+        notice.setFixedNotifyingOfficerPhone(rs.getString("fixednotifyingofficerphone"));
+        notice.setFixedNotifyingOfficerEmail(rs.getString("fixednotifyingofficeremail"));
 
         return notice;
 
@@ -2282,11 +2339,11 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                viol = new CodeViolationDisplayable(getCodeViolation(rs.getInt("codeviolation_violationid")));
+                  viol = new CodeViolationDisplayable(getCodeViolation(rs.getInt("codeviolation_violationid")));
                 viol.setIncludeOrdinanceText(rs.getBoolean("includeordtext"));
                 viol.setIncludeHumanFriendlyText(rs.getBoolean("includehumanfriendlyordtext"));
-                viol.setIncludeViolationPhotos(rs.getBoolean("includeviolationphoto"));
-                codeViolationList.add(viol);
+                 viol.setIncludeViolationPhotos(rs.getBoolean("includeviolationphoto"));
+                 codeViolationList.add(viol);
             }
 
         } catch (SQLException ex) {

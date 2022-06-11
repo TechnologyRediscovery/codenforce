@@ -640,43 +640,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
 
     }
 
-    /**
-     * Listener
-     *
-     * @param ev
-     */
-    public void handlePhotoUpload(FileUploadEvent ev) {
-        if (ev == null) {
-            System.out.println("ViolationAddBB.handlePhotoUpload | event: null");
-            return;
-        }
-        
-        try {
-            BlobCoordinator blobc = getBlobCoordinator();
-            BlobIntegrator bi = getBlobIntegrator();
-            
-            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
-            // TODO: PF upgrade: https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
-            
-            //blob.setBytes(ev.getFile().getContents());
-            
-            blob.setFilename(ev.getFile().getFileName());
-            blob.setMuni(getSessionBean().getSessMuni());
-            
-            currentViolation.getBlobList().add(blobc.storeBlob(blob));
-            
-            bi.linkBlobToViolation(blob.getPhotoDocID(), currentViolation.getViolationID());
-            
-        } catch (IntegrationException | IOException | BlobTypeException ex) {
-            System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
-        } catch (BlobException ex) {
-            System.out.println("ViolationAddBB.handlePhotoUpload | upload failed! " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-        }
-    }
-
+    
     /**
      * Responds to user requests to commit a new code violation to the CECase
      *
@@ -741,88 +705,7 @@ public class ViolationBB extends BackingBeanUtils implements Serializable {
         
     }
 
-    /**
-     * Listener for user request to remove photo on violation
-     *
-     * @param photoid
-     * @return
-     */
-    public String onPhotoRemoveButtonChange(int photoid) {
-        BlobIntegrator bi = getBlobIntegrator();
-        try {
-            bi.removePhotoViolationsLink(photoid, currentViolation.getViolationID());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Blob link removed with ID " + photoid, ""));
-        } catch (IntegrationException ex) {
-            System.out.println("ViolationBB.onPhotoRemoveButtonChange() | ERROR: "+ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An issue occurred while trying to sever file-violation link.", ""));
-            
-        } 
-
-        // do something here
-        return "ceCaseViolations";
-
-    }
-    
-    
-    /**
-     * @param blob 
-     */
-    public void onPhotoUpdateDescription(Blob blob){
-        BlobIntegrator bi = getBlobIntegrator();
-        try {
-            bi.updatePhotoDocMetadata(blob);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated photo description", ""));
-            
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Failed to update photo description", ""));
-        } 
-        
-    }
-
-    public String photosConfirm() {
-        
-        if(currentViolation == null){
-            currentViolation = getSessionBean().getSessCodeViolation();
-        }
-
-        if(currentViolation.getBlobList() == null  ||  currentViolation.getBlobList().isEmpty()){
-            getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "No uploaded photos to commit.", 
-                                "Use the 'Return to case home without commiting photos' button bellow if you have no photos to upload."));
-            return "";
-        }
-        
-        BlobIntegrator bi = getBlobIntegrator();
-        
-        for(BlobLight photo : currentViolation.getBlobList()){
-            
-            try { 
-                // commit and link
-                
-                bi.commitPhotograph(photo.getPhotoDocID());
-                bi.linkBlobToViolation(photo.getPhotoDocID(), currentViolation.getViolationID());
-                
-            } catch (IntegrationException ex) {
-                System.out.println(ex.toString());
-                    getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
-                                "Please call your municipal office and report your concern by phone."));
-                    return "";
-            }
-        }
-
-        return "ceCaseViolations";
-    }
+  
     
     /**
      * @return the currentViolation

@@ -31,8 +31,9 @@
 
                                         <div class="publi-login-container">
 
-                                            <div class="publi-login-title">
-                                                HI, WELCOME TO <span style="float:right"><span style="color: #DEE461">CODE</span><span style="color:#00B4ED">NFORCE</span> ! </span> 
+                                            <div class="publi-login-title"
+                                                 style="margin-left: 20px; margin-right:auto;">
+                                                WELCOME TO <span style="color: #DEE461">CODE</span><span style="color:#00B4ED">NFORCE</span> ! 
                                             </div>
 
                                             <div class="public-login-button">
@@ -41,14 +42,94 @@
                                                                  action="#{loginBB.loginToMissionControl}"
                                                                  style="width: 100%"/>
                                             </div>
+                                            
                                             <div class="public-login-text">
-                                                <p>
-                                                    TCVCOG staff, code enforcement officials, and other authorized users access tools
-                                                    via mission control
-                                                </p>
+                                             
+                                                <p:spacer height="20px" />
+                                                <h2>Release notes</h2>
+                                                <p:accordionPanel id="release-panel">
+                                                    <p:tab title="Release Alpha 0.836: Monday, 11-April-2022 @ 1054h">
+                                                        <ul>
+                                                            <li>Adjusted the Code Enforcement case list report to reflect, once again, the changes specified
+                                                                in the 8.11.21 specs document. These changes had to be re-applied after pushing the diverged
+                                                                branch containing the revised database schema -- dubbed the "humanization and parcelization" upgrade.
+                                                            </li>
+                                                        </ul>
+                                                        
+                                                    </p:tab>
+                                                    <p:tab title="Release Alpha 0.835: Tuesady, 5-April-2022 @ 0031h">
+                                                        <ul>
+                                                            <li><span style="font-weight:bold">New date pickers have been implemented system-wide.</span> All 66 calendar tools are now unified to default
+                                                            to manual entry of the date in the American month/day/year MM/dd/YYYY hh:mm (24hr time). And they all have
+                                                            a little calendar icon that brings up the month overlay where you can click on a day instead.</li>
+                                                            <li>Code violations <span style="font-weight:bold">date of record can now be edited</span> after violation add.</li>
+                                                            <li>Code violations that are nullified can <span style="font-weight:bold">now be reactivated</span> using a link under the nullification date.</li>
+                                                            <li>Based on NOV-person linking discussion with Alex, a special button has been added to the person
+                                                            profile (upper right panel called special tools) that allows quick linking to the current property. 
+                                                            This removes two steps from the process of creating a new person and then linking that person to 
+                                                            a property and then sending them an NOV.</li>
+                                                            <li>When adding a new street, edit mode appears at default.</li>
+                                                        </ul>
+                                                    </p:tab>
+                                                    <p:tab title="Release Alpha 0.830: Friday, 1-April-2022 @ 2020h">
+                                                        <ul>
+                                                            
+                                                            <li>When creating an NOV, the <span style="font-weight:bold">recipient choice dialog has direct links
+                                                            to the person and address search/add dialogs</span>. Note that when you click these links
+                                                            the recipient choice dialog will disappear. But when you click the blue "choose addressee"
+                                                            button, your new links will be populated and ready for selection.</li>
+                                                            
+                                                            <li><span style="font-weight:bold">Case report list</span> Now includes each citation's entire log history, so 
+                                                            log your citations as they move through the system!</li>
+                                                            
+                                                            
+                                                            <li><span style="font-weight:bold">Session Address is now: gone!</span> Instead, when you search for an address 
+                                                            from the link in the main top bar, you'll be able to directly link your selected
+                                                            address to either your current property or current person right from the address searcher.</li>
+                                                            
+                                                            <li>The <span style="font-weight:bold">unit manager on the property profile is now active</span>, allowing for adding, editing, and removing
+                                                            property units. More importantly, once the unit list is complete, you can start a new occupancy
+                                                            period on that unit and start the inspection process.</li>
+                                                        </ul>
+                                                        <h3>Known issues</h3>
+                                                        <ul>
+                                                            <li>From SG: Default violation findings are not "sticking" for future violations</li>
+                                                            <li>Occupancy Period start/end dates are not writing to DB correctly</li>
+                                                            <li>Max upload size still around 5mb</li>
+                                                        </ul>
+                                                        <h3>WIP (Work in process)</h3>
+                                                        <ul>
+                                                            <li>Field inspections on code enforcement cases, field inspection violation migration from occupancy to code enf. case</li>
+                                                            <li>Adding origination event to master case list on dashboard</li>
+                                                            <li>Person link role selection (owner, tenant, etc.)</li>
+                                                            <li>Default violation finding bug fixing</li>
+                                                            <li>Migrate to PrimeFaces 11.0 to fix max upload size</li>
+                                                        </ul>
+                                                        
+                                                        
+                                                    </p:tab>
+                                                    <p:tab title="Release Alpha 0.821: Monday, 21-March-2022 @ 1149h">
+                                                        <ul>
+                                                            <li>Platinum Citations are now live for final testing. Viewing an old citation or creating a new citation on CECase profile now allows you to enter a docket number, record individual violation statuses, and create a date-stamped log of each phase of the citation life cycle. Photos/documents can be uploaded directly. Person links coming soon.</li>
+                                                            <li>Citation remove/deactivate, citation status log deactivate, citation docket deactivate are not operable.</li>
+                                                            <li>File uploads on CE case are working again using our unified photo-doc interface. File size limit is still around 10mb, but the solution has been found for an upcoming release.</li>
+                                                        </ul>
+                                                        <h3>Known issues</h3>
+                                                        <ul>
+                                                            <li>Person linking on citations is not yet active.</li>
+                                                            <li>The session address mess correction is underway and is planned for revision by the end of the week.</li>
+                                                            <li>Property unit builder is still work in progress, so ability to create new occ periods yet</li>
+                                                        </ul>
+                                                        
+                                                    </p:tab>
+                                                    <p:tab title="Release Alpha: 0.81: 15-MAR-2022 @ 0857h" >
+                                                        <ul>
+                                                            <li>Events now can contain person links! After you create an event, then click view/edit in its display table, and then "Manage event-person connections "</li>
+                                                            <li>Mailing address linking is now active. You are always linking either a property or a person to the session's current address, which is displayed under the session Property session box. Manage property address connections in the property profile page and the person address connections in the person profile dialog, accessed with "person - view/edit" in the Person session box. </li>
+                                                        </ul>
+                                                    </p:tab>
+                                                </p:accordionPanel>
                                             </div>
-                                           
-
                                         </div>
                                     </div>
                                 </div>

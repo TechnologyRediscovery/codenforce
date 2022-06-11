@@ -79,13 +79,12 @@ public abstract class PublicInfoBundle implements Serializable {
      * @param manager 
      */
     public void setCaseManager(User manager){
-        if (manager != null && manager.getPerson() != null) {
+        
+        if (manager != null && manager.getHuman() != null) {
             StringBuilder sb = new StringBuilder();
-            sb.append(manager.getPerson().getFirstName());
-            sb.append(" ");
-            sb.append(manager.getPerson().getLastName());
+            sb.append(manager.getHuman().getName());
             setCaseManagerName(sb.toString());
-            setCaseManagerContact(manager.getPerson().getPrimaryPhone().phoneNumber);
+        
         }
     }
     
@@ -103,7 +102,7 @@ public abstract class PublicInfoBundle implements Serializable {
                 setAddressAssociated(false);
             } else {
                 setAddressAssociated(true);
-                setPropertyAddress(prop.getAddress());
+                setPropertyAddress(prop.getAddressString());
             }
         
     }

@@ -12,6 +12,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsEventRulesEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 
 /**
  *  Listified CECase object 
@@ -20,21 +21,28 @@ import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
  */
 public class CECaseDataHeavy
         extends CECase
-        implements Cloneable,
-        IFace_EventRuleGoverned,
-        IFace_CredentialSigned,
-        IFace_Loggable,
-        IFace_ActivatableBOB,
-        IFace_PaymentHolder,
-        IFace_humanListHolder{
+        implements  Cloneable,
+                    IFace_EventRuleGoverned,
+                    IFace_CredentialSigned,
+                    IFace_Loggable,
+                    IFace_ActivatableBOB,
+                    IFace_PaymentHolder,
+                    IFace_BlobHolder,
+                    IFace_humanListHolder,
+                    IFace_inspectable{
 
     // accessed through methods specified in the interfaces
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CECASEHUMAN;
-
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CECaseHuman;
+    final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.CE_CASE;
+    final static BlobLinkEnum BLOB_LINK_UPSTREAM_POOL = BlobLinkEnum.PROPERTY;
+    
+    
     private Property property;
     private PropertyUnit propertyUnit;
     
     protected List<HumanLink> humanLinkList;
+    
+    protected List<FieldInspection> inspectionList;
     
     private List<Proposal> proposalList;
     private List<EventRuleImplementation> eventRuleList;
@@ -50,42 +58,42 @@ public class CECaseDataHeavy
     public CECaseDataHeavy(CECase cse) {
         if(cse != null){
             
-        this.caseID = cse.caseID;
-        this.publicControlCode = cse.publicControlCode;
-        this.paccEnabled = cse.paccEnabled;
+           this.caseID = cse.caseID;
+            this.publicControlCode = cse.publicControlCode;
+            this.paccEnabled = cse.paccEnabled;
 
-        this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
+            this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
 
-        this.parcelKey = cse.parcelKey;
-        this.propertyUnitID = cse.propertyUnitID;
+            this.parcelKey = cse.parcelKey;
+            this.propertyUnitID = cse.propertyUnitID;
 
-        this.caseManager = cse.caseManager;
-        this.caseName = cse.caseName;
+            this.caseManager = cse.caseManager;
+            this.caseName = cse.caseName;
 
-        this.originationDate = cse.originationDate;
-        this.closingDate = cse.closingDate;
-        this.creationTimestamp = cse.creationTimestamp;
+            this.originationDate = cse.originationDate;
+            this.closingDate = cse.closingDate;
+            this.creationTimestamp = cse.creationTimestamp;
 
-        this.notes = cse.notes;
+            this.notes = cse.notes;
 
-        this.source = cse.source;
+            this.source = cse.source;
 
-        this.citationList = cse.citationList;
-        this.noticeList = cse.noticeList;
-        this.violationList = cse.violationList;
-       
-        this.active = cse.active;
-        this.propertyInfoCase = cse.propertyInfoCase;
-        this.personInfoPersonID = cse.getPersonInfoPersonID();
-        
-        this.lastUpdatedBy = cse.getLastUpdatedBy();
-        this.lastUpdatedTS = cse.getLastUpdatedTS();
-        this.statusBundle = cse.getStatusBundle();
-        
-        this.eventList = cse.eventList;
-        this.statusAssignmentLog = cse.statusAssignmentLog;
-        
-        eventListMaster = new ArrayList<>();
+            this.citationList = cse.citationList;
+            this.noticeList = cse.noticeList;
+            this.violationList = cse.violationList;
+
+            this.active = cse.active;
+            this.propertyInfoCase = cse.propertyInfoCase;
+            this.personInfoPersonID = cse.getPersonInfoPersonID();
+
+            this.lastUpdatedBy = cse.getLastUpdatedBy();
+            this.lastUpdatedTS = cse.getLastUpdatedTS();
+            this.statusBundle = cse.getStatusBundle();
+
+            this.eventList = cse.eventList;
+            this.statusAssignmentLog = cse.statusAssignmentLog;
+
+            eventListMaster = new ArrayList<>();
         } else {
             System.out.println("CECaseDataHeavy.const: null input case");
         }
@@ -401,6 +409,57 @@ public class CECaseDataHeavy
     @Override
     public int getHostPK() {
         return caseID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return BLOB_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return caseID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return BLOB_LINK_UPSTREAM_POOL;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return property.parcelKey;
+    }
+
+    /**
+     * @return the inspectionList
+     */
+    @Override
+    public List<FieldInspection> getInspectionList() {
+        return inspectionList;
+    }
+
+    /**
+     * @param inspectionList the inspectionList to set
+     */
+    @Override
+    public void setInspectionList(List<FieldInspection> inspectionList) {
+        this.inspectionList = inspectionList;
+    }
+
+    @Override
+    public DomainEnum getDomainEnum() {
+        return CECASE_ENUM;
+    }
+
+    @Override
+    public User getManager() {
+        return caseManager;
+    }
+
+    @Override
+    public boolean isNewInspectionsAllowed() {
+        return closingDate == null;
     }
 
 }

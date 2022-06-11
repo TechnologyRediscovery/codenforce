@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 
 /**
  * Represents a specific ordinance that MIGHT be inspected
@@ -33,36 +34,40 @@ import com.tcvcog.tcvce.entities.CodeElement;
  * 
  * @author sylvia
  */
-public class OccSpaceElement extends CodeElement {
+public class OccSpaceElement 
+        extends EnforcableCodeElement {
     
-    protected int spaceElementID;
+    protected int occChecklistSpaceTypeElementID;
     protected boolean requiredForInspection;
+    private int parentSpaceTypeID;
+    
 
     public OccSpaceElement() {}
 
-    public OccSpaceElement(CodeElement codeElement) {
-        super(codeElement);
+    public OccSpaceElement(EnforcableCodeElement ece) {
+        super(ece);
     }
 
     public OccSpaceElement(OccSpaceElement occSpaceElement) {
         super(occSpaceElement);
-        this.spaceElementID = occSpaceElement.getSpaceElementID();
+        this.occChecklistSpaceTypeElementID = occSpaceElement.getOccChecklistSpaceTypeElementID();
         this.requiredForInspection = occSpaceElement.isRequiredForInspection();
+        this.parentSpaceTypeID = occSpaceElement.getParentSpaceTypeID();
     }
 
 
     /**
-     * @return the spaceElementID
+     * @return the occChecklistSpaceTypeElementID
      */
-    public int getSpaceElementID() {
-        return spaceElementID;
+    public int getOccChecklistSpaceTypeElementID() {
+        return occChecklistSpaceTypeElementID;
     }
 
     /**
-     * @param spaceElementID the spaceElementID to set
+     * @param occChecklistSpaceTypeElementID the occChecklistSpaceTypeElementID to set
      */
-    public void setSpaceElementID(int spaceElementID) {
-        this.spaceElementID = spaceElementID;
+    public void setOccChecklistSpaceTypeElementID(int occChecklistSpaceTypeElementID) {
+        this.occChecklistSpaceTypeElementID = occChecklistSpaceTypeElementID;
     }
 
     /**
@@ -79,5 +84,20 @@ public class OccSpaceElement extends CodeElement {
         this.requiredForInspection = requiredForInspection;
     }
 
-   
+    /**
+     * @return the parentSpaceTypeID
+     */
+    public int getParentSpaceTypeID() {
+        return parentSpaceTypeID;
+    }
+
+    /**
+     * @param parentSpaceTypeID the parentSpaceTypeID to set
+     */
+    public void setParentSpaceTypeID(int parentSpaceTypeID) {
+        this.parentSpaceTypeID = parentSpaceTypeID;
+    }
+
+    
+    
 }

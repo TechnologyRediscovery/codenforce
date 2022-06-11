@@ -23,16 +23,21 @@ import java.time.LocalDateTime;
  * @author sylvia
  */
 public  class   ContactEmail 
-        extends Contact{
+        extends Contact
+        implements Comparable<Object>{
     
     final static String TABLE_NAME = "contactemail";
     final static String PKFIELD = "emailid";
+    final static String HFNAME = "Email Address";
+    
     
     protected int emailID;
     protected int humanID;
     protected String emailaddress;
     protected LocalDateTime bounceTS;
     protected String notes;
+    
+    protected int priority;
 
     public ContactEmail(){
         
@@ -124,6 +129,34 @@ public  class   ContactEmail
     @Override
     public String getDBTableName() {
         return TABLE_NAME;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return HFNAME;
+    }
+
+    /**
+     * @return the priority
+     */
+    public int getPriority() {
+        return priority;
+    }
+
+    /**
+     * @param priority the priority to set
+     */
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if(o instanceof ContactEmail){
+            ContactEmail ce = (ContactEmail) o;
+            return Integer.compare(this.priority, ce.priority);
+        }
+        return 0;
     }
     
 }

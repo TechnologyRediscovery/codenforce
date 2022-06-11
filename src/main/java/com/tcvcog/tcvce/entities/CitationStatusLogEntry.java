@@ -29,10 +29,12 @@ import java.time.LocalDateTime;
  */
 public class    CitationStatusLogEntry 
         extends TrackedEntity
-        implements IFace_noteHolder{
+        implements IFace_noteHolder,
+        Comparable<Object>{
     
     final static String CITATION_STATUS_TABLE = "citationcitationstatus";
     final static String CITATION_STATUS_PKFIELD = "citationstatusid";
+    final static String HF_NAME = "Citation status log entry";
     
     private int logEntryID;
     private int citationID;
@@ -41,6 +43,8 @@ public class    CitationStatusLogEntry
     private LocalDateTime dateOfRecord;
     
     private String notes;
+    
+    private CourtEntity courtEntity;
     
     private boolean nonStatusEditsForbidden;
     private EventRuleAbstract phaseChangeRule;
@@ -166,6 +170,36 @@ public class    CitationStatusLogEntry
      */
     public void setLogEntryID(int logEntryID) {
         this.logEntryID = logEntryID;
+    }
+
+    /**
+     * @return the courtEntity
+     */
+    public CourtEntity getCourtEntity() {
+        return courtEntity;
+    }
+
+    /**
+     * @param courtEntity the courtEntity to set
+     */
+    public void setCourtEntity(CourtEntity courtEntity) {
+        this.courtEntity = courtEntity;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return HF_NAME;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if(o instanceof CitationStatusLogEntry){
+            CitationStatusLogEntry csle = (CitationStatusLogEntry) o;
+            if(this.getDateOfRecord() != null && csle.getDateOfRecord() != null){
+                return this.getDateOfRecord().compareTo(((CitationStatusLogEntry) o).getDateOfRecord());
+            }
+        }
+        return 0;
     }
     
 }

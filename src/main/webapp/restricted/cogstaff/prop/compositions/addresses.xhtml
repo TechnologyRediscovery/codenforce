@@ -1,0 +1,1365 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="addresses-growl-form">
+
+        <p:growl id="addresses-growl"
+                 globalOnly="false" 
+                 />
+    </h:form>
+
+    <p:dialog   id="address-dialog"
+                height="700" width="1200"
+                widgetVar="address-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="#{addressBB.currentMailingAddress.addressID eq 0 ? 'Add new address' : 'Edit address'}"
+                rendered="true"
+                >
+
+        <div class="p-grid">
+            <div class="p-col">
+                <p:panel id="address-info-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Address Info">
+
+                    <h:form id="address-info-form">
+
+                        <p:commandButton id="address-edit-button"
+                                         value="#{addressBB.addressEditMode? 'Save changes' : 'Edit'}"
+                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                         icon="fa #{addressBB.addressEditMode ? 'fa-check' : 'fa-pencil'}"
+                                         actionListener="#{addressBB.toggleMailingAddressEditMode}"
+                                         oncomplete="PF('address-dialog-var').show()"
+                                         update="address-info-form
+                                         building-form"/>
+
+                        <p:commandButton id="zip-search-button"
+                                         value="Search for Zip, City, and State"
+                                         rendered="false"
+                                         icon="fa fa-address-book"
+                                         oncomplete="PF('address-search-dialog-var').show()"
+                                         />
+                        <div class="restrict-main-contents-io-button gray_button">
+
+                            <p:commandButton    id="address-edit-abort-button"
+                                                ajax="true"
+                                                rendered="#{addressBB.addressEditMode}"
+                                                value="Abort edit"
+                                                actionListener="#{addressBB.onMailingAddressAbortOperationButtonChange}"
+                                                oncomplete="PF('address-dialog-var').show()"
+                                                update="address-info-form"
+                                                icon="fa fa-stop" />
+                        </div>
+
+                        <p:spacer height="5px"/>    
+
+                        <div class="p-grid">
+                            <div class="p-col-6">Address ID</div>
+
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                              value="#{addressBB.currentMailingAddress.addressID eq 0 ? 'new record' : addressBB.currentMailingAddress.addressID}"/>
+                            </div>
+
+                            <div class="p-col-6">Building Number</div>
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                              value="#{addressBB.currentMailingAddress.buildingNo}"/>
+
+                                <p:inputText rendered="#{addressBB.addressEditMode}"
+                                             value="#{addressBB.currentMailingAddress.buildingNo}" />
+                            </div>
+                            <div class="p-col-6">
+                                PO Box
+                            </div>
+
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                              value="#{addressBB.currentMailingAddress.poBox eq 0 ? '' : addressBB.currentMailingAddress.poBox}"/>
+
+                                <p:selectBooleanCheckbox    id="address-pobox-sbcb"
+                                                            rendered="#{addressBB.addressEditMode}"
+                                                            value="#{addressBB.formPOBox}" >
+                                    <p:ajax process="address-pobox-sbcb"
+                                            update="address-pobox-it" />
+
+                                </p:selectBooleanCheckbox>
+
+                                <p:inputText    id="address-pobox-it"
+                                                rendered="#{addressBB.addressEditMode}"
+                                                disabled="#{!addressBB.formPOBox}"
+                                                value="#{addressBB.currentMailingAddress.poBox}"
+                                                type="number"/>
+                            </div>
+
+                            <div class="p-col-6">
+                                Street
+                            </div>
+
+                            <div class="p-col-6">
+                                <h:outputText rendered="true" 
+                                              value="#{!empty addressBB.currentMailingAddress.street ? addressBB.currentMailingAddress.street.name : ''}"/>
+                                <h:outputText rendered="true" 
+                                              value=" (ID:#{!empty addressBB.currentMailingAddress.street ? addressBB.currentMailingAddress.street.streetID : ''})"/>
+                            </div>
+
+                            <div class="p-col-6">
+                                City, State, ZIP Code
+                            </div>
+
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!empty addressBB.currentMailingAddress.street}" 
+                                              value="#{!empty addressBB.currentMailingAddress.street ? addressBB.currentMailingAddress.street.cityStateZip.city : ''}"/>
+
+                                <h:outputText   rendered="#{!empty addressBB.currentMailingAddress.street}" 
+                                                value=", " />
+
+                                <h:outputText rendered="#{!empty addressBB.currentMailingAddress.street}" 
+                                              value="#{!empty addressBB.currentMailingAddress.street ? addressBB.currentMailingAddress.street.cityStateZip.state : ''}"/>
+
+                                <h:outputText   rendered="#{!empty addressBB.currentMailingAddress.street}" 
+                                                value=" " />
+
+                                <h:outputText rendered="#{!empty addressBB.currentMailingAddress.street}" 
+                                              value="#{!empty addressBB.currentMailingAddress.street ? addressBB.currentMailingAddress.street.cityStateZip.zipCode : ''}"/>
+                            </div>
+
+
+                            <div class="p-col-6">Source</div>
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                              value="#{addressBB.currentMailingAddress.source.title}"/>
+
+                                <p:selectOneMenu id="address-source-som"
+                                                 required="true"
+                                                 rendered="#{addressBB.addressEditMode}" 
+                                                 value="#{addressBB.currentMailingAddress.source}">
+                                    <f:converter converterId="bobSourceConverter"/>
+                                    <f:selectItems value="#{addressBB.addressSourceList}"
+                                                   var="bs" 
+                                                   itemValue="#{bs}" 
+                                                   itemLabel="#{bs.title} (ID:#{bs.sourceid})"/>
+                                </p:selectOneMenu>
+
+                            </div>
+
+
+                            <div class="p-col-6">Verified?</div>
+                            <div class="p-col-6">
+                                <h:outputText   rendered="#{!addressBB.addressEditMode}"
+                                                value="#{empty addressBB.currentMailingAddress.verifiedTS ? 'No' : 'Yes'}" />
+
+                                <p:spacer height="2px" />
+
+                                <h:outputText   rendered="#{!addressBB.addressEditMode}"
+                                                value="#{!empty addressBB.currentMailingAddress.verifiedTS ? 'on ' : ''}" />
+
+                                <p:spacer height="2px" />
+
+                                <h:outputText   rendered="#{!addressBB.addressEditMode}"
+                                                value="#{!empty addressBB.currentMailingAddress.verifiedBy ? 'by ' : ''}" />
+
+                                <h:outputText   rendered="#{!addressBB.addressEditMode}"
+                                                value="#{!empty addressBB.currentMailingAddress.verifiedBy ? addressBB.currentMailingAddress.verifiedBy.username : ''}" />
+
+
+                                <p:selectBooleanCheckbox    id="address-verified-sbcb"
+                                                            rendered="#{addressBB.addressEditMode}"
+                                                            value="#{addressBB.formAddressVerified}" >
+
+                                    <p:ajax process="address-verified-sbcb" 
+                                            update="address-ver-source-som"/>
+                                </p:selectBooleanCheckbox>
+                            </div>
+
+                            <div class="p-col-6">Verification Source</div>
+                            <div class="p-col-6">
+                                <h:outputText rendered="#{!addressBB.addressEditMode}" 
+                                              value="#{addressBB.currentMailingAddress.verifiedSource.title}"/>
+
+                                <p:selectOneMenu id="address-ver-source-som"
+                                                 required="false"
+                                                 disabled="#{!addressBB.formAddressVerified}"
+                                                 rendered="#{addressBB.addressEditMode}" 
+                                                 value="#{addressBB.currentMailingAddress.verifiedSource}">
+                                    <f:converter converterId="bobSourceConverter"/>
+                                    <f:selectItems value="#{addressBB.addressSourceList}"
+                                                   var="bs" 
+                                                   itemValue="#{bs}" 
+                                                   itemLabel="#{bs.title} (ID:#{bs.sourceid})"/>
+                                </p:selectOneMenu>
+
+                            </div>
+
+                            <div class="p-col-6">Creation</div>
+                            <div class="p-col-6">
+                                <h:outputText value="#{addressBB.getPrettyDate(addressBB.currentMailingAddress.createdTS)}" />
+                                <p:spacer height="2px" />
+                                <h:outputText   rendered="#{!empty addressBB.currentMailingAddress.createdBy}"
+                                                value="by #{addressBB.currentMailingAddress.createdBy.username}" />
+                            </div>
+
+                            <div class="p-col-6">Last update</div>
+                            <div class="p-col-6">
+                                <h:outputText value="#{addressBB.getPrettyDate(addressBB.currentMailingAddress.lastUpdatedTS)}" />
+                                <p:spacer height="2px" />
+                                <h:outputText   rendered="#{!empty addressBB.currentMailingAddress.lastUpdatedBy}"
+                                                value="by #{addressBB.currentMailingAddress.lastUpdatedBy.username}" />
+                            </div>
+
+                            <div class="p-col-6">Record status</div>
+                            <div class="p-col-6">
+                                <h:outputText value="#{empty addressBB.currentMailingAddress.deactivatedTS ? 'active' : 'deactivated on'}" />
+                                <p:spacer height="2px" />
+                                <h:outputText value="#{empty addressBB.currentMailingAddress.deactivatedTS ? '' : addressBB.getPrettyDate(addressBB.currentMailingAddress.deactivatedTS) }" />
+                                <p:spacer height="2px" />
+                                <h:outputText   rendered="#{!empty addressBB.currentMailingAddress.deactivatedBy}"
+                                                value="by #{addressBB.currentMailingAddress.deactivatedBy.username}" />
+                            </div>
+                            <div class="p-col-6">
+                                Notes
+                                <p:spacer height="3px" />
+
+                                <p:commandLink  id="address-notes-init-clink"
+                                                ajax="true"
+                                                style="color:blue; font-weight: bold;"
+                                                oncomplete="PF('address-note-dialog-var').show()"
+                                                rendered="#{!addressBB.editModeCurrentAddress}"
+                                                update="address-note-dialog
+                                                address-note-form"
+                                                value="Attach note"
+                                                actionListener="#{addressBB.onMailingAddressNoteInitButtonChange}">
+
+                                </p:commandLink>
+
+                            </div>
+                            <div class="p-col-6">
+                                <h:outputText value="#{addressBB.currentMailingAddress.notes}"
+                                              escape="false" />
+                            </div>
+                        </div>
+                    </h:form>
+                </p:panel>
+
+            </div>
+
+            <div class="p-col">
+
+
+                <p:panel id="address-links-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Address Connections">
+
+                    <h:form id="address-links-form">
+
+                        <h:outputText value="connections to #{addressBB.currentMailingAddress.addressPretty2LineEscapeFalse}"
+                                      escape="false" />
+
+
+                    </h:form>
+                </p:panel>
+
+            </div>
+
+        </div>
+    </p:dialog>
+
+    <p:dialog   id="address-search-dialog"
+                height="600" width="1400"
+                widgetVar="address-search-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Address Manager"
+                rendered="true"
+                >
+
+        <div class="p-grid nested-grid">
+            <div class="p-col-12">
+                <div class="p-grid">
+                    <div class="p-col-2">
+
+                        <h:form id="address-search-selected-help-form">
+                            <h2>Selected address:   <p:commandButton id="address-search-selected-help-button"
+                                                                     icon="fa fa-question-circle-o"
+                                                                     styleClass="button-help"
+                                                                     type="button" /></h2>
+
+
+
+                            <p:overlayPanel for="address-search-selected-help-button"
+                                            style="width:350px;" 
+                                            dismissable="true"
+                                            showCloseIcon="true">
+                                <h3>Help on current address</h3>
+                                <p>Select an address by searching for a ZIP code (or using the quick 
+                                    ZIP code link in the street search column (middle), choosing a 
+                                    street, and then choosing a building on that street.</p>
+
+                                <p>Once you have a selected address, you can link it to your 
+                                    current property or person using buttons that appear after selection.</p>
+                            </p:overlayPanel>
+
+                        </h:form>
+
+                    </div>
+                    <div class="p-col-4">
+                        <h:form id="selected-address-form">
+
+                            <h:outputText value="#{addressBB.currentMailingAddress.addressPretty2LineEscapeFalse}" 
+                                          escape="false"/>
+
+                            <p:spacer height="2px" />
+
+                            <p:commandLink id="activebob-viewaddresses-cl"
+                                           value="address details" 
+                                           ajax="true"
+                                           rendered="#{!empty addressBB.currentMailingAddress}"
+                                           style="color:blue; font-weight: bold;"
+                                           actionListener="#{addressBB.onMailingAddressViewCurrentAddress}"
+                                           oncomplete="PF('address-dialog-var').show();"
+                                           update="address-dialog
+                                           address-info-form
+                                           addresses-growl-form">
+                            </p:commandLink>
+
+                        </h:form>
+
+                    </div>
+                    <div class="p-col-6">
+                        <h:form id="selected-address-links-form">
+
+                            <p:commandButton id="link-address-to-session-property"
+                                             value="Link Parcel ID :#{sessionBean.sessProperty.countyParcelID} to #{addressBB.currentMailingAddress.addressPretty1Line}"
+                                             actionListener="#{addressBB.onLinkCurrentAddressToSessionProperty}"
+                                             icon="fa fa-link"
+                                             disabled="#{empty sessionBean.sessProperty}"
+                                             rendered="#{!empty addressBB.currentMailingAddress}"
+                                             oncomplete="PF('address-link-dialog-var').show();"
+                                             update="   address-link-dialog
+                                             address-linking-form" />
+
+                            <p:spacer height="5px" />
+
+                            <p:commandButton id="link-address-to-session-person"
+                                             value="Link #{sessionBean.sessPerson.name} (ID:#{sessionBean.sessPerson.humanID}) to #{addressBB.currentMailingAddress.addressPretty1Line}"
+                                             actionListener="#{addressBB.onLinkCurrentAddressToSessionPerson}"
+                                             icon="fa fa-link"
+                                             disabled="#{empty sessionBean.sessPerson}"
+                                             rendered="#{!empty addressBB.currentMailingAddress}"
+                                             oncomplete="PF('address-link-dialog-var').show();"
+                                             update="   address-link-dialog
+                                             address-linking-form" />
+
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+            <div class="p-col-12">
+                <div class="p-grid">
+                    <div class="p-col-4">
+                        <p:panel id="csz-search-panel"
+                                 toggleable="true"
+                                 collapsed="false"
+                                 header="City, State, ZIP Code Search">
+
+                            <h:form id="csz-search-form">
+                                <p:selectOneMenu id="csz-search-query-som"
+                                                 tabindex="1"
+                                                 value="#{addressBB.selectedCSZQuery}"
+                                                 style="width: 100%"
+                                                 >
+                                    <f:converter converterId="bOBQueryConverter"/>
+
+                                    <f:selectItem itemLabel="select a query..."
+                                                  noSelectionOption="true"
+                                                  itemDisabled="true"
+                                                  />
+                                    <f:selectItems id="csz-search-query-si"
+                                                   value="#{addressBB.qcszEnumList}"
+                                                   var="ql"
+                                                   itemValue="#{ql}"
+                                                   itemLabel="#{ql.queryTitle}" 
+                                                   />
+                                    <p:ajax update="
+                                            csz-params-form
+                                            addresses-growl-form"
+                                            listener="#{addressBB.onQueryChange}"
+                                            />
+                                </p:selectOneMenu>
+
+                            </h:form>
+
+                            <p:spacer height="5px"/>    
+                            <h:form id="csz-params-form">
+
+                                <f:subview  id="csz-params-subview-zip"
+                                            rendered="#{addressBB.selectedCSZQuery.primaryParams.zip_ctl}">
+
+
+                                    <div class="p-grid">
+                                        <div class="p-col-6">
+                                            <h:outputText   id="param-zip-zip-label"
+                                                            value="ZIP Code" />
+
+                                        </div>
+
+                                        <div class="p-col-6">
+                                            <p:inputText    id="param-zip-zip-it"
+                                                            value="#{addressBB.selectedCSZQuery.primaryParams.zip_val}" />
+                                        </div>
+
+                                    </div>
+
+                                </f:subview>
+
+                                <f:subview  id="csz-params-subview-city"
+                                            rendered="#{addressBB.selectedCSZQuery.primaryParams.city_ctl}">
+
+                                    <div class="p-grid">
+
+                                        <div class="p-col-6">
+                                            <h:outputText   id="param-zip-city-label"
+                                                            value="City" />
+                                        </div>
+
+
+                                        <div class="p-col-6">
+                                            <p:inputText    id="param-zip-city-it"
+                                                            value="#{addressBB.selectedCSZQuery.primaryParams.city_val}"  />
+                                        </div>
+                                    </div>
+                                </f:subview>
+
+                                <f:subview  id="csz-params-subview-state"
+                                            rendered="#{addressBB.selectedCSZQuery.primaryParams.state_ctl}">
+                                    <div class="p-grid">
+                                        <div class="p-col-6">
+
+                                            <h:outputText   id="param-zip-state-label"
+                                                            value="State" />
+                                        </div>
+
+                                        <div class="p-col-6">
+                                            <p:inputText    id="param-zip-state-it"
+                                                            value="#{addressBB.selectedCSZQuery.primaryParams.state_val}" 
+                                                            />
+                                        </div>
+                                    </div>
+                                </f:subview>
+
+                                <p:commandButton id="csz-search-button"
+                                                 value="Search"
+                                                 rendered="true"
+                                                 icon="fa fa-search"
+                                                 style="margin-right: 10px;"
+                                                 disabled="#{addressBB.selectedCSZQuery.queryExecuted}"
+                                                 actionListener="#{addressBB.onQueryCSZExecuteButtonChange}"
+                                                 oncomplete="PF('address-search-dialog-var').show()"
+                                                 update="@form
+                                                 csz-results-form
+                                                 addresses-growl-form"/>
+
+                                <p:commandButton    id="csz-search-clear-button"
+                                                    ajax="true"
+                                                    rendered="true"
+                                                    disabled="#{!addressBB.selectedCSZQuery.queryExecuted}"
+                                                    value="Reset search"
+                                                    actionListener="#{addressBB.onQueryResetButtonChange}"
+                                                    update="addresses-growl-form
+                                                    csz-results-form
+                                                    @form"
+                                                    icon="fa fa-eraser" />
+
+                            </h:form>
+
+                            <p:spacer height="5px"/>   
+
+                            <h:form id="csz-results-form">
+
+                                <p:dataTable    id="csz-results-table"
+                                                value="#{addressBB.selectedCSZQuery.results}"
+                                                var="csz"
+                                                lazy="false"
+                                                rowKey="#{csz.cityStateZipID}"
+                                                tableStyleClass="primeDataTable"
+                                                draggableRows="true" 
+                                                stripedRows="true"
+                                                rowExpandMode="multiple"
+                                                tabindex="6">
+
+                                    <p:column width="10%" 
+                                              headerText="Exp.">
+                                        <p:rowToggler/>
+                                    </p:column>
+
+                                    <p:column width="20%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ZIP Code"/>
+                                        </f:facet>
+                                        <h:outputText value="#{csz.zipCode}" />
+                                    </p:column>
+
+                                    <p:column width="40%"
+                                              sortBy="#{csz.city}"
+                                              filterable="true">
+                                        <f:facet name="header">
+                                            <h:outputText value="City"/>
+                                        </f:facet>
+                                        <h:outputText value="#{csz.city}" />
+                                    </p:column>
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="State"/>
+                                        </f:facet>
+                                        <h:outputText value="#{csz.state}" />
+                                    </p:column>
+
+                                    <p:column width="20%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Actions"/>
+                                        </f:facet>
+
+                                        <p:commandLink  id="csz-select"
+                                                        value="load streets"
+                                                        style="color:blue; font-weight: bold;"
+                                                        rendered="true"
+                                                        actionListener="#{addressBB.selectCityStateZip(csz)}"
+                                                        ajax="true"
+                                                        update="address-dialog
+                                                        street-panel
+                                                        address-info-form
+                                                        street-search-form
+                                                        addresses-growl-form"
+                                                        />
+                                    </p:column>
+                                    <p:rowExpansion>
+                                        <div class="p-grid">
+
+                                            <div class="p-col-4">
+                                                City/State/Zip ID
+                                            </div>
+                                            <div class="p-col-8">
+                                                <h:outputText value="#{csz.cityStateZipID}" />
+                                            </div>
+                                            <div class="p-col-4">
+                                                Record Type
+                                            </div>
+                                            <div class="p-col-8">
+                                                <h:outputText value="#{csz.recordTypeString}" />
+                                            </div>
+                                            <div class="p-col-4">
+                                                Default role
+                                            </div>
+                                            <div class="p-col-8">
+                                                <h:outputText value="#{csz.defaultTypeString}" />
+                                            </div>
+                                            <div class="p-col-4">
+                                                Default City
+                                            </div>
+                                            <div class="p-col-8">
+                                                <h:outputText value="#{csz.defaultCity}" />
+                                            </div>
+                                        </div>
+                                    </p:rowExpansion>
+                                </p:dataTable>
+
+
+                            </h:form>
+                        </p:panel>  
+                    </div>
+
+                    <div class="p-col-4">
+
+                        <p:panel id="street-panel"
+                                 toggleable="true"
+                                 collapsed="false"
+                                 header="Streets in ZIP Code: #{addressBB.currentCityStateZip.zipCode} (#{addressBB.currentCityStateZip.defaultCity}, #{addressBB.currentCityStateZip.state})">
+
+                            <h:form id="street-search-form">
+
+                                <h:outputText value="Quick load: ZIP Codes in #{systemServicesBB.bbSessionMuni.muniName}: " />
+
+                                <ui:repeat id="muni-zip-uir"
+                                           value="#{systemServicesBB.bbSessionMuni.zipList}"
+                                           var="zip">
+                                    <p:commandLink  id="csz-quick-select"
+                                                    value="#{zip.zipCode}"
+                                                    style="color:blue; font-weight: bold;"
+                                                    rendered="true"
+                                                    actionListener="#{addressBB.selectCityStateZip(zip)}"
+                                                    ajax="true"
+                                                    update="address-dialog
+                                                    street-panel
+                                                    address-info-form
+                                                    street-search-form
+                                                    addresses-growl-form"
+                                                    />
+                                    <h:outputText value=" " />
+                                </ui:repeat>
+
+                                <p:spacer height="5px"/>
+
+                                <p:commandButton id="street-create-init-button"
+                                                 value="New steet in #{addressBB.currentCityStateZip.zipCode}"
+                                                 icon="fa fa-plus"
+                                                 disabled="#{empty addressBB.currentCityStateZip}"
+                                                 oncomplete="PF('street-infoedit-dialog-var').show()"
+                                                 actionListener="#{addressBB.onMailingStreetCreateInitButtonChange}"
+                                                 update="street-infoedit-dialog
+                                                 street-infoedit-form"/>
+
+                                <p:spacer height="5px"/>
+
+                                <p:dataTable    id="street-results-table"
+                                                value="#{addressBB.streetList}"
+                                                filteredValue="#{addressBB.streetListFiltered}"
+                                                var="street"
+                                                lazy="false"
+                                                scrollable="true"
+                                                scrollHeight="200px"
+                                                scrollRows="5"
+                                                rowKey="#{street.streetID}"
+                                                tableStyleClass="primeDataTable"
+                                                draggableRows="false" 
+                                                tabindex="6">
+
+                                    <p:column width="40%"
+                                              sortBy="#{street.name}"
+                                              filterable="true"
+                                              filterBy="#{street.name}"
+                                              >
+                                        <f:facet name="header">
+                                            <h:outputText value="Street Name"/>
+                                        </f:facet>
+                                        <h:outputText value="#{street.name}" />
+                                    </p:column>
+
+                                    <p:column width="15%">
+                                        <f:facet name="header">
+                                            <h:outputText value="ZIP Code"/>
+                                        </f:facet>
+                                        <h:outputText value="#{street.cityStateZip.zipCode}" />
+                                    </p:column>
+
+                                    <p:column width="10%">
+                                        <f:facet name="header">
+                                            <h:outputText value="State"/>
+                                        </f:facet>
+                                        <h:outputText value="#{street.cityStateZip.state}" />
+                                    </p:column>
+
+                                    <p:column width="35%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Actions"/>
+                                        </f:facet>
+
+                                        <p:commandLink  id="street-viewedit"
+                                                        value="view/edit"
+                                                        style="color:blue; font-weight: bold;"
+                                                        rendered="true"
+                                                        actionListener="#{addressBB.onStreetViewEditLinkClick(street)}"
+                                                        ajax="true"
+                                                        oncomplete="PF('street-infoedit-dialog-var').show();"
+                                                        update="street-infoedit-dialog
+                                                        street-infoedit-form"
+                                                        />
+
+                                        <p:spacer height="2px" />
+
+
+                                        <p:commandLink  id="street-select"
+                                                        value="load addresses"
+                                                        style="color:blue; font-weight: bold;"
+                                                        rendered="true"
+                                                        actionListener="#{addressBB.onStreetSelectLinkClick(street)}"
+                                                        ajax="true"
+                                                        update="building-panel
+                                                        building-form
+                                                        addresses-growl-form"
+                                                        />
+                                    </p:column>
+                                </p:dataTable>
+                            </h:form>
+                        </p:panel>
+                    </div>
+                    <div class="p-col-4">
+                        <p:panel id="building-panel"
+                                 toggleable="true"
+                                 collapsed="false"
+                                 header="Addresses">
+                            <h:form id="building-form">
+
+                                <p:commandButton id="address-create-init-button"
+                                                 value="New address on #{addressBB.currentStreet.name}"
+                                                 disabled="#{empty addressBB.currentStreet}"
+                                                 icon="fa fa-plus"
+                                                 oncomplete="PF('address-dialog-var').show()"
+                                                 actionListener="#{addressBB.onMailingAddressAddInitButtonChange}"
+                                                 update="address-dialog
+                                                 address-info-form
+                                                 addresses-growl-form"/>
+
+                                <p:spacer height="5px" />
+
+                                <p:dataTable    id="address-results-table"
+                                                value="#{addressBB.mailingAddressList}"
+                                                filteredValue="#{addressBB.mailingAddressListFiltered}"
+                                                var="addr"
+                                                lazy="false"
+                                                rowKey="#{addr.addressID}"
+                                                tableStyleClass="primeDataTable"
+                                                draggableRows="true" 
+                                                stripedRows="true"
+                                                tabindex="6">
+
+                                    <p:column width="20%"
+                                              filterBy="#{addr.buildingNo}"
+                                              filterable="true"
+                                              sortBy="#{addr.buildingNo}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Bldg No."/>
+                                        </f:facet>
+                                        <h:outputText value="#{addr.buildingNo}" />
+                                    </p:column>
+
+                                    <p:column width="25%"
+                                              sortBy="#{addr.street.name}">
+                                        <f:facet name="header">
+                                            <h:outputText value="Street"/>
+                                        </f:facet>
+                                        <h:outputText value="#{addr.street.name}" />
+                                    </p:column>
+
+                                    <p:column width="25%">
+                                        <f:facet name="header">
+                                            <h:outputText value="City"/>
+                                        </f:facet>
+                                        <h:outputText value="#{addr.street.cityStateZip.defaultCity}" />
+                                    </p:column>
+
+                                    <p:column width="20%">
+                                        <f:facet name="header">
+                                            <h:outputText value="Actions"/>
+                                        </f:facet>
+
+                                        <p:commandLink  id="address-view"
+                                                        value="view/edit"
+                                                        style="color:blue; font-weight: bold;"
+                                                        rendered="true"
+                                                        actionListener="#{addressBB.onMailingAddressViewEditLinkClick(addr)}"
+                                                        ajax="true"
+                                                        oncomplete="PF('address-dialog-var').show();"
+                                                        update="address-dialog
+                                                        address-info-form
+                                                        addresses-growl-form"
+                                                        />
+
+                                        <p:spacer height="3px" />
+
+                                        <p:commandLink  id="address-select"
+                                                        value="select for linking"
+                                                        style="color:blue; font-weight: bold;"
+                                                        rendered="true"
+                                                        actionListener="#{addressBB.onMailingAddressViewEditLinkClick(addr)}"
+                                                        ajax="true"
+                                                        update="selected-address-form
+                                                        selected-address-links-form"
+                                                        />
+                                    </p:column>
+                                </p:dataTable>
+                            </h:form>
+                        </p:panel>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p:dialog>
+
+
+    <p:dialog id="street-infoedit-dialog"
+              width="1000"
+              widgetVar="street-infoedit-dialog-var"
+              header="Street: #{addressBB.currentStreet.streetID eq 0 ? '(New street)' : addressBB.currentStreet.name}"
+              modal="true"
+              closeOnEscape="true"
+              closable="true"
+              resizable="true">
+        <h:form id="street-infoedit-form">
+
+            <p:commandButton id="street-edit-button"
+                             value="#{addressBB.editModeCurrentStreet ? 'Save Changes' : 'Edit'}"
+                             disabled="#{!addressBB.currentStreet.active}"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             icon="fa #{addressBB.editModeCurrentStreet ? 'fa-check' : 'fa-pencil'}"
+                             actionListener="#{addressBB.onToggleStreetEditModeButtonChange}"
+                             oncomplete="PF('street-infoedit-dialog-var').show()"
+                             update="@form
+                             street-infoedit-dialog
+                             street-search-form"/>
+
+            <div class="gray_button">
+
+                <p:commandButton id="street-edit-abort"
+                                 value="Cancel"
+                                 styleClass="gray-button"
+                                 rendered="#{addressBB.editModeCurrentStreet}"
+                                 icon="fa fa-stop"
+                                 ajax="true"
+                                 actionListener="#{addressBB.onMailingStreetEditAbort}"
+                                 update="street-infoedit-form"
+                                 />
+            </div>
+
+            <div class="p-grid">
+                <div class="p-col-6">
+                    ID
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.currentStreet.streetID eq 0 ? '(New street)' : addressBB.currentStreet.streetID}" />
+                </div>
+
+                <div class="p-col-6">
+                    Street Name
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.currentStreet.name}" 
+                                  rendered="#{!addressBB.editModeCurrentStreet}"
+                                  />
+                    <p:inputText value="#{addressBB.currentStreet.name}" 
+                                 rendered="#{addressBB.editModeCurrentStreet}"
+                                 />
+                </div>
+                <div class="p-col-6">
+                    City, State, Zip
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.currentStreet.cityStateZip.city}" 
+                                  rendered="true"
+                                  />
+                    <h:outputText value=", " />
+                    <h:outputText value="#{addressBB.currentStreet.cityStateZip.state}" 
+                                  rendered="true"
+                                  />
+
+                    <h:outputText value=" " />
+                    <h:outputText value="#{addressBB.currentStreet.cityStateZip.zipCode}" 
+                                  rendered="true"
+                                  />
+
+                    <p:spacer height="3px" />
+                    <h:outputText value="(CSZip ID:#{addressBB.currentStreet.cityStateZip.cityStateZipID})" 
+                                  rendered="true"
+                                  />
+                </div>
+
+                <div class="p-col-6">
+                    Created
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.getPrettyDate(addressBB.currentStreet.createdTS)}" />
+
+                </div>
+                <div class="p-col-6">
+                    Active
+                    <p:spacer height="3px" />
+
+                    <p:commandLink  id="street-deactivate-clink"
+                                    ajax="true"
+                                    style="color:blue; font-weight: bold;"
+                                    oncomplete="PF('remove-street-confirm-dialog-var').show()"
+                                    rendered="#{!addressBB.editModeCurrentStreet}"
+                                    update="remove-street-confirm-dialog
+                                    remove-street-confirm-form"
+                                    value="Deactivate street ID #{addressBB.currentStreet.streetID}"
+                                    actionListener="#{addressBB.onMailingStreetDeactivateInitLinkClick}">
+
+                    </p:commandLink>
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.currentStreet.active ? 'Active' : 'Deactivated'}" />
+
+                </div>
+                <div class="p-col-6">
+                    Notes
+                    <p:spacer height="3px" />
+                    <p:commandLink  id="street-notes-init-clink"
+                                    ajax="true"
+                                    style="color:blue; font-weight: bold;"
+                                    oncomplete="PF('street-note-dialog-var').show()"
+                                    rendered="#{!addressBB.editModeCurrentStreet}"
+                                    update="street-note-dialog
+                                    street-note-form"
+                                    value="Attach note"
+                                    actionListener="#{addressBB.onMailingStreetNoteInitButtonChange}">
+
+                    </p:commandLink>
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="#{addressBB.currentStreet.notes}" 
+                                  escape="false"/>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+
+
+
+    <p:confirmDialog id="remove-street-confirm-dialog"
+                     widgetVar="remove-street-confirm-dialog-var"
+                     header="Confirm deactivation of street?"
+                     closeOnEscape="true"
+                     closable="true"
+                     responsive="true">
+
+        <h:form id="remove-street-confirm-form">
+            <h:outputText value="DEACTIVATOR BEWEARE! Deactivating a street will deactivate all addresses on this street and all links to all those addresses!" />
+            <p:spacer height="5px" />
+            <p:commandButton  id="street-remove-commit-button"
+                              ajax="true"
+                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                              update="addresses-growl-form"
+                              value="Confirm removal of street #{addressBB.currentStreet.name} (ID: #{addressBB.currentStreet.streetID})"
+                              actionListener="#{addressBB.onMailingStreetDeactivateCommit}" 
+                              oncomplete="PF('remove-street-confirm-dialog-var').hide()">
+            </p:commandButton>
+
+            <p:spacer height="5px" />
+
+            <div class="gray_button">
+
+                <p:commandButton id="remove-street-abort-button"
+                                 value="Cancel"
+                                 styleClass="gray-button"
+                                 rendered="true"
+                                 icon="fa fa-stop"
+                                 process="@none"
+                                 immediate="true"
+                                 actionListener="#{addressBB.onMailingStreetEditAbort}"
+                                 oncomplete="PF('remove-street-confirm-dialog-var').hide()" />
+            </div>
+        </h:form>
+    </p:confirmDialog>
+
+
+    <p:confirmDialog id="remove-address-confirm-dialog"
+                     widgetVar="remove-address-confirm-dialog-var"
+                     header="Confirm deactivation of address?"
+                     closeOnEscape="true"
+                     closable="true"
+                     responsive="true">
+
+        <h:form id="remove-address-confirm-form">
+            <h:outputText value="DEACTIVATOR BEWEARE! Deactivating an address will deactivate all links to this address!" />
+            <p:spacer height="5px" />
+            <p:commandButton  id="address-remove-commit-button"
+                              ajax="true"
+                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                              update="addresses-growl-form"
+                              value="Confirm removal of address #{addressBB.currentMailingAddress.buildingNo} (ID: #{addressBB.currentMailingAddress.addressID})"
+                              actionListener="#{addressBB.onMailingStreetDeactivateCommit}" 
+                              oncomplete="PF('remove-address-confirm-dialog-var').hide()">
+            </p:commandButton>
+
+            <p:spacer height="5px" />
+
+            <div class="gray_button">
+
+                <p:commandButton id="remove-address-abort-button"
+                                 value="Cancel"
+                                 styleClass="gray-button"
+                                 rendered="true"
+                                 icon="fa fa-stop"
+                                 process="@none"
+                                 immediate="true"
+                                 actionListener="#{addressBB.onMailingAddressAbortOperationButtonChange}"
+                                 oncomplete="PF('remove-address-confirm-dialog-var').hide()" />
+            </div>
+        </h:form>
+    </p:confirmDialog>
+
+    <p:dialog   id="address-note-dialog"
+                height="400" width="400"
+                widgetVar="address-note-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Append note Current Address ID:#{addressBB.currentMailingAddress.addressID}"
+                rendered="true"
+                >
+
+        <h:form id="address-note-form">
+            <h:outputText value="Note content:" />
+
+            <p:spacer height="5px" />
+
+            <p:inputTextarea value="#{addressBB.formNotesAddress}"
+                             cols="40"
+                             rows="5" />
+
+            <p:spacer height="3px" />
+            <h:outputText value="(your username and the date/time will be automatically included)" />
+            <p:spacer height="5px" />
+
+            <p:commandButton id="address-note-commit-button" 
+                             value="Save note"
+                             rendered="true"
+                             icon="fa fa-sticky-note"
+                             ajax="true"
+                             actionListener="#{addressBB.onMailingAddressNoteCommitButtonChage}"
+                             oncomplete="PF('address-note-dialog-var').hide()"
+                             update="address-info-form
+                             addresses-growl-form"/>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog   id="street-note-dialog"
+                height="400" width="400"
+                widgetVar="street-note-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Append note to current street ID:#{addressBB.currentStreet.streetID}"
+                rendered="true"
+                >
+
+        <h:form id="street-note-form">
+            <h:outputText value="Note content:" />
+
+            <p:spacer height="5px" />
+
+            <p:inputTextarea value="#{addressBB.formNotesStreet}"
+                             cols="40"
+                             rows="5" />
+
+            <p:spacer height="3px" />
+            <h:outputText value="(your username and the date/time will be automatically included)" />
+            <p:spacer height="5px" />
+
+            <p:commandButton id="street-note-commit-button" 
+                             value="Save note"
+                             rendered="true"
+                             icon="fa fa-sticky-note"
+                             ajax="true"
+                             actionListener="#{addressBB.onMailingStreetNoteCommitButtonChage}"
+                             oncomplete="PF('street-note-dialog-var').hide()"
+                             update="addresses-growl-form
+                             street-infoedit-form"/>
+        </h:form>
+    </p:dialog>
+
+
+    <p:panel     id="addresslink-list-panel"
+                 toggleable="true"
+                 collapsed="false"
+                 rendered="false"
+                 header="Address Connections to #{addressBB.currentAddressListHolder.linkedObjectSchemaEnum.TARGET_OBJECT_FRIENDLY_NAME} (ID:#{addressBB.currentAddressListHolder.targetObjectPK})" >
+
+
+
+        <h:form id="addresslink-list-form">
+
+            <p:commandButton id="parcel-address-add-init-cb"
+                             ajax="true"
+                             value="Connect #{addressBB.currentAddressListHolder.linkedObjectSchemaEnum.TARGET_OBJECT_FRIENDLY_NAME} to the session address #{!empty sessionBean.sessMailingAddress ? sessionBean.sessMailingAddress.addressPretty1Line : ''}"
+                             icon="fa fa-link"
+                             actionListener="#{addressBB.onLinkToSessionMailingAddressInitButtonChange}"
+                             />
+
+            <p:spacer height="5px" />
+
+            <p:dataTable    id="address-link-table"
+                            value="#{addressBB.currentAddressListHolder.mailingAddressLinkList}"
+                            var="madlink"
+                            rowKey="#{madlink.linkID}"
+                            tableStyleClass="primeDataTable"
+                            draggableRows="true" 
+                            tabindex="6">
+
+                <p:column width="15%">
+                    <f:facet name="header">
+                        <h:outputText value="Priority"/>
+                    </f:facet>
+                </p:column>
+
+                <p:column width="50%">
+
+                    <h:outputText value="#{madlink.addressPretty2LineEscapeFalse}"
+                                  escape="false"/>
+
+
+                </p:column>
+
+                <p:column width="35%">
+                    <f:facet name="header">
+                        <h:outputText value="Actions"/>
+                    </f:facet>
+
+                    <p:commandLink      id="parcel-addr-actions-cl"
+                                        ajax="true"
+                                        actionListener="#{addressBB.onMalingAddressLinkViewEditInit(madlink)}"
+                                        style="color:blue; font-weight: bold;"
+                                        oncomplete="PF('address-link-dialog-var').show()"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                        update="address-link-dialog
+                                        addresses-growl-form
+                                        address-linking-form"
+                                        value="view/edit" />
+                    <h:outputText value="(link ID: #{madlink.linkID})" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:panel>
+
+
+    <p:dialog   id="address-link-dialog"
+                height="600" width="400"
+                widgetVar="address-link-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Address Link ID:#{addressBB.currentMailingAddressLink.linkID eq 0 ? '(New Link)' : addressBB.currentMailingAddressLink.linkID}"
+                rendered="true"
+                >
+
+        <h:form id="address-linking-form">
+
+            <p:commandButton id="address-link-edit-toggle-button"
+                             value="#{addressBB.editModeCurrentAddressLink? 'Save changes' : 'Edit'}"
+                             rendered="true"
+                             ajax="true"
+                             style="margin-right:10px;"
+                             icon="fa #{addressBB.editModeCurrentAddressLink ? 'fa-check' : 'fa-pencil'}"
+                             actionListener="#{addressBB.onMailingAddressLinkEditToggleButtonChange}"
+                             update="@form
+                             addresslink-list-form
+                             addresses-growl-form
+                             #{addressBB.addressListHolderComponentForUpdatePostMADLinkOperation}
+                             "
+                             />
+
+
+
+            <p:commandButton    id="address-link-edit-cancel-button"
+                                ajax="true"
+                                rendered="#{addressBB.editModeCurrentAddressLink}"
+                                value="Abort edit"
+                                process="@none"
+                                immediate="true"
+                                actionListener="#{addressBB.onMailingAddressLinkEditAbort}"
+                                update="@form
+                                addresses-growl-form
+                                addresslink-list-form"
+                                icon="fa fa-stop" />
+
+
+            <p:spacer height="5px" />
+            <div class="p-grid">
+                <div class="p-col-4">
+                    <p:outputLabel for="addresslink-target-ot">
+                        <h:outputText value="Target"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+                    <h:outputText id="addresslink-target-ot"
+                                  value="#{addressBB.currentMailingAddressLink.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME} "
+                                  />
+                    <p:spacer height="3px" />
+                    <h:outputText id="addresslink-target-id"
+                                  value="(ID: #{addressBB.currentMailingAddressLink.targetObjectPK})"
+                                  />
+                </div>
+
+
+
+                <div class="p-col-4">
+                    <p:outputLabel for="address-link-role">
+                        <h:outputText value="Role"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+                    <h:outputText id="address-link-role"
+                                  value="#{!empty addressBB.currentMailingAddressLink.linkedObjectRole
+                                           ? addressBB.currentMailingAddressLink.linkedObjectRole.title
+                                           :'' } "
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"
+                                  />
+
+                    <p:selectOneMenu id="address-link-role-som" 
+                                     value="#{addressBB.currentMailingAddressLink.linkedObjectRole}" 
+                                     rendered="#{addressBB.editModeCurrentAddressLink}"
+                                     converter="linkedObjectRoleConverter" 
+                                     required="true"
+                                     requiredMessage="Oops, please select an association type">
+
+                        <f:selectItem itemLabel="Choose an association type" 
+                                      itemDisabled="true"
+                                      noSelectionOption="true"/>
+
+                        <f:selectItems id="rolelist-si" 
+                                       value="#{addressBB.mailingAddressLinkRoleCandidateList}" 
+                                       var="lr" 
+                                       itemValue="#{lr}" 
+                                       itemLabel="#{lr.title}"/>
+                    </p:selectOneMenu>
+                </div>
+                <div class="p-col-4">
+                    <p:outputLabel for="address-ot">
+                        <h:outputText value="Address"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+                    <h:outputText id="address-ot"
+                                  value="#{addressBB.currentMailingAddressLink.addressPretty2LineEscapeFalse} "
+                                  escape="false"/>
+                </div>
+
+                <div class="p-col-4">
+                    <p:outputLabel for="address-link-priority-ot">
+                        <h:outputText value="Priority"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+                    <h:outputText id="address-link-priority-ot"
+                                  value="#{addressBB.currentMailingAddressLink.priority}"
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"
+                                  />
+
+                    <p:inputNumber rendered="#{addressBB.editModeCurrentAddressLink}"
+                                   value="#{addressBB.currentMailingAddressLink.priority}"
+                                   decimalPlaces="0"
+                                   minValue="0"
+                                   maxValue="100" 
+                                   required="true"/>
+                </div>
+
+                <div class="p-col-4">
+                    <p:outputLabel for="addresslink-creationts">
+                        <h:outputText value="Creation"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+
+                    <h:outputText id="addresslink-creationts"
+                                  value="#{addressBB.getPrettyDate(addressBB.currentMailingAddressLink.linkCreatedTS)}"/>
+                    <p:spacer height="3px" />
+                    <h:outputText id="addresslink-creator-by"
+                                  value="#{addressBB.currentMailingAddressLink.linkCreatedByUserID}"/>
+
+                </div>
+                <div class="p-col-4">
+                    <p:outputLabel for="addresslink-lastupdatedts">
+                        <h:outputText value="Last update"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+
+                    <h:outputText id="addresslink-lastupdatedts"
+                                  value="#{addressBB.getPrettyDate(addressBB.currentMailingAddressLink.lastUpdatedTS)}"
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"/>
+                    <p:spacer height="3px"
+                              rendered="#{!addressBB.editModeCurrentAddressLink}"/>
+                    <h:outputText id="addresslink-lastupdator-by"
+                                  value="By User ID:#{addressBB.currentMailingAddressLink.linkLastUpdatedByUserID}"
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"/>
+
+                </div>
+                <div class="p-col-4">
+                    <p:outputLabel for="addresslink-active">
+                        <h:outputText value="Active"/>
+                    </p:outputLabel>
+                    <p:spacer height="5px" />
+                    <p:commandLink      id="address-link-deactivate-init-cl"
+                                        ajax="true"
+                                        actionListener="#{addressBB.onMailingAddressLinkDeactivateInitLinkClick}"
+                                        style="color:blue; font-weight: bold;"
+                                        oncomplete="PF('address-link-remove-dialog-var').show()"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                        disabled="#{addressBB.currentMailingAddressLink.linkID eq 0 or addressBB.editModeCurrentAddressLink}"
+                                        update="address-link-remove-dialog
+                                        address-link-remove-form"
+                                        value="deactivate link" />
+                </div>
+                <div class="p-col-8">
+
+                    <h:outputText id="addresslink-active"
+                                  value="#{empty addressBB.currentMailingAddressLink.deactivatedTS ? 'Yes' : 'No-Inactive'}"
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"/>
+                </div>
+                <div class="p-col-4">
+                    <p:outputLabel for="address-link-notes">
+                        <h:outputText value="Notes"/>
+                    </p:outputLabel>
+                </div>
+                <div class="p-col-8">
+                    <h:outputText id="address-link-notes"
+                                  value="#{addressBB.currentMailingAddressLink.linkNotes} "
+                                  rendered="#{!addressBB.editModeCurrentAddressLink}"
+                                  escape="false"
+                                  />
+                    <p:inputTextarea id="address-link-notes-ita"
+                                     cols="50"
+                                     rows="5"
+                                     required="false"
+                                     value="#{addressBB.currentMailingAddressLink.linkNotes}"
+                                     rendered="#{addressBB.editModeCurrentAddressLink}" />
+                </div>
+
+            </div>
+        </h:form>
+    </p:dialog>
+
+
+    <p:dialog   id="address-link-remove-dialog"
+                height="400" width="400"
+                widgetVar="address-link-remove-dialog-var"
+                responsive="true"
+                resizable="true"
+                closable="true"
+                closeOnEscape="true"
+                modal="true"
+                header="Remove Link to address: #{addressBB.currentMailingAddressLink.addressPretty1Line}"
+                rendered="true"
+                >
+
+        <h:form id="address-link-remove-form">
+            <h:outputText value="Deactivating an address link is irreversible (by web users)." />
+
+            <p:commandButton id="address-link-deactivate-confirm-button"
+                             value="Deactivate address link ID: #{addressBB.currentMailingAddressLink.linkID}"
+                             rendered="true"
+                             icon="fa fa-trash"
+                             ajax="true"
+                             actionListener="#{addressBB.onMailingAddressLinkDeactivateCommitButtonChange}"
+                             oncomplete="PF('address-link--remove-dialog-var').hide(); PF('address-link-dialog-var').hide();"
+                             update="addresses-growl-form
+                             #{addressBB.addressListHolderComponentForUpdatePostMADLinkOperation}"/>
+
+
+
+        </h:form>
+
+
+    </p:dialog>
+
+
+
+</ui:composition>

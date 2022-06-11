@@ -50,8 +50,8 @@ ALTER TABLE public.codesetelement
 
 ALTER TABLE codeset ADD COLUMN active BOOLEAN DEFAULT TRUE;
 
--- RUN ON REMOTE TO HERE
--- RUN LOCALLY TO HERE
+
+
 ALTER TABLE textblock 
     ADD COLUMN injectabletemplate BOOLEAN DEFAULT FALSE;
 
@@ -375,6 +375,7 @@ CREATE TABLE parcelunit
 
 ALTER TABLE parcelunit ADD COLUMN location_occlocationdescriptor INTEGER CONSTRAINT parcelunit_loc_locationdescriptionid_fk REFERENCES occlocationdescriptor (locationdescriptionid);
 
+-- this will be later deleted, but continuing for script continuity's sake
 CREATE SEQUENCE IF NOT EXISTS humanparcelrole_roleid_seq
     START WITH 100
     INCREMENT BY 1
@@ -382,6 +383,7 @@ CREATE SEQUENCE IF NOT EXISTS humanparcelrole_roleid_seq
     NO MAXVALUE
     CACHE 1;
 
+-- this will be later deleted, but continuing for script continuity's sake
 CREATE TABLE public.humanparcelrole
     (
         roleid              INTEGER PRIMARY KEY DEFAULT nextval('humanparcelrole_roleid_seq'),
@@ -444,6 +446,8 @@ CREATE TABLE public.mailingaddressparcel
         notes                       TEXT
     );
 
+-- SB22: needed to add a PK constraint on parcelunit for this FK to work
+ALTER TABLE parcelunit ADD CONSTRAINT parcelunit_pk PRIMARY KEY (unitid);
 
 CREATE SEQUENCE IF NOT EXISTS parcelunithuman_linkid_seq
     START WITH 100
@@ -468,24 +472,6 @@ CREATE TABLE public.humanparcelunit
     );
 
 
-
-CREATE SEQUENCE IF NOT EXISTS occperiodlease_leaseid_seq
-    START WITH 100
-    INCREMENT BY 1
-    MINVALUE 100
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE TABLE public.occperiodlease
-    (
-        leaseid             INTEGER PRIMARY KEY DEFAULT nextval('parcelunithumanlease_leaseid_seq'),
-        datestart           DATE,
-        dateend             DATE,
-        signeddate          DATE,
-        monthlyrent         MONEY,
-        leasor_humanid      INTEGER CONSTRAINT parcelhumanlease
-    
-    );
 
 
 CREATE SEQUENCE IF NOT EXISTS humanparcel_linkid_seq
@@ -582,4 +568,4 @@ CREATE TABLE public.humancecase
 
 --IF datepublished IS NULL the patch is still open and receiving changes
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (33, 'database/patches/dbpatch_beta33.sql','12-14-2020', 'ecd', 'NOV/DEC 2020 changes');
+    VALUES (33, 'database/patches/dbpatch_beta33.sql','03-10-2022', 'ecd', 'NOV/DEC 2020 changes; inconsistently implemented on live system, as determined during SB22, when this patch in its entirety was run on the remote system to get through db patch 37; published date from Dec 2020 to March 2022');

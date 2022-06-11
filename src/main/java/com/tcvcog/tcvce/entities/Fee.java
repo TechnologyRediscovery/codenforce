@@ -117,34 +117,7 @@ public class Fee extends BOb {
         this.expiryDate = expiryDate;
     }
 
-    /**
-     * @return the effective date
-     */
-    public Date getEffectiveUtilDate() {
-        return DateTimeUtil.convertUtilDate(effectiveDate);
-    }
-
-    /**
-     * @param effectiveUtilDate the date to set
-     */
-    public void setEffectiveUtilDate(Date effectiveUtilDate) {
-        effectiveDate = DateTimeUtil.convertUtilDate(effectiveUtilDate);
-    }
-
-    /**
-     * @return the expiry date
-     */
-    public Date getExpiryUtilDate() {
-        return DateTimeUtil.convertUtilDate(expiryDate);
-    }
-
-    /**
-     * @param expiryUtilDate the date to set
-     */
-    public void setExpiryUtilDate(Date expiryUtilDate) {
-        expiryDate = DateTimeUtil.convertUtilDate(expiryUtilDate);
-    }
-    
+   
     public String getNotes() {
         return notes;
     }

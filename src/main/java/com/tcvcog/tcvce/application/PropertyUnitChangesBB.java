@@ -52,7 +52,7 @@ public class PropertyUnitChangesBB
     private ViewOptionsActiveListsEnum currentViewOption;
 
     public PropertyUnitChangesBB() {
-    }
+    } 
 
     @PostConstruct
     public void initBean() {
@@ -61,8 +61,9 @@ public class PropertyUnitChangesBB
         allViewOptions = Arrays.asList(ViewOptionsActiveListsEnum.values());
 
         if (currentViewOption == null) {
-
-            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
+            // Remove me during init! null pointer hell
+            
+            // setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
         }
     }
 
@@ -99,11 +100,9 @@ public class PropertyUnitChangesBB
     public String approvedByWho(PropertyUnitChangeOrder change) {
 
         if (change.getApprovedBy() != null) {
-            return "Approved by: " + change.getApprovedBy().getPerson().getFirstName()
-                    + " "
-                    + change.getApprovedBy().getPerson().getLastName()
+            return "Approved by: " + change.getApprovedBy().getHuman().getName()
                     + " (ID# "
-                    + change.getApprovedBy().getPerson().getHumanID()
+                    + change.getApprovedBy().getHuman().getHumanID()
                     + ")";
         } else if(change.isActive()) {
             return "No action taken yet";

@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import java.time.LocalDateTime;
 
 /**
@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
  */
 public class PublicInfoBundleOccInspection extends PublicInfoBundle {
     
-    private OccInspection bundledInspection;
+    private FieldInspection bundledInspection;
     
     @Override
     public String toString(){
@@ -37,16 +37,16 @@ public class PublicInfoBundleOccInspection extends PublicInfoBundle {
         
     }
 
-    public OccInspection getBundledInspection() {
+    public FieldInspection getBundledInspection() {
         return bundledInspection;
     }
     
     /**
-     * Remove all sensitive data from the OccInspection and set it in the
-     * bundledInspection field.
+     * Remove all sensitive data from the FieldInspection and set it in the
+ bundledInspection field.
      * @param input 
      */
-    public void setBundledInspection(OccInspection input) {
+    public void setBundledInspection(FieldInspection input) {
         
         setPacc(input.getPacc());
         

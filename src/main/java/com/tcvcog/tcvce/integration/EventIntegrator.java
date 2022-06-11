@@ -472,22 +472,14 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
         try {
             stmt = con.prepareStatement(sb.toString());
-           
-
             stmt.setString(1, event.getNotes());
-            
-        
-            
             if(event.getLastUpdatedBy() != null){
                 stmt.setInt(2, event.getLastUpdatedBy().getUserID());
             } else {
                 stmt.setNull(2, java.sql.Types.NULL);
             }
-            
             stmt.setInt(3, event.getEventID());
-            
             stmt.executeUpdate();
-            
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -498,8 +490,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
-    
- 
     
     /**
      * Primary search method for EventCnF objects system wide!
@@ -525,19 +515,19 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         
         params.appendSQL("SELECT DISTINCT eventid \n");
         params.appendSQL("FROM public.event INNER JOIN public.eventcategory ON (category_catid = categoryid) \n");
-        params.appendSQL("LEFT OUTER JOIN public.eventperson ON (ceevent_eventid = event.eventid) \n");
+        params.appendSQL("LEFT OUTER JOIN public.eventhuman ON (eventhuman.event_eventid = event.eventid) \n");
         // to get to property and hence municipality, we must traverse different key pathways
         // through the database for CE versus Occ. This is all backflippy crazy shit because
         // of the decision decision to maintain only one event tablef or both Occ events and CE events.
         if(params.getEventDomain_val().equals(DomainEnum.CODE_ENFORCEMENT)){
             params.appendSQL("LEFT OUTER JOIN public.cecase ON (cecase.caseid = event.cecase_caseid) \n");
-            params.appendSQL("LEFT OUTER JOIN public.property ON (cecase.property_propertyid = property_propertyid)  \n");
+            params.appendSQL("LEFT OUTER JOIN public.parcel ON (cecase.parcel_parcelkey = parcel.parcelkey)  \n");
             
         } else {
             // with only two enum values now, we either have Code enf or occ
             params.appendSQL("LEFT OUTER JOIN public.occperiod ON (occperiod.periodid = event.occperiod_periodid) \n");
-            params.appendSQL("LEFT OUTER JOIN public.propertyunit ON (propertyunit.unitid = occperiod.propertyunit_unitid) \n");
-            params.appendSQL("LEFT OUTER JOIN public.property ON (property.propertyid = propertyunit.property_propertyid) \n");
+            params.appendSQL("LEFT OUTER JOIN public.parcelunit ON (parcelunit_unitid= occperiod.parcelunit_unitid) \n");
+            params.appendSQL("LEFT OUTER JOIN public.parcel ON (parcel.parcelkey = parcelunit.parcel_parcelkey) \n");
         }
         params.appendSQL("WHERE eventid IS NOT NULL \n");
         
@@ -569,7 +559,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
            // *******************************
             if (params.isEventType_ctl() ) {
                 if(params.getEventType_val()!= null){
-                    params.appendSQL("AND public.eventcategory.categorytype = CAST(? AS eventType ");
+                    params.appendSQL("AND public.eventcategory.categorytype = CAST(? AS eventType) ");
                 } else {
                     params.setEventType_ctl(false);
                     params.appendToParamLog("EVENT TYPE: no object specified; event type filter disabled; | ");
@@ -601,10 +591,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
            // *******************************
             if (params.isPerson_ctl()) {
                 if(params.getPerson_val() != null){
-                    params.appendSQL("AND eventperson.person_personid=? ");
+                    params.appendSQL("AND eventhuman.human_humanid=? ");
                 } else {
                     params.setPerson_ctl(false);
-                    params.appendToParamLog("EVENT PERSONS: No Person object specified; person filter disabled; | ");
+                    params.appendToParamLog("EVENT PERSONS: No human object specified; person filter disabled; | ");
                 }
             }
 
@@ -831,7 +821,6 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         }
         ec.setActive(rs.getBoolean("active"));
         ec.setDefaultDurationMins(rs.getInt("defaultdurationmins"));
-        
         ec.setUserRankMinimumToEnact(rs.getInt("userrankminimumtoenact"));
         ec.setUserRankMinimumToView(rs.getInt("userrankminimumtoview"));
         ec.setUserRankMinimumToUpdate(rs.getInt("userrankminimumtoupdate"));
@@ -884,14 +873,15 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         PreparedStatement stmt = null;
         ArrayList<EventCategory> categoryList = new ArrayList();
-
+        EventCoordinator ec = getEventCoordinator();
+        
         try {
 
             stmt = con.prepareStatement(query);
             stmt.setString(1, et.toString());
             rs = stmt.executeQuery();
             while (rs.next()) {
-                categoryList.add(getEventCategory(rs.getInt("categoryid")));
+                categoryList.add(ec.getEventCategory(rs.getInt("categoryid")));
             }
 
         } catch (SQLException ex) {
@@ -937,7 +927,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(5, ec.isHidable());
 
             if(ec.getIcon() != null){
-                stmt.setInt(6, ec.getIcon().getIconid());
+                stmt.setInt(6, ec.getIcon().getID());
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
@@ -996,7 +986,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setBoolean(5, ec.isHidable());
 
             if(ec.getIcon() != null){
-                stmt.setInt(6, ec.getIcon().getIconid());
+                stmt.setInt(6, ec.getIcon().getID());
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }

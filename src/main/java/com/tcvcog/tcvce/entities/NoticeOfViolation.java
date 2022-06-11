@@ -36,12 +36,10 @@ public  class NoticeOfViolation
     private int noticeID;
     
     /**
-     * @deprecated with humanization
+     * Not deprecated with humanization
      */
     private Person recipient;
-    
-    private Human recipHuman;
-    private HumanMailingAddressLink mailingLink;
+    private MailingAddress recipientMailingAddress;
     /**
      * Records a timestamp for when the human and connected mailing address
      *  is transferred into these NOV-specific fields, such that we can always
@@ -65,14 +63,18 @@ public  class NoticeOfViolation
     
     
     private LocalDateTime dateOfRecord;
-    private java.util.Date dateOfRecordUtilDate;
-    private String dateOfRecordPretty;
     
     private LocalDateTime creationTS;
-    private String creationTSPretty;
+   
     private User creationBy;
     
     private User notifyingOfficer;
+    private Person notifyingOfficerPerson;
+    
+    private String fixedNotifyingOfficerName;
+    private String fixedNotifyingOfficerTitle;
+    private String fixedNotifyingOfficerPhone;
+    private String fixedNotifyingOfficerEmail;
     
     private int headerImageID;
     
@@ -180,26 +182,7 @@ public  class NoticeOfViolation
         this.sentTS = sentTS;
     }
 
-    /**
-     * @return the creationTSPretty
-     */
-    public String getCreationTSPretty() {
-        if(creationTS != null){
-            creationTSPretty = DateTimeUtil.getPrettyDate(creationTS);
-        }
-        return creationTSPretty;
-    }
-
-    /**
-     * @return the dateOfRecordPretty
-     */
-    public String getDateOfRecordPretty() {
-        if(dateOfRecord != null){
-            dateOfRecordPretty = DateTimeUtil.getPrettyDate(dateOfRecord);
-        }
-        return dateOfRecordPretty;
-    }
-
+   
     /**
      * @return the sentTSPretty
      */
@@ -210,19 +193,7 @@ public  class NoticeOfViolation
         return sentTSPretty;
     }
 
-    /**
-     * @param creationTSPretty the creationTSPretty to set
-     */
-    public void setCreationTSPretty(String creationTSPretty) {
-        this.creationTSPretty = creationTSPretty;
-    }
-
-    /**
-     * @param dateOfRecordPretty the dateOfRecordPretty to set
-     */
-    public void setDateOfRecordPretty(String dateOfRecordPretty) {
-        this.dateOfRecordPretty = dateOfRecordPretty;
-    }
+  
 
     /**
      * @param sentTSPretty the sentTSPretty to set
@@ -446,22 +417,7 @@ public  class NoticeOfViolation
         this.includeViolationPhotoAttachment = includeViolationPhotoAttachment;
     }
 
-    /**
-     * @return the dateOfRecordUtilDate
-     */
-    public java.util.Date getDateOfRecordUtilDate() {
-        dateOfRecordUtilDate = DateTimeUtil.convertUtilDate(dateOfRecord);
-        return dateOfRecordUtilDate;
-    }
-
-    /**
-     * @param dateOfRecordUtilDate the dateOfRecordUtilDate to set
-     */
-    public void setDateOfRecordUtilDate(java.util.Date dateOfRecordUtilDate) {
-        dateOfRecord = DateTimeUtil.convertUtilDate(dateOfRecordUtilDate);
-        this.dateOfRecordUtilDate = dateOfRecordUtilDate;
-    }
-
+   
   
     /**
      * @return the headerImageID
@@ -590,20 +546,6 @@ public  class NoticeOfViolation
     }
 
     /**
-     * @return the recipHuman
-     */
-    public Human getRecipHuman() {
-        return recipHuman;
-    }
-
-    /**
-     * @return the mailingLink
-     */
-    public HumanMailingAddressLink getMailingLink() {
-        return mailingLink;
-    }
-
-    /**
      * @return the fixedAddrXferTS
      */
     public LocalDateTime getFixedAddrXferTS() {
@@ -652,19 +594,7 @@ public  class NoticeOfViolation
         return fixedRecipientZip;
     }
 
-    /**
-     * @param recipHuman the recipHuman to set
-     */
-    public void setRecipHuman(Human recipHuman) {
-        this.recipHuman = recipHuman;
-    }
-
-    /**
-     * @param mailingLink the mailingLink to set
-     */
-    public void setMailingLink(HumanMailingAddressLink mailingLink) {
-        this.mailingLink = mailingLink;
-    }
+  
 
     /**
      * @param fixedAddrXferTS the fixedAddrXferTS to set
@@ -713,6 +643,90 @@ public  class NoticeOfViolation
      */
     public void setFixedRecipientZip(String fixedRecipientZip) {
         this.fixedRecipientZip = fixedRecipientZip;
+    }
+
+    /**
+     * @return the notifyingOfficerPerson
+     */
+    public Person getNotifyingOfficerPerson() {
+        return notifyingOfficerPerson;
+    }
+
+    /**
+     * @param notifyingOfficerPerson the notifyingOfficerPerson to set
+     */
+    public void setNotifyingOfficerPerson(Person notifyingOfficerPerson) {
+        this.notifyingOfficerPerson = notifyingOfficerPerson;
+    }
+
+    /**
+     * @return the fixedNotifyingOfficerName
+     */
+    public String getFixedNotifyingOfficerName() {
+        return fixedNotifyingOfficerName;
+    }
+
+    /**
+     * @return the fixedNotifyingOfficerTitle
+     */
+    public String getFixedNotifyingOfficerTitle() {
+        return fixedNotifyingOfficerTitle;
+    }
+
+    /**
+     * @return the fixedNotifyingOfficerPhone
+     */
+    public String getFixedNotifyingOfficerPhone() {
+        return fixedNotifyingOfficerPhone;
+    }
+
+    /**
+     * @return the fixedNotifyingOfficerEmail
+     */
+    public String getFixedNotifyingOfficerEmail() {
+        return fixedNotifyingOfficerEmail;
+    }
+
+    /**
+     * @param fixedNotifyingOfficerName the fixedNotifyingOfficerName to set
+     */
+    public void setFixedNotifyingOfficerName(String fixedNotifyingOfficerName) {
+        this.fixedNotifyingOfficerName = fixedNotifyingOfficerName;
+    }
+
+    /**
+     * @param fixedNotifyingOfficerTitle the fixedNotifyingOfficerTitle to set
+     */
+    public void setFixedNotifyingOfficerTitle(String fixedNotifyingOfficerTitle) {
+        this.fixedNotifyingOfficerTitle = fixedNotifyingOfficerTitle;
+    }
+
+    /**
+     * @param fixedNotifyingOfficerPhone the fixedNotifyingOfficerPhone to set
+     */
+    public void setFixedNotifyingOfficerPhone(String fixedNotifyingOfficerPhone) {
+        this.fixedNotifyingOfficerPhone = fixedNotifyingOfficerPhone;
+    }
+
+    /**
+     * @param fixedNotifyingOfficerEmail the fixedNotifyingOfficerEmail to set
+     */
+    public void setFixedNotifyingOfficerEmail(String fixedNotifyingOfficerEmail) {
+        this.fixedNotifyingOfficerEmail = fixedNotifyingOfficerEmail;
+    }
+
+    /**
+     * @return the recipientMailingAddress
+     */
+    public MailingAddress getRecipientMailingAddress() {
+        return recipientMailingAddress;
+    }
+
+    /**
+     * @param recipientMailingAddress the recipientMailingAddress to set
+     */
+    public void setRecipientMailingAddress(MailingAddress recipientMailingAddress) {
+        this.recipientMailingAddress = recipientMailingAddress;
     }
 
    

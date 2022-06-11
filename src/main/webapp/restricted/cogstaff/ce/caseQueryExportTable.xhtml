@@ -183,11 +183,11 @@
                                                               style="font-style: italic"/>
 
                                             </p:column>
-                                            <p:column width="12%" sortBy="#{c.property.address}">
+                                            <p:column width="12%" sortBy="#{c.property.addressString}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Property" />
                                                 </f:facet>
-                                                <h:outputText value="#{c.property.address} "/>
+                                                <h:outputText value="#{c.property.addressString} "/>
                                                 <p:spacer height="2px"/>
                                                 <h:outputText value=" (#{c.property.muni.muniName})"/>
                                             </p:column>

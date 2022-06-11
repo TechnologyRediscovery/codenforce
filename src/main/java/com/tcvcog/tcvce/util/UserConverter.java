@@ -47,7 +47,13 @@ public class UserConverter extends EntityConverter implements Converter {
         }
 
         User u = (User) o;
-        String userID = u.getUsername();
+        String userID = null;
+        if(u.getHuman() != null && u.getHuman().getName() != null){
+            userID = u.getHuman().getName();
+        } else {
+            userID = u.getUsername();
+        }
+         
         if (userID != null) {
             this.getViewMap(fc).put(userID, o);
             return userID;

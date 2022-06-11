@@ -16,10 +16,12 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.UserAuthorized;
+import com.tcvcog.tcvce.util.Constants;
 import javax.annotation.PostConstruct;
 import javax.faces.context.ExternalContext;
 
@@ -30,6 +32,9 @@ import javax.faces.context.ExternalContext;
 public class LoginBB extends BackingBeanUtils {
 
     private UserAuthorized publicUA;
+    private String patchRecord;
+    private String ds;
+    private String releaseID;
     /**
      * Creates a new instance of LoginBB
      */
@@ -40,12 +45,16 @@ public class LoginBB extends BackingBeanUtils {
     @PostConstruct
     public void initBean(){
         UserCoordinator uc = getUserCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
         try {
             publicUA = uc.auth_getPublicUserAuthorized();
+            patchRecord = sc.getDBPatchIDList();
         } catch (IntegrationException | BObStatusException  ex) {
             System.out.println(ex);
         }
         
+        ds = getResourceBundle(Constants.DB_CONNECTION_PARAMS).getString("jndi_name");
+        releaseID = getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("releaseidentifier");
     }
     
     /**
@@ -79,6 +88,48 @@ public class LoginBB extends BackingBeanUtils {
      */
     public void setPublicUA(UserAuthorized publicUA) {
         this.publicUA = publicUA;
+    }
+
+    /**
+     * @return the patchRecord
+     */
+    public String getPatchRecord() {
+        return patchRecord;
+    }
+
+    /**
+     * @param patchRecord the patchRecord to set
+     */
+    public void setPatchRecord(String patchRecord) {
+        this.patchRecord = patchRecord;
+    }
+
+    /**
+     * @return the ds
+     */
+    public String getDs() {
+        return ds;
+    }
+
+    /**
+     * @param ds the ds to set
+     */
+    public void setDs(String ds) {
+        this.ds = ds;
+    }
+
+    /**
+     * @return the releaseID
+     */
+    public String getReleaseID() {
+        return releaseID;
+    }
+
+    /**
+     * @param releaseID the releaseID to set
+     */
+    public void setReleaseID(String releaseID) {
+        this.releaseID = releaseID;
     }
     
 }

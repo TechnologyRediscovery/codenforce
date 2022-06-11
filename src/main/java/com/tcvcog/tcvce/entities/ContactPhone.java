@@ -23,10 +23,11 @@ import java.time.LocalDateTime;
  * @author sylvia
  */
 public  class   ContactPhone 
-        extends Contact{
+        extends Contact implements Comparable<Object>{
     
     final static String TABLE_NAME = "contactphone";
     final static String PKFIELD = "phoneid";
+    final static String HF_NAME = "Phone number";
     
     
     protected int phoneID;
@@ -37,6 +38,8 @@ public  class   ContactPhone
     protected String notes;
     protected LocalDateTime disconnectTS;
     protected User disconnectRecordedBy;
+    
+    protected int priority;
     
     public ContactPhone(){
         
@@ -165,6 +168,34 @@ public  class   ContactPhone
     @Override
     public String getDBTableName() {
         return TABLE_NAME;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return HF_NAME;
+    }
+
+    /**
+     * @return the priority
+     */
+    public int getPriority() {
+        return priority;
+    }
+
+    /**
+     * @param priority the priority to set
+     */
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if(o instanceof ContactPhone){
+            ContactPhone cp = (ContactPhone) o;
+            return Integer.compare(this.priority, cp.priority);
+        }
+        return 0;
     }
     
 }

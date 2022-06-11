@@ -24,126 +24,181 @@ package com.tcvcog.tcvce.entities;
  */
 public enum LinkedObjectSchemaEnum {
     
-    OCCAPPLICATIONHUMAN (   
+    OccApplicationHuman (   
+                            "Occupancy Application",
                             "public.occpermitapplicationhuman",
                             "OccApplicationHuman", 
                             "???", 
                             "",
+                            null,
                             "???",
-                            LinkedObjectFamilyEnum.HUMAN
+                            LinkedObjectFamilyEnum.HUMAN,
+                            false
                         ),  // for Jurplel to update
     
-    CECASEHUMAN         (   
+    CECaseHuman         (   
+                            "Code Enf. Case",
                             "public.humancecase", 
                             "CECaseHuman", 
                             "linkid", 
                             "cecase_caseid",
+                            null,
                             "humancecase_linkid_seq",
-                            LinkedObjectFamilyEnum.HUMAN
+                            LinkedObjectFamilyEnum.HUMAN,
+                            true
+        
                         ), 
     
-    OCCPERIODHUMAN      (
+    OccPeriodHuman      (
+                            "Occupancy Period",
                             "public.humanoccperiod",
                             "OccPeriodHuman", 
                             "linkid", 
                             "occperiod_periodid",
+                            null,
                             "humanoccperiod_linkid_seq",
-                            LinkedObjectFamilyEnum.HUMAN
+                            LinkedObjectFamilyEnum.HUMAN,
+                            true
                         ), 
     
-    PARCELHUMAN         (   
+    ParcelHuman         (   
+                            "Parcel",
                             "public.humanparcel",
                             "ParcelHuman", 
                             "linkid", 
                             "parcel_parcelkey",
+                            null,
                             "humanparcel_linkid_seq",
-                            LinkedObjectFamilyEnum.HUMAN
+                            LinkedObjectFamilyEnum.HUMAN,
+                            true
                         ), 
     
-    PARCELUNITHUMAN     (   
+    ParcelUnitHuman     (   
+                            "Parcel Unit",
                             "public.humanparcelunit",
                             "ParcelUnitHuman", 
                             "linkid", 
                             "parcelunit_unitid",
+                            null,
                             "parcelunithuman_linkid_seq",
-                            LinkedObjectFamilyEnum.HUMAN
+                            LinkedObjectFamilyEnum.HUMAN,
+                            true
                         ),
     
-    CITATIONHUMAN       (
+    CitationHuman       (
+                            "Citation",
                             "public.citationhuman",
                             "CitationHuman", 
                             "linkid", 
                             "citation_citationid",
+                            null,
                             "citationhuman_seq",
-                            LinkedObjectFamilyEnum.HUMAN
+                            LinkedObjectFamilyEnum.HUMAN,
+                            true
                         ), 
     
-    CITATIONDCKETHUMAN       (
+    CitationDocketHuman       (
+                            "Citation Docket",
                             "public.citationdockethuman",
                             "CitationDocketHuman", 
                             "linkid", 
                             "docketno_docketid",
+                            null,
                             "citationdockethuman_linkid_seq",
-                            LinkedObjectFamilyEnum.HUMAN
+                            LinkedObjectFamilyEnum.HUMAN,
+                            false
                         ), 
     
-    EVENTHUMAN          (
+    EventHuman          (
+                            "Event",
                             "public.eventhuman",
                             "EventHuman", 
                             "linkid", 
                             "event_eventid",
+                            null,
                             "eventhuman_linkid_seq",
-                            LinkedObjectFamilyEnum.HUMAN
+                            LinkedObjectFamilyEnum.HUMAN,
+                            true
                         ), 
     
-    MUNIHUMAN           (
+    MuniHuman           (
+                            "Municipality",
                             "public.humanmuni",
                             "MuniHuman",
                             "linkid", 
                             "muni_municode",
+                            null,
                             "humanmuni_linkid_seq",
-                            LinkedObjectFamilyEnum.HUMAN
+                            LinkedObjectFamilyEnum.HUMAN,
+                            true
                         ),
     
-    HUMANMAILINGADDRESS (   
+    MailingaddressHuman (   
+                            "Person",
                             "humanmailingaddress",
                             "MailingaddressHuman", 
-                            "",
-                            "",
-                            "",
-                            LinkedObjectFamilyEnum.MAILING
+                            "linkid",
+                            "humanmailing_humanid",
+                            "humanmailing_addressid",
+                            "humanmailing_linkid_seq",
+                            LinkedObjectFamilyEnum.MAILING,
+                            true
                         ), 
-    PARCELMAILINGADDRESS  (
+    ParcelMailingaddress  (
+                            "Parcel",
                             "parcelmailingaddress",
                             "ParcelMailingaddress", 
+                            "linkid", 
+                            "parcel_parcelkey",
+                            "mailingaddress_addressid",
+                            "parcelmailing_linkid_seq",
+                            LinkedObjectFamilyEnum.MAILING,
+                            true
+                        ),
+    CITATION_CODEVIOLATION  (
+                            "Citation",
+                            "citationviolation",
                             "", 
-                            "",
-                            "",
-                            LinkedObjectFamilyEnum.MAILING
+                            "citationviolationid", 
+                            "codeviolation_violationid",
+                            null,
+                            "citationviolation_cvid_seq",
+                            LinkedObjectFamilyEnum.MAILING,
+                            true
+                            
                         );
 
     
+    private final String TARGET_OBJECT_FRIENDLY_NAME;
     private final String LINKING_TABLE_NAME;
     private final String LINK_ROLE_SCHEMA_TYPE_STRING;
     private final String LINKING_TABLE_PK_FIELD;
     private final String TARGET_TABLE_FK_FIELD;
+    private final String LINKED_OBJECT_FK_FIELD;
     private final String LINKING_TABLE_SEQ_ID;
     private final LinkedObjectFamilyEnum FAMILY;
+    private final boolean ACTIVELINK;
 
     private LinkedObjectSchemaEnum   (
+                                        String friendly,
                                         String ltn, 
                                         String ts, 
                                         String ltpk, 
                                         String ttfk,
+                                        String lofk,
                                         String seqid,
-                                        LinkedObjectFamilyEnum fam
+                                        LinkedObjectFamilyEnum fam,
+                                        boolean active
                                     )    {
+        TARGET_OBJECT_FRIENDLY_NAME = friendly;
         LINKING_TABLE_NAME = ltn;
         LINK_ROLE_SCHEMA_TYPE_STRING = ts;
         LINKING_TABLE_PK_FIELD = ltpk;
         TARGET_TABLE_FK_FIELD = ttfk;
+        LINKED_OBJECT_FK_FIELD = lofk;
         LINKING_TABLE_SEQ_ID = seqid;
         FAMILY = fam;
+        ACTIVELINK = active;
     }
     
     public String getLinkingTableName(){
@@ -154,7 +209,7 @@ public enum LinkedObjectSchemaEnum {
         return LINK_ROLE_SCHEMA_TYPE_STRING;
     }
     
-    public String getLinkedTablePKField(){
+    public String getLinkingTablePKField(){
         return LINKING_TABLE_PK_FIELD;
     }
     
@@ -168,6 +223,27 @@ public enum LinkedObjectSchemaEnum {
     }
     public LinkedObjectFamilyEnum getLinkedObjectFamilyEnum(){
         return FAMILY;
+    }
+
+    /**
+     * @return the TARGET_OBJECT_FRIENDLY_NAME
+     */
+    public String getTARGET_OBJECT_FRIENDLY_NAME() {
+        return TARGET_OBJECT_FRIENDLY_NAME;
+    }
+
+    /**
+     * @return the ACTIVELINK
+     */
+    public boolean isACTIVELINK() {
+        return ACTIVELINK;
+    }
+
+    /**
+     * @return the LINKED_OBJECT_FK_FIELD
+     */
+    public String getLINKED_OBJECT_FK_FIELD() {
+        return LINKED_OBJECT_FK_FIELD;
     }
     
 }

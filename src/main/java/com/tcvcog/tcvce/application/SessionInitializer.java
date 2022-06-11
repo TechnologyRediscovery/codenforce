@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
@@ -47,6 +48,8 @@ import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.QueryCECaseEnum;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
+import com.tcvcog.tcvce.entities.search.QueryOccPeriodEnum;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import java.io.Serializable;
 import javax.faces.application.FacesMessage;
@@ -59,6 +62,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -249,6 +254,8 @@ public  class       SessionInitializer
         } catch (SessionException ex) {
             System.out.println("SessionInitializer.intitiateInternalSession | Session exception");
             System.out.println(ex);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    ex.getMessage(), ""));
             return "";
         }
     }
@@ -277,59 +284,56 @@ public  class       SessionInitializer
         List<SessionException> exlist = new ArrayList<>();
      
         for(SubSysEnum ss: SubSysEnum.values()){
-            try{
-                if(ss.isInitialize()){
-                    printSubsystemInit(ss);
-                    switch(ss){
-                        case N_USER:
-                            initSubsystem_N_User(ua, ss);
-                            break;
-                        case I_MUNICIPALITY:
-                            initSubsystem_I_Municipality(ua, ss);
-                            break;
-                        case II_CODEBOOK:
-                            initSubsystem_II_CodeBook(cred, ss, sb.getSessMuni());
-                            break;
-                        case III_PROPERTY:
-                            initSubsystem_III_Property(ua, ss);
-                            break;
-                        case IV_PERSON:
-                            initSubsystem_IV_Person(cred, ss);
-                            break;
-                        case V_EVENT:
-                            initSubsystem_V_Event(cred, ss);
-                            break;
-                        case VI_OCCPERIOD:
-                            initSubsystem_VI_OccPeriod(cred, ss);
-                            break;
-                        case VII_CECASE:
-                            initSubsystem_VII_CECase(ua, ss);
-                            break;
-                        case VIII_CEACTIONREQ:
-                            initSubsystem_VIII_CEActionRequest(cred, ss);
-                            break;
-                        case VIV_OCCAPP:
-                            initSubsystem_VIV_OccApp(cred, ss);
-                            break;
-                        case X_PAYMENT:
-                            initSubsystem_X_Payment(cred, ss);
-                            break;
-                        case XI_REPORT:
-                            initSubsystem_XI_Report(cred, ss);
-                            break;
-                        case XII_BLOB:
-                            initSubsystem_XII_Blob(cred, ss);
-                            break;
-                        case XIII_PUBLICINFO:
-                            initSubsystem_XIII_PublicInfoBundle(cred, ss);
-                            break;
-                    } // close switch
-                    printSubsystemInitComplete(ss);
-                } // close if
-            } catch (SessionException ex){
-                System.out.println(ex.getLocalizedMessage());
-                throw new SessionException("Subsystem init catch all", ex);
-            }
+            
+            if(ss.isInitialize()){
+                printSubsystemInit(ss);
+                switch(ss){
+                    case N_USER:
+                        initSubsystem_N_User(ua, ss);
+                        break;
+                    case I_MUNICIPALITY:
+                        initSubsystem_I_Municipality(ua, ss);
+                        break;
+                    case II_CODEBOOK:
+                        initSubsystem_II_CodeBook(cred, ss, sb.getSessMuni());
+                        break;
+                    case III_PROPERTY:
+                        initSubsystem_III_Property(ua, ss);
+                        break;
+                    case IV_PERSON:
+                        initSubsystem_IV_Person(cred, ss);
+                        break;
+                    case V_EVENT:
+                        initSubsystem_V_Event(cred, ss);
+                        break;
+                    case VI_OCCPERIOD:
+                        initSubsystem_VI_OccPeriod(cred, ss);
+                        break;
+                    case VII_CECASE:
+                        initSubsystem_VII_CECase(ua, ss);
+                        break;
+                    case VIII_CEACTIONREQ:
+                        initSubsystem_VIII_CEActionRequest(cred, ss);
+                        break;
+                    case VIV_OCCAPP:
+                        initSubsystem_VIV_OccApp(cred, ss);
+                        break;
+                    case X_PAYMENT:
+                        initSubsystem_X_Payment(cred, ss);
+                        break;
+                    case XI_REPORT:
+                        initSubsystem_XI_Report(cred, ss);
+                        break;
+                    case XII_BLOB:
+                        initSubsystem_XII_Blob(cred, ss);
+                        break;
+                    case XIII_PUBLICINFO:
+                        initSubsystem_XIII_PublicInfoBundle(cred, ss);
+                        break;
+                } // close switch
+                printSubsystemInitComplete(ss);
+            } // close if
+            
         } // close for over subsystem enum
         
         // record session data to DB
@@ -507,7 +511,6 @@ public  class       SessionInitializer
         SearchCoordinator sc = getSearchCoordinator();
         SessionBean sessBean = getSessionBean();
         
-        try {
 
 //            TODO: Fix hanging session on property history load
 //                  INCIDENT to hanging session on thindes session
@@ -515,21 +518,13 @@ public  class       SessionInitializer
             
             if(sessBean.getSessPropertyList() == null || sessBean.getSessPropertyList().isEmpty()){
                 sessBean.setSessProperty(pc.selectDefaultProperty(ua));
+                if(sessBean.getSessProperty() != null && sessBean.getSessProperty().getAddress() != null){
+                    sessBean.setSessMailingAddress(sessBean.getSessProperty().getAddress());
+                }
             } else {
 //                sessBean.setSessProperty(pc.assemblePropertyDataHeavy(sessBean.getSessPropertyList().get(0), cred));
             }
-            sessBean.setSessPropertyList(pc.assemblePropertyHistoryList(ua.getKeyCard()));
-            sessBean.setQueryPropertyList(sc.buildQueryPropertyList(ua.getKeyCard()));
-            
-            if(!sessBean.getQueryPropertyList().isEmpty()){
-                sessBean.setQueryProperty(sessBean.getQueryPropertyList().get(0));
-            }            
-        } catch (IntegrationException |  BObStatusException ex) {
-            System.out.println(ex);
-            throw new SessionException( "Error setting proerty query list", 
-                                        ex, ss, 
-                                        ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
-        }        
+//            sessBean.setSessPropertyList(pc.assemblePropertyHistoryList(ua.getKeyCard()));
     }
 
 
@@ -554,9 +549,9 @@ public  class       SessionInitializer
         try {
             sb.setSessPersonList(persc.getPersonListFromHumanLinkList(getSessionBean().getSessProperty().getHumanLinkList()));
             if(sb.getSessPersonList().isEmpty()){
-                sb.setSessPersonQueued(persc.selectDefaultPerson(cred));
+                sb.setSessPerson(persc.selectDefaultPerson(cred));
             } else {
-                sb.setSessPersonQueued(sb.getSessPersonList().get(0));
+                sb.setSessPerson(sb.getSessPersonList().get(0));
             }
             sb.setQueryPersonList(sc.buildQueryPersonList(cred));
             if(!sb.getQueryPersonList().isEmpty()){
@@ -620,32 +615,28 @@ public  class       SessionInitializer
         MunicipalityCoordinator mc = getMuniCoordinator();
         
         OccPeriod op = null;
-        try {
-            // Session object init
-            sb.setSessOccPeriodListLight(occCord.assembleOccPeriodHistoryList(cred));
-            if(sb.getSessOccPeriodList().isEmpty()){
-                op = occCord.getOccPeriod(sb.getSessMuni().getDefaultOccPeriodID());
-            } else {
-                // if there's a history, convert the head item to a data heavy and put in session
-                op = sb.getSessOccPeriodList().get(0);
-            }
+        // Session object init
             
-            sb.setSessOccPeriod(occCord.assembleOccPeriodDataHeavy(op, cred));
-            if(op == null){
-                throw new SessionException("Unable to set a session occ period");
-            }
+//            QueryOccPeriod qop = sc.runQuery(sc.initQuery(QueryOccPeriodEnum.ALL_PERIODS_IN_MUNI, cred));
             
-            // Query set init
-            sb.setQueryOccPeriodList(sc.buildQueryOccPeriodList(cred));
-            if(!sb.getQueryOccPeriodList().isEmpty()){
-                sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
-            }
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
-            System.out.println(ex);
-            throw new SessionException( "Occ period list or query assembly failure", 
-                                        ex, 
-                                        ss, 
-                                        ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
+//            sb.setSessOccPeriodList(qop.getBOBResultList());
+        sb.setSessOccPeriodList(new ArrayList<>());
+        if(sb.getSessOccPeriodList().isEmpty()){
+            // Turn off during occ period refresh migration
+        //                op = occCord.getOccPeriod(sb.getSessMuni().getDefaultOccPeriodID());
+        } else {
+            // if there's a history, convert the head item to a data heavy and put in session
+        //                op = sb.getSessOccPeriodList().get(0);
+        }
+        //            if(op == null){
+        //                throw new SessionException("Unable to set a session occ period");
+        //            }
+        //            sb.setSessOccPeriodFromPeriodBase(op);
+
+        // Query set init
+        sb.setQueryOccPeriodList(sc.buildQueryOccPeriodList(cred));
+        if(!sb.getQueryOccPeriodList().isEmpty()){
+            sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
         }
     }
     
@@ -804,6 +795,16 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_XII_Blob(Credential cred, SubSysEnum ss) throws SessionException{
+        BlobCoordinator bc = getBlobCoordinator();
+        try {
+            sb.setBlobTypeList(bc.getBlobTypeListComplete());
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+            throw new SessionException("XII_BLOB FATAL: could not build session blob type list");
+            
+        }
+        
+        
         
     }
 

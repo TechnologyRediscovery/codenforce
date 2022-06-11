@@ -174,7 +174,7 @@
                         <background-validation-millis>1</background-validation-millis>
                     </validation>
                     <statement>
-                        <prepared-statement-cache-size>0</prepared-statement-cache-size>
+                        <prepared-statement-cache-size>50</prepared-statement-cache-size>
                         <share-prepared-statements>false</share-prepared-statements>
                     </statement>
                 </datasource>
@@ -486,6 +486,8 @@
                             <module-option name="dsJndiName" value="java:jboss/postgresDS"/>
                             <module-option name="principalsQuery" value="SELECT password FROM login WHERE username=?"/>
                             <module-option name="rolesQuery" value="SELECT text(userrole), 'Roles' FROM login WHERE username=?"/>
+			    <module-option name="hashAlgorithm" value="MD5"/>
+			    <module-option name="hashEncoding" value="base64"/>
                         </login-module>
                     </authentication>
                 </security-domain>

@@ -168,33 +168,7 @@ public  class           SearchParams
         this.muni_val = muni_val;
     }
 
-    /**
-     * @return the startDate_val_utilDate
-     */
-    public java.util.Date getStartDate_val_utilDate() {
-        return DateTimeUtil.convertUtilDate(date_start_val);
-    }
-
-    /**
-     * @param startDate_val_utilDate the startDate_val_utilDate to set
-     */
-    public void setStartDate_val_utilDate(java.util.Date startDate_val_utilDate) {
-        date_start_val = DateTimeUtil.convertUtilDate(startDate_val_utilDate);
-    }
-
-    /**
-     * @return the endDate_val_utilDate
-     */
-    public java.util.Date getEndDate_val_utilDate() {
-        return DateTimeUtil.convertUtilDate(date_end_val);
-    }
-
-    /**
-     * @param endDate_val_utilDate the endDate_val_utilDate to set
-     */
-    public void setEndDate_val_utilDate(java.util.Date endDate_val_utilDate) {
-        date_end_val = DateTimeUtil.convertUtilDate(endDate_val_utilDate);
-    }
+   
 
     /**
      * @return the date_start_val
@@ -210,19 +184,7 @@ public  class           SearchParams
         return date_end_val;
     }
 
-    /**
-     * @return the date_start_val in Util date form.
-     */
-    public Date getDate_start_val_util() {
-        return DateTimeUtil.convertUtilDate(date_start_val);
-    }
-
-    /**
-     * @return the date_end_val in Util date form.
-     */
-    public Date getDate_end_val_util() {
-        return DateTimeUtil.convertUtilDate(date_end_val);
-    }
+   
     
     /**
      * @param date_start_val the date_start_val to set
@@ -238,19 +200,7 @@ public  class           SearchParams
         this.date_end_val = date_end_val;
     }
     
-    /**
-     * @param dateStartUtil the date_start_val to set in Util date form
-     */
-    public void setDate_start_val_util(Date dateStartUtil) {
-        date_start_val = DateTimeUtil.convertUtilDate(dateStartUtil);
-    }
-
-    /**
-     * @param dateEndUtil the date_end_val to set in Util date form
-     */
-    public void setDate_end_val_util(Date dateEndUtil) {
-        date_end_val = DateTimeUtil.convertUtilDate(dateEndUtil);
-    }
+  
 
     /**
      * @return the startDate_val_SQLDate

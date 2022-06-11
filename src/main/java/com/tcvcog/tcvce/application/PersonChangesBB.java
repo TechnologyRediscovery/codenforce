@@ -146,7 +146,7 @@ public class PersonChangesBB
         PersonCoordinator pc = getPersonCoordinator();
 
         try {
-            getSessionBean().setSessPerson(pc.assemblePersonDataHeavy(person, getSessionBean().getSessUser().getMyCredential()));
+            getSessionBean().setSessPerson(pc.getPerson(person));
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         }
@@ -165,11 +165,8 @@ public class PersonChangesBB
     public String approvedByWho(PersonChangeOrder change) {
 
         if (change.getApprovedBy() != null) {
-            return "Approved by: " + change.getApprovedBy().getPerson().getFirstName()
-                    + " "
-                    + change.getApprovedBy().getPerson().getLastName()
-                    + " (ID# "
-                    + change.getApprovedBy().getPerson().getHumanID()
+            return "Approved by: " + change.getApprovedBy().getHuman().getName()
+                    + change.getApprovedBy().getHuman().getHumanID()
                     + ")";
         } else if (change.isActive()) {
             return "No action taken yet";

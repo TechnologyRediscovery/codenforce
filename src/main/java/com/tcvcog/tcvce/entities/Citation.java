@@ -31,11 +31,14 @@ import java.util.Objects;
  */
 public  class       Citation 
         extends     TrackedEntity
-        implements  IFace_humanListHolder{
+        implements  IFace_humanListHolder, 
+                    IFace_BlobHolder{
     
     final static String CITATION_TABLE = "citation";
     final static String CITATION_PKFIELD = "citationid";
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CITATIONHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.CitationHuman;
+    final static BlobLinkEnum CITATION_BLOB_LINK_ENUM = BlobLinkEnum.CITATION;
+    final static BlobLinkEnum CITATION_BLOB_LINK_UPSTREAM_POOL = BlobLinkEnum.CE_CASE;
     
     private int cecaseID;
     
@@ -206,11 +209,15 @@ public  class       Citation
         this.statusLog = status;
     }
     
-    public CitationStatusLogEntry getStatus(){
+    /**
+     * Special getter that returns the first element in the sorted status log
+     * @return 
+     */
+    public CitationStatusLogEntry getMostRecentStatusLogEntry(){
         if(statusLog != null && !statusLog.isEmpty()){
             return statusLog.get(0); // return the first, most current status log entry
         } 
-        return null;
+        return new CitationStatusLogEntry();
     }
 
     /**
@@ -260,16 +267,11 @@ public  class       Citation
     }
 
 
-    /**
-     * @param citatonNo the citationNo to set
-     */
-    public void setCitatonNo(String citatonNo) {
-        this.citationNo = citatonNo;
-    }
-
+  
     /**
      * @return the blobList
      */
+    @Override
     public List<BlobLight> getBlobList() {
         return blobList;
     }
@@ -277,6 +279,7 @@ public  class       Citation
     /**
      * @param blobList the blobList to set
      */
+    @Override
     public void setBlobList(List<BlobLight> blobList) {
         this.blobList = blobList;
     }
@@ -373,6 +376,26 @@ public  class       Citation
      */
     public void setFilingType(CitationFilingType filingType) {
         this.filingType = filingType;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return CITATION_BLOB_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return citationID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return CITATION_BLOB_LINK_UPSTREAM_POOL;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return cecaseID;
     }
 
 }

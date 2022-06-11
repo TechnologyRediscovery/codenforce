@@ -18,7 +18,7 @@ import java.io.Serializable;
 public class        SearchParamsOccPeriod 
         extends     SearchParams {
     
-    public static final String MUNI_DBFIELD = "property.municipality_municode";
+    public static final String MUNI_DBFIELD = "parcel.muni_municode";
     
     // filter OCC-1
     private boolean property_ctl;

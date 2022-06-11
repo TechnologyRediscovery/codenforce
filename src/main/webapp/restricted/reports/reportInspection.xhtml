@@ -20,67 +20,305 @@
                             </div>
                             <div class="logo-title-wrapper">
                                 <div class="report-title">
-                                    <h:outputText id="report-title-ot"  value="#{reportingBB.reportConfigOccInspection.title}"/> 
+                                    <h:outputText id="report-title-ot"  value="#{reportingBB.reportConfigFieldInspection.title}"/> 
                                 </div>
                                 <div class="report-title-sub">
-                                    <h:outputText id="report-subtitle-ot"  value="#{reportingBB.reportConfigOccInspection.muni.muniName}, #{eventCECaseReportBB.reportConfig.muni.address_state}"/> 
+                                    <h:outputText id="report-subtitle-ot"  value="#{reportingBB.reportConfigFieldInspection.muni.muniName}"/> 
                                     <h:outputText value=" | " />
-                                    <h:outputText id="creator-ot" value="Created by: #{reportingBB.reportConfigOccInspection.creator.person.firstName}" />
+                                    <h:outputText id="creator-ot" value="Created by: #{reportingBB.reportConfigFieldInspection.creator.human.name}" />
                                     <h:outputText value=" " />
-                                    <h:outputText value="#{reportingBB.reportConfigOccInspection.creator.person.lastName}" />
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.creator.human.name}" />
                                     <h:outputText value=" | " />
-                                    <h:outputText id="report-ts-ot" value="#{reportingBB.reportConfigOccInspection.generationTimestampPretty}" />
+                                    <h:outputText id="report-ts-ot" value="#{reportingBB.reportConfigFieldInspection.generationTimestampPretty}" />
                                 </div>
                             </div>
                         </div>
                     </div>
                 </f:view>
             </ui:define>
+            <p:spacer height="5px" style="clear:both;" />
             <ui:define name="print-content">
-                
+
                 <f:view id="report-inspection-view">
                     <h:form id="report-inspection-form">
 
-                        <h2>Occupancy inspection report</h2>
-                            <div class="occperiod-address-container">
+                        <h2 style="clear:both;">Field inspection report</h2>
+                        <div class="occperiod-address-container">
 
-                                <h:outputText styleClass="occperiod-address" 
-                                              value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.property.address}" />
-                                <h:outputText styleClass="occperiod-address" 
-                                              value=", " />
-                                <h:outputText styleClass="occperiod-address" 
-                                              value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.property.address_city}" />
-                                <h:outputText styleClass="occperiod-address" 
-                                              value=" " />
-                                <h:outputText styleClass="occperiod-address" 
-                                              value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.property.address_state}" />
+                            <h:outputText styleClass="occperiod-address" 
+                                          value="#{reportingBB.reportConfigFieldInspection.occPeriod.propUnitProp.property.primaryAddressLink.buildingNo}" />
 
-                                <p:spacer height="3px" />
+                            <h:outputText styleClass="occperiod-address" 
+                                          value="#{reportingBB.reportConfigFieldInspection.occPeriod.propUnitProp.property.primaryAddressLink.street.name}" />
+                            <h:outputText styleClass="occperiod-address" 
+                                          value=" " />
+                            <h:outputText styleClass="occperiod-address" 
+                                          value="#{reportingBB.reportConfigFieldInspection.occPeriod.propUnitProp.property.primaryAddressLink.street.cityStateZip.city}" />
 
-                                <h:outputText styleClass="ui-label-inline" value="Occupancy period for unit no. "  />
 
-                                <h:outputText value="(single dwelling unit)"  
-                                              rendered="#{reportingBB.reportConfigOccInspection.propUnitWithProp == '-1'}"
-                                              styleClass="data-text italic" />
+                            <p:spacer height="3px" />
 
-                                <h:outputText value="#{reportingBB.reportConfigOccInspection.propUnitWithProp.unitNumber}"  
-                                              rendered="#{reportingBB.reportConfigOccInspection.propUnitWithProp.unitNumber != '-1'}"
-                                              styleClass="data-text"/>
+                            <h:outputText styleClass="ui-label-inline" value="Unit: "  />
+
+                            <h:outputText value="Single dwelling unit"  
+                                          rendered="#{reportingBB.reportConfigFieldInspection.occPeriod.propUnitProp.unitNumber eq '-1'}"
+                                          styleClass="data-text italic" />
+
+                            <h:outputText value="#{reportingBB.reportConfigFieldInspection.occPeriod.propUnitProp.unitNumber}"
+                                          rendered="#{reportingBB.reportConfigFieldInspection.occPeriod.propUnitProp.unitNumber ne '-1'}"
+                                          styleClass="data-text"/>
+                        </div>
+
+                        <h3>Inspection Details</h3>
+
+
+                        <div class="ui-g data_container_nested_restrict_report">
+
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputLabel value="Inspector: "/>
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspection.inspector.human.name}" />
+                                </div>
                             </div>
-                        
-                        <h2>To-Do list before reinspection</h2>
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputLabel value="Municipality having jurisdiction"/>
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.muni.muniName}" />
+                                </div>
+                            </div>
+                            
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="Inspection ID" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspection.inspectionID}" />
+                                </div>
+                            </div>
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="Start of inspection" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.getPrettyDate(reportConfigFieldInspection.inspection.timeStart)}" />
+                                </div>
+                            </div>
+                            
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="End of inspection" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.getPrettyDate(reportConfigFieldInspection.inspection.timeEnd)}" />
+                                </div>
+                            </div>
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="Cause of inspection" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspection.cause.title}" />
+                                </div>
+                            </div>
+                            
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+
+                                    <h:outputText value="Inspection Type" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspection.checklistTemplate.title}" />
+                                </div>
+                            </div>
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="Property Type" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.occPeriod.propUnitProp.property.parcelInfo.useType.name}" />
+                                </div>
+                            </div>
+                            
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="Property Owner" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="Ellen Bascomb" />
+                                    <p:spacer height="2px" />
+                                    <h:outputText value="323 West Lake Terrace" />
+                                    <p:spacer height="2px" />
+                                    <h:outputText value="Apartment 31Y" />
+                                    <p:spacer height="2px" />
+                                    <h:outputText value="Newcomb Road, 22212" />
+                                </div>
+                            </div>
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="# bedrooms" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspection.numBedrooms}" />
+                                </div>
+                            </div>
+                            
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="# bathrooms" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspection.numBathrooms}" />
+                                </div>
+                            </div>
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="Max occupants allowed" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspection.maxOccupantsAllowed}" />
+                                </div>
+                            </div>
+                            
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="Determination" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspection.determination.title}" />
+                                </div>
+                            </div>
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="Pre-Inspection notes" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspection.notesPreInspection}" />
+                                </div>
+                            </div>
+                            
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="Remarks" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspection.remarks}" />
+                                </div>
+                            </div>
+                            <!--NESTED DATA FIELD -->
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputText value="General Comments" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspection.generalComments}" />
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <h2>
+                            <h:outputText value="Inspection Photos (#{reportingBB.reportConfigFieldInspection.inspection.blobList.size()})" />
+                        </h2>
+                        <ui:repeat value="#{reportingBB.reportConfigFieldInspection.inspection.blobList}"
+                                           var="blobins" >
+                                
+                                    <h4>
+                                        <h:outputText value="#{blobins.title}"/>
+                                    </h4>
+                                    <p:graphicImage value="#{blobsterBB.image}"
+                                            alt="no preview available" 
+                                            style="width: 800px" 
+                                            cache="false"
+                                            rendered="#{blobins.type.browserViewable}">
+                                        <f:param name="blobid" value="#{blobins.photoDocID}"/>
+                                        </p:graphicImage>
+
+                                        <h:outputText value="no preview available; download to view"
+                                                      rendered="#{!blobins.type.browserViewable}" />
+                                        <h:outputText value="#{blobins.description} "/>
+                                </ui:repeat>
+
+                        <h2>Ordinance details</h2>
 
                         <p:dataScroller
                             id="scroller-inspectedspacelist"
                             widgetVar="var-scroller-inspectedspacelist"
                             var="inspace"
-                            value="#{reportingBB.reportConfigOccInspection.occPeriod.governingInspection.inspectedSpaceListVisible}"
-                            rowIndexVar="#{inspace.spaceID}">
+                            value="#{reportingBB.reportConfigFieldInspection.inspection.inspectedSpaceList}"
+                            rowIndexVar="#{inspace.inspectedSpaceID}">
 
                             <div class="occinsspace-metadata-container">
 
                                 <div class="occperiod-inspace-header">
-                                    <h:outputText styleClass="data-text" value="#{inspace.name}" />
+                                    <h:outputText styleClass="data-text" value="#{inspace.type.spaceTypeTitle}" />
                                 </div>
                                 <div class="occperiod-inspace-info">
 
@@ -91,7 +329,7 @@
                                         <h:outputText value=" | " /> 
                                     </f:subview>
                                     <h:outputText value="Showing " /> 
-                                    <h:outputText value="#{inspace.inspectedElementListVisible.size()}" /> 
+                                    <h:outputText value="#{inspace.inspectedElementList.size()}" /> 
                                     <h:outputText value=" / " /> 
                                     <h:outputText value="#{inspace.inspectedElementList.size()} total items" />
                                 </div>                                                
@@ -103,42 +341,50 @@
                                 widgetVar="var-scroller-inspectedspacelist-elementlist"
                                 var="inelement"
 
-                                value="#{inspace.inspectedElementListVisible}"
+                                value="#{inspace.inspectedElementList}"
                                 rowIndexVar="#{inelement.inspectedSpaceElementID}">
 
                                 <div class="occperiod-inelement-header">
 
-                                    <h:outputText  styleClass="data-text" value="#{inelement.ordSubSecTitle}" />
-                                    <h:outputText  styleClass="data-text" value=" (&#167;" />
-                                    <h:outputText  styleClass="data-text" value="#{inelement.ordSubSecNum}" />
-                                    <h:outputText  styleClass="data-text" value=", " />
-                                    <h:outputText  styleClass="data-text" value="#{inelement.ordSecTitle} " />
-                                    <h:outputText  styleClass="data-text" value=")" />
+                                    <h:outputText  styleClass="data-text" 
+                                                   value="#{inelement.headerString}" 
+                                                   escape="false"/>
                                 </div>
 
                                 <h:panelGrid    id="occperiod-inspectedspace-panelgrid-inspelement" 
-                                                columns="3" 
+                                                columns="1" 
                                                 cellpadding="10" footerClass="gridFooter"
                                                 columnClasses="gridTd, gridTd, gridTd" 
                                                 rendered="true">
                                     <h:panelGroup rendered="false">
                                         <div class="status-display-container">
                                             <div class="status-display-icon-container">
-                                                <i class="material-icons status-display-icon-i #{reportingBB.reportConfigOccInspection.defaultItemIcon.styleClass}">
-                                                    <h:outputText id="status-display-icon-ot" value="#{reportingBB.reportConfigOccInspection.defaultItemIcon.materialIcon}"/>
+                                                <i class="material-icons status-display-icon-i #{reportingBB.reportConfigFieldInspection.defaultItemIcon.styleClass}">
+                                                    <h:outputText id="status-display-icon-ot" value="#{reportingBB.reportConfigFieldInspection.defaultItemIcon.materialIcon}"/>
                                                 </i>
                                             </div>
                                         </div>
                                     </h:panelGroup>      
+                                    
+                                    <h:panelGroup>
+                                        
+
+                                        <div class="report-inspection-itemstatus">
+
+                                            <h:outputText value="Item Status: #{inelement.status.statusEnum.label}" />
+
+                                        </div>
+
+                                    </h:panelGroup>
 
                                     <h:panelGroup>
                                         <f:subview      id="occperiod-inspectedspace-subview-compliancedata"
-                                                        rendered="#{(!(empty inelement.complianceGrantedTS)) and reportingBB.reportConfigOccInspection.includeElementComplianceInfo}">
+                                                        rendered="#{(!(empty inelement.complianceGrantedTS)) and reportingBB.reportConfigFieldInspection.includeElementComplianceInfo}">
 
                                             <h:outputText value="Compliance granted by: " 
                                                           styleClass="ui-label-inline #{inelement.status.icon.styleClass}" />
 
-                                            <h:outputText  value="#{inelement.complianceGrantedBy.person.firstName} #{inelement.complianceGrantedBy.person.lastName}" 
+                                            <h:outputText  value="#{inelement.complianceGrantedBy.human.name}" 
                                                            styleClass="data-text #{inelement.status.icon.styleClass}" />
 
                                             <h:outputText styleClass="ui-label-inline #{inelement.status.icon.styleClass}" value=" on " />
@@ -147,10 +393,10 @@
 
                                         </f:subview>
                                         <f:subview      id="occperiod-inspectedspace-subview-lastinspecteddata"
-                                                        rendered="#{(!(empty inelement.lastInspectedTS)) and reportingBB.reportConfigOccInspection.includeElementLastInspectedInfo}">
+                                                        rendered="#{(!(empty inelement.lastInspectedTS)) and reportingBB.reportConfigFieldInspection.includeElementLastInspectedInfo}">
 
                                             <h:outputText styleClass="ui-label-inline" value="Last inspected by: " />
-                                            <h:outputText  styleClass="data-text" value="#{inelement.lastInspectedBy.person.firstName} #{inelement.lastInspectedBy.person.lastName}" />
+                                            <h:outputText  styleClass="data-text" value="#{inelement.lastInspectedBy.human.name}" />
                                             <h:outputText styleClass="ui-label-inline" value=" on " />
                                             <h:outputText  styleClass="data-text" value="#{occInspectionBB.getPrettyDate(inelement.lastInspectedTS)}" />
                                         </f:subview>
@@ -158,7 +404,7 @@
                                         <p:spacer height="5px" />
 
                                         <f:subview      id="occperiod-inspectedspace-subview-notes"
-                                                        rendered="#{(!(empty inelement.notes)) and reportingBB.reportConfigOccInspection.includeElementNotes}">
+                                                        rendered="#{(!(empty inelement.notes)) and reportingBB.reportConfigFieldInspection.includeElementNotes}">
                                             <h:outputText styleClass="ui-label-inline" value="Notes: " />
                                             <h:outputText  styleClass="data-text" value="#{inelement.notes}" escape="false"/>
                                         </f:subview>
@@ -166,13 +412,41 @@
                                         <p:spacer height="5px" />
 
                                         <f:subview      id="occperiod-inspectedspace-subview-ordtext"
-                                                        rendered="#{reportingBB.reportConfigOccInspection.includeFullOrdText}">
+                                                        rendered="#{reportingBB.reportConfigFieldInspection.includeFullOrdText}">
                                             <h:outputText styleClass="ui-label-inline" value="Ordinance text: " />
                                             <h:outputText styleClass="italic" value="#{inelement.ordTechnicalText}" escape="false"/>
                                         </f:subview>
                                         <p:spacer height="5px" />
                                     </h:panelGroup>
+                                    
+                                    <h:panelGroup>
+                                        
+
+                                        <h3>
+                                            <h:outputText value="Photos (#{inelement.blobList.size()})" />
+                                        </h3>
+
+                                        <ui:repeat value="#{inelement.blobList}"
+                                                   var="blob" >
+
+                                            <h4>
+                                                <h:outputText value="#{blob.title}"/>
+                                            </h4>
+                                                <h:outputText value="Description: #{blob.description} "/>
+                                            <p:graphicImage value="#{blobsterBB.image}"
+                                                    alt="no preview available" 
+                                                    style="width: 800px" 
+                                                    cache="false"
+                                                    rendered="#{blob.type.browserViewable}">
+                                                <f:param name="blobid" value="#{blob.photoDocID}"/>
+                                                </p:graphicImage>
+
+                                                <h:outputText value="no preview available; download to view"
+                                                              rendered="#{!blob.type.browserViewable}" />
+                                        </ui:repeat>
+                                    </h:panelGroup>
                                 </h:panelGrid>
+                                
                                 <hr />  
                             </p:dataScroller>
                         </p:dataScroller>

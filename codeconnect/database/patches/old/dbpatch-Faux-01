@@ -1,0 +1,84 @@
+--*************************************
+--NOT FOR FINAL USE
+-- Data Insert Faux-1
+-- OCT 10, 2021
+-- GIT Issue #214 
+--********************
+
+-- BAKED INTO dbpatch_beta39.sql on 11 APRIL 22 by ECD
+	
+INSERT INTO public.eventcategory
+	(categoryid, categorytype, title, notifymonitors, hidable, icon_iconid, relativeorderwithintype, 
+	 relativeorderglobal, hosteventdescriptionsuggtext, defaultdurationmins, 
+	 active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
+VALUES
+	(400, 'Occupancy', 'PASS for Occupancy no violations', 					true, true, 22, 0, 0, 'Property passed inspection with no violations', 							15, true, 5, 0, 5),
+	(401, 'Occupancy', 'PASS with violations', 								true, true, 29, 0, 0, 'Property passed inspection with violations', 							15, true, 5, 0, 5),
+	(402, 'Occupancy', 'Fail NO LEGAL OCCUPANCY PERMITTED', 				true, true, 30, 0, 0, 'Property failed inspection, Occupancy not permitted', 					15, true, 5, 0, 5),
+	(403, 'Occupancy', 'Fail with violations NO LEGAL OCCUPANCY PERMITTED', true, true, 30, 0, 0, 'Property failed inspection with violations, Occupancy not permitted', 	15, true, 5, 0, 5),
+	(404, 'Occupancy', 'Pass with Affidavit for TCO', 						true, true, 29, 0, 0, 'Property passed inspections with Affidavit for TCO', 					15, true, 5, 0, 5),
+	(405, 'Occupancy', 'Field Inspection Report', 							true, true, 28, 0, 0, 'Property revieced a Field Inspection', 									15, true, 5, 0, 5),
+	(406, 'Occupancy', 'Progress Inspection', 								true, true, 28, 0, 0, 'Property revieced a progress Inspection - For compliance with POA', 		15, true, 5, 0, 5),
+	(407, 'Occupancy', 'Follow Up Inspection', 								true, true, 28, 0, 0, 'Property revieced a follow up Inspection', 								15, true, 5, 0, 5);
+
+INSERT INTO public.occinspectiondetermination
+	(title, eventcat_catid, active, description)
+VALUES
+	('PASS for Occupancy no violations', 					400, true, 'Property passed inspection with no violations'),
+	('PASS with violations', 								401, true, 'Property passed inspection with violations'),
+	('Fail NO LEGAL OCCUPANCY PERMITTED', 					402, true, 'Property failed inspection, Occupancy not permitted'),
+	('Fail with Violations NO LEGAL OCCUPANCY PERMITTED', 	403, true, 'Property failed inspection with violations, Occupancy not permitted'),
+	('Pass with Affidavit for TCO', 						404, true, 'Property passed inspections with Affidavit for TCO'),
+	('Field Inspection Report', 							405, true, 'Property revieced a Field Inspection'),
+	('Progress Inspection', 								406, true, 'Property revieced a progress Inspection - For compliance with POA'),
+	('Follow Up Inspection', 								407, true, 'Property revieced a follow up Inspection');
+
+
+INSERT INTO public.occinspectioncause
+	(title, active)
+VALUES
+	('CO-Scheduled', true),
+	('CO Re-Inspection less than 20 Days', true),
+	('CO Re-Inspection more than 20 Days', true),
+	('CO Re-Inspection more than 30 Days', true),
+	('Patrol Findind Initial', true),
+	('Health Safety Welfare', true),
+	('Complaint Recieved', true),
+	('Follow up/Progress Inspection', true);
+
+CREATE SEQUENCE IF NOT EXISTS occinspectionrequirement_requirementid_seq
+	START WITH 100
+	INCREMENT BY 1
+	MINVALUE 100
+	NO MAXVALUE
+	CACHE 1;
+
+CREATE TABLE public.occinspectionrequirement (
+	requirementid		INTEGER PRIMARY KEY DEFAULT nextval('occinspectionrequirement_requirementid_seq'),
+	title 				text NOT NULL,
+	description			text,
+	active				boolean DEFAULT true
+);
+
+INSERT INTO public.occinspectionrequirement
+	(title, description)
+VALUES
+	('Building Permit','Building permit is required'),
+	('Zoning Permit','Zoning permit is required'),
+	('Flood Plain Permit', 'Flood Plain permit is required'),
+	('Re-Inspection','A Re-Inspection is required'),
+	('Additional AHJ Code Review','Additional AHJ Code review is required'),
+	('CO Permit','CO permit is required');
+
+CREATE TABLE public.occinspectionrequirementassigned (
+	occrequirement_requirementid 			INTEGER CONSTRAINT occinspectionrequirementassigned_requirementid_fk REFERENCES public.occinspectionrequirement (requirementid),
+	occinspection_inspectionid				INTEGER CONSTRAINT occinspectionrequirementassigned_inspectionid_fk REFERENCES public.occinspection (inspectionid),
+	assignedby								INTEGER CONSTRAINT occinspectionrequirementassigned_assignedby_userid_fk REFERENCES public.login (userid),
+	assigneddate							TIMESTAMP WITH TIME ZONE,
+	assignednotes							TEXT,
+	fulfilledby								INTEGER CONSTRAINT occinspectionrequirementassigned_fulfilledby_userid_fk REFERENCES public.login (userid),
+	fulfilleddate							TIMESTAMP WITH TIME ZONE,
+	fulfillednotes							TEXT,
+	notes									TEXT,
+	CONSTRAINT occinspectionrequirementassigned_pk PRIMARY KEY (occrequirement_requirementid,occinspection_inspectionid)
+);

@@ -656,7 +656,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
             stmt.setInt(15, dir.getMinimumRequiredUserRankToEvaluate());
             
             stmt.setBoolean(16, dir.isActive());
-            stmt.setInt(17, dir.getIcon().getIconid());
+            stmt.setInt(17, dir.getIcon().getID());
             stmt.setInt(18, dir.getRelativeorder());
             stmt.setBoolean(19, dir.isDirectPropToMuniSysAdmin());
             stmt.setBoolean(20, dir.isRequiredEvaluationForBOBClose());

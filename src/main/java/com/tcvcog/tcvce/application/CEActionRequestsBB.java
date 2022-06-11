@@ -587,7 +587,7 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         QueryProperty qp = null;
 
         try {
-            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, getSessionBean().getSessUser().getMyCredential());
+            qp = sc.initQuery(QueryPropertyEnum.ADDRESS_BLDG_NUM_ONLY, getSessionBean().getSessUser().getMyCredential());
 
             if (muniForPropSwitchSearch == null) {
 
@@ -597,8 +597,8 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
 
             } else if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsProperty spp = qp.getPrimaryParams();
-                spp.setAddress_ctl(true);
-                spp.setAddress_val(houseNumSearch + " " + streetNameSearch);
+                spp.setAddress_bldgNum_ctl(true);
+                spp.setAddress_bldgNum_val(houseNumSearch + " " + streetNameSearch);
                 spp.setMuni_ctl(true);
                 spp.setMuni_val(muniForPropSwitchSearch);
                 spp.setLimitResultCount_ctl(true);
@@ -648,12 +648,12 @@ public class CEActionRequestsBB extends BackingBeanUtils implements Serializable
         StringBuilder sb = new StringBuilder();
         if (formerProp != null) {
             sb.append("Previous address: ");
-            sb.append(formerProp.getAddress());
+            sb.append(formerProp.getAddressString());
             sb.append(" (");
             sb.append(formerProp.getMuni().getMuniName());
             sb.append(")");
             sb.append("New address: ");
-            sb.append(selectedRequest.getRequestProperty().getAddress());
+            sb.append(selectedRequest.getRequestProperty().getAddressString());
             sb.append(" (");
             sb.append(selectedRequest.getRequestProperty().getMuni().getMuniName());
             sb.append(")");

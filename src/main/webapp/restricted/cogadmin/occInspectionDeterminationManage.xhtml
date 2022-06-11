@@ -1,0 +1,207 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <link rel="stylesheet" type="text/css" href="css/style.css"></link>
+        <title>Occupation Inspection Determination Manager</title>
+    </h:head>
+    <h:body>
+        <ui:composition template="/restricted/navContainer_restricted.xhtml">
+            <ui:define name="content">
+                <div class="mainContainer">
+                    <h:form id="oidmanage-messages-form">
+                        <p:growl id="growl" showDetail="true"/>
+                    </h:form>
+                            
+                    <h1>Determination Manager</h1>
+                    <f:view>
+                        <h:form id="oid-manage-form">
+                            
+                            <p:commandButton ajax="true" value="Add New Determination" icon="fa fa-plus" 
+                                             actionListener="#{occInspectionDeterminationBB.createNewDetermination}"
+                                             oncomplete="PF('oid-addupdate-dialog').show()"
+                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                             update="oid-add-update-form"/>
+                            
+                            <p:spacer height="15px"/>
+                            
+                             <p:dataTable
+                                id="oid-table"
+                                var="occInspectionDetermination"
+                                value="#{occInspectionDeterminationBB.detList}"
+                                rowKey="#{occInspectionDetermination.determinationID}"
+                                tableStyleClass="primeDataTable">
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{occInspectionDetermination.determinationID}"/>
+                                </p:column>
+                                 
+                                 <p:column width="8%">
+                                    <p:commandButton ajax="true"
+                                                     id="update-oid-cb" value="edit" 
+                                        styleClass="multiButtonLineButton" 
+                                        actionListener="#{occInspectionDeterminationBB.editDetermination(occInspectionDetermination)}"
+                                        oncomplete="PF('oid-addupdate-dialog').show()"
+                                        update="oid-add-update-form" />
+                                </p:column>
+                                 
+                                 <p:column width="8%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Title" />
+                                    </f:facet>
+                                    <h:outputText value="#{occInspectionDetermination.title}"/>
+                                </p:column>
+                                 
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Description" />
+                                    </f:facet>
+                                    <h:outputText value="#{occInspectionDetermination.description}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Notes" />
+                                    </f:facet>
+                                    <h:outputText value="#{occInspectionDetermination.notes}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Event Category" />
+                                    </f:facet>
+                                    <h:outputText value="#{occInspectionDetermination.eventCategory.eventCategoryTitle}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Category ID" />
+                                    </f:facet>
+                                    <h:outputText value="#{occInspectionDetermination.eventCategory.categoryID}"/>
+                                </p:column>
+                            
+                            </p:dataTable>
+                            
+                        <p:spacer height="15px"/>
+                        <hr/>
+                        <p:spacer height="15px"/>
+                        
+
+                        </h:form>
+                        
+                    <p:dialog      height="650" width="800"
+                                   widgetVar="user-info-dialog"
+                                   closable="true" 
+                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
+                        
+
+                    </p:dialog>
+                        
+                        
+                        
+                    <p:dialog   height="750" width="1000"
+                                widgetVar="oid-addupdate-dialog"
+                                closable="true" 
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}">
+                        <h:form id="oid-add-update-form">
+                            
+                            <h2>Add/update Determination</h2>
+                            <p><h:outputText id="oid-id-ot" value="Icon ID: #{occInspectionDeterminationBB.currentDetermination.determinationID}"/></p>
+                            
+                            <h:panelGrid columns="2" border="0" 
+                                         cellpadding="5" columnClasses="gridTd, gridTd"
+                                         footerClass="gridFooter">
+                                
+                                <h:panelGroup>
+                                    <h:outputLabel  id="oid-title-ol"
+                                                    value="Name" 
+                                                    for="oid-title-it"/>
+                                    <p:inputText id="oid-title-it" 
+                                                 value="#{occInspectionDeterminationBB.currentDetermination.title}" 
+                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                    <h:message for="oid-title-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel  id="oid-describe-ol"
+                                                    value="Description" 
+                                                    for="oid-describe-it"/>
+                                    <p:inputText id="oid-describe-it" 
+                                                 value="#{occInspectionDeterminationBB.currentDetermination.description}" 
+                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                    <h:message for="oid-describe-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel  id="oid-note-ol" 
+                                                    value="Notes" 
+                                                    for="oid-note-it"/>
+                                    <p:inputText id="oid-note-it" 
+                                                 value="#{occInspectionDeterminationBB.currentDetermination.notes}" 
+                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                    <h:message for="oid-note-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <h:outputLabel  id="oid-eventid-ol"
+                                                    value="Event Category ID" 
+                                                    for="oid-eventid-it"/>
+                                    <p:inputText id="oid-eventid-it" 
+                                                 value="#{occInspectionDeterminationBB.currentDetermination.eventCategory.categoryID}" 
+                                                 style="width: 200px;" tabindex="1" required="true" styleClass="inputText"/>
+                                    <h:message for="oid-eventid-it" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </h:panelGroup>
+                            </h:panelGrid>
+
+                            <p:spacer height="15px"/>
+                             <p:commandButton ajax="true" tabindex="2"
+                                                 value="Cancel" icon="fa fa-stop" 
+                                                 onclick="PF('oid-addupdate-dialog').hide()"/>
+                             
+                             <p:commandButton    id="oid-commitupdates-cb"
+                                                ajax="true" value="Update Determination data" icon="fa fa-plus" 
+                                             tabindex="11" 
+                                             actionListener="#{occInspectionDeterminationBB.commitUpdates}"
+                                             disabled="#{!(occInspectionDeterminationBB.currentDetermination.determinationID!= 0)}"
+                                             oncomplete="PF('oid-addupdate-dialog').hide()"
+                                             update="oid-manage-form:oid-table
+                                             oidmanage-messages-form"
+                                             />
+                            
+                             <p:commandButton    id="oid-commitinsert-cb"
+                                                ajax="true" value="Add new Determination" icon="fa fa-plus" 
+                                                tabindex="11" actionListener="#{occInspectionDeterminationBB.commitInsert}"
+                                                disabled="#{!(occInspectionDeterminationBB.currentDetermination.determinationID == 0)}"
+                                             oncomplete="PF('oid-addupdate-dialog').hide()"
+                                             update="oid-manage-form:oid-table
+                                             oidmanage-messages-form"
+                                             />
+                             
+                             <p:commandButton    id="oid-commitremove-cb"
+                                                ajax="true" value="Remove Determination" icon="fa fa-trash" 
+                                                tabindex="11" actionListener="#{occInspectionDeterminationBB.commitRemove}"
+                                                disabled="#{!(occInspectionDeterminationBB.currentDetermination.determinationID != 0)}"
+                                             oncomplete="PF('oid-addupdate-dialog').hide()"
+                                             update="oid-manage-form:oid-table
+                                             oidmanage-messages-form"
+                                             />
+                                             
+
+                        </h:form>
+
+                    </p:dialog>
+                        
+                        
+                        
+                    </f:view>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

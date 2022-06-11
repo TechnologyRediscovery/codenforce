@@ -101,33 +101,7 @@ public class Payment extends BOb {
         this.dateReceived = dateReceived;
     }
 
-    /**
-     * @return the dateDeposited
-     */
-    public Date getDateDepositedUtilDate() {
-        return DateTimeUtil.convertUtilDate(dateDeposited);
-    }
-
-    /**
-     * @param dateDeposited the dateDeposited to set
-     */
-    public void setDateDepositedUtilDate(Date dateDeposited) {
-        this.dateDeposited = DateTimeUtil.convertUtilDate(dateDeposited);
-    }
-
-    /**
-     * @return the dateReceived
-     */
-    public Date getDateReceivedUtilDate() {
-        return DateTimeUtil.convertUtilDate(dateReceived);
-    }
-
-    /**
-     * @param dateReceived the dateReceived to set
-     */
-    public void setDateReceivedUtilDate(Date dateReceived) {
-        this.dateReceived = DateTimeUtil.convertUtilDate(dateReceived);
-    }
+   
     
     /**
      * @return the amount

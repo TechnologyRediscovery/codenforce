@@ -42,8 +42,8 @@ public class OccInspectionDeterminationConverter extends EntityConverter impleme
             return "";
         }
 
-        OccInspectionDetermination opt = (OccInspectionDetermination) o;
-        String title = opt.getTitle();
+        OccInspectionDetermination oid = (OccInspectionDetermination) o;
+        String title = oid.getTitle();
         if (title != null){
             this.getViewMap(fc).put(title,o);
             return title;
@@ -51,8 +51,5 @@ public class OccInspectionDeterminationConverter extends EntityConverter impleme
         } else {
             return "OccInspectionDeterminationConverter error";
         }
-
-
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

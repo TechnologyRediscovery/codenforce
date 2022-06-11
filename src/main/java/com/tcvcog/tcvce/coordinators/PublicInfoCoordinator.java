@@ -53,7 +53,7 @@ import com.tcvcog.tcvce.entities.PublicInfoBundlePersonOccApplication;
 import com.tcvcog.tcvce.entities.PublicInfoBundleProperty;
 import com.tcvcog.tcvce.entities.PublicInfoBundlePropertyUnit;
 import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.occupancy.OccInspection;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
@@ -190,13 +190,13 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
 
-        List<OccInspection> inspectionList = oii.getOccInspectionListByPACC(pacc);
+//        List<OccInspection> inspectionList = oii.getOccInspectionListByPACC(pacc);
 
-        for (OccInspection ins : inspectionList) {
+//        for (FieldInspection ins : inspectionList) {
             // TODO upgrade for parcelization
 //            infoBundleList.add(extractPublicInfo(ins));
 
-        }
+//        }
 
         return infoBundleList;
     }
@@ -239,7 +239,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 pib.setAddressAssociated(false);
             } else {
                 pib.setAddressAssociated(true);
-                pib.setPropertyAddress(c.getProperty().getAddress());
+                pib.setPropertyAddress(c.getProperty().getAddressString());
             }
 
             ArrayList<PublicInfoBundleEventCnF> eventBundles = new ArrayList<>();
@@ -589,7 +589,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             ArrayList<PublicInfoBundleOccInspection> bundledInspections = new ArrayList<>();
 
             if (opdh.getInspectionList() != null) {
-                for (OccInspection skeleton : (List<OccInspection>) opdh.getInspectionList()) {
+                for (FieldInspection skeleton : (List<FieldInspection>) opdh.getInspectionList()) {
 
                     bundledInspections.add(extractPublicInfo(skeleton));
 
@@ -634,8 +634,8 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles an OccInspection into a PublicInfoBundleOccPermitApplication by
-     * stripping out its private information. One of the more resource-intense
+     * Bundles an FieldInspection into a PublicInfoBundleOccPermitApplication by
+ stripping out its private information. One of the more resource-intense
      * extraction methods, as it has to bundle a list of OccPeriods.
      *
      * @param input
@@ -699,14 +699,14 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Bundles an OccInspection into a PublicInfoBundleOccInspection by
-     * stripping out its private information. One of the more resource-intense
+     * Bundles an FieldInspection into a PublicInfoBundleOccInspection by
+ stripping out its private information. One of the more resource-intense
      * extraction methods, as it has to bundle a list of OccPeriods.
      *
      * @param input
      * @return
      */
-    public PublicInfoBundleOccInspection extractPublicInfo(OccInspection input) {
+    public PublicInfoBundleOccInspection extractPublicInfo(FieldInspection input) {
         PublicInfoBundleOccInspection pib = new PublicInfoBundleOccInspection();
 
         pib.setTypeName("OccInspection");
@@ -723,7 +723,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             pib.setShowDetailsPageButton(true);
         } else {
 
-            OccInspection skeleton = new OccInspection();
+            FieldInspection skeleton = new FieldInspection();
             skeleton.setInspectionID(input.getInspectionID());
             pib.setBundledInspection(skeleton);
             pib.setPaccStatusMessage("A public information bundle was found but public "
@@ -839,14 +839,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             ArrayList<PublicInfoBundlePerson> personHorde = new ArrayList<>();
 
-            if (input.getPersonList() != null) {
-/// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                                    
-//                for (Person skeleton : input.getPersonList()) {
-
-//                    personHorde.add(extractPublicInfo(skeleton));
-//
-//                }
-            }
+         
 
             pib.setPersonList(personHorde);
 
@@ -980,25 +973,25 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
     }
 
     /**
-     * Converts a bundled OccInspection to an unbundled OccInspection for
-     * internal use. Currently does not check for changes.
+     * Converts a bundled FieldInspection to an unbundled FieldInspection for
+ internal use. Currently does not check for changes.
      *
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      * @param input
      * @return
      *
      */
-    public OccInspection export(PublicInfoBundleOccInspection input) throws IntegrationException, BObStatusException {
+    public FieldInspection export(PublicInfoBundleOccInspection input) throws IntegrationException, BObStatusException {
 
         OccInspectionIntegrator oi = getOccInspectionIntegrator();
-        OccInspection unbundled = input.getBundledInspection();
+        FieldInspection unbundled = input.getBundledInspection();
 
         return oi.getOccInspection(unbundled.getInspectionID());
     }
 
     /**
-     * Converts a bundled PublicInfoBundleEventCnF to an unbundled OccInspection
-     * for internal use. Currently does not check for changes. Uses the
+     * Converts a bundled PublicInfoBundleEventCnF to an unbundled FieldInspection
+ for internal use. Currently does not check for changes. Uses the
      * data-heavy class to contain the necessary fields.
      *
      * @param input
@@ -1120,7 +1113,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         Property exportable = pc.getProperty(unbundled.getParcelKey());
 
 /// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                            
-//        exportable.setAddress(unbundled.getAddress());
+//        exportable.setAddress(unbundled.getAddressString());
 //        exportable.setStatus(unbundled.getStatus());
 //        exportable.setMuni(unbundled.getMuni());
 //        exportable.setParID(unbundled.getParID());
@@ -1181,7 +1174,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             }
         }
 
-        ArrayList<OccInspection> inspectionHorde = new ArrayList<>();
+        ArrayList<FieldInspection> inspectionHorde = new ArrayList<>();
 
         if (input.getInspectionList() != null) {
 
@@ -1245,7 +1238,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         Person unbundled = input.getBundledPerson();
 
 /// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                            
-//        Person exportable = pc.getPerson(unbundled.getHumanID());
+//        Person exportable = pc.getPersonByHumanID(unbundled.getHumanID());
 
 //        if (exportable == null) {
 //

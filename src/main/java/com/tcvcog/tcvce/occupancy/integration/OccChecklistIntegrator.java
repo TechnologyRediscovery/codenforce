@@ -6,14 +6,16 @@
 package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.occupancy.OccChecklistTemplate;
 import com.tcvcog.tcvce.entities.occupancy.OccSpace;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceElement;
 import com.tcvcog.tcvce.entities.occupancy.OccSpaceType;
-import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeInspectionDirective;
+import com.tcvcog.tcvce.entities.occupancy.OccSpaceTypeChecklistified;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
 import java.sql.Connection;
@@ -47,8 +49,8 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
      * @return an instance of List, perhaps with checklists
      * @throws IntegrationException 
      */
-    public List<OccChecklistTemplate> getOccChecklistTemplateList(Municipality muni) throws IntegrationException {
-        List<OccChecklistTemplate> checklistList = new ArrayList<>();
+    public List<Integer> getOccChecklistTemplateList(Municipality muni) throws IntegrationException {
+        List<Integer> checklistIDList = new ArrayList<>();
         StringBuilder sb = new StringBuilder(); 
         sb.append("SELECT checklistid FROM public.occchecklist ");
         if(muni == null){
@@ -69,7 +71,7 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
             }
             rs = stmt.executeQuery();
             while (rs.next()) {
-                checklistList.add(getChecklistTemplate(rs.getInt("checklistid")));
+                checklistIDList.add(rs.getInt("checklistid"));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -79,34 +81,35 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return checklistList;
+        return checklistIDList;
     }
+    
+    
+    
 
     /**
-     * Connects a OccSpace with Code Elements.
+     * Connects an OccSpaceTypeChecklistified to a List of CodeElements. 
+     * Note that the 
      *
-     * @param spc the space to which the elements should be connected
-     * @param elementsToAttach a list of CodeElements that should be inspected
-     * in this space
-     * @return
+     * @param ose
      * @throws IntegrationException
      */
-    public void attachCodeElementsToSpace(OccSpace spc, List<CodeElement> elementsToAttach) throws IntegrationException {
-        String sql = "INSERT INTO public.occspaceelement(\n" + " spaceelementid, space_id, codeelement_id)\n" + " VALUES (DEFAULT, ?, ?);";
+    public void attachCodeElementsToSpaceTypeInChecklist(OccSpaceElement ose) throws IntegrationException {
+        String sql =    "INSERT INTO public.occchecklistspacetypeelement(\n" +
+                        "            spaceelementid, codesetelement_seteleid, required, checklistspacetype_typeid)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?);";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ListIterator li = elementsToAttach.listIterator();
-        CodeElement ce;
         try {
             // for each CodeElement in the list passed into the method, make an entry in the spaceelement table
-            while (li.hasNext()) {
-                ce = (CodeElement) li.next();
                 stmt = con.prepareStatement(sql);
-                stmt.setInt(1, spc.getSpaceID());
-                stmt.setInt(2, ce.getElementID());
+                
+                stmt.setInt(1, ose.getCodeSetElementID());
+                stmt.setBoolean(2, ose.isRequiredForInspection());
+                stmt.setInt(3, ose.getParentSpaceTypeID());
+                
                 stmt.execute();
-            }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("", ex);
@@ -116,73 +119,72 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
     }
+
+   
 
     /**
-     * Connects a OccSpace with Code Elements.
-     *
-     * @param spc the space to which the elements should be connected
-     * @param ele
-     * @return
-     * @throws IntegrationException
+     * Builds a list of OccSpaceType IDs from records in the occchecklistspacetype using a checklist ID
+     * table
+     * @param checklistID
+     * @return the list of fully-baked objects
+     * @throws IntegrationException 
      */
-    public int attachCodeElementToSpace(OccSpace spc, CodeElement ele) throws IntegrationException {
-        if (spc == null || ele == null) {
-            return 0;
-        }
-        int newlyLinkedSpaceCodeElementID = 0;
-        String sql = "INSERT INTO public.occspaceelement(\n" + " spaceelementid, space_id, codeelement_id)\n" + " VALUES (DEFAULT, ?, ?);";
+    public List<Integer> getOccSpaceTypeChecklistifiedIDListByChecklist(int checklistID) throws IntegrationException {
+        String query = "SELECT checklistspacetypeid FROM public.occchecklistspacetype WHERE checklist_id=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(sql);
-            stmt.setInt(1, spc.getSpaceID());
-            stmt.setInt(2, ele.getElementID());
-            stmt.execute();
-            String retrievalQuery = "SELECT currval('spaceelement_seq');";
-            stmt = con.prepareStatement(retrievalQuery);
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                newlyLinkedSpaceCodeElementID = rs.getInt(1);
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("", ex);
-        } finally {
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return newlyLinkedSpaceCodeElementID;
-    }
-
-    public List<OccSpaceType> getOccInspecTemplateSpaceTypeList(int checklistID) throws IntegrationException {
-        String query = "    SELECT spacetype_typeid FROM public.occchecklistspacetype WHERE checklist_id=?;";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        List<OccSpaceType> typelist = new ArrayList<>();
+        List<Integer> ostidl = new ArrayList<>();
         try {
             stmt = con.prepareStatement(query);
             stmt.setInt(1, checklistID);
             rs = stmt.executeQuery();
             while (rs.next()) {
-                typelist.add(getSpaceType(rs.getInt("spacetype_typeid")));
-                
+                ostidl.add(rs.getInt("checklistspacetypeid"));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Cannot get space type", ex);
+            throw new IntegrationException("getOccSpaceTypeChecklistifiedIDListByChecklist | Error building list of space type IDs by checklist!", ex);
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return typelist;
+        return ostidl;
     }
 
-    public void deleteOccChecklistSpaceType(OccSpaceType spaceType) throws IntegrationException {
-        String query = "DELETE FROM public.occchecklistspacetype\n" + " WHERE spacetype_typeid= ?;";
+    /**
+     * Removes a space type from a checklist
+     * 
+     * @param ostchk
+     * @throws IntegrationException 
+     */
+    public void deleteOccSpaceTypeChecklistified(OccSpaceTypeChecklistified ostchk) throws IntegrationException {
+        String query = "DELETE FROM public.occchecklistspacetype\n" 
+                + " WHERE checklistspacetypeid = ?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, ostchk.getChecklistSpaceTypeID());
+            stmt.execute();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot delete space type checklistified--probably because another" + "part of the database has a reference item.", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    /**
+     * Removes a space type from a checklist
+     * 
+     * @param spaceType
+     * @throws IntegrationException 
+     */
+    public void deleteSpaceType(OccSpaceType spaceType) throws IntegrationException {
+        String query = "DELETE FROM public.occspacetype\n" 
+                + " WHERE spacetypeid= ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
@@ -198,8 +200,15 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
         } // close finally
     }
 
+    /**
+     * Retrieves and builds a bare bones checklist, with title and such, but no
+     * space types or elements--see the config methods on the OccInspectionCoordinator
+     * @param checklistID
+     * @return
+     * @throws IntegrationException 
+     */
     public OccChecklistTemplate getChecklistTemplate(int checklistID) throws IntegrationException {
-        String checklistTableSELECT = "SELECT checklistid, title, description, muni_municode, active, governingcodesource_sourceid\n" + 
+        String checklistTableSELECT = "SELECT checklistid, title, description, muni_municode, active, governingcodesource_sourceid, createdts \n" + 
                 "  FROM public.occchecklist WHERE checklistid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -225,7 +234,32 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
     
     
     /**
-     * Extracts a record from occspacetype
+     * Utility method for populating a OccChecklistTemplate with metadata
+     *
+     * @param rs containing all metadata fields from the checklist table
+     * @return half-baked OccChecklistTemplate object (no element lists)
+     */
+    private OccChecklistTemplate generateChecklistTemplate(ResultSet rs) throws SQLException, IntegrationException {
+        OccChecklistTemplate chkList = new OccChecklistTemplate();
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        CodeIntegrator ci = getCodeIntegrator();
+        chkList.setInspectionChecklistID(rs.getInt("checklistid"));
+        chkList.setTitle(rs.getString("title"));
+        chkList.setDescription(rs.getString("description"));
+        chkList.setMuni(mi.getMuni(rs.getInt("muni_municode")));
+        chkList.setActive(rs.getBoolean("active"));
+        chkList.setGoverningCodeSource(ci.getCodeSource(rs.getInt("governingcodesource_sourceid")));
+        if(rs.getTimestamp("createdts") != null){
+            chkList.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
+        } 
+        
+        return chkList;
+    }
+
+    
+    
+    /**
+     * Extracts a record from occspacetype, with no inspection meta data attached
      *
      * @param spaceTypeID
      * @return
@@ -233,13 +267,12 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
      */
     public OccSpaceType getOccSpaceType(int spaceTypeID) throws IntegrationException {
         OccSpaceType spaceType = null;
-        String query = "SELECT checklistspacetypeid, checklist_id, required, spacetype_typeid, notes\n" 
-                + "  FROM public.occchecklistspacetype WHERE checklistspacetypeid=?;";
+        String query = "SELECT spacetypeid, spacetitle, description\n" +
+                    "  FROM public.occspacetype WHERE spacetypeid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         
-        OccupancyIntegrator oi = getOccupancyIntegrator();
         
         try {
             stmt = con.prepareStatement(query);
@@ -258,19 +291,107 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
         } // close finally
         return spaceType;
     }
+    
+      /**
+     * Generator for OccSpaceType objects
+     * @param rs for a single record with all fields SELECTed
+     * @return the fully-baked object
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
+    private OccSpaceType generateOccSpaceType(ResultSet rs) throws SQLException, IntegrationException {
+        OccSpaceType tpe = new OccSpaceType();
+        tpe.setSpaceTypeID(rs.getInt("spacetypeid"));
+        tpe.setSpaceTypeTitle(rs.getString("spacetitle"));
+        tpe.setSpaceTypeDescription(rs.getString("description"));
+        return tpe;
+    }    
+    
+    
+    /**
+     * Extracts all space types from the DB
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<Integer> getOccSpaceTypeIDListComplete() throws IntegrationException{
+        List<Integer> idl = new ArrayList<>();
+        
+        String query = "SELECT spacetypeid, spacetitle, description\n" +
+                    "  FROM public.occspacetype;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                idl.add(rs.getInt("spacetypeid"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Could not create sapce", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return idl;
+    }
 
-    public void updateSpaceType(OccSpaceType spaceType) throws IntegrationException {
-        String query = "UPDATE public.occchecklistspacetype\n" +
-                "SET checklist_id=?, required=?, spacetype_typeid=?, notes=?\n" +
-                "WHERE spacetypeid=?";
+    
+      
+    /**
+     * Updates a record in the occspacetype by ID
+     * @param ost to update
+     * @throws IntegrationException 
+     */
+    public void updateSpaceType(OccSpaceType ost) throws IntegrationException {
+        String query = "UPDATE public.occspacetype\n" +
+                        "   SET spacetitle=?, description=?\n" +
+                        " WHERE spacetypeid=?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setString(1, spaceType.getSpaceTypeTitle());
-            stmt.setString(2, spaceType.getSpaceTypeDescription());
-            stmt.setBoolean(3, spaceType.isRequired());
-            stmt.setInt(4, spaceType.getSpaceTypeID());
+            stmt.setString(1, ost.getSpaceTypeTitle());
+            stmt.setString(2, ost.getSpaceTypeDescription());
+            
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to update space type", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        }
+    }
+
+    
+    
+        
+    
+    /**
+     * Updates a record in the occchecklistspacetype by ID
+     * @param ostc
+     * @throws IntegrationException 
+     */
+    public void updateSpaceTypeChecklistified(OccSpaceTypeChecklistified ostc) throws IntegrationException {
+        String query = "UPDATE public.occchecklistspacetype\n" +
+                        "   SET checklist_id=?, required=?, spacetype_typeid=?, \n" +
+                        "       notes=?\n" +
+                        " WHERE checklistspacetypeid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, ostc.getChecklistParentID());
+            stmt.setBoolean(2, ostc.isRequired());
+            stmt.setInt(3, ostc.getSpaceTypeID());
+            stmt.setString(4, ostc.getNotes());
+            stmt.setInt(5, ostc.getChecklistSpaceTypeID());
+            
             stmt.executeUpdate();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -281,22 +402,66 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
              
         }
     }
+    
+    /**
+     * Updates a record in the occchecklistspacetype by ID
+     * @param ose
+     * @throws IntegrationException 
+     */
+    public void updateOccSpaceElement(OccSpaceElement ose) throws IntegrationException {
+        if(ose == null){
+            throw new IntegrationException("Cannot update null OccSpaceElement");
+        }
+        String query = "UPDATE public.occchecklistspacetypeelement\n" +
+                        "   SET required=? WHERE spaceelementid=?;";
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setBoolean(1, ose.isRequiredForInspection());
+            stmt.setInt(2, ose.getOccChecklistSpaceTypeElementID());
+            
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to OccSpaceElement", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             
+        }
+    }
 
   
-
-    public void insertSpaceType(OccSpaceType spaceType) throws IntegrationException {
-        String query = "INSERT INTO public.occchecklistspacetype\n" +
-                "(checklist_id, required, spacetype_typeid, notes)"
-                + "    VALUES(DEFAULT, ?, ?, ?)";
+    /**
+     * Creates a new record in the occspacetype--bare bones type
+     * @param spaceType
+     * @throws IntegrationException 
+     */
+    public int insertSpaceType(OccSpaceType spaceType) throws IntegrationException {
+        String query = "INSERT INTO public.occspacetype(\n" +
+                        "            spacetypeid, spacetitle, description)\n" +
+                        "    VALUES (DEFAULT, ?, ?);";
 
         Connection con = getPostgresCon();
+         ResultSet rs = null;
+         int freshID = 0;
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, spaceType.getSpaceTypeTitle());
             stmt.setString(2, spaceType.getSpaceTypeDescription());
-            stmt.setBoolean(3, spaceType.isRequired());
             stmt.execute();
+            
+            
+            String retrievalQuery = "SELECT currval('spacetype_spacetypeid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                freshID = rs.getInt(1);
+            }
+            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Cannot insert SpaceType", ex);
@@ -305,78 +470,120 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              
         } // close finally
-
+        return freshID;
     }
 
-    private OccSpaceType generateOccSpaceType(ResultSet rs) throws SQLException, IntegrationException {
-        OccSpaceType type = new OccSpaceType();
-        type.setSpaceTypeID(rs.getInt("checklistspacetypeid"));
-        // no checklist id field yet
-        type.setRequired(rs.getBoolean("required"));
-        type.setSpaceTypeID(rs.getInt("spacetype_typeid"));
-        // no notes field yet
-        // also other useless fields are present
-        return type;
-    }    
-    
-    public void deleteSpaceType(OccSpaceType spaceType) throws IntegrationException {
-        String query = "DELETE FROM public.occchecklistspacetype\n" + " WHERE spacetypeid= ?;";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, spaceType.getSpaceTypeID());
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot delete space type--probably because another" + "part of the database has a reference item.", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             
-        } // close finally
-    }
-
-    /**
-     * Deletes both the linked spaceelements and the space entry itself
-     *
-     * @param s
-     * @throws IntegrationException
+  
+  
+ /**
+     * Extracts all space types from the DB
+     * @param ostchk
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException if the space type is not unique in the checklist
      */
-    public void deleteSpaceAndElementLinks(OccSpace s) throws IntegrationException {
+    public void verifyUniqueChecklistSpaceTypeLink(OccSpaceTypeChecklistified ostchk) throws IntegrationException, BObStatusException{
+        
+        String query = "SELECT checklistspacetypeid \n" +
+                        "  FROM public.occchecklistspacetype WHERE checklist_id=? AND spacetype_typeid=?;";
         Connection con = getPostgresCon();
+        ResultSet rs = null;
         PreparedStatement stmt = null;
+        
         try {
-            // start by removing space elements
-            String query = "DELETE FROM public.occspaceelement\n" + " WHERE spaceelementid = ?;";
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, s.getSpaceID());
-            stmt.executeQuery();
-            // now remove the space itself
-            query = "DELETE FROM public.space WHERE spaceid = ?";
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, s.getSpaceID());
-            stmt.executeQuery();
+            stmt.setInt(1, ostchk.getChecklistParentID());
+            stmt.setInt(2, ostchk.getSpaceTypeID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Cannot link space type to checklist: Duplicate Mapping. ");
+                sb.append("Checklist ID ");
+                sb.append(ostchk.getChecklistParentID());
+                sb.append(" is already linked to space type ID ");
+                sb.append(ostchk.getSpaceTypeID());
+                throw new BObStatusException(sb.toString());
+            }
+            System.out.println("OccChecklistIntegrator: Verified unique mapping of element to space type!");
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to delete the space and its associated" + "elements: Probably because this space has been used in one or more" + "occupancy inspectsion. It's here to stay!", ex);
+            throw new IntegrationException("Could verify unique space type and checklist", ex);
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
+        
+    }
+
+    
+     
+ /**
+     * Extracts all space types from the DB
+     * @param ose
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException if the element is not unique in the space type
+     */
+    public void verifyUniqueCodeElementInSpaceType(OccSpaceElement ose) throws IntegrationException, BObStatusException{
+        if(ose == null){
+            throw new BObStatusException("Cannot check occ space element for uniqueness with null element!");
+        }
+        if(ose.getCodeSetElementID() == 0 || ose.getParentSpaceTypeID() == 0){
+            throw new BObStatusException("Cannot check OccSpaceElement for uniqueness with ID 0 in codeset or parent space type");
+        }
+        
+        String query = "SELECT spaceelementid FROM public.occchecklistspacetypeelement"
+                + " WHERE codesetelement_seteleid = ? AND checklistspacetype_typeid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, ose.getCodeSetElementID());
+            stmt.setInt(2, ose.getParentSpaceTypeID());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Cannot link element to space type: Duplicate Mapping. ");
+                sb.append("Space type ID: ");
+                sb.append(ose.getParentSpaceTypeID());
+                sb.append(" is already linked to code set element ID ");
+                sb.append(ose.getCodeSetElementID());
+                throw new BObStatusException(sb.toString());
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Could not verify uniqueness of element to space type", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
     }
 
 
-    public void insertOccChecklistSpaceType(int checklistid, OccSpaceType ost) throws IntegrationException {
-        String query = "INSERT INTO public.occchecklistspacetype(\n" + "     checklistspacetypeid, checklist_id, required, spacetype_typeid, \n" + "     overridespacetyperequired, overridespacetyperequiredvalue, overridespacetyperequireallspaces) \n" + "     VALUES (DEFAULT, ?, ?, ?, ?, ?, ?)";
+
+    /**
+     * Inserts a record into the occchecklistspacetype table but does not
+     * process its OccSpaceElement list in its belly.
+     * @param ost
+     * @throws IntegrationException 
+     */
+    public void insertOccChecklistSpaceTypeChecklistified(OccSpaceTypeChecklistified ost) throws IntegrationException {
+        String query = "INSERT INTO public.occchecklistspacetype(\n" 
+                + "     checklistspacetypeid, checklist_id, required, spacetype_typeid, notes) \n" 
+                + "     VALUES (DEFAULT, ?, ?, ?, ?)";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, checklistid);
+            
+            stmt.setInt(1, ost.getChecklistParentID());
             stmt.setBoolean(2, ost.isRequired());
             stmt.setInt(3, ost.getSpaceTypeID());
+            stmt.setString(4, ost.getNotes());
+            
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -391,48 +598,31 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
     /**
      * Removes the connection between a OccSpace and a Code Element. Handy for
      * adjusting ChecklistBlueprints
+     * 
+     * TODO: adapt to new
      *
      * @param spc
      * @param elementToDetach
      * @throws IntegrationException
      */
-    public void detachCodeElementFromSpace(OccSpace spc, CodeElement elementToDetach) throws IntegrationException {
-        String query = "DELETE FROM public.occspaceelement\n" + " WHERE space_id = ? AND codeelement_id = ?;";
+    public void detachOccSpaceElementFromOccSpaceTypeChecklistified(OccSpaceElement elementToDetach) throws IntegrationException {
+        String query = "DELETE FROM public.occchecklistspacetypeelement\n" 
+                + " WHERE checklistspacetype_typeid = ? AND codesetelement_seteleid = ?;";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, spc.getSpaceID());
-            stmt.setInt(2, elementToDetach.getElementID());
-            System.out.println("ChecklistIntegrator.dettachCodeElementsFromSpace | stmt: " + stmt.toString());
+            stmt.setInt(1, elementToDetach.getParentSpaceTypeID());
+            stmt.setInt(2, elementToDetach.getCodeSetElementID());
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("", ex);
+            throw new IntegrationException("OccChecklistIntegrator.detachCodeElementFromOccSpaceTypeChecklistified | Could not remove link", ex);
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              
         } // close finally
-    }
-
-    /**
-     * Utility method for populating a OccChecklistTemplate with metadata
-     *
-     * @param rs containing all metadata fields from the checklist table
-     * @return half-baked OccChecklistTemplate object (no element lists)
-     */
-    private OccChecklistTemplate generateChecklistTemplate(ResultSet rs) throws SQLException, IntegrationException {
-        OccChecklistTemplate chkList = new OccChecklistTemplate();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        CodeIntegrator ci = getCodeIntegrator();
-        chkList.setInspectionChecklistID(rs.getInt("checklistid"));
-        chkList.setTitle(rs.getString("title"));
-        chkList.setDescription(rs.getString("description"));
-        chkList.setMuni(mi.getMuni(rs.getInt("muni_municode")));
-        chkList.setActive(rs.getBoolean("active"));
-        chkList.setGoverningCodeSource(ci.getCodeSource(rs.getInt("governingcodesource_sourceid")));
-        return chkList;
     }
 
     /**
@@ -442,13 +632,14 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
      * @param bp
      * @throws IntegrationException
      */
-    public void insertChecklistTemplateMetadata(OccChecklistTemplate bp) throws IntegrationException {
+    public int insertChecklistTemplateMetadata(OccChecklistTemplate bp) throws IntegrationException {
         String query = "INSERT INTO public.occchecklist(\n" 
                 + "            checklistid, title, description, muni_municode, active, governingcodesource_sourceid, createdts)\n" 
                 + "    VALUES (DEFAULT, ?, ?, ?, ?, ?, now());";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
+        int freshID = 0;
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, bp.getTitle());
@@ -461,6 +652,16 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
                 stmt.setNull(5, Types.NULL);
             }
             stmt.execute();
+            
+            String retrievalQuery = "SELECT currval('checklist_checklistid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                freshID = rs.getInt(1);
+            }
+            
+            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("", ex);
@@ -469,69 +670,32 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
+        return freshID;
     }
 
-    public OccSpaceType getSpaceType(int spacetypeid) throws IntegrationException {
-        String query =      "   SELECT spacetypeid, spacetitle, description, required\n" 
-                        +   "   FROM public.occchecklistspacetype WHERE spacetypeid = ?;";
-        Connection con = getPostgresCon();
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        OccSpaceType st = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, spacetypeid);
-            rs = stmt.executeQuery();
-            while (rs.next()) {
-                st = generateOccSpaceType(rs);
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Could not get space type", ex);
-        } finally {
-            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-        return st;
-    }
-
-    public void detachElement(int spaceid) throws IntegrationException {
-        String query = "DELETE FROM public.occspaceelement\n" + " WHERE space_id= ?;";
-        Connection con = getPostgresCon();
-        PreparedStatement stmt = null;
-        try {
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, spaceid);
-            stmt.execute();
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Cannot detach element--probably because another" + "part of the database has a reference item.", ex);
-        } finally {
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             
-        } // close finally
-    }
+    
 
     /**
      * Updates a record in occchecklist
-     * @param blueprint
+     * @param oct
      * @throws IntegrationException
      */
-    public void updateChecklistTemplateMetadata(OccChecklistTemplate blueprint) throws IntegrationException {
+    public void updateChecklistTemplateMetadata(OccChecklistTemplate oct) throws IntegrationException {
         String query = "UPDATE public.occchecklist\n" 
                 + "   SET title=?, description=?, muni_municode=?, active=?, \n" 
-                + "       governingcodesource_sourceid=?\n" + " WHERE checklistid=?";
+                + "       governingcodesource_sourceid=?\n" 
+                + " WHERE checklistid=?";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setString(1, blueprint.getTitle());
-            stmt.setString(2, blueprint.getDescription());
-            stmt.setInt(3, blueprint.getMuni().getMuniCode());
-            stmt.setBoolean(4, blueprint.isActive());
-            stmt.setInt(5, blueprint.getGoverningCodeSource().getSourceID());
+            stmt.setString(1, oct.getTitle());
+            stmt.setString(2, oct.getDescription());
+            stmt.setInt(3, oct.getMuni().getMuniCode());
+            stmt.setBoolean(4, oct.isActive());
+            stmt.setInt(5, oct.getGoverningCodeSource().getSourceID());
+            stmt.setInt(6, oct.getInspectionChecklistID());
+            
             stmt.execute();
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -544,9 +708,17 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
     }
 
  
+    /**
+     * Asks DB for the ID of the most recently assigned ID
+     * @param occInspectionIntegrator
+     * @return 
+     */
     public int getLastInsertSpaceTypeid(OccInspectionIntegrator occInspectionIntegrator) {
         int lastInsertSpaceTypeid = 0;
-        String query = "SELECT spacetypeid\n" + "  FROM public.occchecklistspacetype\n" + "  ORDER BY spacetypeid DESC\n" + "  LIMIT 1;";
+        String query =  "SELECT spacetypeid\n" 
+                    +   "  FROM public.occchecklistspacetype\n" 
+                    +   "  ORDER BY spacetypeid DESC\n" 
+                    +   "  LIMIT 1;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -567,44 +739,77 @@ public class OccChecklistIntegrator extends BackingBeanUtils{
     }
 
     /**
-     * Takes in a OccSpace object, extracts its ID, then uses that to query for
+     * Takes in a OccSpace type ID, then uses that to query for
      * all of the codeelements attached to that space. Used to compose a
      * checklist blueprint which can be converted into an implemented checklist
-     *
-     * TODO: Fix me
      * 
-     * @param spc the space Object to load up with elements. When passed in,
-     * only the ID needs to be held in the object
-     * @return a OccSpace object populated with CodeElement objects
+     * @param ocstid the checklistspacetypeID
+     * @return a OccSpaceChecklistified object populated with CodeElement objects
      * @throws IntegrationException
      */
-    public List<OccSpaceElement> getOccSpaceElementsByOccSpaceType(OccSpaceType spc) throws IntegrationException {
+    public OccSpaceTypeChecklistified getOccSpaceTypeChecklistified(int ocstid) throws IntegrationException {
         
-        String query = "SELECT spaceelementid, codeelement_id, required, checklistspacetype_typeid \n" 
-                + "  FROM public.occspaceelement WHERE checklistspacetype_typeid=?";
+         String query = "SELECT 	occchecklistspacetypeelement.spaceelementid, \n" + //inc
+                        "	occchecklistspacetypeelement.codesetelement_seteleid, \n" + //inc
+                        "	occchecklistspacetypeelement.required AS ocsterequired, \n" + //inc
+                        "	occchecklistspacetypeelement.checklistspacetype_typeid, \n" + // join field
+                        "	occchecklistspacetypeelement.notes AS ocstenotes,\n" + //inc
+                        "	occchecklistspacetype.checklistspacetypeid, \n" + //inc
+                        "	occchecklistspacetype.checklist_id, \n" + //inc
+                        "	occchecklistspacetype.required AS ocstrequired, \n" + //inc
+                        "	occchecklistspacetype.spacetype_typeid, \n" + // join field
+                        "	occchecklistspacetype.notes AS ocstnotes \n" + //inc
+                        "FROM    public.occchecklistspacetype \n" +
+                        "	LEFT OUTER JOIN public.occchecklistspacetypeelement ON (occchecklistspacetypeelement.checklistspacetype_typeid=occchecklistspacetype.checklistspacetypeid) " +
+                        "WHERE 	occchecklistspacetype.checklistspacetypeid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
         List<OccSpaceElement> eleList = new ArrayList<>();
+        OccSpaceTypeChecklistified ostc = null;
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, spc.getSpaceTypeID());
+            stmt.setInt(1, ocstid);
             rs = stmt.executeQuery();
+            boolean containerBuilt = false;
             while (rs.next()) {
-                OccSpaceElement ele = new OccSpaceElement(getCodeCoordinator().getCodeElement(rs.getInt("codeelement_id")));
-                ele.setRequiredForInspection(rs.getBoolean("required"));
-                ele.setSpaceElementID(rs.getInt("spaceelementid"));
-                eleList.add(new OccSpaceElement(ele));
+                if(!containerBuilt){
+                    ostc = new OccSpaceTypeChecklistified(getOccSpaceType(rs.getInt("spacetype_typeid")));
+                    ostc.setChecklistSpaceTypeID(rs.getInt("checklistspacetypeid"));
+                    ostc.setRequired(rs.getBoolean("ocstrequired"));
+                    ostc.setChecklistParentID(rs.getInt("checklist_id"));
+                    ostc.setNotes(rs.getString("ocstnotes"));
+                    containerBuilt = true;
+                }
+                
+                // Because of this yucky left outer join, we can get back a row to correspond
+                // to a type but a type that has no elements to inspect. So this was yielding
+                // an occspacelement without any guts and erroring out the insert.
+                if(rs.getInt("spaceelementid") != 0){
+                    // this call to the code coordinator is basically an antipattern--but for this level of 
+                    // complexity of object creation, we'll try this for testing
+                    int seteleid = rs.getInt("codesetelement_seteleid");
+                    OccSpaceElement ele = new OccSpaceElement(getCodeCoordinator().getEnforcableCodeElement(seteleid));
+                    ele.setRequiredForInspection(rs.getBoolean("ocsterequired"));
+                    ele.setOccChecklistSpaceTypeElementID(rs.getInt("spaceelementid"));
+                    ele.setNotes(rs.getString("ocstenotes"));
+                    ele.setParentSpaceTypeID(rs.getInt("checklistspacetype_typeid"));
+                    eleList.add(new OccSpaceElement(ele));
+                }
+            }
+            //inject our list of elements
+            if(ostc !=null){
+                ostc.setCodeElementList(eleList);
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("", ex);
+            throw new IntegrationException("OccChecklistIntegrator.getOccSpaceTypeChecklistified | Could not built fancy OccSpaceTypeChecklistified!", ex);
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return eleList;
+        return ostc;
     }
     
 }

@@ -75,7 +75,6 @@ public class    PublicInfoBundlePerson
 //        
 //        input.setExpiryDate(LocalDateTime.MIN);
 //        input.setExpireString("*****");
-//        input.setExpiryDateUtilDate(new Date());
 //        input.setExpiryNotes("*****");
 //        
 //        input.setLinkedUserID(0);

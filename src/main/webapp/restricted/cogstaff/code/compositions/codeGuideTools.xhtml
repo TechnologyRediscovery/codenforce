@@ -1,0 +1,502 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="codeguide-growl-form">
+        <p:growl id="codeguide-growl" />
+    </h:form>
+
+    <p:dialog id="codeguide-list-dialog"
+              widgetVar="codeguide-list-dialog-var"
+              header="Manage ordinance guide records"
+              closable="true"
+              closeOnEscape="true"
+              modal="true"
+              height="500"
+              width="1000"
+              resizable="true"
+              responsive="true">
+
+        <h:form id="codeguide-list-form">
+
+            <p:commandButton id="codeguideentry-create-init-button"
+                             value="Create new code category"
+                             icon="fa fa-plus"
+                             ajax="true"
+                             style="margin-right: 10px;"
+                             oncomplete="PF('codeguide-viewedit-dialog-var').show()"
+                             actionListener="#{codeElementGuideBB.onCodeElementGuideEntryCreateInitButtonPress}"
+                             update="   codeguide-viewedit-dialog
+                             codeguide-viewedit-form"/>
+            
+            <p:commandButton id="mangeordcategories-button"
+                             value="Manage ordinance categories"
+                             icon="fa fa-link"
+                             ajax="true"
+                             oncomplete="PF('codeguide-maptoelements-dialog-var').show()"
+                             actionListener="#{codeElementGuideBB.onLinkElementsToGuideInitButtonPush}"
+                             update="   codeguide-maptoelements-dialog
+                             codeguide-choosesource-form
+                             codeguide-maptoelements-form"/>
+
+            <p:spacer height="5px"/>
+
+
+            <p:dataTable
+                id="codeguide-table"
+                value="#{codeElementGuideBB.codeGuideList}"
+                tableStyleClass="primeDataTable"
+                draggableColumns="true"
+                rowKey="#{cege.guideEntryID}"
+                reflow="true"
+                var="cege"
+                rowExpandMode="multiple"
+                expandedRow="false">
+
+                <p:column width="3%">
+                    <f:facet name="header">
+                        <h:outputText value="Expand" />
+                    </f:facet>
+                    <p:rowToggler />
+                </p:column>
+
+                <p:column width="3%">
+                    <f:facet name="header">
+                        <h:outputText value="no." />
+                    </f:facet>
+                    <h:outputText value="#{cege.guideEntryID}"/>
+                </p:column>
+
+                <p:column width="15%"
+                          sortBy="#{cege.category}">
+                    <f:facet name="header">
+                        <h:outputText value="Category" />
+                    </f:facet>
+                    <h:outputText value="#{cege.category}"/>
+                </p:column>
+
+                <p:column width="15%"
+                          sortBy="#{cege.subCategory}">
+                    <f:facet name="header">
+                        <h:outputText value="Sub Category" />
+                    </f:facet>
+                    <h:outputText value="#{cege.subCategory}"/>
+                </p:column>
+
+                <p:column width="20%">
+                    <f:facet name="header">
+                        <h:outputText value="Description" />
+                    </f:facet>
+                    <div class="wrapText">
+                        <h:outputText value="#{cege.description}"/>
+                    </div>
+                </p:column>
+
+                <p:column width="8%"
+                          sortBy="#{cege.priority}">
+                    <f:facet name="header">
+                        <h:outputText value="Priority?" />
+                    </f:facet>
+                    <h:outputText value="#{cege.priority}"/>
+                </p:column>
+
+
+
+                <p:column width="8%">
+                    <f:facet name="header">
+                        <h:outputText value="actions" />
+                    </f:facet>
+                    <p:commandLink ajax="true"
+                                   style="color:blue;"
+                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                   update="codeguide-viewedit-dialog
+                                   codeguide-viewedit-form"
+                                   value="view/edit"
+                                   oncomplete="PF('codeguide-viewedit-dialog-var').show();"
+                                   actionListener="#{codeElementGuideBB.onCodeElementGuideEntryViewRemoveInitLinkClick(cege)}">
+                    </p:commandLink>
+
+                    <h:outputText value=" | " />
+
+                    <p:commandLink ajax="true"
+                                   style="color:blue;"
+                                   oncomplete="PF('codeguide-remove-dialog-var').show()"
+                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                   update="codeguide-remove-dialog
+                                   codeguide-remove-form"
+                                   value="remove"
+                                   actionListener="#{codeElementGuideBB.onCodeElementGuideEntryViewRemoveInitLinkClick(cege)}">
+                    </p:commandLink>
+                </p:column>
+
+                <p:rowExpansion>
+                    <div class="outlinedBox">
+                        <h:outputLabel styleClass="bold" value="Enforcement Gudielines:"/>
+                        <p:spacer height="10px"/>
+                        <h:outputText value="#{cege.enforcementGuidelines}" escape="false"/>
+                        <p:spacer height="15px"/>
+                        <h:outputLabel styleClass="bold" value="Inspection Gudielines:"/>
+                        <p:spacer height="10px"/>
+                        <h:outputText value="#{cege.inspectionGuidelines}" escape="false"/>
+                    </div>
+                </p:rowExpansion>
+            </p:dataTable> 
+        </h:form>
+    </p:dialog>
+
+
+    <p:dialog id="codeguide-viewedit-dialog"
+              widgetVar="codeguide-viewedit-dialog-var"
+              width="800"
+              height="700"
+              header="View/edit code guide entry"
+              modal="true"
+              closeOnEscape="true"
+              closable="true"
+              resizable="true">
+        <h:form id="codeguide-viewedit-form">
+
+            <p:commandButton id="codeguide-edit-button"
+                             value="#{codeElementGuideBB.editModeGuideEntry ? 'Save Changes' : 'Edit'}"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             icon="fa #{codeElementGuideBB.editModeGuideEntry ? 'fa-check' : 'fa-pencil'}"
+                             actionListener="#{codeElementGuideBB.onToggleEditModeCurrentGuideEntryButtonPress}"
+                             oncomplete="PF('codeguide-viewedit-dialog-var').show()"
+                             update="@form
+                             codeguide-list-form
+                             @form:@parent:codeguide-growl-form"/>
+
+            <div class="gray_button">
+
+                <p:commandButton id="codeguide-edit-abort-button"
+                                 value="Cancel"
+                                 styleClass="gray-button"
+                                 rendered="#{codeElementGuideBB.editModeGuideEntry}"
+                                 icon="fa fa-stop"
+                                 process="@none"
+                                 immediate="true"
+                                 actionListener="#{codeElementGuideBB.onEditOperationAbort}"
+                                 oncomplete="PF('codeguide-viewedit-dialog-var').hide()"
+                                 />
+            </div>
+
+            <div class="p-grid">
+                <div class="p-col-3">
+                    ID
+                </div>
+                <div class="p-col-9">
+                    <h:outputText value="#{codeElementGuideBB.currentGuideEntry.guideEntryID eq 0 ? '(New entry)' :codeElementGuideBB.currentGuideEntry.guideEntryID}" />
+                </div>
+
+                <div class="p-col-3">
+                    Category
+                </div>
+                <div class="p-col-9">
+                    <h:outputText value="#{codeElementGuideBB.currentGuideEntry.category}" 
+                                  rendered="#{!codeElementGuideBB.editModeGuideEntry}"/>
+
+                    <p:inputText value="#{codeElementGuideBB.currentGuideEntry.category}" 
+                                 rendered="#{codeElementGuideBB.editModeGuideEntry}"/>
+                </div>
+
+                <div class="p-col-3">
+                    Sub-Category
+                </div>
+                <div class="p-col-9">
+                    <h:outputText value="#{codeElementGuideBB.currentGuideEntry.subCategory}" 
+                                  rendered="#{!codeElementGuideBB.editModeGuideEntry}"/>
+
+                    <p:inputText value="#{codeElementGuideBB.currentGuideEntry.subCategory}" 
+                                 rendered="#{codeElementGuideBB.editModeGuideEntry}"/>
+                </div>
+
+                <div class="p-col-3">
+                    Description
+                </div>
+                <div class="p-col-9">
+                    <h:outputText value="#{codeElementGuideBB.currentGuideEntry.description}" 
+                                  rendered="#{!codeElementGuideBB.editModeGuideEntry}"/>
+
+                    <p:inputText value="#{codeElementGuideBB.currentGuideEntry.description}" 
+                                 rendered="#{codeElementGuideBB.editModeGuideEntry}"/>
+                </div>
+
+                <div class="p-col-3">
+                    Enforcement Guidelines
+                </div>
+                <div class="p-col-9">
+                    <h:outputText value="#{codeElementGuideBB.currentGuideEntry.enforcementGuidelines}" 
+                                  rendered="#{!codeElementGuideBB.editModeGuideEntry}"/>
+
+                    <p:inputTextarea    cols="40"
+                                        rows="5"
+                                        value="#{codeElementGuideBB.currentGuideEntry.enforcementGuidelines}" 
+                                        rendered="#{codeElementGuideBB.editModeGuideEntry}"/>
+                </div>
+
+                <div class="p-col-3">
+                    Inspection Guidelines
+                </div>
+                <div class="p-col-9">
+                    <h:outputText value="#{codeElementGuideBB.currentGuideEntry.inspectionGuidelines}" 
+                                  rendered="#{!codeElementGuideBB.editModeGuideEntry}"/>
+
+                    <p:inputTextarea    cols="40"
+                                        rows="5"
+                                        value="#{codeElementGuideBB.currentGuideEntry.inspectionGuidelines}" 
+                                        rendered="#{codeElementGuideBB.editModeGuideEntry}"/>
+                </div>
+
+            </div>
+        </h:form>
+    </p:dialog>
+
+
+    <p:dialog id="codeguide-remove-dialog"
+              widgetVar="codeguide-remove-dialog-var"
+              width="800"
+              height="700"
+              header="Remove code guide entry"
+              modal="true"
+              closeOnEscape="true"
+              closable="true"
+              resizable="true">
+        <h:form id="codeguide-remove-form">
+
+            <p:commandButton id="codeguide-remove-button"
+                             value="Remove code guide entry ID #{codeElementGuideBB.currentGuideEntry.guideEntryID} (#{codeElementGuideBB.currentGuideEntry.category})"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             icon="fa fa-trash"
+                             actionListener="#{codeElementGuideBB.onCodeGuideEntryRemoveCommitButtonClick}"
+                             oncomplete="PF('codeguide-remove-dialog-var').hide()"
+                             update="codeguide-list-form
+                             @form:@parent:codeguide-growl-form"/>
+
+            <div class="gray_button">
+
+                <p:commandButton id="codeguide-remove-abort-button"
+                                 value="Cancel"
+                                 styleClass="gray-button"
+                                 rendered="true"
+                                 icon="fa fa-stop"
+                                 process="@none"
+                                 immediate="true"
+                                 actionListener="#{codeElementGuideBB.onEditOperationAbort}"
+                                 oncomplete="PF('codeguide-remove-dialog-var').hide()"
+                                 />
+            </div>
+
+
+
+        </h:form>
+    </p:dialog>
+
+
+    <p:dialog id="codeguide-maptoelements-dialog"
+              widgetVar="codeguide-maptoelements-dialog-var"
+              width="1200"
+              height="700"
+              header="Connect categories to ordinances"
+              modal="true"
+              closeOnEscape="true"
+              closable="true"
+              resizable="true">
+        <h:form id="codeguide-choosesource-form">
+
+            <p class="note">Select a code source (e.g. IPMC 2015) from which you wish to add an ordinance to this code book.</p>
+
+            <p:selectOneMenu 
+                id="sourceMenu" 
+                value="#{codeElementGuideBB.codeSourceSelected}">
+
+                <f:selectItems value="#{codeElementGuideBB.codeSourceList}" 
+                               var="source" 
+                               itemLabel="#{source.sourceName} (#{source.sourceYear})"/>
+                <f:converter converterId="codeSourceConverter" />
+
+            </p:selectOneMenu>
+
+            <h:message for="sourceMenu" showDetail="true" showSummary="true" 
+                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+
+            <p:commandButton
+                id="sets-addelements-querysource-cb"
+                value="Get Ordinances from selected Source"
+                actionListener="#{codeElementGuideBB.onGetElementsInSourceButtonClick}"
+                ajax="true" 
+                icon="fa fa-list"
+                update="codeguide-maptoelements-form
+                codeguide-growl-form"/>
+
+        </h:form>
+        <p:spacer height="5px" />
+
+        <h:form id="codeguide-maptoelements-form">
+            <p:commandButton
+                id="guideentries-updateall-button"
+                value="Update all ordinance categories"
+                actionListener="#{codeElementGuideBB.updateCodeGuideLinksOnAllElementsInSource}"
+                ajax="true" 
+                icon="fa fa-link"
+                update="@form
+                codeguide-growl-form"/>
+            
+            <p:spacer height="5px" />
+
+            <p:dataTable
+                id="codeElementTable"
+                var="ord"
+                value="#{codeElementGuideBB.elementList}"
+                rowKey="#{ord.elementID}"
+                tableStyleClass="primeDataTable"
+                scrollable="true">
+
+                <p:column width="5%">
+                    <f:facet name="header">
+                        <h:outputText value="Exp"/>
+                    </f:facet>
+                    <p:rowToggler/>
+                </p:column>
+
+
+                <p:column width="30%" 
+                          sortBy="#{ord.headerString}"
+                          filterBy="#{ord.headerString}">
+                    <f:facet name="header">
+                        <h:outputText value="Ordinance"/>
+                    </f:facet>
+                    <div class="wrapText">
+                        <h:outputText value="#{ord.headerString}"
+                                      escape="false"/>
+                    </div>
+                </p:column>
+
+                <p:column width="5%" 
+                          sortBy="#{ord.elementID}"
+                          >
+                    <f:facet name="header">
+                        <h:outputText value="ID" />
+                    </f:facet>
+                    <h:outputText value="#{ord.elementID}"/>
+                </p:column>
+                
+                <p:column width="30%" 
+                          sortBy="#{ord.guideEntry.category}"
+                          >
+                    <f:facet name="header">
+                        <h:outputText value="Current Category" />
+                    </f:facet>
+                    <h:outputText value="#{!empty ord.guideEntry ? ord.guideEntry.category:''}"/>
+                    <h:outputText value="#{!empty ord.guideEntry.subCategory ? ':':''}"/>
+                    <h:outputText value="#{!empty ord.guideEntry.subCategory ? ord.guideEntry.subCategory:''}"/>
+                </p:column>
+
+
+
+                <p:column width="30%" sortBy="#{ord.guideEntry.category}"
+                          filterBy="#{ord.guideEntry.category}">
+                    <f:facet name="header">
+                        <h:outputText value="Change category to..." />
+                    </f:facet>
+
+                    <p:selectOneMenu 
+                        id="guideentry-som" 
+                        value="#{ord.guideEntry}">
+
+                         <f:selectItem itemLabel="select a category..." 
+                                       noSelectionOption="true" />
+                        <f:selectItems value="#{codeElementGuideBB.codeGuideList}" 
+                                       var="entry" 
+                                       itemLabel="#{entry.category}:#{entry.subCategory}"/>
+                        <f:converter converterId="codeGuideEntryConverter" />
+
+                    </p:selectOneMenu>
+
+                </p:column>
+
+                <p:rowExpansion>
+                    <div class="outlinedBox">
+
+
+
+                        <div class="rowExpansion"
+                             style="font-size: 1.4em;">
+                            <h:outputText value="&quot;" />
+                            <h:outputText escape="false" 
+                                          value="#{ord.ordTechnicalText}" 
+                                          styleClass="monospace"
+                                          />
+                            <h:outputText value="&quot;" />
+                        </div>
+
+
+                        <h2>Meta data</h2>
+
+                        <div class="ui-g data_container_nested_restrict">
+                            <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputLabel  for="ord-id">
+                                        <h:outputText value="ID" />
+                                    </h:outputLabel>
+                                </div>
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText id="ord-id" 
+                                                  value="#{ord.elementID}"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputLabel  for="ord-created">
+                                        <h:outputText value="Created" />
+                                    </h:outputLabel>
+                                </div>
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText id="ord-created" 
+                                                  value="#{codeElementBB.getPrettyDateNoTime(ord.createdTS)}"/>
+                                    <h:outputText value="#{!(empty ord.createdBy) ? ' by ' : ''}"/>
+                                    <h:outputText value="#{!(empty ord.createdBy) ? ord.createdBy.phumanlastName : ''}"/>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputLabel  for="ord-updated">
+                                        <h:outputText value="Last updated" />
+                                    </h:outputLabel>
+                                </div>
+                                <div class="restrict-data-field-value-inline" >
+                                    <h:outputText id="ord-updated" 
+                                                  value="#{codeElementBB.getPrettyDateNoTime(ord.lastUpdatedTS)}"/>
+                                    <h:outputText value="#{!(empty ord.lastupdatedBy) ? ' by ' : ''}"/>
+                                    <h:outputText value="#{!(empty ord.lastupdatedBy) ? ord.lastupdatedBy.perhumanstName : ''}"/>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <p:spacer height="15px"/>
+                        <h:outputLabel styleClass="bold" value="Code Guide: Enforcement Tips"/>
+                        <div class="rowExpansion">
+                            <h:outputText escape="false" value="#{ord.guideEntry.enforcementGuidelines}"/>
+                        </div>
+
+                        <p:spacer height="15px"/>
+
+                        <h:outputLabel styleClass="bold" value="Code guide: Inspection Tips"/>
+                        <div class="rowExpansion">
+                            <h:outputText escape="false" value="#{ord.guideEntry.inspectionGuidelines}"/>
+                        </div>
+                    </div>
+                </p:rowExpansion>
+
+            </p:dataTable>
+
+
+
+        </h:form>
+    </p:dialog>
+
+</ui:composition>

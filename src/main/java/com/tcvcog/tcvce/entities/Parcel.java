@@ -30,6 +30,8 @@ public  class Parcel
         
     final static String TABLE_NAME = "parcel";
     final static String PKFIELD = "parcelkey";
+    final static String HF_NAME = "Parcel";
+    
     
     
     protected int parcelKey;
@@ -220,6 +222,11 @@ public  class Parcel
      */
     public void setParcelInfo(ParcelInfo parcelInfo) {
         this.parcelInfo = parcelInfo;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return HF_NAME;
     }
 
    

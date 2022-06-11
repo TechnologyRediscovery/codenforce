@@ -18,7 +18,8 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 /**
- *
+ * Embodies the official ranks of the entire CodeNForce system!!
+ * 
  * @author ellen bascomb of apt 31y
  */
 public enum RoleType {

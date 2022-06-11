@@ -22,14 +22,20 @@ import java.time.LocalDateTime;
  * Represents a single street
  * @author Ellen Bascomb of 31Y
  */
-public class MailingStreet {
-    
+public  class   MailingStreet 
+        extends TrackedEntity
+        implements IFace_noteHolder{
+   
     private int streetID;
     private String name;
     private MailingCityStateZip cityStateZip;
     private String notes;
     private boolean poBox;
-    private LocalDateTime createdTS;
+    
+    
+    final String TABLE_NAME = "mailingstreet";
+    final String PK_NAME = "streetid";
+    
 
     /**
      * @return the streetID
@@ -55,6 +61,7 @@ public class MailingStreet {
     /**
      * @return the notes
      */
+    @Override
     public String getNotes() {
         return notes;
     }
@@ -66,12 +73,7 @@ public class MailingStreet {
         return poBox;
     }
 
-    /**
-     * @return the createdTS
-     */
-    public LocalDateTime getCreatedTS() {
-        return createdTS;
-    }
+  
 
     /**
      * @param streetID the streetID to set
@@ -97,6 +99,7 @@ public class MailingStreet {
     /**
      * @param notes the notes to set
      */
+    @Override
     public void setNotes(String notes) {
         this.notes = notes;
     }
@@ -108,11 +111,27 @@ public class MailingStreet {
         this.poBox = poBox;
     }
 
-    /**
-     * @param createdTS the createdTS to set
-     */
-    public void setCreatedTS(LocalDateTime createdTS) {
-        this.createdTS = createdTS;
+  
+
+    @Override
+    public String getPKFieldName() {
+        return PK_NAME;
+    }
+
+    @Override
+    public int getDBKey() {
+        return streetID;
+    }
+
+    @Override
+    public String getDBTableName() {
+       return TABLE_NAME;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return "Mailing Street";
+        
     }
     
 }

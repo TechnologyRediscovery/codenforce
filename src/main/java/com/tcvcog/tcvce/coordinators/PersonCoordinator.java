@@ -21,13 +21,20 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
+import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Citation;
+import com.tcvcog.tcvce.entities.CitationDocketRecord;
+import com.tcvcog.tcvce.entities.ContactEmail;
+import com.tcvcog.tcvce.entities.ContactPhone;
+import com.tcvcog.tcvce.entities.ContactPhoneType;
 import com.tcvcog.tcvce.entities.Credential;
+import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.IFace_humanListHolder;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonDataHeavy;
+import com.tcvcog.tcvce.entities.PersonLinkHeavy;
 import com.tcvcog.tcvce.entities.PersonType;
 import com.tcvcog.tcvce.entities.PersonWithChanges;
 import com.tcvcog.tcvce.entities.User;
@@ -42,9 +49,15 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import com.tcvcog.tcvce.entities.IFace_PersonListHolder;
+import com.tcvcog.tcvce.entities.LinkedObjectFamilyEnum;
+import com.tcvcog.tcvce.entities.LinkedObjectSchemaEnum;
+import com.tcvcog.tcvce.entities.MailingAddress;
+import com.tcvcog.tcvce.entities.Parcel;
+import com.tcvcog.tcvce.entities.PropertyUnit;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitApplication;
+import java.time.LocalDateTime;
+import java.util.Collections;
 
 /**
  * The master controller class for Humans and their Java incarnation called
@@ -78,8 +91,12 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         if(humanID == 0){
             return null;
         }
-        return configureHuman(pi.getHuman(humanID));
+        Human h = pi.getHuman(humanID);
+        h = configureHuman(h);
+         return h;
     }
+    
+    
     
     /**
      * Creates a HumanLink from a given Human PRIOR to being
@@ -88,7 +105,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param hu to turn into a HumanLink
      * @return the given Human wrapped in a Link. Null if input is null.
      */
-    public HumanLink getHumanLinkSkeleton(Human hu){
+    public HumanLink createHumanLinkSkeleton(Human hu){
         if(hu != null){
             return new HumanLink(hu);
             
@@ -120,48 +137,152 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         return hll;
     }
     
+   
     
     /**
      * Grand staircase entrance for connecting a human holder to a human
      * @param hlh
-     * @param hum
+     * @param hlink if all you have is a human (or Person subclass), use the 
+     * convenience method createHumanLink method
      * @param ua the user doing the linking
      * @return the link ID for the freshly inserted link
      * @throws BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public int linkHuman(IFace_humanListHolder hlh, HumanLink hum, UserAuthorized ua) throws BObStatusException, IntegrationException{
+    public int linkHuman(IFace_humanListHolder hlh, HumanLink hlink, UserAuthorized ua) throws BObStatusException, IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
-        
-        if(hlh == null || hum == null){
-            throw new BObStatusException("Cannot link human with null human or human holder");
+        SystemCoordinator sc = getSystemCoordinator();
+        if(hlh == null || hlink == null || ua == null){
+            throw new BObStatusException("Cannot link human with null human or human holder or null user");
         }
         
-        hum.setCreatedBy(ua);
-        hum.setLinkLastUpdatedBy(ua);
+        hlink.setLinkCreatedByUserID(ua.getUserID());
+        hlink.setLinkLastUpdatedByUserID(ua.getUserID());
+        if(hlink.getLinkSource() == null){
+            hlink.setLinkSource(sc.getBObSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                .getString("bobSourceHumanLinkDefault"))));
+        }
+        if(hlink.getLinkedObjectRole() == null){
+            determineAndSetDefaultLinkedObjectRole(hlh, hlink);
+        }
+
+        return pi.insertHumanLink(hlh, hlink);
+    }
+    
+    
+    /**
+     * Uses instanceof to check what type of human holder we have and sets the default
+     * role code so the DB record is complete.
+     * @param hlink
+     * @return 
+     */
+    private HumanLink determineAndSetDefaultLinkedObjectRole(IFace_humanListHolder hlh, HumanLink hlink) throws BObStatusException, IntegrationException{
+        if(hlh == null || hlink == null){
+            throw new BObStatusException("Cannot determine default linked object role with null list holder or human linke");
+        }
         
-        return pi.insertHumanLink(hlh, hum);
+        SystemIntegrator si = getSystemIntegrator();
+        
+        if(hlh instanceof OccPermitApplication){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_occapp"))));
+            
+        } else if (hlh instanceof CECase){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_cecase"))));
+        } else if (hlh instanceof OccPeriod){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_occperiod"))));
+            
+        } else if (hlh instanceof Parcel){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_parcel"))));
+            
+        } else if (hlh instanceof PropertyUnit){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_parcelunit"))));
+            
+        } else if (hlh instanceof Citation){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_citation"))));
+            
+        } else if (hlh instanceof CitationDocketRecord){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_docket"))));
+            
+        } else if (hlh instanceof EventCnF){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_event"))));
+            
+        } else if (hlh instanceof Municipality){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_muni"))));
+            
+        } else if (hlh instanceof MailingAddress){
+            hlink.setLinkRole(si.getLinkedObjectRole(
+                    Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                            .getString("default_linkedobjectrole_human_mailing"))));
+            
+        } else {
+            throw new BObStatusException("Cannot determine a default linked object role for given list holder");
+        }
+        
+        return hlink;
+        
     }
     
     
     /**
      * Grand staircase entrance for deactivating a human holder and one of its humans
-     * @param hlh the host BOB
      * @param hl to deactivate
      * @param ua the user doing the deactivating
      * @throws BObStatusException 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public void deactivateLinkedHuman(IFace_humanListHolder hlh, HumanLink hl, UserAuthorized ua) 
+    public void deactivateHumanLink(HumanLink hl, UserAuthorized ua) 
             throws BObStatusException, IntegrationException{
         
         PersonIntegrator pi = getPersonIntegrator();
         
-        if(hlh == null || hl == null){
-            throw new BObStatusException("Cannot link human with null human or human holder");
+        if(ua == null || hl == null){
+            throw new BObStatusException("Cannot deactivate human link with null user or link");
         }
-        hl.setLastUpdatedBy(ua);
-        hl.setDeceasedBy(ua);
-        pi.deactivateHumanLink(hlh, hl);
+        hl.setLinkLastUpdatedByUserID(ua.getUserID());
+        hl.setLinkDeactivatedByUserID(ua.getUserID());
+        pi.deactivateHumanLink(hl);
+    }
+    
+    /**
+     * Takes in a human link and builds the note infrastructure and sends
+     * to be integrated
+     * @param hl without note appended, just the old notes in the notes field
+     * @param noteToAppend the string value of the note to append
+     * @param u doing the noting
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void appendNoteToHumanLink(HumanLink hl, String noteToAppend, UserAuthorized u) 
+            throws BObStatusException, IntegrationException{
+        SystemCoordinator sc = getSystemCoordinator();
+        PersonIntegrator pi =getPersonIntegrator();
+        MessageBuilderParams mbp = new MessageBuilderParams();
+        if(hl  != null){
+            mbp.setExistingContent(hl.getNotes());
+            mbp.setUser(u);
+            mbp.setNewMessageContent(noteToAppend);
+            mbp.setHeader("LINK NOTE");
+            hl.setNotes(sc.appendNoteBlock(mbp));
+            pi.updateHumanLinkNotes(hl);
+        }
     }
     
     
@@ -176,20 +297,35 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Access point for getting a person 
+ Convenience method for calling getPersonByHumanID that takes 
+ a human object
+     * @param humanID
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public Person getPersonByHumanID(int humanID) throws IntegrationException, BObStatusException{
+        Human h = getHuman(humanID);
+        Person p = getPerson(h);
+        return p;
+        
+    }
+    
+    /**
      * A Person is a Human with lists of MailingAddresses, phone numbers, and emails
      * @param hum
      * @return the fully-baked human (i.e. a person)
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public Person getPerson(Human hum) throws IntegrationException, BObStatusException{
-        PersonIntegrator pi = getPersonIntegrator();
-        
-        if(hum != null){
+        if(hum == null){
             return null;
         }
         Person p = new Person(hum);
-        
-        return configurePerson(p);
+        p = configurePerson(p);
+        return p;
     }
     
     /**
@@ -219,66 +355,52 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     public List<Person> getPersonListFromHumanLinkList(List<HumanLink> humanLinkList) throws IntegrationException, BObStatusException{
         List<Person> pl = new ArrayList<>();
-        for(HumanLink hl: humanLinkList){
-            pl.add(getPerson(hl));
+        if(humanLinkList != null && !humanLinkList.isEmpty()){
+            for(HumanLink hl: humanLinkList){
+                pl.add(getPerson(hl));
+            }
         }
         return pl;
         
     }
     
-    public IFace_PersonListHolder assemblePersonList(IFace_PersonListHolder plh){
-        
-        return null;
-        
-        
-    }
-    
+  
     /**
      * Builds a data heavy version of a person
      * Implements logic depending on if the person is a skeleton or not
      * @param pers
-     * @param cred
-     * @return
+     * @return the fully baked person with a link list in its belly
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public PersonDataHeavy assemblePersonDataHeavy(Person pers, Credential cred) throws IntegrationException, BObStatusException{
-        PersonDataHeavy pdh = null;
-        if(pers != null && cred != null){
-            // if we have a skeleton person, don't try to get a person from the DB, since there's no ID
-            if(pers.getHumanID() == 0){
-                pdh = new PersonDataHeavy(pers, cred);
-                
-            } else {
-
-               pdh = new PersonDataHeavy(getPerson(pers), cred);
-               SearchCoordinator sc = getSearchCoordinator();
-
-               try {
-                   QueryCECase qcse = sc.initQuery(QueryCECaseEnum.PERSINFOCASES, cred);
-                   qcse.getPrimaryParams().setPersonInfoCaseID_val(pers);
-                   pdh.setCaseList(sc.runQuery(qcse).getResults());
-
-       //            QueryOccPeriod qop = sc.initQuery(QueryOccPeriodEnum.PERSONS, cred);
-       //            qop.getPrimaryParams().setPerson_val(pers);
-       //            pdh.setPeriodList(sc.runQuery(qop).getBOBResultList());
-
-       //            TURNED OFF TO MIGRATE TO HUMANIZATION
-       //            QueryProperty qprop = sc.initQuery(QueryPropertyEnum.PERSONS, cred);
-       //            qprop.getPrimaryParams().setPerson_val(pers);
-       //            pdh.setPropertyList(sc.runQuery(qprop).getBOBResultList());
-
-       //            QueryEvent qe = sc.initQuery(QueryEventEnum.PERSONS, cred);
-       //            qe.getPrimaryParams().setPerson_val(pers);
-       //            pdh.setEventList(sc.runQuery(qe).getBOBResultList());
-
-               } catch (SearchException ex) {
-                   System.out.println(ex);
-               }
-            }
+    public PersonLinkHeavy assemblePersonLinkHeavy(Person pers) throws IntegrationException, BObStatusException{
+        PersonLinkHeavy persLinkHeavy = null;
+        PersonIntegrator pi = getPersonIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        if(pers == null){
+            throw new BObStatusException("Cannot assemble person link heavy with null input person");
+            
         }
-        
-        return pdh;
+        persLinkHeavy = new PersonLinkHeavy(pers);
+        List<HumanLink> hll = new ArrayList<>();
+        List<LinkedObjectSchemaEnum> schemaList = sc.assembleLinkedObjectSchemaEnumListByFamily(LinkedObjectFamilyEnum.HUMAN);
+        if(schemaList != null && !schemaList.isEmpty()){
+            // iterate over all the enums that describe possible human links
+            // and get their linked object IDs, injecting them to the master list
+            // for display in the UI
+            for(LinkedObjectSchemaEnum lose: schemaList){
+                if(lose.isACTIVELINK()){
+                    System.out.println("PersonCoordinator.assemblePersonLinkHeavy | Checking enum " + lose.getLinkingTableName());
+                    List<HumanLink> hllinternal = pi.getHumanLinksByLinkedObjectEnum(lose, persLinkHeavy);
+                    System.out.println("PersonCoordinator.assemblePersonLinkHeavy | Links:  " + hllinternal.size());
+                    hll.addAll(hllinternal);
+                }
+            }
+        }       
+        persLinkHeavy.setHumanLinkList(hll);
+        return persLinkHeavy;
     }
+    
     
     /**
      * Logic container for Person object assembly
@@ -289,11 +411,24 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     private Person configurePerson(Person p) throws IntegrationException, BObStatusException{
         PersonIntegrator pi = getPersonIntegrator();
-        PropertyIntegrator propi = getPropertyIntegrator();
+        PropertyCoordinator pc = getPropertyCoordinator();
         
-        p.setAddressList(propi.getMailingAddressListByHuman(p.getHumanID()));
-        p.setPhoneList(pi.getContactPhoneList(p.getHumanID()));
-        p.setEmailList(pi.getContactEmailList(p.getHumanID()));
+        if(p == null){
+            throw new BObStatusException("Cannot configure null person");
+        }
+        
+        // sort our contacts.
+        p.setMailingAddressLinkList(pc.getMailingAddressLinkList(p));
+        List<ContactPhone> phl = pi.getContactPhoneList(p.getHumanID());
+        if(phl != null && phl.size() >= 2){
+            Collections.sort(phl);
+        }
+        p.setPhoneList(phl);
+        List<ContactEmail> eml = pi.getContactEmailList(p.getHumanID());
+        if(eml != null && eml.size() >= 2){
+            Collections.sort(eml);
+        }
+        p.setEmailList(eml);
         
         return p;
         
@@ -302,16 +437,23 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     
     /**
-     * Logic intermediary for Updates to the Person listing
+     * Logic intermediary for Updates to the human listing
      * @param h
      * @param u
      * @throws IntegrationException 
      */
     public void humanEdit(Human h, User u) throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
-        pi.updateHuman(h);
+        if(h != null && u != null){
+            h.setLastUpdatedBy(u);
+            pi.updateHuman(h);
+        }
     }
     
+    /**
+     * Factory method for Human objects not in the DB
+     * @return an empty Skeleton of a Human
+     */
     public Human humanInit(){
         Human h = new Human();
         return h;
@@ -324,7 +466,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param m
      * @return 
      */
-    public Person personInit(Municipality m){
+    public Person createPersonSkeleton(Municipality m){
         Person newP = new Person(humanInit()); 
         newP.setBusinessEntity(false);
         return newP;
@@ -337,15 +479,17 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      * @param ua
      * @return
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public int humanAdd(Human h, UserAuthorized ua) throws IntegrationException{
+    public Person insertHuman(Human h, UserAuthorized ua) throws IntegrationException, BObStatusException{
         SystemIntegrator si = getSystemIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
        
+        h.setLastUpdatedBy(ua);
         h.setCreatedBy(ua);
         h.setSource( si.getBOBSource(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                                 .getString("bobsourcePersonInternal"))));
-        return pi.insertHuman(h);
+        return getPersonByHumanID(pi.insertHuman(h));
         
     }
     
@@ -376,8 +520,263 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
             System.out.println("PersonCoordinator.addNotesToPerson: person: " + p.getHumanID() + " notes: " + noteToAdd);
         } else {
             throw new BObStatusException("cannot append note given a null person, user, or note string");
+        }
+    }
+    
+    
+    /**
+     * Queries DB for all humans who have been linked to a User in the table login
+     * @return a list, perhaps with the Humans mapped to hers
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public List<Human> getHumansMappedToUsers() throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        List<Human> hl = new ArrayList<>();
+        List<Integer> idl = pi.getPersonsMappedToAUser();
+        if(!idl.isEmpty()){
+            for(Integer i: idl){
+                hl.add(getHuman(i));
+            }
+        }
+        return hl;
+    }
+    
+    // *******************************************************
+    // *********  CONTACT PHONE AND EMAIL STUFF **************
+    // *******************************************************
+    
+    /**
+     * Factory method for ContactPhone objects
+     * @return 
+     */
+    public ContactPhone createContactPhoneSkeleton(){
+        return new ContactPhone();
+    }
+    
+    public List<ContactPhone> getContactPhoneList(List<Integer> phidl) throws IntegrationException{
+        List<ContactPhone> phoneList = new ArrayList<>();
+        if(phidl != null && !phidl.isEmpty()){
+            for(Integer i: phidl){
+                phoneList.add(getContactPhone(i));
+            }
+        }
+       return phoneList;
+    }
+
+    /**
+     * Type safe getter
+     * @param ph
+     * @return 
+     */
+    public ContactPhone getContactPhone(ContactPhone ph) throws IntegrationException{
+        if(ph != null){
+            return getContactPhone(ph.getPhoneID());
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Extracts a phone by ID from the DB
+     * @param phid
+     * @return
+     * @throws IntegrationException 
+     */
+    public ContactPhone getContactPhone(int phid) throws IntegrationException{
+        if(phid != 0){
+            PersonIntegrator pi = getPersonIntegrator();
+            return configureContactPhone(pi.getContactPhone(phid));
+        } else {
+            throw new IntegrationException("cannot fetch phone with ID of 0");
             
         }
+        
+    }
+    
+    /**
+     * Logic configuration intermediary for ContactPhone objects
+     * @param ph
+     * @return the passed in object that has been configured
+     */
+    private ContactPhone configureContactPhone(ContactPhone ph){
+        // nothing to do here yet
+        return ph;
+    }
+    
+    /**
+     * Logic intermediary for updating phone numbers
+     * @param phone
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void contactPhoneUpdate(ContactPhone phone, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        PersonIntegrator pi = getPersonIntegrator();
+        if(phone == null || ua == null){
+            throw new BObStatusException("Cannot update phone witn null phone or user");
+        }
+        phone.setLastUpdatedBy(ua);
+        pi.updateContactPhone(phone);
+    }
+    
+    /**
+     * Logic block for deactivating a phone number record
+     * @param phone to deactivate
+     * @param ua doing the deactivation
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void contactPhoneDeactivate(ContactPhone phone, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(phone == null || ua == null){
+            throw new BObStatusException("Cannot deactivate phone with null phone or user");
+        }
+        PersonIntegrator pi = getPersonIntegrator();
+        phone.setDeactivatedBy(ua);
+        phone.setDeactivatedTS(LocalDateTime.now());
+        phone.setLastUpdatedBy(ua);
+        pi.updateContactPhone(phone);
+        
+        
+    }
+    
+    
+    /**
+     * Logic intermediary for adding a new phone number to the DB
+     * @param phone
+     * @param p
+     * @param ua
+     * @return 
+     */
+    public ContactPhone contactPhoneAdd(ContactPhone phone, Person p, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        PersonIntegrator pi = getPersonIntegrator();
+        if(phone == null || p == null || ua == null){
+            throw new BObStatusException("Cannot insert phone with null phone, person, or user");
+        }
+        phone.setCreatedBy(ua);
+        phone.setLastUpdatedBy(ua);
+        phone.setHumanID(p.getHumanID());
+        return getContactPhone(pi.insertContactPhone(phone));
+        
+    }
+    
+    /** EMAILS ****/
+    
+    /**
+     * Factory method for ContactEmail objects
+     * @return 
+     */
+    public ContactEmail createContactEmailSkeleton(){
+        return new ContactEmail();
+        
+    }
+    
+    /**
+     * Convenience method for extracting an entire list of emails
+     * from the database, all configured and ready for injection into a Person!
+     * @param emids
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public List<ContactEmail> getContactEmailList(List<Integer> emids) throws IntegrationException{
+        List<ContactEmail> emailList = new ArrayList<>();
+        if(emids != null && !emids.isEmpty()){
+            for(Integer i: emids){
+                emailList.add(getContactEmail(i));
+            }
+        }
+        return emailList;
+    }
+    
+    /**
+     * Type safe email getter
+     * @param ce
+     * @return
+     * @throws IntegrationException 
+     */
+    public ContactEmail getContactEmail(ContactEmail ce) throws IntegrationException{
+        if(ce != null){
+            return getContactEmail(ce.getEmailID());
+        } else {
+            return null;
+        }
+    }
+    
+    
+    /**
+     * Retrieves a single ContactEmail from the DB
+     * @param emid
+     * @return 
+     */
+    public ContactEmail getContactEmail(int emid) throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        return configureContactEmail(pi.getContactEmail(emid));
+    }
+    
+    /**
+     * Internal logic method for configuring the ContactEmail objects
+     * @param ce
+     * @return 
+     */
+    private ContactEmail configureContactEmail(ContactEmail ce){
+        // Nothing to do here yet
+        return ce;
+    }
+    
+    
+    /**
+     * Logic intermediary for updating email records 
+     * @param em
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void contactEmailUpdate(ContactEmail em, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        PersonIntegrator pi = getPersonIntegrator();
+        if(em == null || ua == null){
+            throw new BObStatusException("Cannot update email with null email, or user");
+        }
+        em.setLastUpdatedBy(ua);
+        pi.updateContactEmail(em);
+        
+    }
+    
+    /**
+     * Logic intermediary for adding new email addresses to the DB
+     * @param em
+     * @param p
+     * @param ua 
+     * @return the new ContactEmail with a DB key
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public ContactEmail contactEmailAdd(ContactEmail em, Person p, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        PersonIntegrator pi = getPersonIntegrator();
+        if(em == null || p == null || ua == null){
+            throw new BObStatusException("Cannot write new email with null email, person, or user");
+        }
+        em.setCreatedBy(ua);
+        em.setLastUpdatedBy(ua);
+        em.setHumanID(p.getPersonID());
+        
+        return getContactEmail(pi.insertContactEmail(em));
+    }
+    
+    /**
+     * Logic block for deactivating an email
+     * @param em to deac
+     * @param ua doing the deactivation
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void contactEmailDeactivate(ContactEmail em, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(em == null || ua == null){
+            throw new BObStatusException("Cannot Deac an email with null email or user");
+        }
+        PersonIntegrator pi = getPersonIntegrator();
+        em.setDeactivatedBy(ua);
+        em.setDeactivatedTS(LocalDateTime.now());
+        em.setLastUpdatedBy(ua);
+        pi.updateContactEmail(em);
+        
         
     }
     
@@ -424,15 +823,19 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     
     /**
      * Logic container for choosing a default person if the SessionInitializer
-     * does not have a session List to work from
+     * does not have a session List to work from. Currently it just grabs
+     * the UserAuthorized's Person
      * @param cred
      * @return the selected person proposed for becoming the sessionPerson
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
     public Person selectDefaultPerson(Credential cred) throws IntegrationException{
         UserCoordinator uc = getUserCoordinator();
+        PersonCoordinator pc = getPersonCoordinator();
         try {
-            return uc.user_getUser(cred.getGoverningAuthPeriod().getUserID()).getPerson();
+            User u = uc.user_getUser(cred.getGoverningAuthPeriod().getUserID());
+            System.out.println("PersonCoordinator.selectDefaultPerson: " + u);
+            return pc.getPerson(u.getHuman());
         } catch (BObStatusException ex) {
             throw new IntegrationException(ex.getMessage());
         }
@@ -457,7 +860,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         if(cred != null){
             idList = pi.getPersonHistory(cred.getGoverningAuthPeriod().getUserID());
             while(!idList.isEmpty() && pl.size() <= Constants.MAX_BOB_HISTORY_SIZE){
-//                pl.add(pi.getPerson(idList.remove(0)));
+//                pl.add(pi.getPersonByHumanID(idList.remove(0)));
             }
         }
         return pl;
@@ -505,6 +908,18 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public PersonType[] getPersonTypes() {
         
         return personTypes;
+    }
+    
+    /**
+     * Returns the master list of all contact phone types
+     * e.g. cell phone, home, work, etc. 
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public List<ContactPhoneType> getContactPhoneTypeList() throws IntegrationException{
+        PersonIntegrator pi = getPersonIntegrator();
+        return pi.getContactPhoneTypeList();
+        
     }
 
     
@@ -786,7 +1201,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
      */
     public PersonWithChanges getPersonWithChanges(int personID) throws IntegrationException{
         
-//        PersonWithChanges skeleton = new PersonWithChanges(getPerson(personID));
+//        PersonWithChanges skeleton = new PersonWithChanges(getPersonByHumanID(personID));
         
         PersonIntegrator pi = getPersonIntegrator();
         

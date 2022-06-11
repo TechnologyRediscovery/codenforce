@@ -30,7 +30,7 @@ public class        PropertyUnitDataHeavy
         extends     PropertyUnit
         implements  IFace_CredentialSigned,
                     IFace_humanListHolder{
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.PARCELUNITHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.ParcelUnitHuman;
 
     private List<OccPeriod> periodList;
     
@@ -54,15 +54,13 @@ public class        PropertyUnitDataHeavy
             this.unitNumber = prop.getUnitNumber();
 
             this.notes = prop.getNotes();
-            this.otherKnownAddress = prop.getOtherKnownAddress();
 
             this.rentalIntentDateStart = prop.getRentalIntentDateStart();
             this.rentalIntentDateStop = prop.getRentalIntentDateStop();
-            this.rentalIntentLastUpdatedBy = prop.getRentalIntentLastUpdatedBy();
             this.rentalNotes = prop.getRentalNotes();
-            this.active = prop.isActive();
             this.conditionIntensityClassID = prop.getConditionIntensityClassID();
             this.lastUpdatedTS = prop.getLastUpdatedTS();
+            this.source = prop.source;
 
         }
     }

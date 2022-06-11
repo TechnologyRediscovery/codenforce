@@ -46,7 +46,7 @@ public class QueryEvent
         if(this.isQueryExecuted()){
             if(this.results != null && !this.results.isEmpty()){
                 for(EventCnF ev: this.results){
-                    totalDuration = totalDuration + ev.computeEventDurationMins();
+                    totalDuration = totalDuration + ev.getDuration();
                 }
             }
         }

@@ -68,7 +68,9 @@ public class PropertyUnitsBB
 
         if (currentViewOption == null) {
 
-            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ALL);
+            // TODO: fix my null pointers with skeleton like properties
+            
+//            setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ALL);
 
         }
 
@@ -83,215 +85,82 @@ public class PropertyUnitsBB
         return "propertyUnits";
     }
 
-    public String manageOccPeriod(OccPeriod op) {
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-
-        try {
-            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(op, getSessionBean().getSessUser().getMyCredential()));
-        } catch (IntegrationException | BObStatusException | SearchException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not load occupancy period with data" + ex.getMessage(), ""));
-
-        }
-        return "occPeriodWorkflow";
-
-    }
-
-    /**
-     * Logic container for steps needed to be taken before a unit list is edited
-     *
-     * @param ev
-     */
-    public void beginPropertyUnitUpdates(ActionEvent ev) {
-    }
-
-    /**
-     * Adds a blank unit to propUnitsToAdd list. This newly-created unit can
-     * then be selected and edited by the user.
-     */
-    public void addUnitToNewPropUnits() {
-        PropertyUnit unitToAdd;
-        PropertyCoordinator pc = getPropertyCoordinator();
-        unitToAdd = pc.initPropertyUnit(currProp);
-        unitDisplayList.add(unitToAdd);
-
-//        clearAddUnitFormValues();
-    }
-
-    public void removePropertyUnitFromEditTable(PropertyUnit pu) {
-        getCurrProp().getUnitList().remove(pu);
-        getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Zap!", ""));
-
-    }
-
-    /**
-     * Finalizes the unit list the user has created so that it can be compared
-     * to the existing one in the database.
-     *
-     */
-    public void finalizeUnitList() {
-        PropertyCoordinator pc = getPropertyCoordinator();
-
-        try {
-            pc.applyUnitList(unitDisplayList, currProp);
-        } catch(IntegrationException ex) {
-            System.out.println("PropertyUnitsBB.finalizeUnitList() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "An error occurred while trying to save your changes to the database", "")); 
-        }catch (BObStatusException ex){
-           getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    ex.toString(), "")); 
-        }
-
-        refreshCurrPropWithLists();
-
-        setCurrentViewOption(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
-    } // close method
-
-    private void refreshCurrPropWithLists() {
-        PropertyCoordinator pc = getPropertyCoordinator();
-        try {
-            currProp = pc.getPropertyDataHeavy(currProp.getParcelKey(), getSessionBean().getSessUser());
-            getSessionBean().setSessProperty(currProp);
-        } catch (IntegrationException | BObStatusException | SearchException | AuthorizationException | EventException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not update current property with lists | Exception details: " + ex.getMessage(), ""));
-        }
-
-    }
-
-    /**
-     * @return the currProp
-     */
-    public PropertyDataHeavy getCurrProp() {
-        return currProp;
-    }
-
-    /**
-     * @param currProp the currProp to set
-     */
-    public void setCurrProp(PropertyDataHeavy currProp) {
-        this.currProp = currProp;
-    }
-
-    /**
-     * @return the currPropUnit
-     */
-    public PropertyUnit getCurrPropUnit() {
-        return currPropUnit;
-    }
-
-    /**
-     * @param currPropUnit the currPropUnit to set
-     */
-    public void setCurrPropUnit(PropertyUnit currPropUnit) {
-        this.currPropUnit = currPropUnit;
-    }
-
-    /**
-     * @return the currPropUnitWithLists
-     */
-    public PropertyUnitDataHeavy getCurrPropUnitWithLists() {
-        return currPropUnitWithLists;
-    }
-
-    /**
-     * @param currPropUnitWithLists the currPropUnitWithLists to set
-     */
-    public void setCurrPropUnitWithLists(PropertyUnitDataHeavy currPropUnitWithLists) {
-        this.currPropUnitWithLists = currPropUnitWithLists;
-    }
-
-    public ArrayList<PropertyUnit> getUnitDisplayList() {
-        return unitDisplayList;
-    }
-
-    public void setUnitDisplayList(ArrayList<PropertyUnit> unitDisplayList) {
-        this.unitDisplayList = unitDisplayList;
-    }
-
-    public ViewOptionsActiveListsEnum getCurrentViewOption() {
-        return currentViewOption;
-    }
+  
 
     public void setCurrentViewOption(ViewOptionsActiveListsEnum input) {
+        if(currProp != null){
+            
+            currentViewOption = input;
 
-        currentViewOption = input;
+            unitDisplayList = new ArrayList<>();
 
-        unitDisplayList = new ArrayList<>();
+            heavyDisplayList = new ArrayList<>();
 
-        heavyDisplayList = new ArrayList<>();
+            if (null == currentViewOption) {
+                getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "An error occurred while trying to set the current view option. Returning to default.", ""));
+                currentViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
+            } else {
+                switch (currentViewOption) {
+                    case VIEW_ALL:
+                        unitDisplayList.addAll(currProp.getUnitList());
+                        heavyDisplayList.addAll(currProp.getUnitWithListsList());
+                        break;
 
-        if (null == currentViewOption) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to set the current view option. Returning to default.", ""));
-            currentViewOption = ViewOptionsActiveListsEnum.VIEW_ACTIVE;
-        } else {
-            switch (currentViewOption) {
-                case VIEW_ALL:
-                    unitDisplayList.addAll(currProp.getUnitList());
-                    heavyDisplayList.addAll(currProp.getUnitWithListsList());
-                    break;
-
-                case VIEW_ACTIVE:
-                    for (PropertyUnit unit : currProp.getUnitList()) {
-                        if (unit.isActive()) {
-                            unitDisplayList.add(unit);
+                    case VIEW_ACTIVE:
+                        for (PropertyUnit unit : currProp.getUnitList()) {
+                            if (unit.isActive()) {
+                                unitDisplayList.add(unit);
+                            }
                         }
+
+                        for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()) {
+                            if (unit.isActive()) {
+                                heavyDisplayList.add(unit);
+                            }
+                        }
+
+                        break;
+
+                    case VIEW_INACTIVE:
+                        for (PropertyUnit unit : currProp.getUnitList()) {
+                            if (!unit.isActive()) {
+                                unitDisplayList.add(unit);
+                            }
+                        }
+
+                        for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()) {
+                            if (unit.isActive()) {
+                                heavyDisplayList.add(unit);
+                            }
+                        }
+
+                        break;
+                }
+
+                Collections.sort(heavyDisplayList, new Comparator<PropertyUnitDataHeavy>() {
+                    @Override
+                    public int compare(PropertyUnitDataHeavy unit1, PropertyUnitDataHeavy unit2) {
+
+                        return Boolean.compare(unit2.isActive(), unit1.isActive());
                     }
 
-                    for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()) {
-                        if (unit.isActive()) {
-                            heavyDisplayList.add(unit);
-                        }
-                    }
-
-                    break;
-
-                case VIEW_INACTIVE:
-                    for (PropertyUnit unit : currProp.getUnitList()) {
-                        if (!unit.isActive()) {
-                            unitDisplayList.add(unit);
-                        }
-                    }
-
-                    for (PropertyUnitDataHeavy unit : currProp.getUnitWithListsList()) {
-                        if (unit.isActive()) {
-                            heavyDisplayList.add(unit);
-                        }
-                    }
-
-                    break;
+                });
             }
 
-            Collections.sort(heavyDisplayList, new Comparator<PropertyUnitDataHeavy>() {
-                @Override
-                public int compare(PropertyUnitDataHeavy unit1, PropertyUnitDataHeavy unit2) {
+            Collections.sort(unitDisplayList, new Comparator<PropertyUnit>() {
+                    @Override
+                    public int compare(PropertyUnit unit1, PropertyUnit unit2) {
 
-                    return Boolean.compare(unit2.isActive(), unit1.isActive());
-                }
+                        return Boolean.compare(unit2.isActive(), unit1.isActive());
+                    }
 
-            });
+                });
         }
-        
-        Collections.sort(unitDisplayList, new Comparator<PropertyUnit>() {
-                @Override
-                public int compare(PropertyUnit unit1, PropertyUnit unit2) {
-
-                    return Boolean.compare(unit2.isActive(), unit1.isActive());
-                }
-
-            });
 
     }
+   
 
 public List<ViewOptionsActiveListsEnum> getAllViewOptions() {
         return allViewOptions;

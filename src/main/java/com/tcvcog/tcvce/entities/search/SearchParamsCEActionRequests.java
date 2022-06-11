@@ -18,7 +18,7 @@ import com.tcvcog.tcvce.entities.Property;
 public  class       SearchParamsCEActionRequests 
         extends     SearchParams {
     
-    public static final String DBFIELD = "property.municipality_municode";
+    public static final String DBFIELD = "parcel.muni_municode";
     
     // filter CEAR-1
     private boolean requestStatus_ctl;

@@ -67,6 +67,9 @@ public class UserMuniAuthPeriod extends BOb implements Serializable, Comparable<
 
     private int assignmentRelativeOrder;
     
+    private LocalDateTime oathTS;
+    private CourtEntity oathCourtEntity;
+    
     /**
      * Half-baked attempt at some security on BOBs
      * @return 
@@ -392,32 +395,33 @@ public class UserMuniAuthPeriod extends BOb implements Serializable, Comparable<
         this.validityEvaluatedTS = validityEvaluatedTS;
     }
 
+  
     /**
-     * @return the stopDateUtilDate
+     * @return the oathCourtEntity
      */
-    public java.util.Date getStopDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(stopDate);
+    public CourtEntity getOathCourtEntity() {
+        return oathCourtEntity;
     }
 
     /**
-     * @param stopDateUtilDate the stopDateUtilDate to set
+     * @param oathCourtEntity the oathCourtEntity to set
      */
-    public void setStopDateUtilDate(java.util.Date stopDateUtilDate) {
-        stopDate = DateTimeUtil.convertUtilDate(stopDateUtilDate);
+    public void setOathCourtEntity(CourtEntity oathCourtEntity) {
+        this.oathCourtEntity = oathCourtEntity;
     }
 
     /**
-     * @return the startDateUtilDate
+     * @return the oathTS
      */
-    public java.util.Date getStartDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(startDate);
+    public LocalDateTime getOathTS() {
+        return oathTS;
     }
 
     /**
-     * @param startDateUtilDate the startDateUtilDate to set
+     * @param oathTS the oathTS to set
      */
-    public void setStartDateUtilDate(java.util.Date startDateUtilDate) {
-        startDate = DateTimeUtil.convertUtilDate(startDateUtilDate);
+    public void setOathTS(LocalDateTime oathTS) {
+        this.oathTS = oathTS;
     }
     
 }

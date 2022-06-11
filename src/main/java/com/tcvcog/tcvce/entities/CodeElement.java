@@ -66,31 +66,44 @@ public class CodeElement
     public CodeElement() {}
 
     public CodeElement(CodeElement codeElement) {
-        this.elementID = codeElement.getElementID();
-        this.guideEntry = codeElement.getGuideEntry();
-        this.guideEntryID = codeElement.getGuideEntryID();
-        this.source = codeElement.getSource();
-        this.ordchapterNo = codeElement.getOrdchapterNo();
-        this.ordchapterTitle = codeElement.getOrdchapterTitle();
-        this.ordSecNum = codeElement.getOrdSecNum();
-        this.ordSecTitle = codeElement.getOrdSecTitle();
-        this.ordSubSecNum = codeElement.getOrdSubSecNum();
-        this.ordSubSecTitle = codeElement.getOrdSubSecTitle();
-        this.ordSubSubSecNum = codeElement.getOrdSubSubSecNum();
-        this.ordTechnicalText = codeElement.getOrdTechnicalText();
-        this.ordHumanFriendlyText = codeElement.getOrdHumanFriendlyText();
-        this.active = codeElement.isActive();
-        this.usingInjectedValues = codeElement.isUsingInjectedValues();
-        this.resourceURL = codeElement.getResourceURL();
-        this.notes = codeElement.getNotes();
-        this.legacyID = codeElement.getLegacyID();
-        this.headerString = codeElement.getHeaderString();
-        this.createdTS = codeElement.getCreatedTS();
-        this.createdBy = codeElement.getCreatedBy();
-        this.lastUpdatedTS = codeElement.getLastUpdatedTS();
-        this.lastupdatedBy = codeElement.getLastupdatedBy();
-        this.deactivatedTS = codeElement.getDeactivatedTS();
-        this.deactivatedBy = codeElement.getDeactivatedBy();
+        if(codeElement != null){
+
+            this.elementID = codeElement.getElementID();
+            this.guideEntry = codeElement.getGuideEntry();
+            this.guideEntryID = codeElement.getGuideEntryID();
+            this.source = codeElement.getSource();
+            this.ordchapterNo = codeElement.getOrdchapterNo();
+            this.ordchapterTitle = codeElement.getOrdchapterTitle();
+            this.ordSecNum = codeElement.getOrdSecNum();
+            this.ordSecTitle = codeElement.getOrdSecTitle();
+            this.ordSubSecNum = codeElement.getOrdSubSecNum();
+            this.ordSubSecTitle = codeElement.getOrdSubSecTitle();
+            this.ordSubSubSecNum = codeElement.getOrdSubSubSecNum();
+            this.ordTechnicalText = codeElement.getOrdTechnicalText();
+            this.ordHumanFriendlyText = codeElement.getOrdHumanFriendlyText();
+            this.active = codeElement.isActive();
+            this.usingInjectedValues = codeElement.isUsingInjectedValues();
+            this.resourceURL = codeElement.getResourceURL();
+            this.notes = codeElement.getNotes();
+            this.legacyID = codeElement.getLegacyID();
+            this.headerString = codeElement.getHeaderString();
+            this.createdTS = codeElement.getCreatedTS();
+            this.createdBy = codeElement.getCreatedBy();
+            this.lastUpdatedTS = codeElement.getLastUpdatedTS();
+            this.lastupdatedBy = codeElement.getLastupdatedBy();
+            this.deactivatedTS = codeElement.getDeactivatedTS();
+            this.deactivatedBy = codeElement.getDeactivatedBy();
+        }
+    }
+
+    
+     /**
+     * @return the headerString
+     */
+    public String getHeaderString() {
+       
+        
+        return headerString;
     }
 
 
@@ -385,23 +398,7 @@ public class CodeElement
         this.guideEntryID = guideEntryID;
     }
 
-    /**
-     * @return the headerString
-     */
-    public String getHeaderString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(ordchapterTitle);
-        sb.append(":");
-        sb.append(ordSecTitle);
-        sb.append("-");
-        sb.append(ordSubSecNum);
-        sb.append(":");
-        sb.append(ordSubSecTitle);
-        headerString = sb.toString();
-        
-        return headerString;
-    }
-
+   
     /**
      * @param headerString the headerString to set
      */

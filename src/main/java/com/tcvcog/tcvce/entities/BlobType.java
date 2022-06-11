@@ -16,35 +16,32 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
 /**
  * Represents a type of binary large object, BLOB
  * 
  * @author Ellen Bascomb
  */
-public class BlobType {
-   private BlobTypeEnum typeEnum;
+public class BlobType implements Serializable, Comparable<BlobType>, Manageable {
+   
+   private int typeID;
    private String title;
    private Icon icon;
-
-    /**
-     * @return the typeEnum
-     */
-    public BlobTypeEnum getTypeEnum() {
-        return typeEnum;
-    }
-
-    /**
-     * @param typeEnum the typeEnum to set
-     */
-    public void setTypeEnum(BlobTypeEnum typeEnum) {
-        this.typeEnum = typeEnum;
-    }
-
+   private String contentTypeString;
+   private boolean browserViewable;
+   private String notes;
+   private List<String> fileExtensionsPermitted;
+   
     /**
      * @return the title
      */
     public String getTitle() {
         return title;
+        
     }
 
     /**
@@ -66,6 +63,147 @@ public class BlobType {
      */
     public void setIcon(Icon icon) {
         this.icon = icon;
+    }
+
+    /**
+     * @return the typeID
+     */
+    public int getTypeID() {
+        return typeID;
+    }
+
+    /**
+     * @return the contentTypeString
+     */
+    public String getContentTypeString() {
+        return contentTypeString;
+    }
+
+    /**
+     * @return the browserViewable
+     */
+    public boolean isBrowserViewable() {
+        return browserViewable;
+    }
+
+    /**
+     * @return the fileExtensionsPermitted
+     */
+    public List<String> getFileExtensionsPermitted() {
+        return fileExtensionsPermitted;
+    }
+
+    /**
+     * @param typeID the typeID to set
+     */
+    public void setTypeID(int typeID) {
+        this.typeID = typeID;
+    }
+
+    /**
+     * @param contentTypeString the contentTypeString to set
+     */
+    public void setContentTypeString(String contentTypeString) {
+        this.contentTypeString = contentTypeString;
+    }
+
+    /**
+     * @param browserViewable the browserViewable to set
+     */
+    public void setBrowserViewable(boolean browserViewable) {
+        this.browserViewable = browserViewable;
+    }
+
+    /**
+     * @param fileExtensionsPermitted the fileExtensionsPermitted to set
+     */
+    public void setFileExtensionsPermitted(List<String> fileExtensionsPermitted) {
+        this.fileExtensionsPermitted = fileExtensionsPermitted;
+    }
+
+    /**
+     * @return the notes
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    /**
+     * @param notes the notes to set
+     */
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    @Override
+    public int compareTo(BlobType o) {
+        return this.title.compareTo(o.title);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + this.typeID;
+        hash = 97 * hash + Objects.hashCode(this.title);
+        hash = 97 * hash + Objects.hashCode(this.icon);
+        hash = 97 * hash + Objects.hashCode(this.contentTypeString);
+        hash = 97 * hash + (this.browserViewable ? 1 : 0);
+        hash = 97 * hash + Objects.hashCode(this.notes);
+        hash = 97 * hash + Objects.hashCode(this.fileExtensionsPermitted);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BlobType other = (BlobType) obj;
+        if (this.typeID != other.typeID) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public LocalDateTime getDeactivatedts() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void setDeactivatedts(LocalDateTime deactivatedts) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public ManagedSchemaEnum getMANAGEABLE_SCHEMA() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public String getName() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void setName(String name) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public int getID() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void setID(int ID) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
     

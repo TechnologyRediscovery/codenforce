@@ -17,7 +17,6 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.util;
 
-import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.Person;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -25,7 +24,7 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
 /**
- * Converter for EventCategory objects
+ * Converter for Person objects
  * @author Eric Darsow
  */
 
@@ -48,7 +47,7 @@ public class PersonConverter extends EntityConverter implements Converter{
             return "";
         }
         Person p = (Person) o;
-        String fullName = p.getFirstName() + " " +  p.getLastName();
+        String fullName = p.getName();
         if (fullName != null){
             this.getViewMap(fc).put(fullName,o);
             return fullName;

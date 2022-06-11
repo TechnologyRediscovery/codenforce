@@ -28,21 +28,21 @@ public  interface   IFace_trackedEntityLink
     
     public LocalDateTime getLinkCreatedTS();
     public void setLinkCreatedTS(LocalDateTime ts);
-    public User getLinkCreatedBy();
-    public void setLinkCreatedBy(User usr);
+    public int getLinkCreatedByUserID();
+    public void setLinkCreatedByUserID(int userID);
     
     public void setLinkSource(BOBSource source);
     public BOBSource getLinkSource();
     
     public LocalDateTime getLinkLastUpdatedTS();
     public void setLinkLastUpdatedTS(LocalDateTime ts);
-    public User getLinkLastUpdatedBy();
-    public void setLinkLastUpdatedBy(User usr);
+    public int getLinkLastUpdatedByUserID();
+    public void setLinkLastUpdatedByUserID(int userID);
     
     public LocalDateTime getLinkDeactivatedTS();
     public void setLinkDeactivatedTS(LocalDateTime ts);
-    public void setLinkDeactivatedBy(User usr);
-    public User getLinkDeactivatedBy();
+    public int getLinkDeactivatedByUserID();
+    public void setLinkDeactivatedByUserID(int usrID);
     
     public boolean isLinkDeactivated();
     
@@ -51,5 +51,7 @@ public  interface   IFace_trackedEntityLink
     
     public LinkedObjectRole getLinkedObjectRole();
     public void setLinkedObjectRole(LinkedObjectRole lor);
+    
+    public int getParentObjectID();
     
 }

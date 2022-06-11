@@ -48,10 +48,7 @@ public  class       CodeViolationPropCECaseHeavy
     this.description = cv.description;
     this.notes = cv.notes;
     this.dateOfRecord = cv.dateOfRecord;
-    this.dateOfRecordUtilDate = cv.dateOfRecordUtilDate;
-    this.dateOfRecordPretty = cv.dateOfRecordPretty;
     this.creationTS = cv.creationTS;
-    this.creationTSPretty = cv.creationTSPretty;
     this.createdBy = cv.createdBy;
     this.allowHostCaseUpdate = cv.allowHostCaseUpdate;
     this.allowOrdinanceUpdates = cv.allowOrdinanceUpdates;
@@ -68,6 +65,7 @@ public  class       CodeViolationPropCECaseHeavy
     this.nullifiedTS = cv.nullifiedTS;
     this.nullifiedUser = cv.nullifiedUser;
     this.leagacyImport = cv.leagacyImport;
+    this.makeFindingsDefault = cv.makeFindingsDefault;
     // TODO: address from NADGIT
 //    this.photoList = cv.photoList;
 //    this.blobIDList = cv.blobIDList;

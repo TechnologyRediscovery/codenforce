@@ -18,8 +18,12 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.entities.BlobLight;
+import com.tcvcog.tcvce.entities.BlobLinkEnum;
+
 import com.tcvcog.tcvce.entities.CodeElement;
+import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.IFace_BlobHolder;
+import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.User;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -27,13 +31,17 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Represents an ordinance that has been inspected (or is in queue
+ * to be inspected) during an occupancy inspection
  * @author ellen bascomb of apt 31y
  */
 public class OccInspectedSpaceElement
         extends OccSpaceElement
         implements Serializable, Comparable<OccInspectedSpaceElement>, IFace_BlobHolder {
 
+    private final static BlobLinkEnum BLOB_LINK_ENUM = BlobLinkEnum.INSPECTED_ELEMENT;
+    private final static BlobLinkEnum BLOP_UPSPTREAM_POOL = BlobLinkEnum.FIELD_INSPECTION;
+    
     private int inspectedSpaceElementID;
 
     // Here lies the remains of composition replaced by inheritance! 2-AUG-19 on occbeta
@@ -51,7 +59,8 @@ public class OccInspectedSpaceElement
 
     private List<BlobLight> blobList;
     private OccLocationDescriptor location;
-    private int failureIntensityClassID;
+    
+    private IntensityClass faillureSeverity;
     private OccInspectableStatus status;
 
     private boolean migrateToCaseOnFail;
@@ -62,11 +71,12 @@ public class OccInspectedSpaceElement
      * inspectedspace table
      */
     private int inspectedSpaceID;
+    private int occInspectionID;
 
     public OccInspectedSpaceElement() { }
 
-    public OccInspectedSpaceElement(CodeElement codeElement) {
-        super(codeElement);
+    public OccInspectedSpaceElement(EnforcableCodeElement ece) {
+        super(ece);
     }
 
     public OccInspectedSpaceElement(OccSpaceElement occSpaceElement) {
@@ -75,19 +85,26 @@ public class OccInspectedSpaceElement
 
     public OccInspectedSpaceElement(OccInspectedSpaceElement occInspectedSpaceElement) {
         super(occInspectedSpaceElement);
-        this.inspectedSpaceElementID = occInspectedSpaceElement.getInspectedSpaceElementID();
-        this.lastInspectedTS = occInspectedSpaceElement.getLastInspectedTS();
-        this.lastInspectedBy = occInspectedSpaceElement.getLastInspectedBy();
-        this.complianceGrantedTS = occInspectedSpaceElement.getComplianceGrantedTS();
-        this.complianceGrantedBy = occInspectedSpaceElement.getComplianceGrantedBy();
-        this.required = occInspectedSpaceElement.isRequired();
-        this.overrideRequiredFlag_thisElementNotInspectedBy = occInspectedSpaceElement.getOverrideRequiredFlag_thisElementNotInspectedBy();
-        this.inspectionNotes = occInspectedSpaceElement.getInspectionNotes();
-        this.blobList = occInspectedSpaceElement.getBlobList();
-        this.location = occInspectedSpaceElement.getLocation();
-        this.failureIntensityClassID = occInspectedSpaceElement.getFailureIntensityClassID();
-        this.status = occInspectedSpaceElement.getStatus();
-        this.inspectedSpaceID = occInspectedSpaceElement.getInspectedSpaceID();
+        if(occInspectedSpaceElement != null){
+            
+            this.inspectedSpaceElementID = occInspectedSpaceElement.getInspectedSpaceElementID();
+            this.lastInspectedTS = occInspectedSpaceElement.getLastInspectedTS();
+            this.lastInspectedBy = occInspectedSpaceElement.getLastInspectedBy();
+            
+            this.complianceGrantedTS = occInspectedSpaceElement.getComplianceGrantedTS();
+            this.complianceGrantedBy = occInspectedSpaceElement.getComplianceGrantedBy();
+            this.required = occInspectedSpaceElement.isRequired();
+            
+            this.overrideRequiredFlag_thisElementNotInspectedBy = occInspectedSpaceElement.getOverrideRequiredFlag_thisElementNotInspectedBy();
+            this.inspectionNotes = occInspectedSpaceElement.getInspectionNotes();
+            this.blobList = occInspectedSpaceElement.getBlobList();
+            
+            this.location = occInspectedSpaceElement.getLocation();
+            this.faillureSeverity = occInspectedSpaceElement.getFaillureSeverity();
+            this.status = occInspectedSpaceElement.getStatus();
+            
+            this.inspectedSpaceID = occInspectedSpaceElement.getInspectedSpaceID();
+        }
     }
 
     /**
@@ -217,19 +234,6 @@ public class OccInspectedSpaceElement
         this.overrideRequiredFlag_thisElementNotInspectedBy = overrideRequiredFlag_thisElementNotInspectedBy;
     }
 
-    /**
-     * @return the failureIntensityClassID
-     */
-    public int getFailureIntensityClassID() {
-        return failureIntensityClassID;
-    }
-
-    /**
-     * @param failureIntensityClassID the failureIntensityClassID to set
-     */
-    public void setFailureIntensityClassID(int failureIntensityClassID) {
-        this.failureIntensityClassID = failureIntensityClassID;
-    }
 
     @Override
     public int hashCode() {
@@ -243,7 +247,6 @@ public class OccInspectedSpaceElement
         hash = 97 * hash + Objects.hashCode(this.overrideRequiredFlag_thisElementNotInspectedBy);
         hash = 97 * hash + Objects.hashCode(this.inspectionNotes);
         hash = 97 * hash + Objects.hashCode(this.location);
-        hash = 97 * hash + this.failureIntensityClassID;
         return hash;
     }
 
@@ -255,47 +258,11 @@ public class OccInspectedSpaceElement
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        if (obj instanceof CodeElement){
-            if(this.elementID == ((CodeElement) obj).getElementID()){
-                return true;
-            } else {
-                return false;
-            }
-        }
         final OccInspectedSpaceElement other = (OccInspectedSpaceElement) obj;
         if (this.inspectedSpaceElementID != other.inspectedSpaceElementID) {
             return false;
         }
-        if (this.required != other.required) {
-            return false;
-        }
-        if (this.failureIntensityClassID != other.failureIntensityClassID) {
-            return false;
-        }
-        if (!Objects.equals(this.inspectionNotes, other.inspectionNotes)) {
-            return false;
-        }
-        if (!Objects.equals(this.lastInspectedTS, other.lastInspectedTS)) {
-            return false;
-        }
-        if (!Objects.equals(this.lastInspectedBy, other.lastInspectedBy)) {
-            return false;
-        }
-        if (!Objects.equals(this.complianceGrantedTS, other.complianceGrantedTS)) {
-            return false;
-        }
-        if (!Objects.equals(this.complianceGrantedBy, other.complianceGrantedBy)) {
-            return false;
-        }
-        if (!Objects.equals(this.overrideRequiredFlag_thisElementNotInspectedBy, other.overrideRequiredFlag_thisElementNotInspectedBy)) {
-            return false;
-        }
-        if (!Objects.equals(this.location, other.location)) {
-            return false;
-        }
+       
         return true;
     }
 
@@ -367,6 +334,7 @@ public class OccInspectedSpaceElement
     /**
      * Not boring! These are getters and setter wrappers for the status parameter that take and give raw enums
      *
+     * @return 
      **/
     public OccInspectionStatusEnum getStatusEnum() {
         return getStatus().getStatusEnum();
@@ -374,5 +342,53 @@ public class OccInspectedSpaceElement
 
     public void setStatusEnum(OccInspectionStatusEnum statusEnum) {
         setStatus(new OccInspectableStatus(statusEnum));
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return BLOB_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return inspectedSpaceElementID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return BLOP_UPSPTREAM_POOL;
+    }
+
+    /**
+     * @return the occInspectionID
+     */
+    public int getOccInspectionID() {
+        return occInspectionID;
+    }
+
+    /**
+     * @param occInspectionID the occInspectionID to set
+     */
+    public void setOccInspectionID(int occInspectionID) {
+        this.occInspectionID = occInspectionID;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return occInspectionID;
+    }
+
+    /**
+     * @return the faillureSeverity
+     */
+    public IntensityClass getFaillureSeverity() {
+        return faillureSeverity;
+    }
+
+    /**
+     * @param faillureSeverity the faillureSeverity to set
+     */
+    public void setFaillureSeverity(IntensityClass faillureSeverity) {
+        this.faillureSeverity = faillureSeverity;
     }
 }

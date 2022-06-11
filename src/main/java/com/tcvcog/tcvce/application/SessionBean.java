@@ -35,11 +35,15 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,26 +93,36 @@ public class    SessionBean
     
     private CodeSource sessCodeSource;
     private CodeElementGuideEntry activeCodeElementGuideEntry;
-    private EnforcableCodeElement selectedEnfCodeElement;
+    private List<CodeElementGuideEntry> sessCodeGuideList;
+    private EnforcableCodeElement sessEnforcableCodeElement;
     private CodeElement activeCodeElement;
+    
+    private OccChecklistTemplate sessChecklistTemplate;
+    private OccSpaceType sessOccSpaceType;
     
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                   III Property                                 <<< */
     /* >>> -------------------------------------------------------------- <<< */
     private PropertyDataHeavy sessProperty;
-    private ActivatableRouteEnum sessPropertyRoute;
     
     private List<Property> sessPropertyList;
-    private ActivatableRouteEnum sessPropertyListRoute;
+    private ActivatableRouteEnum sessPropertyRoute;
 
     private PropertyUnit sessPropertyUnit;
     
     private boolean startPropInfoPageWithAdd;
     
+    private MailingCityStateZip sessMailingCityStateZip;
+    private MailingAddress sessMailingAddress;
+    private MailingAddressLink sessMailingAddressLink;
+    private IFace_addressListHolder sessAddressListHolder;
+    private List<MailingAddressLink> sessMailingAddressLinkRefreshedList;
+    
+    
+    
     /* >>> QUERY PROPERTY <<< */
     private QueryProperty queryProperty;
-    private List<QueryProperty> queryPropertyList;
     
     /**
      * Convenience method for setting the session property and
@@ -142,11 +156,7 @@ public class    SessionBean
             System.out.println(ex);
         }
 
-        try {
-            sessPropertyList = pc.assemblePropertyHistoryList(sessUser.getKeyCard());
-        } catch (BObStatusException ex) {
-            System.out.println(ex.getMessage());
-        }
+       
     }
     
     
@@ -155,8 +165,10 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     
-    private PersonDataHeavy sessPerson;
+    private Person sessPerson;
     private ActivatableRouteEnum sessPersonRoute;
+    private IFace_humanListHolder sessHumanListHolder;
+    private List<HumanLink> sessHumanListRefreshedList;
     
     private Person sessPersonQueued;
     private List<Person> sessPersonList;
@@ -208,11 +220,17 @@ public class    SessionBean
     private List<OccPeriodPropertyUnitHeavy> sessOccPeriodList;
     
     private OccPermit sessOccPermit;
-    private OccInspection sessOccInspection;
+    private FieldInspection sessOccInspection;
     
     /* >>> QUERY OCCPERIOD <<< */
     private QueryOccPeriod queryOccPeriod;
     private List<QueryOccPeriod> queryOccPeriodList;
+    
+    private IFace_inspectable sessInspectable;
+    
+    private List<FieldInspection> sessFieldInspectionListForRefresh;
+    
+    
     
     
     /* >>> -------------------------------------------------------------- <<< */
@@ -224,6 +242,8 @@ public class    SessionBean
     private CECase sessCECaseQueued;
     private ActivatableRouteEnum sessCECaseListRoute;
     private List<CECasePropertyUnitHeavy> sessCECaseList;
+    
+    private LocalDateTime sessCECaseRefreshTrigger;
     
     private PageModeEnum ceCaseSearchProfilePageModeRequest;
     private PageModeEnum ceCaseViolationsPageModeRequest; 
@@ -307,7 +327,7 @@ public class    SessionBean
     
     private ReportConfigCEEventList reportConfigCEEventList;
     
-    private ReportConfigOccInspection reportConfigInspection;
+    private ReportConfigOccInspection reportConfigFieldInspection;
     private ReportConfigOccPermit reportConfigOccPermit;
     
     /* >>> -------------------------------------------------------------- <<< */
@@ -315,8 +335,48 @@ public class    SessionBean
     /* >>> -------------------------------------------------------------- <<< */
     
     private Blob sessBlob;
+    private BlobLight sessBlobLight;
+    private List<BlobLight> sessBlobLightListForRefreshUptake;
+    private IFace_BlobHolder sessBlobHolder;
+    private BlobPool sessBlobHolderPool;
     private List<Blob> blobList;
     private PageModeEnum blobPageModeRequest;
+    private List<BlobType> blobTypeList;
+    
+   
+    
+    /**
+     * If there's a session blob holder, I figure out what type it is
+     * and then I get a new one and point our session blob holder to it
+     * @param bh
+     * @return the session's BlobHolder
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BlobException
+     */
+    public IFace_BlobHolder setAndRefreshSessionBlobHolderAndBuildUpstreamPool(IFace_BlobHolder bh) 
+            throws BObStatusException, IntegrationException, BlobException{
+        BlobCoordinator bc = getBlobCoordinator();
+        System.out.println("SessionBean.refreshSessionBlobHolder " );
+        if(bh != null){
+            sessBlobHolder = bh;
+            
+            sessBlobHolder.setBlobList(bc.getBlobLightList(sessBlobHolder));
+        
+            // update upstream pool
+            BlobLinkEnum upstreamPool = bh.getBlobUpstreamPoolEnum();
+            if(upstreamPool != null){
+
+                sessBlobHolderPool = bc.getBlobPool(bh);
+            }
+        }
+        
+        return sessBlobHolder;
+    }
+    
+   
+    
+    
     
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                  XIII PublicInfoBundle                          <<< */
@@ -365,10 +425,7 @@ public class    SessionBean
         PropertyCoordinator pc = getPropertyCoordinator();
         PersonCoordinator perc = getPersonCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        SystemCoordinator sc = getSystemCoordinator();
         EventCoordinator ec = getEventCoordinator();
-        SearchCoordinator searchC = getSearchCoordinator();
         
         UserAuthorized ua = sessUser;
         Credential cred = sessUser.getKeyCard();
@@ -387,12 +444,15 @@ public class    SessionBean
                 // PERSONS
                 sessPersonList = perc.getPersonListFromHumanLinkList(pdh.getHumanLinkList());
                 if(sessPersonList != null && !sessPersonList.isEmpty()){
-                    sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
+                    sessPerson = perc.getPerson(sessPersonList.get(0));
                     sessPersonRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                     sessPersonListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                 } else {
                     sessPersonRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
                     sessPersonListRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+                }
+                if(sessProperty.getAddress() != null){
+                    sessMailingAddress = sessProperty.getAddress();
                 }
                 
               
@@ -417,7 +477,7 @@ public class    SessionBean
                 setSessOccPeriodListLight(pdh.getCompletePeriodList());
 
                 if (sessOccPeriodList != null && !sessOccPeriodList.isEmpty()) {
-                    setSessOccPeriod(sessOccPeriodList.get(0));
+                    setSessOccPeriodFromPeriodBase(sessOccPeriodList.get(0));
                     sessOccPeriodRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                     sessOccPeriodListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                 } else {
@@ -447,37 +507,25 @@ public class    SessionBean
                     
                 }
                 
-                return "propertySearchProfile";
+                return "propertyInfo";
                 
                 
 
             } else if (bob instanceof Person) {
-                Person pers = (Person) bob;
-                PersonDataHeavy persdh = perc.assemblePersonDataHeavy(pers, ua.getKeyCard());
-                sessPerson = persdh;
+                Person pers = perc.getPerson((Person) bob);
+                
+                sessPerson = pers;
                 
                 // check to see if our session Person is connected to the session property. If so, do nothing
                 // if not, figure out a property to associate with this Person and make it the sessionProperty
                 if(sessProperty != null && sessProperty.getHumanLinkList()!= null && !sessProperty.getHumanLinkList().isEmpty()){
                     // TODO: figure out checking a Person against a list of humanLink objects
-                    if(!sessProperty.getHumanLinkList().contains(sessPerson)){
-                        QueryProperty qp = searchC.initQuery(QueryPropertyEnum.PERSONS, sessUser.getKeyCard());
-                        if(qp.getParamsList() != null && !qp.getParamsList().isEmpty()){
-                            qp.getParamsList().get(0).setPerson_ctl(true);
-                            qp.getParamsList().get(0).setPerson_val(pers);
-                            searchC.runQuery(qp);
-                            sessPropertyList = qp.getBOBResultList();
-                            if(sessPropertyList != null && !sessPropertyList.isEmpty()){
-                                sessProperty = pc.assemblePropertyDataHeavy(sessPropertyList.get(0),sessUser);
-                            }
-                            
-                        }
-                    }
+                   // DELETED on HUMANIZATION__THIS IS A FUCKING MESS
                 } // close property and property list configuration
                 
                 if(sessProperty != null && sessProperty.getCeCaseList() != null && !sessProperty.getCeCaseList().isEmpty()){
                     sessCECase = cc.cecase_assembleCECaseDataHeavy(sessProperty.getCeCaseList().get(0), sessUser);
-                    sessCECaseList = sessProperty.getCeCaseList();
+//                    sessCECaseList = sessProperty.getCeCaseList();
                 }
                 return "personSearchProfile";
                 
@@ -490,17 +538,19 @@ public class    SessionBean
                 sessCECase = csedh;
                 
                 sessProperty = pc.assemblePropertyDataHeavy(pc.getProperty(cse.getParcelKey()), ua);
-                sessPropertyList = pc.assemblePropertyHistoryList(ua.getKeyCard());
-                sessCECaseList = sessProperty.getCeCaseList();
+//                sessPropertyList = pc.assemblePropertyHistoryList(ua.getKeyCard());
+                // Turned off to avoid the case list getting set to zero
+//                sessCECaseList = sessProperty.getCeCaseList();
                 
                 sessPersonList = perc.getPersonListFromHumanLinkList(sessProperty.getHumanLinkList());
+                
                 if(sessPersonList != null && !sessPersonList.isEmpty()){
-                    sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
+                    sessPerson = perc.getPerson(sessPersonList.get(0));
                 }
 
                 setSessOccPeriodListLight(sessProperty.getCompletePeriodList());
                 if (sessOccPeriodList != null && !sessOccPeriodList.isEmpty()) {
-                    setSessOccPeriod(sessOccPeriodList.get(0));
+                    setSessOccPeriodFromPeriodBase(sessOccPeriodList.get(0));
                 }
 
                 setSessEventsPageEventDomainRequest(DomainEnum.CODE_ENFORCEMENT);
@@ -514,7 +564,7 @@ public class    SessionBean
 
 
                 // Set sessOccPeriod
-                setSessOccPeriod(period);
+                setSessOccPeriodFromPeriodBase(period);
 
 
                 // Set current property to match the sessOccPeriod's propertyUnit
@@ -525,7 +575,7 @@ public class    SessionBean
                 // TODO: OCC BUILD 1: Turned off to get build working
 //                sessPersonList = sessProperty.getPersonList();
 //                if(sessPersonList != null && !sessPersonList.isEmpty()){
-//                    sessPerson = perc.assemblePersonDataHeavy(sessPersonList.get(0), ua.getKeyCard());
+//                    sessPerson = perc.assemblePersonLinkHeavy(sessPersonList.get(0), ua.getKeyCard());
 //                }
 
 
@@ -586,7 +636,7 @@ public class    SessionBean
      * Creates a new instance of getSessionBean()
      */
     public SessionBean() {
-        System.out.println("SessionBean.SessionBean");
+        System.out.println("SessionBean.SessionBean constructor");
     }
     
     
@@ -645,10 +695,10 @@ public class    SessionBean
     }
 
     /**
-     * @return the selectedEnfCodeElement
+     * @return the sessEnforcableCodeElement
      */
-    public EnforcableCodeElement getSelectedEnfCodeElement() {
-        return selectedEnfCodeElement;
+    public EnforcableCodeElement getSessEnforcableCodeElement() {
+        return sessEnforcableCodeElement;
     }
 
     /**
@@ -705,10 +755,10 @@ public class    SessionBean
     }
 
     /**
-     * @param selectedEnfCodeElement the selectedEnfCodeElement to set
+     * @param sessEnforcableCodeElement the sessEnforcableCodeElement to set
      */
-    public void setSelectedEnfCodeElement(EnforcableCodeElement selectedEnfCodeElement) {
-        this.selectedEnfCodeElement = selectedEnfCodeElement;
+    public void setSessEnforcableCodeElement(EnforcableCodeElement sessEnforcableCodeElement) {
+        this.sessEnforcableCodeElement = sessEnforcableCodeElement;
     }
 
     /**
@@ -860,6 +910,11 @@ public class    SessionBean
         
     }
     
+    /**
+     * Setter for session CE Case objects
+     * @param cse which will be fetched from the DB again and then assembled
+     * into a DataHeavy version
+     */
     public void setSessCECase(CECase cse){
         CaseCoordinator cc = getCaseCoordinator();
         try {
@@ -1091,7 +1146,7 @@ public class    SessionBean
     /**
      * @return the sessOccInspection
      */
-    public OccInspection getSessOccInspection() {
+    public FieldInspection getSessOccInspection() {
         return sessOccInspection;
     }
 
@@ -1127,7 +1182,7 @@ public class    SessionBean
     public void setSessOccPeriodListLight(List<OccPeriod> lightOccPeriodList) {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            setSessOccPeriodList(oc.getOccPeriodPropertyUnitHeavy(lightOccPeriodList));
+            setSessOccPeriodList(oc.getOccPeriodPropertyUnitHeavyList(lightOccPeriodList));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -1136,7 +1191,7 @@ public class    SessionBean
     /**
      * @param sessOccInspection the sessOccInspection to set
      */
-    public void setSessOccInspection(OccInspection sessOccInspection) {
+    public void setSessOccInspection(FieldInspection sessOccInspection) {
         this.sessOccInspection = sessOccInspection;
     }
 
@@ -1268,17 +1323,17 @@ public class    SessionBean
     }
 
     /**
-     * @return the reportConfigInspection
+     * @return the reportConfigFieldInspection
      */
-    public ReportConfigOccInspection getReportConfigInspection() {
-        return reportConfigInspection;
+    public ReportConfigOccInspection getReportConfigFieldInspection() {
+        return reportConfigFieldInspection;
     }
 
     /**
-     * @param reportConfigInspection the reportConfigInspection to set
+     * @param reportConfigFieldInspection the reportConfigFieldInspection to set
      */
-    public void setReportConfigInspection(ReportConfigOccInspection reportConfigInspection) {
-        this.reportConfigInspection = reportConfigInspection;
+    public void setReportConfigFieldInspection(ReportConfigOccInspection reportConfigFieldInspection) {
+        this.reportConfigFieldInspection = reportConfigFieldInspection;
     }
 
     /**
@@ -1403,26 +1458,31 @@ public class    SessionBean
     }
 
     /**
-     * @param sessOccPeriod the sessOccPeriod to set
+     * @param sop the sessOccPeriod to set; if null is passed in
+     * the current occ period is reloaded and kept as the session object
      */
-    public void setSessOccPeriod(OccPeriodDataHeavy sessOccPeriod) {
-
+    public void setSessOccPeriod(OccPeriodDataHeavy sop) {
+        
         // Set PropertyUnitWithProp because we have property integrator object here and not in the class
         PropertyIntegrator pi = getPropertyIntegrator();
         try {
-            sessOccPeriod.setPropUnitProp(pi.getPropertyUnitWithProp(sessOccPeriod.getPeriodID()));
-        } catch (IntegrationException | BObStatusException ex) {
+            if(sop != null){
+                sop.setPropUnitProp(pi.getPropertyUnitWithProp(sop.getPropertyUnitID()));
+                this.sessOccPeriod = sop;
+            } else {
+                OccupancyCoordinator oc = getOccupancyCoordinator();
+                this.sessOccPeriod = oc.assembleOccPeriodDataHeavy(sessOccPeriod, sessUser.getKeyCard());
+            }
+        } catch (IntegrationException | BObStatusException | SearchException ex) {
             System.out.println(ex);
         }
-
-        this.sessOccPeriod = sessOccPeriod;
     }
 
     /**
      * Sets the current session occupancy period to the heavy value of opBase
      * @param occPeriodBase
      */
-    public void setSessOccPeriod(OccPeriod occPeriodBase) {
+    public void setSessOccPeriodFromPeriodBase(OccPeriod occPeriodBase) {
         OccupancyCoordinator oc = getOccupancyCoordinator();
 
         // Convert occPeriodBase to a heavy data class (because it can be modified, presumably)
@@ -1434,22 +1494,11 @@ public class    SessionBean
         }
 
         // Set the current session occ period to this converted "heavy" occ period
+        // but go through the setter so we load the prop unit heavy version
         setSessOccPeriod(occPeriodHeavy);
     }
 
-    /**
-     * @return the queryPropertyList
-     */
-    public List<QueryProperty> getQueryPropertyList() {
-        return queryPropertyList;
-    }
-
-    /**
-     * @param queryPropertyList the queryPropertyList to set
-     */
-    public void setQueryPropertyList(List<QueryProperty> queryPropertyList) {
-        this.queryPropertyList = queryPropertyList;
-    }
+   
 
     /**
      * @return the queryPersonList
@@ -1552,14 +1601,14 @@ public class    SessionBean
     /**
      * @return the sessPerson
      */
-    public PersonDataHeavy getSessPerson() {
+    public Person getSessPerson() {
         return sessPerson;
     }
 
     /**
      * @param sessPerson the sessPerson to set
      */
-    public void setSessPerson(PersonDataHeavy sessPerson) {
+    public void setSessPerson(Person sessPerson) {
         this.sessPerson = sessPerson;
     }
 
@@ -1876,6 +1925,267 @@ public class    SessionBean
     public void setOnPageLoad_sessionSwitch_viewProfile(boolean onPageLoad_sessionSwitch_viewProfile) {
         this.onPageLoad_sessionSwitch_viewProfile = onPageLoad_sessionSwitch_viewProfile;
     }
+
+    /**
+     * @return the sessMailingCityStateZip
+     */
+    public MailingCityStateZip getSessMailingCityStateZip() {
+        return sessMailingCityStateZip;
+    }
+
+    /**
+     * @param sessMailingCityStateZip the sessMailingCityStateZip to set
+     */
+    public void setSessMailingCityStateZip(MailingCityStateZip sessMailingCityStateZip) {
+        this.sessMailingCityStateZip = sessMailingCityStateZip;
+    }
+
+    /**
+     * @return the sessBlobLight
+     */
+    public BlobLight getSessBlobLight() {
+        return sessBlobLight;
+    }
+
+    /**
+     * @return the sessBlobHolder
+     */
+    public IFace_BlobHolder getSessBlobHolder() {
+        return sessBlobHolder;
+    }
+
+    /**
+     * @param sessBlobLight the sessBlobLight to set
+     */
+    public void setSessBlobLight(BlobLight sessBlobLight) {
+        this.sessBlobLight = sessBlobLight;
+    }
+    
+    
+
+
+    /**
+     * I'm a normal setter
+     * 
+     * @param sessBlobHolder the sessBlobHolder to set
+     */
+    public void setSessBlobHolder(IFace_BlobHolder sessBlobHolder) {
+       
+        this.sessBlobHolder = sessBlobHolder;
+    }
+
+    /**
+     * @return the blobTypeList
+     */
+    public List<BlobType> getBlobTypeList() {
+        return blobTypeList;
+    }
+
+    /**
+     * @param blobTypeList the blobTypeList to set
+     */
+    public void setBlobTypeList(List<BlobType> blobTypeList) {
+        this.blobTypeList = blobTypeList;
+    }
+
+    
+    /**
+     * @return the sessBlobHolderPool
+     */
+    public BlobPool getSessBlobHolderPool() {
+        return sessBlobHolderPool;
+    }
+
+    /**
+     * @param sessBlobHolderPool the sessBlobHolderPool to set
+     */
+    public void setSessBlobHolderPool(BlobPool sessBlobHolderPool) {
+        this.sessBlobHolderPool = sessBlobHolderPool;
+    }
+
+    /**
+     * @return the sessChecklistTemplate
+     */
+    public OccChecklistTemplate getSessChecklistTemplate() {
+        return sessChecklistTemplate;
+    }
+
+    /**
+     * @param sessChecklistTemplate the sessChecklistTemplate to set
+     */
+    public void setSessChecklistTemplate(OccChecklistTemplate sessChecklistTemplate) {
+        this.sessChecklistTemplate = sessChecklistTemplate;
+    }
+
+    /**
+     * @return the sessOccSpaceType
+     */
+    public OccSpaceType getSessOccSpaceType() {
+        return sessOccSpaceType;
+    }
+
+    /**
+     * @param sessOccSpaceType the sessOccSpaceType to set
+     */
+    public void setSessOccSpaceType(OccSpaceType sessOccSpaceType) {
+        this.sessOccSpaceType = sessOccSpaceType;
+    }
+
+    /**
+     * @return the sessCodeGuideList
+     */
+    public List<CodeElementGuideEntry> getSessCodeGuideList() {
+        return sessCodeGuideList;
+    }
+
+    /**
+     * @param sessCodeGuideList the sessCodeGuideList to set
+     */
+    public void setSessCodeGuideList(List<CodeElementGuideEntry> sessCodeGuideList) {
+        this.sessCodeGuideList = sessCodeGuideList;
+    }
+
+    /**
+     * @return the sessMailingAddress
+     */
+    public MailingAddress getSessMailingAddress() {
+        return sessMailingAddress;
+    }
+
+    /**
+     * @param sessMailingAddress the sessMailingAddress to set
+     */
+    public void setSessMailingAddress(MailingAddress sessMailingAddress) {
+        this.sessMailingAddress = sessMailingAddress;
+    }
+
+    /**
+     * @return the sessHumanListHolder
+     */
+    public IFace_humanListHolder getSessHumanListHolder() {
+        return sessHumanListHolder;
+    }
+
+    /**
+     * @param sessHumanListHolder the sessHumanListHolder to set
+     */
+    public void setSessHumanListHolder(IFace_humanListHolder sessHumanListHolder) {
+        this.sessHumanListHolder = sessHumanListHolder;
+    }
+
+    /**
+     * @return the sessHumanListRefreshedList
+     */
+    public List<HumanLink> getSessHumanListRefreshedList() {
+        return sessHumanListRefreshedList;
+    }
+
+    /**
+     * @param sessHumanListRefreshedList the sessHumanListRefreshedList to set
+     */
+    public void setSessHumanListRefreshedList(List<HumanLink> sessHumanListRefreshedList) {
+        this.sessHumanListRefreshedList = sessHumanListRefreshedList;
+    }
+
+    /**
+     * @return the sessMailingAddressLink
+     */
+    public MailingAddressLink getSessMailingAddressLink() {
+        return sessMailingAddressLink;
+    }
+
+    /**
+     * @param sessMailingAddressLink the sessMailingAddressLink to set
+     */
+    public void setSessMailingAddressLink(MailingAddressLink sessMailingAddressLink) {
+        this.sessMailingAddressLink = sessMailingAddressLink;
+    }
+
+    /**
+     * @return the sessAddressListHolder
+     */
+    public IFace_addressListHolder getSessAddressListHolder() {
+        return sessAddressListHolder;
+    }
+
+    /**
+     * @param sessAddressListHolder the sessAddressListHolder to set
+     */
+    public void setSessAddressListHolder(IFace_addressListHolder sessAddressListHolder) {
+        this.sessAddressListHolder = sessAddressListHolder;
+    }
+
+    /**
+     * @return the sessMailingAddressLinkRefreshedList
+     */
+    public List<MailingAddressLink> getSessMailingAddressLinkRefreshedList() {
+        return sessMailingAddressLinkRefreshedList;
+    }
+
+    /**
+     * @param sessMailingAddressLinkRefreshedList the sessMailingAddressLinkRefreshedList to set
+     */
+    public void setSessMailingAddressLinkRefreshedList(List<MailingAddressLink> sessMailingAddressLinkRefreshedList) {
+        this.sessMailingAddressLinkRefreshedList = sessMailingAddressLinkRefreshedList;
+    }
+
+    /**
+     * @return the sessBlobLightListForRefreshUptake
+     */
+    public List<BlobLight> getSessBlobLightListForRefreshUptake() {
+        return sessBlobLightListForRefreshUptake;
+    }
+
+    /**
+     * @param sessBlobLightListForRefreshUptake the sessBlobLightListForRefreshUptake to set
+     */
+    public void setSessBlobLightListForRefreshUptake(List<BlobLight> sessBlobLightListForRefreshUptake) {
+        this.sessBlobLightListForRefreshUptake = sessBlobLightListForRefreshUptake;
+    }
+
+    /**
+     * @return the sessCECaseRefreshTrigger
+     */
+    public LocalDateTime getSessCECaseRefreshTrigger() {
+        return sessCECaseRefreshTrigger;
+    }
+
+    /**
+     * @param sessCECaseRefreshTrigger the sessCECaseRefreshTrigger to set
+     */
+    public void setSessCECaseRefreshTrigger(LocalDateTime sessCECaseRefreshTrigger) {
+        this.sessCECaseRefreshTrigger = sessCECaseRefreshTrigger;
+    }
+
+    /**
+     * @return the sessInspectable
+     */
+    public IFace_inspectable getSessInspectable() {
+        return sessInspectable;
+    }
+
+    /**
+     * @param sessInspectable the sessInspectable to set
+     */
+    public void setSessInspectable(IFace_inspectable sessInspectable) {
+        this.sessInspectable = sessInspectable;
+    }
+
+    /**
+     * @return the sessFieldInspectionListForRefresh
+     */
+    public List<FieldInspection> getSessFieldInspectionListForRefresh() {
+        return sessFieldInspectionListForRefresh;
+    }
+
+    /**
+     * @param sessFieldInspectionListForRefresh the sessFieldInspectionListForRefresh to set
+     */
+    public void setSessFieldInspectionListForRefresh(List<FieldInspection> sessFieldInspectionListForRefresh) {
+        this.sessFieldInspectionListForRefresh = sessFieldInspectionListForRefresh;
+    }
+
+    
 
     
 }

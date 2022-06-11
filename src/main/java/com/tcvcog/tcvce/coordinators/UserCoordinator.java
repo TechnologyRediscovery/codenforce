@@ -244,9 +244,10 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * 
      * @param usr
      * @return An assembled list of users for authorization
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public List<User> user_assembleUserListForSearch(User usr) throws BObStatusException{
-        // we do nothing with muniList
+        // we do nothing with user
         UserIntegrator ui = getUserIntegrator();
         
         List<User> ulst = new ArrayList<>();
@@ -281,7 +282,6 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             ||  uap.getStartDate().isAfter(LocalDateTime.now())
             ||  uap.getStopDate().isBefore(LocalDateTime.now())
         ){
-            System.out.println("UserCoordinator.validateUserMuniAuthPeriod | declared invalid: " + uap.getUserMuniAuthPeriodID());
             return uap;
         }
         // since we have a valid period, git it the extra valid stamp
@@ -356,6 +356,37 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             v = true;
         } 
         return v;
+    }
+    
+    /**
+     * *** SECURITY CRITICAL METHOD ***
+     * Throws an exception if the given UserAuthorized does meet or exceed
+     * the rank of the supplied role type
+     * @param ua
+     * @param rt 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.AuthorizationException 
+     */
+    public void auth_verifyUserAuthorizedRank_MeetOrExceed_SECURITYCRITICAL(UserAuthorized ua, RoleType rt) 
+            throws BObStatusException, AuthorizationException{
+        if(ua == null || rt == null){
+            throw new BObStatusException("Cannot verify rank (meet or exceed) with null User or Role");
+            
+        }
+        if(ua.getKeyCard().getGoverningAuthPeriod().getRole().getRank() < rt.getRank()){
+            StringBuilder sb = new StringBuilder();
+            sb.append("User with rank: ");
+            sb.append(ua.getKeyCard().getGoverningAuthPeriod().getRole().getLabel());
+            sb.append("(rank ");
+            sb.append(ua.getKeyCard().getGoverningAuthPeriod().getRole().getRank());
+            sb.append(") fails to meet or exceed required rank: ");
+            sb.append(rt.getLabel());
+            sb.append("(rank");
+            sb.append(rt.getRank());
+            sb.append(");");
+            
+            throw new AuthorizationException(sb.toString());
+        }
     }
    
    
@@ -837,7 +868,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public void user_updateUser(User u) throws IntegrationException, AuthorizationException{
         UserIntegrator ui = getUserIntegrator();
         StringBuilder sb = new StringBuilder();
-        if(u != null && (u.getPerson() != null || u.getPerson().getHumanID() != 0)){
+        if(u != null && (u.getHuman() != null || u.getHuman().getHumanID() != 0)){
                 ui.updateUser(u);
         }
     }
@@ -845,6 +876,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * Logic intermediary for forcing password reset on next login
      * // As of BETA 2020 this doesn't get "forced" yet
+     * TODO: Force reset
      * 
      * @param u
      * @throws IntegrationException 
@@ -855,11 +887,18 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         
     }
     
-    
+    /**
+     * Updates the person object that represents the human operating this user account.
+     * 
+     * @param u
+     * @param freshPerson
+     * @throws IntegrationException
+     * @throws AuthorizationException 
+     */
     public void user_updateUserPersonLink(User u, Person freshPerson) throws IntegrationException, AuthorizationException{
         
         UserIntegrator ui = getUserIntegrator();
-        if(u != null && u.getPerson().getHumanID() != 0){
+        if(u != null && u.getHuman().getHumanID() != 0){
     
             // TODO: complete note on user udpates
             MessageBuilderParams mb = new MessageBuilderParams();
@@ -949,7 +988,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     
     /**
      * Generates a User list that represents allowable users to engage with
-     * for a given muni. This method doesn't return fully-fledged users
+     * for a given muni. This method doesn't return fully-fledged users.
+     * This method asks the inputted UserAuthorized for all of its
+     * (VALID) UMAPS and gets all the other Users who share ANY muni in that list
      * @param userRequestor
      * @return
      * @throws IntegrationException
@@ -1055,6 +1096,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public List<User> user_assembleUserListComplete(UserAuthorized ua) throws IntegrationException, BObStatusException{
         UserIntegrator ui = getUserIntegrator();
         List<User> ul = new ArrayList<>();
+        // only devs can make this list
         if(ua.getKeyCard().isHasDeveloperPermissions()){
             List<Integer> idl = ui.getUserListComplete();
             if(idl != null && !idl.isEmpty()){
@@ -1064,6 +1106,32 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             }
         }
         return ul;
+    }
+    
+    /**
+     * Implements logic to assemble a list of code officer users only. NOTE that 
+     * this list will select only users who have a valid UMAP
+     * in the given muni AND who have a non-null oath timestamp field in UMAP.
+     * INVALID UMAPS are not used to assemble this list.
+     * @param muni
+     * @return all users in the given muni who have a non-null oathts
+     */
+    public List<User> user_assembleUserListOfficerOathRequired(Municipality muni) throws IntegrationException, AuthorizationException, BObStatusException{
+        UserIntegrator ui = getUserIntegrator();
+        List<User> swornOfficerUsers = new ArrayList<>();
+        if(muni != null){
+            List<UserMuniAuthPeriod> umapl = ui.getUserMuniAuthPeriodsRaw(muni);
+            umapl = auth_cleanUserMuniAuthPeriodList(umapl);
+            if(umapl != null && !umapl.isEmpty()){
+                for(UserMuniAuthPeriod u: umapl){
+                    if(u.getOathTS() != null){
+                        swornOfficerUsers.add(user_getUser(u.getUserID()));
+                    }
+                }
+            } // we have umaps
+        } // null input check
+        
+        return swornOfficerUsers;
     }
     
     
@@ -1097,7 +1165,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param uaList
      * @return 
      */
-    public List<User> user_extractUsersFromUserAuthorized(List<UserAuthorized> uaList){
+    public List<User> user_upcastUsersFromUserAuthorized(List<UserAuthorized> uaList){
         List<User> uList = null;
         if(uaList != null && !uaList.isEmpty()){
             uList = new ArrayList<>();

@@ -73,11 +73,15 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
         if(mdh != null && ua != null){
             PropertyCoordinator pc = getPropertyCoordinator();
             CourtEntityIntegrator cei = getCourtEntityIntegrator();
+            UserCoordinator uc = getUserCoordinator();
             // FIX THIS WHEN WE HAVE STABLE AUTHORIZATION PROCEDURES
-    //        muni.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedListForConfig(muni)));
+//            mdh.setUserList(uc.extractUsersFromUserAuthorized(uc.getUserAuthorizedListForConfig(mdh)));
+            
             try {
                 mdh.setMuniPropertyDH(pc.assemblePropertyDataHeavy(pc.getProperty(mdh.getMuniOfficePropertyId()), ua));
                 mdh.setCourtEntities(cei.getCourtEntityList(mdh.getMuniCode()));
+                mdh.setSwornOfficerList(uc.user_assembleUserListOfficerOathRequired(mdh));
+                mdh.setZipList(pc.getZipListByMunicipality(mdh));
             } catch (SearchException ex) {
                 System.out.println(ex);
             }

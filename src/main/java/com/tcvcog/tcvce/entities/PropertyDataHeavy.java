@@ -31,18 +31,24 @@ public  class       PropertyDataHeavy
         extends     Property 
         implements  IFace_CredentialSigned,
                     IFace_humanListHolder,
-                    IFace_PersonListHolder{
+                    IFace_BlobHolder{
     
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUIM = LinkedObjectSchemaEnum.CECASEHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUIM = LinkedObjectSchemaEnum.ParcelHuman;
+    final static BlobLinkEnum PROPDH_LINK_ENUM = BlobLinkEnum.PROPERTY;
+    /**
+     * A property is the highest level blob holder, so it has no upstream pool
+     */
+    final static BlobLinkEnum PROPDH_UPSTRREAM_BLOB_POOL = null;
+    
     protected List<HumanLink> humanLinkList;
     protected List<Person> personList;
+    
     
     
     private List<CECasePropertyUnitHeavy> ceCaseList;
     private List<PropertyUnitDataHeavy> unitWithListsList;
     private List<CECaseDataHeavy> propInfoCaseList;
     private List<BlobLight> blobList;
-    private List<PropertyExtData> extDataList;
     
     private String credentialSignature;
     
@@ -61,19 +67,9 @@ public  class       PropertyDataHeavy
         
         this.credentialSignature = cred.getSignature();
          
-        this.addresses = prop.getAddresses();
+        this.mailingAddressLinkList = prop.getMailingAddressLinkList();
         
         
-    }
-    
-     @Override
-    public List<Person> getPersonList() {
-        return personList;
-    }
-
-    @Override
-    public void setPersonList(List<Person> pList) {
-        personList = pList;
     }
     
     
@@ -226,20 +222,7 @@ public  class       PropertyDataHeavy
         return propInfoCaseList;
     }
 
-    /**
-     * @return the extDataList
-     */
-    public List<PropertyExtData> getExtDataList() {
-        return extDataList;
-    }
-
-    /**
-     * @param extDataList the extDataList to set
-     */
-    public void setExtDataList(List<PropertyExtData> extDataList) {
-        this.extDataList = extDataList;
-    }
-
+   
    
 
 
@@ -262,6 +245,26 @@ public  class       PropertyDataHeavy
     @Override
     public int getHostPK() {
         return parcelKey;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return PROPDH_LINK_ENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return parcelKey;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return PROPDH_UPSTRREAM_BLOB_POOL;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return 0;
     }
 
    

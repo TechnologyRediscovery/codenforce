@@ -19,16 +19,22 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
+import com.tcvcog.tcvce.entities.Manageable;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.domain.IntegrationException;
+
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.BOBSource;
+import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.entities.NavigationItem;
 import com.tcvcog.tcvce.entities.NavigationSubItem;
 import com.tcvcog.tcvce.entities.PrintStyle;
+import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.LogIntegrator;
@@ -41,19 +47,26 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
- *
+ * Logic holder for all sorts of misc cross-object
+ * and system objects
+ * 
  * @author ellen bascomb of apt 31y
  */
 public class SystemCoordinator extends BackingBeanUtils implements Serializable {
 
+    private final RoleType MIN_RANK_TO_APPEND_NOTES = RoleType.MuniReader;
     private Map<Integer, String> muniCodeNameMap;
+    
 
     /**
      * Creates a new instance of LoggingCoordinator
@@ -132,6 +145,51 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     protected void requestBaseInternalAccessCredential(UserAuthorized ua) {
         // TODO: Finish guts
     }
+    
+    /**
+     * Iterates through all values in LinkedObjectSchemaEnum and returns
+     * only those that are of the inputted family (e.g. human links or address links)
+     * @param fam not null
+     * @return a list, perhaps with instances of LinkedObjectFamilyEnum
+     * @throws BObStatusException for null input
+     */
+    public List<LinkedObjectSchemaEnum> assembleLinkedObjectSchemaEnumListByFamily(LinkedObjectFamilyEnum fam) throws BObStatusException{
+        if(fam == null){
+            throw new BObStatusException("Cannot assemble linked object schema list with null family");
+        }
+        
+        List<LinkedObjectSchemaEnum> rawSchemaList = new ArrayList<>();
+        List<LinkedObjectSchemaEnum> chosenSchemas = new ArrayList<>();
+        rawSchemaList.addAll(Arrays.asList(LinkedObjectSchemaEnum.values()));
+        if(!rawSchemaList.isEmpty()){
+            for(LinkedObjectSchemaEnum lose: rawSchemaList){
+                if(lose.getLinkedObjectFamilyEnum() == fam){
+                    chosenSchemas.add(lose);
+                }
+            }
+        }
+        return chosenSchemas;
+    }
+    
+    
+    
+    /**
+     * Coordinates the creation of all LinkedObjectRoles given a link schema enum instance
+     * @param lose which set of roles you want
+     * @return a list, possibly containing LinkedObjectRoles ; never null
+     */
+    public List<LinkedObjectRole> assembleLinkedObjectRolesBySchema(LinkedObjectSchemaEnum lose) throws IntegrationException, BObStatusException{
+        List<LinkedObjectRole> roleList = new ArrayList<>();
+        SystemIntegrator si = getSystemIntegrator();
+        
+        List<Integer> idl = si.getLinkedObjectRoleListBySchemaFamily(lose);
+        if(idl != null && !idl.isEmpty()){
+            for(Integer i: idl){
+                roleList.add(si.getLinkedObjectRole(i));
+            }
+        }
+        return roleList;
+    }
 
     /**
      * The official note appending tool of the entire codeNforce system!
@@ -168,7 +226,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         // NOTE content
          if (mbp.getNewMessageContent() != null) {
             sb.append(Constants.FMT_HTML_BREAK);
-            sb.append(Constants.FMT_CONTENT);
+            // don't prepend the characters "Content: "!!!
+//            sb.append(Constants.FMT_CONTENT);
             sb.append(mbp.getNewMessageContent());
         }
          
@@ -177,10 +236,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         sb.append(Constants.FMT_NOTEBYLINE);
         if (mbp.getUser() != null) {
 
-            if (mbp.getUser().getPerson() != null) {
-                sb.append(mbp.getUser().getPerson().getFirstName());
-                sb.append(Constants.FMT_SPACE_LITERAL);
-                sb.append(mbp.getUser().getPerson().getLastName());
+            if (mbp.getUser().getHuman() != null) {
+                sb.append(mbp.getUser().getHuman().getName());
                 sb.append(Constants.FMT_SPACE_LITERAL);
             }
             sb.append(Constants.FMT_HTML_BREAK);
@@ -193,10 +250,6 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         }
         sb.append(Constants.FMT_AT);
         sb.append(stampCurrentTimeForNote());
-
-
-     
-       
 
         if (mbp.getCred() != null && mbp.isIncludeCredentialSig()) {
             sb.append(Constants.FMT_SIGNATURELEAD);
@@ -211,6 +264,36 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             sb.append(mbp.getExistingContent());
         }
         return sb.toString();
+    }
+    
+    /**
+     * Logic pass through for note writing using the standardized interface
+     * 
+     * @param nh Caller must prepare the note holder with all the correct content
+     * of its note field so this method and the integrator can just yank and go
+     * @param ua doing the noting
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void writeNotes(IFace_noteHolder nh, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        SystemIntegrator si = getSystemIntegrator();
+        if(nh == null || ua == null || nh.getDBKey() == 0){
+            throw new BObStatusException("Cannot append notes with null notes, user, or PK of 0");
+        }
+        // enforce minimum permissions
+        if(ua.getKeyCard().getGoverningAuthPeriod().getRole().getRank() >= MIN_RANK_TO_APPEND_NOTES.getRank() ){
+            si.writeNotes(nh);
+        }
+        
+    }
+    
+    /**
+     * Utility for getting patch table to UI
+     * @return the Patch IDs
+     */
+    public String getDBPatchIDList() throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        return si.getDatabasePatchRecord();
     }
 
     /**
@@ -291,8 +374,11 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         if (idl != null && !idl.isEmpty()) {
             for (Integer i : idl) {
                 try {
-                    sourceList.add(si.getBOBSource(i));
-                } catch (IntegrationException ex) {
+                    BOBSource s = si.getBOBSource(i);
+                    if(s != null && s.isUserattributable()){
+                        sourceList.add(s);
+                    }
+                } catch (IntegrationException | BObStatusException ex) {
                     System.out.println(ex);
                 }
             }
@@ -307,7 +393,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      * @return
      * @throws IntegrationException 
      */
-   public BOBSource getBObSource(int sourceid) throws IntegrationException{
+   public BOBSource getBObSource(int sourceid) throws IntegrationException, BObStatusException{
        if(sourceid==0){
            return null;
        }
@@ -316,7 +402,81 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
        return si.getBOBSource(sourceid);
        
    }
-    
+   
+   /**
+    * 
+    * @param m Manageable
+    * @return int times used in the database
+    * @throws IntegrationException 
+    */
+   public int checkForUse(Manageable m) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       return si.checkManagableForUse(m);
+   }
+   
+   public Icon getIcon(int iconID) throws IntegrationException {
+      SystemIntegrator si = getSystemIntegrator();
+      return si.getIcon(iconID);
+   }
+   
+   public void deactivateIcon(Icon i) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.deactivateIcon(i);
+   }
+   
+   public void updateIcon(Icon i) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.updateIcon(i);
+   }
+   
+   public void insertIcon(Icon i) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.insertIcon(i);
+   }
+   
+   public List<Icon> getIconList(boolean includeDeactivated) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       return si.getIconList(includeDeactivated);
+   }
+   
+   public List<Icon> getIconList() throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       return si.getIconList();
+   }
+   
+   public int putCheckForUse(PropertyUseType p) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       return si.putCheckForUse(p);
+   }
+   
+   public PropertyUseType getPut(int putID) throws IntegrationException {
+      SystemIntegrator si = getSystemIntegrator();
+      return si.getPut(putID);
+   }
+   
+   public void deactivatePut(PropertyUseType p) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.deactivatePut(p);
+   }
+   
+   public void updatePut(PropertyUseType p) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.updatePut(p);
+   }
+   
+   public void insertPut(PropertyUseType p) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       si.insertPut(p);
+   }
+   
+   public List<PropertyUseType> getPutList() throws IntegrationException {
+       return getPutList(false);
+   }
+   
+   public List<PropertyUseType> getPutList(boolean includeDeactivated) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       return si.getPutList(includeDeactivated);
+   }
 
     /**
      * Adapter method for taking in simple note info, not in Object format and
@@ -606,7 +766,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
 
     //Sidebar Sub Nav Item: System
     private final NavigationSubItem users = getNavSubItem("Users", "/restricted/cogadmin/userConfig.xhtml", "fa fa-user-o", false);
-    private final NavigationSubItem icons = getNavSubItem("Icons", "/restricted/cogadmin/iconManage.xhtml", "fa fa-rebel", false);
+    private final NavigationSubItem manage = getNavSubItem("Manage", "/restricted/cogadmin/manage-home.xhtml", "fa fa-rebel", false);
+    private final NavigationSubItem oid = getNavSubItem("Occ Det's", "/restricted/cogadmin/occInspectionDeterminationManage.xhtml", "fa fa-pencil-square-o", false);
     private final NavigationSubItem blobs = getNavSubItem("Files", "/restricted/cogadmin/manageBlob.xhtml", "fa fa-folder", false);
 
     //Store SubNav Items into List: Reports
@@ -614,7 +775,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
         navList.add(users);
-        navList.add(icons);
+        navList.add(manage);
+        navList.add(oid);
         navList.add(blobs);
         return navList;
     }

@@ -16,64 +16,17 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.coordinators.BlobCoordinator;
-import com.tcvcog.tcvce.coordinators.CaseCoordinator;
-import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.PersonCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.coordinators.SystemCoordinator;
-import com.tcvcog.tcvce.coordinators.UserCoordinator;
-import com.tcvcog.tcvce.domain.BObStatusException;
-import com.tcvcog.tcvce.domain.BlobException;
-import com.tcvcog.tcvce.domain.BlobTypeException;
-import com.tcvcog.tcvce.domain.EventException;
-import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.domain.ViolationException;
-import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.Blob;
-import com.tcvcog.tcvce.entities.BlobLight;
-import com.tcvcog.tcvce.entities.CEActionRequest;
-import com.tcvcog.tcvce.entities.CECase;
-import com.tcvcog.tcvce.entities.CECaseDataHeavy;
-import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
-import com.tcvcog.tcvce.entities.CaseStageEnum;
-import com.tcvcog.tcvce.entities.Citation;
-import com.tcvcog.tcvce.entities.CitationCodeViolationLink;
-import com.tcvcog.tcvce.entities.CitationStatus;
-import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
-import com.tcvcog.tcvce.entities.CodeSet;
-import com.tcvcog.tcvce.entities.CodeViolation;
-import com.tcvcog.tcvce.entities.CourtEntity;
-import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
-import com.tcvcog.tcvce.entities.DomainEnum;
-import com.tcvcog.tcvce.entities.EventType;
-import com.tcvcog.tcvce.entities.Human;
-import com.tcvcog.tcvce.entities.HumanLink;
-import com.tcvcog.tcvce.entities.IntensityClass;
-import com.tcvcog.tcvce.entities.NoticeOfViolation;
-import com.tcvcog.tcvce.entities.PageModeEnum;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.PersonDataHeavy;
-import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.PropertyDataHeavy;
-import com.tcvcog.tcvce.entities.Proposal;
-import com.tcvcog.tcvce.entities.User;
+import com.tcvcog.tcvce.coordinators.*;
+import com.tcvcog.tcvce.domain.*;
+import com.tcvcog.tcvce.entities.*;
+import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.search.QueryCECase;
 import com.tcvcog.tcvce.entities.search.SearchParamsCECase;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
-import com.tcvcog.tcvce.integration.CaseIntegrator;
-import com.tcvcog.tcvce.integration.CourtEntityIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
-import com.tcvcog.tcvce.util.Constants;
-import com.tcvcog.tcvce.util.DateTimeUtil;
-import com.tcvcog.tcvce.util.MessageBuilderParams;
+import com.tcvcog.tcvce.util.*;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.io.IOException;
@@ -81,11 +34,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -148,14 +97,17 @@ public class CECaseSearchProfileBB
     private ViewOptionsActiveListsEnum selectedViewOption;
     
     private List<IntensityClass> severityList;
-    private java.util.Date complianceDateForm;
+    private LocalDateTime complianceDateForm;
     
     private String formNoteTextViolation;
     private List<EnforcableCodeElement> filteredElementList;
+    private List<EnforcableCodeElement> selectedElementList;
+    private List<CodeViolation> selectedViolationList;
+
     private CodeSet currentCodeSet;
 
     private boolean extendStipCompUsingDate;
-    private java.util.Date extendedStipCompDate;
+    private LocalDateTime extendedStipCompDate;
     private int extendedStipCompDaysFromToday;
     
     private boolean formMakeFindingsDefault;
@@ -195,21 +147,7 @@ public class CECaseSearchProfileBB
     
     
     
-    /*******************************************************
-     *              Citation jazz
-    /*******************************************************/
-    private Citation currentCitation;
-    private List<CitationStatus> citationStatusList;
-    private List<CourtEntity> courtEntityList;
-
-    private boolean issueCitationDisabled;
-    private boolean updateCitationDisabled;
-    private String formNoteCitationText;
-    
-    private List<CodeViolation> removedViolationList;
-    private String citationEditEventDescription;
-    
-    private User citationIssuingOfficer;
+  
     
     
     
@@ -360,19 +298,7 @@ public class CECaseSearchProfileBB
         eventHumanCandidates = new ArrayList<>();
         
         updateNewEventFieldsWithCatChange = true;
-        
-        // Citation stuff
-        
-        CourtEntityIntegrator cei = getCourtEntityIntegrator();
-        try {
-            citationStatusList = cc.citation_getCitationStatusList();
-            courtEntityList = cei.getCourtEntityList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        
-        removedViolationList = new ArrayList<>();
-        
+       
         
     }
     
@@ -392,6 +318,9 @@ public class CECaseSearchProfileBB
             }
         }
     }
+    
+       
+ 
     
     /**
      * Sets the session event
@@ -428,6 +357,37 @@ public class CECaseSearchProfileBB
         
     }
     
+    /**
+     * Special getter that tells this bean to check the session for a refresh 
+     * trigger timestamp.
+     * @return 
+     */
+    public LocalDateTime getReloadCECaseTrigger(){
+        LocalDateTime trigger = getSessionBean().getSessCECaseRefreshTrigger();
+        if(trigger != null){
+            reloadCase();
+            System.out.println("CECaseSearchProfileBB.getReloadCECaseTrigger: "+ getPrettyDateNoTime(trigger));
+            trigger = null;
+            getSessionBean().setSessCECaseRefreshTrigger(trigger);
+        }
+        return trigger;
+        
+    }
+    
+    /**
+     * provides the ID of the component for accessory UIs to refresh so the CE case is
+     * refreshed. Updating this component will call getReloadCECaseTrigger which, if not null
+     * triggers a reload.
+     * @return 
+     */
+    public String getReloadCECaseComponentIDToUpdate(){
+        return "case-refresh-trigger-form";
+    }
+    
+    
+    /**
+     * Gets a new cecase data heavy
+     */
     public void reloadCase(){
         CaseCoordinator cc = getCaseCoordinator();
         try {
@@ -788,92 +748,32 @@ public class CECaseSearchProfileBB
     /*******************************************************/
     /*******************************************************/
     
-    
-    
-    
     /**
-     * Listener for user requests to start the blob update process
-     * @param bl 
+     * Special getter wrapper around the CECase blob list
+     * that checks the session for a new blob list
+     * that may have been injected by the BlobUtilitiesBB
+     * 
+     * @return the CECases's updated blob list
      */
-  public void onBlobSelectButtonChange(BlobLight bl){
-      
-      currentBlob = bl;
-      System.out.println("CECaseSearchProfileBB.onBlobSelectButtonChange: current blob: " + currentBlob.getPhotoDocID());
-      
-  }
-    
-    
-    public String onBlobViewButtonChange(Blob blob){
-        return "blobs";
-        
-    }
-
-    /**
-     * Listener for user requests to start a file upload
-     * @param ev
-     */
-    public void onBlobAddButtonChange(ActionEvent ev){
-        // nothing to do here yet
-        System.out.println("CECaseSearchProfileBB.onBlobAddButtonChange");
-
-    }
-      /**
-     * Listener for user requests to update the current blob
-     * @param ev
-     */
-    public void onBlobUpdateMetadata(ActionEvent ev){
-          BlobCoordinator bc = getBlobCoordinator();
-        
-        try{
-            bc.updateBlobMetatdata(currentBlob, getSessionBean().getSessUser());
-            reloadCaseListener(ev);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated blob title and description!", ""));
-        } catch(IntegrationException ex){
-            System.out.println("manageBlobBB.updateBlobDescription() | ERROR: " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "An error occurred while trying to update the description!", ""));
-        }
-    }
-
-    public String onBlobConfirm() {
-        
-      
-        if(currentViolation.getBlobList() == null  ||  currentViolation.getBlobList().isEmpty()){
-            getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "No uploaded pdfs or photos to commit.", 
-                                "Use the 'Return to case home without commiting photos' button bellow if you have no photos to upload."));
-            return "";
-        }
-        
-        BlobIntegrator bi = getBlobIntegrator();
-        
-        for(BlobLight photo : currentViolation.getBlobList()){
-            
-            try { 
-                // commit and link
-                
-                bi.commitPhotograph(photo.getPhotoDocID());
-                bi.linkBlobToViolation(photo.getPhotoDocID(), currentViolation.getViolationID());
-                
-            } catch (IntegrationException ex) {
-                System.out.println(ex.toString());
-                    getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                                "INTEGRATION ERROR: Unable write request into the database, our apologies!", 
-                                "Please call your municipal office and report your concern by phone."));
-                    return "";
+    public List<BlobLight> getBlobLightListFromCECase(){
+        List<BlobLight> sessBlobListForUpdate = getSessionBean().getSessBlobLightListForRefreshUptake();
+        if(sessBlobListForUpdate != null && currentCase != null){
+            System.out.println("CECaseSearchProfileBB.getBlobLightListFromCECase | found non-null session blob list for uptake: " + sessBlobListForUpdate.size());
+            getCurrentCase().setBlobList(sessBlobListForUpdate);
+            // clear session since we have the new list
+            getSessionBean().setSessBlobLightListForRefreshUptake(null);
+            return sessBlobListForUpdate;
+        } else {
+            if(currentCase.getBlobList() != null){
+                return currentCase.getBlobList();
+            } else {
+                return new ArrayList<>();
             }
         }
-        
-        return "ceCaseProfile";
-
     }
     
     
+   
     
     
 
@@ -1147,7 +1047,6 @@ public class CECaseSearchProfileBB
     public void onViolationRecordComplianceInitButtonChange(CodeViolation viol){
         currentViolation = viol;
         // set default compliance date of today
-        prepareComplianceDateForm();
     }
     
     /**
@@ -1158,13 +1057,9 @@ public class CECaseSearchProfileBB
      */
     public void onViolationRecordComplianceInitButtonChange(ActionEvent ev){
         System.out.println("CeCaseSearchProfileBB.onViolationRecordComplianceInitButtonChange | from dialog");
-        prepareComplianceDateForm();
     }
     
-    private void prepareComplianceDateForm(){
-        complianceDateForm = java.util.Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
-        
-    }
+  
     
     /**
      * Listener for user requests to start nuke operation
@@ -1199,36 +1094,110 @@ public class CECaseSearchProfileBB
      *
      * @param ece
      */
-    public void onViolationSelectElementButtonChange(EnforcableCodeElement ece) {
-        System.out.println("CECaseSearchProfileBB.onViolationSelectElementButtonChange: CSEID: " + ece.getCodeSetElementID());
+     private CodeViolation injectOrdinanceIntoViolation(EnforcableCodeElement ece) throws BObStatusException {
+
+       
         CaseCoordinator cc = getCaseCoordinator();
-        try {
-            currentViolation = cc.violation_injectOrdinance(currentCase, getCurrentViolation(), ece, null);
-        } catch (BObStatusException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
+        CodeViolation cv = null;
+        cv = cc.violation_injectOrdinance(currentCase, cc.violation_getCodeViolationSkeleton(currentCase), ece, null);
+       
+        return cv;
+    }
+    
+    /**
+    * Listener for user indication that ordinances have been selected
+     * and we're ready to configure the violation of those ordinances
+     * Iterates over each of the selected elements and injects the ordinance
+     * and builds a violation list for configuration
+     * 
+    */
+    public void onOrdinanceSelectionCompleteButtonChange(){
+        if(!selectedElementList.isEmpty()){
+            for(EnforcableCodeElement ece: selectedElementList){
+                try{
+                    System.out.println("onOrdinanceSelectionCompleteButtonChange | visiting eceID: " + ece.getCodeSetElementID());
+                    CodeViolation cv = injectOrdinanceIntoViolation(ece);
+                    System.out.println("onOrdinanceSelectionCompleteButtonChange | Adding Code Violation to list, cseID: " + cv.getViolatedEnfElement().getCodeSetElementID());
+                    selectedViolationList.add(cv);
+                } catch (BObStatusException ex) {
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    ex.getMessage(), ""));
+                }
+            }
+        } else {
+             getFacesContext().addMessage(null,
+                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
+
+                            "At least one ordinance is required!", ""));
         }
     }
     
     /**
+     * Responds to user requests to commit a new code violation to the CECase
+     *
+     * @return
+    */
+    public String onViolationAddCommitButtonChange() {
+
+
+        CaseCoordinator cc = getCaseCoordinator();
+        UserAuthorized ua = getSessionBean().getSessUser();
+        
+        // Iterate over all the violations and add them to our case
+        if(!selectedViolationList.isEmpty()){
+            for(CodeViolation cv: selectedViolationList){
+                try {
+                    cc.violation_attachViolationToCase(cv, currentCase, ua);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                    "Success! Violation attached to case.", ""));
+                    // Removed for batch processing
+                    //            getSessionBean().getSessionBean().setSessCodeViolation(currentViolation);
+                    System.out.println("ViolationBB.onViolationAddCommmitButtonChange | attached violation to case");
+                    if(cv.isMakeFindingsDefault()){
+                        makeViolationFindingsDefault(cv);
+                    }
+                } catch (IntegrationException | SearchException | BObStatusException | EventException | ViolationException ex) {
+                    System.out.println(ex);
+                    getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    ex.getMessage(), ""));
+                }
+            }
+        }
+        
+        return "ceCaseProfile";
+    }
+    
+      /**
+     * Listener for user requests to remove a violation from the list
+     * of ECEs turned into violations, prior to their attachment to the case
+     * @param cv 
+     */
+    public void onViolationRemoveFromBatchButtonChange(CodeViolation cv){
+        if(cv != null && !selectedViolationList.isEmpty()){
+            selectedViolationList.remove(cv);
+            System.out.println("Removed Violation ECE ID from batch: " + cv.getViolatedEnfElement().getCodeSetElementID());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Removed Ordiance from Batch-Code Set Element ID: " + cv.getViolatedEnfElement().getCodeSetElementID(), ""));
+        }
+    }
+    
+     /**
      * Listener for user requests to start the violation add process
+     * 
      * @param ev
      */
     public void onViolationAddInit(ActionEvent ev) {
-        CaseCoordinator cc = getCaseCoordinator();
-        System.out.println("violationBB.OnModeInsertInit");
-
-        try {
-            currentViolation = cc.violation_getCodeViolationSkeleton(currentCase);
-        } catch (BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-        }
-
+        // setup our lists
+        selectedElementList = new ArrayList<>();
+        selectedViolationList = new ArrayList<>();
+        System.out.println("OnViolationAddInit: Selected Element list Size: " + selectedElementList.size());
     }
+    
+    
     
       /**
      * Listener for commencement of extending stip comp date
@@ -1249,13 +1218,13 @@ public class CECaseSearchProfileBB
         long secBetween;
         try {
             if (isExtendStipCompUsingDate() && getExtendedStipCompDate() != null) {
-                LocalDateTime freshDate = getExtendedStipCompDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                if (freshDate.isBefore(LocalDateTime.now())) {
+                
+                if (extendedStipCompDate.isBefore(LocalDateTime.now())) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                     "Stipulated compliance dates must be in the future!", ""));
                 } else {
-                    secBetween = freshDate.toEpochSecond(ZoneOffset.of("-4")) - LocalDateTime.now().toEpochSecond(ZoneOffset.of("-4"));
+                    secBetween = extendedStipCompDate.toEpochSecond(ZoneOffset.of("-4")) - LocalDateTime.now().toEpochSecond(ZoneOffset.of("-4"));
                     // divide by num seconds in a day
                     long daysBetween = secBetween / (24 * 60 * 60);
                     cc.violation_extendStipulatedComplianceDate(getCurrentViolation(), daysBetween, currentCase, getSessionBean().getSessUser());
@@ -1569,7 +1538,7 @@ public class CECaseSearchProfileBB
         EventCoordinator ec = getEventCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         if(currentViolation != null){
-            currentViolation.setActualComplianceDateUtilDate(complianceDateForm);
+            currentViolation.setActualComplianceDate(complianceDateForm);
         }
         // build event details package
         EventCnF e = null;
@@ -1655,36 +1624,7 @@ public class CECaseSearchProfileBB
 
   
 
-    /**
-     * Responds to user requests to commit a new code violation to the CECase
-     *
-     * @return
-     */
-    public String onViolationAddCommitButtonChange() {
-
-        CaseCoordinator cc = getCaseCoordinator();
-
-        try {
-            cc.violation_attachViolationToCase(currentViolation, currentCase, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success! Violation attached to case.", ""));
-            getSessionBean().getSessionBean().setSessCodeViolation(currentViolation);
-            System.out.println("ViolationBB.onViolationAddCommmitButtonChange | completed violation process");
-        } catch (IntegrationException | SearchException | BObStatusException | EventException | ViolationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            return "";
-        }
-        
-        if(formMakeFindingsDefault){
-            makeViolationFindingsDefault(currentViolation);
-        }
-        return "ceCaseProfile";
-
-    }
+  
     
     /**
      * Listener for user requests to abort violation add process
@@ -1716,6 +1656,10 @@ public class CECaseSearchProfileBB
 
     }
     
+    /**
+     * Listener for user requests to nullify a violation
+     * @return 
+     */
     public String onViolationNullifyCommitButtonChange(){
         CaseCoordinator cc = getCaseCoordinator();
          try {
@@ -1732,84 +1676,32 @@ public class CECaseSearchProfileBB
 
         }
         return "ceCaseProfile";
-        
     }
     
-    
-    /********************************************** /
-    /***********BLOBS****************************** /
-    /********************************************** /
-
-
-
+   
     /**
-     * Listener for user requests to upload a file and attach to case
-     *
-     * @param ev
+     * Listener for user requests to reactivate a violation
+     * @return 
      */
-    public void onBlobUploadCommitButtonChange(FileUploadEvent ev) {
+    public String onViolationReactivateButtonChange(){
         CaseCoordinator cc = getCaseCoordinator();
-        if (this.blobList == null) {
-            this.blobList = new ArrayList<>();
-        }
-        
-        try {
-            BlobCoordinator blobc = getBlobCoordinator();
-            
-            Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
-            blob.setBytes(ev.getFile().getContent());
-            blob.setFilename(ev.getFile().getFileName());
-            blob.setMuni(getSessionBean().getSessMuni());
-            Blob freshBlob = cc.blob_ceCase_attachBlob(getSessionBean().getSessUser(), blob, currentCase);
-            // ship to coordinator for storage
-            if(freshBlob != null){
-                System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getPhotoDocID());
-            } 
-            
-            this.currentCase.getBlobList().add(freshBlob);
-            this.getBlobList().add(blob);
-        } catch (IntegrationException | IOException  | BlobException | BlobTypeException ex) {
-            System.out.println("cecaseSearchProfileBB.onBlobUploadCommitButtonChange | upload failed! " + ex);
-            System.out.println(ex);
-        } 
-    }
-
-    /**
-     * Listener for user request to remove photo on violation
-     *     
-     * @param bl
-     */
-    public void onBlobRemoveInitButtonChange(BlobLight bl) {
-        currentBlob = bl;
-        
-    }
-    
-    
-    /**
-     * Removes link between blob and cecase
-     * @param ev
-     */
-    public void onBlobRemoveCommitButtonChange(ActionEvent ev){
-        BlobCoordinator bc = getBlobCoordinator();
-        try {
-            bc.removeCECaseBlobRecord(currentBlob, currentCase);
+         try {
+            cc.violation_reactivateViolation(currentViolation, currentCase, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success! Blob link removed.", ""));
-        } catch (BObStatusException ex) {
+                            "Success! Violation reactivated.", ""));
+        } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Operation: Failed! Blob link not removed.", ""));
-            
+                            ex.getMessage(), null));
+            return "";
 
         }
-        
-        reloadCase();
-        
+        return "ceCaseProfile";
     }
     
-    
+   
   
     
     
@@ -1911,49 +1803,7 @@ public class CECaseSearchProfileBB
         }
     }
 
-    public void onEventRemoveInitButtonChange(ActionEvent ev){
-        // do nothing yet
-    }
-    
-    public String onEventRemoveCommitButtonChange(){
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            ec.removeEvent(getCurrentEvent(), getSessionBean().getSessUser());
-             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Removed event ID " + getCurrentEvent().getEventID(), ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                ex.getMessage(), ""));
-             return "";
-        }
-        
-        return "ceCaseProfile";
-        
-    }
-
-    
-    public String onEventReactivateCommitButtonChange(){
-        EventCoordinator ec = getEventCoordinator();
-        try {
-            currentEvent.setActive(true);
-            ec.updateEvent(currentEvent, getSessionBean().getSessUser());
-             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Reactivated event ID " + getCurrentEvent().getEventID(), ""));
-        } catch (IntegrationException | BObStatusException | EventException ex) {
-            System.out.println(ex);
-             getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                ex.getMessage(), ""));
-             return "";
-        }
-        
-        return "ceCaseProfile";
-        
-    }
+  
     
     /**
      * All Code Enforcement case events are funneled through this method which
@@ -2152,27 +2002,7 @@ public class CECaseSearchProfileBB
 
     }
 
-    /**
-     * Listener method for adding the selected person to a queue
-     * @param ev 
-     */
-    public void queueSelectedPerson(ActionEvent ev) {
-        PersonCoordinator pc = getPersonCoordinator();
-        if (eventHumanSelected != null) {
-            getCurrentEvent().getPersonList().add(pc.getHumanLinkSkeleton(eventHumanSelected));
-        } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Please select one or more people to attach to this event",
-                            "This is a non-user system-level error that must be fixed by your Sys Admin"));
-        }
-    }
-
-    public void deQueuePersonFromEvent(Person p) {
-        if (getCurrentEvent().getPersonList() != null) {
-            getCurrentEvent().getPersonList().remove(p);
-        }
-    }
+   
 
    
       /**
@@ -2235,7 +2065,7 @@ public class CECaseSearchProfileBB
      */
     public void personCreateInit(ActionEvent ev){
         PersonCoordinator pc = getPersonCoordinator();
-        workingPerson = pc.personInit(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
+        workingPerson = pc.createPersonSkeleton(getSessionBean().getSessUser().getMyCredential().getGoverningAuthPeriod().getMuni());
     }
 
     /**
@@ -2246,18 +2076,18 @@ public class CECaseSearchProfileBB
         PersonCoordinator pc = getPersonCoordinator();
     
         try {
-            int freshID = pc.humanAdd(workingPerson, getSessionBean().getSessUser());
-            PersonDataHeavy freshPerson = pc.assemblePersonDataHeavy(pc.getPerson(pc.getHuman(freshID)),getSessionBean().getSessUser().getKeyCard());
-            getSessionBean().setSessPerson(freshPerson);
-            HumanLink hl = new HumanLink(freshPerson);
+           Person per = pc.insertHuman(workingPerson, getSessionBean().getSessUser());
+            
+            getSessionBean().setSessPerson(per);
+            HumanLink hl = new HumanLink(per);
         
             Property property = currentCase.getProperty();
             
             pc.linkHuman(currentCase, hl, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                  new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                     "Successfully added " + freshPerson.getFirstName() + " to the Database!" 
-                         + " and connected to " + property.getAddress(), ""));
+                     "Successfully added " + per.getName() + " to the Database!" 
+                         + " and connected to " + property.getAddressString(), ""));
            } catch (IntegrationException | BObStatusException ex) {
                System.out.println(ex.toString());
                   getFacesContext().addMessage(null,
@@ -2270,224 +2100,29 @@ public class CECaseSearchProfileBB
     }
     
     
-    
-    /*******************************************************
-    /*******************************************************
-     **              Citations                            **
-    /*******************************************************/
-    /*******************************************************/
-    
     /**
-     * Listener for user requests to view a citation
-     * @param cit 
+     * Special getter that returns a field inspection list on a CECase
+     * and will check the session bean to see if there are any updates
+     * from the inspection specific code
+     * @return 
      */
-    public void onCitationViewButtonChange(Citation cit){
-        currentCitation = cit;
-    }
-    
-    public void onCitationAddInitButtonChange(ActionEvent ev){
-          CaseCoordinator cc = getCaseCoordinator();
-        
-        try {
-            currentCitation = cc.citation_getCitationSkeleton(currentCase, getSessionBean().getSessUser(), getSessionBean().getSessUser());
-        } catch (BObStatusException | IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            
-        }
-        
-    }
-    
-    /**
-     * Listener for user requests to start the citation removal process
-     * @param cit 
-     */
-    public void onCitationRemoveInitButtonChange(Citation cit){
-        currentCitation = cit;
-    }
-    
-     /**
-     * Listener for user requests to remove a citation
-     *
-     * @return
-     */
-    public String onCitationRemoveCommitButtonChange() {
-        CaseCoordinator cc = getCaseCoordinator();
-        try {
-            cc.citation_removeCitation(currentCitation, getSessionBean().getSessUser());
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            return "";
-        }
-
-        return "ceCaseProfile";
-
-    }
-    
-    /**
-     * Listener for user requests to start the note process
-     * for a specific citation
-     * @param cit 
-     */
-    public void onCitationNoteInitButtonChange(Citation cit){
-        formNoteCitationText = "";
-        
-    }
-    
-    /**
-     * Listener for user requests to complete the citation
-     * note add operation
-     * @param ev 
-     */
-    public void onCitationNoteCommitButtonChange(ActionEvent ev){
-        
-         CaseCoordinator cc = getCaseCoordinator();
-
-        MessageBuilderParams mbp = new MessageBuilderParams();
-        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
-        mbp.setExistingContent(currentCitation.getNotes());
-        mbp.setNewMessageContent(getFormNoteText());
-        mbp.setHeader("Citation Note");
-        mbp.setUser(getSessionBean().getSessUser());
-
-        try {
-
-            cc.citation_updateNotes(mbp, currentCitation);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Succesfully appended note!", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Fatal error appending note; apologies!", ""));
-        }
-        
-    }
-    
-    /**
-     * Listener for user requests to remove a violation from a citation
-     * @param v 
-     */
-    public void onCitationViolationRemoveButtonChange(CitationCodeViolationLink v) {
-        currentCitation.getViolationList().remove(v);
-        removedViolationList.add(v);
-    }
-
-    /**
-     * Listener for user requests to add a violation to a citation
-     * @param v 
-     */
-    public void onCitationViolationRestoreButtonChange(CitationCodeViolationLink v) {
-        currentCitation.getViolationList().add(v);
-        removedViolationList.remove(v);
-    }
-    
-    
-    /**
-     * Listener for user requests to update the current citation.
-     * Only accessible from a citation profile, so no need for
-     * the Citation to come as an input param
-     */
-    public void onCitationUpdateInitButtonChange(){
-        
-        // TODO: Check logic on citation to see for allowable updates
-        
-    }
-     
-     /**
-     * Listener for user requests to commit citation updates
-     *
-     * @return
-     */
-    public String onCitationUpdateCommitButtonChange() {
-        System.out.println("CitationBB.updateCitation");
-        CaseCoordinator cc = getCaseCoordinator();
-
-        try {
-            cc.citation_updateCitation(currentCitation);
-        } catch (IntegrationException | BObStatusException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            System.out.println(ex);
-            return "";
-        }
-        return "ceCaseProfile";
-    }
-
-    /**
-     * Listener for user requests to begin citation status update operation
-     * @param ev 
-     */
-    public void onCitationUpdateStatusInitButtonChange(ActionEvent ev){
-        
-    }
-    
-    /**
-     * Listener for user requests to commit changes to citation status
-     *
-     * @return
-     */
-    public String onCitationUpdateStatusCommitButtonChange() {
-        System.out.println("CitationBB.updateCitationStatus");
-        CaseCoordinator cc = getCaseCoordinator();
-
-        try {
-            cc.citation_updateCitation(currentCitation);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success: Updated citation status!", ""));
-        } catch (IntegrationException | BObStatusException ex) {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(), ""));
-            System.out.println(ex);
-            return "";
-        }
-        return "ceCaseProfile";
-    }
-
-    /**
-     * Listener for user requests to issue a citation
-     *
-     * @return page nav
-     */
-    public String onCitationAddCommitButtonChange() {
-        System.out.println("CitationBB.IssueCitation");
-        CaseCoordinator cc = getCaseCoordinator();
-        if(currentCitation != null){
-
-                Citation c = currentCitation;
-                
-                try {
-                    cc.citation_insertCitation(c,getSessionBean().getSessUser(),citationIssuingOfficer);
-
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                    "New citation added to database!", ""));
-                } catch (IntegrationException | BObStatusException ex) {
-                    getFacesContext().addMessage(null,
-                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                    "Unable to issue citation due to a database integration error", ""));
-                    System.out.println(ex);
-                    return "";
-                }
-                return "ceCaseProfile";
+    public List<FieldInspection> getManagedCECaseFieldInspectionList(){
+        List<FieldInspection> updatedFIList = getSessionBean().getSessFieldInspectionListForRefresh();
+        if(updatedFIList != null){
+             if(currentCase != null){
+                 currentCase.setInspectionList(updatedFIList);
+                 getSessionBean().setSessFieldInspectionListForRefresh(null);
+                 return currentCase.getInspectionList();
+             }
         } else {
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to issue citation due to page object error", ""));
-            return "";
+            if(currentCase != null){
+                 return currentCase.getInspectionList();
+            } 
         }
+        return new ArrayList<>();
     }
     
-   
+    
     
     /*******************************************************
     /*******************************************************
@@ -2858,12 +2493,7 @@ public class CECaseSearchProfileBB
         return extendStipCompUsingDate;
     }
 
-    /**
-     * @return the extendedStipCompDate
-     */
-    public java.util.Date getExtendedStipCompDate() {
-        return extendedStipCompDate;
-    }
+   
 
     /**
      * @return the extendedStipCompDaysFromToday
@@ -2928,12 +2558,7 @@ public class CECaseSearchProfileBB
         this.extendStipCompUsingDate = extendStipCompUsingDate;
     }
 
-    /**
-     * @param extendedStipCompDate the extendedStipCompDate to set
-     */
-    public void setExtendedStipCompDate(java.util.Date extendedStipCompDate) {
-        this.extendedStipCompDate = extendedStipCompDate;
-    }
+   
 
     /**
      * @param extendedStipCompDaysFromToday the extendedStipCompDaysFromToday to set
@@ -2945,14 +2570,14 @@ public class CECaseSearchProfileBB
     /**
      * @return the complianceDateForm
      */
-    public java.util.Date getComplianceDateForm() {
+    public LocalDateTime getComplianceDateForm() {
         return complianceDateForm;
     }
 
     /**
      * @param complianceDateForm the complianceDateForm to set
      */
-    public void setComplianceDateForm(java.util.Date complianceDateForm) {
+    public void setComplianceDateForm(LocalDateTime complianceDateForm) {
         this.complianceDateForm = complianceDateForm;
     }
 
@@ -3180,118 +2805,7 @@ public class CECaseSearchProfileBB
         this.currentCasePropDataHeavy = currentCasePropDataHeavy;
     }
 
-    /**
-     * @return the currentCitation
-     */
-    public Citation getCurrentCitation() {
-        return currentCitation;
-    }
-
-    /**
-     * @return the citationStatusList
-     */
-    public List<CitationStatus> getCitationStatusList() {
-        return citationStatusList;
-    }
-
-    /**
-     * @return the courtEntityList
-     */
-    public List<CourtEntity> getCourtEntityList() {
-        return courtEntityList;
-    }
-
-    /**
-     * @return the issueCitationDisabled
-     */
-    public boolean isIssueCitationDisabled() {
-        return issueCitationDisabled;
-    }
-
-    /**
-     * @return the updateCitationDisabled
-     */
-    public boolean isUpdateCitationDisabled() {
-        return updateCitationDisabled;
-    }
-
-    /**
-     * @return the formNoteCitationText
-     */
-    public String getFormNoteCitationText() {
-        return formNoteCitationText;
-    }
-
-    /**
-     * @return the removedViolationList
-     */
-    public List<CodeViolation> getRemovedViolationList() {
-        return removedViolationList;
-    }
-
-    /**
-     * @return the citationEditEventDescription
-     */
-    public String getCitationEditEventDescription() {
-        return citationEditEventDescription;
-    }
-
-    /**
-     * @param currentCitation the currentCitation to set
-     */
-    public void setCurrentCitation(Citation currentCitation) {
-        this.currentCitation = currentCitation;
-    }
-
-    /**
-     * @param citationStatusList the citationStatusList to set
-     */
-    public void setCitationStatusList(List<CitationStatus> citationStatusList) {
-        this.citationStatusList = citationStatusList;
-    }
-
-    /**
-     * @param courtEntityList the courtEntityList to set
-     */
-    public void setCourtEntityList(List<CourtEntity> courtEntityList) {
-        this.courtEntityList = courtEntityList;
-    }
-
-    /**
-     * @param issueCitationDisabled the issueCitationDisabled to set
-     */
-    public void setIssueCitationDisabled(boolean issueCitationDisabled) {
-        this.issueCitationDisabled = issueCitationDisabled;
-    }
-
-    /**
-     * @param updateCitationDisabled the updateCitationDisabled to set
-     */
-    public void setUpdateCitationDisabled(boolean updateCitationDisabled) {
-        this.updateCitationDisabled = updateCitationDisabled;
-    }
-
-    /**
-     * @param formNoteCitationText the formNoteCitationText to set
-     */
-    public void setFormNoteCitationText(String formNoteCitationText) {
-        this.formNoteCitationText = formNoteCitationText;
-    }
-
-    /**
-     * @param removedViolationList the removedViolationList to set
-     */
-    public void setRemovedViolationList(List<CodeViolation> removedViolationList) {
-        this.removedViolationList = removedViolationList;
-    }
-
-    /**
-     * @param citationEditEventDescription the citationEditEventDescription to set
-     */
-    public void setCitationEditEventDescription(String citationEditEventDescription) {
-        this.citationEditEventDescription = citationEditEventDescription;
-    }
-
+    
     /**
      * @return the blobList
      */
@@ -3320,20 +2834,7 @@ public class CECaseSearchProfileBB
         this.currentBlob = currentBlob;
     }
 
-    /**
-     * @return the citationIssuingOfficer
-     */
-    public User getCitationIssuingOfficer() {
-        return citationIssuingOfficer;
-    }
-
-    /**
-     * @param citationIssuingOfficer the citationIssuingOfficer to set
-     */
-    public void setCitationIssuingOfficer(User citationIssuingOfficer) {
-        this.citationIssuingOfficer = citationIssuingOfficer;
-    }
-
+   
     /**
      * @return the eventPersonIDForLookup
      */
@@ -3348,8 +2849,47 @@ public class CECaseSearchProfileBB
         this.eventPersonIDForLookup = eventPersonIDForLookup;
     }
 
-   
-   
+    /**
+     * @return the selectedElementList
+     */
+    public List<EnforcableCodeElement> getSelectedElementList() {
+        return selectedElementList;
+    }
+
+    /**
+     * @return the selectedViolationList
+     */
+    public List<CodeViolation> getSelectedViolationList() {
+        return selectedViolationList;
+    }
+
+    /**
+     * @param selectedElementList the selectedElementList to set
+     */
+    public void setSelectedElementList(List<EnforcableCodeElement> selectedElementList) {
+        this.selectedElementList = selectedElementList;
+    }
+
+    /**
+     * @param selectedViolationList the selectedViolationList to set
+     */
+    public void setSelectedViolationList(List<CodeViolation> selectedViolationList) {
+        this.selectedViolationList = selectedViolationList;
+    }
+
+    /**
+     * @return the extendedStipCompDate
+     */
+    public LocalDateTime getExtendedStipCompDate() {
+        return extendedStipCompDate;
+    }
+
+    /**
+     * @param extendedStipCompDate the extendedStipCompDate to set
+     */
+    public void setExtendedStipCompDate(LocalDateTime extendedStipCompDate) {
+        this.extendedStipCompDate = extendedStipCompDate;
+    }
 
    
 

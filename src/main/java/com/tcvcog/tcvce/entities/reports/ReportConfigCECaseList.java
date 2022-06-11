@@ -35,6 +35,8 @@ public class ReportConfigCECaseList
     private boolean includeFullOwnerContactInfo;
     private boolean includeViolationList;
     private boolean includeEventSummaryByCase;
+    private boolean includeCECaseStatusPie;
+    private boolean includeStreetLevelSummary;
     
     private boolean includeExtendedPropertyDetails;
     
@@ -74,7 +76,7 @@ public class ReportConfigCECaseList
     
     // Metrics
     private double averageAgeOfCasesClosed;
-    private double averageAgeOfCasesOpenAsOfReportEndDate;
+    private String averageAgeOfCasesOpenAsOfReportEndDate;
     
     public ReportConfigCECaseList(){
         violationsCitedDateRange = new ArrayList<>();
@@ -287,7 +289,7 @@ public class ReportConfigCECaseList
     /**
      * @return the averageAgeOfCasesOpenAsOfReportEndDate
      */
-    public double getAverageAgeOfCasesOpenAsOfReportEndDate() {
+    public String getAverageAgeOfCasesOpenAsOfReportEndDate() {
         return averageAgeOfCasesOpenAsOfReportEndDate;
     }
 
@@ -301,7 +303,7 @@ public class ReportConfigCECaseList
     /**
      * @param averageAgeOfCasesOpenAsOfReportEndDate the averageAgeOfCasesOpenAsOfReportEndDate to set
      */
-    public void setAverageAgeOfCasesOpenAsOfReportEndDate(double averageAgeOfCasesOpenAsOfReportEndDate) {
+    public void setAverageAgeOfCasesOpenAsOfReportEndDate(String averageAgeOfCasesOpenAsOfReportEndDate) {
         this.averageAgeOfCasesOpenAsOfReportEndDate = averageAgeOfCasesOpenAsOfReportEndDate;
     }
 
@@ -555,6 +557,34 @@ public class ReportConfigCECaseList
      */
     public void setPieViolCompCount(int pieViolCompCount) {
         this.pieViolCompCount = pieViolCompCount;
+    }
+
+    /**
+     * @return the includeCECaseStatusPie
+     */
+    public boolean isIncludeCECaseStatusPie() {
+        return includeCECaseStatusPie;
+    }
+
+    /**
+     * @param includeCECaseStatusPie the includeCECaseStatusPie to set
+     */
+    public void setIncludeCECaseStatusPie(boolean includeCECaseStatusPie) {
+        this.includeCECaseStatusPie = includeCECaseStatusPie;
+    }
+
+    /**
+     * @return the includeStreetLevelSummary
+     */
+    public boolean isIncludeStreetLevelSummary() {
+        return includeStreetLevelSummary;
+    }
+
+    /**
+     * @param includeStreetLevelSummary the includeStreetLevelSummary to set
+     */
+    public void setIncludeStreetLevelSummary(boolean includeStreetLevelSummary) {
+        this.includeStreetLevelSummary = includeStreetLevelSummary;
     }
     
     

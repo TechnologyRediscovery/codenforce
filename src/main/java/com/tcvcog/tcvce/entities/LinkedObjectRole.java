@@ -16,7 +16,9 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Humanization standard
@@ -26,10 +28,10 @@ import java.time.LocalDateTime;
  * 
  * @author Ellen Bascomb of Apartment 31Y
  */
-public class LinkedObjectRole {
+public class LinkedObjectRole implements Serializable {
     
     
-    protected String linkingTableName;
+    
     protected LinkedObjectSchemaEnum schema;
     protected int roleID;
     protected String title;
@@ -44,6 +46,37 @@ public class LinkedObjectRole {
         
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.schema);
+        hash = 97 * hash + this.roleID;
+        hash = 97 * hash + Objects.hashCode(this.title);
+        hash = 97 * hash + Objects.hashCode(this.createdTS);
+        hash = 97 * hash + Objects.hashCode(this.description);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final LinkedObjectRole other = (LinkedObjectRole) obj;
+        if (this.roleID != other.roleID) {
+            return false;
+        }
+        return true;
+    }
+
+    
+    
     /**
      * @return the roleID
      */
@@ -142,12 +175,7 @@ public class LinkedObjectRole {
         this.notes = notes;
     }
 
-    /**
-     * @return the linkingTableName
-     */
-    public String getLinkingTableName() {
-        return linkingTableName;
-    }
+   
 
     /**
      * @return the schema

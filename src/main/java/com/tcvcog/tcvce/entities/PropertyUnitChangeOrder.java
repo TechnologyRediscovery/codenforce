@@ -39,7 +39,6 @@ public class PropertyUnitChangeOrder extends ChangeOrder {
     public PropertyUnitChangeOrder(PropertyUnit input) {
         unitID = input.getUnitID();
         unitNumber = input.getUnitNumber();
-        otherKnownAddress = input.getOtherKnownAddress();
         notes = input.getNotes();
         rentalNotes = input.getRentalNotes();
     }
@@ -62,9 +61,6 @@ public class PropertyUnitChangeOrder extends ChangeOrder {
             unitNumber = proposed.getUnitNumber();
         }
 
-        if (!compareStrings(original.getOtherKnownAddress(), proposed.getOtherKnownAddress())) {
-            otherKnownAddress = proposed.getOtherKnownAddress();
-        }
 
         if (!compareStrings(original.getNotes(), proposed.getNotes())) {
             notes = proposed.getNotes();
@@ -84,7 +80,6 @@ public class PropertyUnitChangeOrder extends ChangeOrder {
         
         skeleton.setNotes(notes);
         
-        skeleton.setOtherKnownAddress(otherKnownAddress);
         
         return skeleton;
         

@@ -29,7 +29,15 @@ public class        CECase
                     IFace_StatusLogHolder,
                     Comparable<CECase>,
                     IFace_ActivatableBOB,
-                    IFace_NoteHolder {
+                    IFace_noteHolder {
+    
+    final static String CASE_TABLE_NAME = "cecase";
+    final static String CASE_PK_FIELD = "caseid";
+    final static String CASE_FRIENDLY_NAME = "Code Enforcement Case";
+    final static DomainEnum CECASE_ENUM = DomainEnum.CODE_ENFORCEMENT;
+    
+    
+    
     
     protected int caseID;
     protected int publicControlCode;
@@ -287,7 +295,7 @@ public class        CECase
             System.out.println("CECase.assembleCitationListNonDraft: list size" + citationList.size());
             for(Citation cit: citationList){
                 // look for citations which are not in draft state
-                if(cit.getStatus().isNonStatusEditsForbidden()){
+                if(cit.getMostRecentStatusLogEntry().isNonStatusEditsForbidden()){
                     citl.add(cit);
                     System.out.println("CECase.assembleCitationListNonDraft: found non-draft citation ID " + cit.getCitationID());
                 }
@@ -535,42 +543,7 @@ public class        CECase
 
   
 
-    /**
-     * @return the closingDateUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getClosingDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(closingDate);
-    }
-
-    /**
-     * @param cd
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setClosingDateUtilDate(java.util.Date cd) {
-        closingDate = DateTimeUtil.convertUtilDate(cd);
-    }
-
-    /**
-     * @return the originationDateUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getOriginationDateUtilDate() {
-        return DateTimeUtil.convertUtilDate(originationDate);
-    }
-
-    /**
-     * @param od
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setOriginationDateUtilDate(java.util.Date od) {
-        originationDate = DateTimeUtil.convertUtilDate(od);
-    }
-
+   
     /**
      * @return the source
      */
@@ -766,6 +739,31 @@ public class        CECase
             sb.append(note);
             statusAssignmentLog = sb.toString();
         }
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return CASE_PK_FIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+        return caseID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return CASE_TABLE_NAME;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return CASE_FRIENDLY_NAME;
+    }
+
+    @Override
+    public DomainEnum getEventDomain() {
+        return CECASE_ENUM;
     }
 
    

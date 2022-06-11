@@ -1215,7 +1215,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         PropertyCoordinator pc = getPropertyCoordinator();
         try {
-            return pc.getPropertyByPropUnitID(currentOccPeriod.getPropertyUnitID()).getAddress();
+            return pc.getPropertyByPropUnitID(currentOccPeriod.getPropertyUnitID()).getAddressString();
         } catch (IntegrationException ex) {
             System.out.println(ex.toString());
             getFacesContext().addMessage(null,
@@ -1253,7 +1253,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            return cc.cecase_assembleCECasePropertyUnitHeavy(currentCase).getProperty().getAddress();
+            return cc.cecase_assembleCECasePropertyUnitHeavy(currentCase).getProperty().getAddressString();
         } catch (IntegrationException | SearchException ex) {
             System.out.println(ex);
         }

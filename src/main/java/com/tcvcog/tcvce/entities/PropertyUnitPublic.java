@@ -17,6 +17,7 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -24,17 +25,41 @@ import java.time.LocalDateTime;
  * @author sylvia
  */
 public  class       PropertyUnitPublic 
-        extends     BOb
+        extends     TrackedEntity
         implements  Serializable{
+    
+    final static String TABLE_NAME = "parcelunit";
+    final static String PK_FIELD = "unitid";
+    final static String PRIMARY_DWELLING_UNIT_NUM_CODE = "-D";
+    final static String PRIMARY_DWELLING_UNIT_PRETTY_NAME = "Primary Dwelling Unit";
+    
     
     protected int unitID;
     protected int parcelKey;
     protected String unitNumber;
-    protected String otherKnownAddress;
-    protected LocalDateTime rentalIntentDateStart;
-    protected LocalDateTime rentalIntentDateStop;
-    protected User rentalIntentLastUpdatedBy;
+    
+    protected LocalDate rentalIntentDateStart;
+    protected LocalDate rentalIntentDateStop;
+    
 
+    /**
+     * Fancy getter that converts the system's default dwelling unit number into
+     * a pretty string for display
+     * @return the pretty unit number
+     */
+    public String getUnitNumberCleaned(){
+        if(unitNumber != null){
+            System.out.println("PropertyUnitPublic.getUnitNumberCleaned: " + unitNumber);
+            if(unitNumber.equals(PRIMARY_DWELLING_UNIT_NUM_CODE)){
+                System.out.println("PropertyUnitPublic.getUnitNumberCleaned | found primary");
+                return PRIMARY_DWELLING_UNIT_PRETTY_NAME;
+            } else {
+                return unitNumber;
+            }
+        }
+        return "";
+    }
+    
     /**
      * @return the unitID
      */
@@ -63,12 +88,7 @@ public  class       PropertyUnitPublic
         this.unitNumber = unitNumber;
     }
 
-    /**
-     * @param otherKnownAddress the otherKnownAddress to set
-     */
-    public void setOtherKnownAddress(String otherKnownAddress) {
-        this.otherKnownAddress = otherKnownAddress;
-    }
+  
 
     /**
      * @return the parcelKey
@@ -82,6 +102,49 @@ public  class       PropertyUnitPublic
      */
     public void setParcelKey(int parcelKey) {
         this.parcelKey = parcelKey;
+    }
+
+    /**
+     * @return the rentalIntentDateStop
+     */
+    public LocalDate getRentalIntentDateStop() {
+        return rentalIntentDateStop;
+    }
+
+    /**
+     * @param rentalIntentDateStop the rentalIntentDateStop to set
+     */
+    public void setRentalIntentDateStop(LocalDate rentalIntentDateStop) {
+        this.rentalIntentDateStop = rentalIntentDateStop;
+    }
+
+    /**
+     * @return the rentalIntentDateStart
+     */
+    public LocalDate getRentalIntentDateStart() {
+        return rentalIntentDateStart;
+    }
+
+    /**
+     * @param rentalIntentDateStart the rentalIntentDateStart to set
+     */
+    public void setRentalIntentDateStart(LocalDate rentalIntentDateStart) {
+        this.rentalIntentDateStart = rentalIntentDateStart;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return PK_FIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+        return unitID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return TABLE_NAME;
     }
     
 }

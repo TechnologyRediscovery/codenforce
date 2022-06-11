@@ -47,7 +47,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
    
     private ReportConfigCEEventList reportCEEvent;
     
-    private ReportConfigOccInspection reportConfigOccInspection;
+    private ReportConfigOccInspection reportConfigFieldInspection;
     private ReportConfigOccPermit reportConfigOccPermit;
     
     private HorizontalBarChartModel caseCountByPhase;
@@ -92,7 +92,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         reportCECaseList = getSessionBean().getReportConfigCECaseList();
         
         reportConfigOccPermit = getSessionBean().getReportConfigOccPermit();
-        reportConfigOccInspection = getSessionBean().getReportConfigInspection();
+        reportConfigFieldInspection = getSessionBean().getReportConfigFieldInspection();
         
         if(reportCECase != null){
             currentReport = reportCECase;
@@ -317,17 +317,17 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
    
 
     /**
-     * @return the reportConfigOccInspection
+     * @return the reportConfigFieldInspection
      */
-    public ReportConfigOccInspection getReportConfigOccInspection() {
-        return reportConfigOccInspection;
+    public ReportConfigOccInspection getReportConfigFieldInspection() {
+        return reportConfigFieldInspection;
     }
 
     /**
-     * @param reportConfigOccInspection the reportConfigOccInspection to set
+     * @param reportConfigFieldInspection the reportConfigFieldInspection to set
      */
-    public void setReportConfigOccInspection(ReportConfigOccInspection reportConfigOccInspection) {
-        this.reportConfigOccInspection = reportConfigOccInspection;
+    public void setReportConfigFieldInspection(ReportConfigOccInspection reportConfigFieldInspection) {
+        this.reportConfigFieldInspection = reportConfigFieldInspection;
     }
 
     /**

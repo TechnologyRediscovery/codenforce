@@ -376,7 +376,6 @@ ALTER TABLE noticeofviolation ADD COLUMN notifyingofficer_userid INTEGER
     CONSTRAINT nov_notifyingofficer_fk 
     REFERENCES login (userid);
 
--- RUN ON REMOTE UP TO HERE EXCEPT for blob migration
 
 
 
@@ -389,6 +388,7 @@ $$
 $$ language 'plpgsql' STRICT;
 
 --Alright, let's get started
+-- RUN ON REMOTE UP TO HERE EXCEPT for blob migration
 
 ALTER TABLE public.occpermitapplication ADD COLUMN applicationpubliccc integer;
 
@@ -404,9 +404,14 @@ ALTER TABLE public.occpermitapplication ALTER COLUMN allowuplinkaccess SET DEFAU
 
 
 
+-- NOTE on new brain SpringBreak2022: 
+-- NOTICE:  constraint "photodoc_blobbytes_fk" of relation "photodoc" does not exist, skipping
+-- Query returned successfully with no result in 42 msec.
+
 ALTER TABLE photodoc DROP CONSTRAINT IF EXISTS photodoc_blobbytes_fk;
 
 
 --IF datepublished IS NULL the patch is still open and receiving changes
+-- Published during new brain SB22
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (35, 'database/patches/dbpatch_beta35.sql',NULL, 'ecd', 'Early JAN 2021 changes');
+    VALUES (35, 'database/patches/dbpatch_beta35.sql','03-10-2022', 'ecd', 'Early JAN 2021 changes');

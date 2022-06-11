@@ -15,7 +15,7 @@
                              process="@form"
                              actionListener="#{occInspectionBB.reports_initializeOccPermitReport}"
                              oncomplete="PF('occperiod-createpermit-occpermit-var').show()"
-                             disabled="#{empty occPeriodSearchWorkflowBB.currentOccPeriod.authorizedTS}"
+                             disabled="#{empty occPeriodBB.currentOccPeriod.authorizedTS}"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                              icon="fa fa-plus"
                              update="occperiod-createpermit-occpermit-form"/>

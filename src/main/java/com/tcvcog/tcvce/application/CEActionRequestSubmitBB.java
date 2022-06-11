@@ -53,6 +53,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -63,7 +65,8 @@ import org.primefaces.event.FileUploadEvent;
  *
  * @author cedba
  */
-public class CEActionRequestSubmitBB extends BackingBeanUtils implements Serializable {
+public class CEActionRequestSubmitBB 
+        extends BackingBeanUtils implements Serializable {
 
     private CEActionRequest currentRequest; //the CEAR the user is filling out
 
@@ -195,7 +198,12 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      * @return 
      */
     public String requestActionAsFacesUser() {
-        currentRequest.setRequestor(getSessionBean().getSessUser().getPerson());
+        PersonCoordinator pc = getPersonCoordinator();
+        try {
+            currentRequest.setRequestor(pc.getPerson(getSessionBean().getSessUser().getHuman()));
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
         getSessionBean().setSessCEAR(currentRequest);
         return "reviewAndSubmit";
     }
@@ -281,7 +289,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
 //            insertedPersonID = personIntegrator.insertPerson(p);
             System.out.println("CEActionReqeustSubmitBB.storeActionRequestorPerson | PersonID " + insertedPersonID);
-        } catch (IntegrationException ex) {
+        } catch (IntegrationException  |  BObStatusException ex) {
             System.out.println(ex.toString());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -414,7 +422,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
             //save the description to the database.
             try {
-                bi.updatePhotoDocMetadata(b);
+                bi.updateBlobLight(b);
             } catch (IntegrationException ex) {
                 System.out.println("CEActionRequestSubmitBB.savePhotosAndContinue() | ERROR: " + ex);
             }
@@ -488,7 +496,7 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         UserCoordinator uc = getUserCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
         Municipality m = currentRequest.getMuni();
-        Person skel = pc.personInit(m);
+        Person skel = pc.createPersonSkeleton(m);
         try {
             skel.setCreatedBy(uc.user_getUserRobot());
         } catch (IntegrationException | BObStatusException ex) {
@@ -498,6 +506,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         getSessionBean().setSessCEAR(currentRequest);
     }
 
+    
+    /**
+     * TODO: must be updated for IFace_BlobHolder
+     * @param ev 
+     */
     public void handlePhotoUpload(FileUploadEvent ev) {
         if (ev == null) {
             System.out.println("CEActionRequestBB.handlePhotoUpload | event: null");
@@ -508,27 +521,27 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
 
         BlobCoordinator blobc = getBlobCoordinator();
         Blob blob = null;
-        try {
-            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
+//        try {
+//            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
             // TODO: PF migration https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
 //            blob.setBytes(ev.getFile().getContents());  // set bytes
-            blob.setFilename(ev.getFile().getFileName());
-            blob.setMuni(currentRequest.getMuni());
-
-            blob = blobc.storeBlob(blob);
-        } catch (IntegrationException | IOException | BlobTypeException ex) {
-            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Something went wrong while trying to upload your photo, please try again.",
-                            "If this problem persists, please call your municipal office."));
-        } catch (BlobException ex) {
-            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            ex.getMessage(),
-                            ""));
-        }
+//            blob.setFilename(ev.getFile().getFileName());
+//            blob.setMuni(currentRequest.getMuni());
+//
+//            blob = blobc.storeBlob(blob);
+//        } catch (IntegrationException | IOException | BlobTypeException ex) {
+//            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            "Something went wrong while trying to upload your photo, please try again.",
+//                            "If this problem persists, please call your municipal office."));
+//        } catch (BlobException ex) {
+//            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
+//            getFacesContext().addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                            ex.getMessage(),
+//                            ""));
+//        }
 
         currentRequest.getBlobList().add(blob);
     }
@@ -540,11 +553,11 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
      * @return
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public String submitActionRequest() throws IntegrationException {
+    public String submitActionRequest()  {
 
         CEActionRequestIntegrator ceari = getcEActionRequestIntegrator();
-        BlobIntegrator blobI = getBlobIntegrator();
         PersonIntegrator pi = getPersonIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
         SessionBean sb = getSessionBean();
         SystemIntegrator si = getSystemIntegrator();
 
@@ -558,53 +571,53 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         // the person or the request bounces
         if (currentRequest.getRequestor().getHumanID() == 0) {
             
-            //The person is not in our database, prepared it for saving
-            if (getSessionBean().getSessUser() != null) {
-                currentRequest.getRequestor().setSource(
-                        si.getBOBSource(Integer.parseInt(
-                                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                                        .getString("actionRequestNewPersonByInternalUserPersonSourceID"))));
-            } else {
-                currentRequest.getRequestor().setSource(
-                        si.getBOBSource(Integer.parseInt(
-                                getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                                        .getString("actionRequestPublicUserPersonSourceID"))));
+            try{
+                
+                //The person is not in our database, prepared it for saving
+                if (getSessionBean().getSessUser() != null) {
+                    currentRequest.getRequestor().setSource(
+                            si.getBOBSource(Integer.parseInt(
+                                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                            .getString("actionRequestNewPersonByInternalUserPersonSourceID"))));
+                } else {
+                    currentRequest.getRequestor().setSource(
+                            si.getBOBSource(Integer.parseInt(
+                                    getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                                            .getString("actionRequestPublicUserPersonSourceID"))));
+                }
+
+                //insert it into the database.
+                personID = insertActionRequestorNewPerson(currentRequest.getRequestor());
+                    //We want to get the entry we just inserted into the database
+    //                currentRequest.setRequestor(pi.getPersonByHumanID(personID));
+            } catch (BObStatusException | IntegrationException ex ){
+                System.out.println(ex);
             }
-            
-            //insert it into the database.
-            personID = insertActionRequestorNewPerson(currentRequest.getRequestor());
-                //We want to get the entry we just inserted into the database
-//                currentRequest.setRequestor(pi.getPerson(personID));
         } else {
 
             // do nothing, since we already have the person in the system
         }
 
-        //Generate a PACC for the user to access the CEAR
-        currentRequest.setRequestPublicCC(generateControlCodeFromTime(currentRequest.getMuniCode()));
-        // all requests now are required to be at a known address
-        currentRequest.setIsAtKnownAddress(true);
-        currentRequest.setActive(true);
-        currentRequest.setDateOfRecord(LocalDateTime.now(ZoneId.systemDefault()));
-        
-        // note that the time stamp is applied by the integration layer
-        // with a simple call to the backing bean getTimeStamp method
         try {
+            //Generate a PACC for the user to access the CEAR
+            currentRequest.setRequestPublicCC(generateControlCodeFromTime(currentRequest.getMuniCode()));
+            // all requests now are required to be at a known address
+            currentRequest.setIsAtKnownAddress(true);
+            currentRequest.setActive(true);
+            currentRequest.setDateOfRecord(LocalDateTime.now(ZoneId.systemDefault()));
+
+            // note that the time stamp is applied by the integration layer
+            // with a simple call to the backing bean getTimeStamp method
             // send the request into the DB
             submittedActionRequestID = ceari.submitCEActionRequest(currentRequest);
             
             // get the request we just submitted to attach it to the files the user uploaded
             // before displaying the PACC
             sb.setSessCEAR(ceari.getActionRequestByRequestID(submittedActionRequestID));
-
-            for (BlobLight blob : currentRequest.getBlobList()) {
-                try {
-                    blobI.linkPhotoBlobToActionRequest(blob.getPhotoDocID(), sb.getSessCEAR().getRequestID());
-                } catch (IntegrationException ex) {
-                    System.out.println(ex);
-                }
-            }
-
+            
+            // BLOB linking needs to be done through the blob backing bean 
+            // BUT AFTER the CEAR submission--attaching stuff happens later
+          
             clearNavStack();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -682,12 +695,12 @@ public class CEActionRequestSubmitBB extends BackingBeanUtils implements Seriali
         QueryProperty qp = null;
 
         try {
-            qp = sc.initQuery(QueryPropertyEnum.HOUSESTREETNUM, uc.auth_getPublicUserAuthorized().getMyCredential());
+            qp = sc.initQuery(QueryPropertyEnum.ADDRESS_BLDG_NUM_ONLY, uc.auth_getPublicUserAuthorized().getMyCredential());
 
             if (qp != null && !qp.getParamsList().isEmpty()) {
                 SearchParamsProperty spp = qp.getPrimaryParams();
-                spp.setAddress_ctl(true);
-                spp.setAddress_val(houseNum + " " + streetName);
+                spp.setAddress_bldgNum_ctl(true);
+                spp.setAddress_bldgNum_val(houseNum + " " + streetName);
                 spp.setMuni_ctl(true);
                 spp.setMuni_val(currentRequest.getMuni());
                 spp.setLimitResultCount_ctl(true);

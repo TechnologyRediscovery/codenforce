@@ -37,11 +37,14 @@ public class OccInspectedSpace
 
     private int inspectedSpaceID;
     
-    protected OccSpaceType type;
+    protected OccSpaceTypeChecklistified type;
     
     private List<OccInspectedSpaceElement> inspectedElementList;
     private List<OccInspectedSpaceElement> inspectedElementListVisible;
     private ViewOptionsOccChecklistItemsEnum viewSetting;
+    
+    private List<OccInsElementGroup> inspectedElementGroupList;
+    private Map<OccInspectionStatusEnum, List<OccInspectedSpaceElement>> elementStatusMap;
     
     private OccLocationDescriptor location;
 
@@ -72,33 +75,57 @@ public class OccInspectedSpace
 
         this.status = space.getStatus();
 
-        this.inspectionID = getInspectionID();
+        this.inspectionID = space.getInspectionID();
     }
 
     public void configureVisibleElementList() {
-        inspectedElementListVisible.clear();
-        for(Iterator<OccInspectedSpaceElement> itEle = inspectedElementList.iterator(); itEle.hasNext(); ){
-            OccInspectedSpaceElement oise = itEle.next();
-            switch(viewSetting){
-                case ALL_ITEMS:
-                    inspectedElementListVisible.add(oise);
-                    break;
-                case FAILED_ITEMS_ONLY:
-                    // look for failed items
-                    if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() != null){
+        if(inspectedElementListVisible != null){
+            inspectedElementListVisible.clear();
+            for(Iterator<OccInspectedSpaceElement> itEle = inspectedElementList.iterator(); itEle.hasNext(); ){
+                OccInspectedSpaceElement oise = itEle.next();
+                switch(viewSetting){
+                    case ALL_ITEMS:
                         inspectedElementListVisible.add(oise);
-                    } 
-                    break;
-                case UNISPECTED_ITEMS_ONLY:
-                    // look for failed items
-                    if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() == null){
+                        break;
+                    case FAILED_ITEMS_ONLY:
+                        // look for failed items
+                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() != null){
+                            inspectedElementListVisible.add(oise);
+                        } 
+                        break;
+                    case UNISPECTED_ITEMS_ONLY:
+                        // look for failed items
+                        if(oise.getComplianceGrantedTS() == null && oise.getLastInspectedTS() == null){
+                            inspectedElementListVisible.add(oise);
+                        } 
+                        break;
+                    default:
                         inspectedElementListVisible.add(oise);
-                    } 
-                    break;
-                default:
-                    inspectedElementListVisible.add(oise);
+                }
             }
         }
+    }
+    
+    public List<OccInspectedSpaceElement> getElementListPass(){
+        if(elementStatusMap != null){
+            return elementStatusMap.get(OccInspectionStatusEnum.PASS);
+        }
+        return new ArrayList<>();
+    }
+    
+    public List<OccInspectedSpaceElement> getElementListFail(){
+        if(elementStatusMap != null){
+            return elementStatusMap.get(OccInspectionStatusEnum.VIOLATION);
+        }
+        return new ArrayList<>();
+        
+    }
+    public List<OccInspectedSpaceElement> getElementListNotIns(){
+        if(elementStatusMap != null){
+            return elementStatusMap.get(OccInspectionStatusEnum.NOTINSPECTED);
+        }
+        return new ArrayList<>();
+        
     }
 
 
@@ -106,7 +133,6 @@ public class OccInspectedSpace
         Set<OccLocationDescriptor> locationDescriptors = new HashSet();
 
         for (OccInspectedSpaceElement inspectedSpaceElement : inspectedElementList) {
-            System.out.println("A:" + inspectedSpaceElement.getInspectedSpaceID());
             locationDescriptors.add(inspectedSpaceElement.getLocation());
         }
 
@@ -160,7 +186,7 @@ public class OccInspectedSpace
     /**
      * @return the spaceType
      */
-    public OccSpaceType getType() {
+    public OccSpaceTypeChecklistified getType() {
         return type;
     }
 
@@ -169,7 +195,7 @@ public class OccInspectedSpace
     /**
      * @param type the spaceType to set
      */
-    public void setType(OccSpaceType type) {
+    public void setType(OccSpaceTypeChecklistified type) {
         this.type = type;
     }
 
@@ -314,6 +340,34 @@ public class OccInspectedSpace
 
     public void setInspectionID(int inspectionID) {
         this.inspectionID = inspectionID;
+    }
+
+    /**
+     * @return the inspectedElementGroupList
+     */
+    public List<OccInsElementGroup> getInspectedElementGroupList() {
+        return inspectedElementGroupList;
+    }
+
+    /**
+     * @param inspectedElementGroupList the inspectedElementGroupList to set
+     */
+    public void setInspectedElementGroupList(List<OccInsElementGroup> inspectedElementGroupList) {
+        this.inspectedElementGroupList = inspectedElementGroupList;
+    }
+
+    /**
+     * @return the elementStatusMap
+     */
+    public Map<OccInspectionStatusEnum, List<OccInspectedSpaceElement>> getElementStatusMap() {
+        return elementStatusMap;
+    }
+
+    /**
+     * @param elementStatusMap the elementStatusMap to set
+     */
+    public void setElementStatusMap(Map<OccInspectionStatusEnum, List<OccInspectedSpaceElement>> elementStatusMap) {
+        this.elementStatusMap = elementStatusMap;
     }
     
 }

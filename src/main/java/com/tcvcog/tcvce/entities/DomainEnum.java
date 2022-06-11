@@ -32,7 +32,7 @@ public enum DomainEnum {
                                 "OCC"),
     UNIVERSAL               (   "All event subdomains", 
                                 "cecase_caseid",
-                                "UNI");  // this field should never
+                                "UNI");                         // this field should never
                                                                 // be used since the Search Coor
     private final String title;                                 // is interpreting UNIVERSAL to run
     private final String dbField;                               // the other two independently

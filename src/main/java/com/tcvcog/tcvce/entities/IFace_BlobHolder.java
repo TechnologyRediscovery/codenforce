@@ -20,9 +20,24 @@ import java.util.List;
 
 /**
  * Interface for any object that has attached blob IDs
- * @author Nathan Dietz
+ * @author Nathan Dietz & Ellen Bascomb
  */
 public interface IFace_BlobHolder {
-    public void setBlobList(List<BlobLight> blobIDList);
+    
+    public void setBlobList(List<BlobLight> bl);
     public List<BlobLight> getBlobList();
+    
+    public BlobLinkEnum getBlobLinkEnum();
+    public int getParentObjectID();
+    
+    public BlobLinkEnum getBlobUpstreamPoolEnum();
+    /**
+     * This is the DB primary key for the blobHolder
+     * that will give birth to the upstream
+     * pool for this BlobHolder
+     * @return the database primary key that corresponds
+     * to the link table named stored in the
+     * BlobLinkEnum entry you get with getBlobUpstreamPoolEnum();
+     */
+    public int getBlobUpstreamPoolEnumPoolFeederID();
 }

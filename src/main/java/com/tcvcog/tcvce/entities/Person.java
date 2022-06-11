@@ -18,10 +18,6 @@ package com.tcvcog.tcvce.entities;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
-import com.tcvcog.tcvce.util.DateTimeUtil;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Objects;
 import java.util.List;
 
 /**
@@ -34,12 +30,16 @@ import java.util.List;
 public  class       Person 
         extends     Human
         implements  IFace_Loggable,
+                    IFace_addressListHolder,
                     IFace_ActivatableBOB{
     
-    protected List<HumanMailingAddressLink> addressList;
+    final static LinkedObjectSchemaEnum PERSON_ADDRESS_LOSE = LinkedObjectSchemaEnum.MailingaddressHuman;
+    
+    protected List<MailingAddressLink> mailingAddressLinkList;
     protected List<ContactEmail> emailList;
     protected List<ContactPhone> phoneList;
 
+    
   
 
     /**
@@ -49,7 +49,7 @@ public  class       Person
      */
     public Person(Person p) {
        super(p);
-       this.addressList = p.addressList;
+       this.mailingAddressLinkList = p.mailingAddressLinkList;
        this.emailList = p.emailList;
        this.phoneList = p.phoneList;
         
@@ -79,8 +79,8 @@ public  class       Person
      * @return the address at position 0 or null if no addresses present
      */
     public MailingAddress getPrimaryMailingAddress(){
-        if(addressList != null && !addressList.isEmpty()){
-            return addressList.get(0);
+        if(mailingAddressLinkList != null && !mailingAddressLinkList.isEmpty()){
+            return mailingAddressLinkList.get(0);
         }
         return null;
         
@@ -214,10 +214,11 @@ public  class       Person
     }
 
     /**
-     * @return the addressList
+     * @return the mailingAddressLinkList
      */
-    public List<HumanMailingAddressLink> getAddressList() {
-        return addressList;
+    @Override
+    public List<MailingAddressLink> getMailingAddressLinkList() {
+        return mailingAddressLinkList;
     }
 
     /**
@@ -235,13 +236,26 @@ public  class       Person
     }
 
     /**
-     * @param addressList the addressList to set
+     * @param mailingAddressLinkList the mailingAddressLinkList to set
      */
-    public void setAddressList(List<HumanMailingAddressLink> addressList) {
-        this.addressList = addressList;
+    @Override
+    public void setMailingAddressLinkList(List<MailingAddressLink> mailingAddressLinkList) {
+        this.mailingAddressLinkList = mailingAddressLinkList;
+    }
+
+    
+
+    @Override
+    public LinkedObjectSchemaEnum getLinkedObjectSchemaEnum() {
+        return PERSON_ADDRESS_LOSE;
+    }
+
+    @Override
+    public int getTargetObjectPK() {
+        return humanID;
     }
     
-    
+
 
  
     

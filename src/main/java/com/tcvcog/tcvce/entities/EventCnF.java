@@ -33,10 +33,15 @@ public  class       EventCnF
         extends     BOb
         implements  Comparable<EventCnF>,
                     IFace_Loggable,
+                    IFace_noteHolder,
                     IFace_ActivatableBOB,
                     IFace_humanListHolder{
     
-    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.EVENTHUMAN;
+    final static LinkedObjectSchemaEnum HUMAN_LINK_SCHEMA_ENUM = LinkedObjectSchemaEnum.EventHuman;
+    final static String EVENT_FRIENDLY_NAME = "Event";
+    final static String EVENT_TABLE_NAME = "event";
+    final static String EVENT_PK_FIELD = "eventid";
+    
     
     protected int eventID;
     protected EventCategory category;
@@ -66,14 +71,14 @@ public  class       EventCnF
     protected LocalDateTime lastUpdatedTS;
     
     protected boolean active;
+    protected String notes;
     
     /**
      * Only for use in JavaLand; no DB col for hiding
      */
     protected boolean hidden;
-    protected String notes;
+    protected long duration;
     
-    protected List<HumanLink> personList;
     
     public EventCnF(){
         
@@ -104,25 +109,9 @@ public  class       EventCnF
         this.hidden = ev.hidden;
         this.notes = ev.notes;
         
-        this.personList = ev.personList;
     }
     
-    /**
-     * Computes how long the event lasted using timeStart and timeEnd
-     * @return 0 unless timeEnd is after timeStart, in which case total duration
-     * in mins is returned
-     */
-    public long computeEventDurationMins(){
-        long duration = 0;
-        if(timeStart != null && timeEnd != null){
-            if(timeEnd.isAfter(timeStart)){
-                long sec = timeEnd.toEpochSecond(ZoneOffset.UTC) - timeEnd.toEpochSecond(ZoneOffset.UTC);
-                duration = (long) ((double) sec / 60.0);
-            }
-        }
-        return duration;
-    }
-    
+   
     
     /**
      * @return the eventID
@@ -244,19 +233,6 @@ public  class       EventCnF
 
   
 
-    /**
-     * @return the personList
-     */
-    public List<HumanLink> getPersonList() {
-        return personList;
-    }
-
-    /**
-     * @param personList the personList to set
-     */
-    public void setPersonList(List<HumanLink> personList) {
-        this.personList = personList;
-    }
 
     
 
@@ -284,7 +260,6 @@ public  class       EventCnF
         hash = 97 * hash + (this.active ? 1 : 0);
         hash = 97 * hash + (this.hidden ? 1 : 0);
         hash = 97 * hash + Objects.hashCode(this.notes);
-        hash = 97 * hash + Objects.hashCode(this.personList);
         return hash;
     }
 
@@ -355,14 +330,7 @@ public  class       EventCnF
         return timeStart;
     }
 
-    /**
-     * @return the timeStartUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getTimeStartUtilDate() {
-        return DateTimeUtil.convertUtilDate(timeStart);
-    }
+  
 
     /**
      * @return the timeEnd
@@ -372,14 +340,7 @@ public  class       EventCnF
         return timeEnd;
     }
 
-    /**
-     * @return the timeEndUtilDate
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public java.util.Date getTimeEndUtilDate() {
-        return DateTimeUtil.convertUtilDate(timeEnd);
-    }
+   
     
     public String getTimeStartPretty(){
         return DateTimeUtil.getPrettyDate(timeStart);
@@ -397,14 +358,7 @@ public  class       EventCnF
         this.timeStart = timeStart;
     }
 
-    /**
-     * @param tsud
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setTimeStartUtilDate(java.util.Date tsud) {
-        timeStart = DateTimeUtil.convertUtilDate(tsud);
-    }
+   
 
     /**
      * @param timeEnd the timeEnd to set
@@ -413,14 +367,7 @@ public  class       EventCnF
         this.timeEnd = timeEnd;
     }
 
-    /**
-     * @param teud
-     * @deprecated primefaces now supports LocalDateTime values
-     */
-    @Deprecated
-    public void setTimeEndUtilDate(java.util.Date teud) {
-        timeEnd = DateTimeUtil.convertUtilDate(teud);
-    }
+   
 
     /**
      * @return the lastUpdatedBy
@@ -471,6 +418,41 @@ public  class       EventCnF
     @Override
     public int getHostPK() {
         return eventID;
+    }
+
+    @Override
+    public String getNoteHolderFriendlyName() {
+        return EVENT_FRIENDLY_NAME;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return EVENT_PK_FIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+        return this.eventID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return EVENT_TABLE_NAME;
+    }
+
+    /**
+     * @return the duration
+     */
+    public long getDuration() {
+       
+        return duration;
+    }
+
+    /**
+     * @param duration the duration to set
+     */
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 
     

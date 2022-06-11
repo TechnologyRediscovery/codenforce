@@ -14,35 +14,41 @@ import com.tcvcog.tcvce.entities.RoleType;
 public  enum        QueryPersonEnum 
         implements  IFace_RankLowerBounded{
     
-    PERSON_NAME(        "First and or last name",
-                        "Filters by first or last name parts; case insensitive",
+    PERSON_NAME(        "Name",
+                        "Searches through name field only; case insensitive",
                         RoleType.MuniStaff,
                         true),
     
-    ACTIVE_PERSONS(     "Active persons", 
-                        "Persons associated with active code enf and occ cases", 
-                        RoleType.MuniReader,
-                        true),
-    
-    USER_PERSONS(       "User persons", 
-                        "Persons whose role is to store a system User's personal data, such as name and phone", 
-                        RoleType.MuniReader,
-                        true),
-    
-    TENANTS(            "Tenants",
-                        "Persons who are attached to properties with type Rental and are type Tenant",
+    PHONE(              "Phone",
+                        "Searches through phone number field only; case insensitive",
                         RoleType.MuniStaff,
                         true),
     
-    PROPERTY_PERSONS(   "Property persons",
-                        "All Person entities associated with the property in any way",
+    EMAIL(              "Email address",
+                        "Searches through email field only; case insensitive",
+                        RoleType.MuniStaff,
+                        true),
+    JOB_TITLE (         "Job title",
+                        "Searches through job title field only; case insensitive",
                         RoleType.MuniStaff,
                         true),
     
-    OCCPERIOD_PERSONS(  "OccPeriod Persons",
-                        "All persons associated with a given Occupancy Period",
+    MINORS_ONLY(        "All persons under 18",
+                        "Searches for all persons marked as under 18",
                         RoleType.MuniStaff,
-                        false),   
+                        true),
+    
+    
+    BUSINESSES(        "All businesses",
+                        "Returns all records flagged as a business entity",
+                        RoleType.MuniStaff,
+                        true),
+    
+    
+    MULIT_HUMANS(        "All Multi-humans",
+                        "Returns all records flagged as representing more than one human",
+                        RoleType.MuniStaff,
+                        true),
     
     CUSTOM(             "Custom", 
                         "Custom", 

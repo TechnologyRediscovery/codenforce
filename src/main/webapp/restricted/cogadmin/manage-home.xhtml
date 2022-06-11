@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:composition 
+        template="layout-manage.xhtml">
+
+        <ui:define name="Dialog">
+
+
+            <c:if test="${!manageBB.currentSchema.SCHEMA_TYPE_STRING == 'Icon'}">
+                <p:outputLabel for="@next" value="Icon"/>
+                <p:selectOneMenu id="advanced" value="#{manageBB.current.icon}"
+                                 panelStyle="width:180px" var="i" converter="iconConverter"
+                                 filter="true" filterMatchMode="startsWith">
+
+                    <f:selectItems value="#{manageBB.iconList}" var="icon"
+                                   itemLabel="#{icon.name}" itemValue="#{icon}"/>
+
+                    <p:column style="width:10%">
+                        <i class="material-icons"><h:outputText value="#{i.materialIcon}"/></i>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Name"/>
+                        </f:facet>
+                        <h:outputText value="#{i.name}"/>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        <h:outputText value="#{manageBB.iconList.size()} icons" 
+                                      style="font-weight:bold;" styleClass="p-py-1 p-d-block"/>
+                    </f:facet>
+                </p:selectOneMenu>
+            </c:if>
+
+            <c:choose>
+                <c:when test="${manageBB.currentSchema.SCHEMA_TYPE_STRING == 'Icon'}">
+                    <div class="p-col-4">Style Class</div>
+                    <div class="p-col-8">
+                        <h:outputText value="#{manageBB.current.styleClass}"
+                                      rendered="#{!manageBB.editMode}" />
+                        <p:inputText value="#{manageBB.current.styleClass}"
+                                     rendered="#{manageBB.editMode}" />
+                    </div>
+
+                    <div class="p-col-4">Font Awesome <i class="#{manageBB.current.fontAwesome}"/></div>
+                    <div class="p-col-8">
+                        <h:outputText value="#{manageBB.current.fontAwesome}"
+                                      rendered="#{!manageBB.editMode}" />
+                        <p:inputText value="#{manageBB.current.fontAwesome}"
+                                     rendered="#{manageBB.editMode}" />
+                    </div>
+
+                    <div class="p-col-4">Material Icon <i class="material-icons"><h:outputText value="#{manageBB.current.materialIcon}"/></i></div>
+                    <div class="p-col-8">
+                        <h:outputText value="#{manageBB.current.materialIcon}"
+                                      rendered="#{!manageBB.editMode}" />
+                        <p:inputText value="#{manageBB.current.materialIcon}"
+                                     rendered="#{manageBB.editMode}" />
+                    </div>
+                </c:when>
+
+
+                <c:when test="${'#{manageBB.currentSchema.SCHEMA_TYPE_STRING}' == 'PropertyUseType'}">
+                    <div class="p-col-4">Description</div>
+                    <div class="p-col-8">
+                        <h:outputText value="#{manageBB.current.description}"
+                                      rendered="#{!manageBB.editMode}" />
+                        <p:inputText value="#{manageBB.current.description}"
+                                     rendered="#{manageBB.editMode}" />
+                    </div>
+                </c:when>
+            </c:choose>
+
+
+        </ui:define>
+
+    </ui:composition>
+</html>
