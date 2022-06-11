@@ -957,6 +957,13 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     
+    
+    <managed-bean>
+        <managed-bean-name>occPermitSearchBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPermitSearchBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>occPermitApplicationManageBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.occupancy.application.OccPermitApplicationManageBB</managed-bean-class>
@@ -971,10 +978,12 @@
         <navigation-case>
             <from-outcome>inspectionReport</from-outcome>
             <to-view-id>/restricted/reports/reportInspection.xhtml</to-view-id>
+            <redirect />
         </navigation-case>
         <navigation-case>
             <from-outcome>occPermit</from-outcome>
             <to-view-id>/restricted/reports/reportOccPermit.xhtml</to-view-id>
+            <redirect />
         </navigation-case>
     </navigation-rule>
    

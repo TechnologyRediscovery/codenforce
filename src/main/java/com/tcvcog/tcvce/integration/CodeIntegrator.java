@@ -1002,7 +1002,9 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         newEce.setNormDaysToComply(rs.getInt("normdaystocomply"));
         newEce.setDaysToComplyNotes(rs.getString("daystocomplynotes"));
         newEce.setMuniSpecificNotes(rs.getString("munispecificnotes"));
-        newEce.setFeeList(pi.getFeeList(newEce));
+        
+        // DEAC DURING CHARGE UPGRADE
+//        newEce.setFeeList(pi.getFeeList(newEce));
         newEce.setDefaultViolationDescription(rs.getString("defaultviolationdescription"));
         
         if(rs.getTimestamp("createdts") != null){

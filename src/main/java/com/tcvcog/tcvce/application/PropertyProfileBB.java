@@ -140,11 +140,12 @@ public class PropertyProfileBB
             System.out.println(ex);
         }
          
-        occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPeriodTypeList();
+        occPeriodTypeList = getSessionBean().getSessMuni().getProfile().getOccPermitTypeList();
         sourceList = sc.getBobSourceListComplete();
         personToAddList = new ArrayList<>();
         eventViewOptions = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
         eventViewOptionSelected = ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN;
+        getSessionBean().setSessHumanListRefreshedList(null);
         
     }
     
@@ -159,10 +160,12 @@ public class PropertyProfileBB
             int newID = oc.insertOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
             getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessUser()));
         } catch (IntegrationException | BObStatusException | EventException | SearchException ex) {
+            System.out.println("PropertyProfileBB.onAddOccperiodCommitButtonChange | " + ex.getClass().getCanonicalName());
+            System.out.println(ex.getMessage());
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                        "Could not commit new occ period: " , ""));
+                                        "Could not commit new permit file: " , ""));
             return "";
         }
         return "occPeriodWorkflow";

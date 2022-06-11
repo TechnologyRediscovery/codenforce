@@ -19,6 +19,7 @@
                         <!-- Title -->
                         <h:form id="occperiod-launcher">
                             <h1>
+                                <h:outputText value="Permit File: " />
                                 <h:outputText id="header-addr-ot" value="#{occPeriodBB.currentPropertyUnit.parcelMailing.addressPretty1Line} "/>
                                 <h:outputText id="header-unit-ot" value="Unit #{occPeriodBB.currentPropertyUnit.unitNumberCleaned} "/>
                                 
@@ -28,7 +29,7 @@
                         <div class="mainContainer">
                             <!-- Navbar -->
                             <div class="page-links">
-                                <a href="#occperiod-status-panel">occupancy period status</a>
+                                <a href="#occperiod-status-panel">permit file status</a>
                                 <h:outputText value=" | "/>
                                 <a href="#occperiod-permits-panel">
                                     <h:outputText value="permits"/>
@@ -133,8 +134,10 @@
                                 <!-- Second column -->
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                                     <ui:include src="../compositions/eventsPanel.xhtml"/>
-                                    <ui:include src="../compositions/feesPanel.xhtml"/>
-                                    <ui:include src="../compositions/paymentsPanel.xhtml"/>
+                                    <ui:remove>
+                                        
+                                        <ui:include src="../compositions/chargesPaymentsTools.xhtml"/>
+                                    </ui:remove>
                                     <ui:include src="../compositions/notesPanel.xhtml"/>
                                 </div>
                             </div>

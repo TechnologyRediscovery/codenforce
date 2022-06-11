@@ -244,7 +244,10 @@ public class    SessionBean
     private IFace_inspectable sessInspectable;
     
     private List<FieldInspection> sessFieldInspectionListForRefresh;
+    private List<QueryOccPermit> queryOccPermitList;
     
+    private List<OccPermitPropUnitHeavy> sessOccPermitList;
+    private QueryOccPermit queryOccPermit;
     
     
     
@@ -445,6 +448,7 @@ public class    SessionBean
         PersonCoordinator perc = getPersonCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
         EventCoordinator ec = getEventCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
         
         UserAuthorized ua = sessUser;
         Credential cred = sessUser.getKeyCard();
@@ -613,6 +617,19 @@ public class    SessionBean
                 
             } else if (bob instanceof CEActionRequest) {
                 CEActionRequest cear = (CEActionRequest) bob;
+            } else if (bob instanceof OccPermit){
+                OccPermit permit = (OccPermit) bob;
+                OccPeriod period = oc.getOccPeriod(permit.getPeriodID());
+                setSessOccPeriodFromPeriodBase(period);
+                setSessProperty(sessOccPeriod.getPropUnitProp().getProperty());
+                sessCECaseList = sessProperty.getCeCaseList();
+                if (sessCECaseList != null && !sessCECaseList.isEmpty()) {
+                    setSessCECase(sessCECaseList.get(0));
+                }
+
+                setSessEventsPageEventDomainRequest(DomainEnum.OCCUPANCY);
+                
+                return "occPeriodWorkflow";
             }
             
             else {
@@ -2203,6 +2220,48 @@ public class    SessionBean
      */
     public void setNoteholderRefreshTimestampTrigger(LocalDateTime noteholderRefreshTimestampTrigger) {
         this.noteholderRefreshTimestampTrigger = noteholderRefreshTimestampTrigger;
+    }
+
+    /**
+     * @return the queryOccPermitList
+     */
+    public List<QueryOccPermit> getQueryOccPermitList() {
+        return queryOccPermitList;
+    }
+
+    /**
+     * @return the sessOccPermitList
+     */
+    public List<OccPermitPropUnitHeavy> getSessOccPermitList() {
+        return sessOccPermitList;
+    }
+
+    /**
+     * @param queryOccPermitList the queryOccPermitList to set
+     */
+    public void setQueryOccPermitList(List<QueryOccPermit> queryOccPermitList) {
+        this.queryOccPermitList = queryOccPermitList;
+    }
+
+    /**
+     * @param sessOccPermitList the sessOccPermitList to set
+     */
+    public void setSessOccPermitList(List<OccPermitPropUnitHeavy> sessOccPermitList) {
+        this.sessOccPermitList = sessOccPermitList;
+    }
+
+    /**
+     * @return the queryOccPermit
+     */
+    public QueryOccPermit getQueryOccPermit() {
+        return queryOccPermit;
+    }
+
+    /**
+     * @param queryOccPermit the queryOccPermit to set
+     */
+    public void setQueryOccPermit(QueryOccPermit queryOccPermit) {
+        this.queryOccPermit = queryOccPermit;
     }
 
     

@@ -149,7 +149,7 @@ public class CECaseBB
                 currentViolation = currentCase.getViolationList().get(0);
             }
         }
-        
+        getSessionBean().setSessHumanListRefreshedList(null);
         
         filteredElementList = null;
         formExtendStipCompUsingDate = true;

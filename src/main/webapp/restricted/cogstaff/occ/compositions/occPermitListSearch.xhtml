@@ -1,0 +1,208 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="occpermit-messages-form">
+        <p:growl id="occpermit-growl" />
+    </h:form>
+
+
+    <p:panel  id="occpermit-list-panel"
+              toggleable="true"
+              widgetVar="occpermit-list-panel-var"
+              collapsed="false"
+              style="width:100%;"
+              header="Permit Search">
+        
+        <h:form id="occpermit-query-form">
+            
+
+
+        <h:outputLabel styleClass="bold" 
+                       value="Select a Permit query:" 
+                       for="occpermit-query-desc-ot" />
+
+        <p:selectOneMenu id="occpermit-query-som" 
+                         tabindex="1" 
+                         value="#{occPermitSearchBB.occPermitQuerySelected}"
+                         disabled="#{occPermitSearchBB.occPermitQuerySelected.queryExecuted}">
+            <f:converter converterId="bOBQueryConverter"/>
+            <f:selectItem itemLabel="select one..." noSelectionOption="true" itemDisabled="true"/>
+            <f:selectItems id="querylist-si" 
+                           value="#{occPermitSearchBB.occPermitQueryList}" 
+                           var="ql" 
+                           itemValue="#{ql}" 
+                           itemLabel="#{ql.queryTitle}" />
+            <p:ajax listener="#{occPermitSearchBB.changeQuerySelected}"
+                    update="@form
+                    occpermit-messages-form" />
+        </p:selectOneMenu>
+
+        <p:spacer height="5px" />
+
+        <h:outputLabel styleClass="bold" 
+                       value="Description: " 
+                       for="occpermit-query-desc-ot" />
+        <h:outputText id="occpermit-query-desc-ot" 
+                      value="#{occPermitSearchBB.occPermitQuerySelected.queryName.desc}" />
+
+        <p:spacer height="5px" />
+
+        <p:commandButton   id="occpermit-executequery-cb" 
+                           ajax="true" 
+                           actionListener="#{occPermitSearchBB.executeQuery}"
+                           disabled="#{occPermitSearchBB.occPermitQuerySelected.queryExecuted}"
+                           icon="fa fa-flash" 
+                           styleClass="button"
+                           value="run query" 
+                           update="@form
+                           occpermit-messages-form
+                           occpermit-search-results-form
+                           occpermit-search-log-form"/>
+
+        <p:commandButton   id="occpermit-search-clear-cb" 
+                           ajax="true" 
+                           actionListener="#{occPermitSearchBB.resetQuery}"
+                           icon="fa fa-eraser" 
+                           styleClass="button inline-button"
+                           value="clear query" 
+                           disabled="#{!occPermitSearchBB.occPermitQuerySelected.queryExecuted}"
+                           update=" occpermit-search-log-form
+                           occpermit-messages-form
+                           @form"/>
+
+
+        <p:selectBooleanButton  id="occpermit-search-appendresults-chkbox" 
+                                onLabel="Add results to existing permit List"
+                                onIcon="fa fa-indent"
+                                offLabel="Build fresh permit list on search"
+                                offIcon="fa fa-eraser"
+                                value="#{occPermitSearchBB.appendResultsToList}" 
+                                disabled="false" />
+
+        </h:form>
+
+        <h:form id="occpermit-search-results-form" >
+
+            <p:commandButton   id="occpermit-search-results-clear-button" 
+                               ajax="true" 
+                               actionListener="#{occPermitSearchBB.clearOccPermitList()}"
+                               icon="fa fa-eraser" 
+                               styleClass="button"
+                               value="clear results list" 
+                               update=" occpermit-messages-form
+                                        occpermit-search-results-form"/>
+
+       
+
+            <p:spacer height="5px" />
+            <h:outputText value="listing #{occPermitSearchBB.occPermitList.size()} permits" 
+                          styleClass="italic"/>
+            <p:spacer height="5px" />
+
+            <p:dataTable
+                id="occpermits-table"
+                var="permit"
+                rowKey="#{permit.permitID}"
+                value="#{occPermitSearchBB.occPermitList}"
+                tableStyleClass="primeDataTable"
+                resizableColumns="true"
+                widgetVar="occpermits-table-var"
+                rowExpandMode="multiple"
+                expandedRow="false"
+                >
+                <p:column width="10%"
+                          sortable="true"
+                          sortBy="#{permit.permitType}">
+                    <f:facet name="header">
+                        <h:outputText value="Type" />
+                    </f:facet>
+                    <h:outputText value="#{permit.permitType.title}" />
+                </p:column>
+
+                <p:column width="20%"
+                          sortable="true"
+                          sortBy="#{permit.propUnitWithProp.property.primaryAddressLink.street.name}">
+                    <f:facet name="header">
+                        <h:outputText value="Unit and Property" />
+                    </f:facet>
+                    <h:outputText value="#{permit.propUnitWithProp.unitNumber}" />
+                    
+                    <p:spacer height="3px" />
+                    
+                    <p:commandLink id="permittable-viewproperty-cl"
+                                   value="#{permit.propUnitWithProp.property.primaryAddressLink.buildingNo} #{permit.propUnitWithProp.property.primaryAddressLink.street.name}" 
+                                   action="#{occPermitSearchBB.onViewPropertyLinkClick(permit)}"
+                                   ajax="false"
+                                   style="color:blue; font-weight: bold;"/>
+                </p:column>
+                
+                <p:column width="20%" 
+                          sortable="true"
+                          sortBy="#{permit.referenceNo}">
+                          
+                    <f:facet name="header">
+                        <h:outputText value="Reference no." />
+                    </f:facet>
+                    
+                    <h:outputText value="#{permit.referenceNo}" />
+                </p:column>
+
+                <p:column width="20%"
+                          sortable="true"
+                          sortBy="#{permit.finalizedts}">
+                    <f:facet name="header">
+                        <h:outputText value="Issuance date" />
+                    </f:facet>
+                    <h:outputText value="#{occPermitSearchBB.getPrettyDateNoTime(permit.finalizedts)}" />
+                    <p:spacer height="3px" />
+                    <h:outputText value="By #{permit.finalizedBy.human.name}"
+                                  rendered="#{!empty permit.finalizedBy}" />
+                </p:column>
+
+                <p:column width="10%">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <div class="restrict-main-contents-io-link">
+                        <p:commandLink id="permit-view-cl" 
+                                       ajax="false"
+                                       action="#{occPermitSearchBB.onViewPermitLinkClick(permit)}"
+                                       value="printable permit" 
+                                       style="color:blue;"
+                                       target="_blank"
+                                       type="button" />
+                        
+                        <p:spacer height="3px" />
+                        
+                        <p:commandLink id="file-view-cl" 
+                                       ajax="false"
+                                       action="#{occPermitSearchBB.onViewFileLinkClick(permit)}"
+                                       value="view permit file" 
+                                       style="color:blue;"
+                                       type="button" />
+                    </div>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:panel>
+
+    <p:panel  id="occpermit-search-log-panel"
+              toggleable="true"
+              widgetVar="occpermit-search-log-panel-var"
+              collapsed="true"
+              style="width:100%;"
+              header="CECase Query log">
+
+        <h:form id="occpermit-search-log-form">
+            <div class="search-query-desc">
+                <h:outputText id="occpermit-search-log-ot" 
+                              value="#{occPermitSearchBB.occPermitQuerySelected.queryLog}"
+                              escape="false"/>
+            </div>
+        </h:form>
+    </p:panel>
+
+</ui:composition>

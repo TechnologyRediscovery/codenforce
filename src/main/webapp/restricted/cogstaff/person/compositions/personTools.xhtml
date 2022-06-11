@@ -1552,7 +1552,7 @@
                 </div>
 
                 <div class="p-col-6">
-                    <h:outputText value="Occupancy Period" />
+                    <h:outputText value="Permit File" />
                 </div>
                 <div class="p-col-6">
                     <p:commandLink        id="activatehlh-period-cl"
@@ -1568,10 +1568,8 @@
                                           hlh-humlist-panel"
                                           >
                         
-                        <h:outputText value="#{!empty sessionBean.sessOccPeriod ? 'Occupancy Period (ID:': '[No session occ period]'}" />
+                        <h:outputText value="#{!empty sessionBean.sessOccPeriod ? 'Permit file (ID:': '[No session permit file]'}" />
                         <h:outputText value="#{!empty sessionBean.sessOccPeriod ? sessionBean.sessOccPeriod.periodID : ''}" />
-                        <h:outputText value="#{!empty sessionBean.sessOccPeriod ? ') Type: ' : ''}" />
-                        <h:outputText value="#{!empty sessionBean.sessOccPeriod ? sessionBean.sessOccPeriod.type.title : ''}" />
                     </p:commandLink>
                 </div>
             </div>

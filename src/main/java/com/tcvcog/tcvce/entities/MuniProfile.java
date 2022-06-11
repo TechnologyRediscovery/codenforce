@@ -39,7 +39,7 @@ public class MuniProfile {
     private int novDefaultDaysForFollowup;
     
     private EventRuleSet eventRuleSetCE;
-    private List<OccPermitType> occPeriodTypeList;
+    private List<OccPermitType> occPermitTypeList;
     private List<Fee> feeList;
 
     /**
@@ -169,17 +169,17 @@ public class MuniProfile {
     }
 
     /**
-     * @return the occPeriodTypeList
+     * @return the occPermitTypeList
      */
-    public List<OccPermitType> getOccPeriodTypeList() {
-        return occPeriodTypeList;
+    public List<OccPermitType> getOccPermitTypeList() {
+        return occPermitTypeList;
     }
 
     /**
-     * @param occPeriodTypeList the occPeriodTypeList to set
+     * @param occPermitTypeList the occPermitTypeList to set
      */
-    public void setOccPeriodTypeList(List<OccPermitType> occPeriodTypeList) {
-        this.occPeriodTypeList = occPeriodTypeList;
+    public void setOccPermitTypeList(List<OccPermitType> occPermitTypeList) {
+        this.occPermitTypeList = occPermitTypeList;
     }
     
      @Override

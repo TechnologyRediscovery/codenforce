@@ -50,6 +50,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodStatusEnum;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitPropUnitHeavy;
 import com.tcvcog.tcvce.entities.search.QueryEvent;
 import com.tcvcog.tcvce.entities.search.QueryEventEnum;
 import com.tcvcog.tcvce.entities.search.QueryPerson;
@@ -589,6 +590,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             pass = false;
         // okay, we've got at least one field inspection , so check if it's finalized
         } else {
+            permit.appendToDynamicPopulationLog("Inspections: [Info] Occ Period contains at least 1 field inspection");
+            permit.appendToDynamicPopulationLog(Constants.FMT_HTML_BREAK);
+            // get finalized inspections
             List<FieldInspection> finalizedFINs = new ArrayList<>();
             for(FieldInspection fin: finList){
                 if(fin.getDetermination() != null){
@@ -600,13 +604,15 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 permit.appendToDynamicPopulationLog("Inspections: [FATAL] Occ period contains zero finalized inspections. Review your inspections and finalize them and try again");
                 pass = false;
             } else {
+                permit.appendToDynamicPopulationLog("Inspections: [Info] Occ Period contains at least 1 finalized field inspection");
+                permit.appendToDynamicPopulationLog(Constants.FMT_HTML_BREAK);
                 // get newest to oldest.
                 // we still need 
                 Collections.sort(finalizedFINs);
                 Collections.reverse(finalizedFINs);
                 // get our Final inspection
                 FieldInspection inspectionFinal = finalizedFINs.get(0);
-                // The only of the three inspection dates needs to come from
+                // The only one of the three inspection dates needs to come from
                 // an inspection whose finalization determination qualifies as passing
                 
                 if(inspectionFinal.getDetermination().isQualifiesAsPassed()){
@@ -621,6 +627,8 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 }
                 // Get the initial inspection
                 FieldInspection inspectionInitial = finList.get(finalizedFINs.size()-1);
+                permit.appendToDynamicPopulationLog("Inspections: [Info] Initial inspection assigned with ID " + inspectionInitial.getInspectionID());
+                permit.appendToDynamicPopulationLog(Constants.FMT_HTML_BREAK);
                 permit.setDynamicInitialInspectionFINRef(inspectionInitial);
                 permit.setDynamicInitialInspection(inspectionInitial.getEffectiveDateOfRecord());
                 
@@ -641,7 +649,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                         permit.appendToDynamicPopulationLog("Inspections: [INFO] Reinspection assigned same inspection as Initial Inspection (ID:"+inspectionInitial.getInspectionID()+")");
                         break;
                     case 3:
-                        // gt>3: no break--fall through to default
+                        // >3: no break--fall through to default
                     default:
                         inspeectionReinspetion = finalizedFINs.get(1); // get second most recent inspection and call it the reinspection
                         permit.appendToDynamicPopulationLog("Inspections: [INFO] Reinspection assigned same inspection as Second most recent Inspection (ID:"+inspectionInitial.getInspectionID()+")");
@@ -659,17 +667,16 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         // configure date of issuance to today
         permit.setDynamicdateofissue(LocalDateTime.now());
-        if(permit.getPermitType().isExpires()){
+        // Configure expiry date on types that expire
+        if(permit.getPermitType() != null && permit.getPermitType().isExpires()){
             if(permit.getPermitType().getDefaultValidityPeriodDays() == 0){
                 permit.setDynamicDateExpiry(LocalDateTime.now().plusDays(DEFAULT_PERMIT_EXPIRY_WINDOW_DAYS));
             } else {
                 permit.setDynamicDateExpiry(LocalDateTime.now().plusDays(permit.getPermitType().getDefaultValidityPeriodDays()));
             }
         }
-        
-        
         // Hold off on persons here;
-        
+        // If nobody nixed our pass, then timestamp the dynamic fields
         if(pass){
             permit.setDynamicPopulationReadyForFinalizationTS(LocalDateTime.now());
         }
@@ -693,6 +700,52 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         return configureOccPermit(oi.getOccPermit(permitID), ua);
     }
 
+    
+    /**
+     * Manufactures an occupancy permit that contains the host propertyunit and all
+     * their inner goodies for display of Permits in a search result that span 
+     * parcels
+     * 
+     * @param permitLight
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public OccPermitPropUnitHeavy getOccPermitPropertyUnitHeavy(OccPermit permitLight) throws IntegrationException, BObStatusException{
+        if(permitLight == null){
+            return null;
+        }
+        
+        PropertyCoordinator pc = getPropertyCoordinator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        
+        OccPermitPropUnitHeavy oppuh = new OccPermitPropUnitHeavy(permitLight);
+        oppuh.setPropUnitWithProp(pc.getPropertyUnitWithProp(oc.getOccPeriod(permitLight.getPeriodID()).getPropertyUnitID()));
+        
+        return oppuh;
+    }
+    
+    
+    
+    /**
+     * The official retrieval point for all permits NOT in draft stage by muni, 
+     * which means issued, nullified, AND--if a logic error occurs--DEACTIVATED 
+     * issued or issued/nullified 
+     * @param muni
+     * @return 
+     */
+    public List<OccPermitPropUnitHeavy> getOccPermitDocket(Municipality muni){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        
+        
+        List<OccPermitPropUnitHeavy> plist = new ArrayList<>();
+         return plist;
+        
+         
+       
+        
+        
+    } 
     
     /**
      * 
@@ -883,6 +936,10 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
        if(permit.getStaticdateofapplication() == null){
            auditPass = false;
            permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD1: missing date of application ");
+       } 
+       if(permit.getStaticdateofissue() == null){
+           auditPass = false;
+           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD5: missing date of issuance");
        }
        if(permit.getStaticinitialinspection() == null){
            auditPass = false;
@@ -893,40 +950,47 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
            auditPass = false;
            permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD4: missing date of final inspection ");
        }
-       if(permit.getStaticdateofissue() == null){
-           auditPass = false;
-           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD5: missing date of issuance");
-       }
        
        // DATE SEQUENCE AUDITS
-       if(permit.getStaticdateofissue().isBefore(permit.getStaticdateofapplication())){
-           auditPass = false;
-           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD6: date of application cannot be BEFORE date of issuance");
+       if(permit.getStaticdateofissue() != null && permit.getStaticdateofapplication() != null){
+            if(permit.getStaticdateofissue().isBefore(permit.getStaticdateofapplication())){
+                auditPass = false;
+                permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD6: date of application cannot be BEFORE date of issuance");
+            }
        }
-       if(permit.getStaticdateofissue().isBefore(permit.getStaticinitialinspection())){
-           auditPass = false;
-           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD7: date of initial inspection cannot be BEFORE date of issuance");
+       if(permit.getStaticdateofissue() != null && permit.getStaticinitialinspection()!= null){
+           
+            if(permit.getStaticdateofissue().isBefore(permit.getStaticinitialinspection())){
+                auditPass = false;
+                permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD7: date of initial inspection cannot be BEFORE date of issuance");
+            }
        }
-       if(permit.getStaticdateofissue().isBefore(permit.getStaticreinspectiondate())){
-           auditPass = false;
-           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD8: date of re-inspection cannot be BEFORE date of issuance");
+       if(permit.getStaticdateofissue() != null && permit.getStaticreinspectiondate()!= null){
+            if(permit.getStaticdateofissue().isBefore(permit.getStaticreinspectiondate())){
+                auditPass = false;
+                permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD8: date of re-inspection cannot be BEFORE date of issuance");
+            }
        }
-       if(permit.getStaticdateofissue().isBefore(permit.getStaticfinalinspection())){
-           auditPass = false;
-           permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD9: date of final inspection cannot be BEFORE date of issuance");
+       if(permit.getStaticdateofissue() != null && permit.getStaticfinalinspection()!= null){
+            if(permit.getStaticdateofissue().isBefore(permit.getStaticfinalinspection())){
+                auditPass = false;
+                permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD9: date of final inspection cannot be BEFORE date of issuance");
+            }
        }
-       if(permit.getStaticreinspectiondate() != null){
+       if(permit.getStaticreinspectiondate() != null && permit.getStaticinitialinspection() != null){
             if(permit.getStaticreinspectiondate().isBefore(permit.getStaticinitialinspection())){
                 auditPass = false;
                 permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD10: date of reinspeection cannot be BEFORE date of initial inspection");
             }
        }
-       if(permit.getStaticfinalinspection().isBefore(permit.getStaticinitialinspection())){
-                auditPass = false;
-                permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD11: date of final inspection cannot be BEFORE date of initial inspection");
+       if(permit.getStaticfinalinspection()!= null && permit.getStaticinitialinspection() != null){
+            if(permit.getStaticfinalinspection().isBefore(permit.getStaticinitialinspection())){
+                     auditPass = false;
+                     permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization error code OPFD11: date of final inspection cannot be BEFORE date of initial inspection");
+            }
        }
        // TCO
-       if(permit.getStaticdateofexpiry() != null){
+       if(permit.getStaticdateofexpiry() != null && permit.getStaticdateofissue() != null){
            if(permit.getStaticdateofexpiry().isBefore(permit.getStaticdateofissue())){
                auditPass = false;
                permit.appendToFinalizationAuditLog("FATAL Occ Permit Finalization erro code OPFD12: date of expiry must come AFTER the date of issuance");
@@ -990,6 +1054,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccupancyIntegrator oi = getOccupancyIntegrator();
         PropertyCoordinator pc = getPropertyCoordinator();     
         
+        occPermitClearStaticFields(permit);
         
         permit.setStatictitle(permit.getPermitType().getPermitTitle());
         permit.setStaticcolumnlink(OCCPERMIT_DEFAULT_COL_SEP);
@@ -1002,6 +1067,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         sb = new StringBuilder();
         if(puwp != null){
             if(!puwp.getUnitNumber().equals(pc.DEFAULTUNITNUMBER)){
+                sb.append("Unit: ");
                 sb.append(puwp.getUnitNumber());
                 sb.append(Constants.FMT_HTML_BREAK);
             }
@@ -1118,6 +1184,41 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         permit.setLastUpdatedBy(ua);
         
         oi.updateOccPermitStaticFields(permit);
+    }
+    
+    /**
+     * Allows for a fresh start writing in static values
+     * 
+     * @param permit 
+     */
+    private void occPermitClearStaticFields(OccPermit permit){
+        permit.setStaticdateofapplication(null);
+        permit.setStaticinitialinspection(null);
+        permit.setStaticreinspectiondate(null);
+        permit.setStaticfinalinspection(null);
+        permit.setStaticdateofissue(null);
+        permit.setStaticdateofexpiry(null);
+        permit.setStatictitle(null);
+        permit.setStaticmuniaddress(null);
+        permit.setStaticpropertyinfo(null);
+        permit.setStaticownerseller(null);
+        permit.setStaticcolumnlink(null);
+        permit.setStaticbuyertenant(null);
+        permit.setStaticproposeduse(null);
+        permit.setStaticusecode(null);
+        permit.setStaticconstructiontype(null);
+        permit.setStaticpropclass(null);
+        permit.setStaticofficername(null);
+        permit.setStaticissuedundercodesourceid(null);
+        permit.setStaticstipulations(null);
+        permit.setStaticcomments(null);
+        permit.setStaticmanager(null);
+        permit.setStatictenants(null);
+        permit.setStaticleaseterm(null);
+        permit.setStaticleasestatus(null);
+        permit.setStaticpaymentstatus(null);
+        permit.setStaticnotice(null);
+        
     }
     
     /**

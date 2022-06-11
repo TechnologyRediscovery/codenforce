@@ -381,11 +381,11 @@
                     <h:form id="inspection-advancedtools-form">
                         <h3>Transfer inspection to new period</h3>
 
-                        <h:outputText     value="Current Occupancy period ID: #{fieldInspectionBB.currentInspection.occPeriodID}"/>
+                        <h:outputText     value="Current permit file ID: #{fieldInspectionBB.currentInspection.occPeriodID}"/>
 
                         <p:spacer height="4px" />
 
-                        <h:outputText  value="Enter the ID of the Occupancy Period to which this inspection should be transferred. On successful transfer, you'll be sent to the dashboard." />
+                        <h:outputText  value="Enter the ID of the permit file to which this inspection should be transferred. On successful transfer, you'll be sent to the dashboard." />
 
                         <p:inputNumber value="#{fieldInspectionBB.occPeriodIDFortransferFormField}"
                                        required="true" />
@@ -1600,7 +1600,7 @@
                     <h2>Inspection details options</h2>
                 </div>
                 <div class="p-col-4">
-                    Include containing Object info <br />(Occ Period or CECase):
+                    Include containing Object info <br />(Permit File or CECase):
                 </div>
                 <div class="p-col-2">
                     <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includeParentObjectInfoHeader}"

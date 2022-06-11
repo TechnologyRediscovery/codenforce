@@ -217,3 +217,8 @@ ALTER TABLE public.noticeofviolation
   ADD CONSTRAINT nov_mailing_fk FOREIGN KEY (recipient_mailing)
       REFERENCES public.mailingaddress (addressid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+-- NOV migration of reccipient
+SELECT cnf_injectstaticnovdata(814);
+SELECT cnf_injectstaticnovdata(821);
+

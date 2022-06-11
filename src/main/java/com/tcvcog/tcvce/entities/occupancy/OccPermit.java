@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.ParcelInfo;
@@ -33,7 +34,8 @@ import java.util.List;
  *
  * @author ellen bascomb of apt 31y
  */
-public class OccPermit extends TrackedEntity {
+public class OccPermit extends TrackedEntity 
+    implements IFace_ActivatableBOB{
     
     final static String TABLE_NAME = "occpermit";
     final static String PERMIT_PK = "permitid";
@@ -42,6 +44,81 @@ public class OccPermit extends TrackedEntity {
     public OccPermit(){
         dynamicPopulationLog = new String();
         finalizationAuditLog = new String();
+    }
+    
+    /**
+     * Constructor of an OccPermit object given an
+     * OccPermit object
+     * @param permit
+     */
+    public OccPermit(OccPermit permit){
+        
+          dynamicPopulationLog = new String();
+        finalizationAuditLog = new String();
+        
+        
+        this.permitID = permit.permitID;
+        this.referenceNo = permit.referenceNo;
+        this.periodID = permit.periodID;
+        this.permitType = permit.permitType;
+        this.permitAdditionalText = permit.permitAdditionalText;
+        this.notes = permit.notes;
+        this.finalizedts = permit.finalizedts;
+        this.finalizedBy = permit.finalizedBy;
+        this.nullifiedTS = permit.nullifiedTS;
+        this.nullifiedBy = permit.nullifiedBy;
+        this.dynamicPopulationLog = permit.dynamicPopulationLog;
+        this.finalizationAuditLog = permit.finalizationAuditLog;
+        this.dynamicPopulationReadyForFinalizationTS = permit.dynamicPopulationReadyForFinalizationTS;
+        this.finalizationAuditPassTS = permit.finalizationAuditPassTS;
+        this.parcelInfo = permit.parcelInfo;
+        this.issuingOfficer = permit.issuingOfficer;
+        this.text_comments = permit.text_comments;
+        this.dynamicDateOfApplication = permit.dynamicDateOfApplication;
+        this.dynamicsDateOfApplicationAppRef = permit.dynamicsDateOfApplicationAppRef;
+        this.dynamicInitialInspection = permit.dynamicInitialInspection;
+        this.dynamicInitialInspectionFINRef = permit.dynamicInitialInspectionFINRef;
+        this.dynamicreinspectiondate = permit.dynamicreinspectiondate;
+        this.dynamicReInspectionFINRef = permit.dynamicReInspectionFINRef;
+        this.dynamicfinalinspection = permit.dynamicfinalinspection;
+        this.dynamicFinalInspectionFINRef = permit.dynamicFinalInspectionFINRef;
+        this.dynamicdateofissue = permit.dynamicdateofissue;
+        this.dynamicDateExpiry = permit.dynamicDateExpiry;
+        this.staticdateofapplication = permit.staticdateofapplication;
+        this.staticinitialinspection = permit.staticinitialinspection;
+        this.staticreinspectiondate = permit.staticreinspectiondate;
+        this.staticfinalinspection = permit.staticfinalinspection;
+        this.staticdateofissue = permit.staticdateofissue;
+        this.staticdateofexpiry = permit.staticdateofexpiry;
+        this.statictitle = permit.statictitle;
+        this.staticmuniaddress = permit.staticmuniaddress;
+        this.staticpropertyinfo = permit.staticpropertyinfo;
+        this.staticownerseller = permit.staticownerseller;
+        this.staticcolumnlink = permit.staticcolumnlink;
+        this.staticbuyertenant = permit.staticbuyertenant;
+        this.staticproposeduse = permit.staticproposeduse;
+        this.staticusecode = permit.staticusecode;
+        this.staticconstructiontype = permit.staticconstructiontype;
+        this.staticpropclass   = permit.staticpropclass;   
+        this.staticofficername = permit.staticofficername; 
+        this.staticissuedundercodesourceid   = permit.staticissuedundercodesourceid;   
+        this.staticstipulations = permit.staticstipulations;
+        this.staticcomments = permit.staticcomments;
+        this.staticmanager = permit.staticmanager;
+        this.statictenants = permit.statictenants;
+        this.staticleaseterm = permit.staticleaseterm;
+        this.staticleasestatus = permit.staticleasestatus;
+        this.staticpaymentstatus = permit.staticpaymentstatus;
+        this.staticnotice = permit.staticnotice;
+        this.ownerSellerLinkList = permit.ownerSellerLinkList;
+        this.buyerTenantLinkList = permit.buyerTenantLinkList;
+        this.managerLinkList = permit.managerLinkList;
+        this.tenantLinkList = permit.tenantLinkList;
+        this.issuingCodeSourceList = permit.issuingCodeSourceList;
+        this.textBlocks_stipulations = permit.textBlocks_stipulations;
+        this.textBlocks_notice = permit.textBlocks_notice;
+        this.textBlocks_comments = permit.textBlocks_comments;
+        
     }
     
     
@@ -59,9 +136,7 @@ public class OccPermit extends TrackedEntity {
     
     private LocalDateTime nullifiedTS;
     private User nullifiedBy;
-    
-    
-    
+       
     
     // ********************************************************************
     // ********************** DYNAMIC FIELDS ******************************
@@ -73,47 +148,7 @@ public class OccPermit extends TrackedEntity {
     private String dynamicPopulationLog;
     private String finalizationAuditLog;
     
-    /**
-     * Tacks whatever String is passed in and appends it to the config log
-     * @param s 
-     */
-    public void appendToDynamicPopulationLog(String s){
-        if(dynamicPopulationLog != null && s != null){
-            StringBuilder sb = new StringBuilder(dynamicPopulationLog);
-            sb.append(s);
-            sb.append(Constants.FMT_HTML_BREAK);
-            dynamicPopulationLog = sb.toString();
-            
-        }
-    }
-
-    /**
-     * Clears the dynamic population log
-     */
-    public void clearDynamicPopulationLog(){
-        dynamicPopulationLog = new String();
-    }
-    
-    /**
-     * Tacks on input to the finalization audit log
-     * @param s 
-     */
-    public void appendToFinalizationAuditLog(String s){
-        if(finalizationAuditLog != null && s != null){
-            StringBuilder sb = new StringBuilder(finalizationAuditLog);
-            sb.append(s);
-            sb.append(Constants.FMT_HTML_BREAK);
-            finalizationAuditLog = sb.toString();
-        }
-        
-    }
-    
-    /**
-     * Clears finalization audit log
-     */
-    public void clearFinalizationAuditLog(){
-        finalizationAuditLog = new String();
-    }
+  
     
     private LocalDateTime dynamicPopulationReadyForFinalizationTS;
     private LocalDateTime finalizationAuditPassTS;
@@ -190,7 +225,47 @@ public class OccPermit extends TrackedEntity {
     private String staticpaymentstatus;
     private String staticnotice;
 
+      /**
+     * Tacks whatever String is passed in and appends it to the config log
+     * @param s 
+     */
+    public void appendToDynamicPopulationLog(String s){
+        if(dynamicPopulationLog != null && s != null){
+            StringBuilder sb = new StringBuilder(dynamicPopulationLog);
+            sb.append(s);
+            sb.append(Constants.FMT_HTML_BREAK);
+            dynamicPopulationLog = sb.toString();
+            
+        }
+    }
+
+    /**
+     * Clears the dynamic population log
+     */
+    public void clearDynamicPopulationLog(){
+        dynamicPopulationLog = new String();
+    }
     
+    /**
+     * Tacks on input to the finalization audit log
+     * @param s 
+     */
+    public void appendToFinalizationAuditLog(String s){
+        if(finalizationAuditLog != null && s != null){
+            StringBuilder sb = new StringBuilder(finalizationAuditLog);
+            sb.append(s);
+            sb.append(Constants.FMT_HTML_BREAK);
+            finalizationAuditLog = sb.toString();
+        }
+        
+    }
+    
+    /**
+     * Clears finalization audit log
+     */
+    public void clearFinalizationAuditLog(){
+        finalizationAuditLog = new String();
+    }
     /**
      * @return the permitID
      */

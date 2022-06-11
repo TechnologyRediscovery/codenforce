@@ -59,7 +59,7 @@ public class    OccPeriodSearchBB
     public void initBean() {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         SessionBean sb = getSessionBean();
-        search_occPeriodTypeList = sb.getSessMuni().getProfile().getOccPeriodTypeList();
+        search_occPeriodTypeList = sb.getSessMuni().getProfile().getOccPermitTypeList();
         occPeriodList = sb.getSessOccPeriodList();
 
             if (occPeriodList != null && occPeriodList.isEmpty()) {
@@ -100,6 +100,7 @@ public class    OccPeriodSearchBB
     public void clearOccPeriodList() {
         if (occPeriodList != null) {
             occPeriodList.clear();
+            getSessionBean().setSessOccPermitList(new ArrayList<>());
         }
     }
 
@@ -126,7 +127,6 @@ public class    OccPeriodSearchBB
     public void executeQuery() {
         System.out.println("occPeriodBB.executeQuery");
         SearchCoordinator sc = getSearchCoordinator();
-        CaseCoordinator cc = getCaseCoordinator();
         int listSize = 0;
 
         if (!appendResultsToList) {
@@ -168,6 +168,7 @@ public class    OccPeriodSearchBB
         if (occPeriodQueryList != null && !occPeriodQueryList.isEmpty()) {
             occPeriodQuerySelected = occPeriodQueryList.get(0);
         }
+        getSessionBean().setSessOccPermitList(new ArrayList<>());
         configureParameters();
 
     }

@@ -216,10 +216,100 @@ ALTER TABLE public.occinspectiondetermination ADD COLUMN qualifiesaspassed boole
 
 ALTER TABLE occperiodtype ADD COLUMN expires BOOLEAN DEFAULT FALSE;
 
+
+
+ALTER TABLE occperiodtype RENAME TO occpermittype;
+ALTER TABLE public.occpermit ADD COLUMN staticdateexpiry timestamp with time zone;
+ALTER TABLE public.occpermit ADD COLUMN permittype_typeid integer;
+ALTER TABLE public.occpermit
+  ADD CONSTRAINT occpermit_typeid_fk FOREIGN KEY (permittype_typeid)
+      REFERENCES public.occpermittype (typeid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+
+
+
+
 -- ******************************* run on LOCAL TEST system up to here *******************************
 -- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
+CREATE TYPE transactiontype AS ENUM ('charge','payment', 'adjustment');
 
+
+CREATE SEQUENCE public.moneyledger_transactionid_seq
+  INCREMENT 1
+  MINVALUE 100
+  MAXVALUE 9223372036854775807
+  START 101
+  CACHE 1;
+ALTER TABLE public.citationfilingtype_typeid_seq
+  OWNER TO sylvia;
+
+
+
+CREATE TABLE public.moneyledger
+(
+	transactionid integer NOT NULL DEFAULT nextval('moneyledger_transactionid_seq'::regclass),
+	cecase_caseid integer CONSTRAINT moneyledger_caseid_fk REFERENCES cecase (caseid),
+	occperiod_periodid integer CONSTRAINT moneyledger_occperiod_fk REFERENCES occperiod (periodid),
+	transtype transactiontype NOT NULL,
+	amount 			money NOT NULL,
+	dateofrecord 			TIMESTAMP WITH TIME ZONE,
+	createdts               TIMESTAMP WITH TIME ZONE,
+	createdby_userid        INTEGER CONSTRAINT moneyledger_createdby_userid_fk REFERENCES login (userid),     
+	lastupdatedts           TIMESTAMP WITH TIME ZONE,
+	lastupdatedby_userid    INTEGER CONSTRAINT moneyledger_lastupdatdby_userid_fk REFERENCES login (userid),
+	deactivatedts           TIMESTAMP WITH TIME ZONE,
+	deactivatedby_userid    INTEGER CONSTRAINT moneyledger_deactivatedby_userid_fk REFERENCES login (userid),    
+    notes text,
+
+
+);
+
+
+CREATE TYPE chargetype AS ENUM ('fee','fine');
+
+CREATE TABLE public.chargeschedule
+(
+	feeid integer NOT NULL DEFAULT nextval('occinspectionfee_feeid_seq'::regclass),
+	ctype chargetype NOT NULL,
+	muni_municode integer NOT NULL,
+	chargename text NOT NULL,
+	chargeamount money NOT NULL,
+	governingordinance_eceid integer NOT NULL CONSTRAINT chargeschedule_ord_fk REFERENCES codesetelement (codesetelementid),
+	effectivedate timestamp with time zone NOT NULL,
+	expirydate timestamp with time zone NOT NULL,
+	createdts               TIMESTAMP WITH TIME ZONE,
+	createdby_userid        INTEGER CONSTRAINT chargeschedule_createdby_userid_fk REFERENCES login (userid),     
+	lastupdatedts           TIMESTAMP WITH TIME ZONE,
+	lastupdatedby_userid    INTEGER CONSTRAINT chargeschedule_lastupdatdby_userid_fk REFERENCES login (userid),
+	deactivatedts           TIMESTAMP WITH TIME ZONE,
+	deactivatedby_userid    INTEGER CONSTRAINT chargeschedule_deactivatedby_userid_fk REFERENCES login (userid),    
+	notes text,
+  
+  CONSTRAINT occinspecfee_feeid_pk PRIMARY KEY (feeid),
+  CONSTRAINT muni_municode_fk FOREIGN KEY (muni_municode)
+      REFERENCES public.municipality (municode) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+
+CREATE TABLE public.moneychargeledger
+(
+
+
+
+);
+
+
+
+
+
+-- WIP fields
+ALTER TABLE public.login DROP CONSTRAINT login_personlink_personid_fk;
+ALTER TABLE public.login
+  ADD CONSTRAINT login_humanlink_humanid_fk FOREIGN KEY (personlink)
+      REFERENCES public.human (humanid) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 
 ALTER TABLE public.cecase RENAME COLUMN login_userid TO manager_userid;

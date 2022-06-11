@@ -52,7 +52,7 @@
 
                 </p:column>
 
-                <p:column headerText="# Occ Periods"
+                <p:column headerText="# Permit Files"
                           styleClass="centeredColumnContent">
 
                     <h:outputText value="#{unit.periodList.size()}"/>
@@ -63,7 +63,7 @@
                                      actionListener="#{propertyProfileBB.onOccperiodCreateInitButtonChange(unit)}"
                                      oncomplete="PF('occperiod-add-dialog-var').show()"
                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                     value="New Occ Period"
+                                     value="New Permit File"
                                      style="color:blue; font-weight: bold;"
                                      update="occperiod-add-form"
                                      />
@@ -332,13 +332,7 @@
                             var="period"
                             value="#{propertyProfileBB.currentPropertyUnit.periodList}"
                             >                                         
-                            <div style="datum">
-                                <h:outputText value="Permit File Type: " 
-                                              styleClass="ui-label-inline" />
-                                <h:outputText value="#{period.type.title}" 
-                                              styleClass="data-text"/>
-                            </div>
-
+                           
                             <div style="datum">
 
                                 <h:outputText value="Start Date: " 
@@ -501,7 +495,7 @@
                     <p:selectOneMenu rendered="true"
                                      value="#{propertyProfileBB.currentOccPeriod.manager}"
                                      converter="userConverter">
-                        <f:selectItem itemLabel="select a case manager"
+                        <f:selectItem itemLabel="select a permit file manager"
                                       noSelectionOption="true" 
                                       itemDisabled="true"/>
                         <f:selectItems value="#{systemServicesBB.bbSessionMuni.swornOfficerList}" 

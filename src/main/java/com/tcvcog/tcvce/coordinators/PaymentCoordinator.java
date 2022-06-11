@@ -92,11 +92,8 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
                 skeleton.setNotes("Automatically assigned");
 
                 pi.insertOccPeriodFee(skeleton);
-
             }
-
         }
-
     }
 
     /**
@@ -134,9 +131,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
                 pi.insertCECaseFee(skeleton);
 
             }
-
         }
-
     }
 
     /**
@@ -167,9 +162,7 @@ public class PaymentCoordinator extends BackingBeanUtils implements Serializable
         } else {
             input.setReducedByUser(new User());
         }
-
         return input;
-
     }
 
     public void insertAssignedFee(FeeAssigned input, OccPeriod currentOccPeriod, boolean waived) throws IntegrationException, BObStatusException {

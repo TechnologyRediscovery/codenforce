@@ -540,12 +540,15 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
      * event presence
      * @return the eventHumanLinkList
      */
-    public List<HumanLink> getEventHumanLinkList() {
-        checkForPersonListReloadTrigger();
-        if(currentEvent != null && currentEvent.getHumanLinkList() != null){
-            eventHumanLinkList = currentEvent.getHumanLinkList();
+    public List<HumanLink> getManagedEventHumanLinkList() {
+        List<HumanLink> hll = getSessionBean().getSessHumanListRefreshedList();
+        if(hll != null){
+            currentEvent.setHumanLinkList(hll);
+            // clear our refreshed list
+            getSessionBean().setSessHumanListRefreshedList(null);
         }
-        return eventHumanLinkList;
+        return currentEvent.getHumanLinkList();
+       
     }
    
     /**

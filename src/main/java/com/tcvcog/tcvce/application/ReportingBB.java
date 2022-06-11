@@ -96,6 +96,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         }
         System.out.println("ReportingBB.intiBean");
         
+        
     }
     
     /**

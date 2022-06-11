@@ -865,7 +865,7 @@
                                             toggleable="true"
                                             widgetVar="prop-periods-list-panel-var"
                                             collapsed="false"
-                                            header="Occupancy periods">
+                                            header="Permit File">
 
                                     <h:form id="prop-periods-form">
 
@@ -875,14 +875,9 @@
                                                      tableStyleClass="primeDataTable"
                                                      rowKey="#{period.periodID}"
                                                      >
-                                            <p:column width="10%" 
-                                                      headerText="Exp.">
-                                                <p:rowToggler/>
-                                            </p:column>
-
                                             <p:column width="8%">
                                                 <f:facet name="header">
-                                                    <h:outputText value="Period ID"/>
+                                                    <h:outputText value="File ID"/>
                                                 </f:facet>
                                                 <h:outputText value="#{period.periodID}" />
                                             </p:column>
@@ -892,13 +887,7 @@
                                                 </f:facet>
                                                 <h:outputText value="#{period.propertyUnitID}" />
                                             </p:column>
-                                            <p:column width="15%">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Type"/>
-                                                </f:facet>
-                                                <h:outputText value="#{period.type.title}" />
-                                            </p:column>
-
+                                            
 
                                             <p:column width="15%">
                                                 <f:facet name="header">
@@ -924,7 +913,7 @@
                                                     <h:outputText value="Actions"/>
                                                 </f:facet>
                                                 <p:commandLink          id="occperiodtable-exploreperiod-cl"
-                                                                        value="view period"  
+                                                                        value="view permit file"  
                                                                         style="color:blue; font-weight: bold;"
                                                                         ajax="false" 
                                                                         action="#{propertyProfileBB.onViewOccPeriodButtonChange(period)}"

@@ -355,7 +355,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
             try {
                 return getSessionBean().navigateToPageCorrespondingToObject(per);
             } catch (BObStatusException ex) {
-                System.out.println();
+                System.out.println(ex);
             }
         }
         return "";

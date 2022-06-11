@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.entities.MailingCityStateZipRecordTypeEnum;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
+import com.tcvcog.tcvce.entities.occupancy.OccPermitPropUnitHeavy;
 import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -273,6 +274,42 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     
    
     
+    /**
+     * Primary entry point for queries against the occpermit table
+     * @param q
+     * @return
+     * @throws SearchException 
+     */
+      public QueryOccPermit runQuery(QueryOccPermit q) throws SearchException{
+        OccupancyIntegrator oi = getOccupancyIntegrator();
+        OccupancyCoordinator oc = getOccupancyCoordinator();
+        
+        if(q == null){ return null; }
+        
+        prepareQueryForRun(q);
+
+        List<SearchParamsOccPermit> paramsList = q.getParamsList();
+        List<OccPermitPropUnitHeavy> permitListTemp = new ArrayList<>();
+        
+        for(SearchParamsOccPermit sp: paramsList){
+            permitListTemp.clear();
+            
+            try {
+                for(Integer i: oi.searchForOccPermits(sp)){
+                    permitListTemp.add(oc.getOccPermitPropertyUnitHeavy(oc.getOccPermit(i, q.getRequestingUser())));
+                }
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+                throw new SearchException("Integration exception when querying OccPeriods");
+            }
+            q.addToResults(permitListTemp);
+            q.appendToQueryLog(sp);
+        }
+        
+        postRunConfigureQuery(q);
+        
+        return q;
+    }
     
      /**
       * Single point of entry for queries against the CECase table
@@ -961,6 +998,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          query = new QueryOccPeriod(qName, paramsList, cred);
          return (QueryOccPeriod) initQueryFinalizeInit(query);
      }
+    
+    
  
     
     /**
@@ -1183,6 +1222,36 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * Container for query initialization logic based on the given Enum val
+     * for this method's associated Query subclass. Delegates configuration of
+     * filter-level settings on parameter objects to methods grouped later in this
+     * class prefixed by genParams_XXXX
+     * 
+     * @param qName
+     * @param cred
+     * @return the initialized query
+     */
+    public QueryOccPermit initQuery(QueryOccPermitEnum qName, Credential cred) {
+        QueryOccPermit query = null;
+        List<SearchParamsOccPermit> paramList = new ArrayList<>();
+        SearchParamsOccPermit params = generateParams_occPermit_init();
+              
+        switch(qName){
+            case ALL_FINALIZED:
+                paramList.add(generateParams_occPermit_muniAllFinalized(params));
+                break;
+            
+            default:
+                break;
+        }
+        
+        query = new QueryOccPermit(qName, paramList, cred);
+        return (QueryOccPermit) initQueryFinalizeInit(query);
+        
+        
+    }
+    
     
     
 //    --------------------------------------------------------------------------
@@ -1280,6 +1349,23 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         QueryOccPeriodEnum[] nameArray = QueryOccPeriodEnum.values();
         List<QueryOccPeriod> queryList = new ArrayList<>();
         for(QueryOccPeriodEnum queryTitle: nameArray){
+            if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
+               queryList.add(initQuery(queryTitle, cred));
+            }
+        }
+        return queryList;
+    }
+    
+    /**
+     * Assembles a list of Query objects available to each user given their 
+     * Credential object. Calls internal method for verifying rank minimums
+     * @param cred
+     * @return 
+     */
+    public List<QueryOccPermit> buildQueryOccPermitList(Credential cred){
+        QueryOccPermitEnum[] nameArray = QueryOccPermitEnum.values();
+        List<QueryOccPermit> queryList = new ArrayList<>();
+        for(QueryOccPermitEnum queryTitle: nameArray){
             if(checkAuthorizationToAddQueryToList(queryTitle, cred)){
                queryList.add(initQuery(queryTitle, cred));
             }
@@ -2827,6 +2913,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      }
      
      
+  
+     
      public SearchParamsMailingCityStateZip generateParams_MCSZ_zipByCityState(SearchParamsMailingCityStateZip params){
           params.setFilterName("Search for ZIP codes by city and state");
           
@@ -2912,6 +3000,36 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
          
          return params;
      }
+     
+     
+     // ***********************************************************************
+     // ************************ OCC PERMITS **********************************
+     // ***********************************************************************
+     
+    /**
+      * Initializes a search against occ permit
+      * @return 
+      */
+     public SearchParamsOccPermit generateParams_occPermit_init(){
+         SearchParamsOccPermit spop = new SearchParamsOccPermit();
+         spop.setMuni_ctl(true);
+         
+         return spop;
+     }
+     
+     
+    /**
+     * Configure params for searching for all permits in a given municipality
+     * @param spop
+     * @return 
+     */
+    public SearchParamsOccPermit generateParams_occPermit_muniAllFinalized(SearchParamsOccPermit spop){
+        
+        spop.setDraft_ctl(true);
+        spop.setDraft_val(false);
+        return spop;
+         
+    }
      
     
     

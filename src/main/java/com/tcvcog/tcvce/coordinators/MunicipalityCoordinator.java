@@ -71,7 +71,8 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
      * @throws AuthorizationException
      * @throws EventException 
      */
-    private MunicipalityDataHeavy configureMuniDataHeavy(MunicipalityDataHeavy mdh, UserAuthorized ua) throws IntegrationException, BObStatusException, AuthorizationException, EventException, BlobException {
+    private MunicipalityDataHeavy configureMuniDataHeavy(MunicipalityDataHeavy mdh, UserAuthorized ua) 
+            throws IntegrationException, BObStatusException, AuthorizationException, EventException, BlobException {
         if(mdh != null && ua != null){
             PropertyCoordinator pc = getPropertyCoordinator();
             CourtEntityIntegrator cei = getCourtEntityIntegrator();

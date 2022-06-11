@@ -26,23 +26,28 @@ public enum DomainEnum {
     
     CODE_ENFORCEMENT        (   "Code enforcement cases", 
                                 "cecase_caseid",
-                                "CE"),
+                                "CE",
+                                "fee"),
     OCCUPANCY               (   "Occupancy Periods", 
                                 "occperiod_periodid",
-                                "OCC"),
+                                "OCC",
+                                "fine"),
     UNIVERSAL               (   "All event subdomains", 
                                 "cecase_caseid",
-                                "UNI");                         // this field should never
+                                "UNI",
+                                "charge");                         // this field should never
                                                                 // be used since the Search Coor
     private final String title;                                 // is interpreting UNIVERSAL to run
     private final String dbField;                               // the other two independently
                                                                 // and combine the results\
     private final String abbrev;
+    private final String chargeTypeName;
     
-    private DomainEnum(String t, String db, String ab){
+    private DomainEnum(String t, String db, String ab, String ctn){
         title = t;
         dbField = db;
         abbrev = ab;
+        chargeTypeName = ctn;
     }
 
     /**
@@ -64,6 +69,13 @@ public enum DomainEnum {
      */
     public String getAbbrev() {
         return abbrev;
+    }
+
+    /**
+     * @return the chargeTypeName
+     */
+    public String getChargeTypeName() {
+        return chargeTypeName;
     }
 
 

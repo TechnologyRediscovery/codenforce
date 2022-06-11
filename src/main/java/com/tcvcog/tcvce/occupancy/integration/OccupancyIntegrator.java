@@ -48,6 +48,7 @@ import com.tcvcog.tcvce.entities.occupancy.OccAppPersonRequirement;
 import com.tcvcog.tcvce.entities.occupancy.OccApplicationStatusEnum;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
+import com.tcvcog.tcvce.entities.search.SearchParamsOccPermit;
 import java.io.Serializable;
 import java.sql.Array;
 import java.sql.Connection;
@@ -69,7 +70,8 @@ import java.util.List;
 public class OccupancyIntegrator extends BackingBeanUtils implements Serializable {
 
     
-    final String ACTIVE_FIELD = "occperiod.deactivatedts";
+    final String ACTIVE_FIELD_OCCPERIOD = "occperiod.deactivatedts";
+    final String ACTIVE_FIELD_OCCPERMIT = "occpermit.deactivatedts";
     
     /**
      * Creates a new instance of OccupancyIntegrator
@@ -116,7 +118,104 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         return opIDList;
     }
 
-  
+    /**
+     * Primary entry point for searches against the occ permit table
+     * @param spop
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+  public List<Integer> searchForOccPermits(SearchParamsOccPermit spop) throws IntegrationException{
+        
+        
+        if(spop == null){
+            throw new IntegrationException("cannot search with null params");
+            
+        }
+        List<Integer> permitIDList = new ArrayList<>();
+        
+        SearchCoordinator sc = getSearchCoordinator();
+        
+        spop.appendSQL("SELECT permitid FROM occpermit\n");
+        spop.appendSQL("INNER JOIN occperiod ON (occperiod.periodid = occpermit.occperiod_periodid)\n");
+        spop.appendSQL("INNER JOIN parcelunit ON (occperiod.parcelunit_unitid = parcelunit.unitid)\n");
+        spop.appendSQL("INNER JOIN parcel ON (parcelunit.parcel_parcelkey = parcel.parcelkey)\n" );
+        spop.appendSQL("INNER JOIN municipality ON (parcel.muni_municode = municipality.municode)\n" );
+        spop.appendSQL("WHERE permitid IS NOT NULL ");                        
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            if (!spop.isBobID_ctl()) {
+           
+                spop = (SearchParamsOccPermit) sc.assembleBObSearchSQL_muniDatesUserActive(spop, 
+                                                            SearchParamsOccPermit.MUNI_DBFIELD,
+                                                            ACTIVE_FIELD_OCCPERMIT);
+                if(spop.isDraft_ctl()){
+                    if(spop.isDraft_val()){
+                        spop.appendSQL("AND finalizedts IS NULL ");
+                    } else {
+                        spop.appendSQL("AND finalizedts IS NOT NULL ");
+                    }
+                }
+            } else {
+                spop.appendSQL("AND permitid=?");
+            }
+            
+            
+            spop.appendSQL(";");
+            
+            
+            
+            stmt = con.prepareStatement(spop.extractRawSQL());
+            
+            int paramCounter = 0;
+
+            if (!spop.isBobID_ctl()) {
+                if (spop.isMuni_ctl()) {
+                     stmt.setInt(++paramCounter, spop.getMuni_val().getMuniCode());
+                }
+                
+                if(spop.isDate_startEnd_ctl()){
+                    stmt.setTimestamp(++paramCounter, spop.getDateStart_val_sql());
+                    stmt.setTimestamp(++paramCounter, spop.getDateEnd_val_sql());
+                 }
+                
+                if (spop.isUser_ctl()) {
+                   stmt.setInt(++paramCounter, spop.getUser_val().getUserID());
+                }
+                
+            } else {
+                stmt.setInt(++paramCounter, spop.getBobID_val());
+            }
+
+            rs = stmt.executeQuery();
+
+            int counter = 0;
+            int maxResults;
+            if (spop.isLimitResultCount_ctl()) {
+                maxResults = spop.getLimitResultCount_val();
+            } else {
+                maxResults = Integer.MAX_VALUE;
+            }
+            while (rs.next() && counter < maxResults) {
+                permitIDList.add(rs.getInt("permitid"));
+                counter++;
+            }
+            
+           
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to search for occ permits", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return permitIDList;
+      
+  }
 
     /**
      * Single point of entry for queries against the OccPeriod table
@@ -145,10 +244,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
            // *******************************
            // **   MUNI,DATES,USER,ACTIVE  **
            // *******************************
-            params = (SearchParamsOccPeriod) sc.assembleBObSearchSQL_muniDatesUserActive(
-                                                            params, 
+            params = (SearchParamsOccPeriod) sc.assembleBObSearchSQL_muniDatesUserActive(params, 
                                                             SearchParamsOccPeriod.MUNI_DBFIELD,
-                                                            ACTIVE_FIELD);
+                                                            ACTIVE_FIELD_OCCPERIOD);
             
            // *******************************
             // **        PROPERTY           **
@@ -611,8 +709,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     /**
      * Entry point for OccPermit objects into the database. 
      * Only called by coordinator. BUT remember, 
- you can only write to the metadata fields here. Actual permit static fields
- are written specially through the occPermitPopulateStaticFieldsFromDynamicFields
+     *  you can only write to the metadata fields here. Actual permit static fields
+     *  are written specially through the occPermitPopulateStaticFieldsFromDynamicFields
      * @param permit
      * @return ID of the skeleton. 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
@@ -738,7 +836,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         String query = "UPDATE public.occpermit\n" +
                         "   SET referenceno=?,  \n" +
                         "       notes=?, finalizedts=?, finalizedby_userid=?, lastupdatedts=now(), \n" +
-                        "       lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?, occperiod_periodid=?, permittype_typeid\n" +
+                        "       lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?, occperiod_periodid=?, permittype_typeid=?\n" +
                         " WHERE permitid=?;";
 
         Connection con = getPostgresCon();
@@ -752,6 +850,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 stmt.setNull(1, java.sql.Types.NULL);
             }
             stmt.setString(2, permit.getNotes());
+            
             if(permit.getFinalizedts() != null){
                 stmt.setTimestamp(3, java.sql.Timestamp.valueOf(permit.getFinalizedts()));
             } else {
@@ -929,6 +1028,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt.setString(27, permit.getStaticconstructiontype());
             if(permit.getStaticdateofexpiry() != null){
                 stmt.setTimestamp(28, java.sql.Timestamp.valueOf(permit.getStaticdateofexpiry()));
+            } else {
+                stmt.setNull(28, java.sql.Types.NULL);
             }
             stmt.setInt(29, permit.getPermitID());
             
@@ -1184,8 +1285,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public int insertOccPeriod(OccPeriod period) throws IntegrationException, BObStatusException {
-        if(period == null || period.getCreatedBy() == null){
-            throw new BObStatusException("cannot insert occ period with null period, type, or creator");
+        if(period == null || period.getCreatedBy() == null || period.getPropertyUnitID() == 0){
+            throw new BObStatusException("cannot insert occ period with null period, type, or creator, or parcel unit with ID == 0");
         }
         
         String query = " INSERT INTO public.occperiod(\n"
@@ -1249,7 +1350,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
             stmt.execute();
 
-            String lastIDNumSQL = "SELECT currval('occperiodid_seq'::regclass)";
+            String lastIDNumSQL = "SELECT currval('occperiodid_seq'::regclass);";
 
             stmt = con.prepareStatement(lastIDNumSQL);
 
@@ -1259,7 +1360,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 newPeriodId = rs.getInt("currval");
             }
             
-        pc.insertAutoAssignedFees(period);
+            
+        // TODO: fix this with fee/payment update    
+//        pc.insertAutoAssignedFees(period);
 
         } catch (SQLException ex) {
             throw new IntegrationException("OccupancyIntegrator.insertOccPeriod"
@@ -1427,7 +1530,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setPermitTitleSub(rs.getString("permittitlesub"));
             opt.setExpires(rs.getBoolean("expires"));
 
-            opt.setPermittedFees(pi.getFeeList(opt));
+            // ** Deac during CHARGES UPGRADE
+//            opt.setPermittedFees(pi.getFeeList(opt));
         } catch (SQLException ex) {
             System.out.println(ex.toString());
             throw new IntegrationException("Error generating OccPermitType from ResultSet", ex);

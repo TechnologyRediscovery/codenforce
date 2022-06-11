@@ -7,7 +7,7 @@
              toggleable="true"
              widgetVar="occperiod-status-panel-var"
              collapsed="false"
-             header="Occupancy Period Status | ID: #{occPeriodBB.currentOccPeriod.periodID}
+             header="Permit File Status | ID: #{occPeriodBB.currentOccPeriod.periodID}
              | last updated: #{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPeriod.lastUpdatedTS)}">
 
         <h:form id="occperiod-status-form">
@@ -83,8 +83,7 @@
                     <div class="restrict-data-field-value-inline">
 
                         <h:outputText id="occperiod-manager-ot"
-                                      value="#{occPeriodBB.currentOccPeriod.manager.human.name}
-                                      #{occPeriodBB.currentOccPeriod.manager.human.name}"/>
+                                      value="#{occPeriodBB.currentOccPeriod.manager.human.name}"/>
                         <br/>
                         <h:outputText id="occperiod-manager-username"
                                       value="(#{occPeriodBB.currentOccPeriod.manager.username})"/>
@@ -97,15 +96,12 @@
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <div class="restrict-data-field-label-inline">
                         <p:outputLabel>
-                            <h:outputText value="Created by"/>
+                            <h:outputText value="Property"/>
                         </p:outputLabel>
                     </div>
                     <div class="restrict-data-field-value-inline">
-                        <h:outputText value="#{occPeriodBB.currentOccPeriod.createdBy.human.name}
-                                      #{occPeriodBB.currentOccPeriod.createdBy.human.name}
-                                      (#{occPeriodBB.currentOccPeriod.createdBy.username})"/>
-                        <br/>
-                        <h:outputText value="at #{occPeriodBB.getPrettyDate(occPeriodBB.currentOccPeriod.createdTS)}"/>
+                        <h:outputText value="#{occPeriodBB.currentOccPeriod.propUnitProp.property.address.addressPretty2LineEscapeFalse}"
+                                      escape="false"/>
                     </div>
                 </div>
             </div>
@@ -310,7 +306,7 @@
     <!-- Change manager dialog -->
     <p:dialog id="occperiod-changemanager-dialog"
               height="450" width="600"
-              header="Change occupancy period manager"
+              header="Change Permit File Manager"
               widgetVar="occperiod-changemanager-dialog-var"
               closable="true"
               resizable="true"
@@ -347,7 +343,7 @@
                 </div>
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-changemanager-button"
-                                     value="Change manager of period ID #{occPeriodBB.currentOccPeriod.periodID}"
+                                     value="Change manager of permit file ID #{occPeriodBB.currentOccPeriod.periodID}"
                                      icon="fa fa-user"
                                      oncomplete="PF('occperiod-changemanager-dialog-var').hide()"
                                      update="occperiod-status-form"
@@ -367,10 +363,9 @@
         </h:form>
     </p:dialog>
 
-    <!-- Edit occ period start date dialog -->
     <p:dialog id="occperiod-editstart-dialog"
               height="450" width="600"
-              header="Edit occupancy period start date"
+              header="Edit permit file start date"
               widgetVar="occperiod-editstart-dialog-var"
               closable="true"
               responsive="true"
@@ -415,7 +410,7 @@
 
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-editstart-button"
-                                     value="Change start date of occupancy period ID #{occPeriodBB.currentOccPeriod.periodID}"
+                                     value="Change start date of permit file ID #{occPeriodBB.currentOccPeriod.periodID}"
                                      icon="fa fa-user"
                                      oncomplete="PF('occperiod-editstart-dialog-var').hide()"
                                      update="occperiod-status-form"
@@ -441,7 +436,7 @@
     <!-- Edit occ period end date dialog -->
     <p:dialog id="occperiod-editend-dialog"
               height="450" width="600"
-              header="Edit occupancy period end date"
+              header="Edit permit file end date"
               widgetVar="occperiod-editend-dialog-var"
               closable="true"
               responsive="true"
@@ -486,7 +481,7 @@
 
                 <div class="ui-g-12 ui-md-6 ui-lg-6 data_field">
                     <p:commandButton id="occperiod-editend-button"
-                                     value="Change end date of occupancy period ID #{occPeriodBB.currentOccPeriod.periodID}"
+                                     value="Change end date of permit file ID #{occPeriodBB.currentOccPeriod.periodID}"
                                      icon="fa fa-user"
                                      oncomplete="PF('occperiod-editend-dialog-var').hide()"
                                      update="occperiod-status-form"

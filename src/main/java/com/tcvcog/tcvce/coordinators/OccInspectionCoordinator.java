@@ -465,8 +465,9 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 
         inspection.setReadyForPassedCertification(allSpacesPassed);
         if (!inspection.getInspectedSpaceList().isEmpty()) {
-            Collections.sort(inspection.getInspectedSpaceList());
-            Collections.reverse(inspection.getInspectedSpaceList());
+            // disable and debug later
+//            Collections.sort(inspection.getInspectedSpaceList());
+//            Collections.reverse(inspection.getInspectedSpaceList());
         }
         
 
@@ -539,7 +540,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             System.out.println(ex);
         }
 
-        Collections.sort(inSpace.getInspectedElementList());
+        // DEBUG LATER
+//        Collections.sort(inSpace.getInspectedElementList());
         return inSpace;
 
     }
@@ -557,7 +559,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             Map<String, List<OccInspectedSpaceElement>> oismap = new HashMap<>();
             
             if(!ois.getInspectedElementList().isEmpty()){
-                Collections.sort(ois.getInspectedElementList());
+                // Disable for debugging
+//                Collections.sort(ois.getInspectedElementList());
                 for(OccInspectedSpaceElement oise: ois.getInspectedElementList()){
                     String cat = null;
                     if(oise.getGuideEntry() != null){

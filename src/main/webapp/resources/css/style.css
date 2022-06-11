@@ -1790,6 +1790,15 @@ i.inspection-notinspected{
 
 }
 
+.occpermit-referencenointable {
+    font-weight: bold;
+    font-size: 1.3em;
+    color:darkgreen;
+}
+
+.occpermit-finalizedintable{
+    color: darkgreen;
+}
 
 
 /* ****************** CLOSE INSPECTION AND OCC PERMIT********************/

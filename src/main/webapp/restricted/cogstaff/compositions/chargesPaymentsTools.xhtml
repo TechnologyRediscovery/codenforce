@@ -1,9 +1,128 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
-                xmlns:p="http://primefaces.org/ui">
-    <p:panel id="payments-panel"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+    <p:panel id="fees-panel"
+             toggleable="true"
+             widgetVar="fees-panel-var"
+             collapsed="false"
+             header="Fees (#{paymentsBB.feeListSize})">
+        <h:form id="fees-form">
+            <p:dataTable id="fees-table"
+                         value="#{paymentsBB.currentPaymentHolder.feeList}"
+                         var="fee"
+                         rowKey="#{fee.assignedFeeID}"
+                         tableStyleClass="primeDataTable"
+                         rowExpandMode="single"
+                         expandedRow="false">
+
+                <p:column width="3%">
+                    <f:facet name="header">
+                        <h:outputText value="Exp"/>
+                    </f:facet>
+                    <p:rowToggler/>
+                </p:column>
+                <p:column width="8%">
+                    <f:facet name="header">
+                        <h:outputText value="ID" />
+                    </f:facet>
+                    <h:outputText value="#{fee.assignedFeeID}"/>
+                </p:column>
+
+
+                <p:column width="10%" sortBy="#{fee.fee.name}"
+                          filterBy="#{fee.fee.name}">
+                    <f:facet name="header">
+                        <h:outputText value="Fee Name" />
+                    </f:facet>
+                    <h:outputText value="#{fee.fee.name}"/>
+                </p:column>
+
+                <p:column width="10%" sortBy="#{fee.fee.amount}"
+                          filterBy="#{fee.fee.amount}">
+                    <f:facet name="header">
+                        <h:outputText value="Amount" />
+                    </f:facet>
+                    <h:outputText value="#{fee.fee.amount}"/>
+                </p:column>
+
+                <p:column width="15%" filterBy="#{fee.fee.effectiveDate}"
+                          sortBy="#{fee.fee.effectiveDate}">
+                    <f:facet name="header">
+                        <h:outputText value="Effective" />
+                    </f:facet>
+                    <h:outputText value="#{fee.fee.effectiveDate}"/>
+                </p:column>
+
+                <p:column width="15%" filterBy="#{fee.fee.expiryDate}"
+                          sortBy="#{fee.fee.expiryDate}">
+                    <f:facet name="header">
+                        <h:outputText value="Expiry" />
+                    </f:facet>
+                    <h:outputText value="#{fee.fee.expiryDate}"/>
+                </p:column>
+                <p:rowExpansion>
+                    <div class="outlinedBox">
+                        <h2>Full fee listing for fee <h:outputText value="#{fee.fee.occupancyInspectionFeeID}"/> </h2>
+
+                        <h:outputLabel styleClass="ui-label-inline" value="Notes"/>
+                        <p:spacer height="15px"/>
+                        <div class="rowExpansion">
+                            <h:outputText value="#{fee.fee.notes}"/>
+                        </div>
+
+                        <h:outputLabel styleClass="ui-label-inline" value="Assigned By"/>
+                        <p:spacer height="15px"/>
+                        <div class="rowExpansion">
+                            <h:outputText value="#{fee.assignedBy.human.firstName} #{fee.assignedBy.human.lastName} (ID: #{fee.assignedBy.userID})"/>
+                        </div>
+
+                        <h:outputLabel styleClass="ui-label-inline" value="Last Modified"/>
+                        <p:spacer height="15px"/>
+                        <div class="rowExpansion">
+                            <h:outputText value="#{fee.lastModified}"/>
+                        </div>
+
+                        <h:outputLabel styleClass="ui-label-inline" value="Other notes"/>
+                        <p:spacer height="15px"/>
+                        <div class="rowExpansion">
+                            <h:outputText value="#{fee.notes}"/>
+                        </div>
+
+                        <h:outputLabel styleClass="ui-label-inline" value="Amount Reduced By"/>
+                        <p:spacer height="15px"/>
+                        <div class="rowExpansion">
+                            <h:outputText value="$ #{fee.reducedBy}"/>
+                        </div>
+
+                        <h:outputLabel styleClass="ui-label-inline" value="Reduced By"/>
+                        <p:spacer height="15px"/>
+                        <div class="rowExpansion">
+                            <h:outputText value="#{fee.reducedByUser.human.firstName} #{fee.reducedByUser.human.lastName} (ID: #{fee.reducedByUser.userID}"/>
+                        </div>
+
+                        <h:outputLabel styleClass="ui-label-inline" value="Waived By"/>
+                        <p:spacer height="15px"/>
+                        <div class="rowExpansion">
+                            <h:outputText value="#{fee.waivedBy.human.firstName} #{fee.waivedBy.human.lastName} (ID: #{fee.waivedBy.userID}"/>
+                        </div>
+
+                        <ui:remove>
+                            <p:spacer height="15px"/>
+                            <div class="rowExpansion">
+                                <p:commandButton value="Edit this payment" action="#{paymentsBB.editPayment(payment)}"/>
+                            </div>
+                        </ui:remove>
+                    </div>
+                </p:rowExpansion>
+
+            </p:dataTable>
+            <p:commandButton value="Edit this fee list" action="#{paymentsBB.editHolderFees}"/>
+        </h:form>
+    </p:panel>
+    
+      <p:panel id="payments-panel"
              toggleable="true"
              collapsed="false"
              header="Payments (#{paymentsBB.paymentListSize})">

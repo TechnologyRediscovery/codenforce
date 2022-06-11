@@ -152,7 +152,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse.setProposalList(wc.getProposalList(cse, cred));
 
             // EVENT RULE LIST
-            cse.setEventRuleList(wc.rules_getEventRuleImpList(cse, cred));
+//            cse.setEventRuleList(wc.rules_getEventRuleImpList(cse, cred));
 
             // Human list
             cse.setHumanLinkList(persc.getHumanLinkList(cse));

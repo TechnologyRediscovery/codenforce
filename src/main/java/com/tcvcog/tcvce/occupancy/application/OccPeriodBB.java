@@ -121,13 +121,13 @@ public class OccPeriodBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         SessionBean sb = getSessionBean();
         PropertyCoordinator pc = getPropertyCoordinator();
-
+        getSessionBean().setSessHumanListRefreshedList(null);
         currentOccPeriod = sb.getSessOccPeriod();
         if(currentOccPeriod != null){
-            occPeriodTypeList = sb.getSessMuni().getProfile().getOccPeriodTypeList();
+            occPeriodTypeList = sb.getSessMuni().getProfile().getOccPermitTypeList();
             setLastSavedOccPeriod(new OccPeriod(currentOccPeriod));
 
-            setOccPeriodTypeList(sb.getSessMuni().getProfile().getOccPeriodTypeList());
+            setOccPeriodTypeList(sb.getSessMuni().getProfile().getOccPermitTypeList());
 
             try {
                 currentPropertyUnit = pc.getPropertyUnitDataHeavy(currentOccPeriod.getPropUnitProp(), getSessionBean().getSessUser());
@@ -410,6 +410,17 @@ public class OccPeriodBB
         currentOccPermit = oc.getOccPermitSkeleton(getSessionBean().getSessUser());
     }
     
+    /**
+     * Listener for user requests to be done selecting persons. Since all the other
+     * operations are AJAXED, we don't need to do anything
+     * @param ev 
+     */
+    public void onOccPermitDoneWithPersonsSelection(ActionEvent ev){
+        System.out.println("OccPeriodBB.onOccPermitDoneWithPersonsSelection");
+        getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Done with person assignments!", ""));
+    }
     
     /**
      * Writes a skeleton occ permit into the db
@@ -423,6 +434,7 @@ public class OccPeriodBB
         freshPermitID = oc.insertOccPermit(currentOccPermit, currentOccPeriod, getSessionBean().getSessUser());
         currentOccPermit = oc.getOccPermit(freshPermitID, getSessionBean().getSessUser());
         configureCurrentOccPermitForOfficerReview();
+        
         System.out.println("OccPeriodBB.onOccPermitInitCommitButtonChange | current occ permit ID: " + currentOccPermit.getPermitID());
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
@@ -440,8 +452,7 @@ public class OccPeriodBB
      */
     public void refreshCurrentOccPermit(ActionEvent ev){
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        if(currentOccPermit != null && currentOccPermit.getPermitID() != 0){
-            System.out.println("OccPeriodBB.refreshCurrentOccPermit | current occ permit ID: " + currentOccPermit.getPermitID());
+        if(currentOccPermit != null){
             try {
                 currentOccPermit = oc.getOccPermit(currentOccPermit.getPermitID(), getSessionBean().getSessUser());
             } catch (IntegrationException | BObStatusException ex) {
@@ -524,7 +535,7 @@ public class OccPeriodBB
     public void onOccPermitAuditForFinalization(ActionEvent ev) {
         System.out.println("OccPeriodBB.onOccPermitAuditForFinalization");
         OccupancyCoordinator oc = getOccupancyCoordinator();
-        
+        refreshCurrentOccPermit(null);
         try {
             if(oc.occPermitAuditForFinalization(currentOccPermit, getSessionBean().getSessUser())){
                 getFacesContext().addMessage(null,
@@ -554,9 +565,10 @@ public class OccPeriodBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.occPermitFinalize(currentOccPermit, getSessionBean().getSessUser(),getSessionBean().getSessMuni());
+            refreshCurrentOccPermit(null);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Finalized Occ permit No " + currentOccPermit.getReferenceNo(), ""));
+                            "Finalized Occ permit ref Number: " + currentOccPermit.getReferenceNo(), ""));
             reloadCurrentOccPeriodDataHeavy();
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
@@ -573,6 +585,7 @@ public class OccPeriodBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             oc.occPermitFinalizeOverrideAudit(currentOccPermit, getSessionBean().getSessUser(),getSessionBean().getSessMuni());
+            refreshCurrentOccPermit(null);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Finalized Occ permit No " + currentOccPermit.getReferenceNo(), ""));
@@ -630,6 +643,7 @@ public class OccPeriodBB
      */
     public String onOccPermitPrintLinkClick(OccPermit op){
         OccupancyCoordinator oc = getOccupancyCoordinator();
+        currentOccPermit = op;
         currentOccPermitConfig = oc.getOccPermitReportConfigDefault(currentOccPermit, currentOccPeriod, currentPropertyUnit, getSessionBean().getSessUser());
         getSessionBean().setReportConfigOccPermit(currentOccPermitConfig);
         return "occPermit";
@@ -737,12 +751,22 @@ public class OccPeriodBB
 
             switch(currentTextBlockPermitFieldEnum){
                 case STIPULATIONS:
+                    if(currentOccPermit.getTextBlocks_stipulations() == null){
+                        currentOccPermit.setTextBlocks_stipulations(new ArrayList<>());
+                    }
                     currentOccPermit.getTextBlocks_stipulations().addAll(permitBlocksSelectedList);
                     break;
                 case NOTICES:
+                    if(currentOccPermit.getTextBlocks_notice()== null){
+                        currentOccPermit.setTextBlocks_notice(new ArrayList<>());
+                    }
                     currentOccPermit.getTextBlocks_notice().addAll(permitBlocksSelectedList);
                     break;
                 case COMMENTS:
+                    
+                    if(currentOccPermit.getTextBlocks_comments()== null){
+                        currentOccPermit.setTextBlocks_comments(new ArrayList<>());
+                    }
                     currentOccPermit.getTextBlocks_comments().addAll(permitBlocksSelectedList);
                     break;
             }

@@ -547,6 +547,7 @@ public  class       SessionInitializer
     private void initSubsystem_IV_Person(Credential cred, SubSysEnum ss) throws SessionException{
         SearchCoordinator sc = getSearchCoordinator();
         PersonCoordinator persc = getPersonCoordinator();
+        sb.setSessHumanListRefreshedList(null);
         
         try {
             sb.setSessPersonList(persc.getPersonListFromHumanLinkList(getSessionBean().getSessProperty().getHumanLinkList()));
@@ -639,6 +640,11 @@ public  class       SessionInitializer
         sb.setQueryOccPeriodList(sc.buildQueryOccPeriodList(cred));
         if(!sb.getQueryOccPeriodList().isEmpty()){
             sb.setQueryOccPeriod(sb.getQueryOccPeriodList().get(0));
+        }
+        
+        sb.setQueryOccPermitList(sc.buildQueryOccPermitList(cred));
+        if(!sb.getQueryOccPermitList().isEmpty()){
+            sb.setQueryOccPermit(sb.getQueryOccPermitList().get(0));
         }
     }
     

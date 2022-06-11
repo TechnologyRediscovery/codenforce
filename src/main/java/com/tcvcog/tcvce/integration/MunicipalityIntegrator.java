@@ -234,9 +234,9 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mp.setNovDefaultDaysForFollowup(rs.getInt("novfollowupdefaultdays"));
         
         mp.setEventRuleSetCE(wi.rules_getEventRuleSet(rs.getInt("profileid")));
-        mp.setOccPeriodTypeList(oi.getOccPermitTypeList(rs.getInt("profileid")));
-        if(mp.getOccPeriodTypeList() == null){
-            mp.setOccPeriodTypeList(new ArrayList<OccPermitType>());
+        mp.setOccPermitTypeList(oi.getOccPermitTypeList(rs.getInt("profileid")));
+        if(mp.getOccPermitTypeList() == null){
+            mp.setOccPermitTypeList(new ArrayList<OccPermitType>());
         }
         
         return mp;

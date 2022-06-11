@@ -386,6 +386,10 @@ public class OccInspectedSpace
 
     @Override
     public int compareTo(OccInspectedSpace o) {
+        if(o.addedToChecklistTS == null || this.addedToChecklistTS == null){
+            return 0;
+        
+        }
         return this.addedToChecklistTS.compareTo(o.addedToChecklistTS);
     }
 
