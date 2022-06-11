@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
+import com.tcvcog.tcvce.entities.Manageable;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.entities.BOb;
 import com.tcvcog.tcvce.entities.Credential;
@@ -403,9 +404,15 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
        
    }
    
-   public int iconCheckForUse(Icon i) throws IntegrationException {
+   /**
+    * 
+    * @param m Manageable
+    * @return int times used in the database
+    * @throws IntegrationException 
+    */
+   public int checkForUse(Manageable m) throws IntegrationException {
        SystemIntegrator si = getSystemIntegrator();
-       return si.iconCheckForUse(i);
+       return si.checkManagableForUse(m);
    }
    
    public Icon getIcon(int iconID) throws IntegrationException {
@@ -426,6 +433,11 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
    public void insertIcon(Icon i) throws IntegrationException {
        SystemIntegrator si = getSystemIntegrator();
        si.insertIcon(i);
+   }
+   
+   public List<Icon> getIconList(boolean includeDeactivated) throws IntegrationException {
+       SystemIntegrator si = getSystemIntegrator();
+       return si.getIconList(includeDeactivated);
    }
    
    public List<Icon> getIconList() throws IntegrationException {
@@ -459,8 +471,12 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
    }
    
    public List<PropertyUseType> getPutList() throws IntegrationException {
+       return getPutList(false);
+   }
+   
+   public List<PropertyUseType> getPutList(boolean includeDeactivated) throws IntegrationException {
        SystemIntegrator si = getSystemIntegrator();
-       return si.getPutList();
+       return si.getPutList(includeDeactivated);
    }
 
     /**
@@ -867,8 +883,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
 
     //Sidebar Sub Nav Item: System
     private final NavigationSubItem users = getNavSubItem("Users", "/restricted/cogadmin/userConfig.xhtml", "fa fa-user-o", false);
-    private final NavigationSubItem icons = getNavSubItem("Icons", "/restricted/cogadmin/iconManage.xhtml", "fa fa-rebel", false);
-    private final NavigationSubItem puts = getNavSubItem("PUTs", "/restricted/cogadmin/propertyUseTypeManage.xhtml", "fa fa-flag", false);
+    private final NavigationSubItem manage = getNavSubItem("Manage", "/restricted/cogadmin/manage-home.xhtml", "fa fa-rebel", false);
     private final NavigationSubItem oid = getNavSubItem("Occ Det's", "/restricted/cogadmin/occInspectionDeterminationManage.xhtml", "fa fa-pencil-square-o", false);
     private final NavigationSubItem blobs = getNavSubItem("Files", "/restricted/cogadmin/manageBlob.xhtml", "fa fa-folder", false);
 
@@ -877,8 +892,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
         navList.add(users);
-        navList.add(icons);
-        navList.add(puts);
+        navList.add(manage);
         navList.add(oid);
         navList.add(blobs);
         return navList;

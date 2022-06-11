@@ -7,7 +7,6 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Icon;
-import com.tcvcog.tcvce.entities.PropertyUseType;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import java.io.Serializable;
 import java.util.List;
@@ -21,135 +20,101 @@ import javax.faces.event.ActionEvent;
  *
  * @author sylvia
  */
-public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
+public class deprecated_IconBB extends BackingBeanUtils implements Serializable{
 
-    private List<PropertyUseType> putList;
-    private PropertyUseType currentPut;
-    
     private List<Icon> iconList;
+    private Icon currentIcon;
     
     /**
      * Creates a new 
-     * instance of PropertyUseTypeBB
+     * instance of IconBB
      */
-    public PropertyUseTypeBB() {
+    public deprecated_IconBB() {
         
         
     }
     
     @PostConstruct
     public void initBean(){
-        refreshPutList();
-        createNewPut();
+        refreshIconList();
     }
     
-    public void refreshPutList(){
+    public void refreshIconList(){
         SystemCoordinator sc = getSystemCoordinator();
         try {
-            putList = sc.getPutList();
-            setIconList(sc.getIconList());
+            iconList = sc.getIconList();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
     }
     
-    public void editPut(PropertyUseType p){
-        currentPut = p;
+    public void editIcon(Icon i){
+        currentIcon = i;
     }
     
     public void commitUpdates(ActionEvent ev){
         SystemCoordinator sc = getSystemCoordinator();
         try {
-            sc.updatePut(currentPut);
+            sc.updateIcon(currentIcon);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated PropertyUseType", ""));
+                            "Successfully updated icon", ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not update PropertyUseType, sorry", ""));
+                            "Could not update icon, sorry", ""));
         }
-        refreshPutList();
+        refreshIconList();
     }
     
     public void commitInsert(ActionEvent ev){
         SystemCoordinator sc = getSystemCoordinator();
         try {
-            sc.insertPut(currentPut);
+            sc.insertIcon(currentIcon);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Success! PropertyUseType inserted", ""));
+                            "Success! Icon inserted", ""));
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not insert PropertyUseType, sorry", ""));
+                            "Could not insert icon, sorry", ""));
         }
-        refreshPutList();
+        refreshIconList();
     }
     
-    //method for deleting existing puts
     public void commitRemove(ActionEvent ev) {
         SystemCoordinator sc = getSystemCoordinator();
-        if(currentPut.getTypeID() > 0){             
+        if(currentIcon.getID() > 0){             
             try {
-                int uses = sc.putCheckForUse(currentPut);
+                int uses = sc.checkForUse(currentIcon);
                 if(uses == 0){
-                    sc.deactivatePut(currentPut);
+                    sc.deactivateIcon(currentIcon);
                     getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Success! PropertyUseType removed", ""));
+                                "Success! Icon removed", ""));
                 } else {
                     getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "PropertyUseType is in use " + uses + " times. Could not remove", ""));
+                                "Icon is in use " + uses + " times. Could not remove", ""));
                 }
             } catch (IntegrationException ex) {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Could not remove PropertyUseType, sorry", ""));
+                                "Could not remove Icon, sorry", ""));
             }
-            refreshPutList();
+            refreshIconList();
         } else {
                 getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "Invalid PropertyUseTypeID: " + currentPut.getTypeID(), ""));
+                                "Invalid IconID: " + currentIcon.getID(), ""));
         }
     }
     
-    public void createNewPut(){
-        PropertyUseType p = new PropertyUseType();
-        p.setIcon(new Icon());
-        currentPut = p;
+    public void createNewIcon(){
+        Icon i = new Icon();
+        currentIcon = i;
     }
     
-
-    /**
-     * @return the putList
-     */
-    public List<PropertyUseType> getPutList() {
-        return putList;
-    }
-
-    /**
-     * @param putList the putList to set
-     */
-    public void setPutList(List<PropertyUseType> putList) {
-        this.putList = putList;
-    }
-
-    /**
-     * @return the currentPut
-     */
-    public PropertyUseType getCurrentPut() {
-        return currentPut;
-    }
-
-    /**
-     * @param currentPut the currentPut to set
-     */
-    public void setCurrentPut(PropertyUseType currentPut) {
-        this.currentPut = currentPut;
-    }
 
     /**
      * @return the iconList
@@ -163,6 +128,20 @@ public class PropertyUseTypeBB extends BackingBeanUtils implements Serializable{
      */
     public void setIconList(List<Icon> iconList) {
         this.iconList = iconList;
+    }
+
+    /**
+     * @return the currentIcon
+     */
+    public Icon getCurrentIcon() {
+        return currentIcon;
+    }
+
+    /**
+     * @param currentIcon the currentIcon to set
+     */
+    public void setCurrentIcon(Icon currentIcon) {
+        this.currentIcon = currentIcon;
     }
     
 }

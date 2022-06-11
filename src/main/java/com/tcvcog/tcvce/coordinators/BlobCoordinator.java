@@ -129,6 +129,36 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
+     * Updates the DB with BlobType bt
+     * @param bt the BlobType to update
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void updateBlobType(BlobType bt) throws IntegrationException{
+        BlobIntegrator bi = getBlobIntegrator();
+        bi.updateBlobType(bt);
+    }
+    
+    /**
+     * Inserts BlobType bt into the DB
+     * @param bt the BlobType to update
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void insertBlobType(BlobType bt) throws IntegrationException{
+        BlobIntegrator bi = getBlobIntegrator();
+        bi.insertBlobType(bt);
+    }
+    
+    /**
+     * Adds a deactivatedts to BlobType bt in the DB
+     * @param bt the BlobType to update
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void deactivateBlobType(BlobType bt) throws IntegrationException{
+        BlobIntegrator bi = getBlobIntegrator();
+        bi.deactivateBlobType(bt);
+    }
+    
+    /**
      * Extracts all BlobTypes from the DB
      * @return 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
