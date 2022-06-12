@@ -407,6 +407,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
        
+        // inject our humans
         ev.setHumanLinkList(pc.getHumanLinkList(ev));
         
         return ev;
@@ -432,7 +433,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     
     
     /**
-     * Business rule aware pathway to update fields on EventCnF objects
+     * Business rule aware pathway to update fields on EventCnF objects:
      * When updating Person links, this method clears all previous connections
      * and rebuilds the mapping from scratch on each update.
      * 
@@ -741,10 +742,14 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * viewer. This logic will review what our event domain is, the thing
      * onto which we might be attaching events (which as of Jun 2020 are CECase
      * objects or OccPeriod objects), and the attacher
+     * ** ECD on 11JUN22: Shouldn't the eventHolder be able to tell us its domain?
+     * 
      * @param domain
      * @param erg which will be interrogated for is open/closed status
      * @param ua doing potential creation of an event
      * @return 
+     * 
+     * 
      */
     public List<EventType> determinePermittedEventTypes(    DomainEnum domain,
                                                             IFace_EventHolder erg,

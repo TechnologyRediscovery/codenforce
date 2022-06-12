@@ -5,6 +5,7 @@
 -- GIT Issue #222 
 --********************
 
+-- INCORPORATED INTO PATCH 40
 
 --Changes Boolean active to deactivated timestamp
 --Matains deactived status on tables

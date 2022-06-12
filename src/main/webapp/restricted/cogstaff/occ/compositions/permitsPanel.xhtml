@@ -10,7 +10,9 @@
 
    
     
-      <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+    <p:ajaxStatus onstart="PF('statusDialog').show()" 
+                  onsuccess="PF('statusDialog').hide()"
+                  delay="50"/>
 
     <p:dialog widgetVar="statusDialog" 
               modal="true"

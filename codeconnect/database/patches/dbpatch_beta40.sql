@@ -226,6 +226,7 @@ ALTER TABLE public.occpermit
       REFERENCES public.occpermittype (typeid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION;
 
+-- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
 DROP TABLE public.moneycecasefeepayment CASCADE;
 DROP TABLE public.moneycecasefeeassigned CASCADE;
@@ -245,12 +246,33 @@ DROP TABLE public.moneycodesetelementfee CASCADE;
 -- Query returned successfully with no result in 184 msec.
 
 
+-- ******************* MFAUX Fields ******************
 
 
--- ******************************* run on LIVE DEPLOYED system up to here *******************************
+--Changes Boolean active to deactivated timestamp
+--Matains deactived status on tables
+ALTER TABLE icon
+ADD deactivatedts timestamp with time zone;
+
+UPDATE icon 
+SET deactivatedts = '2022-04-14 12:00:00.000000+00'
+WHERE active = FALSE;
+
+ALTER TABLE icon
+DROP COLUMN active;
 
 
+ALTER TABLE propertyusetype
+ADD deactivatedts timestamp with time zone;
 
+UPDATE propertyusetype 
+SET deactivatedts = '2022-04-14 12:00:00.000000+00'
+WHERE active = FALSE;
+
+ALTER TABLE propertyusetype
+DROP COLUMN active;
+
+-- ******************* END MFAUX Fields ******************
 
 CREATE TYPE transactiontype AS ENUM ('charge','payment', 'adjustment');
 
@@ -261,6 +283,7 @@ CREATE SEQUENCE public.moneyledger_transactionid_seq
   MAXVALUE 9223372036854775807
   START 101
   CACHE 1;
+
 ALTER TABLE public.citationfilingtype_typeid_seq
   OWNER TO sylvia;
 
@@ -268,16 +291,16 @@ ALTER TABLE public.citationfilingtype_typeid_seq
 
 CREATE TABLE public.moneyledger
 (
-	transactionid integer NOT NULL DEFAULT nextval('moneyledger_transactionid_seq'::regclass),
-	cecase_caseid integer CONSTRAINT moneyledger_caseid_fk REFERENCES cecase (caseid),
-	occperiod_periodid integer CONSTRAINT moneyledger_occperiod_fk REFERENCES occperiod (periodid),
-	transtype transactiontype NOT NULL,
-	amount 			money NOT NULL,
-	dateofrecord 			TIMESTAMP WITH TIME ZONE,
-	createdts               TIMESTAMP WITH TIME ZONE,
-	createdby_userid        INTEGER CONSTRAINT moneyledger_createdby_userid_fk REFERENCES login (userid),     
-	lastupdatedts           TIMESTAMP WITH TIME ZONE,
-	lastupdatedby_userid    INTEGER CONSTRAINT moneyledger_lastupdatdby_userid_fk REFERENCES login (userid),
+	transactionid 				integer NOT NULL DEFAULT nextval('moneyledger_transactionid_seq'::regclass),
+	cecase_caseid 				integer CONSTRAINT moneyledger_caseid_fk REFERENCES cecase (caseid),
+	occperiod_periodid 			integer CONSTRAINT moneyledger_occperiod_fk REFERENCES occperiod (periodid),
+	transtype 					transactiontype 	NOT NULL,
+	amount 						money NOT NULL,
+	dateofrecord 			TIMESTAMP WITH TIME ZONE NOT NULL,
+	createdts               TIMESTAMP WITH TIME ZONE NOT NULL,
+	createdby_userid        INTEGER NOT NULL CONSTRAINT moneyledger_createdby_userid_fk REFERENCES login (userid),     
+	lastupdatedts           TIMESTAMP WITH TIME ZONE NOT NULL,
+	lastupdatedby_userid    INTEGER NOT NULL CONSTRAINT moneyledger_lastupdatdby_userid_fk REFERENCES login (userid),
 	deactivatedts           TIMESTAMP WITH TIME ZONE,
 	deactivatedby_userid    INTEGER CONSTRAINT moneyledger_deactivatedby_userid_fk REFERENCES login (userid),    
     notes text,
@@ -312,6 +335,19 @@ CREATE TABLE public.chargeschedule
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 
+CREATE TABLE public.moneytransactionsource
+(
+  typeid integer NOT NULL DEFAULT nextval('paymenttype_typeid_seq'::regclass),
+  pmttypetitle text NOT NULL,
+  notes text,
+  CONSTRAINT pmttype_typeid_pk PRIMARY KEY (typeid)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.moneytransactionsource
+  OWNER TO sylvia;
+
 
 -- ******************************* run on LOCAL TEST system up to here *******************************
 
@@ -322,6 +358,8 @@ CREATE TABLE public.moneychargeledger
 
 
 );
+
+
 
 
 

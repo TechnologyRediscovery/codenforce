@@ -1,5 +1,5 @@
-# codeconnect
-Municipal government code enforcement and occupancy permitting web-app system
+# codNforce
+Municipal government code enforcement and occupancy permitting web-app system; publicly funded, and maybe even citizen directed
 
 
 ## Build
