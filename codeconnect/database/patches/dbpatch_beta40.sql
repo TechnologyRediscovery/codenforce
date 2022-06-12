@@ -274,6 +274,57 @@ DROP COLUMN active;
 
 -- ******************* END MFAUX Fields ******************
 
+
+CREATE TYPE chargetype AS ENUM ('fee','fine');
+
+CREATE TABLE public.moneychargeschedule
+(
+	chargeid 					integer NOT NULL DEFAULT nextval('occinspectionfee_feeid_seq'::regclass),
+	chgtype 					chargetype NOT NULL,
+	muni_municode 				integer NOT NULL,
+	chargename 					text NOT NULL,
+	description					text,
+	chargeamount 				money NOT NULL,
+	governingordinance_eceid 	integer NOT NULL CONSTRAINT moneychargeschedule_ord_fk REFERENCES codesetelement (codesetelementid),
+	effectivedate 				timestamp with time zone NOT NULL,
+	expirydate 					timestamp with time zone NOT NULL,
+	minranktoassign				role,
+	minranktodeactivate 		role,
+	eventcatwhenposted		INTEGER CONSTRAINT moneychargeschedule_postingeventcat_fk REFERENCES eventcategory (categoryid),
+	createdts               TIMESTAMP WITH TIME ZONE,
+	createdby_userid        INTEGER CONSTRAINT moneychargeschedule_createdby_userid_fk REFERENCES login (userid),     
+	lastupdatedts           TIMESTAMP WITH TIME ZONE,
+	lastupdatedby_userid    INTEGER CONSTRAINT moneychargeschedule_lastupdatdby_userid_fk REFERENCES login (userid),
+	deactivatedts           TIMESTAMP WITH TIME ZONE,
+	deactivatedby_userid    INTEGER CONSTRAINT moneychargeschedule_deactivatedby_userid_fk REFERENCES login (userid),    
+	notes text,
+  
+  CONSTRAINT occinspecfee_feeid_pk PRIMARY KEY (chargeid),
+  CONSTRAINT muni_municode_fk FOREIGN KEY (muni_municode)
+      REFERENCES public.municipality (municode) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+
+
+CREATE TABLE public.moneytransactionsource
+(
+  sourceid integer NOT NULL DEFAULT nextval('paymenttype_typeid_seq'::regclass),
+  title text NOT NULL,
+  descrition text,
+  notes text,
+  humanassignable BOOLEAN DEFAULT TRUE,
+  eventcatwhenposted		INTEGER CONSTRAINT moneytransactionsource_eventcat_fk REFERENCES eventcategory (categoryid),
+  CONSTRAINT pmttype_typeid_pk PRIMARY KEY (sourceid)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.moneytransactionsource
+  OWNER TO sylvia;
+
+
+
 CREATE TYPE transactiontype AS ENUM ('charge','payment', 'adjustment');
 
 
@@ -291,12 +342,35 @@ ALTER TABLE public.citationfilingtype_typeid_seq
 
 CREATE TABLE public.moneyledger
 (
-	transactionid 				integer NOT NULL DEFAULT nextval('moneyledger_transactionid_seq'::regclass),
+	transactionid 				integer PRIMARY KEY NOT NULL DEFAULT nextval('moneyledger_transactionid_seq'::regclass),
 	cecase_caseid 				integer CONSTRAINT moneyledger_caseid_fk REFERENCES cecase (caseid),
 	occperiod_periodid 			integer CONSTRAINT moneyledger_occperiod_fk REFERENCES occperiod (periodid),
 	transtype 					transactiontype 	NOT NULL,
+	charge_chargeid 			INTEGER CONSTRAINT moneyledger_chargeid_fk REFERENCES moneychargeschedule (chargeid),
 	amount 						money NOT NULL,
 	dateofrecord 			TIMESTAMP WITH TIME ZONE NOT NULL,
+	source 					INTEGER CONSTRAINT moneyledger_transsource_fk REFERENCES moneytransactionsource (sourceid),
+	event_eventid			INTEGER CONSTRAINT moneyledger_event_fk REFERENCES event (eventid),
+	human_humanid 			INTEGER CONSTRAINT moneyledger_humanid_fk REFERENCES human (humanid),
+	humanrole_lorid 		INTEGER CONSTRAINT moneyledger_humanlor_fk REFERENCES linkedobjectrole (lorid),
+	lockedts				TIMESTAMP WITH TIME ZONE,
+	lockedby_userid 		INTEGER NOT NULL CONSTRAINT moneyledger_lockedby_userid_fk REFERENCES login (userid),     
+	createdts               TIMESTAMP WITH TIME ZONE NOT NULL,
+	createdby_userid        INTEGER NOT NULL CONSTRAINT moneyledger_createdby_userid_fk REFERENCES login (userid),     
+	lastupdatedts           TIMESTAMP WITH TIME ZONE NOT NULL,
+	lastupdatedby_userid    INTEGER NOT NULL CONSTRAINT moneyledger_lastupdatdby_userid_fk REFERENCES login (userid),
+	deactivatedts           TIMESTAMP WITH TIME ZONE,
+	deactivatedby_userid    INTEGER CONSTRAINT moneyledger_deactivatedby_userid_fk REFERENCES login (userid),    
+    notes text
+);
+
+
+
+CREATE TABLE pulic.moneyledgercharge
+(
+
+	transaction_id 			INTEGER NOT NULL CONSTRAINT monleyledgercharge_transid_fk REFERENCES moneyledger (transactionid),
+	charge_id 				INTEGER NOT NULL CONSTRAINT moneyledgercharge_chargeid_fk REFERENCES moneychargeschedule (chargeid),
 	createdts               TIMESTAMP WITH TIME ZONE NOT NULL,
 	createdby_userid        INTEGER NOT NULL CONSTRAINT moneyledger_createdby_userid_fk REFERENCES login (userid),     
 	lastupdatedts           TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -304,61 +378,12 @@ CREATE TABLE public.moneyledger
 	deactivatedts           TIMESTAMP WITH TIME ZONE,
 	deactivatedby_userid    INTEGER CONSTRAINT moneyledger_deactivatedby_userid_fk REFERENCES login (userid),    
     notes text,
-
+    CONSTRAINT moneyledgercharge_pk PRIMARY KEY (transaction_id, charge_id)
 
 );
-
-
-CREATE TYPE chargetype AS ENUM ('fee','fine');
-
-CREATE TABLE public.chargeschedule
-(
-	feeid integer NOT NULL DEFAULT nextval('occinspectionfee_feeid_seq'::regclass),
-	ctype chargetype NOT NULL,
-	muni_municode integer NOT NULL,
-	chargename text NOT NULL,
-	chargeamount money NOT NULL,
-	governingordinance_eceid integer NOT NULL CONSTRAINT chargeschedule_ord_fk REFERENCES codesetelement (codesetelementid),
-	effectivedate timestamp with time zone NOT NULL,
-	expirydate timestamp with time zone NOT NULL,
-	createdts               TIMESTAMP WITH TIME ZONE,
-	createdby_userid        INTEGER CONSTRAINT chargeschedule_createdby_userid_fk REFERENCES login (userid),     
-	lastupdatedts           TIMESTAMP WITH TIME ZONE,
-	lastupdatedby_userid    INTEGER CONSTRAINT chargeschedule_lastupdatdby_userid_fk REFERENCES login (userid),
-	deactivatedts           TIMESTAMP WITH TIME ZONE,
-	deactivatedby_userid    INTEGER CONSTRAINT chargeschedule_deactivatedby_userid_fk REFERENCES login (userid),    
-	notes text,
-  
-  CONSTRAINT occinspecfee_feeid_pk PRIMARY KEY (feeid),
-  CONSTRAINT muni_municode_fk FOREIGN KEY (muni_municode)
-      REFERENCES public.municipality (municode) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-)
-
-CREATE TABLE public.moneytransactionsource
-(
-  typeid integer NOT NULL DEFAULT nextval('paymenttype_typeid_seq'::regclass),
-  pmttypetitle text NOT NULL,
-  notes text,
-  CONSTRAINT pmttype_typeid_pk PRIMARY KEY (typeid)
-)
-WITH (
-  OIDS=FALSE
-);
-ALTER TABLE public.moneytransactionsource
-  OWNER TO sylvia;
 
 
 -- ******************************* run on LOCAL TEST system up to here *******************************
-
-
-CREATE TABLE public.moneychargeledger
-(
-
-
-
-);
-
 
 
 
