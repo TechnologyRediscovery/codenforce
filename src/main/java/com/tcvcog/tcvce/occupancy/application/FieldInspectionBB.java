@@ -731,7 +731,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
             System.out.println("OccInspectionBB.onDeactivateInspectionButtonClick | deactivating inspection " + currentInspection.getInspectionID());
             OccInspectionCoordinator oic = getOccInspectionCoordinator();
             try {
-                oic.deactivateOccInspection(getSessionBean().getSessUser(), currentInspection, getSessionBean().getSessOccPeriod());
+                oic.deactivateOccInspection(getSessionBean().getSessUser(), currentInspection, currentInspectable);
                 refreshInspectionListAndTriggerManagedListReload();
                  getFacesContext().addMessage(null,
                            new FacesMessage(FacesMessage.SEVERITY_INFO,
