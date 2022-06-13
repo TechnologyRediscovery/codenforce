@@ -1057,22 +1057,56 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     
     
     /**
-     * TODO: Finish me!
-     * @param opt
+     * Updates a record in occ permit type
+     * @param permitType
      * @throws IntegrationException 
      */
-    public void updateOccPeriodType(OccPermitType opt) throws IntegrationException {
-        String query = "UPDATE public.occpermittype\n"
-                + "   SET typename=?, typedescription=?\n"
-                + " WHERE typeid=?;";
+    public void updateOccPermitType(OccPermitType permitType) throws IntegrationException {
+        String query = "UPDATE public.occpermittype\n" +
+                        "   SET muni_municode=?, title=?, authorizeduses=?, description=?, \n" +
+                        "       userassignable=?, permittable=?, requireinspectionpass=?, requireleaselink=?, \n" +
+                        "       active=?, allowthirdpartyinspection=?, commercial=?, defaultpermitvalidityperioddays=?, \n" +
+                        "       eventruleset_setid=?, permittitle=?, permittitlesub=?, expires=?, \n" +
+                        "       requiremanager=?, requiretenant=?, requirezerobalance=?\n" +
+                        " WHERE typeid=?;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
-            //stmt.setInt(1, opt.getOccupancyPermitTypeID());
-            //stmt.setInt(2, opt.getOccupancyPermitTypeMuniCodeID());
+            stmt.setInt(1, permitType.getMuni().getMuniCode());
+            stmt.setString(2, permitType.getTitle());
+            stmt.setString(3, permitType.getAuthorizeduses());
+            stmt.setString(4, permitType.getDescription());
+            stmt.setBoolean(5, permitType.isUserassignable());
+
+            stmt.setBoolean(6, permitType.isPermittable());
+            stmt.setBoolean(7, permitType.isPassedInspectionRequired());
+
+            stmt.setBoolean(8, permitType.isRequireLeaseLink());
+            stmt.setBoolean(9, permitType.isActive());
+            stmt.setBoolean(10, permitType.isAllowthirdpartyinspection());
+            
+            stmt.setBoolean(11, permitType.isCommercial());
+
+            stmt.setInt(12, permitType.getDefaultValidityPeriodDays());
+            if(permitType.getBaseRuleSetID() != 0){
+                stmt.setInt(13, permitType.getBaseRuleSetID());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            
+            stmt.setString(14, permitType.getPermitTitle());
+            stmt.setString(15, permitType.getPermitTitleSub());
+            stmt.setBoolean(16, permitType.isExpires());
+            stmt.setBoolean(17, permitType.isRequireManager());
+            stmt.setBoolean(18, permitType.isRequireTenant());
+            stmt.setBoolean(19, permitType.isRequireZeroBalance());
+            
+            stmt.setInt(20, permitType.getTypeID());
+            
+            
 
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -1124,12 +1158,10 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         }
         OccPermitType tpe = null;
         String query = "SELECT typeid, muni_municode, title, authorizeduses, description, userassignable, \n" +
-                        "       permittable, startdaterequired, enddaterequired, passedinspectionrequired, \n" +
-                        "       rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n" +
-                        "       requiredpersontypes, commercial, requirepersontypeentrycheck, \n" +
-                        "       defaultpermitvalidityperioddays, occchecklist_checklistlistid, \n" +
-                        "       asynchronousinspectionvalidityperiod, defaultinspectionvalidityperiod, \n" +
-                        "       eventruleset_setid, inspectable, permittitle, permittitlesub, expires \n" +
+                        "       permittable, requireinspectionpass, requireleaselink, active, \n" +
+                        "       allowthirdpartyinspection, commercial, defaultpermitvalidityperioddays, \n" +
+                        "       eventruleset_setid, permittitle, permittitlesub, expires, requiremanager, \n" +
+                        "       requiretenant, requirezerobalance\n" +
                         "  FROM public.occpermittype WHERE typeid=?;";
 
         Connection con = getPostgresCon();
@@ -1218,54 +1250,56 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
     /**
      * Writes a new record in the occperiodtype table
-     * @param periodType
+     * @param permitType
      * @throws IntegrationException 
      */
-    public void insertOccPermitType(OccPermitType periodType) throws IntegrationException {
+    public void insertOccPermitType(OccPermitType permitType) throws IntegrationException {
         String query = "INSERT INTO public.occpermittype(\n" +
-                        "            typeid, muni_municode, title, authorizeduses, description, userassignable, \n" +
-                        "            permittable, startdaterequired, enddaterequired, passedinspectionrequired, \n" +
-                        "            rentalcompatible, active, allowthirdpartyinspection, optionalpersontypes, \n" +
-                        "            requiredpersontypes, commercial, requirepersontypeentrycheck, \n" +
-                        "            defaultpermitvalidityperioddays, occchecklist_checklistlistid, \n" +
-                        "            asynchronousinspectionvalidityperiod, defaultinspectionvalidityperiod, \n" +
-                        "            eventruleset_setid, inspectable, permittitle, permittitlesub)\n" +
-                        "    VALUES (?, ?, ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, \n" +
-                        "            ?, ?, \n" +
-                        "            ?, ?, \n" +
-                        "            ?, ?, ?, ?);";
+"            typeid, muni_municode, title, authorizeduses, description, userassignable, \n" +
+"            permittable, requireinspectionpass, requireleaselink, active, \n" +
+"            allowthirdpartyinspection, commercial, defaultpermitvalidityperioddays, \n" +
+"            eventruleset_setid, permittitle, permittitlesub, expires, requiremanager, \n" +
+"            requiretenant, requirezerobalance)\n" +
+"    VALUES (DEFAULT, ?, ?, ?, ?, ?, \n" +
+"            ?, ?, ?, ?, \n" +
+"            ?, ?, ?, \n" +
+"            ?, ?, ?, ?, ?, \n" +
+"            ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, periodType.getMuni().getMuniCode());
-            stmt.setString(2, periodType.getTitle());
-            stmt.setString(3, periodType.getAuthorizeduses());
-            stmt.setString(4, periodType.getDescription());
-            stmt.setBoolean(5, periodType.isUserassignable());
+            stmt.setInt(1, permitType.getMuni().getMuniCode());
+            stmt.setString(2, permitType.getTitle());
+            stmt.setString(3, permitType.getAuthorizeduses());
+            stmt.setString(4, permitType.getDescription());
+            stmt.setBoolean(5, permitType.isUserassignable());
 
-            stmt.setBoolean(6, periodType.isPermittable());
-            stmt.setBoolean(7, periodType.isStartdaterequired());
-            stmt.setBoolean(8, periodType.isEnddaterequired());
-            stmt.setBoolean(8, periodType.isPassedInspectionRequired());
+            stmt.setBoolean(6, permitType.isPermittable());
+            stmt.setBoolean(7, permitType.isPassedInspectionRequired());
 
-            stmt.setBoolean(9, periodType.isRentalcompatible());
-            stmt.setBoolean(10, periodType.isActive());
-            stmt.setBoolean(11, periodType.isAllowthirdpartyinspection());
-            stmt.setArray(12, con.createArrayOf("integer", periodType.getOptionalpersontypeList().toArray()));
+            stmt.setBoolean(8, permitType.isRequireLeaseLink());
+            stmt.setBoolean(9, permitType.isActive());
+            stmt.setBoolean(10, permitType.isAllowthirdpartyinspection());
+            
+            stmt.setBoolean(11, permitType.isCommercial());
 
-            stmt.setArray(13, con.createArrayOf("integer", periodType.getRequiredPersontypeList().toArray()));
-            stmt.setBoolean(14, periodType.isCommercial());
-            stmt.setBoolean(15, periodType.isRequirepersontypeentrycheck());
-
-            stmt.setInt(16, periodType.getDefaultValidityPeriodDays());
-            stmt.setString(17, periodType.getPermitTitle());
-            stmt.setString(18, periodType.getPermitTitleSub());
+            stmt.setInt(12, permitType.getDefaultValidityPeriodDays());
+            if(permitType.getBaseRuleSetID() != 0){
+                stmt.setInt(13, permitType.getBaseRuleSetID());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            
+            stmt.setString(14, permitType.getPermitTitle());
+            stmt.setString(15, permitType.getPermitTitleSub());
+            stmt.setBoolean(16, permitType.isExpires());
+            stmt.setBoolean(17, permitType.isRequireManager());
+            stmt.setBoolean(18, permitType.isRequireTenant());
+            stmt.setBoolean(19, permitType.isRequireZeroBalance());
+            
 
             stmt.execute();
         } catch (SQLException ex) {
@@ -1505,30 +1539,27 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             opt.setUserassignable(rs.getBoolean("userassignable"));
             
             opt.setPermittable(rs.getBoolean("permittable"));
-            opt.setStartdaterequired(rs.getBoolean("startdaterequired"));
-            opt.setEnddaterequired(rs.getBoolean("enddaterequired"));
-            opt.setPassedInspectionRequired(rs.getBoolean("passedinspectionrequired"));
+            opt.setPassedInspectionRequired(rs.getBoolean("requireinspectionpass"));
             
-            opt.setRentalcompatible(rs.getBoolean("rentalcompatible"));
+            opt.setRequireLeaseLink(rs.getBoolean("requireleaselink"));
             opt.setActive(rs.getBoolean("active"));
             opt.setAllowthirdpartyinspection(rs.getBoolean("allowthirdpartyinspection"));
 //            opt.setOptionalpersontypeList(generateOptionalPersonTypes(rs));
 
 //            opt.setRequiredPersontypeList(generateRequiredPersonTypes(rs));
             opt.setCommercial(rs.getBoolean("commercial"));
-            opt.setRequirepersontypeentrycheck(rs.getBoolean("requirepersontypeentrycheck"));
             
             opt.setDefaultValidityPeriodDays(rs.getInt("defaultpermitvalidityperioddays"));
-            opt.setChecklistID(rs.getInt("occchecklist_checklistlistid"));
             
-            opt.setAsynchronousValidityPeriod((rs.getBoolean("asynchronousinspectionvalidityperiod")));
-            opt.setDefaultValidityPeriodDays((rs.getInt("defaultinspectionvalidityperiod")));
             
             opt.setBaseRuleSetID(rs.getInt("eventruleset_setid"));
-            opt.setInspectable(rs.getBoolean("inspectable"));
             opt.setPermitTitle(rs.getString("permittitle"));
             opt.setPermitTitleSub(rs.getString("permittitlesub"));
             opt.setExpires(rs.getBoolean("expires"));
+            
+            opt.setRequireManager(rs.getBoolean("requiremanager"));
+            opt.setRequireTenant(rs.getBoolean("requiretenant"));
+            opt.setRequireZeroBalance(rs.getBoolean("requirezerobalance"));
 
             // ** Deac during CHARGES UPGRADE
 //            opt.setPermittedFees(pi.getFeeList(opt));

@@ -726,20 +726,28 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      * @param ev
      */
     public void onDeactivateInspectionButtonClick(ActionEvent ev){
-        System.out.println("OccInspectionBB.onDeactivateInspectionButtonClick | deactivating inspection " + currentInspection.getInspectionID());
-        OccInspectionCoordinator oic = getOccInspectionCoordinator();
-        try {
-            oic.deactivateOccInspection(getSessionBean().getSessUser(), currentInspection, getSessionBean().getSessOccPeriod());
-            refreshInspectionListAndTriggerManagedListReload();
-             getFacesContext().addMessage(null,
-                       new FacesMessage(FacesMessage.SEVERITY_INFO,
-                               "Occ Inspection deactivated with ID " + currentInspection.getInspectionID(), ""));
-        } catch (BObStatusException | AuthorizationException | IntegrationException  ex) {
-            System.out.println(ex);
-             getFacesContext().addMessage(null,
-                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                               ex.getMessage(), ""));
-        } 
+        if(currentInspection != null){
+            
+            System.out.println("OccInspectionBB.onDeactivateInspectionButtonClick | deactivating inspection " + currentInspection.getInspectionID());
+            OccInspectionCoordinator oic = getOccInspectionCoordinator();
+            try {
+                oic.deactivateOccInspection(getSessionBean().getSessUser(), currentInspection, getSessionBean().getSessOccPeriod());
+                refreshInspectionListAndTriggerManagedListReload();
+                 getFacesContext().addMessage(null,
+                           new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                   "Occ Inspection deactivated with ID " + currentInspection.getInspectionID(), ""));
+            } catch (BObStatusException | AuthorizationException | IntegrationException  ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null,
+                           new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                   ex.getMessage(), ""));
+            } 
+        } else {
+            System.out.println("OccInspectionBB.onDeactivateInspectionButtonClick | cannot deactivate null current inspection");
+            getFacesContext().addMessage(null,
+                      new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                              "Page setup error; cannot deactivate inspection", ""));
+        }
     }
     
     /**

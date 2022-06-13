@@ -355,6 +355,9 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             
         }
         if(verifyUserAuthorizationForInspectionActions(ua, oi, inspectable)) {
+            if(oi.getDetermination() != null){
+                throw new BObStatusException("A field inspection that has already been finalized cannot be deactivated. Remove finalization first if you must deactivate.");
+            }
             OccInspectionIntegrator oii = getOccInspectionIntegrator();
             oi.setDeactivatedBy(ua);
             oi.setDeactivatedTS(LocalDateTime.now());
@@ -391,15 +394,16 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * from undertaking action
      */
     private boolean verifyUserAuthorizationForInspectionActions(UserAuthorized ua,
-                                                                FieldInspection oi, 
+                                                                FieldInspection fin, 
                                                                 IFace_inspectable inspectable){
         
         boolean auth = false;
-        if(ua != null && oi != null && inspectable != null && inspectable.getManager() != null){
-            if(ua.getUserID() == oi.getInspector().getUserID() || ua.getUserID() == inspectable.getManager().getUserID() || ua.getKeyCard().isHasSysAdminPermissions()){
-                if(oi.getDomainEnum() != null && oi.getDomainEnum() == inspectable.getDomainEnum()){
+        if(ua != null && fin != null && fin.getInspector() != null && inspectable != null && inspectable.getManager() != null){
+            if(ua.getKeyCard().isHasSysAdminPermissions() || ua.getUserID() == fin.getInspector().getUserID() || ua.getUserID() == inspectable.getManager().getUserID() ){
+                // domain enum not working for deac
+//                if(fin.getDomainEnum() != null && fin.getDomainEnum() == inspectable.getDomainEnum()){
                     auth = true;
-                }
+//                }
             }
         }
         

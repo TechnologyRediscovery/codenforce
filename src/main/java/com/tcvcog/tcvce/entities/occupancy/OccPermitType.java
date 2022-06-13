@@ -36,29 +36,21 @@ public class OccPermitType implements Cloneable {
     private boolean userassignable;
     private List<Fee> permittedFees;
     
-    /**
-     * Used to build a checklist template for the occperiod
-     */
-    private int checklistID;
     
     private boolean permittable;
-    private boolean startdaterequired;
-    private boolean enddaterequired;
     private boolean inspectable;
-    private boolean passedInspectionRequired;
-    private boolean asynchronousValidityPeriod;
+    private boolean requireInspectionPass;
+    private boolean requireManager;
+    private boolean requireTenant;
+    private boolean requireZeroBalance;
     
     private int baseRuleSetID;
     
-    private boolean rentalcompatible;
+    private boolean requireLeaseLink;
     private boolean active;
     private boolean allowthirdpartyinspection;
     
-    private List<PersonType> optionalpersontypeList;
-    private List<PersonType> requiredPersontypeList;
-    
     private boolean commercial;
-    private boolean requirepersontypeentrycheck;
     
     private int defaultValidityPeriodDays;
     
@@ -121,31 +113,17 @@ public class OccPermitType implements Cloneable {
     }
 
     /**
-     * @return the startdaterequired
-     */
-    public boolean isStartdaterequired() {
-        return startdaterequired;
-    }
-
-    /**
-     * @return the enddaterequired
-     */
-    public boolean isEnddaterequired() {
-        return enddaterequired;
-    }
-
-    /**
-     * @return the passedInspectionRequired
+     * @return the requireInspectionPass
      */
     public boolean isPassedInspectionRequired() {
-        return passedInspectionRequired;
+        return isRequireInspectionPass();
     }
 
     /**
-     * @return the rentalcompatible
+     * @return the requireLeaseLink
      */
-    public boolean isRentalcompatible() {
-        return rentalcompatible;
+    public boolean isRequireLeaseLink() {
+        return requireLeaseLink;
     }
 
     /**
@@ -163,32 +141,12 @@ public class OccPermitType implements Cloneable {
     }
 
     /**
-     * @return the optionalpersontypeList
-     */
-    public List<PersonType> getOptionalpersontypeList() {
-        return optionalpersontypeList;
-    }
-
-    /**
-     * @return the requiredPersontypeList
-     */
-    public List<PersonType> getRequiredPersontypeList() {
-        return requiredPersontypeList;
-    }
-
-    /**
      * @return the commercial
      */
     public boolean isCommercial() {
         return commercial;
     }
 
-    /**
-     * @return the requirepersontypeentrycheck
-     */
-    public boolean isRequirepersontypeentrycheck() {
-        return requirepersontypeentrycheck;
-    }
 
     /**
      * @param typeid the typeid to set
@@ -240,31 +198,17 @@ public class OccPermitType implements Cloneable {
     }
 
     /**
-     * @param startdaterequired the startdaterequired to set
-     */
-    public void setStartdaterequired(boolean startdaterequired) {
-        this.startdaterequired = startdaterequired;
-    }
-
-    /**
-     * @param enddaterequired the enddaterequired to set
-     */
-    public void setEnddaterequired(boolean enddaterequired) {
-        this.enddaterequired = enddaterequired;
-    }
-
-    /**
-     * @param passedInspectionRequired the passedInspectionRequired to set
+     * @param passedInspectionRequired the requireInspectionPass to set
      */
     public void setPassedInspectionRequired(boolean passedInspectionRequired) {
-        this.passedInspectionRequired = passedInspectionRequired;
+        this.setRequireInspectionPass(passedInspectionRequired);
     }
 
     /**
-     * @param rentalcompatible the rentalcompatible to set
+     * @param requireLeaseLink the requireLeaseLink to set
      */
-    public void setRentalcompatible(boolean rentalcompatible) {
-        this.rentalcompatible = rentalcompatible;
+    public void setRequireLeaseLink(boolean requireLeaseLink) {
+        this.requireLeaseLink = requireLeaseLink;
     }
 
     /**
@@ -282,32 +226,12 @@ public class OccPermitType implements Cloneable {
     }
 
     /**
-     * @param optionalpersontypeList the optionalpersontypeList to set
-     */
-    public void setOptionalpersontypeList(List<PersonType> optionalpersontypeList) {
-        this.optionalpersontypeList = optionalpersontypeList;
-    }
-
-    /**
-     * @param requiredPersontypeList the requiredPersontypeList to set
-     */
-    public void setRequiredPersontypeList(List<PersonType> requiredPersontypeList) {
-        this.requiredPersontypeList = requiredPersontypeList;
-    }
-
-    /**
      * @param commercial the commercial to set
      */
     public void setCommercial(boolean commercial) {
         this.commercial = commercial;
     }
 
-    /**
-     * @param requirepersontypeentrycheck the requirepersontypeentrycheck to set
-     */
-    public void setRequirepersontypeentrycheck(boolean requirepersontypeentrycheck) {
-        this.requirepersontypeentrycheck = requirepersontypeentrycheck;
-    }
 
     /**
      * @return the defaultValidityPeriodDays
@@ -347,17 +271,12 @@ public class OccPermitType implements Cloneable {
         hash = 23 * hash + Objects.hashCode(this.description);
         hash = 23 * hash + (this.userassignable ? 1 : 0);
         hash = 23 * hash + (this.permittable ? 1 : 0);
-        hash = 23 * hash + (this.startdaterequired ? 1 : 0);
-        hash = 23 * hash + (this.enddaterequired ? 1 : 0);
         hash = 23 * hash + (this.inspectable ? 1 : 0);
-        hash = 23 * hash + (this.passedInspectionRequired ? 1 : 0);
-        hash = 23 * hash + (this.rentalcompatible ? 1 : 0);
+        hash = 23 * hash + (this.isRequireInspectionPass() ? 1 : 0);
+        hash = 23 * hash + (this.requireLeaseLink ? 1 : 0);
         hash = 23 * hash + (this.active ? 1 : 0);
         hash = 23 * hash + (this.allowthirdpartyinspection ? 1 : 0);
-        hash = 23 * hash + Objects.hashCode(this.optionalpersontypeList);
-        hash = 23 * hash + Objects.hashCode(this.requiredPersontypeList);
         hash = 23 * hash + (this.commercial ? 1 : 0);
-        hash = 23 * hash + (this.requirepersontypeentrycheck ? 1 : 0);
         hash = 23 * hash + this.defaultValidityPeriodDays;
         hash = 23 * hash + Objects.hashCode(this.permittedFees);
         return hash;
@@ -406,19 +325,6 @@ public class OccPermitType implements Cloneable {
         this.permitTitleSub = permitTitleSub;
     }
 
-    /**
-     * @return the checklistID
-     */
-    public int getChecklistID() {
-        return checklistID;
-    }
-
-    /**
-     * @param checklistID the checklistID to set
-     */
-    public void setChecklistID(int checklistID) {
-        this.checklistID = checklistID;
-    }
     
     public List<Fee> getPermittedFees() {
         return permittedFees;
@@ -426,20 +332,6 @@ public class OccPermitType implements Cloneable {
 
     public void setPermittedFees(List<Fee> permittedFees) {
         this.permittedFees = permittedFees;
-    }
-
-    /**
-     * @return the asynchronousValidityPeriod
-     */
-    public boolean isAsynchronousValidityPeriod() {
-        return asynchronousValidityPeriod;
-    }
-
-    /**
-     * @param asynchronousValidityPeriod the asynchronousValidityPeriod to set
-     */
-    public void setAsynchronousValidityPeriod(boolean asynchronousValidityPeriod) {
-        this.asynchronousValidityPeriod = asynchronousValidityPeriod;
     }
 
     /**
@@ -468,6 +360,62 @@ public class OccPermitType implements Cloneable {
      */
     public void setExpires(boolean expires) {
         this.expires = expires;
+    }
+
+    /**
+     * @return the requireManager
+     */
+    public boolean isRequireManager() {
+        return requireManager;
+    }
+
+    /**
+     * @param requireManager the requireManager to set
+     */
+    public void setRequireManager(boolean requireManager) {
+        this.requireManager = requireManager;
+    }
+
+    /**
+     * @return the requireTenant
+     */
+    public boolean isRequireTenant() {
+        return requireTenant;
+    }
+
+    /**
+     * @param requireTenant the requireTenant to set
+     */
+    public void setRequireTenant(boolean requireTenant) {
+        this.requireTenant = requireTenant;
+    }
+
+    /**
+     * @return the requireZeroBalance
+     */
+    public boolean isRequireZeroBalance() {
+        return requireZeroBalance;
+    }
+
+    /**
+     * @param requireZeroBalance the requireZeroBalance to set
+     */
+    public void setRequireZeroBalance(boolean requireZeroBalance) {
+        this.requireZeroBalance = requireZeroBalance;
+    }
+
+    /**
+     * @return the requireInspectionPass
+     */
+    public boolean isRequireInspectionPass() {
+        return requireInspectionPass;
+    }
+
+    /**
+     * @param requireInspectionPass the requireInspectionPass to set
+     */
+    public void setRequireInspectionPass(boolean requireInspectionPass) {
+        this.requireInspectionPass = requireInspectionPass;
     }
     
 }

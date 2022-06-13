@@ -130,7 +130,7 @@ public class OccupancyPeriodTypesBB extends BackingBeanUtils implements Serializ
 //        o.setOccupancyPermitTypeDescription(formOccupancyPermitTypeDescription);
         
         try{
-            oi.updateOccPeriodType(o);
+            oi.updateOccPermitType(o);
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Occupancy Permit Type updated!", ""));

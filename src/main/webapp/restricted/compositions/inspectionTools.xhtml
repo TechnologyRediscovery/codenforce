@@ -377,7 +377,7 @@
                 <p:panel id="inspection-advancedtools-panel"
                          toggleable="true"
                          collapsed="true"
-                         header="Transfer or Deactivation">
+                         header="Transfer and Deactivation">
                     <h:form id="inspection-advancedtools-form">
                         <h3>Transfer inspection to new period</h3>
 
@@ -398,10 +398,12 @@
                         <h3>Deactivate inspection</h3>
 
                         <p:commandButton  id="inspection-deacinspection-button"
-                                          action="#{fieldInspectionBB.onDeactivateInspectionButtonClick}"
-                                          ajax="false"
+                                          actionListener="#{fieldInspectionBB.onDeactivateInspectionButtonClick}"
+                                          ajax="true"
                                           value="Deactivate inspection ID #{fieldInspectionBB.currentInspection.inspectionID}"
-                                          update="#{fieldInspectionBB.inspectionListComponentForUpdate}"
+                                          update="#{fieldInspectionBB.inspectionListComponentForUpdate}
+                                          inspectiontools-growl-form"
+                                          oncomplete="PF('inspection-profile-dialog-var').hide();"
                                           >
                         </p:commandButton>
 
