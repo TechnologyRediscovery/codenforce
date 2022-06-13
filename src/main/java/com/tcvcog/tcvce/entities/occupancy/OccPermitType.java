@@ -38,7 +38,6 @@ public class OccPermitType implements Cloneable {
     
     
     private boolean permittable;
-    private boolean inspectable;
     private boolean requireInspectionPass;
     private boolean requireManager;
     private boolean requireTenant;
@@ -247,19 +246,6 @@ public class OccPermitType implements Cloneable {
         this.defaultValidityPeriodDays = defaultValidityPeriodDays;
     }
 
-    /**
-     * @return the inspectable
-     */
-    public boolean isInspectable() {
-        return inspectable;
-    }
-
-    /**
-     * @param inspectable the inspectable to set
-     */
-    public void setInspectable(boolean inspectable) {
-        this.inspectable = inspectable;
-    }
 
     @Override
     public int hashCode() {
@@ -271,7 +257,6 @@ public class OccPermitType implements Cloneable {
         hash = 23 * hash + Objects.hashCode(this.description);
         hash = 23 * hash + (this.userassignable ? 1 : 0);
         hash = 23 * hash + (this.permittable ? 1 : 0);
-        hash = 23 * hash + (this.inspectable ? 1 : 0);
         hash = 23 * hash + (this.isRequireInspectionPass() ? 1 : 0);
         hash = 23 * hash + (this.requireLeaseLink ? 1 : 0);
         hash = 23 * hash + (this.active ? 1 : 0);

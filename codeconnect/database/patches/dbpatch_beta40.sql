@@ -226,25 +226,6 @@ ALTER TABLE public.occpermit
       REFERENCES public.occpermittype (typeid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION;
 
--- ******************************* run on LIVE DEPLOYED system up to here *******************************
-
-DROP TABLE public.moneycecasefeepayment CASCADE;
-DROP TABLE public.moneycecasefeeassigned CASCADE;
-
-DROP TABLE public.moneycodesetelementfee CASCADE;
- 
- DROP TABLE public.moneyoccperiodfeeassigned CASCADE;
- DROP TABLE public.moneyoccperiodfeepayment CASCADE;
- DROP TABLE public.moneyoccperiodtypefee CASCADE;
- 
- DROP TABLE public.moneypayment CASCADE;
- DROP TABLE public.moneyfee CASCADE;
-
---  NOTICE:  drop cascades to constraint moneyoccpermittypefeepayment_occperassignedfee_fk on table moneyoccperiodfeepayment
--- NOTICE:  drop cascades to 2 other objects
--- DETAIL:  drop cascades to constraint codesetelement_feeid_fk on table codesetelement
--- drop cascades to constraint muniprofilefee__feeid_fk on table muniprofilefee
--- Query returned successfully with no result in 184 msec.
 
 
 -- ******************* MFAUX Fields ******************
@@ -274,6 +255,46 @@ ALTER TABLE propertyusetype
 DROP COLUMN active;
 
 -- ******************* END MFAUX Fields ******************
+
+-- adjust our occpermittype to specify payment related stuff, and clean up from migration from occperiodtype to permittype
+ALTER TABLE public.occpermittype DROP COLUMN defaultinspectionvalidityperiod;
+
+ALTER TABLE public.occpermittype DROP COLUMN inspectable;
+ALTER TABLE public.occpermittype DROP COLUMN optionalpersontypes;
+ALTER TABLE public.occpermittype DROP COLUMN requiredpersontypes;
+ALTER TABLE public.occpermittype DROP COLUMN requirepersontypeentrycheck;
+
+ALTER TABLE public.occpermittype DROP COLUMN occchecklist_checklistlistid;
+ALTER TABLE public.occpermittype DROP COLUMN asynchronousinspectionvalidityperiod;
+ALTER TABLE public.occpermittype DROP COLUMN startdaterequired;
+ALTER TABLE public.occpermittype DROP COLUMN enddaterequired;
+
+ALTER TABLE public.occpermittype RENAME COLUMN rentalcompatible TO requireleaselink;
+ALTER TABLE public.occpermittype RENAME COLUMN passedinspectionrequired TO requireinspectionpass;
+ALTER TABLE public.occpermittype ADD COLUMN requiremanager boolean;
+ALTER TABLE public.occpermittype ADD COLUMN requiretenant boolean;
+ALTER TABLE public.occpermittype ADD COLUMN requirezerobalance boolean;
+
+-- ******************************* run on LIVE DEPLOYED system up to here *******************************
+
+
+DROP TABLE public.moneycecasefeepayment CASCADE;
+DROP TABLE public.moneycecasefeeassigned CASCADE;
+
+DROP TABLE public.moneycodesetelementfee CASCADE;
+ 
+ DROP TABLE public.moneyoccperiodfeeassigned CASCADE;
+ DROP TABLE public.moneyoccperiodfeepayment CASCADE;
+ DROP TABLE public.moneyoccperiodtypefee CASCADE;
+ 
+ DROP TABLE public.moneypayment CASCADE;
+ DROP TABLE public.moneyfee CASCADE;
+
+--  NOTICE:  drop cascades to constraint moneyoccpermittypefeepayment_occperassignedfee_fk on table moneyoccperiodfeepayment
+-- NOTICE:  drop cascades to 2 other objects
+-- DETAIL:  drop cascades to constraint codesetelement_feeid_fk on table codesetelement
+-- drop cascades to constraint muniprofilefee__feeid_fk on table muniprofilefee
+-- Query returned successfully with no result in 184 msec.
 
 
 -- ********************** BEGIN GRAND TRANSACTION REVAMP **********************
@@ -401,9 +422,7 @@ CREATE TABLE public.moneychargeoccpermittype
     CONSTRAINT moneychargeoccpermittype_pk PRIMARY KEY (permittype_id, charge_id)
 );
 
-ALTER TABLE public.occpermittype DROP COLUMN defaultinspectionvalidityperiod;
 
-ALTER TABLE public.occpermittype DROP COLUMN inspectable;
 
 
 DROP TABLE public.moneypaymenttype;
@@ -616,21 +635,6 @@ DROP TABLE public.muniprofilefee;
 
 -- |^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^ END GRAND TRANSACTION REVAMP |^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^
 
-
--- adjust our occpermittype to specify payment related stuff, and clean up from migration from occperiodtype to permittype
-ALTER TABLE public.occpermittype DROP COLUMN optionalpersontypes;
-ALTER TABLE public.occpermittype DROP COLUMN requiredpersontypes;
-ALTER TABLE public.occpermittype DROP COLUMN requirepersontypeentrycheck;
-ALTER TABLE public.occpermittype DROP COLUMN occchecklist_checklistlistid;
-ALTER TABLE public.occpermittype DROP COLUMN asynchronousinspectionvalidityperiod;
-ALTER TABLE public.occpermittype DROP COLUMN startdaterequired;
-ALTER TABLE public.occpermittype DROP COLUMN enddaterequired;
-
-ALTER TABLE public.occpermittype RENAME COLUMN rentalcompatible TO requireleaselink;
-ALTER TABLE public.occpermittype RENAME COLUMN passedinspectionrequired TO requireinspectionpass;
-ALTER TABLE public.occpermittype ADD COLUMN requiremanager boolean;
-ALTER TABLE public.occpermittype ADD COLUMN requiretenant boolean;
-ALTER TABLE public.occpermittype ADD COLUMN requirezerobalance boolean;
 
 
 
