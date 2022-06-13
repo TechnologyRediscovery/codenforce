@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.money.entities.ChargeOrder;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,7 +41,7 @@ public class MuniProfile {
     
     private EventRuleSet eventRuleSetCE;
     private List<OccPermitType> occPermitTypeList;
-    private List<Fee> feeList;
+    private List<ChargeOrder> feeList;
 
     /**
      * @return the profileID
@@ -244,14 +245,14 @@ public class MuniProfile {
     /**
      * @return the feeList
      */
-    public List<Fee> getFeeList() {
+    public List<ChargeOrder> getFeeList() {
         return feeList;
     }
 
     /**
      * @param feeList the feeList to set
      */
-    public void setFeeList(List<Fee> feeList) {
+    public void setFeeList(List<ChargeOrder> feeList) {
         this.feeList = feeList;
     }
 }

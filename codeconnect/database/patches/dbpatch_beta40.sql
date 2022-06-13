@@ -45,7 +45,7 @@ ALTER TABLE public.municipality ADD COLUMN officeparcel_parcelid INTEGER
 
 
 
---- SNAPPER UPDATES ---------------- -- HAVEN"T RUN ON SERVER SNAPPER
+--- SNAPPER UPDATES ---------------- -- HAVEN'T RUN ON SERVER SNAPPER
 
 
 --BEGIN; -- not needed during 11-MAY-2022 updates
@@ -236,6 +236,7 @@ DROP TABLE public.moneycodesetelementfee CASCADE;
  DROP TABLE public.moneyoccperiodfeeassigned CASCADE;
  DROP TABLE public.moneyoccperiodfeepayment CASCADE;
  DROP TABLE public.moneyoccperiodtypefee CASCADE;
+ 
  DROP TABLE public.moneypayment CASCADE;
  DROP TABLE public.moneyfee CASCADE;
 
@@ -275,6 +276,9 @@ DROP COLUMN active;
 -- ******************* END MFAUX Fields ******************
 
 
+-- ********************** BEGIN GRAND TRANSACTION REVAMP **********************
+
+
 CREATE TYPE chargetype AS ENUM ('fee','fine');
 
 CREATE TABLE public.moneychargeschedule
@@ -306,13 +310,15 @@ CREATE TABLE public.moneychargeschedule
 );
 
 
+CREATE TYPE transactiontype AS ENUM ('charge','payment', 'adjustment');
 
 CREATE TABLE public.moneytransactionsource
 (
   sourceid integer NOT NULL DEFAULT nextval('paymenttype_typeid_seq'::regclass),
   title text NOT NULL,
-  descrition text,
+  description text,
   notes text,
+  
   humanassignable BOOLEAN DEFAULT TRUE,
   eventcatwhenposted		INTEGER CONSTRAINT moneytransactionsource_eventcat_fk REFERENCES eventcategory (categoryid),
   CONSTRAINT pmttype_typeid_pk PRIMARY KEY (sourceid)
@@ -323,9 +329,9 @@ WITH (
 ALTER TABLE public.moneytransactionsource
   OWNER TO sylvia;
 
+ALTER TABLE public.moneytransactionsource ADD COLUMN applicabletype_typeid 	transactiontype;
 
 
-CREATE TYPE transactiontype AS ENUM ('charge','payment', 'adjustment');
 
 
 CREATE SEQUENCE public.moneyledger_transactionid_seq
@@ -346,13 +352,10 @@ CREATE TABLE public.moneyledger
 	cecase_caseid 				integer CONSTRAINT moneyledger_caseid_fk REFERENCES cecase (caseid),
 	occperiod_periodid 			integer CONSTRAINT moneyledger_occperiod_fk REFERENCES occperiod (periodid),
 	transtype 					transactiontype 	NOT NULL,
-	charge_chargeid 			INTEGER CONSTRAINT moneyledger_chargeid_fk REFERENCES moneychargeschedule (chargeid),
 	amount 						money NOT NULL,
 	dateofrecord 			TIMESTAMP WITH TIME ZONE NOT NULL,
-	source 					INTEGER CONSTRAINT moneyledger_transsource_fk REFERENCES moneytransactionsource (sourceid),
+	source_id 					INTEGER CONSTRAINT moneyledger_transsource_fk REFERENCES moneytransactionsource (sourceid),
 	event_eventid			INTEGER CONSTRAINT moneyledger_event_fk REFERENCES event (eventid),
-	human_humanid 			INTEGER CONSTRAINT moneyledger_humanid_fk REFERENCES human (humanid),
-	humanrole_lorid 		INTEGER CONSTRAINT moneyledger_humanlor_fk REFERENCES linkedobjectrole (lorid),
 	lockedts				TIMESTAMP WITH TIME ZONE,
 	lockedby_userid 		INTEGER NOT NULL CONSTRAINT moneyledger_lockedby_userid_fk REFERENCES login (userid),     
 	createdts               TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -379,11 +382,144 @@ CREATE TABLE pulic.moneyledgercharge
 	deactivatedby_userid    INTEGER CONSTRAINT moneyledger_deactivatedby_userid_fk REFERENCES login (userid),    
     notes text,
     CONSTRAINT moneyledgercharge_pk PRIMARY KEY (transaction_id, charge_id)
-
 );
 
 
+CREATE TABLE public.moneychargeoccpermittype
+(
+	permittype_id 		INTEGER NOT NULL CONSTRAINT moneychargepermittype_permitid_fk REFERENCES occpermittype (typeid),
+	charge_id 			INTEGER NOT NULL CONSTRAINT moneychargepermittype_chargeid_fk REFERENCES moneychargeschedule (chargeid),
+	requireattachment 	BOOLEAN, 				
+	createdts               TIMESTAMP WITH TIME ZONE NOT NULL,
+	createdby_userid        INTEGER NOT NULL CONSTRAINT moneyledger_createdby_userid_fk REFERENCES login (userid),     
+	lastupdatedts           TIMESTAMP WITH TIME ZONE NOT NULL,
+	lastupdatedby_userid    INTEGER NOT NULL CONSTRAINT moneyledger_lastupdatdby_userid_fk REFERENCES login (userid),
+	deactivatedts           TIMESTAMP WITH TIME ZONE,
+	deactivatedby_userid    INTEGER CONSTRAINT moneyledger_deactivatedby_userid_fk REFERENCES login (userid),    
+    notes text,
+    CONSTRAINT moneychargeoccpermittype_pk PRIMARY KEY (permittype_id, charge_id)
+);
+
+ALTER TABLE public.occpermittype DROP COLUMN defaultinspectionvalidityperiod;
+
+ALTER TABLE public.occpermittype DROP COLUMN inspectable;
+
+
+DROP TABLE public.moneypaymenttype;
+
+
+CREATE SEQUENCE public.moneypmtmetadatacheck_checkid_seq
+  INCREMENT 1
+  MINVALUE 100000
+  MAXVALUE 9223372036854775807
+  START 100001
+  CACHE 1;
+
+
+
+CREATE TABLE public.moneypmtmetadatacheck
+(
+	checkid 				INTEGER NOT NULL PRIMARY KEY DEFAULT nextval('moneypmtmetadatacheck_checkid_seq'),
+	transaction_id 			INTEGER NOT NULL CONSTRAINT moneypmtmetadatacheck_transid_fk REFERENCES moneyledger (transactionid),
+	checkno 				INTEGER NOT NULL,
+	bankname 				TEXT,
+	mailingaddress_addressid 	INTEGER NOT NULL CONSTRAINT moneypmtmetadatacheck_addressid_fk REFERENCES mailingaddress (addressid),	
+	createdts               TIMESTAMP WITH TIME ZONE NOT NULL,
+	createdby_userid        INTEGER NOT NULL CONSTRAINT moneypmtmetadatacheck_createdby_userid_fk REFERENCES login (userid),     
+	lastupdatedts           TIMESTAMP WITH TIME ZONE NOT NULL,
+	lastupdatedby_userid    INTEGER NOT NULL CONSTRAINT moneypmtmetadatacheck_lastupdatdby_userid_fk REFERENCES login (userid),
+	deactivatedts           TIMESTAMP WITH TIME ZONE,
+	deactivatedby_userid    INTEGER CONSTRAINT moneypmtmetadatacheck_deactivatedby_userid_fk REFERENCES login (userid),    
+    notes text
+);
+
+
+CREATE SEQUENCE public.moneytransactionhuman_linkid_seq
+  INCREMENT 1
+  MINVALUE 1000
+  MAXVALUE 9223372036854775807
+  START 1001
+  CACHE 1;
+
+CREATE TABLE public.moneytransactionhuman
+
+(
+	linkid 					INTEGER NOT NULL DEFAULT nextval('moneytransactionhuman_linkid_seq') CONSTRAINT moneytransactionhuman_linkid_pk PRIMARY KEY,
+	human_humanid 			INTEGER NOT NULL CONSTRAINT moneytransactionhuman_humanid_fk REFERENCES human (humanid),
+	transaction_id 			INTEGER NOT NULL CONSTRAINT moneytransactionhuman_transid_fk REFERENCES moneyledger (transactionid),
+	linkedobjectrole_lorid INTEGER NOT NULL CONSTRAINT moneytransactionhuman_lorid_fk REFERENCES linkedobjectrole (lorid),
+	createdts               TIMESTAMP WITH TIME ZONE NOT NULL,
+	createdby_userid        INTEGER NOT NULL CONSTRAINT moneytransactionhuman_createdby_userid_fk REFERENCES login (userid),     
+	lastupdatedts           TIMESTAMP WITH TIME ZONE NOT NULL,
+	lastupdatedby_userid    INTEGER NOT NULL CONSTRAINT moneytransactionhuman_lastupdatdby_userid_fk REFERENCES login (userid),
+	deactivatedts           TIMESTAMP WITH TIME ZONE,
+	deactivatedby_userid    INTEGER CONSTRAINT moneytransactionhuman_deactivatedby_userid_fk REFERENCES login (userid),    
+    notes text
+);
+
+
+CREATE SEQUENCE public.moneypmtmetadatamunicipay_municipayrecordid_seq
+  INCREMENT 1
+  MINVALUE 100000
+  MAXVALUE 9223372036854775807
+  START 100001
+  CACHE 1;
+
+CREATE TABLE public.moneypmtmetadatamunicipay
+(
+	recordid				INTEGER NOT NULL DEFAULT nextval('moneypmtmetadatamunicipay_municipayrecordid_seq') CONSTRAINT moneypmtmetadatamunicipay_pk PRIMARY KEY,
+	transaction_id 			INTEGER NOT NULL CONSTRAINT moneypmtmetadatamunicipay_transid_fk REFERENCES moneyledger (transactionid),
+	municipayrefno			TEXT,
+	municipayreply 		  	TEXT,
+	createdts               TIMESTAMP WITH TIME ZONE NOT NULL,
+	createdby_userid        INTEGER NOT NULL CONSTRAINT moneyledger_createdby_userid_fk REFERENCES login (userid),     
+	lastupdatedts           TIMESTAMP WITH TIME ZONE NOT NULL,
+	lastupdatedby_userid    INTEGER NOT NULL CONSTRAINT moneyledger_lastupdatdby_userid_fk REFERENCES login (userid),
+	deactivatedts           TIMESTAMP WITH TIME ZONE,
+	deactivatedby_userid    INTEGER CONSTRAINT moneyledger_deactivatedby_userid_fk REFERENCES login (userid),    
+    notes text
+);
+
+
+-- RUN THESE ALTER TYPES ONE BY ONE ALONE
+
+-- ALTER TYPE transactiontype ADD VALUE 'CHARGE';
+-- ALTER TYPE transactiontype ADD VALUE 'PAYMENT';
+-- ALTER TYPE transactiontype ADD VALUE 'ADJUSTMENT';
+-- ALTER TYPE chargetype ADD VALUE 'FEE';
+-- ALTER TYPE chargetype ADD VALUE 'FINE';
+
+
 -- ******************************* run on LOCAL TEST system up to here *******************************
+
+
+-- drop these columns and check integration methods/objects for compat
+-- DETAIL:  drop cascades to constraint codesetelement_feeid_fk on table codesetelement
+-- drop cascades to constraint muniprofilefee__feeid_fk on table muniprofilefee
+-- Query returned successfully with no result in 184 msec.
+DROP TABLE public.muniprofilefee;
+
+
+
+
+-- |^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^ END GRAND TRANSACTION REVAMP |^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^
+
+
+-- adjust our occpermittype to specify payment related stuff, and clean up from migration from occperiodtype to permittype
+ALTER TABLE public.occpermittype DROP COLUMN optionalpersontypes;
+ALTER TABLE public.occpermittype DROP COLUMN requiredpersontypes;
+ALTER TABLE public.occpermittype DROP COLUMN requirepersontypeentrycheck;
+ALTER TABLE public.occpermittype DROP COLUMN occchecklist_checklistlistid;
+ALTER TABLE public.occpermittype DROP COLUMN asynchronousinspectionvalidityperiod;
+ALTER TABLE public.occpermittype DROP COLUMN startdaterequired;
+ALTER TABLE public.occpermittype DROP COLUMN enddaterequired;
+
+ALTER TABLE public.occpermittype RENAME COLUMN rentalcompatible TO requireleaselink;
+ALTER TABLE public.occpermittype RENAME COLUMN passedinspectionrequired TO requireinspectionpass;
+ALTER TABLE public.occpermittype ADD COLUMN requiremanager boolean;
+ALTER TABLE public.occpermittype ADD COLUMN requiretenant boolean;
+ALTER TABLE public.occpermittype ADD COLUMN requirezerobalance boolean;
+
 
 
 

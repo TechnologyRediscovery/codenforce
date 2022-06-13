@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
-import com.tcvcog.tcvce.entities.Fee;
+import com.tcvcog.tcvce.money.entities.ChargeOrder;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.PersonType;
 import java.util.List;
@@ -34,7 +34,7 @@ public class OccPermitType implements Cloneable {
     private String authorizeduses;
     private String description;
     private boolean userassignable;
-    private List<Fee> permittedFees;
+    private List<ChargeOrder> permittedFees;
     
     /**
      * Used to build a checklist template for the occperiod
@@ -420,11 +420,11 @@ public class OccPermitType implements Cloneable {
         this.checklistID = checklistID;
     }
     
-    public List<Fee> getPermittedFees() {
+    public List<ChargeOrder> getPermittedFees() {
         return permittedFees;
     }
 
-    public void setPermittedFees(List<Fee> permittedFees) {
+    public void setPermittedFees(List<ChargeOrder> permittedFees) {
         this.permittedFees = permittedFees;
     }
 

@@ -29,7 +29,7 @@ import com.tcvcog.tcvce.entities.CodeElementGuideEntry;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
+import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -985,7 +985,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
      */
     private EnforcableCodeElement generateEnforcableCodeElement(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         
-        PaymentIntegrator pi = getPaymentIntegrator();
+        MoneyIntegrator pi = getMoneyIntegrator();
         UserIntegrator ui = getUserIntegrator();
         CodeCoordinator cc = getCodeCoordinator();
         CodeElement ele = cc.getCodeElement(rs.getInt("codelement_elementid"));

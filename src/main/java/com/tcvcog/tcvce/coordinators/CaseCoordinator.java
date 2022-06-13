@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.coordinators;
 
+import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportCEARList;
@@ -31,7 +32,7 @@ import com.tcvcog.tcvce.entities.reports.ReportCECaseListCatEnum;
 import com.tcvcog.tcvce.entities.reports.ReportCECaseListStreetCECaseContainer;
 import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.integration.*;
-import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
+import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -3350,7 +3351,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
 
         CaseIntegrator ci = getCaseIntegrator();
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
         int insertedViolationID;
 
         violation_verifyCodeViolationAttributes(cse, cv);
@@ -3361,7 +3362,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cv.setCreatedBy(ua);
         }
         insertedViolationID = ci.insertCodeViolation(cv);
-        pc.insertAutoAssignedFees(cse, cv);
         return insertedViolationID;
     }
 

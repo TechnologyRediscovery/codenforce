@@ -1497,17 +1497,23 @@
 
 
     <managed-bean>
-        <managed-bean-name>feeManagementBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.FeeManagementBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>chageManagementBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.money.ChargeManagementBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
     
     <managed-bean>
-        <managed-bean-name>paymentCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.coordinators.PaymentCoordinator</managed-bean-class>
-        <managed-bean-scope>application</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>moneyCoordinator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.money.coordination.MoneyCoordinator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>moneyIntegrator</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.money.integration.MoneyIntegrator</managed-bean-class>
+    
+        <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~ nav rules: payments ~~~~~~~~~~~~~~~~~~~~~~~~ --> 
     <navigation-rule>
@@ -1558,9 +1564,9 @@
 
     <managed-bean>
         <managed-bean-name>paymentBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.occupancy.application.PaymentBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.money.PaymentBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
     
     <managed-bean>
@@ -1679,17 +1685,17 @@
     
     <managed-bean>
         <managed-bean-name>pIBCECaseBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PIBCECaseBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.money.ChargeManagementBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
     
         
     <managed-bean>
         <managed-bean-name>personSearchPublicBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PersonSearchPublicBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.money.coordination.MoneyCoordinator</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>occPeriodPublicBB</managed-bean-name>
@@ -1962,9 +1968,9 @@
 
     <managed-bean>
         <managed-bean-name>paymentsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.PaymentsBB</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.money.PaymentsBB</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
     <managed-bean>
         <managed-bean-name>blobRetrieveBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.BlobRetrieveBB</managed-bean-class>

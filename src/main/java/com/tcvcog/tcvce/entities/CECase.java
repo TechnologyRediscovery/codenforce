@@ -8,6 +8,8 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
+import com.tcvcog.tcvce.money.entities.IFace_ledgerHolder;
+import com.tcvcog.tcvce.money.entities.MoneyLedger;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
@@ -29,7 +31,8 @@ public class        CECase
                     IFace_StatusLogHolder,
                     Comparable<CECase>,
                     IFace_ActivatableBOB,
-                    IFace_noteHolder {
+                    IFace_noteHolder,
+                    IFace_ledgerHolder{
     
     final static String CASE_TABLE_NAME = "cecase";
     final static String CASE_PK_FIELD = "caseid";
@@ -71,6 +74,7 @@ public class        CECase
     protected List<Citation> citationList;
     protected List<NoticeOfViolation> noticeList;
     protected List<CodeViolation> violationList;
+    protected MoneyLedger ledger;
     
     protected boolean active;
     protected boolean propertyInfoCase;
@@ -790,6 +794,16 @@ public class        CECase
      */
     public void setDaysSinceLastEvent(String daysSinceLastEvent) {
         this.daysSinceLastEvent = daysSinceLastEvent;
+    }
+
+    @Override
+    public void setMoneyLedger(MoneyLedger ledger) {
+        this.ledger = ledger;
+    }
+
+    @Override
+    public MoneyLedger getMoneyLedger() {
+        return this.ledger;
     }
 
    

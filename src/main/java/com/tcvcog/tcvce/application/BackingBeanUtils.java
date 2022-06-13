@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
 import com.tcvcog.tcvce.coordinators.*;
 
 import java.io.Serializable;
@@ -40,7 +41,7 @@ import com.tcvcog.tcvce.integration.UserIntegrator;
 // occupancy integrators
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
+import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
 
 // system integrators
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -116,8 +117,8 @@ public class        BackingBeanUtils
     private OccupancyCoordinator occupancyCoordinator;
     private OccInspectionCoordinator occInspectionCoordinator;
 
-    private PaymentIntegrator paymentIntegrator;
-    private PaymentCoordinator paymentCoordinator;
+    private MoneyIntegrator moneyIntegrator;
+    private MoneyCoordinator moneyCoordinator;
     private DataCoordinator dataCoordinator;
     
     private BlobCoordinator blobCoordinator;
@@ -533,22 +534,22 @@ public class        BackingBeanUtils
 
     
     /**
-     * @return the paymentIntegrator
+     * @return the moneyIntegrator
      */
-    public PaymentIntegrator getPaymentIntegrator() {
+    public MoneyIntegrator getMoneyIntegrator() {
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{paymentIntegrator}", PaymentIntegrator.class);
-        paymentIntegrator = (PaymentIntegrator) ve.getValue(context.getELContext());
-        return paymentIntegrator;
+                .createValueExpression(context.getELContext(), "#{moneyIntegrator}", MoneyIntegrator.class);
+        moneyIntegrator = (MoneyIntegrator) ve.getValue(context.getELContext());
+        return moneyIntegrator;
     }
 
-    public PaymentCoordinator getPaymentCoordinator(){
+    public MoneyCoordinator getMoneyCoordinator(){
         FacesContext context = getFacesContext();
         ValueExpression ve = context.getApplication().getExpressionFactory()
-                .createValueExpression(context.getELContext(), "#{paymentCoordinator}", PaymentCoordinator.class);
-        paymentCoordinator = (PaymentCoordinator) ve.getValue(context.getELContext());
-        return paymentCoordinator;
+                .createValueExpression(context.getELContext(), "#{moneyCoordinator}", MoneyCoordinator.class);
+        moneyCoordinator = (MoneyCoordinator) ve.getValue(context.getELContext());
+        return moneyCoordinator;
     }
     
     /**
@@ -561,10 +562,10 @@ public class        BackingBeanUtils
     
 
     /**
-     * @param paymentIntegrator the paymentIntegrator to set
+     * @param moneyIntegrator the moneyIntegrator to set
      */
-    public void setPaymentIntegrator(PaymentIntegrator paymentIntegrator) {
-        this.paymentIntegrator = paymentIntegrator;
+    public void setMoneyIntegrator(MoneyIntegrator moneyIntegrator) {
+        this.moneyIntegrator = moneyIntegrator;
     }
 
 

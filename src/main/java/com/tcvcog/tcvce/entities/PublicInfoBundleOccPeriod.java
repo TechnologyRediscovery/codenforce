@@ -38,8 +38,6 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle {
     
     private List<PublicInfoBundlePerson> personList;
     private List<PublicInfoBundleOccInspection> inspectionList;
-    private List<PublicInfoBundleFeeAssigned> feeList;
-    private List<PublicInfoBundlePayment> paymentList;
 
     @Override
     public String toString() {
@@ -92,22 +90,7 @@ public class PublicInfoBundleOccPeriod extends PublicInfoBundle {
         this.inspectionList = inspectionList;
     }
 
-    public List<PublicInfoBundleFeeAssigned> getFeeList() {
-        return feeList;
-    }
-
-    public void setFeeList(List<PublicInfoBundleFeeAssigned> feeList) {
-        this.feeList = feeList;
-    }
-
-    public List<PublicInfoBundlePayment> getPaymentList() {
-        return paymentList;
-    }
-
-    public void setPaymentList(List<PublicInfoBundlePayment> paymentList) {
-        this.paymentList = paymentList;
-    }
-    
+ 
     
 
 }

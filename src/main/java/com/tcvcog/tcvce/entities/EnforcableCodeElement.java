@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.money.entities.ChargeOrder;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -78,7 +79,7 @@ public class EnforcableCodeElement
     protected int normDaysToComply;
     protected String daysToComplyNotes;
     protected String muniSpecificNotes;
-    protected List<Fee> feeList;
+    protected List<ChargeOrder> feeList;
     protected String defaultViolationDescription;
     
     protected List<String> injectedValues;
@@ -217,11 +218,11 @@ public class EnforcableCodeElement
         this.muniSpecificNotes = muniSpecificNotes;
     }
 
-    public List<Fee> getFeeList() {
+    public List<ChargeOrder> getFeeList() {
         return feeList;
     }
 
-    public void setFeeList(List<Fee> feeList) {
+    public void setFeeList(List<ChargeOrder> feeList) {
         this.feeList = feeList;
     }
 

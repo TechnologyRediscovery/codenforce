@@ -134,7 +134,7 @@ public enum LinkedObjectSchemaEnum {
                         ),
     
     MailingaddressHuman (   
-                            "Person",
+                            "Mailing Address",
                             "humanmailingaddress",
                             "MailingaddressHuman", 
                             "linkid",
@@ -142,6 +142,17 @@ public enum LinkedObjectSchemaEnum {
                             "humanmailing_addressid",
                             "humanmailing_linkid_seq",
                             LinkedObjectFamilyEnum.MAILING,
+                            true
+                        ), 
+    TransactionHuman     (   
+                            "Transaction",
+                            "moneytransactionhuman",
+                            "TransactionHuman", 
+                            "linkid",
+                            "transaction_id",
+                            "human_humanid",
+                            "moneytransactionhuman_linkid_seq",
+                            LinkedObjectFamilyEnum.HUMAN,
                             true
                         ), 
     ParcelMailingaddress  (
@@ -174,7 +185,7 @@ public enum LinkedObjectSchemaEnum {
     private final String LINK_ROLE_SCHEMA_TYPE_STRING;
     private final String LINKING_TABLE_PK_FIELD;
     private final String TARGET_TABLE_FK_FIELD;
-    private final String LINKED_OBJECT_FK_FIELD;
+    private final String LINKED_OBJECT_FK_FIELD; // either the human or mad
     private final String LINKING_TABLE_SEQ_ID;
     private final LinkedObjectFamilyEnum FAMILY;
     private final boolean ACTIVELINK;

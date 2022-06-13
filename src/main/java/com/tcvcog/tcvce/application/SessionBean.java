@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.money.entities.TransactionPayment;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
@@ -321,15 +322,15 @@ public class    SessionBean
     private boolean unitDetermined;
     
     /* >>> -------------------------------------------------------------- <<< */
-    /* >>>                        X Payment                               <<< */
+    /* >>>                        X TransactionPayment                               <<< */
     /* >>> -------------------------------------------------------------- <<< */
 
-    private Payment sessPayment;
+    private TransactionPayment sessPayment;
     private String paymentRedirTo;
     
     private OccPeriod feeManagementOccPeriod;
     private String feeRedirTo;
-    private Payment sessionPayment;
+    private TransactionPayment sessionPayment;
     
     private DomainEnum feeManagementDomain;
     private CECase feeManagementCeCase;
@@ -1417,7 +1418,7 @@ public class    SessionBean
     /**
      * @return the sessPayment
      */
-    public Payment getSessPayment() {
+    public TransactionPayment getSessPayment() {
         return sessPayment;
     }
 
@@ -1438,7 +1439,7 @@ public class    SessionBean
     /**
      * @param sessPayment the sessPayment to set
      */
-    public void setSessPayment(Payment sessPayment) {
+    public void setSessPayment(TransactionPayment sessPayment) {
         this.sessPayment = sessPayment;
     }
     /**
@@ -1758,7 +1759,7 @@ public class    SessionBean
     /**
      * @return the sessionPayment
      */
-    public Payment getSessionPayment() {
+    public TransactionPayment getSessionPayment() {
         return sessionPayment;
     }
 
@@ -1772,7 +1773,7 @@ public class    SessionBean
     /**
      * @param sessionPayment the sessionPayment to set
      */
-    public void setSessionPayment(Payment sessionPayment) {
+    public void setSessionPayment(TransactionPayment sessionPayment) {
         this.sessionPayment = sessionPayment;
     }
 

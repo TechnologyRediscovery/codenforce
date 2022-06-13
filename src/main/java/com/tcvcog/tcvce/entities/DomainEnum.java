@@ -27,27 +27,32 @@ public enum DomainEnum {
     CODE_ENFORCEMENT        (   "Code enforcement cases", 
                                 "cecase_caseid",
                                 "CE",
-                                "fee"),
+                                "fee", 
+                                "cecase_caseid"),
     OCCUPANCY               (   "Occupancy Periods", 
                                 "occperiod_periodid",
                                 "OCC",
-                                "fine"),
+                                "fine",
+                                "occperiod_periodid"),
     UNIVERSAL               (   "All event subdomains", 
                                 "cecase_caseid",
                                 "UNI",
-                                "charge");                         // this field should never
+                                "charge",
+                                "");                         // this field should never
                                                                 // be used since the Search Coor
     private final String title;                                 // is interpreting UNIVERSAL to run
     private final String dbField;                               // the other two independently
                                                                 // and combine the results\
     private final String abbrev;
     private final String chargeTypeName;
+    protected final String ledgerFKFieldString;
     
-    private DomainEnum(String t, String db, String ab, String ctn){
+    private DomainEnum(String t, String db, String ab, String ctn, String lfks){
         title = t;
         dbField = db;
         abbrev = ab;
         chargeTypeName = ctn;
+        ledgerFKFieldString = lfks;
     }
 
     /**
@@ -76,6 +81,13 @@ public enum DomainEnum {
      */
     public String getChargeTypeName() {
         return chargeTypeName;
+    }
+
+    /**
+     * @return the ledgerFKFieldString
+     */
+    public String getLedgerFKFieldString() {
+        return ledgerFKFieldString;
     }
 
 

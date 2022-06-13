@@ -345,7 +345,7 @@
 +     ++++++  ++ ++ +     [braddockdemo~10^2~10^2~34^2] DBPATCH RELEASE 27; public user creation infrastructure
 +     ++++++  ++ ++ +     [braddockdemo~41] workflow pages WIP; pause for public user
 -     ------  -- -- -   - [ppmergetest] merged publicInfoUpgrade with eventOverhaul via recovered
-+     ++++++  ++ ++ +   + [ppmergetest^2] Quick fix to paymentIntegrator to generate correct type of feeAssigned.
++     ++++++  ++ ++ +   + [ppmergetest^2] Quick fix to moneyIntegrator to generate correct type of feeAssigned.
 +     ++++++  ++ ++ +   + [ppmergetest^2^] Finalizing my work on the PublicInfoCoordinator thus far
 +     ++++++  ++ ++ +   + [ppmergetest^2~2] Making a bundle for inspections, and all of its inner fields that need bundling
 +     ++++++  ++ ++ +   + [ppmergetest^2~3] Fixes from code review
@@ -372,9 +372,9 @@
 --    ------  -- -- -   - [aftercovid~4^2^] Merge pull request #86 from TechnologyRediscovery/paymentsUIUpdate
 ++    ++++++  ++ ++ +   + [aftercovid~4^2^2^] Whoops! Forgot a few tweaks. It's all good now. Ready for pull request!
 ++    ++++++  ++ ++ +   + [aftercovid~4^2^2~2] Completed FeeManagementBB. Both payment BBs use coordinator methods and DataHeavy objects now
-++    ++++++  ++ ++ +   + [aftercovid~4^2^2~3] Continued work on FeeManagementBB, corrected mistakes on PaymentCoordinator
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~3] Continued work on FeeManagementBB, corrected mistakes on moneyCoordinator
 ++    ++++++  ++ ++ +   + [aftercovid~4^2^2~4] Began migration of integration code from FeeManagementBB to various coordinators
-++    ++++++  ++ ++ +   + [aftercovid~4^2^2~5] Finished migrating integration code from PaymentBB to PaymentCoordinator
+++    ++++++  ++ ++ +   + [aftercovid~4^2^2~5] Finished migrating integration code from PaymentBB to moneyCoordinator
 ++    ++++++  ++ ++ +   + [aftercovid~4^2^2~6] beginning work on Issue #43. PaymentsBB now uses OccPeriodDataHeavy and refreshFeeAssignedList has been updated
 ++    ++++++  ++ ++ +   + [aftercovid~4^2^2~7] Migrated feeTypeManage.xhtml to the new UI, debugging and all. Issue #33 complete!
 ++    ++++++  ++ ++ +   + [aftercovid~4^2^2~8] Finished paymentTypeManage.xhtml

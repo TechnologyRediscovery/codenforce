@@ -16,10 +16,11 @@
  */
 package com.tcvcog.tcvce.occupancy.integration;
 
+import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
+import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
@@ -729,7 +730,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         PreparedStatement stmt = null;
         int freshPermitID = 0;
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
         
         try {
             con = getPostgresCon();
@@ -799,7 +800,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         PreparedStatement stmt = null;
         int finalizedPermitCount = 0;
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
         
         try {
             con = getPostgresCon();
@@ -1301,7 +1302,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         PreparedStatement stmt = null;
         int newPeriodId = 0;
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
         
         try {
             con = getPostgresCon();
@@ -1494,7 +1495,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
     private OccPermitType generateOccPermitType(ResultSet rs) throws IntegrationException {
         OccPermitType opt = new OccPermitType();
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
-        PaymentIntegrator pi = getPaymentIntegrator();
+        MoneyIntegrator pi = getMoneyIntegrator();
         
         try {
             opt.setTypeID(rs.getInt("typeid"));

@@ -16,6 +16,8 @@
  */
 package com.tcvcog.tcvce.coordinators;
 
+import com.tcvcog.tcvce.money.entities.TransactionPayment;
+import com.tcvcog.tcvce.money.entities.TransactionCharge;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -31,7 +33,7 @@ import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
+import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 
@@ -333,46 +335,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
     }
 
-    /**
-     * Bundles a Payment into a PublicInfoBundlePayment by stripping out its
-     * private information.
-     *
-     * @param input
-     * @return
-     */
-    public PublicInfoBundlePayment extractPublicInfo(Payment input) {
-
-        PublicInfoBundlePayment pib = new PublicInfoBundlePayment();
-
-        pib.setTypeName("Payment");
-        pib.setShowAddMessageButton(false);
-        //the Paymentobject does not have a PACC Enabled field
-        //if (!input.isPaccEnabled()) {
-
-        PersonCoordinator pc = getPersonCoordinator();
-
-        Person skeleton = pc.anonymizePersonData(input.getPayer());
-
-        // TODO upgrade for parcelization
-//        pib.setPayer(extractPublicInfo(skeleton));
-
-        pib.setBundledPayment(input);
-
-        pib.setPaccStatusMessage("Public access enabled");
-        pib.setPaccEnabled(true);
-
-        pib.setShowDetailsPageButton(true);
-        /*} else {
-            Payment skeleton = new Payment();
-            skeleton.setPaymentID(input.getPaymentID());
-            pib.setBundledPayment(skeleton);
-            pib.setPaccStatusMessage("A public information bundle was found but public "
-                    + "access was switched off by a code officer. Please contact your municipal office. ");
-
-        }*/
-
-        return pib;
-    }
+   
 
     /**
      * Bundles a Person into a PublicInfoBundlePerson by stripping out its
@@ -565,29 +528,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
                 }
             }
 
-            ArrayList<PublicInfoBundleFeeAssigned> bundledFees = new ArrayList<>();
-            if (opdh.getFeeList() != null) {
-                for (FeeAssigned skeleton : opdh.getFeeList()) {
-
-                    bundledFees.add(extractPublicInfo(skeleton));
-
-                }
-            }
-
-            ArrayList<PublicInfoBundlePayment> bundledPayments = new ArrayList<>();
-
-            if (opdh.getPaymentList() != null) {
-                for (Payment skeleton : opdh.getPaymentList()) {
-
-                    bundledPayments.add(extractPublicInfo(skeleton));
-
-                }
-            }
 
             pib.setPersonList(bundledPersons);
             pib.setInspectionList(bundledInspections);
-            pib.setFeeList(bundledFees);
-            pib.setPaymentList(bundledPayments);
 
             pib.setShowDetailsPageButton(true);
         } else {
@@ -703,27 +646,7 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return pib;
     }
 
-    /**
-     * Bundles a FeeAssigned into a PublicInfoBundleFeeAssigned by stripping out
-     * its private information.
-     *
-     * @param input
-     * @return
-     */
-    public PublicInfoBundleFeeAssigned extractPublicInfo(FeeAssigned input) {
-        PublicInfoBundleFeeAssigned pib = new PublicInfoBundleFeeAssigned();
-
-        pib.setBundledFee(input);
-
-        pib.setTypeName("FeeAssigned");
-        pib.setPaccStatusMessage("Public access enabled");
-        pib.setPaccEnabled(true);
-
-        pib.setShowAddMessageButton(false);
-        pib.setShowDetailsPageButton(true);
-
-        return pib;
-    }
+   
 
     /**
      * Bundles a PropertyUnit into a PublicInfoBundlePropertyUnit by stripping
@@ -829,65 +752,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         return pib;
     }
 
-    /**
-     * Converts a bundled Payment to an unbundled Payment for internal use. This
-     * method does check for changes.
-     *
-     * @param input
-     * @return
-     */
-    public Payment export(PublicInfoBundlePayment input) throws BObStatusException {
+   
 
-        PaymentIntegrator pi = getPaymentIntegrator();
-
-        Payment unbundled = input.getBundledPayment();
-
-        try {
-            //Checks to see if payment is new. 
-            //If the get method throws an error, the payment probably doesn't exist
-            Payment exportable = pi.getPayment(unbundled.getPaymentID());
-            if (!unbundled.getNotes().contains("*")) {
-                exportable.setNotes(unbundled.getNotes());
-            }
-            exportable.setDomain(unbundled.getDomain());
-            return exportable;
-        } catch (IntegrationException ex) {
-            System.out.println("Exporting payment failed. Assuming exported payment is new, and could not be found in DB.");
-            System.out.println("But here's the error message, just in case: " + ex.toString());
-            return unbundled;
-        }
-    }
-
-    /**
-     * Converts a bundled FeeAssigned to an unbundled FeeAssigned for internal
-     * use. Currently does not check for changes.
-     *
-     * @param input
-     * @return
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     */
-    public FeeAssigned export(PublicInfoBundleFeeAssigned input) 
-            throws IntegrationException, BObStatusException {
-
-        PaymentIntegrator pi = getPaymentIntegrator();
-
-        FeeAssigned unbundled = input.getBundledFee();
-
-        FeeAssigned exportable = pi.getFeeAssigned(unbundled.getAssignedFeeID(), unbundled.getDomain());
-
-        ArrayList<Payment> skeletonHorde = new ArrayList<>();
-
-        if (input.getPaymentList() != null) {
-
-            for (PublicInfoBundlePayment bundle : input.getPaymentList()) {
-                skeletonHorde.add(export(bundle));
-            }
-
-        }
-        exportable.setPaymentList(skeletonHorde);
-        return exportable;
-    }
-
+   
     /**
      * Converts a bundled PropertyUnit to an unbundled PropertyUnit for internal
      * use. Currently does check for changes. Uses the data-heavy class to
@@ -1155,42 +1022,15 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
             }
         }
 
-        ArrayList<FeeAssigned> feeHorde = new ArrayList<>();
+        ArrayList<TransactionCharge> feeHorde = new ArrayList<>();
 
-        if (input.getFeeList() != null) {
-            for (PublicInfoBundleFeeAssigned bundle : input.getFeeList()) {
-
-                FeeAssigned temp = new FeeAssigned(export(bundle));
-
-                temp.setOccPeriodID(exportable.getPeriodID());
-
-                // TODO: update for occ periods not having any more types
-//                temp.setOccPeriodTypeID(exportable.getType().getTypeID());
-
-                feeHorde.add(temp);
-
-            }
-        }
-
-        ArrayList<Payment> paymentHorde = new ArrayList<>();
-
-        if (input.getPaymentList() != null) {
-
-            for (PublicInfoBundlePayment bundle : input.getPaymentList()) {
-
-                paymentHorde.add(new Payment(export(bundle)));
-
-            }
-        }
 
 /// ----------- >TODO: upgrade for humanization/parcelization <--------------------                                            
 //        exportable.setPersonList(skeletonHorde);
 
         exportable.setInspectionList(inspectionHorde);
 
-        exportable.setFeeList(feeHorde);
 
-        exportable.setPaymentList(paymentHorde);
 
         return exportable;
 

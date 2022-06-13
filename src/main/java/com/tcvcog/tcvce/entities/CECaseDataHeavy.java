@@ -5,6 +5,8 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.money.entities.TransactionPayment;
+import com.tcvcog.tcvce.money.entities.TransactionCharge;
 import java.util.ArrayList;
 import java.util.List;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
@@ -26,7 +28,6 @@ public class CECaseDataHeavy
                     IFace_CredentialSigned,
                     IFace_Loggable,
                     IFace_ActivatableBOB,
-                    IFace_PaymentHolder,
                     IFace_BlobHolder,
                     IFace_humanListHolder,
                     IFace_inspectable{
@@ -49,8 +50,8 @@ public class CECaseDataHeavy
 
     private List<CEActionRequest> ceActionRequestList;
 
-    private List<FeeAssigned> feeList;
-    private List<Payment> paymentList;
+    private List<TransactionCharge> feeList;
+    private List<TransactionPayment> paymentList;
     
     private List<BlobLight> blobList;
     
@@ -251,52 +252,18 @@ public class CECaseDataHeavy
     /**
      * @return the feeList
      */
-    public List<FeeAssigned> getFeeList() {
+    public List<TransactionCharge> getFeeList() {
         return feeList;
     }
 
     /**
      * @param feeList the feeList to set
      */
-    public void setFeeList(List<FeeAssigned> feeList) {
+    public void setFeeList(List<TransactionCharge> feeList) {
         this.feeList = feeList;
     }
 
-    /**
-     * @return the paymentList
-     */
-    @Override
-    public List<Payment> getPaymentList() {
-        return paymentList;
-    }
-
-
-    /**
-     * @param paymentList the paymentList to set
-     */
-    @Override
-    public void setPaymentList(List<Payment> paymentList) {
-        this.paymentList = paymentList;
-    }
-
-    /**
-     * Takes the general Payment type and converts it to
-     *
-     * @param paymentList the paymentList to set
-     */
-    @Override
-    public void setPaymentListGeneral(List<Payment> paymentList) {
-        List<Payment> skeletonHorde = new ArrayList<>();
-
-        for (Payment p : paymentList) {
-
-            skeletonHorde.add(new Payment(p));
-
-        }
-
-        this.paymentList = skeletonHorde;
-    }
-
+  
     @Override
     public String getCredentialSignature() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

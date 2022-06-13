@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.entities.HumanLink;
+import com.tcvcog.tcvce.money.entities.IFace_ledgerHolder;
+import com.tcvcog.tcvce.money.entities.MoneyLedger;
 
 /**
  * Primary Business Object BOB for holding data about Occupancy Periods
@@ -38,7 +40,8 @@ public  class       OccPeriod
                     IFace_EventHolder,
                     Comparable<OccPeriod>,
                     IFace_ActivatableBOB,
-                    IFace_noteHolder {
+                    IFace_noteHolder,
+                    IFace_ledgerHolder{
     
     final static String OCCPERIOD_TABLE_NAME = "occperiod";
     final static String OCCPERIOD_PK_FIELD = "periodid";
@@ -58,6 +61,7 @@ public  class       OccPeriod
     protected User periodTypeCertifiedBy;
     protected LocalDateTime periodTypeCertifiedTS;
     protected List<EventCnF> eventList;
+    protected MoneyLedger ledger;
     
     protected BOBSource source;
     
@@ -544,4 +548,15 @@ public  class       OccPeriod
     public void setPermitList(List<OccPermit> permitList) {
         this.permitList = permitList;
     }
+    
+     @Override
+    public void setMoneyLedger(MoneyLedger ledger) {
+        this.ledger = ledger;
+    }
+
+    @Override
+    public MoneyLedger getMoneyLedger() {
+        return this.ledger;
+    }
+
 }

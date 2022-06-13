@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.application;
+package com.tcvcog.tcvce.money;
 
+import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.SessionBean;
+import com.tcvcog.tcvce.money.entities.TransactionPayment;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
@@ -72,7 +75,7 @@ public class PaymentsBB extends BackingBeanUtils implements Serializable {
     /**
      * Redirect to payments page to edit the specified payment.
      */
-    public String editPayment(Payment thisPayment) {
+    public String editPayment(TransactionPayment thisPayment) {
         SessionBean sb = getSessionBean();
 
         sb.setFeeManagementDomain(pageDomain);

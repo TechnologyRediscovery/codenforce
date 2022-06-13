@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
 import com.tcvcog.tcvce.coordinators.*;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -31,7 +32,7 @@ import com.tcvcog.tcvce.integration.UserIntegrator;
 
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
-import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
+import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
 
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -141,11 +142,11 @@ public class Initializer implements ServletContextListener{
         OccInspectionCoordinator occInspectionCoordinator = new OccInspectionCoordinator();
         servletContext.setAttribute("occInspectionCoordinator", occInspectionCoordinator);
 
-        PaymentIntegrator pmtInt = new PaymentIntegrator();
-        servletContext.setAttribute("paymentIntegrator", pmtInt);
+        MoneyIntegrator pmtInt = new MoneyIntegrator();
+        servletContext.setAttribute("moneyIntegrator", pmtInt);
 
-        PaymentCoordinator pmtCrd = new PaymentCoordinator();
-        servletContext.setAttribute("paymentCoordinator", pmtCrd);
+        MoneyCoordinator pmtCrd = new MoneyCoordinator();
+        servletContext.setAttribute("moneyCoordinator", pmtCrd);
 
         SystemIntegrator sysInt = new SystemIntegrator();
         servletContext.setAttribute("systemIntegrator", sysInt);

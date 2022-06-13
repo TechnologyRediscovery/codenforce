@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.occupancy.application;
+package com.tcvcog.tcvce.money;
 
+import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
-import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
@@ -33,8 +33,8 @@ import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
 import com.tcvcog.tcvce.entities.DomainEnum;
-import com.tcvcog.tcvce.entities.Fee;
-import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.money.entities.ChargeOrder;
+import com.tcvcog.tcvce.money.entities.TransactionCharge;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitType;
 import java.io.Serializable;
@@ -51,25 +51,25 @@ import javax.faces.context.FacesContext;
  * @author Adam Gutonski
  */
 @ViewScoped
-public class FeeManagementBB extends BackingBeanUtils implements Serializable {
+public class ChargeManagementBB extends BackingBeanUtils implements Serializable {
 
     //feeTypeManage.xhtml fields
-    private ArrayList<Fee> existingFeeTypeList;
-    private Fee selectedFeeType;
+    private ArrayList<ChargeOrder> existingFeeTypeList;
+    private ChargeOrder selectedFeeType;
 
     //feeManage.xhtml fields
     private OccPeriodDataHeavy currentOccPeriod;
     private CECaseDataHeavy currentCase;
-    private Fee selectedFee;
-    private ArrayList<Fee> feeList;
-    private ArrayList<Fee> filteredFeeList;
+    private ChargeOrder selectedFee;
+    private ArrayList<ChargeOrder> feeList;
+    private ArrayList<ChargeOrder> filteredFeeList;
     private ArrayList<CodeViolation> violationList;
     private ArrayList<CodeViolation> filteredViolationList;
     private CodeViolation selectedViolation;
 
-    private FeeAssigned selectedAssignedFee;
-    private ArrayList<FeeAssigned> feeAssignedList;
-    private ArrayList<FeeAssigned> filteredFeeAssignedList;
+    private TransactionCharge selectedAssignedFee;
+    private ArrayList<TransactionCharge> feeAssignedList;
+    private ArrayList<TransactionCharge> filteredFeeAssignedList;
 
     //feePermissions.xhtml fields
     private ArrayList<OccPermitType> typeList;
@@ -80,10 +80,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private ArrayList<EnforcableCodeElement> filteredElementList;
     private EnforcableCodeElement selectedCodeElement;
 
-    private HashMap<Integer, Fee> existingFeeList;
-    private ArrayList<Fee> workingFeeList;
-    private Fee selectedWorkingFee;
-    private List<Fee> allFees;
+    private HashMap<Integer, ChargeOrder> existingFeeList;
+    private ArrayList<ChargeOrder> workingFeeList;
+    private ChargeOrder selectedWorkingFee;
+    private List<ChargeOrder> allFees;
 
     //Generalized fields
     private DomainEnum currentDomain;
@@ -92,16 +92,16 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     private boolean redirected;
     private boolean currentFeeSelected; //Can be used to see if any entity is currently selected, not just fees
 
-    public FeeManagementBB() {
+    public ChargeManagementBB() {
     }
 
     @PostConstruct
     public void initBean() {
-        selectedFeeType = new Fee();
+        selectedFeeType = new ChargeOrder();
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator mc = getMoneyCoordinator();
 
-        selectedAssignedFee = new FeeAssigned();
+        selectedAssignedFee = new TransactionCharge();
 
         currentMode = "Lookup";
 
@@ -122,7 +122,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             if (allFees == null) {
 
                 try {
-                    allFees = pc.getFeeList();
+                    allFees = mc.getFeeList();
                 } catch (IntegrationException  ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -133,7 +133,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             }
 
             if (feeList == null) {
-                feeList = (ArrayList<Fee>) allFees;
+                feeList = (ArrayList<ChargeOrder>) allFees;
             }
 
             refreshTypesAndElements();
@@ -187,9 +187,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         
         //create an instance of both fees if current mode == "Insert"
         if (getActiveInsertMode()) {
-            selectedAssignedFee = new FeeAssigned();
+            selectedAssignedFee = new TransactionCharge();
 
-            selectedFee = new Fee();
+            selectedFee = new ChargeOrder();
         }
         //show the current mode in p:messages box
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, this.currentMode + " Mode Selected", ""));
@@ -201,7 +201,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * @param currentFee
      * @throws IntegrationException
      */
-    public void onAssignedFeeSelectedButtonChange(FeeAssigned currentFee) throws IntegrationException, BObStatusException {
+    public void onAssignedFeeSelectedButtonChange(TransactionCharge currentFee) throws IntegrationException, BObStatusException {
 
         // "Select" button was selected
         if (currentFeeSelected == true) {
@@ -260,8 +260,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             try {
                 
                 workingFeeList = new ArrayList<>(selectedPeriodType.getPermittedFees());
-                for(Fee fee : workingFeeList){
-                    existingFeeList.put(fee.getFeeID(), fee);
+                for(ChargeOrder fee : workingFeeList){
+                    existingFeeList.put(fee.getChargeID(), fee);
                 }                
                 
             } catch (NullPointerException e) {
@@ -309,8 +309,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             try {
                 workingFeeList = new ArrayList<>(selectedCodeElement.getFeeList());
-                for(Fee fee : workingFeeList){
-                    existingFeeList.put(fee.getFeeID(), fee);
+                for(ChargeOrder fee : workingFeeList){
+                    existingFeeList.put(fee.getChargeID(), fee);
                 }
             } catch (NullPointerException e) {
                 System.out.println("EnforcableCodeElement has no existing permitted fee list, making new lists...");
@@ -348,7 +348,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * @param currentFee
      * @throws IntegrationException
      */
-    public void onFeeSelectedButtonChange(Fee currentFee) throws IntegrationException {
+    public void onFeeSelectedButtonChange(ChargeOrder currentFee) throws IntegrationException {
 
         // "Select" button was selected
         if (currentFeeSelected == true) {
@@ -368,7 +368,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             //turn to default setting
             currentFeeSelected = false;
-            selectedFeeType = new Fee();
+            selectedFeeType = new ChargeOrder();
 
             refreshTypesAndElements();
 
@@ -379,15 +379,15 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Inserts a new FeeAssigned object into the database.
-     * When the interface makes a new FeeAssigned object, it stores the new fee
-     * in the "selectedAssignedFee" field. So, in this case, 
-     * the selectedAssignedFee is a new fee.
+     * Inserts a new TransactionCharge object into the database.
+     * When the interface makes a new TransactionCharge object, it stores the new fee
+ in the "selectedAssignedFee" field. So, in this case, 
+ the selectedAssignedFee is a new fee.
      * @return 
      */
     public String onInsertAssignedFeeButtonChange() throws BObStatusException {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         if (currentDomain == DomainEnum.OCCUPANCY) {
 
@@ -432,7 +432,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      */
     public String onUpdateAssignedFeeButtonChange() throws BObStatusException {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
         if (currentDomain == DomainEnum.OCCUPANCY) {
             try {
 
@@ -477,7 +477,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      */
     public String onRemoveAssignedFeeButtonChange() throws BObStatusException {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         if (currentDomain == DomainEnum.OCCUPANCY) {
 
@@ -568,12 +568,12 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Applies changes on the selected Fee to the database.
+     * Applies changes on the selected ChargeOrder to the database.
      * @return 
      */
     public String onUpdateFeeButtonChange() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         if (getSelectedFeeType() != null) {
 
@@ -599,14 +599,14 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Inserts a new Fee object into the database.
-     * When the interface makes a new Fee object, it stores the new fee
-     * in the "selectedFeeType" field. So, in this case, 
-     * the selectedFeeType is a new fee.
+     * Inserts a new ChargeOrder object into the database.
+     * When the interface makes a new ChargeOrder object, it stores the new fee
+ in the "selectedFeeType" field. So, in this case, 
+ the selectedFeeType is a new fee.
      * @return 
      */
     public String onInsertFeeButtonChange() {
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
         if (getSelectedFeeType() != null) {
 
             try {
@@ -631,15 +631,15 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Remove the selected Fee. 
+     * Remove the selected ChargeOrder. 
      * 
-     * Fee objects do not represent actually applied
-     * fees or any financial data - they're just templates that are then assigned
-     * to other entities via AssignedFee. So, it's okay for users to edit or remove
-     * them at will.
+     * ChargeOrder objects do not represent actually applied
+ fees or any financial data - they're just templates that are then assigned
+ to other entities via AssignedFee. So, it's okay for users to edit or remove
+ them at will.
      */
     public void onRemoveFeeButtonChange() {
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         if (getSelectedFeeType() != null) {
             try {
@@ -664,10 +664,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the existingFeeTypeList
      */
-    public ArrayList<Fee> getFeeTypeList() {
-        PaymentCoordinator pc = getPaymentCoordinator();
+    public ArrayList<ChargeOrder> getFeeTypeList() {
+        MoneyCoordinator pc = getMoneyCoordinator();
         try {
-            existingFeeTypeList = (ArrayList<Fee>) pc.getAllFeeTypes();
+            existingFeeTypeList = (ArrayList<ChargeOrder>) pc.getAllFeeTypes();
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -677,11 +677,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * A method used to only remove a Fee from the list of Fees permitted for
-     * a given entity. It doesn't delete the fee from the database.
+     * A method used to only remove a ChargeOrder from the list of Fees permitted for
+ a given entity. It doesn't delete the fee from the database.
      * @param selectedFee 
      */
-    public void removePermittedFee(Fee selectedFee) {
+    public void removePermittedFee(ChargeOrder selectedFee) {
         workingFeeList.remove(selectedFee);
     }
 
@@ -697,8 +697,8 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
             boolean duplicate = false;
 
-            for (Fee test : workingFeeList) {
-                duplicate = test.getFeeID() == selectedFee.getFeeID();
+            for (ChargeOrder test : workingFeeList) {
+                duplicate = test.getChargeID() == selectedFee.getChargeID();
                 if (duplicate) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -730,7 +730,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 
                 //There are no currently permitted Fees for this entity
                 //Let's skip scanning and insert them all to save on processing time.
-                for (Fee workingFee : workingFeeList) {
+                for (ChargeOrder workingFee : workingFeeList) {
                     insertOrReactivateOccPeriodJoin(workingFee);
                 }
 
@@ -749,7 +749,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
                 
                 //There are no currently permitted Fees for this entity
                 //Let's skip scanning and insert them all to save on processing time.
-                for (Fee workingFee : workingFeeList) {
+                for (ChargeOrder workingFee : workingFeeList) {
 
                     insertOrReactivateCodeElementJoin(workingFee);
                 }
@@ -773,9 +773,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * Activates a join between a workingFee and the selectedPeriodType.
      * @param workingFee 
      */
-    public void insertOrReactivateOccPeriodJoin(Fee workingFee) {
+    public void insertOrReactivateOccPeriodJoin(ChargeOrder workingFee) {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         try {
             pc.activateFeeJoin(workingFee, selectedPeriodType);
@@ -792,9 +792,9 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      * Activates a join between a workingFee and the selectedCodeElement
      * @param workingFee 
      */
-    public void insertOrReactivateCodeElementJoin(Fee workingFee) {
+    public void insertOrReactivateCodeElementJoin(ChargeOrder workingFee) {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         try {
             pc.activateFeeJoin(workingFee, selectedCodeElement);
@@ -813,10 +813,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      */
     public void scanExistingOccPeriodFeeListWithInsert() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
-        for (Fee workingFee : workingFeeList) {
-                if (existingFeeList.containsKey(workingFee.getFeeID())) {
+        for (ChargeOrder workingFee : workingFeeList) {
+                if (existingFeeList.containsKey(workingFee.getChargeID())) {
                     //The working fee is in the existing fee list, let's update it
                     try {
                         pc.updateFeeJoin(workingFee, selectedPeriodType);
@@ -841,10 +841,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      */
     public void scanExistingCodeElementFeeListWithInsert() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
-        for (Fee workingFee : workingFeeList) {
-                if (existingFeeList.containsKey(workingFee.getFeeID())) {
+        for (ChargeOrder workingFee : workingFeeList) {
+                if (existingFeeList.containsKey(workingFee.getChargeID())) {
                     //The working fee is in the existing fee list, let's update it
                     try {
                         pc.updateFeeJoin(workingFee, selectedCodeElement);
@@ -869,10 +869,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      */
     public void scanExistingOccPeriodFeeListWithDeactivate() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         //Work on a clone of the existingFeeList so we don't cause errors.
-        HashMap<Integer, Fee> tempMap = new HashMap<>(existingFeeList);
+        HashMap<Integer, ChargeOrder> tempMap = new HashMap<>(existingFeeList);
         
         /*
         If any fees were removed from the workingFeeList, they would only be 
@@ -880,13 +880,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         workingFeeList from the existingFeeList so we can isolate the no longer
         permitted fees.
         */
-        for(Fee fee : workingFeeList){
-            tempMap.remove(fee.getFeeID());
+        for(ChargeOrder fee : workingFeeList){
+            tempMap.remove(fee.getChargeID());
         }
         
-        List<Fee> prohibitedFees = new ArrayList<>(tempMap.values());
+        List<ChargeOrder> prohibitedFees = new ArrayList<>(tempMap.values());
         
-        for (Fee prohibitedFee : prohibitedFees) {
+        for (ChargeOrder prohibitedFee : prohibitedFees) {
                 try {
                     pc.deactivateFeeJoin(prohibitedFee, selectedPeriodType);
                 } catch (IntegrationException ex) {
@@ -906,10 +906,10 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
      */
     public void scanExistingCodeElementFeeListWithDeactivate() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         //Work on a clone of the existingFeeList so we don't cause errors.
-        HashMap<Integer, Fee> tempMap = new HashMap<>(existingFeeList);
+        HashMap<Integer, ChargeOrder> tempMap = new HashMap<>(existingFeeList);
         
         /*
         If any fees were removed from the workingFeeList, they would only be 
@@ -917,13 +917,13 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         workingFeeList from the existingFeeList so we can isolate the no longer
         permitted fees.
         */
-        for(Fee fee : workingFeeList){
-            tempMap.remove(fee.getFeeID());
+        for(ChargeOrder fee : workingFeeList){
+            tempMap.remove(fee.getChargeID());
         }
         
-        List<Fee> prohibitedFees = new ArrayList<>(tempMap.values());
+        List<ChargeOrder> prohibitedFees = new ArrayList<>(tempMap.values());
         
-        for (Fee prohibitedFee : prohibitedFees) {
+        for (ChargeOrder prohibitedFee : prohibitedFees) {
                 try {
                     pc.deactivateFeeJoin(prohibitedFee, selectedCodeElement);
                 } catch (IntegrationException ex) {
@@ -946,7 +946,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
 
         feeAssignedList = new ArrayList<>();
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         currentDomain = getSessionBean().getFeeManagementDomain();
 
@@ -969,7 +969,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
             if (currentOccPeriod != null) {
 
                 try {
-                    feeAssignedList = (ArrayList<FeeAssigned>) pc.getAssignedFees(currentOccPeriod);
+                    feeAssignedList = (ArrayList<TransactionCharge>) pc.getAssignedFees(currentOccPeriod);
 
                 } catch (IntegrationException ex) {
                     getFacesContext().addMessage(null,
@@ -1011,7 +1011,7 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Refreshes Fee templates and the list of code elements
+     * Refreshes ChargeOrder templates and the list of code elements
      */
     public void refreshTypesAndElements() {
 
@@ -1067,21 +1067,21 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
     /**
      * @param existingFeeTypeList the existingFeeTypeList to set
      */
-    public void setExistingFeeTypeList(ArrayList<Fee> existingFeeTypeList) {
+    public void setExistingFeeTypeList(ArrayList<ChargeOrder> existingFeeTypeList) {
         this.existingFeeTypeList = existingFeeTypeList;
     }
 
     /**
      * @return the selectedFeeType
      */
-    public Fee getSelectedFeeType() {
+    public ChargeOrder getSelectedFeeType() {
         return selectedFeeType;
     }
 
     /**
      * @param selectedFeeType the selectedFeeType to set
      */
-    public void setSelectedFeeType(Fee selectedFeeType) {
+    public void setSelectedFeeType(ChargeOrder selectedFeeType) {
         this.selectedFeeType = selectedFeeType;
     }
 
@@ -1089,19 +1089,19 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         return currentMode;
     }
 
-    public Fee getSelectedFee() {
+    public ChargeOrder getSelectedFee() {
         return selectedFee;
     }
 
-    public void setSelectedFee(Fee selectedFee) {
+    public void setSelectedFee(ChargeOrder selectedFee) {
         this.selectedFee = selectedFee;
     }
 
-    public ArrayList<Fee> getFeeList() {
+    public ArrayList<ChargeOrder> getFeeList() {
         return feeList;
     }
 
-    public void setFeeList(ArrayList<Fee> feeList) {
+    public void setFeeList(ArrayList<ChargeOrder> feeList) {
         this.feeList = feeList;
     }
 
@@ -1113,27 +1113,27 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.violationList = violationList;
     }
 
-    public FeeAssigned getSelectedAssignedFee() {
+    public TransactionCharge getSelectedAssignedFee() {
         return selectedAssignedFee;
     }
 
-    public void setSelectedAssignedFee(FeeAssigned selectedAssignedFee) {
+    public void setSelectedAssignedFee(TransactionCharge selectedAssignedFee) {
         this.selectedAssignedFee = selectedAssignedFee;
     }
 
-    public ArrayList<FeeAssigned> getFeeAssignedList() {
+    public ArrayList<TransactionCharge> getFeeAssignedList() {
         return feeAssignedList;
     }
 
-    public void setFeeAssignedList(ArrayList<FeeAssigned> feeAssignedList) {
+    public void setFeeAssignedList(ArrayList<TransactionCharge> feeAssignedList) {
         this.feeAssignedList = feeAssignedList;
     }
 
-    public ArrayList<FeeAssigned> getFilteredFeeAssignedList() {
+    public ArrayList<TransactionCharge> getFilteredFeeAssignedList() {
         return filteredFeeAssignedList;
     }
 
-    public void setFilteredFeeAssignedList(ArrayList<FeeAssigned> filteredFeeAssignedList) {
+    public void setFilteredFeeAssignedList(ArrayList<TransactionCharge> filteredFeeAssignedList) {
         this.filteredFeeAssignedList = filteredFeeAssignedList;
     }
 
@@ -1145,11 +1145,11 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.waived = waived;
     }
 
-    public ArrayList<Fee> getFilteredFeeList() {
+    public ArrayList<ChargeOrder> getFilteredFeeList() {
         return filteredFeeList;
     }
 
-    public void setFilteredFeeList(ArrayList<Fee> filteredFeeList) {
+    public void setFilteredFeeList(ArrayList<ChargeOrder> filteredFeeList) {
         this.filteredFeeList = filteredFeeList;
     }
 
@@ -1193,27 +1193,27 @@ public class FeeManagementBB extends BackingBeanUtils implements Serializable {
         this.filteredTypeList = filteredTypeList;
     }
 
-    public ArrayList<Fee> getWorkingFeeList() {
+    public ArrayList<ChargeOrder> getWorkingFeeList() {
         return workingFeeList;
     }
 
-    public void setWorkingFeeList(ArrayList<Fee> workingFeeList) {
+    public void setWorkingFeeList(ArrayList<ChargeOrder> workingFeeList) {
         this.workingFeeList = workingFeeList;
     }
 
-    public Fee getSelectedWorkingFee() {
+    public ChargeOrder getSelectedWorkingFee() {
         return selectedWorkingFee;
     }
 
-    public void setSelectedWorkingFee(Fee selectedWorkingFee) {
+    public void setSelectedWorkingFee(ChargeOrder selectedWorkingFee) {
         this.selectedWorkingFee = selectedWorkingFee;
     }
 
-    public List<Fee> getAllFees() {
+    public List<ChargeOrder> getAllFees() {
         return allFees;
     }
 
-    public void setAllFees(List<Fee> allFees) {
+    public void setAllFees(List<ChargeOrder> allFees) {
         this.allFees = allFees;
     }
 

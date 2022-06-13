@@ -16,6 +16,8 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.money.entities.TransactionPayment;
+import com.tcvcog.tcvce.money.entities.TransactionCharge;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 
 import com.tcvcog.tcvce.entities.*;
@@ -39,7 +41,6 @@ public  class       OccPeriodDataHeavy
         extends     OccPeriodPropertyUnitHeavy
         implements  IFace_EventRuleGoverned, 
                     IFace_CredentialSigned,
-                    IFace_PaymentHolder,
                     IFace_humanListHolder,
                     IFace_BlobHolder,
                     IFace_inspectable{
@@ -61,8 +62,8 @@ public  class       OccPeriodDataHeavy
     
     private List<Integer> blobIDList;
     
-    private List<FeeAssigned> feeList;
-    private List<Payment> paymentList;
+    private List<TransactionCharge> feeList;
+    private List<TransactionPayment> paymentList;
     
     private List<BlobLight> blobList;
 
@@ -237,38 +238,7 @@ public  class       OccPeriodDataHeavy
         return proposalListVisible;
     }
     
-      /**
-     * @return the paymentList
-     */
-    @Override
-    public List<Payment> getPaymentList() {
-        return paymentList;
-    }
-
-    /**
-     * @param paymentList the paymentList to set
-     */
-    @Override
-    public void setPaymentList(List<Payment> paymentList) {
-        this.paymentList = paymentList;
-    }
-    
-    /**
-     * Takes the general Payment type and converts it to 
-     * @param paymentList the paymentList to set
-     */
-    @Override
-    public void setPaymentListGeneral(List<Payment> paymentList) {
-        List<Payment> skeletonHorde = new ArrayList<>();
-        
-        for (Payment p : paymentList) {
-            
-            skeletonHorde.add(new Payment(p));
-            
-        }
-        
-        this.paymentList = skeletonHorde;
-    }
+  
 
     /**
      * @return the applicationList
@@ -358,14 +328,14 @@ public  class       OccPeriodDataHeavy
     /**
      * @return the feeList
      */
-    public List<FeeAssigned> getFeeList() {
+    public List<TransactionCharge> getFeeList() {
         return feeList;
     }
 
     /**
      * @param feeList the feeList to set
      */
-    public void setFeeList(List<FeeAssigned> feeList) {
+    public void setFeeList(List<TransactionCharge> feeList) {
         this.feeList = feeList;
     }
 

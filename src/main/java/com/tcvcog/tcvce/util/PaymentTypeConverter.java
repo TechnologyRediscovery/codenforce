@@ -18,7 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.util;
 
 import com.tcvcog.tcvce.entities.EventCategory;
-import com.tcvcog.tcvce.entities.PaymentType;
+import com.tcvcog.tcvce.money.entities.TnxSource;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -38,7 +38,7 @@ public class PaymentTypeConverter extends EntityConverter implements Converter{
             return null; 
         }
         
-        PaymentType pto = (PaymentType) this.getViewMap(fc).get(titleS);
+        TnxSource pto = (TnxSource) this.getViewMap(fc).get(titleS);
         
         System.out.println("PaymentTypeConverter.getAsObject | Retrieved obj: " + pto.getPaymentTypeTitle());
         
@@ -53,7 +53,7 @@ public class PaymentTypeConverter extends EntityConverter implements Converter{
             return "";
         }
         
-        PaymentType pt = (PaymentType) o;
+        TnxSource pt = (TnxSource) o;
         String title = pt.getPaymentTypeTitle();
         if (title != null){
             this.getViewMap(fc).put(title,o);

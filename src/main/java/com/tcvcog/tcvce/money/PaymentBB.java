@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.occupancy.application;
+package com.tcvcog.tcvce.money;
 
+import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
-import com.tcvcog.tcvce.coordinators.PaymentCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -29,10 +29,10 @@ import com.tcvcog.tcvce.domain.NavigationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.DomainEnum;
-import com.tcvcog.tcvce.entities.FeeAssigned;
+import com.tcvcog.tcvce.money.entities.TransactionCharge;
 import com.tcvcog.tcvce.entities.Human;
-import com.tcvcog.tcvce.entities.Payment;
-import com.tcvcog.tcvce.entities.PaymentType;
+import com.tcvcog.tcvce.money.entities.TransactionPayment;
+import com.tcvcog.tcvce.money.entities.TnxSource;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
 import java.io.Serializable;
@@ -48,16 +48,16 @@ import javax.faces.context.FacesContext;
  */
 public class PaymentBB extends BackingBeanUtils implements Serializable {
 
-    private ArrayList<Payment> paymentList;
-    private Payment selectedPayment;
-    private ArrayList<PaymentType> paymentTypeList;
-    private PaymentType selectedPaymentType;
+    private ArrayList<TransactionPayment> paymentList;
+    private TransactionPayment selectedPayment;
+    private ArrayList<TnxSource> paymentTypeList;
+    private TnxSource selectedPaymentType;
 
     private OccPeriodDataHeavy currentOccPeriod;
     private CECaseDataHeavy currentCase;
-    private FeeAssigned selectedAssignedFee;
-    private ArrayList<FeeAssigned> feeAssignedList;
-    private ArrayList<FeeAssigned> occPeriodFilteredFeeList;
+    private TransactionCharge selectedAssignedFee;
+    private ArrayList<TransactionCharge> feeAssignedList;
+    private ArrayList<TransactionCharge> occPeriodFilteredFeeList;
 
     private DomainEnum currentDomain;
     private String currentMode;
@@ -78,9 +78,9 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
         currentMode = "Lookup";
 
-        selectedPayment = new Payment();
+        selectedPayment = new TransactionPayment();
 
-        selectedPaymentType = new PaymentType();
+        selectedPaymentType = new TnxSource();
 
         currentPaymentSelected = false;
     }
@@ -97,7 +97,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
         boolean paymentSet = false; //Once we populate paymentList, we'll set this to true.
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
         try {
             paymentTypeList = pc.getPaymentTypes();
         } catch (IntegrationException ex) {
@@ -131,7 +131,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
                 //If we don't have a payment already in mind, let's grab the list from the database
             } else if (currentOccPeriod != null) {
 
-                for (FeeAssigned fee : feeAssignedList) {
+                for (TransactionCharge fee : feeAssignedList) {
                     paymentList.addAll(fee.getPaymentList());
                 }
                 paymentSet = true;
@@ -166,7 +166,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
                 feeAssignedList.addAll(currentCase.getFeeList());
 
-                for (FeeAssigned fee : feeAssignedList) {
+                for (TransactionCharge fee : feeAssignedList) {
 
                     paymentList.addAll(fee.getPaymentList());
 
@@ -212,7 +212,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         }
         //create an instance object of MunicipalityDataHeavy if current mode == "Insert"
         if (getActiveInsertMode()) {
-            selectedPayment = new Payment();
+            selectedPayment = new TransactionPayment();
         }
         //show the current mode in p:messages box
         getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, this.currentMode + " Mode Selected", ""));
@@ -248,7 +248,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
      *
      * @param p
      */
-    public void onPaymentSelectedButtonChange(Payment p) {
+    public void onPaymentSelectedButtonChange(TransactionPayment p) {
 
         // "Select" button was selected
         if (currentPaymentSelected == true) {
@@ -269,7 +269,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
 
             currentPaymentSelected = false;
 
-            selectedPayment = new Payment();
+            selectedPayment = new TransactionPayment();
 
             //Message Noticefication
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Default Selected Payment: " + selectedPayment.getPaymentID(), ""));
@@ -280,7 +280,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the paymentList
      */
-    public ArrayList<Payment> getPaymentList() {
+    public ArrayList<TransactionPayment> getPaymentList() {
 
         if (paymentList != null) {
             return paymentList;
@@ -291,15 +291,15 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Inserts a new Payment object into the database.
-     * When the interface makes a new Payment object, it stores the new Payment
-     * in the "selectedPayment" field. So, in this case, 
-     * the selectedPayment is a new fee.
+     * Inserts a new TransactionPayment object into the database.
+     * When the interface makes a new TransactionPayment object, it stores the new TransactionPayment
+ in the "selectedPayment" field. So, in this case, 
+ the selectedPayment is a new fee.
      * @return 
      */
     public String onInsertButtonChange() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         if (selectedAssignedFee == null) {
             getFacesContext().addMessage(null,
@@ -329,12 +329,12 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Applies changes on the selected Payment to the database.
+     * Applies changes on the selected TransactionPayment to the database.
      * @return 
      */
     public String onUpdateButtonChange() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         try {
             pc.updatePayment(selectedPayment, selectedAssignedFee);
@@ -363,7 +363,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
      */
     public String onRemoveButtonChange() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         try {
             pc.removePayment(selectedPayment);
@@ -468,21 +468,21 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     /**
      * @param paymentList the paymentList to set
      */
-    public void setPaymentList(ArrayList<Payment> paymentList) {
+    public void setPaymentList(ArrayList<TransactionPayment> paymentList) {
         this.paymentList = paymentList;
     }
 
     /**
      * @return the selectedPayment
      */
-    public Payment getSelectedPayment() {
+    public TransactionPayment getSelectedPayment() {
         return selectedPayment;
     }
 
     /**
      * @param selectedPayment the selectedPayment to set
      */
-    public void setSelectedPayment(Payment selectedPayment) {
+    public void setSelectedPayment(TransactionPayment selectedPayment) {
         this.selectedPayment = selectedPayment;
     }
 
@@ -509,9 +509,9 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * @param type The PaymentType to be selected
+     * @param type The TnxSource to be selected
      */
-    public void onSelectedPayTypeButtonChange(PaymentType type) {
+    public void onSelectedPayTypeButtonChange(TnxSource type) {
         // "Select" button was selected
         if (currentPaymentSelected == true) {
 
@@ -527,11 +527,11 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
             // "Select" button wasn't selected
         } else {
             //turn to default setting
-            selectedPaymentType = new PaymentType();
+            selectedPaymentType = new TnxSource();
 
             currentPaymentSelected = false;
 
-            PaymentCoordinator pc = getPaymentCoordinator();
+            MoneyCoordinator pc = getMoneyCoordinator();
 
             try {
                 paymentTypeList = pc.getPaymentTypes();
@@ -550,12 +550,12 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Applies changes on the selected PaymentType to the database.
+     * Applies changes on the selected TnxSource to the database.
      * @return 
      */
     public String onUpdatePayTypeButtonChange() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         try {
             pc.updatePaymentType(selectedPaymentType);
@@ -575,15 +575,15 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Inserts a new PaymentType object into the database.
-     * When the interface makes a new PaymentType object, it stores the new type
-     * in the "selectedPaymentType" field. So, in this case, 
-     * the selectedPaymentType is a new fee.
+     * Inserts a new TnxSource object into the database.
+     * When the interface makes a new TnxSource object, it stores the new type
+ in the "selectedPaymentType" field. So, in this case, 
+ the selectedPaymentType is a new fee.
      * @return 
      */
     public String onInsertPayTypeButtonChange() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         try {
             pc.insertPaymentType(selectedPaymentType);
@@ -601,12 +601,12 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     }
 
     /**
-     * Remove the selected PaymentType from the database.
+     * Remove the selected TnxSource from the database.
      * @return 
      */
     public String onRemovePayTypeButtonChange() {
 
-        PaymentCoordinator pc = getPaymentCoordinator();
+        MoneyCoordinator pc = getMoneyCoordinator();
 
         try {
             pc.removePaymentType(selectedPaymentType);
@@ -630,7 +630,7 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     /**
      * @return the paymentTypeList
      */
-    public List<PaymentType> getPaymentTypeList() {
+    public List<TnxSource> getPaymentTypeList() {
 
         return paymentTypeList;
 
@@ -639,21 +639,21 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
     /**
      * @param paymentTypeList the paymentTypeList to set
      */
-    public void setPaymentTypeList(ArrayList<PaymentType> paymentTypeList) {
+    public void setPaymentTypeList(ArrayList<TnxSource> paymentTypeList) {
         this.paymentTypeList = paymentTypeList;
     }
 
     /**
      * @return the selectedPaymentType
      */
-    public PaymentType getSelectedPaymentType() {
+    public TnxSource getSelectedPaymentType() {
         return selectedPaymentType;
     }
 
     /**
      * @param selectedPaymentType the selectedPaymentType to set
      */
-    public void setSelectedPaymentType(PaymentType selectedPaymentType) {
+    public void setSelectedPaymentType(TnxSource selectedPaymentType) {
         this.selectedPaymentType = selectedPaymentType;
     }
 
@@ -677,27 +677,27 @@ public class PaymentBB extends BackingBeanUtils implements Serializable {
         this.currentOccPeriod = currentOccPeriod;
     }
 
-    public FeeAssigned getSelectedAssignedFee() {
+    public TransactionCharge getSelectedAssignedFee() {
         return selectedAssignedFee;
     }
 
-    public void setSelectedAssignedFee(FeeAssigned selectedAssignedFee) {
+    public void setSelectedAssignedFee(TransactionCharge selectedAssignedFee) {
         this.selectedAssignedFee = selectedAssignedFee;
     }
 
-    public ArrayList<FeeAssigned> getAssignedFeeList() {
+    public ArrayList<TransactionCharge> getAssignedFeeList() {
         return feeAssignedList;
     }
 
-    public void setAssignedFeeList(ArrayList<FeeAssigned> assignedFeeList) {
+    public void setAssignedFeeList(ArrayList<TransactionCharge> assignedFeeList) {
         this.feeAssignedList = assignedFeeList;
     }
 
-    public ArrayList<FeeAssigned> getOccPeriodFilteredFeeList() {
+    public ArrayList<TransactionCharge> getOccPeriodFilteredFeeList() {
         return occPeriodFilteredFeeList;
     }
 
-    public void setOccPeriodFilteredFeeList(ArrayList<FeeAssigned> occPeriodFilteredFeeList) {
+    public void setOccPeriodFilteredFeeList(ArrayList<TransactionCharge> occPeriodFilteredFeeList) {
         this.occPeriodFilteredFeeList = occPeriodFilteredFeeList;
     }
 
