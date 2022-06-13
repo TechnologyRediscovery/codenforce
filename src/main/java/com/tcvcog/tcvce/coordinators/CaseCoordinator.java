@@ -17,7 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.coordinators;
 
-import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
+import com.tcvcog.tcvce.money.management.MoneyCoordinator;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECaseList;
 import com.tcvcog.tcvce.entities.reports.ReportConfigCECase;
 import com.tcvcog.tcvce.entities.reports.ReportCEARList;
@@ -32,7 +32,7 @@ import com.tcvcog.tcvce.entities.reports.ReportCECaseListCatEnum;
 import com.tcvcog.tcvce.entities.reports.ReportCECaseListStreetCECaseContainer;
 import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.integration.*;
-import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
+import com.tcvcog.tcvce.money.management.MoneyIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.MessageBuilderParams;

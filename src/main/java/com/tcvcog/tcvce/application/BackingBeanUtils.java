@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
+import com.tcvcog.tcvce.money.management.MoneyCoordinator;
 import com.tcvcog.tcvce.coordinators.*;
 
 import java.io.Serializable;
@@ -41,7 +41,7 @@ import com.tcvcog.tcvce.integration.UserIntegrator;
 // occupancy integrators
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
-import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
+import com.tcvcog.tcvce.money.management.MoneyIntegrator;
 
 // system integrators
 import com.tcvcog.tcvce.integration.SystemIntegrator;

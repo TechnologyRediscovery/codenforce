@@ -1505,13 +1505,13 @@
     
     <managed-bean>
         <managed-bean-name>moneyCoordinator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.money.coordination.MoneyCoordinator</managed-bean-class>
+        <managed-bean-class>com.tcvcog.tcvce.money.management.MoneyCoordinator</managed-bean-class>
     
         <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
     <managed-bean>
         <managed-bean-name>moneyIntegrator</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.money.integration.MoneyIntegrator</managed-bean-class>
+        <managed-bean-class>com.tcvcog.tcvce.money.management.MoneyIntegrator</managed-bean-class>
     
         <managed-bean-scope>application</managed-bean-scope></managed-bean>
     
@@ -1693,7 +1693,7 @@
         
     <managed-bean>
         <managed-bean-name>personSearchPublicBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.money.coordination.MoneyCoordinator</managed-bean-class>
+        <managed-bean-class>com.tcvcog.tcvce.money.management.MoneyCoordinator</managed-bean-class>
     
         <managed-bean-scope>view</managed-bean-scope></managed-bean>
     

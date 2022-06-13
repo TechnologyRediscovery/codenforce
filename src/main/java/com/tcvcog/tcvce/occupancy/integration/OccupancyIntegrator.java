@@ -16,11 +16,11 @@
  */
 package com.tcvcog.tcvce.occupancy.integration;
 
-import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
+import com.tcvcog.tcvce.money.management.MoneyIntegrator;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
-import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
+import com.tcvcog.tcvce.money.management.MoneyCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;

@@ -15,7 +15,7 @@ Council of Governments, PA
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.money.coordination;
+package com.tcvcog.tcvce.money.management;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
@@ -24,8 +24,8 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.money.entities.*;
-import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -45,36 +45,62 @@ public class MoneyCoordinator extends BackingBeanUtils implements Serializable {
     
     /**
      * Starting point for creating a new Transaction! Get a skeleton of one
-     * with the TransactionDetails object nicely configured for you
+     * with the TransactionDetails object nicely configured for you.
+     * 
+     * The big thing I do is map a TnxSource to an object that can be written to the DB
+     * and certified coming back from the UI.
+     * 
+     * TODO; Write in the hash of the MS time + salt as a secret that 
+     * The incoming object must have to get any DB changes
+     * 
      * @param typeEnum
      * @param src
      * @param ua
      * @return 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public Transaction getTransactionSkeleton(TnxTypeEnum typeEnum, TnxSource src, UserAuthorized ua) throws BObStatusException{
-        if(typeEnum == null || src == null || ua == null){
+    public TransactionDetails getTransactionSkeleton(TnxSource src, UserAuthorized ua) throws BObStatusException{
+        if( src == null || ua == null){
             throw new BObStatusException("Cannot create a Transaction Skeleton with null typeEnum or user");
         }
-        TransactionDetails trxDet;
+        
+        if(src.getPathway() == null){
+            
+            throw new BObStatusException("Cannot create a Transaction Skeleton with null pathway inside source");
+        }
+        
+        // start at the bottom
+        Transaction tnx = new Transaction();
+        tnx.setTrxSource(src);
+        tnx.setCreatedBy(ua);
         
         
-        switch(typeEnum){
+        
+        TransactionDetails trxDetSubclass = new TransactionDetails(tnx);
+        
+        
+        
+        switch(src.getPathway()){
             case ADJUSTMENT:
-                trxDet = new TransactionAdjustment();
+                trxDetSubclass = new TransactionAdjustment(trxDetSubclass);
                 break;
-            case CHARGE:
-                trxDet = new TransactionCharge();
+            case CHARGE_AUTOMATIC:
+                trxDetSubclass = new TransactionCharge();
                 break;
-            case PAYMENT:
-                trxDet = new TransactionPayment();
+            case CHARGE_MANUAL:
+                trxDetSubclass = new TransactionPayment();
                 break;
+            case PAY_CHECK:
+                trxDetSubclass = new TransactionPaymentCheck();
+                break;
+            case PAY_MUNICIPAY:
+                trxDetSubclass = new TransactionPaymentMunicipay();
             default:
-                throw new BObStatusException("TypeEnum value not supported for transaction skeleton creation");
+                throw new BObStatusException("Pathway value not supported for transaction skeleton creation");
                 
         }
         
-        
+        return trxDetSubclass;
         
         
     }
@@ -102,6 +128,7 @@ public class MoneyCoordinator extends BackingBeanUtils implements Serializable {
         
         Transaction trx = mi.getTransaction(trxid);
         
+        
         return configureTransaction(trx);
     }
     
@@ -117,11 +144,45 @@ public class MoneyCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("Cannot configure a null transaction");
         }
         PersonCoordinator pc = getPersonCoordinator();
+        MoneyIntegrator mi = getMoneyIntegrator();
+        
+        
+        injectTransactionSource(trx);
         trx.setHumanLinkList(pc.getHumanLinkList(trx));
+        
+        auditTransaction(trx);
+        
         
         return trx;
         
     }
+   
+    
+    /**
+     * I do the all important and potentially problematic 
+     * injection of the ComponentEnum into the source based on
+     * data that's on the incoming transaction
+     * 
+     * @param tnx with a nonzero source ID
+     * @return 
+     */
+    protected Transaction injectTransactionSource(Transaction tnx) throws BObStatusException, IntegrationException{
+        
+        if(tnx == null || tnx.getTransactionID() == 0 || tnx.getTrxSourceID() == 0){
+            throw new BObStatusException("Cannot inject transaction source with null tnx or zeros for IDs");
+            
+        }
+        
+        MoneyIntegrator mi = getMoneyIntegrator();
+        
+        
+        
+        tnx.setTrxSource();
+        
+        
+    }
+    
+    
     
     /**
      * Public entry point for writing in a new transaction. Lots of business rule action happens in here
@@ -142,6 +203,8 @@ public class MoneyCoordinator extends BackingBeanUtils implements Serializable {
         trx.setLastUpdatedBy(ua);
         
         auditTransaction(trx);
+        
+        
         return mi.insertTransaction(trx);
         
     }
@@ -162,6 +225,10 @@ public class MoneyCoordinator extends BackingBeanUtils implements Serializable {
         
         if(trx.getTnxDomain() == null){
             throw new BObStatusException("MoneyCoordinator.auditTransaction | FATAL: Transaction cannot have a null domain");
+        }
+        
+        if(trx.getTrxSource() == null){
+            throw new BObStatusException("MoneyCoordinator.auditTransaction | FATAL: Transaction cannot have a null TrxSource");
         }
         
         if(trx.getTnxDomain() == DomainEnum.UNIVERSAL){
@@ -191,7 +258,8 @@ public class MoneyCoordinator extends BackingBeanUtils implements Serializable {
             throw new BObStatusException("MoneyCoordinator.auditTransaction | FATAL: Transaction cannot be of type charge and not be a subclass of TransactionAdjustment");
        }
         
-        
+       trx.setAuditPassTS(LocalDateTime.now());
+       
     }
     
     

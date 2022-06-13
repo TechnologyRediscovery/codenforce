@@ -57,7 +57,7 @@ import com.tcvcog.tcvce.entities.search.QueryPerson;
 import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
-import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
+import com.tcvcog.tcvce.money.management.MoneyIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.util.logging.Level;
 import java.util.logging.Logger;

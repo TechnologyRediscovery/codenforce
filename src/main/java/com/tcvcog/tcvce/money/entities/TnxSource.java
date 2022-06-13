@@ -18,28 +18,55 @@ package com.tcvcog.tcvce.money.entities;
 
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.util.Constants;
 import java.util.Objects;
 
 /**
- *
+ * All transactions come from somewhere. Where they go is less defined.
+ * 
+ * "Locked down" finance class: my ID only exists in the java Enum and DB row
+ * as determined by the Transaction itself
+ * 
  * @author Adam Gutonski & Major refactor by Ellen Bascomb for June 2022 launch
  */
 public class TnxSource extends EntityUtils {
     
-    protected int sourceID;
-    protected String title;
-    protected String description;
-    protected String notes;
-    protected boolean humanAssignable;
-    protected EventCategory eventCategory;
-    protected TnxTypeEnum applicableTnxType;
-    protected boolean active;
+    
+    private String title;
+    private String description;
+    private String notes;
+    private boolean humanAssignable;
+    private EventCategory eventCategory;
+    
+    private TnxTypeEnum applicableTnxType;
+    
+    /**
+     * the all important and potentially faulty way of wiring
+     * the DB to the UI via this enum
+     */
+    private MoneyPathwayComponentEnum pathway;
+    
+    private boolean active;
+    
+    
+    /**
+     * The only door into a TnxSource! 
+     * @param en 
+     */
+    public TnxSource(MoneyPathwayComponentEnum en){
+        pathway = en;
+        
+    }
+    
     
     /**
      * @return the sourceID
      */
     public int getSourceID() {
-        return sourceID;
+        if(pathway != null){
+            return pathway.getTnxSourceID();
+        }
+        return Constants.ID_ZERO_NO_OBJ;
     }
 
     /**
@@ -84,12 +111,6 @@ public class TnxSource extends EntityUtils {
         return applicableTnxType;
     }
 
-    /**
-     * @param sourceID the sourceID to set
-     */
-    public void setSourceID(int sourceID) {
-        this.sourceID = sourceID;
-    }
 
     /**
      * @param title the title to set
@@ -145,6 +166,20 @@ public class TnxSource extends EntityUtils {
      */
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    /**
+     * @return the pathway
+     */
+    public MoneyPathwayComponentEnum getPathway() {
+        return pathway;
+    }
+
+    /**
+     * @param pathway the pathway to set
+     */
+    public void setPathway(MoneyPathwayComponentEnum pathway) {
+        this.pathway = pathway;
     }
     
     

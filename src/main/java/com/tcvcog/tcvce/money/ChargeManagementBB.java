@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.money;
 
-import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
+import com.tcvcog.tcvce.money.management.MoneyCoordinator;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;

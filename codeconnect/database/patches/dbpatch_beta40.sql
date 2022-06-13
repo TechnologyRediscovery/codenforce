@@ -318,7 +318,6 @@ CREATE TABLE public.moneytransactionsource
   title text NOT NULL,
   description text,
   notes text,
-  
   humanassignable BOOLEAN DEFAULT TRUE,
   eventcatwhenposted		INTEGER CONSTRAINT moneytransactionsource_eventcat_fk REFERENCES eventcategory (categoryid),
   CONSTRAINT pmttype_typeid_pk PRIMARY KEY (sourceid)
@@ -330,6 +329,8 @@ ALTER TABLE public.moneytransactionsource
   OWNER TO sylvia;
 
 ALTER TABLE public.moneytransactionsource ADD COLUMN applicabletype_typeid 	transactiontype;
+ALTER TABLE public.moneytransactionsource ADD COLUMN active boolean DEFAULT TRUE;
+
 
 
 
@@ -488,6 +489,112 @@ CREATE TABLE public.moneypmtmetadatamunicipay
 -- ALTER TYPE transactiontype ADD VALUE 'ADJUSTMENT';
 -- ALTER TYPE chargetype ADD VALUE 'FEE';
 -- ALTER TYPE chargetype ADD VALUE 'FINE';
+
+
+ALTER TYPE eventtype ADD VALUE 'Accounting';
+
+
+
+-- Pay by check
+
+INSERT INTO public.eventcategory(
+            categoryid, categorytype, title, description, notifymonitors, 
+            hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, 
+            hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, 
+            active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
+    VALUES (2010, CAST('Accounting' as eventtype), 'Payment: By Check', NULL, TRUE, 
+            TRUE, 10, 0, 0, 
+            'A payment by check recorded in ledger.', NULL, 5, 
+            TRUE, 4, 1, 4);
+
+
+INSERT INTO public.moneytransactionsource(
+            sourceid, title, description, notes, humanassignable, eventcatwhenposted, 
+            applicabletype_typeid, active)
+    VALUES (10, 'Payment by Check', NULL, NULL, TRUE, 2010, 
+            CAST('PAYMENT' AS transactiontype), TRUE);
+
+
+-- Pay by Municipay
+
+
+INSERT INTO public.eventcategory(
+            categoryid, categorytype, title, description, notifymonitors, 
+            hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, 
+            hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, 
+            active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
+    VALUES (2020, CAST('Accounting' as eventtype), 'Payment: By Municipay', NULL, TRUE, 
+            TRUE, 10, 0, 0, 
+            'A payment via Municipay recorded in ledger.', NULL, 5, 
+            TRUE, 4, 1, 4);
+
+
+INSERT INTO public.moneytransactionsource(
+            sourceid, title, description, notes, humanassignable, eventcatwhenposted, 
+            applicabletype_typeid, active)
+    VALUES (20, 'Payment: By Municipay', NULL, NULL, FALSE, 2020, 
+            CAST('PAYMENT' AS transactiontype), TRUE);
+
+
+
+-- Charge: Auto
+
+INSERT INTO public.eventcategory(
+            categoryid, categorytype, title, description, notifymonitors, 
+            hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, 
+            hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, 
+            active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
+    VALUES (2030, CAST('Accounting' as eventtype), 'Charge: Automatic assignment', NULL, TRUE, 
+            TRUE, 10, 0, 0, 
+            'A charge was added to the ledger resulting from automatic assignment based on permit type', NULL, 5, 
+            TRUE, 4, 1, 4);
+
+
+INSERT INTO public.moneytransactionsource(
+            sourceid, title, description, notes, humanassignable, eventcatwhenposted, 
+            applicabletype_typeid, active)
+    VALUES (30, 'Charge: Assigned based on permit type', NULL, NULL, FALSE, 2030, 
+            CAST('CHARGE' AS transactiontype), TRUE);
+
+
+-- charge manual
+
+INSERT INTO public.eventcategory(
+            categoryid, categorytype, title, description, notifymonitors, 
+            hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, 
+            hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, 
+            active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
+    VALUES (2040, CAST('Accounting' as eventtype), 'Charge: Manual assignment', NULL, TRUE, 
+            TRUE, 10, 0, 0, 
+            'A charge was manually added to the object account', NULL, 5, 
+            TRUE, 4, 1, 4);
+
+
+INSERT INTO public.moneytransactionsource(
+            sourceid, title, description, notes, humanassignable, eventcatwhenposted, 
+            applicabletype_typeid, active)
+    VALUES (40, 'Charge: Manually assigned', NULL, NULL, TRUE, 2040, 
+            CAST('CHARGE' AS transactiontype), TRUE);
+
+-- Adjustment
+
+INSERT INTO public.eventcategory(
+            categoryid, categorytype, title, description, notifymonitors, 
+            hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, 
+            hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, 
+            active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)
+    VALUES (2050, CAST('Accounting' as eventtype), 'Account Adjustment', NULL, TRUE, 
+            TRUE, 10, 0, 0, 
+            'An adjustment transaction posted to the object ledger', NULL, 5, 
+            TRUE, 4, 1, 4);
+
+
+INSERT INTO public.moneytransactionsource(
+            sourceid, title, description, notes, humanassignable, eventcatwhenposted, 
+            applicabletype_typeid, active)
+    VALUES (50, 'Adjustment', NULL, NULL, TRUE, 2050, 
+            CAST('ADJUSTMENT' AS transactiontype), TRUE);
+
 
 
 -- ******************************* run on LOCAL TEST system up to here *******************************

@@ -34,6 +34,10 @@ public class TransactionDetails
         
     }
     
+    public TransactionDetails(Transaction trans){
+        super(trans);
+    }
+    
     public TransactionDetails(TransactionDetails det){
         super(det);
         this.trxCreatedTS = det.trxCreatedTS;

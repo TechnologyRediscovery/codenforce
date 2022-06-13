@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
+import com.tcvcog.tcvce.money.management.MoneyCoordinator;
 import com.tcvcog.tcvce.coordinators.*;
 import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
@@ -32,7 +32,7 @@ import com.tcvcog.tcvce.integration.UserIntegrator;
 
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccupancyIntegrator;
-import com.tcvcog.tcvce.money.integration.MoneyIntegrator;
+import com.tcvcog.tcvce.money.management.MoneyIntegrator;
 
 import com.tcvcog.tcvce.integration.LogIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;

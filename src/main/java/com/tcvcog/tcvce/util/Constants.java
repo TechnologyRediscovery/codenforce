@@ -31,6 +31,9 @@ public class Constants implements Serializable {
     public Constants() {
     }
     
+    // object ID 
+    public final static int ID_ZERO_NO_OBJ = 0;
+    
     // Coordinator Keys
     public final static String PROPERTY_COORDINATOR_SCOPE = "sessionScope.";
     public final static String PROPERTY_COORDINATOR_KEY = "propertyCoordinator";

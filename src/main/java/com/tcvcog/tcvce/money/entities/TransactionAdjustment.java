@@ -12,4 +12,18 @@ package com.tcvcog.tcvce.money.entities;
 public class TransactionAdjustment 
         extends TransactionDetails{
     
+    
+    public TransactionAdjustment(TransactionDetails det){
+        super(det);
+        
+    }
+    
+    
+    public TransactionAdjustment(TransactionAdjustment adj){
+        super(adj);
+        
+    }
+    
+    
+    
 }

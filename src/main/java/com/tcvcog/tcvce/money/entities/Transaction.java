@@ -39,7 +39,8 @@ public class Transaction
   protected double amount;
   protected LocalDateTime dateOfRecord;
 
-  protected TnxSource transactionSource;
+  protected int trxSourceID;
+  protected TnxSource trxSource;
   protected int trackingEventID;
   
   protected LocalDateTime lockedTS;
@@ -47,6 +48,8 @@ public class Transaction
   protected String notes;
   
   protected List<HumanLink> humanLinkList;
+  
+  protected LocalDateTime auditPassTS;
   
   public Transaction(){
       
@@ -67,13 +70,15 @@ public class Transaction
     this.tnxType = trx.tnxType;
     this.amount = trx.amount;
     this.dateOfRecord = trx.dateOfRecord;
-    this.transactionSource = trx.transactionSource;
+    this.trxSource = trx.trxSource;
     this.trackingEventID = trx.trackingEventID;
     this.lockedTS = trx.lockedTS;
     this.lockedByUser = trx.lockedByUser;
     this.notes = trx.notes;      
     
     this.humanLinkList = trx.humanLinkList;
+    
+    this.auditPassTS = trx.auditPassTS;
       
       
   }
@@ -145,10 +150,10 @@ public class Transaction
     }
 
     /**
-     * @return the transactionSource
+     * @return the trxSource
      */
-    public TnxSource getTransactionSource() {
-        return transactionSource;
+    public TnxSource getTrxSource() {
+        return trxSource;
     }
 
     /**
@@ -209,10 +214,10 @@ public class Transaction
     }
 
     /**
-     * @param transactionSource the transactionSource to set
+     * @param trxSource the trxSource to set
      */
-    public void setTransactionSource(TnxSource transactionSource) {
-        this.transactionSource = transactionSource;
+    public void setTrxSource(TnxSource trxSource) {
+        this.trxSource = trxSource;
     }
 
     /**
@@ -289,6 +294,34 @@ public class Transaction
     @Override
     public int getHostPK() {
         return transactionID;
+    }
+
+    /**
+     * @return the auditPassTS
+     */
+    public LocalDateTime getAuditPassTS() {
+        return auditPassTS;
+    }
+
+    /**
+     * @param auditPassTS the auditPassTS to set
+     */
+    public void setAuditPassTS(LocalDateTime auditPassTS) {
+        this.auditPassTS = auditPassTS;
+    }
+
+    /**
+     * @return the trxSourceID
+     */
+    public int getTrxSourceID() {
+        return trxSourceID;
+    }
+
+    /**
+     * @param trxSourceID the trxSourceID to set
+     */
+    public void setTrxSourceID(int trxSourceID) {
+        this.trxSourceID = trxSourceID;
     }
   
     

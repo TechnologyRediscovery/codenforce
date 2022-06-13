@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tcvcog.tcvce.money.integration;
+package com.tcvcog.tcvce.money.management;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
@@ -25,7 +25,7 @@ import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
-import com.tcvcog.tcvce.money.coordination.MoneyCoordinator;
+import com.tcvcog.tcvce.money.management.MoneyCoordinator;
 import com.tcvcog.tcvce.money.entities.*;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -100,7 +100,9 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
     
     
     /**
-     * Generator for Transaction ResultSet objects
+     * Generator for Transaction ResultSet objects:
+     * NOTE that no "upward" calls to the Coordinator are happening
+     * anywhere in my belly.
      * @param rs
      * @return the bare bones Transaction, 
      */
@@ -112,13 +114,12 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
         
         Transaction trx = new Transaction();
         SystemIntegrator si = getSystemIntegrator();
-        MoneyCoordinator mc = getMoneyCoordinator();
         
         trx.setTransactionID(rs.getInt("transactionid"));
         trx.setCeCaseID(rs.getInt("cecase_caseid"));
         trx.setOccPeriodID(rs.getInt("occperiod_periodid"));
         trx.setTnxDomain(DomainEnum.valueOf(rs.getString("transtype")));
-        trx.setTransactionSource(mc.getTransactionSource(rs.getInt("source_id")));
+        trx.setTrxSourceID(rs.getInt("source_id"));
         
         trx.setAmount(rs.getDouble("amount"));
         trx.setDateOfRecord(rs.getTimestamp("dateofrecord").toLocalDateTime());
@@ -191,8 +192,8 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
             
-            if(trx.getTransactionSource() != null){
-                stmt.setInt(6, trx.getTransactionSource().getSourceID());
+            if(trx.getTrxSource() != null){
+                stmt.setInt(6, trx.getTrxSource().getSourceID());
             } else {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
@@ -243,13 +244,14 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
     
     /**
      * Builds a TnxSource from the db table moneytransactionsource
-     * @param srcid
-     * @return 
+     * 
+     * @param src
+     * @return ready for injection into the Transaction
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public TnxSource getTransactionSource(int srcid) throws IntegrationException{
-        if(srcid == 0){
-            throw new IntegrationException("Cannot retrieve Tnx source with ID == 0;");
+    protected TnxSource populateTransactionSource(TnxSource src) throws IntegrationException{
+        if(src == null || src.getSourceID() == 0){
+            throw new IntegrationException("Cannot retrieve Tnx source with null transaction or ID == 0;");
         }
         
         
@@ -266,11 +268,11 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
             
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, srcid);
+            stmt.setInt(1, );
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                tnxsrc = generateTnxSource(rs);
+                tnxsrc = generateTnxSource(src, rs);
                 
             }
             
@@ -295,23 +297,27 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    private TnxSource generateTnxSource(ResultSet rs) throws IntegrationException, SQLException{
+    private TnxSource generateTnxSource(TnxSource src, ResultSet rs) throws IntegrationException, SQLException{
         if(rs == null){
             throw new IntegrationException("MoneyIntegrator.generateTnxSource: Cannot populate TnxSource with null RS");
         }
 
         EventCoordinator ec = getEventCoordinator();
         
-        TnxSource tnxS = new TnxSource();
 
-        tnxS.setSourceID(rs.getInt("sourceid"));
-        tnxS.setTitle(rs.getString("title"));
-        tnxS.setDescription(rs.getString("description"));
-        tnxS.setNotes(rs.getString("notes"));
-        tnxS.setEventCategory(ec.getEventCategory(rs.getInt("eventcatwhenposted")));
-        tnxS.setActive(rs.getBoolean("active"));
         
-        return tnxS;
+        src.setTitle(rs.getString("title"));
+        src.setDescription(rs.getString("description"));
+        src.setNotes(rs.getString("notes"));
+        src.setHumanAssignable(rs.getBoolean("humanassignable"));
+        
+        src.setEventCategory(ec.getEventCategory(rs.getInt("eventcatwhenposted")));
+        
+        // this value will be audited on extraction by the coordinator
+        src.setApplicableTnxType(TnxTypeEnum.valueOf(rs.getString("applicabletype_typeid")));
+        src.setActive(rs.getBoolean("active"));
+        
+        return src;
     }
     
     
