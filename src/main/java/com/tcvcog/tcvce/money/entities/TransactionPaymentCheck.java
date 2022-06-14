@@ -5,11 +5,7 @@
  */
 package com.tcvcog.tcvce.money.entities;
 
-import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.IFace_trackedEntityLink;
-import com.tcvcog.tcvce.entities.LinkedObjectRole;
 import com.tcvcog.tcvce.entities.MailingAddressLink;
-import java.time.LocalDateTime;
 
 /**
  * Concrete implementation of a TransactionPayment representing a human
@@ -22,7 +18,7 @@ public  class       TransactionPaymentCheck
     
     
     private int checkID;
-    private int checkNo;
+    private int checkNo;  
     private String bankName;
     private MailingAddressLink mailingAddressOnCheck;
     
@@ -91,9 +87,4 @@ public  class       TransactionPaymentCheck
     public void setMailingAddressOnCheck(MailingAddressLink mailingAddressOnCheck) {
         this.mailingAddressOnCheck = mailingAddressOnCheck;
     }
-    
-    
-    
-    
-    
 }

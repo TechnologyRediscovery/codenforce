@@ -147,41 +147,72 @@ public class MoneyCoordinator extends BackingBeanUtils implements Serializable {
         MoneyIntegrator mi = getMoneyIntegrator();
         
         
-        injectTransactionSource(trx);
+        trx.setTrxSource(mi.getTransactionSource(trx.getTrxSourceID()));
         trx.setHumanLinkList(pc.getHumanLinkList(trx));
+        TransactionDetails trxdet = new TransactionDetails(trx);
+        
+        
+        if(trx.getTrxSource() != null){
+            switch(trx.getTnxType()){
+                case ADJUSTMENT:
+                    trx = configureTransactionAdjustment(new TransactionAdjustment(trxdet));
+                    break;
+                case CHARGE:
+                    trx = configureTransactionCharge(new TransactionCharge(trxdet));
+                    break;
+                case PAYMENT:
+                    trx = configureTransactionPayment(new TransactionPayment(trxdet));
+                    break;
+            }
+        }
         
         auditTransaction(trx);
-        
         
         return trx;
         
     }
-   
     
     /**
-     * I do the all important and potentially problematic 
-     * injection of the ComponentEnum into the source based on
-     * data that's on the incoming transaction
-     * 
-     * @param tnx with a nonzero source ID
+     * Configures this transaction subclass for Adjustments
+     * @param trxAdj
      * @return 
      */
-    protected Transaction injectTransactionSource(Transaction tnx) throws BObStatusException, IntegrationException{
+    private TransactionAdjustment configureTransactionAdjustment(TransactionAdjustment trxAdj){
         
-        if(tnx == null || tnx.getTransactionID() == 0 || tnx.getTrxSourceID() == 0){
-            throw new BObStatusException("Cannot inject transaction source with null tnx or zeros for IDs");
+        return trxAdj;
+    }
+    
+    /**
+     * Configures this transaction as a subclass in the Charge family
+     * @param trxChg
+     * @return 
+     */
+    private TransactionCharge configureTransactionCharge(TransactionCharge trxChg) throws IntegrationException, BObStatusException{
+        MoneyIntegrator mi = getMoneyIntegrator();
+        if(trxChg.getTnxDomain() == DomainEnum.CODE_ENFORCEMENT){
             
         }
         
-        MoneyIntegrator mi = getMoneyIntegrator();
+        trxChg.setChargeOrders(mi.getChargeOrdersPosted(trxChg));
         
-        
-        
-        tnx.setTrxSource();
-        
+        return trxChg;
         
     }
     
+    /**
+     * Configures this transaction as a subclass in the Payment family
+     * @param trxPmt
+     * @return 
+     */
+    private TransactionPayment configureTransactionPayment(TransactionPayment trxPmt){
+        
+        
+        return trxPmt;
+        
+    }
+   
+    
+ 
     
     
     /**

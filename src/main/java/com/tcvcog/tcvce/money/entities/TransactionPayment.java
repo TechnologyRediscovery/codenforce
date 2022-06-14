@@ -17,10 +17,7 @@
  */
 package com.tcvcog.tcvce.money.entities;
 
-import com.tcvcog.tcvce.entities.BOBSource;
-import com.tcvcog.tcvce.entities.IFace_trackedEntityLink;
-import com.tcvcog.tcvce.entities.LinkedObjectRole;
-import java.time.LocalDateTime;
+import java.util.List;
 
 
 /**
@@ -29,9 +26,10 @@ import java.time.LocalDateTime;
  * 
  * @author Adam Gutonski & Nathan Dietz & Ellen Bascomb of Apartment 31Y
  */
-public  class       TransactionPayment 
+public          class       TransactionPayment 
                 extends     TransactionDetails {
     
+    private List<ChargeOrder> chargeOrders;
     
     public TransactionPayment(){
         
@@ -40,6 +38,20 @@ public  class       TransactionPayment
     public TransactionPayment(TransactionDetails det){
         super(det);
         
+    }
+
+    /**
+     * @return the chargeOrders
+     */
+    public List<ChargeOrder> getChargeOrders() {
+        return chargeOrders;
+    }
+
+    /**
+     * @param chargeOrders the chargeOrders to set
+     */
+    public void setChargeOrders(List<ChargeOrder> chargeOrders) {
+        this.chargeOrders = chargeOrders;
     }
    
 }

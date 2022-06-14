@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.money.entities;
 
 import com.tcvcog.tcvce.entities.EntityUtils;
 import com.tcvcog.tcvce.entities.EventCategory;
+import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.util.Constants;
 import java.util.Objects;
 
@@ -37,8 +38,9 @@ public class TnxSource extends EntityUtils {
     private String notes;
     private boolean humanAssignable;
     private EventCategory eventCategory;
-    
     private TnxTypeEnum applicableTnxType;
+    private Municipality muni;
+    private String pathwayEnumLiteral;
     
     /**
      * the all important and potentially faulty way of wiring
@@ -181,6 +183,34 @@ public class TnxSource extends EntityUtils {
     public void setPathway(MoneyPathwayComponentEnum pathway) {
         this.pathway = pathway;
     }
-    
+
+    /**
+     * @return the muni
+     */
+    public Municipality getMuni() {
+        return muni;
+    }
+
+    /**
+     * @return the pathwayEnumLiteral
+     */
+    public String getPathwayEnumLiteral() {
+        return pathwayEnumLiteral;
+    }
+
+    /**
+     * @param muni the muni to set
+     */
+    public void setMuni(Municipality muni) {
+        this.muni = muni;
+    }
+
+    /**
+     * @param pathwayEnumLiteral the pathwayEnumLiteral to set
+     */
+    public void setPathwayEnumLiteral(String pathwayEnumLiteral) {
+        this.pathwayEnumLiteral = pathwayEnumLiteral;
+    }
+
     
 }

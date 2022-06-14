@@ -107,6 +107,37 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     
+    /**
+     * Extracts the Enum value associated with an integer rank
+     * @param rnk
+     * @return 
+     */
+    public RoleType getRoleTypeFromRank(int rnk){
+        if(rnk == 0){
+            return null;
+        }
+        
+        switch(rnk){
+            case 1:
+                return RoleType.Public;
+            case 2:
+                return RoleType.MuniReader;
+            case 3:
+                return RoleType.MuniStaff;
+            case 4:
+                return RoleType.CogStaff;
+            case 5:
+                return RoleType.EnforcementOfficial;
+            case 6:
+                return RoleType.SysAdmin;
+            case 7:
+                return RoleType.Developer;
+            default:
+                return RoleType.Public;
+        }
+    }
+    
+    
      /**
      * Primary user retrieval method: Note that there aren't as many checks here
      * since the jboss container is managing the lookup of authenticated users. 

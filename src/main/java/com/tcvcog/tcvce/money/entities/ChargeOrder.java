@@ -56,6 +56,28 @@ public  class       ChargeOrder
     private EventCategory eventCategoryOnPost;
 
     private String notes;
+    
+    public ChargeOrder(){
+        
+    }
+    
+    public ChargeOrder(ChargeOrder chgOrder){
+        
+        this.chargeID = chgOrder.chargeID;
+        this.chargeDomain = chgOrder.chargeDomain;
+        this.muni = chgOrder.muni;
+        this.name = chgOrder.name;
+        this.description = chgOrder.description;
+        this.amount = chgOrder.amount;
+        this.governingEnforcableCodeElementId = chgOrder.governingEnforcableCodeElementId;
+        this.effectiveDate = chgOrder.effectiveDate;
+        this.expiryDate = chgOrder.expiryDate;
+        this.minRoleToAssign = chgOrder.minRoleToAssign;
+        this.minRoleToDeactivate = chgOrder.minRoleToDeactivate;
+        this.eventCategoryOnPost = chgOrder.eventCategoryOnPost;
+        this.notes = chgOrder.notes;
+        
+    }
 
     /**
      * @return the chargeID

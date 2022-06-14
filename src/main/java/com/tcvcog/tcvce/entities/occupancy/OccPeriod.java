@@ -51,7 +51,6 @@ public  class       OccPeriod
     protected int periodID;
     protected int propertyUnitID;
     
-    
     protected List<HumanLink> humans;
     
     protected FieldInspection governingInspection;
@@ -557,6 +556,11 @@ public  class       OccPeriod
     @Override
     public MoneyLedger getMoneyLedger() {
         return this.ledger;
+    }
+
+    @Override
+    public DomainEnum getDomain() {
+        return OCC_DOMAIN;
     }
 
 }

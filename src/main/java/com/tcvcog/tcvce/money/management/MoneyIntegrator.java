@@ -19,7 +19,9 @@ package com.tcvcog.tcvce.money.management;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
@@ -32,6 +34,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -245,12 +248,12 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
     /**
      * Builds a TnxSource from the db table moneytransactionsource
      * 
-     * @param src
+     * @param sourceID
      * @return ready for injection into the Transaction
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    protected TnxSource populateTransactionSource(TnxSource src) throws IntegrationException{
-        if(src == null || src.getSourceID() == 0){
+    protected TnxSource getTransactionSource(int sourceID) throws IntegrationException{
+        if(sourceID == 0){
             throw new IntegrationException("Cannot retrieve Tnx source with null transaction or ID == 0;");
         }
         
@@ -268,11 +271,11 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
             
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, );
+            stmt.setInt(1, sourceID );
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                tnxsrc = generateTnxSource(src, rs);
+                tnxsrc = generateTnxSource(rs);
                 
             }
             
@@ -297,14 +300,15 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException 
      */
-    private TnxSource generateTnxSource(TnxSource src, ResultSet rs) throws IntegrationException, SQLException{
+    private TnxSource generateTnxSource(ResultSet rs) throws IntegrationException, SQLException{
         if(rs == null){
             throw new IntegrationException("MoneyIntegrator.generateTnxSource: Cannot populate TnxSource with null RS");
         }
 
         EventCoordinator ec = getEventCoordinator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        TnxSource src = new TnxSource(MoneyPathwayComponentEnum.valueOf(rs.getString("trxpathenumliteral")));
         
-
         
         src.setTitle(rs.getString("title"));
         src.setDescription(rs.getString("description"));
@@ -316,6 +320,9 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
         // this value will be audited on extraction by the coordinator
         src.setApplicableTnxType(TnxTypeEnum.valueOf(rs.getString("applicabletype_typeid")));
         src.setActive(rs.getBoolean("active"));
+        if(rs.getInt("muni_municode") != 0){
+            src.setMuni(mc.getMuni(rs.getInt("muni_municode")));
+        }
         
         return src;
     }
@@ -329,35 +336,30 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
     /**
      * Extracts a complete ID list of all records in the moneyledger table
      * that correspond with the object of ID you pass
-     * @param den which will decide whether to query for cases or periods
-     * @param bobID the primary key of either the occperiod or ocecase for which 
-     * we're building a Ledger
+     * @param lh
      * @return a list, perhaps containing an ID number(s) of relevant 
      * Transaction objects
      * @throws IntegrationException for SQL errors or null/0 inputs
      */
-    public List<Integer> getTransactionIDsOfLedger(DomainEnum den, int bobID) throws IntegrationException, BObStatusException{
-        if(den == null || bobID == 0 || den == DomainEnum.UNIVERSAL){
-            throw new IntegrationException("Cannot integrate out ID numbers with null doman enum or bob ID of 0");
+    public List<Integer> getTransactionsByLedger(IFace_ledgerHolder lh) throws IntegrationException, BObStatusException{
+        if( lh == null ){
+            throw new IntegrationException("Cannot integrate ID numbers with null ledger holder");
         }
         
-        
         StringBuilder sb = new StringBuilder("SELECT transactionid FROM public.moneyledger WHERE ");
-        sb.append(den.getLedgerFKFieldString());
+        
+        sb.append(lh.getDomain().getLedgerFKFieldString());
         sb.append("=?;");
         ResultSet rs = null;
         PreparedStatement stmt = null;
         Connection con = null;
-        
         List<Integer> tnxidl = new ArrayList<>();
         
         try {
-            
             con = getPostgresCon();
             
-            
             stmt = con.prepareStatement(sb.toString());
-            stmt.setInt(1, bobID);
+            stmt.setInt(1, lh.getDBKey());
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -366,7 +368,55 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Exception??", ex);
+            throw new IntegrationException("SQL error in assembling ledger transaction ID list", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return tnxidl;
+    }
+    
+    
+    /**
+     * Looks up 
+     * @param chgOrderID
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public ChargeOrder getChargeOrder(int chgOrderID) throws IntegrationException, BObStatusException{
+        if(chgOrderID == 0){
+            throw new IntegrationException("MoneyIntegrator.getChargeOrder | cannot get ChargeOrder by ID with ID == 0");
+        }
+        
+        String query = "SELECT chargeid, chgtype, muni_municode, chargename, description, chargeamount, \n" +
+                        "       governingordinance_eceid, effectivedate, expirydate, minranktoassign, \n" +
+                        "       minranktodeactivate, eventcatwhenposted, createdts, createdby_userid, \n" +
+                        "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
+                        "       notes\n" +
+                        "  FROM public.moneychargeschedule WHERE chargeid=?;";
+        
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        Connection con = null;
+        
+        ChargeOrder order = null;
+        
+        try {
+            
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, chgOrderID);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                order = generateChargeOrder(rs);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to retrieve charge orders from table moneychargeschedule");
             
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -374,33 +424,89 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
         
-        return tnxidl;
+        return order;
         
     }
     
-    public Transaction getTransaction(int trxid){
+    
+    /**
+     * Generates a ChargeOrder given a result set of all fields
+     * @param rs
+     * @return 
+     */
+    private ChargeOrder generateChargeOrder(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        UserCoordinator uc = getUserCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
         
-        String query = "";
+        ChargeOrder co = new ChargeOrder();
+        
+        co.setChargeID(rs.getInt("chargeid"));
+        co.setChargeDomain(ChargeOrderDomainEnum.valueOf(rs.getString("chgtype")));
+        co.setMuni(mc.getMuni(rs.getInt("muni_municode")));
+        co.setName(rs.getString("chargename"));
+        co.setDescription(rs.getString("description"));
+        co.setAmount(rs.getDouble("chargeamount"));
+        
+        co.setGoverningEnforcableCodeElementId(rs.getInt("governingordinance_eceid"));
+        if(rs.getTimestamp("effectivedate") != null){
+            co.setEffectiveDate(rs.getTimestamp("effectivedate").toLocalDateTime());
+        }
+        
+        if(rs.getTimestamp("expirydate") != null){
+            co.setExpiryDate(rs.getTimestamp("expirydate").toLocalDateTime());
+        }
+        
+        co.setMinRoleToAssign(uc.getRoleTypeFromRank(rs.getInt("minranktoassign")));
+        co.setMinRoleToDeactivate(uc.getRoleTypeFromRank(rs.getInt("minranktodeactivate")));
+        
+        co.setEventCategoryOnPost(ec.getEventCategory(rs.getInt("eventcatewhenosted")));
+        si.populateTrackedFields(co, rs, true);
+        co.setNotes(rs.getString("notes"));
+        return co;
+        
+        
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    // TEMPLATE!!!!!!!!!!!!
+    
+    public List<ChargeOrderPosted> getChargeOrdersPosted(Transaction trx) throws IntegrationException, BObStatusException{
+        
+        if(trx == null){
+            throw new IntegrationException("Cannot get ChargeOrdersPosted with null trx"); 
+        }
+        
+        String query = "SELECT transaction_id, charge_id, createdts, createdby_userid, lastupdatedts, \n" +
+                        "       lastupdatedby_userid, deactivatedts, deactivatedby_userid, notes\n" +
+                        "  FROM public.moneyledgercharge WHERE transaction_id=?;";
         ResultSet rs = null;
         PreparedStatement stmt = null;
         Connection con = null;
         
-        List<CECase> cList = new ArrayList<>();
+        List<ChargeOrderPosted> cList = new ArrayList<>();
         
         try {
             
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, propID);
+            stmt.setInt(1, trx.getTransactionID());
             rs = stmt.executeQuery();
             
             while(rs.next()){
-                cList.add();
+                cList.add(generateChargeOrderPosted(rs));
             }
             
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Exception??", ex);
+            throw new IntegrationException("SQL error building charge order posted", ex);
             
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
@@ -412,11 +518,48 @@ public class MoneyIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
-    
-    
-    
-    
-    
+    /**
+     * Assembles a ChargeOrderPosted given a result set of all fields
+     * @param rs
+     * @return the fully baked ChargeOrderPosted
+     * 
+     */
+    private ChargeOrderPosted generateChargeOrderPosted(ResultSet rs) throws IntegrationException, SQLException, BObStatusException{
+        
+        if(rs == null){
+            throw new IntegrationException("Cannot generate COP with null rs");
+        }
+        
+        ChargeOrderPosted cop = new ChargeOrderPosted(getChargeOrder(rs.getInt("charge_id")));
+        cop.setTrxID(rs.getInt("transaction_id"));
+        
+        
+        
+        
+         if(rs.getTimestamp("createdts") != null){
+                cop.setChgOrderPostedCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
+            }
+            if(rs.getInt("createdby_userid") != 0){
+                cop.setChgOrderPostedCreatedByUserID(rs.getInt("createdby_userid"));
+            }
+            
+            if(rs.getTimestamp("lastupdatedts") != null){
+                cop.setChgOrderPostedLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
+            }
+            if(rs.getInt("lastupdatedby_userid") != 0){
+                cop.setChgOrderPostedLastUpdatedByUserID(rs.getInt("lastupdatedby_userid"));
+            }
+            
+            if(rs.getTimestamp("deactivatedts") != null){
+                cop.setChgOrderPostedDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+            }
+            if(rs.getInt("deactivatedby_userid") != 0){
+                cop.setChgOrderPostedDeactivatedByUserID(rs.getInt("deactivatedby_userid"));
+            }
+            
+            cop.setChgOrderPostedNotes(rs.getString("notes"));
+        return cop;
+    }
     
     
     // TEMPLATE!!!!!!!!!!!!

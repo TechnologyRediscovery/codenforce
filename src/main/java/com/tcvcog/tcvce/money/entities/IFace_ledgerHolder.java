@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.money.entities;
 
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.IFace_keyIdentified;
 
 /**
@@ -17,5 +18,6 @@ public interface IFace_ledgerHolder
     
     public void setMoneyLedger(MoneyLedger ledger);
     public MoneyLedger getMoneyLedger();
+    public DomainEnum getDomain();
     
 }

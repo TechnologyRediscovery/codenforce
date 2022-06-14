@@ -806,5 +806,10 @@ public class        CECase
         return this.ledger;
     }
 
+    @Override
+    public DomainEnum getDomain() {
+        return CECASE_ENUM;
+    }
+
    
 }

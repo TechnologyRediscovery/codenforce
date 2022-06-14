@@ -16,60 +16,46 @@
  */
 package com.tcvcog.tcvce.money.entities;
 
-import com.tcvcog.tcvce.entities.DomainEnum;
-import com.tcvcog.tcvce.money.entities.ChargeOrder;
+import java.util.List;
+
 
 /**
  * This BOb represents a fee that has actually been assigned to an entity.
- * @author Nathan Dietz
+ * @author Nathan Dietz and Ellen Bascomb of Apartment 31Y
  */
 public  class       TransactionCharge 
         extends     TransactionDetails{
 
-    
-
-    private ChargeOrder chargeOrder;
-    private DomainEnum domain;
+    private List<ChargeOrderPosted> chargeOrders;
   
-    
-
     public TransactionCharge() {
+        
     }
 
     public TransactionCharge(TransactionCharge trx){
         super(trx);
-        
-        
-        
+        chargeOrders = trx.getChargeOrders();
     }
     
-
-
-    /**
-     * @return the chargeOrder
-     */
-    public ChargeOrder getChargeOrder() {
-        return chargeOrder;
+    public TransactionCharge(TransactionDetails trx){
+        super(trx);
     }
 
     /**
-     * @return the domain
+     * @return the chargeOrders
      */
-    public DomainEnum getDomain() {
-        return domain;
+    public List<ChargeOrderPosted> getChargeOrders() {
+        return chargeOrders;
     }
 
     /**
-     * @param chargeOrder the chargeOrder to set
+     * @param chargeOrders the chargeOrders to set
      */
-    public void setChargeOrder(ChargeOrder chargeOrder) {
-        this.chargeOrder = chargeOrder;
+    public void setChargeOrders(List<ChargeOrderPosted> chargeOrders) {
+        this.chargeOrders = chargeOrders;
     }
+    
+  
 
-    /**
-     * @param domain the domain to set
-     */
-    public void setDomain(DomainEnum domain) {
-        this.domain = domain;
-    }
+ 
 }
