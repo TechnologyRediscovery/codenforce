@@ -18,7 +18,6 @@ package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
-import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
@@ -26,38 +25,22 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
-import com.tcvcog.tcvce.domain.SearchException;
-import com.tcvcog.tcvce.entities.Human;
-import com.tcvcog.tcvce.entities.Municipality;
-import com.tcvcog.tcvce.entities.PageModeEnum;
-import com.tcvcog.tcvce.entities.Person;
-import com.tcvcog.tcvce.entities.RoleType;
-import com.tcvcog.tcvce.entities.User;
-import com.tcvcog.tcvce.entities.UserMuniAuthPeriod;
-import com.tcvcog.tcvce.entities.UserAuthorized;
-import com.tcvcog.tcvce.entities.UserAuthorizedForConfig;
-import com.tcvcog.tcvce.entities.search.QueryPerson;
-import com.tcvcog.tcvce.entities.search.QueryPersonEnum;
+import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.integration.UserIntegrator;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
 /**
- *
+ * Backs the internal management page for users
  * @author sylvia
  */
 public class UserConfigBB extends BackingBeanUtils{
     
-    private PageModeEnum currentMode;
-    private List<PageModeEnum> pageModes;
-
     
     private UserAuthorizedForConfig userAuthorizedInConfig;
     private String freshPasswordCleartext;
@@ -66,6 +49,7 @@ public class UserConfigBB extends BackingBeanUtils{
     private String formUmapNotes;
     
     private List<User> userListForConfig;
+    private List<User> userListForConfigFiltered;
     private boolean userSelected;
     
     
@@ -101,14 +85,6 @@ public class UserConfigBB extends BackingBeanUtils{
         PersonCoordinator pc = getPersonCoordinator();
         MunicipalityCoordinator mc = getMuniCoordinator();
         
-        setPageModes(new ArrayList<PageModeEnum>());
-        getPageModes().add(PageModeEnum.LOOKUP);
-        getPageModes().add(PageModeEnum.INSERT);
-        getPageModes().add(PageModeEnum.UPDATE);
-        getPageModes().add(PageModeEnum.REMOVE);
-         // use same pathway as clicking the button
-        currentMode = PageModeEnum.LOOKUP;
-        setCurrentMode(currentMode);
         
         try {
             User uTemp = null;
@@ -129,6 +105,7 @@ public class UserConfigBB extends BackingBeanUtils{
                 }
                 onObjetViewButtonChange(userAuthorizedInConfig);
                 userListForConfig = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
+                userListForConfigFiltered = new ArrayList<>();
                 muniCandidateList = mc.getPermittedMunicipalityListForAdminMuniAssignment(getSessionBean().getSessUser());
                 roleTypeCandidateList = uc.auth_getPermittedRoleTypesToGrant(getSessionBean().getSessUser());
                 personLinkUseID = false;
@@ -145,76 +122,6 @@ public class UserConfigBB extends BackingBeanUtils{
             System.out.println(ex);
         }
     }
-    
-    /**
-     * Getter for currentMode
-     * @return 
-     */
-    public PageModeEnum getCurrentMode() {
-        return currentMode;
-    }
-
-    /**
-     * Responds to the user clicking one of the page modes: LOOKUP, ADD, UPDATE, REMOVE
-     * @param mode     
-     */
-    public void setCurrentMode(PageModeEnum mode) {
-
-        //store currentMode into tempCurMode as a temporary value, in case the currenMode equal null
-        PageModeEnum tempCurMode = this.currentMode;
-        //reset default setting every time the Mode has been selected 
-//        loadDefaultPageConfig();
-        //check the currentMode == null or not
-        if (currentMode == null) {
-            this.currentMode = tempCurMode;
-        } else {
-            this.currentMode = mode;
-            switch(currentMode){
-                case LOOKUP:
-                    onModeLookupInit();
-                    break;
-                case INSERT:
-                    onModeInsertInit();
-                    break;
-                case UPDATE:
-                    onModeUpdateInit();
-                    break;
-                case REMOVE:
-                    onModeRemoveInit();
-                    break;
-                default:
-                    break;
-                    
-            }
-        }
-    }
-    
-
-    //check if current mode == Lookup
-    public boolean getActiveLookupMode() {
-        // hard-wired on since there's always a property loaded
-        return PageModeEnum.LOOKUP.equals(currentMode) ;
-    }
-
-    /**
-     * Provide UI elements a boolean true if the mode is UPDATE
-     * @return 
-     */
-    public boolean getActiveUpdateMode(){
-        return PageModeEnum.UPDATE.equals(currentMode);
-    }
-
-
-    //check if current mode == Insert
-    public boolean getActiveInsertUpdateMode() {
-        return PageModeEnum.INSERT.equals(currentMode) || PageModeEnum.UPDATE.equals(currentMode);
-    }
-
-    //check if current mode == Remove
-    public boolean getActiveRemoveMode() {
-        return PageModeEnum.REMOVE.equals(currentMode);
-    }
-
     
     /**
      * Primary listener method which copies a reference to the selected 
@@ -236,24 +143,6 @@ public class UserConfigBB extends BackingBeanUtils{
     }
     
    
-     
- 
-    /**
-     * Internal logic container for changes to page mode: Lookup
-     */
-    private void onModeLookupInit(){
-        UserCoordinator uc = getUserCoordinator();
-        try {
-            userListForConfig = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
-        } catch (IntegrationException | AuthorizationException | BObStatusException ex) {
-            System.out.println(ex);
-              getFacesContext().addMessage(null, 
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                    "FATAL: Unable to load user list from database; Apologies", ""));
-        }
-        
-    }
-    
    
     
     /**
@@ -371,9 +260,7 @@ public class UserConfigBB extends BackingBeanUtils{
                         System.out.println("UserConfigBB.insertUser : retrieved new user");
                     } else {
                         System.out.println("UserConfigBB.insertUser : null new user!");
-                        
                     }
-
                 }
 
             } catch (IntegrationException | BObStatusException ex) {
@@ -424,13 +311,9 @@ public class UserConfigBB extends BackingBeanUtils{
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
-            
         }
-        
         return "";
-        
     }
-
    
       /**
      * Listener for commencement of note writing process
@@ -438,9 +321,7 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void onNoteInitButtonChange(ActionEvent ev){
         formNoteText = new String();
-        
     }
-    
     
     /**
      * Listener for user requests to commit new note content to the current Property
@@ -470,12 +351,8 @@ public class UserConfigBB extends BackingBeanUtils{
             getFacesContext().addMessage(null, 
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
                 "Fatal error updating user in DB; apologies!", ""));
-            
         }        
-        
-        
     }
-    
 
     /**
      * Listener for user requests to start to remove the currently selected ERA;
@@ -988,20 +865,7 @@ public class UserConfigBB extends BackingBeanUtils{
         this.userSelected = userSelected;
     }
 
-    /**
-     * @return the pageModes
-     */
-    public List<PageModeEnum> getPageModes() {
-        return pageModes;
-    }
-
-    /**
-     * @param pageModes the pageModes to set
-     */
-    public void setPageModes(List<PageModeEnum> pageModes) {
-        this.pageModes = pageModes;
-    }
-
+ 
     /**
      * @return the personIDToLink
      */
@@ -1028,6 +892,20 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void setPersonLinkUseID(boolean personLinkUseID) {
         this.personLinkUseID = personLinkUseID;
+    }
+
+    /**
+     * @return the userListForConfigFiltered
+     */
+    public List<User> getUserListForConfigFiltered() {
+        return userListForConfigFiltered;
+    }
+
+    /**
+     * @param userListForConfigFiltered the userListForConfigFiltered to set
+     */
+    public void setUserListForConfigFiltered(List<User> userListForConfigFiltered) {
+        this.userListForConfigFiltered = userListForConfigFiltered;
     }
 
    

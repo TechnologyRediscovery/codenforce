@@ -1147,11 +1147,15 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
     public UserAuthorizedForConfig user_transformUserToUserAuthorizedForConfig(User userToConfigure) throws AuthorizationException, IntegrationException, BObStatusException{
         UserAuthorizedForConfig uafc = null;
         UserIntegrator ui = getUserIntegrator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
         if(userToConfigure != null){
             User utemp = user_getUser(userToConfigure.getUserID());
             uafc = new UserAuthorizedForConfig(ui.getUserAuthorizedNoAuthPeriods(utemp));
+            
             uafc.setMuniAuthPeriodsMap(auth_assembleMuniUMAPMapRaw(userToConfigure));
             uafc.setUmapList(ui.getUserMuniAuthPeriodsRaw(userToConfigure.getUserID()));
+            uafc.setHomeMuni(mc.getMuni(uafc.getHomeMuniID()));
+            
             System.out.println("UserCoordinator.user_transformUserToUserAuthorizedForConfig: Transformed username " + userToConfigure.getUsername());
         }
         return uafc;

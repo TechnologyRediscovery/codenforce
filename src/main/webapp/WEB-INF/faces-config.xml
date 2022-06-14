@@ -381,58 +381,9 @@
         <navigation-case>
             <from-outcome>userConfig</from-outcome>
             <to-view-id>/restricted/cogadmin/userConfig.xhtml</to-view-id>
-        </navigation-case>
-        <navigation-case>
-            <from-outcome>userAdd</from-outcome>
-            <to-view-id>/restricted/cogadmin/userAdd.xhtml</to-view-id>
             <redirect />
         </navigation-case>
     </navigation-rule>
-
-    <navigation-rule>
-        <from-view-id>/restricted/cogadmin/userManage.xhtml</from-view-id>
-        <navigation-case>
-            <from-outcome>userManage</from-outcome>
-            <to-view-id>/restricted/cogadmin/userManage.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
-    
-    <navigation-rule>
-        <from-view-id>*</from-view-id>
-        <navigation-case>
-            <from-outcome>userMuniMapping</from-outcome>
-            <to-view-id>/restricted/cogadmin/userAuthMuniManage.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
-
-    <navigation-rule>
-        <from-view-id>/restricted/cogadmin/userAdd.xhtml</from-view-id>
-        <navigation-case>
-            <from-outcome>userManage</from-outcome>
-            <to-view-id>/restricted/cogadmin/userManage.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
-       
-    <navigation-rule>
-        <navigation-case>
-            <from-outcome>userAuthMuniManage</from-outcome>
-            <to-view-id>/restricted/cogadmin/userAuthMuniManage.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
-    
-    <navigation-rule>
-        <from-view-id>*</from-view-id>
-        <navigation-case>
-            <from-outcome>userManage</from-outcome>
-            <to-view-id>/restricted/cogadmin/userManage.xhtml</to-view-id>
-            <redirect />
-        </navigation-case>
-    </navigation-rule>
-    
     
     <!--*********************************************************************-->
     <!--**                       I. MUNICIPALITY                           **-->

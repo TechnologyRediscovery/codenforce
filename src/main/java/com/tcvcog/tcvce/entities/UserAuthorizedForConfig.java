@@ -27,6 +27,8 @@ import java.util.List;
 public class UserAuthorizedForConfig extends UserAuthorized{
 
     private List<UserMuniAuthPeriod> umapList;
+    private Municipality homeMuni;
+    
     
      /**
      * This constructor is the only way of setting the internals of this
@@ -76,6 +78,20 @@ public class UserAuthorizedForConfig extends UserAuthorized{
      */
     public void setUmapList(List<UserMuniAuthPeriod> umapList) {
         this.umapList = umapList;
+    }
+
+    /**
+     * @return the homeMuni
+     */
+    public Municipality getHomeMuni() {
+        return homeMuni;
+    }
+
+    /**
+     * @param homeMuni the homeMuni to set
+     */
+    public void setHomeMuni(Municipality homeMuni) {
+        this.homeMuni = homeMuni;
     }
     
     
