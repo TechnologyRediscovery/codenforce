@@ -70,22 +70,38 @@
                                             tableStyleClass="primeDataTable">
 
                                             <p:column sortBy="#{user.username}"
-                                                      filterBy="#{user.username}">
+                                                      filterBy="#{user.username}"
+                                                      style="width:15%;">
+                                                
                                                 <f:facet name="header">
                                                     <h:outputText value="Username" />
                                                 </f:facet>
                                                 <h:outputText value="#{user.username}"/>
                                             </p:column>
+
+                                            <p:column sortBy="#{user.homeMuni.muniName}"
+                                                      filterBy="#{user.homeMuni.muniName}"
+                                                      style="width:15%;">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Home muni" />
+                                                </f:facet>
+                                                <h:outputText value="#{user.homeMuni.muniName}"/>
+                                                <p:spacer height="3px" />
+                                                <h:outputText value="(MUID:#{user.homeMuni.muniCode})"/>
+                                            </p:column>
+                                            
                                             
                                             <p:column sortBy="#{user.human.name}"
-                                                      filterBy="#{user.human.name}">
+                                                      filterBy="#{user.human.name}"
+                                                      style="width:15%;">
                                                 <f:facet name="header">
                                                     <h:outputText value="Person" />
                                                 </f:facet>
                                                 <h:outputText value="#{user.human.name}"/>
                                                 <h:outputText value=" (PersID: #{user.human.humanID})"/>
                                             </p:column>
-                                            <p:column sortBy="#{user.createdTS}">
+                                            <p:column sortBy="#{user.createdTS}"
+                                                      style="width:15%;">
                                                 <f:facet name="header">
                                                     <h:outputText value="Created" />
                                                 </f:facet>
@@ -93,20 +109,22 @@
                                             </p:column>
 
                                             <p:column sortBy="#{user.active}"
-                                                      filterBy="#{user.active}">
+                                                      filterBy="#{user.active}"
+                                                      style="width:10%;">
                                                 <f:facet name="header">
                                                     <h:outputText value="Active?" />
                                                 </f:facet>
                                                 <h:outputText value="#{user.active ? 'Yes':'No'}"/>
                                             </p:column>
-                                            <p:column sortBy="#{user.noLoginVirtualUser}">
+                                            <p:column sortBy="#{user.noLoginVirtualUser}"
+                                                      style="width:10%;">
                                                 <f:facet name="header">
                                                     <h:outputText value="Virtual?" />
                                                 </f:facet>
                                                 <h:outputText value="#{user.noLoginVirtualUser ? 'Yes' : 'No'}"/>
-                                            </p:column>
-
-                                            <p:column>
+                                          
+                                            <p:column
+                                                style="width:10%;">
                                                 <p:commandButton ajax="true"
                                                                  id="usercfg-viewuser"
                                                                  value="#{user.userID == userConfigBB.userAuthorizedInConfig.userID ? 'Selected':'View'}"

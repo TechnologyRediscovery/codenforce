@@ -48,8 +48,8 @@ public class UserConfigBB extends BackingBeanUtils{
     private UserMuniAuthPeriod umapInConfig;
     private String formUmapNotes;
     
-    private List<User> userListForConfig;
-    private List<User> userListForConfigFiltered;
+    private List<UserAuthorizedForConfig> userListForConfig;
+    private List<UserAuthorizedForConfig> userListForConfigFiltered;
     private boolean userSelected;
     
     
@@ -170,27 +170,7 @@ public class UserConfigBB extends BackingBeanUtils{
     }
      
      
-     public void onLoadAllUsersButtonChange(ActionEvent ev){
-         UserCoordinator uc = getUserCoordinator();
-        try {
-            userListForConfig = uc.user_assembleUserListComplete(getSessionBean().getSessUser());
-            if(userListForConfig != null && !userListForConfig.isEmpty()){
-                userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(userListForConfig.get(0));
-            } else {
-                userAuthorizedInConfig = uc.user_transformUserToUserAuthorizedForConfig(getSessionBean().getSessUser());
-            }
-            System.out.println("UserConfigBB.onLoadAllUsersButtonChange: ulist size " + userListForConfig.size());
-              getFacesContext().addMessage(null, 
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                    "Complete user list loaded!", ""));
-        } catch (IntegrationException | AuthorizationException | BObStatusException ex) {
-            System.out.println(ex);  
-            getFacesContext().addMessage(null, 
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                    "FATAL: Unable to load complete user list from database; Apologies", ""));
-            
-        }
-     }
+    
     
      
      /**
@@ -411,14 +391,14 @@ public class UserConfigBB extends BackingBeanUtils{
     /**
      * @return the userListForConfig
      */
-    public List<User> getUserListForConfig() {
+    public List<UserAuthorizedForConfig> getUserListForConfig() {
         return userListForConfig;
     }
 
     /**
      * @param userListForConfig the userListForConfig to set
      */
-    public void setUserListForConfig(List<User> userListForConfig) {
+    public void setUserListForConfig(List<UserAuthorizedForConfig> userListForConfig) {
         this.userListForConfig = userListForConfig;
     }
 
@@ -897,14 +877,14 @@ public class UserConfigBB extends BackingBeanUtils{
     /**
      * @return the userListForConfigFiltered
      */
-    public List<User> getUserListForConfigFiltered() {
+    public List<UserAuthorizedForConfig> getUserListForConfigFiltered() {
         return userListForConfigFiltered;
     }
 
     /**
      * @param userListForConfigFiltered the userListForConfigFiltered to set
      */
-    public void setUserListForConfigFiltered(List<User> userListForConfigFiltered) {
+    public void setUserListForConfigFiltered(List<UserAuthorizedForConfig> userListForConfigFiltered) {
         this.userListForConfigFiltered = userListForConfigFiltered;
     }
 

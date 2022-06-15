@@ -277,6 +277,69 @@ ALTER TABLE public.occpermittype ADD COLUMN requirezerobalance boolean;
 
 -- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
+-- |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> USER AND MUNI UPGRADES FOR MCCANDLESS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+ALTER TABLE public.login ADD COLUMN humanlink_humanid INTEGER CONSTRAINT login_humanid_fk REFERENCES human (humanid);
+ALTER TABLE public.login RENAME COLUMN personlink TO xarchivepersonlink;
+
+
+
+
+-- make user.humanlink_humanid link NOT NULL
+
+
+
+
+CREATE OR REPLACE FUNCTION cnf_sha1(TEXT) returns TEXT AS $$
+
+	SELECT encode(digest($1, 'sha1'), 'hex')
+
+$$ LANGUAGE SQL STRICT IMMUTABLE $$;
+
+-- tHE PRIMARY KEY OF THE HASH STORAGE TABLE IS THE HASH SIGN
+-- When hashing the UMAPS, do NOT include salt, since we don't want to valid sigs for the same person with the same place with x authority
+
+
+
+
+
+
+-- |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ USER AND MUNI UPGRADES FOR MCCANDLESS ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+
+-- |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Security upgrade ideas  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+CREATE TABLE public.loginsigvault
+(
+	sigsha1hash			TEXT NOT NULL,
+	writets 			TIMESTAMP WITH TIME ZONE DEFAULT now(),
+	CONSTRAINT loginsigvault_hash_pk PRIMARY KEY (sigsha1hash)
+);
+
+
+
+ALTER TABLE public.login ADD COLUMN writets TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.login ADD COLUMN write_umaphsh INTEGER CONSTRAINT login_write_userid_fk REFERENCES public.login (userid);
+ALTER TABLE public.login ADD COLUMN writesig TEXT; -- this locks in "with what authority" WHich makes userID redundant. I should 
+-- be stamping UMAP hashes since the hash can verify its contents that are meaningful to the human reader. Was this DB record the 
+-- UMAP that was stamped? Still store those hashes somewhere else --once, when it's first hashed only, then look that table up by HASHCODE;
+-- THEN the write constraints are required to be FKed to the master HASH table with an index on the hashes!!! The table key + user role permissions system
+-- can be used to make something like a pretty good identity who, when, with what authority verificatio system.
+
+
+-- |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ END Security upgrade ideas  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
 
 DROP TABLE public.moneycecasefeepayment CASCADE;
 DROP TABLE public.moneycecasefeeassigned CASCADE;

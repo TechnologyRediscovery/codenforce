@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * The pivotal class in the Entity world of the User. I'm a user, mapped to a human
+ * allowed to do some level of activity in a given municipality from date X to date Y
+ * 
  * @author sylvia
  */
 public class UserAuthorized extends User{
@@ -42,6 +44,7 @@ public class UserAuthorized extends User{
     
     protected LocalDateTime pswdLastUpdated;
     protected LocalDateTime forcePasswordResetTS;
+    protected int forcePasswordResetByUserID;
     
 
     
@@ -49,32 +52,19 @@ public class UserAuthorized extends User{
      * This constructor is the only way of setting the internals of this
      * security-critical BOB, so all must be assembled by the coordinator
      * and then only read from
-     * @param u
-     * @param uap
-     * @param akc 
+     * @param ua
      */
-    public UserAuthorized(User u ){
-        if(u != null){
-            
-            this.userID = u.getUserID();
-            this.username = u.getUsername();
-            this.userHuman = u.getHuman();
-            this.personID = u.getHumanID();
-            this.notes = u.getNotes();
-            this.badgeNumber = u.getBadgeNumber();
-            this.oriNumber = u.getOriNumber();
-
-            this.noLoginVirtualUser = u.isNoLoginVirtualUser();
-
-
-            this.createdByUserId = u.getCreatedByUserId();
-            this.createdTS = u.getCreatedTS();
-
-            this.lastUpdatedTS = u.lastUpdatedTS;
-            this.deactivatedByUserID = u.deactivatedByUserID;
-            this.deactivatedTS = u.deactivatedTS;
-
-        }
+    public UserAuthorized(UserAuthorized ua ){
+        super(ua);
+        this.myCredential = ua.myCredential;
+        this.pswdLastUpdated = ua.pswdLastUpdated;
+        this.forcePasswordResetTS = ua.forcePasswordResetTS;
+        this.forcePasswordResetByUserID = ua.forcePasswordResetByUserID;
+      
+    }
+    
+    public UserAuthorized(User u){
+        super(u);
     }
     
     
@@ -190,6 +180,20 @@ public class UserAuthorized extends User{
      */
     public Credential getMyCredential() {
         return myCredential;
+    }
+
+    /**
+     * @return the forcePasswordResetByUserID
+     */
+    public int getForcePasswordResetByUserID() {
+        return forcePasswordResetByUserID;
+    }
+
+    /**
+     * @param forcePasswordResetByUserID the forcePasswordResetByUserID to set
+     */
+    public void setForcePasswordResetByUserID(int forcePasswordResetByUserID) {
+        this.forcePasswordResetByUserID = forcePasswordResetByUserID;
     }
     /**
      * @return the homeMuni

@@ -34,7 +34,8 @@ public class User implements Serializable{
     
     protected Human userHuman;
     protected int personID;
-
+    private int humanBondID;
+    
     protected String notes;
     
     protected String badgeNumber;
@@ -44,10 +45,12 @@ public class User implements Serializable{
     
     protected int createdByUserId;
     protected LocalDateTime createdTS;
+    private int lastUpdatedByUserID;
     protected LocalDateTime lastUpdatedTS;
     
     protected LocalDateTime deactivatedTS;
     protected int deactivatedByUserID;
+    
     protected int homeMuniID;
     
     
@@ -56,6 +59,32 @@ public class User implements Serializable{
      * Creates a new instance of User
      */
     public User() {
+    }
+    
+    
+    public User(User u){
+      if(u != null){
+            
+            this.userID = u.getUserID();
+            this.username = u.getUsername();
+            this.userHuman = u.getHuman();
+            this.personID = u.getHumanID();
+            this.notes = u.getNotes();
+            this.badgeNumber = u.getBadgeNumber();
+            this.oriNumber = u.getOriNumber();
+
+            this.noLoginVirtualUser = u.isNoLoginVirtualUser();
+
+
+            this.createdByUserId = u.getCreatedByUserId();
+            this.createdTS = u.getCreatedTS();
+
+            this.lastUpdatedTS = u.lastUpdatedTS;
+            this.deactivatedByUserID = u.deactivatedByUserID;
+            this.deactivatedTS = u.deactivatedTS;
+            
+          
+        }
     }
     
     /**
@@ -141,11 +170,11 @@ public class User implements Serializable{
     }
 
     /**
-     * @param person the userHuman to set - It's actually a Human, not an 
+     * @param hum the userHuman to set - It's actually a Human, not an 
  Instance of Person class
      */
-    public void setHuman(Human person) {
-        this.userHuman = person;
+    public void setHuman(Human hum) {
+        this.userHuman = hum;
     }
 
 
@@ -351,6 +380,34 @@ public class User implements Serializable{
      */
     public int getPersonID() {
         return personID;
+    }
+
+    /**
+     * @return the lastUpdatedByUserID
+     */
+    public int getLastUpdatedByUserID() {
+        return lastUpdatedByUserID;
+    }
+
+    /**
+     * @param lastUpdatedByUserID the lastUpdatedByUserID to set
+     */
+    public void setLastUpdatedByUserID(int lastUpdatedByUserID) {
+        this.lastUpdatedByUserID = lastUpdatedByUserID;
+    }
+
+    /**
+     * @return the humanBondID
+     */
+    public int getHumanBondID() {
+        return humanBondID;
+    }
+
+    /**
+     * @param humanBondID the humanBondID to set
+     */
+    public void setHumanBondID(int humanBondID) {
+        this.humanBondID = humanBondID;
     }
     /**
      * @return the accessRecord

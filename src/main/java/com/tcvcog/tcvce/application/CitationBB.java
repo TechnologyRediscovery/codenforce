@@ -46,7 +46,6 @@ import javax.faces.event.ActionEvent;
 public class CitationBB extends BackingBeanUtils {
 
     private Citation currentCitation;
-    private List<User> filingOfficerCandidateList;
     
     private List<CitationFilingType> citationFilingTypeList;
 
@@ -98,9 +97,8 @@ public class CitationBB extends BackingBeanUtils {
             citationStatusList = cc.citation_getCitationStatusList();
             courtEntityList = cei.getCourtEntityList();
             citationFilingTypeList = cc.citation_getCitationFilingTypeList();
-            filingOfficerCandidateList = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
             
-        } catch (IntegrationException | BObStatusException | AuthorizationException ex) {
+        } catch (IntegrationException | BObStatusException  ex) {
             System.out.println(ex);
         }
         
@@ -843,14 +841,6 @@ public class CitationBB extends BackingBeanUtils {
     }
 
   
-
-    /**
-     * @return the filingOfficerCandidateList
-     */
-    public List<User> getFilingOfficerCandidateList() {
-        return filingOfficerCandidateList;
-    }
-
    
     /**
      * @return the currentCitation
@@ -950,14 +940,6 @@ public class CitationBB extends BackingBeanUtils {
         return citationStatusEditMode;
     }
 
-    /**
-     * @param filingOfficerCandidateList the filingOfficerCandidateList to set
-     */
-    public void setFilingOfficerCandidateList(List<User> filingOfficerCandidateList) {
-        this.filingOfficerCandidateList = filingOfficerCandidateList;
-    }
-
-    /**
    
     /**
      * @param currentCitation the currentCitation to set

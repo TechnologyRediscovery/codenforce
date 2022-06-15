@@ -65,7 +65,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private Person selectedRecipientPerson;
     private MailingAddress selectedRecipAddr;
     
-    private List<User> notifyingOfficerCandidateList;
     private User notifyingOfficerCandidateChosen;
 
     private boolean personLookupUseID;
@@ -148,12 +147,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         nov_createNoticeFollowupEvent = true;
         
         UserCoordinator uc = getUserCoordinator();
-        try {
-            notifyingOfficerCandidateList = uc.user_auth_assembleUserListForConfig(getSessionBean().getSessUser());
-        } catch (AuthorizationException | IntegrationException | BObStatusException ex) {
-            System.out.println(ex );
-        } 
-        
         
         
     } // close initbean
@@ -181,7 +174,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         }
         
     }
-    
     
     // MIGRATED FROM TEXT BLOCK BB
       public String updateTextBlock(){
@@ -1430,20 +1422,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setNov_createNoticeFollowupEvent(boolean nov_createNoticeFollowupEvent) {
         this.nov_createNoticeFollowupEvent = nov_createNoticeFollowupEvent;
-    }
-
-    /**
-     * @return the notifyingOfficerCandidateList
-     */
-    public List<User> getNotifyingOfficerCandidateList() {
-        return notifyingOfficerCandidateList;
-    }
-
-    /**
-     * @param notifyingOfficerCandidateList the notifyingOfficerCandidateList to set
-     */
-    public void setNotifyingOfficerCandidateList(List<User> notifyingOfficerCandidateList) {
-        this.notifyingOfficerCandidateList = notifyingOfficerCandidateList;
     }
 
     /**

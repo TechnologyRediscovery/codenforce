@@ -55,6 +55,24 @@ import java.util.logging.Logger;
  * <br>
  * user_ which are methods governing the creation, editing, and management of the User
  * object world, which is both a data concept and a security-backing class
+ * <br>
+ * <br>
+ * McCandless Signature upgrade:
+ * Special tables have their own version of createdts/user, updatedts/user, and deactivatedts/user
+ * which are signed by the user doing those operations. 
+ * 
+ * The signature is:
+ * The hash of that user's USER and UMAP record field dump <SEP>epoch in miliseconds
+ * 
+ * General principle: UMAP signature versus record signature, which is the UMAP sig +
+ * hash of its field dump
+ * 
+ * the UMAP and its hash are never supposed to change, and those hashes are stored 
+ * with each UMAP when it's made, and then in a separate table that's controlled
+ * by a separate DB user (eventually)
+ * 
+ * Hashes are the same length, which is very handy
+ * 
  * 
  * @author Ellen Bascomb (Apartment: 31Y)
  */
@@ -976,13 +994,32 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param userID
      * @return
      * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
     public User user_getUser(int userID) throws IntegrationException, BObStatusException{
         if(userID == 0){
             return null;
         }
         UserIntegrator ui = getUserIntegrator();
-        return ui.getUser(userID);
+        return user_configureUser(ui.getUser(userID));
+    }
+    
+    
+    /**
+     * Internal logic setter for simple user objects. Most importantly, 
+     * I inject the User's official human!
+     * @param usr
+     * @return
+     * @throws BObStatusException 
+     */
+    private User user_configureUser(User usr) throws BObStatusException, IntegrationException{
+        if(usr == null){
+            throw new BObStatusException("Cannot configure a null user");
+        }
+        
+        PersonCoordinator pc = getPersonCoordinator();
+        usr.setHuman(pc.getHuman(usr.getHumanID()));
+        return usr;
     }
     
     
@@ -996,7 +1033,8 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      * @throws AuthorizationException 
      */
-    public List<User> user_auth_assembleUserListForConfig(UserAuthorized userRequestor) throws IntegrationException, AuthorizationException, BObStatusException{
+    public List<UserAuthorizedForConfig> user_auth_assembleUserListForConfig(UserAuthorized userRequestor) 
+            throws IntegrationException, AuthorizationException, BObStatusException{
         
         UserIntegrator ui = getUserIntegrator();
         List<User> usersForConfig = null;
@@ -1014,24 +1052,32 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                         &&
                     (userRequestor.getMuniAuthPeriodsMap().get(mu).get(0).getRole().getRank() >= RoleType.SysAdmin.getRank())
                 ){
-                    usersForConfig = user_auth_assembleUserListForConfig(mu,userRequestor);
+                    // is this supposed to be addAll()?
+                    usersForConfig.addAll(user_auth_assembleUserListForConfig(mu,userRequestor));
                 } 
             } //close loop over authmunis 
             
             // add any users who don't have any auth periods in that muni but whose home muni is the user's auth muni
             List<User> usersInHomeMuni = ui.getUsersByHomeMuni(userRequestor.getKeyCard().getGoverningAuthPeriod().getMuni());
-            List<User> usersToAdd = new ArrayList<>();
+            List<User> usersToAddNoAuthPeriod = new ArrayList<>();
             for(User usr: usersInHomeMuni){
                 if(!usersForConfig.contains(usr)){
-                    usersToAdd.add(usr);
+                    usersToAddNoAuthPeriod.add(usr);
                 }
             }
-            if(!usersToAdd.isEmpty()){
-                usersForConfig.addAll(usersToAdd);
+            if(!usersToAddNoAuthPeriod.isEmpty()){
+                usersForConfig.addAll(usersToAddNoAuthPeriod);
             }
             
         } // close param not null check
-        return usersForConfig;
+        
+        List<UserAuthorizedForConfig> ualist = new ArrayList<>();
+        if(usersForConfig != null && !usersForConfig.isEmpty()){
+            for(User usr: usersForConfig){
+                ualist.add(user_transformUserToUserAuthorizedForConfig(usr));
+            }
+        }
+        return ualist;
     }
     
     
