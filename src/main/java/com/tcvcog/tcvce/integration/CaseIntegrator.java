@@ -2360,8 +2360,8 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         if(rs.getInt("notifyingofficer_userid") != 0){
             notice.setNotifyingOfficer(uc.user_getUser(rs.getInt("notifyingofficer_userid")));
         }
-        if(notice.getNotifyingOfficer() != null && notice.getNotifyingOfficer().getPersonID() != 0){
-            notice.setNotifyingOfficerPerson(pc.getPersonByHumanID(notice.getNotifyingOfficer().getPersonID()));
+        if(notice.getNotifyingOfficer() != null && notice.getNotifyingOfficer().getHumanID() != 0){
+            notice.setNotifyingOfficerPerson(pc.getPersonByHumanID(notice.getNotifyingOfficer().getHumanID()));
         }
         
         if(rs.getInt("recipient_humanid") != 0){

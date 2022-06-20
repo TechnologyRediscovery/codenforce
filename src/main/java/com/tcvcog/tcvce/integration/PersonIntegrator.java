@@ -1528,9 +1528,14 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
-     public List<Integer> getPersonsMappedToAUser() throws IntegrationException{
+    /**
+     * "Reverse lookup" on humans who are pointed to by a given user.
+     * @return the IDs of the humans
+     * @throws IntegrationException 
+     */
+     public List<Integer> getAllHumansDesignatedAsUserHumans() throws IntegrationException{
         List<Integer> humanidl = new ArrayList<>();
-        String selectQuery =  "SELECT DISTINCT personlink FROM public.login;";
+        String selectQuery =  "SELECT DISTINCT humanlink_humanid FROM public.login;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1539,12 +1544,12 @@ public class PersonIntegrator extends BackingBeanUtils implements Serializable {
             stmt = con.prepareStatement(selectQuery);
             rs = stmt.executeQuery();
             while(rs.next()){
-                humanidl.add(rs.getInt("personlink"));
+                humanidl.add(rs.getInt("humanlink_humanid"));
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to get persons connected to users", ex);
+            throw new IntegrationException("Unable to get humans connected to users", ex);
 
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

@@ -38,13 +38,18 @@ public class UserAuthorizedForConfig extends UserAuthorized{
      */
     public UserAuthorizedForConfig(UserAuthorized u){
         super(u);
-        if(u != null){
-            this.muniAuthPeriodsMap = u.muniAuthPeriodsMap;
-            this.pswdLastUpdated = u.pswdLastUpdated;
-            this.forcePasswordResetTS = u.forcePasswordResetTS;
-            this.lastUpdatedTS = u.lastUpdatedTS;
-            this.deactivatedByUserID = u.deactivatedByUserID;
-            this.deactivatedTS = u.deactivatedTS;
+       
+    }
+    
+    /**
+     * A non deep clone constructor
+     * @param uafc 
+     */
+    public UserAuthorizedForConfig(UserAuthorizedForConfig uafc){
+        super(uafc);
+         if(uafc != null){
+           this.umapList = uafc.umapList;
+           this.homeMuni= uafc.homeMuni;
         }
     }
 
@@ -88,12 +93,14 @@ public class UserAuthorizedForConfig extends UserAuthorized{
     }
 
     /**
+     * Special setter that also sets the ID only version 
+     * of this member to avoid recursion in object creation
      * @param homeMuni the homeMuni to set
      */
     public void setHomeMuni(Municipality homeMuni) {
+        if(homeMuni != null && homeMuni.getMuniCode() != 0 && homeMuni.getMuniCode() != this.homeMuniID){
+            this.homeMuniID = homeMuni.getMuniCode();
+        }
         this.homeMuni = homeMuni;
     }
-    
-    
-    
 }

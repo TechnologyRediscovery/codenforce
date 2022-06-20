@@ -56,10 +56,13 @@ public class UserAuthorized extends User{
      */
     public UserAuthorized(UserAuthorized ua ){
         super(ua);
-        this.myCredential = ua.myCredential;
-        this.pswdLastUpdated = ua.pswdLastUpdated;
-        this.forcePasswordResetTS = ua.forcePasswordResetTS;
-        this.forcePasswordResetByUserID = ua.forcePasswordResetByUserID;
+        if(ua != null){
+            this.muniAuthPeriodsMap = ua.getMuniAuthPeriodsMap();
+            this.myCredential = ua.myCredential;
+            this.pswdLastUpdated = ua.pswdLastUpdated;
+            this.forcePasswordResetTS = ua.forcePasswordResetTS;
+            this.forcePasswordResetByUserID = ua.forcePasswordResetByUserID;
+        }
       
     }
     

@@ -277,6 +277,10 @@ ALTER TABLE public.occpermittype ADD COLUMN requirezerobalance boolean;
 
 -- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
+
+
+
+
 -- |>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> USER AND MUNI UPGRADES FOR MCCANDLESS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
@@ -284,10 +288,34 @@ ALTER TABLE public.login ADD COLUMN humanlink_humanid INTEGER CONSTRAINT login_h
 ALTER TABLE public.login RENAME COLUMN personlink TO xarchivepersonlink;
 
 
+ALTER TABLE public.login RENAME COLUMN createdby TO createdby_userid;
+ALTER TABLE public.login ADD COLUMN lastupdated_userid INTEGER  CONSTRAINT login_lastupdated_userid_fk REFERENCES public.login (userid);
 
+
+
+ALTER TABLE public.login RENAME COLUMN deactivated_userid TO deactivatedby_userid;
+ALTER TABLE public.login ADD COLUMN forcepasswordresetby_userid INTEGER  CONSTRAINT login_forcepasswordresetby_userid_fk REFERENCES public.login (userid);
 
 -- make user.humanlink_humanid link NOT NULL
 
+
+ALTER TABLE public.login RENAME COLUMN lastupdated_userid TO lastupdatedby_userid;
+
+
+
+--ECD LOCAL DEPLOY CURSOR
+
+
+-- |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ USER AND MUNI UPGRADES FOR MCCANDLESS ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+
+
+
+
+
+-- |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Security upgrade ideas  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 
@@ -304,18 +332,6 @@ $$ LANGUAGE SQL STRICT IMMUTABLE $$;
 
 
 
-
--- |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ USER AND MUNI UPGRADES FOR MCCANDLESS ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-
-
-
-
-
--- |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Security upgrade ideas  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 CREATE TABLE public.loginsigvault
 (
 	sigsha1hash			TEXT NOT NULL,
@@ -326,7 +342,7 @@ CREATE TABLE public.loginsigvault
 
 
 ALTER TABLE public.login ADD COLUMN writets TIMESTAMP WITH TIME ZONE;
-ALTER TABLE public.login ADD COLUMN write_umaphsh INTEGER CONSTRAINT login_write_userid_fk REFERENCES public.login (userid);
+ALTER TABLE public.login ADD COLUMN write_umaphsh INTEGER CONSTRAINT -- the hash master table
 ALTER TABLE public.login ADD COLUMN writesig TEXT; -- this locks in "with what authority" WHich makes userID redundant. I should 
 -- be stamping UMAP hashes since the hash can verify its contents that are meaningful to the human reader. Was this DB record the 
 -- UMAP that was stamped? Still store those hashes somewhere else --once, when it's first hashed only, then look that table up by HASHCODE;

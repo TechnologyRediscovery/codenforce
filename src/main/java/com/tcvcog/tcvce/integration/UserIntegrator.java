@@ -78,7 +78,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query =  " SELECT userid, username, password, notes, pswdlastupdated, \n" +
                         "       forcepasswordreset, createdby_userid, createdts, nologinvirtualonly, \n" +
                         "       deactivatedts, deactivatedby_userid, lastupdatedts, userrole, \n" +
-                        "       homemuni, humanlink_humanid, lastupdated_userid, forcepasswordresetby_userid\n" +
+                        "       homemuni, humanlink_humanid, lastupdatedby_userid, forcepasswordresetby_userid\n" +
                         "  FROM public.login WHERE userid = ?;";   
         
         PreparedStatement stmt = null;
@@ -160,7 +160,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             user.setNotes(rs.getString("notes"));
          
             // line 2 of SELECT
-            user.setCreatedByUserId(rs.getInt("createdby"));
+            user.setCreatedByUserId(rs.getInt("createdby_userid"));
             if(rs.getTimestamp("createdts") != null){
                 user.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
             }
@@ -172,8 +172,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
              if(rs.getTimestamp("deactivatedts") != null){
                 user.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());   
             }
-             
-            user.setDeactivatedBy(rs.getInt("deactivated_userid"));
+              
+            user.setDeactivatedBy(rs.getInt("deactivatedby_userid"));
             if(rs.getTimestamp("lastupdatedts") != null){
                 user.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
             }
@@ -181,6 +181,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
              if(rs.getInt("homemuni") != 0){
                 user.setHomeMuniID(rs.getInt("homemuni"));
             }
+            user.setHumanID(rs.getInt("humanlink_humanid"));
          return user;
     }
     
@@ -198,10 +199,12 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             return null;
         }
         
+        UserCoordinator uc = getUserCoordinator();
+        
         Connection con = getPostgresCon();
         ResultSet rs = null;
         // broken query
-        String query =  " SELECT userid, pswdlastupdated, forcepasswordreset, forcepasswordresetby_userid, createdby, createdts " +
+        String query =  " SELECT userid, pswdlastupdated, forcepasswordreset, forcepasswordresetby_userid, createdby_userid, createdts " +
                         " FROM public.login WHERE userid = ?;";
         
         UserAuthorized ua = null;
@@ -212,7 +215,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(1, usr.getUserID());
             rs = stmt.executeQuery();
             while(rs.next()){
-                ua = new UserAuthorized(getUser(usr.getUserID()));
+                ua = new UserAuthorized(uc.user_getUser(usr.getUserID()));
                 ua = generateUserAuthorized(ua, rs);
             }
             
@@ -246,7 +249,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             if(rs.getInt("forcepasswordresetby_userid") != 0){
                 ua.setForcePasswordResetByUserID(rs.getInt("forcepasswordresetby_userid"));
             }
-            ua.setCreatedByUserId(rs.getInt("createdby"));
+            ua.setCreatedByUserId(rs.getInt("createdby_userid"));
             if(rs.getTimestamp("createdts") != null){
                 ua.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
             }
@@ -691,9 +694,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         ResultSet rs = null;
         String query =  "INSERT INTO public.login(\n" +
                         "            userid, username, password, notes, humanlink_humanid, pswdlastupdated, \n" +
-                        "            forcepasswordreset, createdby, createdts, nologinvirtualonly, \n" +
-                        "            deactivatedts, deactivated_userid, lastupdatedts, userrole, homemuni, "
-                        + "          lastupdated_userid)\n" +
+                        "            forcepasswordreset, createdby_userid, createdts, nologinvirtualonly, \n" +
+                        "            deactivatedts, deactivatedby_userid, lastupdatedts, userrole, homemuni, "
+                        + "          lastupdatedby_userid)\n" +
                         "    VALUES (DEFAULT, ?, NULL, ?, ?, NULL, \n" +
                         "            NULL, ?, now(), ?, \n" +
                         "            NULL, NULL, now(), 'User'::role, ?, "
@@ -921,7 +924,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         System.out.println("UserIntegrator.updateUser");
         String query =  "UPDATE public.login\n" +
                         "   SET notes=?, humanlink_humanid=?, \n" +
-                        "    nologinvirtualonly=?, deactivatedts=?, deactivated_userid=?, lastupdatedts=now(), homemuni=? \n" +
+                        "    nologinvirtualonly=?, deactivatedts=?, deactivatedby_userid=?, lastupdatedts=now(), homemuni=? \n" +
                         " WHERE userid=?;";
         
         PreparedStatement stmt = null;

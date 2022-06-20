@@ -882,12 +882,16 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @param u
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.AuthorizationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public void user_updateUser(User u) throws IntegrationException, AuthorizationException{
+    public void user_updateUser(User u) throws IntegrationException, AuthorizationException, 
+            BObStatusException{
         UserIntegrator ui = getUserIntegrator();
-        StringBuilder sb = new StringBuilder();
         if(u != null && (u.getHuman() != null || u.getHuman().getHumanID() != 0)){
                 ui.updateUser(u);
+        } else {
+            throw new BObStatusException("Cannot update user with null user, no human, or a humanID of 0");
+            
         }
     }
     
@@ -998,6 +1002,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      */
     public User user_getUser(int userID) throws IntegrationException, BObStatusException{
         if(userID == 0){
+//            System.out.println("UserCoordinator.user_getUser | input ID 0");
             return null;
         }
         UserIntegrator ui = getUserIntegrator();
@@ -1053,7 +1058,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
                     (userRequestor.getMuniAuthPeriodsMap().get(mu).get(0).getRole().getRank() >= RoleType.SysAdmin.getRank())
                 ){
                     // is this supposed to be addAll()?
-                    usersForConfig.addAll(user_auth_assembleUserListForConfig(mu,userRequestor));
+                    usersForConfig = user_auth_assembleUserListForConfig(mu,userRequestor);
                 } 
             } //close loop over authmunis 
             

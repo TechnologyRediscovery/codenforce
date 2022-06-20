@@ -33,8 +33,9 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 
 /**
- *
- * @author sylvia
+ * SECURITY CRITICAL: The premier tool for managing municipalities system wide!
+ * 
+ * @author CHEN&CHEN and sylvia and Ellen Bascomb of 31Y Revisiting for mcandless (sic) JUNE 2022
  */
 public class MunicipalityManageBB extends BackingBeanUtils implements Serializable {
 

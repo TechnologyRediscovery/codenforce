@@ -142,7 +142,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not update user", ""));
             
-        } catch (AuthorizationException ex) {
+        } catch (AuthorizationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -165,7 +165,7 @@ public class UserBB extends BackingBeanUtils implements Serializable {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Could not update person link, sorry!", ""));
             
-        }  catch (AuthorizationException ex) {
+        }  catch (AuthorizationException | BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,

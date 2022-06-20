@@ -33,14 +33,10 @@ public class User implements Serializable{
     protected String username;
     
     protected Human userHuman;
-    protected int personID;
-    private int humanBondID;
+    private int humanID;
     
     protected String notes;
-    
-    protected String badgeNumber;
-    protected String oriNumber;
-    
+ 
     protected boolean noLoginVirtualUser;
     
     protected int createdByUserId;
@@ -66,23 +62,26 @@ public class User implements Serializable{
       if(u != null){
             
             this.userID = u.getUserID();
+            this.roleType = u.getRoleType();
             this.username = u.getUsername();
+            
             this.userHuman = u.getHuman();
-            this.personID = u.getHumanID();
+            this.humanID = u.getHumanID();
+            
             this.notes = u.getNotes();
-            this.badgeNumber = u.getBadgeNumber();
-            this.oriNumber = u.getOriNumber();
 
             this.noLoginVirtualUser = u.isNoLoginVirtualUser();
-
 
             this.createdByUserId = u.getCreatedByUserId();
             this.createdTS = u.getCreatedTS();
 
-            this.lastUpdatedTS = u.lastUpdatedTS;
             this.deactivatedByUserID = u.deactivatedByUserID;
-            this.deactivatedTS = u.deactivatedTS;
+            this.lastUpdatedTS = u.lastUpdatedTS;
             
+            this.deactivatedTS = u.deactivatedTS;
+            this.deactivatedByUserID = u.deactivatedByUserID;
+            
+            this.homeMuniID = u.homeMuniID;
           
         }
     }
@@ -174,54 +173,16 @@ public class User implements Serializable{
  Instance of Person class
      */
     public void setHuman(Human hum) {
+        if(hum != null){
+            setHumanID(hum.getHumanID());
+        }
         this.userHuman = hum;
     }
 
 
-    /**
-     * @return the badgeNumber
-     */
-    public String getBadgeNumber() {
-        return badgeNumber;
-    }
+   
+    
 
-    /**
-     * @return the oriNumber
-     */
-    public String getOriNumber() {
-        return oriNumber;
-    }
-
-    /**
-     * @param badgeNumber the badgeNumber to set
-     */
-    public void setBadgeNumber(String badgeNumber) {
-        this.badgeNumber = badgeNumber;
-    }
-
-    /**
-     * @param oriNumber the oriNumber to set
-     */
-    public void setOriNumber(String oriNumber) {
-        this.oriNumber = oriNumber;
-    }
-
-    /**
-     * @return the personID
-     */
-    public int getHumanID() {
-        if(userHuman != null){
-            personID = userHuman.getHumanID();
-        }
-        return getPersonID();
-    }
-
-    /**
-     * @param personID the personID to set
-     */
-    public void setPersonID(int personID) {
-        this.personID = personID;
-    }
 
   
 
@@ -232,10 +193,8 @@ public class User implements Serializable{
         hash = 43 * hash + Objects.hashCode(this.roleType);
         hash = 43 * hash + Objects.hashCode(this.username);
         hash = 43 * hash + Objects.hashCode(this.userHuman);
-        hash = 43 * hash + this.getPersonID();
+        hash = 43 * hash + this.getHumanID();
         hash = 43 * hash + Objects.hashCode(this.notes);
-        hash = 43 * hash + Objects.hashCode(this.badgeNumber);
-        hash = 43 * hash + Objects.hashCode(this.oriNumber);
         return hash;
     }
 
@@ -376,10 +335,10 @@ public class User implements Serializable{
     }
 
     /**
-     * @return the personID
+     * @return the humanID
      */
-    public int getPersonID() {
-        return personID;
+    public int getHumanID() {
+        return humanID;
     }
 
     /**
@@ -397,24 +356,12 @@ public class User implements Serializable{
     }
 
     /**
-     * @return the humanBondID
+     * @param humanID the humanID to set
      */
-    public int getHumanBondID() {
-        return humanBondID;
+    public void setHumanID(int humanID) {
+        this.humanID = humanID;
     }
 
-    /**
-     * @param humanBondID the humanBondID to set
-     */
-    public void setHumanBondID(int humanBondID) {
-        this.humanBondID = humanBondID;
-    }
-    /**
-     * @return the accessRecord
-     */
-    /**
-     * @param accessRecord the accessRecord to set
-     */
   
 
 }

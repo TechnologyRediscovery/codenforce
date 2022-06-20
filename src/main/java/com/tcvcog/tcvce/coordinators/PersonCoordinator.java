@@ -629,7 +629,7 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
     public List<Human> getHumansMappedToUsers() throws IntegrationException{
         PersonIntegrator pi = getPersonIntegrator();
         List<Human> hl = new ArrayList<>();
-        List<Integer> idl = pi.getPersonsMappedToAUser();
+        List<Integer> idl = pi.getAllHumansDesignatedAsUserHumans();
         if(!idl.isEmpty()){
             for(Integer i: idl){
                 hl.add(getHuman(i));
