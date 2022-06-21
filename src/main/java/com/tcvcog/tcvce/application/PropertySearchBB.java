@@ -232,10 +232,11 @@ public class PropertySearchBB extends BackingBeanUtils{
             String outcome = getSessionBean().navigateToPageCorrespondingToObject(prop);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                        "Managing property at " + prop.getAddressString() , ""));
-            sc.logObjectView(getSessionBean().getSessUser(), prop);
+                                        "Managing property parcel ID: " + prop.getCountyParcelID() , ""));
+            // disable until after launch
+//            sc.logObjectView(getSessionBean().getSessUser(), prop);
             return outcome;
-        } catch (IntegrationException | BObStatusException ex) {
+        } catch (BObStatusException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_ERROR,

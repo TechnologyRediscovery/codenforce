@@ -275,7 +275,6 @@ ALTER TABLE public.occpermittype ADD COLUMN requiremanager boolean;
 ALTER TABLE public.occpermittype ADD COLUMN requiretenant boolean;
 ALTER TABLE public.occpermittype ADD COLUMN requirezerobalance boolean;
 
--- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
 
 
@@ -303,11 +302,40 @@ ALTER TABLE public.login RENAME COLUMN lastupdated_userid TO lastupdatedby_useri
 
 
 
+
+
+
 --ECD LOCAL DEPLOY CURSOR
+
+
+
+
+CREATE SEQUENCE public.noticeofviolationtype_novtypeid_seq
+  INCREMENT 1
+  MINVALUE 100
+  MAXVALUE 9223372036854775807
+  START 101
+  CACHE 1;
+
+
+
+
+CREATE TABLE public.noticeofviolationtype
+(
+	novtypeid 				integer PRIMARY KEY NOT NULL DEFAULT nextval('noticeofviolationtype_novtypeid_seq'::regclass),
+	title 					TEXT NOT NULL,
+	description 			TEXT,
+	promptfollowupdate 		boolean DEFAULT TRUE,
+    courtdocument 			boolean DEFAULT TRUE,
+    injectviolations	    boolean DEFAULT TRUE,
+	deactivatedts 			TIMESTAMP WITH TIME ZONE
+);
+
 
 
 -- |^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ USER AND MUNI UPGRADES FOR MCCANDLESS ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+-- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
 
 

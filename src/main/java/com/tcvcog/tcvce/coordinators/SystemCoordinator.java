@@ -90,7 +90,8 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
      */
     public void logObjectView(User u, IFace_Loggable ob) throws IntegrationException {
         SystemIntegrator si = getSystemIntegrator();
-        si.logObjectView(u, ob);
+        System.out.println("SystemCoordinator.logObjectView | Disabled until after launch 2022");
+        //  si.logObjectView(u, ob);
 
     }
 
