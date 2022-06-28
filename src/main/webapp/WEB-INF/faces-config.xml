@@ -1953,5 +1953,10 @@
         <managed-bean-class>com.tcvcog.tcvce.application.MigrationBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
-
+    <managed-bean>
+        <description>Backs UI elements for adding, updating, end deactivating text blocks, which are like template building blocks</description>
+        <managed-bean-name>textBlockBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 </faces-config>

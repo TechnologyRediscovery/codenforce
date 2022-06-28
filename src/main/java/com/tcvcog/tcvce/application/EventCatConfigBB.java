@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.EventType;
@@ -25,6 +26,7 @@ import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,11 +41,11 @@ import javax.faces.event.ActionEvent;
  */
 public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
 
-    private EventCategory selectedEventCategory;
+    private EventCategory currentEventCategory;
     private List<EventCategory> eventCategoryList;
     private List<Icon> iconList;
-     
-    private EventType[] eventTypeList;
+    private boolean editModeEventCat; 
+    private List<EventType> eventTypeList;
     
     
     public EventCatConfigBB() {
@@ -51,22 +53,12 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
     
     @PostConstruct
     public void initBean(){
-        
-        if(eventCategoryList == null){
-            try {
-                EventIntegrator ei = getEventIntegrator();
-                eventCategoryList = ei.getEventCategoryList();
-                //return eventCategoryList;
-            } catch (IntegrationException ex) {
-                 getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Unable to load event category list", 
-                            "This must be corrected by the System Administrator"));
-            }
-            
-        } 
-        
         SystemIntegrator si = getSystemIntegrator();
+        eventTypeList = Arrays.asList(EventType.values());
+                
+        refreshCurrentEventCatAndList();
+        
+        
         try {
             iconList = si.getIconList();
         } catch (IntegrationException ex) {
@@ -74,27 +66,69 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
         }
     }
     
-  
-    
-    public void editSelectedEventCategory(ActionEvent e){
-        if(getSelectedEventCategory() != null){
-            
-        } else {
-           getFacesContext().addMessage(null,
+    /**
+     * Edit mode toggler for event categories
+     * @param ev 
+     */
+    public void onToggleEventCatEditMode(ActionEvent ev){
+        System.out.println("EventCatConfigBB.onToggleEventCatEditMode | incoming value: " + editModeEventCat);
+        if(editModeEventCat){
+            if(currentEventCategory != null){
+                if(currentEventCategory.getCategoryID() == 0){
+                    addNewEventCategoryCommit();
+                } else {
+                    editEventCategoryCommit();
+                }
+            } else {
+                   getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Please select an event category to update", ""));
+                        "Event Category page configuration error EC1: currentEventCategory null", 
+                        ""));
+            }
+        } else {
+            // nothing to do--toggle on edit mode below
         }
+        
+        editModeEventCat = !editModeEventCat;
         
     }
     
-    public void commitUpdates(ActionEvent e){
-       EventIntegrator ei = getEventIntegrator();
-       EventCategory ec = new EventCategory();
-       
-       ec.setCategoryID(getSelectedEventCategory().getCategoryID());
+    /**
+     * Listener for user requests to cancel the operation
+     * @param ev 
+     */
+    public void onEventCatEditAbort(ActionEvent ev){
+        editModeEventCat = false;
+    }
+    
+    /**
+     * Entry point for viewing an event category
+     * @param cat 
+     */
+    public void viewEventCategory(EventCategory cat){
+        currentEventCategory = cat;
+    }
+    
+    /**
+     * Starting point for editing an event category
+     * @param cat 
+     */
+    public void editEventCategoryInit(EventCategory cat){
+        System.out.println("EventCatConfigBB.editInit on catID "+ cat.getCategoryID());
+        currentEventCategory = cat;
+        editModeEventCat = true;
+        
+    }
+    
+    /**
+     * INternal organ for sending updates to Coordinator
+     */
+    private void editEventCategoryCommit(){
+       EventCoordinator ec = getEventCoordinator();
         
         try {
-            ei.updateEventCategory(ec);
+            ec.updateEventCategory(currentEventCategory);
+            refreshCurrentEventCatAndList();
             getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Event category updated!", ""));
@@ -107,16 +141,48 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
         
     }
     
-    public void addNewEventCategory(ActionEvent e){
-        EventIntegrator ei = getEventIntegrator();
-        EventCategory ec = new EventCategory();
-        
-        
+    
+    
+    /**
+     * Starts the process of making a new event category
+     * @param ev 
+     */
+    public void onAddEventCategoryInit(ActionEvent ev){
+        EventCoordinator ec = getEventCoordinator();
+        currentEventCategory = ec.getEventCategorySkeleton();
+    }
+    
+    /**
+     * Asks coordinator for fresh current and list
+     */
+    private void refreshCurrentEventCatAndList(){
+        EventCoordinator ec = getEventCoordinator();
         try {
-            ei.insertEventCategory(ec);
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                        "Event category added!", ""));
+            if(currentEventCategory !=null && currentEventCategory.getCategoryID() != 0){
+                    currentEventCategory = ec.getEventCategory(currentEventCategory.getCategoryID());
+            }
+            eventCategoryList = ec.getEventCategoryList();
+            
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
+        
+    }
+    
+    private void addNewEventCategoryCommit(){
+        EventCoordinator ec = getEventCoordinator();
+        
+        int freshID = 0;
+        try {
+            if(currentEventCategory != null){
+                
+                freshID = ec.addEventCategory(currentEventCategory);
+                currentEventCategory.setCategoryID(freshID);
+                refreshCurrentEventCatAndList();
+                getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                            "Event category added!", ""));
+            }
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -124,37 +190,19 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
                         "Unable to add new Event Category to database, sorry.", 
                         "This must be corrected by the System Administrator"));
         }
-        
     }
     
-    public void deleteSelectedEventCategory(ActionEvent e){
-        EventIntegrator ei = getEventIntegrator();
-        if(getSelectedEventCategory() != null){
-            try {
-                ei.deleteEventCategory(getSelectedEventCategory());
-                getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
-                            "Event category deleted forever!", ""));
-            } catch (IntegrationException ex) {
-                getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                            "Unable to delete the category--probably because it is used "
-                                    + "somewhere in the database. Sorry.", 
-                            "This category will always be with us."));
-            }
-            
-        } else {
-            getFacesContext().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Please select a category from the table to delete", ""));
-        }
-    }
+    
+    
+    
 
+//  ******************  GETTERS AND SETTERS  ******************************
+    
     /**
-     * @return the selectedEventCategory
+     * @return the currentEventCategory
      */
-    public EventCategory getSelectedEventCategory() {
-        return selectedEventCategory;
+    public EventCategory getCurrentEventCategory() {
+        return currentEventCategory;
     }
 
     /**
@@ -168,15 +216,15 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
     /**
      * @return the eventTypeList
      */
-    public EventType[] getEventTypeList() {
-        eventTypeList = EventType.values();
+    public List<EventType> getEventTypeList() {
+        
         
         return eventTypeList;
     }
 
  
-    public void setSelectedEventCategory(EventCategory selectedEventCategory) {
-        this.selectedEventCategory = selectedEventCategory;
+    public void setCurrentEventCategory(EventCategory currentEventCategory) {
+        this.currentEventCategory = currentEventCategory;
     }
 
     /**
@@ -191,7 +239,7 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
     /**
      * @param eventTypeList the eventTypeList to set
      */
-    public void setEventTypeList(EventType[] eventTypeList) {
+    public void setEventTypeList(List<EventType> eventTypeList) {
         this.eventTypeList = eventTypeList;
     }
 
@@ -208,6 +256,20 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
      */
     public void setIconList(List<Icon> iconList) {
         this.iconList = iconList;
+    }
+
+    /**
+     * @return the editModeEventCat
+     */
+    public boolean isEditModeEventCat() {
+        return editModeEventCat;
+    }
+
+    /**
+     * @param editModeEventCat the editModeEventCat to set
+     */
+    public void setEditModeEventCat(boolean editModeEventCat) {
+        this.editModeEventCat = editModeEventCat;
     }
     
 }

@@ -6,9 +6,10 @@
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
- *
+ * Represents a bundle of print settings, such as where to print an address
  * @author sylvia
  */
 public class PrintStyle  implements Serializable{
@@ -22,6 +23,40 @@ public class PrintStyle  implements Serializable{
     private int nov_addressee_margin_left;
     private int nov_addressee_margin_top;
     private int nov_text_margin_top;
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + this.styleID;
+        hash = 37 * hash + Objects.hashCode(this.description);
+        hash = 37 * hash + this.header_height;
+        hash = 37 * hash + this.header_img_id;
+        hash = 37 * hash + this.nov_page_margin_top;
+        hash = 37 * hash + this.nov_addressee_margin_left;
+        hash = 37 * hash + this.nov_addressee_margin_top;
+        hash = 37 * hash + this.nov_text_margin_top;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PrintStyle other = (PrintStyle) obj;
+        if (this.styleID != other.styleID) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 
     /**
      * @return the nov_addressee_margin_top

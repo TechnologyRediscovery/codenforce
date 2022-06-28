@@ -37,7 +37,8 @@ public enum EventType {
     Occupancy("Occupancy", 5, 3),
     PropertyInfoCase("Property Info Case", 3, 3),
     Workflow("WOrkflow", 5, 3),
-    Court("Court-related", 3, 1);
+    Court("Court-related", 3, 1),
+    Accounting("money-related", 3, 2);
 
     private final String label;
     protected final int userRankMinimumToEnact;

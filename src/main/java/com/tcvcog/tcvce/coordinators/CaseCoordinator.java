@@ -31,7 +31,6 @@ import com.tcvcog.tcvce.entities.reports.ReportCECaseListCatEnum;
 import com.tcvcog.tcvce.entities.reports.ReportCECaseListStreetCECaseContainer;
 import com.tcvcog.tcvce.entities.search.*;
 import com.tcvcog.tcvce.integration.*;
-import com.tcvcog.tcvce.occupancy.integration.PaymentIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
@@ -44,8 +43,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.model.charts.ChartData;
@@ -2103,9 +2100,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param noticeID
      * @return
      * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public NoticeOfViolation nov_getNoticeOfViolation(int noticeID)
-            throws IntegrationException, BObStatusException {
+            throws IntegrationException, BObStatusException, BlobException {
         CaseIntegrator ci = getCaseIntegrator();
         NoticeOfViolation nov = ci.novGet(noticeID);
         if (nov != null) {
@@ -2124,9 +2122,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
     public List<NoticeOfViolation> nov_getNoticeOfViolationList(List<Integer> idl)
-            throws IntegrationException, BObStatusException {
+            throws IntegrationException, BObStatusException, BlobException {
         List<NoticeOfViolation> novl = new ArrayList<>();
         if (idl != null && !idl.isEmpty()) {
             for (Integer i : idl) {
@@ -2194,11 +2193,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             UserAuthorized ua)
             throws BObStatusException, IntegrationException, EventException, ViolationException {
 
+        PersonCoordinator pc = getPersonCoordinator();
+        
         if (c == null || nov == null || ua == null || nov.getRecipient() == null || nov.getRecipientMailingAddress() == null) {
             throw new BObStatusException("Cannot lock notice with null case, nov, or recipient Person or mailing or user");
         }
-        if (nov.getNotifyingOfficerPerson() == null
-                || nov.getNotifyingOfficerPerson().getEmailList() == null
+        
+        if(nov.getNotifyingOfficerPerson() != null){
+            nov.setNotifyingOfficerPerson(pc.getPersonByHumanID(nov.getNotifyingOfficer().getHumanID()));
+        }
+        
+        if (nov.getNotifyingOfficerPerson().getEmailList() == null
                 || nov.getNotifyingOfficerPerson().getEmailList().isEmpty()
                 || nov.getNotifyingOfficerPerson().getPhoneList() == null
                 || nov.getNotifyingOfficerPerson().getPhoneList().isEmpty()) {
@@ -2208,8 +2213,6 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         CaseIntegrator ci = getCaseIntegrator();
 
         if (nov.getLockedAndqueuedTS() == null) {
-//            int ghostID = pc.createChostPerson(nov.getRecipient(), ua);
-//            nov.setRecipient(pi.getPersonByHumanID(ghostID));
             nov.setLockedAndqueuedTS(LocalDateTime.now());
             nov.setLockedAndQueuedBy(ua);
 
@@ -2248,12 +2251,56 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         TextBlock tb = new TextBlock();
         tb.setMuni(muni);
         tb.setInjectableTemplate(true);
-        tb.setTextBlockCategoryID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("nov_textblocktemplate_categoryid")));
+//        tb.setTextBlockCategoryID(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+//                .getString("nov_textblocktemplate_categoryid")));
         tb.setTextBlockText("inject violations with: ***VIOLATIONS***");
 
         return tb;
 
+    }
+    
+    /**
+     * Extracts all available NOV Types by Muni
+     * @param muni
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public List<NoticeOfViolationType> nov_getNOVTypeList(Municipality muni) throws IntegrationException, BlobException{
+        CaseIntegrator ci = getCaseIntegrator();
+        return nov_getNOVTypeListByID(ci.novGetTypeList(muni));
+        
+    }
+    
+    /**
+     * Basic getter for NOV types
+     * @param typeID
+     * @return
+     * @throws IntegrationException 
+     */
+    public NoticeOfViolationType nov_getNOVType(int typeID) throws IntegrationException, BlobException{
+        CaseIntegrator ci = getCaseIntegrator();
+        if(typeID == 0){
+            return null;
+        }
+        return ci.novGetType(typeID);
+        
+    }
+    
+    /**
+     * Internal organ for getting NOVTypes by a list of IDs
+     * @param idl
+     * @return
+     * @throws IntegrationException 
+     */
+    public List<NoticeOfViolationType> nov_getNOVTypeListByID(List<Integer> idl) throws IntegrationException, BlobException{
+        List<NoticeOfViolationType> typeList = new ArrayList<>();
+        if(idl != null && !idl.isEmpty()){
+            CaseIntegrator ci = getCaseIntegrator();
+            for(Integer i: idl){
+                typeList.add(ci.novGetType(i));
+            }
+        }
+        return typeList;
     }
 
     /**
@@ -2379,6 +2426,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             }
         }
     }
+    
+    /**
+     * Factory for NOVViolationType objects (e.g. Notice of Violation, Request for Compliance)
+     * @return 
+     */
+    public NoticeOfViolationType nov_getNoticeOfViolationTypeSkeleton(){
+        return new NoticeOfViolationType();
+    }
+    
 
     /**
      * @param ps
@@ -2415,7 +2471,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         List<TextBlock> blockList = new ArrayList<>();
 
         if (categoryID != 0) {
-            blockList.addAll(ci.getTextBlocksByCategory(categoryID));
+            // TODO: revisit this logic
+//            blockList.addAll(ci.getTextBlocksByCategory(categoryID));
         }
 
         if (!blockList.isEmpty()) {
@@ -2512,7 +2569,53 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         ci.novUpdateNotes(nov);
     }
+    
+    /**
+     * Inserts an NOV type
+     * @param novt
+     * @return
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public int nov_insertNOVType(NoticeOfViolationType novt) throws BObStatusException, IntegrationException{
+        if(novt == null){
+            throw new BObStatusException("Cannot insert new NOV Type with null NOV type");
+            
+        }
+        CaseIntegrator ci = getCaseIntegrator();
+        return ci.novInsertNOVType(novt);
+    }
+    
+    /**
+     * Updates an NOV type
+     * @param novt
+     * @throws BObStatusException
+     * @throws IntegrationException 
+     */
+    public void nov_updateNOVType(NoticeOfViolationType novt) throws BObStatusException, IntegrationException{
+        if(novt == null){
+            throw new BObStatusException("Cannot update null NOV type");
+        }
+        CaseIntegrator ci = getCaseIntegrator();
+        ci.novUpdateNOVType(novt);
+    }
 
+    /**
+     * Deactivation point for NOV types
+     * @param novt 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void nov_deactivateNOVType(NoticeOfViolationType novt) throws BObStatusException, IntegrationException{
+        if(novt == null){
+            throw new BObStatusException("Cannot deactivate null NOV type");
+        }
+        CaseIntegrator ci = getCaseIntegrator();
+        ci.novUpdateNOVType(novt);
+        
+    }
+    
+    
     // *************************************************************************
     // *                     BLOBS                                             *
     // *************************************************************************

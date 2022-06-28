@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- *
+ * Represents an Icon!
  * @author sylvia
  */
 public class Icon implements Manageable{

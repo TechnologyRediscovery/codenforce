@@ -21,6 +21,7 @@ import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
+import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
@@ -52,6 +53,8 @@ import com.tcvcog.tcvce.entities.CitationCodeViolationLink;
 import com.tcvcog.tcvce.entities.CitationDocketRecord;
 import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.IFace_transferrable;
+import com.tcvcog.tcvce.entities.NoticeOfViolationType;
+import com.tcvcog.tcvce.entities.TextBlockCategory;
 import com.tcvcog.tcvce.entities.ViolationStatusEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsDateRule;
 import java.io.Serializable;
@@ -1691,10 +1694,10 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         String query =  "INSERT INTO public.noticeofviolation(\n" +
                         "            noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "            dateofrecord, recipient_humanid, recipient_mailing, lettertextafterviolations, \n" +
-                        "            notes, creationby, printstyle_styleid, notifyingofficer_userid)\n" +
+                        "            notes, creationby, printstyle_styleid, notifyingofficer_userid, letter_typeid)\n" +
                         "    VALUES (DEFAULT, ?, ?, now(), \n" +
                         "            ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?);";
+                        "            ?, ?, ?, ?, ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1731,6 +1734,13 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                 stmt.setInt(10, notice.getNotifyingOfficer().getUserID());
             } else {
                 throw new BObStatusException("Cannot write notice without a notifying officer");
+            }
+                    
+            
+             if(notice.getNovType()!= null){
+                stmt.setInt(11, notice.getNovType().getTypeID());
+            } else {
+                stmt.setNull(11, java.sql.Types.NULL);
             }
                     
             stmt.execute();
@@ -2040,7 +2050,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                 + "   SET   lettertextbeforeviolations=?, \n"
                 + "         dateofrecord=?, lettertextafterviolations=?, "
                 + "         recipient_humanid=?, recipient_mailing=?, "
-                + "         notifyingofficer_userid=?, notifyingofficer_humanid=?  "
+                + "         notifyingofficer_userid=?, notifyingofficer_humanid=?, letter_typeid=? "
                 + " WHERE noticeid=?;";
         // note that original time stamp is not altered on an update
 
@@ -2075,7 +2085,13 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                 stmt.setNull(7, java.sql.Types.NULL);
             }
             
-            stmt.setInt(8, notice.getNoticeID());
+            if(notice.getNovType() != null){
+                stmt.setInt(8, notice.getNovType().getTypeID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(9, notice.getNoticeID());
 
             stmt.executeUpdate();
             
@@ -2195,7 +2211,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      * @throws IntegrationException
      */
     public NoticeOfViolation novGet(int noticeID) 
-            throws IntegrationException, BObStatusException{
+            throws IntegrationException, BObStatusException, BlobException{
         String query =  "SELECT noticeid, caseid, lettertextbeforeviolations, creationtimestamp, \n" +
                         "       dateofrecord, sentdate, returneddate, personid_recipient, lettertextafterviolations, \n" +
                         "       lockedandqueuedformailingdate, lockedandqueuedformailingby, sentby, \n" +
@@ -2204,7 +2220,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                         "       fixedrecipientxferts, fixedrecipientname, fixedrecipientbldgno, \n" +
                         "       fixedrecipientstreet, fixedrecipientcity, fixedrecipientstate, \n" +
                         "       fixedrecipientzip, fixednotifyingofficername, fixednotifyingofficertitle, \n" +
-                        "       fixednotifyingofficerphone, fixednotifyingofficeremail \n" +
+                        "       fixednotifyingofficerphone, fixednotifyingofficeremail, letter_typeid \n" +
                         "  FROM public.noticeofviolation WHERE noticeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -2267,6 +2283,347 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         return idl;
     }
+    
+    
+    /**
+     * Extracts the IDs of all NOV types based on muni
+     * @param muni if null, all active types will be returned
+     * @return the IDs of the types
+     * @throws IntegrationException 
+     */
+    public List<Integer> novGetTypeList(Municipality muni) throws IntegrationException {
+        
+        StringBuilder sb  = new StringBuilder("SELECT novtypeid FROM public.noticeofviolationtype WHERE deactivatedts IS NULL ");
+        if(muni != null){
+            sb.append("AND muni_municode=?");
+        } else {
+            sb.append(";");
+        }
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        List<Integer> idl = new ArrayList();
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            if(muni != null){
+                stmt.setInt(1, muni.getMuniCode());
+            }
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                idl.add(rs.getInt("novtypeid"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("cannot fetch NOV Type List by Muni, sorry.", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return idl;
+    }
+    
+    
+    /**
+     * Insertion point for NOV Types
+     * @param novt
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public int novInsertNOVType(NoticeOfViolationType novt) throws IntegrationException, BObStatusException {
+
+        if(novt == null || novt.getTypeID() != 0){
+            throw new IntegrationException("Cannot insert new NOV type with null type or nonzero ID");
+        }
+        
+        String query =  "INSERT INTO public.noticeofviolationtype(\n" +
+                        "            novtypeid, title, description, eventcatsent_catid, eventcatfollowup_catid, \n" +
+                        "            eventcatreturned_catid, followupwindowdays, headerimage_photodocid, \n" +
+                        "            textblockcategory_catid, muni_municode, courtdocument, injectviolations, \n" +
+                        "            deactivatedts, printstyle_styleid)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
+                        "            ?, ?, ?, \n" +
+                        "            ?, ?, ?, ?, \n" +
+                        "            NULL, ?);";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int freshID = 0;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setString(1, novt.getTitle());
+            stmt.setString(2, novt.getDescription());
+            if(novt.getEventCatSent() != null){
+                stmt.setInt(3, novt.getEventCatSent().getCategoryID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            if(novt.getEventCatFollowUp() != null){
+                stmt.setInt(4, novt.getEventCatFollowUp().getCategoryID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            if(novt.getEventCatReturned() != null){
+                stmt.setInt(5, novt.getEventCatReturned().getCategoryID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(6, novt.getFollowUpWindowDays());
+            
+            if(novt.getNovHeaderBlob() != null){
+                stmt.setInt(7, novt.getNovHeaderBlob().getPhotoDocID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            if(novt.getTextBlockCategory() != null){
+                stmt.setInt(8, novt.getTextBlockCategory().getCategoryID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            
+            if(novt.getMuni() != null){
+                stmt.setInt(9, novt.getMuni().getMuniCode());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            
+            stmt.setBoolean(10, novt.isCourtDocument());
+            stmt.setBoolean(11, novt.isInjectViolations());
+            
+            
+            if(novt.getPrintStyle() != null){
+                stmt.setInt(12, novt.getPrintStyle().getStyleID());
+            } else{
+                stmt.setNull(12, java.sql.Types.NULL);
+            }
+            
+        
+            stmt.execute();
+            
+            String retrievalQuery = "SELECT currval('noticeofviolationtype_novtypeid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                freshID = rs.getInt(1);
+            }
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert notice of violation type due to an integration error, sorry.", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return freshID;
+
+    } // close method
+    /**
+     * Update point for NOV Types
+     * @param novt
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public void novUpdateNOVType(NoticeOfViolationType novt) throws IntegrationException, BObStatusException {
+
+        if(novt == null || novt.getTypeID() == 0){
+            throw new IntegrationException("Cannot update NOV type with null type or ID == 0");
+        }
+        
+        String query =  "UPDATE public.noticeofviolationtype\n" +
+                        "   SET title=?, description=?, eventcatsent_catid=?, eventcatfollowup_catid=?, \n" +
+                        "       eventcatreturned_catid=?, followupwindowdays=?, headerimage_photodocid=?, \n" +
+                        "       textblockcategory_catid=?, muni_municode=?, courtdocument=?, \n" +
+                        "       injectviolations=?, deactivatedts=?, printstyle_styleid=? \n" +
+                        " WHERE novtypeid=?;";
+
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int freshID = 0;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setString(1, novt.getTitle());
+            stmt.setString(2, novt.getDescription());
+            if(novt.getEventCatSent() != null){
+                stmt.setInt(3, novt.getEventCatSent().getCategoryID());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            if(novt.getEventCatFollowUp() != null){
+                stmt.setInt(4, novt.getEventCatFollowUp().getCategoryID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            if(novt.getEventCatReturned() != null){
+                stmt.setInt(5, novt.getEventCatReturned().getCategoryID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(6, novt.getFollowUpWindowDays());
+            
+            if(novt.getNovHeaderBlob() != null){
+                stmt.setInt(7, novt.getNovHeaderBlob().getPhotoDocID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            if(novt.getTextBlockCategory() != null){
+                stmt.setInt(8, novt.getTextBlockCategory().getCategoryID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            
+            if(novt.getMuni() != null){
+                stmt.setInt(9, novt.getMuni().getMuniCode());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            
+            stmt.setBoolean(10, novt.isCourtDocument());
+            stmt.setBoolean(11, novt.isInjectViolations());
+            if(novt.getDeactivatedTS() != null){
+                stmt.setTimestamp(12, java.sql.Timestamp.valueOf(novt.getDeactivatedTS()));
+            } else {
+                stmt.setNull(12, java.sql.Types.NULL);
+            }
+            
+            if(novt.getPrintStyle() != null){
+                stmt.setInt(13, novt.getPrintStyle().getStyleID());
+            } else{
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(14, novt.getTypeID());
+            
+        
+            stmt.executeUpdate();
+            
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert notice of violation type due to an integration error, sorry.", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+    } // close method
+    
+    
+    /**
+     * Extracts and builds an NOV type object from the DB.
+     * @param tpe
+     * @return
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BlobException 
+     */
+    public NoticeOfViolationType novGetType(int tpe) throws IntegrationException, BlobException {
+        if(tpe == 0){
+            throw new IntegrationException("Cannot get NOV type with ID ==0");
+        }
+        
+        String query  = "SELECT novtypeid, title, description, eventcatsent_catid, eventcatfollowup_catid, \n" +
+                        "       eventcatreturned_catid, followupwindowdays, headerimage_photodocid, \n" +
+                        "       textblockcategory_catid, muni_municode, courtdocument, injectviolations, \n" +
+                        "       deactivatedts, printstyle_styleid \n" +
+                        "  FROM public.noticeofviolationtype WHERE novtypeid=?;";
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        NoticeOfViolationType novt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, tpe);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                novt = novGenerateType(rs);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("cannot fetch NOV Type by id, sorry.", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return novt;
+    }
+    
+        
+    
+   /**
+    * Internal generator for creating NOV type objects
+    */    
+    private NoticeOfViolationType novGenerateType(ResultSet rs) throws SQLException, IntegrationException, BlobException{
+        NoticeOfViolationType novt = new NoticeOfViolationType();
+        EventCoordinator ec = getEventCoordinator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        BlobCoordinator bc = getBlobCoordinator();
+        
+        novt.setTypeID(rs.getInt("novtypeid"));
+        novt.setTitle(rs.getString("title"));
+        novt.setDescription(rs.getString("description"));
+        
+        if(rs.getInt("eventcatsent_catid") != 0){
+            novt.setEventCatSent(ec.getEventCategory(rs.getInt("eventcatsent_catid")));
+        }
+        if(rs.getInt("eventcatfollowup_catid") != 0){
+            novt.setEventCatFollowUp(ec.getEventCategory(rs.getInt("eventcatfollowup_catid")));
+        }
+        if(rs.getInt("eventcatreturned_catid") != 0){
+            novt.setEventCatReturned(ec.getEventCategory(rs.getInt("eventcatreturned_catid")));
+        }
+        
+        novt.setFollowUpWindowDays(rs.getInt("followupwindowdays"));
+        if(rs.getInt("headerimage_photodocid") != 0){
+            novt.setNovHeaderBlob(bc.getBlobLight(rs.getInt("headerimage_photodocid")));
+        }
+        
+        novt.setMuni(mc.getMuni(rs.getInt("muni_municode")));
+        novt.setCourtDocument(rs.getBoolean("courtdocument"));
+        novt.setInjectViolations(rs.getBoolean("injectviolations"));
+        if(rs.getTimestamp("deactivatedts") != null){
+            novt.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+        }
+        if(rs.getInt("textblockcategory_catid") != 0){
+            novt.setTextBlockCategory(sc.getTextBlockCategory(rs.getInt("textblockcategory_catid")));
+        }
+        
+        if(rs.getInt("printstyle_styleid") != 0){
+            novt.setPrintStyle(sc.getPrintStyle(rs.getInt("printstyle_styleid")));
+        }
+        return novt;
+        
+    }
+    
+    
+    
+    
+    
     /**
      * Grabs all the NOVs for a given CECase
      * @param cv
@@ -2313,13 +2670,15 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
     private NoticeOfViolation novGenerate(ResultSet rs) 
             throws SQLException, 
             IntegrationException,
-            BObStatusException {
+            BObStatusException,
+            BlobException {
 
         UserCoordinator uc = getUserCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         EventCoordinator ec = getEventCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
         PropertyCoordinator propc = getPropertyCoordinator();
+        CaseCoordinator cc = getCaseCoordinator();
         
         // the magical moment of notice instantiation
         NoticeOfViolation notice = new NoticeOfViolation();
@@ -2385,6 +2744,10 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         notice.setFixedNotifyingOfficerTitle(rs.getString("fixednotifyingofficertitle"));
         notice.setFixedNotifyingOfficerPhone(rs.getString("fixednotifyingofficerphone"));
         notice.setFixedNotifyingOfficerEmail(rs.getString("fixednotifyingofficeremail"));
+        
+        if(rs.getInt("letter_typeid") != 0){
+            notice.setNovType(cc.nov_getNOVType(rs.getInt("letter_typeid")));
+        }
 
         return notice;
 
@@ -2446,9 +2809,97 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      
    
    /**
+    * Retrieves all text block categories from the DB
+     * @param muni
+    * @return if null, all active cats are returned
+    * @throws IntegrationException 
+    */
+    public List<Integer> getTextBlockCategoryList(Municipality muni) throws IntegrationException{
+        String query =  "SELECT categoryid FROM public.textblockcategory WHERE deactivatedts IS NULL ";
+        if(muni != null){
+            query = query + " AND muni_municode=?;";
+        } else {
+            query = query + ";";
+        }
+        List<Integer> idl = new ArrayList<>();
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+             if(muni != null){
+                stmt.setInt(1, muni.getMuniCode());
+             }
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                idl.add(rs.getInt("categoryid"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot fetch TextBlockMap, sorries!", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return idl;
+    }
+    
+    
+     /**
+    * Retrieves a single text block category
+     * @param id
+    * @return
+    * @throws IntegrationException 
+    */
+    public TextBlockCategory getTextBlockCategory(int id) throws IntegrationException{
+        if(id == 0){
+            throw new IntegrationException("Canot get a text block category if id == 0");
+        }
+        String query =  "SELECT categoryid, categorytitle, icon_iconid, muni_municode, \n" +
+                        "       deactivatedts\n" +
+                        "  FROM public.textblockcategory WHERE categoryid=?";
+
+        TextBlockCategory tbc = null;
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, id);
+            
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                tbc = generateTextBlockCategory(rs);
+                
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot fetch TextBlockCategory, sorries!", ex);
+
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return tbc;
+    }
+    
+   /**
     * Retrieves all text blocks from DB
     * @return
     * @throws IntegrationException 
+    * @deprecated in favor of standard coordinator model--if it wants to build a MAP, 
+    *  then it can do so by itself
     */
     public HashMap<String, Integer> getTextBlockCategoryMap() throws IntegrationException{
         String query =  "SELECT categoryid, categorytitle\n" +
@@ -2478,20 +2929,52 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         return categoryMap;
     }
     
+    /**
+     * Builds a text block
+     * @param rs
+     * @return
+     * @throws SQLException
+     * @throws IntegrationException 
+     */
     private TextBlock generateTextBlock(ResultSet rs) throws SQLException, IntegrationException{
         TextBlock tb = new TextBlock();
-        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MunicipalityCoordinator mc = getMuniCoordinator();
         
         tb.setBlockID(rs.getInt("blockid"));
-        tb.setTextBlockCategoryID(rs.getInt("categoryid"));
-        tb.setTextBlockCategoryTitle(rs.getString("categorytitle"));
-        tb.setMuni(mi.getMuni(rs.getInt("muni_municode")));
+        tb.setCategory(getTextBlockCategory(rs.getInt("blockcategory_catid")));
+        tb.setMuni(mc.getMuni(rs.getInt("muni_municode")));
         tb.setTextBlockName(rs.getString("blockname"));
         tb.setTextBlockText(rs.getString("blocktext"));
         tb.setPlacementOrder(rs.getInt("placementorderdefault"));
         tb.setInjectableTemplate(rs.getBoolean("injectabletemplate"));
+        if(rs.getTimestamp("deactivatedts") != null){
+            tb.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+        }
         
         return tb;
+    }
+    
+    
+    /**
+     * Generator for text block categories;
+     * @param rs
+     * @return 
+     */
+    private TextBlockCategory generateTextBlockCategory(ResultSet rs) throws SQLException, IntegrationException{
+        TextBlockCategory tbc = new TextBlockCategory();
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        
+        tbc.setCategoryID(rs.getInt("categoryid"));
+        tbc.setTitle(rs.getString("categorytitle"));
+        tbc.setIcon(sc.getIcon(rs.getInt("icon_iconid")));
+        tbc.setMuni(mc.getMuni(rs.getInt("muni_municode")));
+        if(rs.getTimestamp("deactivatedts") != null){
+            tbc.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
+        }
+        
+        return tbc;
+        
     }
     
     /**
@@ -2502,12 +2985,9 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      */
      public TextBlock getTextBlock(int blockID) throws IntegrationException{
          
-        String query =  "SELECT blockid, blockcategory_catid, textblock.muni_municode,"
-                + " blockname, blocktext, categoryid, categorytitle, placementorderdefault,"
-                + " injectabletemplate \n" +
-                        "  FROM public.textblock INNER JOIN public.textblockcategory " + 
-                        "  ON textblockcategory.categoryid=textblock.blockcategory_catid\n" +
-                        "  WHERE blockid=?;";
+        String query =  "SELECT blockid, blockcategory_catid, muni_municode, blockname, blocktext, \n" +
+                        "       placementorderdefault, injectabletemplate, deactivatedts\n" +
+                        "  FROM public.textblock  WHERE blockid=?;";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         Connection con = null;
@@ -2537,81 +3017,54 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
          return tb;
      }
      
-    /**
-     * Extracts all text blocks by a given category
-     * @param catID
-     * @return
-     * @throws IntegrationException 
-     */
-     public List<TextBlock> getTextBlocksByCategory(int catID) throws IntegrationException{
-         
-        String query =  "SELECT blockid " +
-                        "  FROM public.textblock WHERE blockcategory_catid=?;";
-        List<TextBlock> blockList = new ArrayList<>();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        Connection con = null;
-        TextBlock tb = null;
-        
-        try {
-            con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, catID);
-            
-            rs = stmt.executeQuery(); 
-            
-            while(rs.next()){
-                blockList.add(getTextBlock(rs.getInt("blockid")));
-            }
-            
-        } catch (SQLException ex) {
-            System.out.println(ex.toString());
-            throw new IntegrationException("Code Violation Integrator: cannot retrive text block by ID", ex);
-            
-        } finally{
-             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
-             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
-             if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
-        } // close finally
-          
-         return blockList;
-     }
+   
      
      /**
       * Extracts all text blocks associated with a given Muni
-      * @param m
+     * @param tbc if null, blocks are returned without respect to category
+      * @param m if Null, all blocks returned
       * @return
       * @throws IntegrationException 
       */
-     public ArrayList<TextBlock> getTextBlocks(Municipality m) throws IntegrationException{
-        String query =    "  SELECT blockid " +
-                            "  FROM public.textblock INNER JOIN public.textblockcategory ON textblockcategory.categoryid=textblock.blockcategory_catid\n" +
-                            "  WHERE textblock.muni_municode=?;";
+     public List<Integer> getTextBlockIDList(TextBlockCategory tbc, Municipality m) throws IntegrationException{
+        StringBuilder sb = new StringBuilder(" SELECT blockid " );
+                            sb.append("  FROM public.textblock WHERE deactivatedts IS NULL ");
+        
+        if(m != null){
+            sb.append(" AND textblock.muni_municode=?");
+        } 
+        if(tbc != null){
+            sb.append(" AND blockcategory_catid=?");
+        }
+        sb.append(";");
+        
         PreparedStatement stmt = null;
         ResultSet rs = null;
         Connection con = null;
-        ArrayList<TextBlock> ll = new ArrayList();
-        TextBlock tb = null;
+        List<Integer> idl = new ArrayList();
         try {
             con = getPostgresCon();
-            stmt = con.prepareStatement(query);
-            stmt.setInt(1, m.getMuniCode());
-            
+            stmt = con.prepareStatement(sb.toString());
+            int paramCount = 0;
+            if(m != null){
+                stmt.setInt(++paramCount, m.getMuniCode());
+            }
+            if(tbc != null){
+                stmt.setInt(++paramCount, tbc.getCategoryID());
+            }
             rs = stmt.executeQuery(); 
-            
             while(rs.next()){
-                tb = getTextBlock(rs.getInt("blockid"));
-                ll.add(tb);
+                idl.add(rs.getInt("blockid"));
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Code Violation Integrator: cannot retrive text blocks by municipality", ex);
+            throw new IntegrationException("CaseIntegrator: cannot retrieve text blocks by cat and/or muni", ex);
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-         return ll;
+         return idl;
      }
      
      /**
@@ -2619,6 +3072,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
       * @param m
       * @return
       * @throws IntegrationException 
+      * @deprecated 
       */
      public ArrayList<TextBlock> getTextBlockTemplates(Municipality m) throws IntegrationException{
         String query =    "  SELECT blockid " +
@@ -2642,7 +3096,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             }
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Code Violation Integrator: cannot retrive text blocks by municipality", ex);
+            throw new IntegrationException("Case Integrator: cannot retrive text blocks by municipality", ex);
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -2656,14 +3110,13 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
       * @return
       * @throws IntegrationException 
       */
-     public List<TextBlock> getAllTextBlocks() throws IntegrationException{
+     public List<Integer> getAllTextBlocks() throws IntegrationException{
         String query =    "  SELECT blockid \n" +
-                          "  FROM public.textblock INNER JOIN public.textblockcategory "
-                        + "  ON textblockcategory.categoryid=textblock.blockcategory_catid;";
+                          "  FROM public.textblock;";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         Connection con = null;
-        ArrayList<TextBlock> ll = new ArrayList<>();
+        List<Integer> idl = new ArrayList<>();
         
         try {
             con = getPostgresCon();
@@ -2672,7 +3125,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             rs = stmt.executeQuery(); 
             
             while(rs.next()){
-                ll.add(getTextBlock(rs.getInt("blockid")));
+                idl.add((rs.getInt("blockid")));
             }
             
         } catch (SQLException ex) {
@@ -2685,7 +3138,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
           
-         return ll;
+         return idl;
          
      }
      
@@ -2707,13 +3160,16 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, tb.getTextBlockCategoryID());
+           if(tb.getCategory() != null){
+                stmt.setInt(1, tb.getCategory().getCategoryID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
             stmt.setInt(2, tb.getMuni().getMuniCode());
             stmt.setString(3, tb.getTextBlockName());
             stmt.setString(4, tb.getTextBlockText());
             stmt.setInt(5, tb.getPlacementOrder());
             stmt.setBoolean(6, tb.isInjectableTemplate());
-            
             
             stmt.execute(); 
             
@@ -2746,7 +3202,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      public void updateTextBlock(TextBlock tb) throws IntegrationException{
         String query = "UPDATE public.textblock\n" +
                         "   SET blockcategory_catid=?, muni_municode=?, blockname=?, \n" +
-                        "       blocktext=?,placementorderdefault=?, injectabletemplate=? \n" +
+                        "       blocktext=?,placementorderdefault=?, injectabletemplate=?, deactivatedts=? \n" +
                         " WHERE blockid=?;";
         PreparedStatement stmt = null;
         Connection con = null;
@@ -2754,13 +3210,22 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, tb.getTextBlockCategoryID());
+            if(tb.getCategory() != null){
+                stmt.setInt(1, tb.getCategory().getCategoryID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
             stmt.setInt(2, tb.getMuni().getMuniCode());
             stmt.setString(3, tb.getTextBlockName());
             stmt.setString(4, tb.getTextBlockText());
             stmt.setInt(5, tb.getPlacementOrder());
             stmt.setBoolean(6, tb.isInjectableTemplate());
-            stmt.setInt(7, tb.getBlockID());  
+            if(tb.getDeactivatedTS() != null){
+                stmt.setTimestamp(7, java.sql.Timestamp.valueOf(tb.getDeactivatedTS()));
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            stmt.setInt(8, tb.getBlockID());  
             
             stmt.execute(); 
             
@@ -2777,34 +3242,114 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
      }
      
      /**
-      * Nukes a text block from the DB--very rare--only allowed if not used in a NOV
-      * @param tb
+      * Creates a new entry in the textblock table
+     * @param tbc
+     * @return  ID of fresh category
       * @throws IntegrationException 
       */
-     public void deleteTextBlock(TextBlock tb) throws IntegrationException{
-        String query = " DELETE FROM public.textblock\n" +
-                        " WHERE blockid=?;";
+     public int insertTextBlockCategory(TextBlockCategory tbc) throws IntegrationException{
+        String query =  "INSERT INTO public.textblockcategory(\n" +
+                        "            categoryid, categorytitle, icon_iconid, muni_municode, deactivatedts)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, ?);";
         PreparedStatement stmt = null;
         Connection con = null;
-        
+        ResultSet rs = null;
+        int insertedBlockCatID = 0;
         try {
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
-            stmt.setInt(1, tb.getBlockID());
+          
+            stmt.setString(1, tbc.getTitle());
+            if(tbc.getIcon() != null){
+                stmt.setInt(2, tbc.getIcon().getID());
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            if(tbc.getMuni() != null){
+                stmt.setInt(3, tbc.getMuni().getMuniCode());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            if(tbc.getDeactivatedTS() != null){
+                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(tbc.getDeactivatedTS()));
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            
             
             stmt.execute(); 
             
+             String retrievalQuery = "SELECT currval('blockcategory_categoryid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                insertedBlockCatID = rs.getInt(1);
+            }
+            
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Text Block Integration Module: cannot delete text block into DB, "
-                    + "probably because it has been used in a letter somewhere", ex);
+            throw new IntegrationException("Text Block Cat Integration Module: cannot insert text block cat into DB, sorry", ex);
             
         } finally{
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
           
+         return insertedBlockCatID;
+         
      }
      
+     /**
+      * Updates key fields on text blocks
+     * @param tbc
+      * @throws IntegrationException 
+      */
+     public void updateTextBlockCategory(TextBlockCategory tbc) throws IntegrationException{
+        String query = "UPDATE public.textblockcategory\n" +
+                        "   SET categorytitle=?, icon_iconid=?, muni_municode=?, \n" +
+                        "       deactivatedts=?\n" +
+                        " WHERE categoryid=?;";
+        PreparedStatement stmt = null;
+        Connection con = null;
+        
+        try {
+            con = getPostgresCon();
+            stmt = con.prepareStatement(query);
+            
+            stmt.setString(1, tbc.getTitle());
+            if(tbc.getIcon() != null){
+                stmt.setInt(2, tbc.getIcon().getID());
+            } else {
+                stmt.setNull(2, java.sql.Types.NULL);
+            }
+            if(tbc.getMuni() != null){
+                stmt.setInt(3, tbc.getMuni().getMuniCode());
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            if(tbc.getDeactivatedTS() != null){
+                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(tbc.getDeactivatedTS()));
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            stmt.setInt(5, tbc.getCategoryID());
+            
+            
+            stmt.executeUpdate(); 
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Text Block Category Integration Module: cannot update text block category in DB", ex);
+            
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+          
+         
+     }
+     
+  
      
 } // close CaseIntegrator

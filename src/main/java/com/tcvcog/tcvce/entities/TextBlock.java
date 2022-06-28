@@ -18,30 +18,31 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- *
+ * Represents a chunk of pre-built text for insertion into letters, 
+ * reports, permits, etc.
+ * 
  * @author ellen bascomb of apt 31y
  */
 public class TextBlock implements Serializable, Comparable<TextBlock>{
     
     private int blockID;
-    private int textBlockCategoryID;
-    private String textBlockCategoryTitle;
     private Municipality muni;
     private String textBlockName;
     private String textBlockText;
     private int placementOrder;
     private boolean injectableTemplate;
+    private TextBlockCategory category;
+    private LocalDateTime deactivatedTS;
     
 
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 97 * hash + this.blockID;
-        hash = 97 * hash + this.textBlockCategoryID;
-        hash = 97 * hash + Objects.hashCode(this.textBlockCategoryTitle);
         hash = 97 * hash + Objects.hashCode(this.muni);
         hash = 97 * hash + Objects.hashCode(this.textBlockName);
         hash = 97 * hash + Objects.hashCode(this.textBlockText);
@@ -61,12 +62,6 @@ public class TextBlock implements Serializable, Comparable<TextBlock>{
         }
         final TextBlock other = (TextBlock) obj;
         if (this.blockID != other.blockID) {
-            return false;
-        }
-        if (this.textBlockCategoryID != other.textBlockCategoryID) {
-            return false;
-        }
-        if (!Objects.equals(this.textBlockCategoryTitle, other.textBlockCategoryTitle)) {
             return false;
         }
         if (!Objects.equals(this.textBlockName, other.textBlockName)) {
@@ -103,13 +98,6 @@ public class TextBlock implements Serializable, Comparable<TextBlock>{
     }
 
     /**
-     * @return the textBlockCategoryID
-     */
-    public int getTextBlockCategoryID() {
-        return textBlockCategoryID;
-    }
-
-    /**
      * @return the muni
      */
     public Municipality getMuni() {
@@ -130,12 +118,6 @@ public class TextBlock implements Serializable, Comparable<TextBlock>{
         this.blockID = blockID;
     }
 
-    /**
-     * @param textBlockCategoryID the textBlockCategoryID to set
-     */
-    public void setTextBlockCategoryID(int textBlockCategoryID) {
-        this.textBlockCategoryID = textBlockCategoryID;
-    }
 
     /**
      * @param muni the muni to set
@@ -151,20 +133,7 @@ public class TextBlock implements Serializable, Comparable<TextBlock>{
         this.textBlockName = textBlockName;
     }
 
-    /**
-     * @return the textBlockCategoryTitle
-     */
-    public String getTextBlockCategoryTitle() {
-        return textBlockCategoryTitle;
-    }
-
-    /**
-     * @param textBlockCategoryTitle the textBlockCategoryTitle to set
-     */
-    public void setTextBlockCategoryTitle(String textBlockCategoryTitle) {
-        this.textBlockCategoryTitle = textBlockCategoryTitle;
-    }
-
+    
     /**
      * @return the placementOrder
      */
@@ -204,6 +173,34 @@ public class TextBlock implements Serializable, Comparable<TextBlock>{
      */
     public void setInjectableTemplate(boolean injectableTemplate) {
         this.injectableTemplate = injectableTemplate;
+    }
+
+    /**
+     * @return the category
+     */
+    public TextBlockCategory getCategory() {
+        return category;
+    }
+
+    /**
+     * @param category the category to set
+     */
+    public void setCategory(TextBlockCategory category) {
+        this.category = category;
+    }
+
+    /**
+     * @return the deactivatedTS
+     */
+    public LocalDateTime getDeactivatedTS() {
+        return deactivatedTS;
+    }
+
+    /**
+     * @param deactivatedTS the deactivatedTS to set
+     */
+    public void setDeactivatedTS(LocalDateTime deactivatedTS) {
+        this.deactivatedTS = deactivatedTS;
     }
 
     

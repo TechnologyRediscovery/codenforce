@@ -305,7 +305,6 @@ ALTER TABLE public.login RENAME COLUMN lastupdated_userid TO lastupdatedby_useri
 
 
 
---ECD LOCAL DEPLOY CURSOR
 
 
 
@@ -318,18 +317,62 @@ CREATE SEQUENCE public.noticeofviolationtype_novtypeid_seq
   CACHE 1;
 
 
-
-
 CREATE TABLE public.noticeofviolationtype
 (
 	novtypeid 				integer PRIMARY KEY NOT NULL DEFAULT nextval('noticeofviolationtype_novtypeid_seq'::regclass),
 	title 					TEXT NOT NULL,
 	description 			TEXT,
-	promptfollowupdate 		boolean DEFAULT TRUE,
+	eventcatsent_catid 		integer CONSTRAINT noticeofviolationtype_eventcatsent_fk REFERENCES eventcategory (categoryid),
+	eventcatfollowup_catid 		integer CONSTRAINT noticeofviolationtype_eventcatfollowup_fk REFERENCES eventcategory (categoryid),
+	eventcatreturned_catid 		integer CONSTRAINT noticeofviolationtype_eventcatreturned_fk REFERENCES eventcategory (categoryid),
+	followupwindowdays 		integer DEFAULT 20,
+	headerimage_photodocid INTEGER CONSTRAINT noticeofviolationtype_headerimage_fk REFERENCES photodoc (photodocid),
+	textblockcategory_catid INTEGER CONSTRAINT noticeofviolationtype_blockcatid_fk REFERENCES textblockcategory (categoryid),
+	muni_municode 			integer CONSTRAINT noticeofviolationtype_municode_fk REFERENCES municipality (municode),
     courtdocument 			boolean DEFAULT TRUE,
     injectviolations	    boolean DEFAULT TRUE,
 	deactivatedts 			TIMESTAMP WITH TIME ZONE
 );
+
+
+ALTER TABLE public.noticeofviolation ADD COLUMN letter_typeid INTEGER 
+	CONSTRAINT noticeofviolationtype_novtypeid_fk REFERENCES public.noticeofviolationtype (novtypeid);
+
+
+ALTER TABLE public.textblockcategory ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE DEFAULT NULL;
+
+ALTER TABLE public.textblock ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE DEFAULT NULL;
+
+ALTER TABLE public.noticeofviolation ADD COLUMN fixedheader_photodocid INTEGER
+	CONSTRAINT noticeofviolation_photodocid_fk REFERENCES photodoc (photodocid);
+
+ALTER TABLE public.noticeofviolationtype ADD COLUMN printstyle_styleid INTEGER
+	CONSTRAINT noticeofviolationtype_printstyle_styleid_fk REFERENCES public.printstyle (styleid);
+
+
+--ECD LOCAL DEPLOY CURSOR
+
+INSERT INTO public.noticeofviolationtype(
+            novtypeid, title, description, eventcatsent_catid, eventcatfollowup_catid, 
+            eventcatreturned_catid, followupwindowdays, headerimage_photodocid, 
+            textblockcategory_catid, muni_municode, courtdocument, injectviolations, 
+            deactivatedts, printstyle_styleid)
+    VALUES (DEFAULT, 'Notice of Violation', 'Standard NOV', 122, 223, 
+            131, 20, NULL, 
+            NULL, 999, TRUE, TRUE, 
+            NULL, 1000);
+
+INSERT INTO public.noticeofviolationtype(
+            novtypeid, title, description, eventcatsent_catid, eventcatfollowup_catid, 
+            eventcatreturned_catid, followupwindowdays, headerimage_photodocid, 
+            textblockcategory_catid, muni_municode, courtdocument, injectviolations, 
+            deactivatedts, printstyle_styleid)
+    VALUES (DEFAULT, 'Compliance request', 'First contact about a violation', 122, 223, 
+            131, 20, NULL, 
+            NULL, 999, TRUE, TRUE, 
+            NULL, 1000);
+
+UPDATE public.noticeofviolation SET letter_typeid = 102;
 
 
 

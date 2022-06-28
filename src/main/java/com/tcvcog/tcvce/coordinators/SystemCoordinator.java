@@ -572,34 +572,115 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     
     /**
      * Extracts text blocks from the DB for user selection;
-     * @param catid if zero, all blocks are returned
+     * @param tbc if null, category is ignored in query
      * @param m if null, all muni's blocks are returned
      * @return a list, perhaps containing 1 or more text blocks
      */
-    public List<TextBlock> getTextBlockList(int catid, Municipality m) throws IntegrationException{
+    public List<TextBlock> getTextBlockList(TextBlockCategory tbc, Municipality m) throws IntegrationException, BObStatusException{
         CaseIntegrator ci = getCaseIntegrator();
-        List<TextBlock> blockListRaw;
-        List<TextBlock> blockListFinal = new ArrayList<>();
-        if(catid == 0 && m == null){
-            return ci.getAllTextBlocks();
+        List<Integer> blockIDList = ci.getTextBlockIDList(tbc, m);
+       return getTextBlocksByIDList(blockIDList);
+    }
+    
+    /**
+     * Utility method for iterating over a list of TextBlock IDs
+     * and returning the object list
+     * @param idl
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public List<TextBlock> getTextBlocksByIDList(List<Integer> idl) throws IntegrationException, BObStatusException{
+         List<TextBlock> blockListFinal = new ArrayList<>();
+        for(Integer i: idl){
+            blockListFinal.add(getTextBlock(i));
         }
-        if(catid != 0 && m != null){
-            blockListRaw = ci.getTextBlocksByCategory(catid);
-            if(blockListRaw != null && !blockListRaw.isEmpty()){
-                for(TextBlock tb: blockListRaw){
-                    if(tb.getMuni().getMuniCode() == m.getMuniCode()){
-                        blockListFinal.add(tb);
-                        
-                    }
-                }
-            }
-        }
-        if(catid != 0 && m == null){
-            return ci.getTextBlocksByCategory(catid);
-        }
-        
         return blockListFinal;
+    }
+    
+    /**
+     * Extracts all text blocks from DB, even deactivated ones for config
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public List<TextBlock> getTextBlockListComplete() throws IntegrationException, BObStatusException{
+        CaseIntegrator ci = getCaseIntegrator();
+        return getTextBlocksByIDList(ci.getAllTextBlocks());
         
+        
+    }
+    
+    
+    /**
+     * Factory for TextBlock objects
+     * @param muni
+     * @return 
+     */
+    public TextBlock getTextBlockSkeleton(Municipality muni){
+        TextBlock tb = new TextBlock();
+        tb.setMuni(muni);
+        return tb;
+    }
+    
+    
+    /**
+     * Factory for TextBlockCategory objects
+     * @param muni
+     * @return 
+     */
+    public TextBlockCategory getTextBlockCategorySkeleton(Municipality muni){
+        TextBlockCategory tbc = new TextBlockCategory();
+        tbc.setMuni(muni);
+        return tbc;
+        
+    }
+    
+    /**
+     * Extracts all text block categories from the DB
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public List<TextBlockCategory> getTextBlockCategoryListComplete() throws IntegrationException, BObStatusException{
+        CaseIntegrator ci = getCaseIntegrator();
+        return getTextBlockCategoryListFromIDList(ci.getTextBlockCategoryList(null));
+        
+    }
+    
+    /**
+     * Logic intermediary for fetching text block categories
+     * @param catid
+     * @return
+     * @throws IntegrationException 
+     */
+    public TextBlockCategory getTextBlockCategory(int catid) throws IntegrationException{
+        
+        CaseIntegrator ci = getCaseIntegrator();
+        
+        if(catid == 0){
+            return null;
+        }
+        
+        return ci.getTextBlockCategory(catid);
+        
+    }
+    
+    
+    /**
+     * Utility methodf or getting a text block category list from IDs only
+     * @param idl
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+     public List<TextBlockCategory> getTextBlockCategoryListFromIDList(List<Integer> idl) throws IntegrationException, BObStatusException{
+         
+         List<TextBlockCategory> blockListFinal = new ArrayList<>();
+        for(Integer i: idl){
+            blockListFinal.add(getTextBlockCategory(i));
+        }
+        return blockListFinal;
     }
     
     /**
@@ -617,6 +698,22 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         }
         
         return ci.insertTextBlock(tb);
+        
+    }
+    /**
+     * Primary insertion point for text blocks
+     * @param tbc
+     * @return  the fresh ID
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public int insertTextBlockCategory(TextBlockCategory tbc) throws BObStatusException, IntegrationException{
+        CaseIntegrator ci = getCaseIntegrator();
+        if(tbc == null ){
+            throw new BObStatusException("Cannot insert text block Cat with null block or null user");
+        }
+        
+        return ci.insertTextBlockCategory(tbc);
         
     }
     
@@ -637,25 +734,59 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         ci.updateTextBlock(tb);
         
     }
+    
+    /**
+     * Logic and permissions check for updates to a text block
+     * @param tbc
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void updateTextBlockCategory(TextBlockCategory tbc) throws IntegrationException, BObStatusException{
+        CaseIntegrator ci = getCaseIntegrator();
+        if(tbc == null ){
+            throw new BObStatusException("Cannot update text block with null block cat ");
+        }
+        
+        ci.updateTextBlockCategory(tbc);
+        
+    }
 
     /**
      * Logic and permissions check for deactivation of TextBlocks
-     * TODO: Finish me!
      * 
      * @param tb
      * @param ua 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public void deactivateTextBlock(TextBlock tb, UserAuthorized ua) throws BObStatusException{
+    public void deactivateTextBlock(TextBlock tb, UserAuthorized ua) throws BObStatusException, IntegrationException{
         if(tb == null || ua == null){
-            throw new BObStatusException("Cannot insert text block with null block or null user");
+            throw new BObStatusException("Cannot deactivate text block with null block or null user");
         }
-        
+        CaseIntegrator ci = getCaseIntegrator();
+        tb.setDeactivatedTS(LocalDateTime.now());
+        ci.updateTextBlock(tb);
         
         
     }
     
     
+
+    /**
+     * Logic and permissions check for deactivation of TextBlocksCats
+     * 
+     * @param tbc
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public void deactivateTextBlockCategory(TextBlockCategory tbc) throws BObStatusException, IntegrationException{
+        if(tbc == null){
+            throw new BObStatusException("Cannot deactivate text block cat with null block or null user");
+        }
+        CaseIntegrator ci = getCaseIntegrator();
+        tbc.setDeactivatedTS(LocalDateTime.now());
+        ci.updateTextBlockCategory(tbc);
+        
+        
+    }
     
     
     
@@ -868,17 +999,17 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sidebar Sub Nav Item: Reports
-    private final NavigationSubItem events = getNavSubItem("Event Activity", "/restricted/cogstaff/event/events.xhtml", "fa fa-flag", false);
-    private final NavigationSubItem eventConfig = getNavSubItem("Event Setup", "/restricted/cogstaff/event/eventConfiguration.xhtml", "fa fa-sign-in", false);
-    private final NavigationSubItem eventRuleConfig = getNavSubItem("Event Rules", "/restricted/cogstaff/event/eventRuleConfiguration.xhtml", "fa fa-sign-in", false);
+//    private final NavigationSubItem events = getNavSubItem("Event Activity", "/restricted/cogstaff/event/events.xhtml", "fa fa-flag", false);
+    private final NavigationSubItem eventConfig = getNavSubItem("Event Setup", "/restricted/cogstaff/event/eventCatConfig.xhtml", "fa fa-sign-in", false);
+//    private final NavigationSubItem eventRuleConfig = getNavSubItem("Event Rules", "/restricted/cogstaff/event/eventRuleConfiguration.xhtml", "fa fa-sign-in", false);
 
     //Store SubNav Items into List: Reports
     public List<NavigationSubItem> getSidebarReportList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
-        navList.add(events);
+//        navList.add(events);
         navList.add(eventConfig);
-        navList.add(eventRuleConfig);
+//        navList.add(eventRuleConfig);
         return navList;
     }
 

@@ -32,6 +32,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -179,6 +181,19 @@ public class NavigationBB extends BackingBeanUtils implements Serializable {
         return viewID;
     }
 
+    /**
+     * Listener to view the muni property DH
+     * @return 
+     */
+    public String navigateToMuniPropertyDH(){
+        try {
+            System.out.println("NavigationBB.navigateToMuniPropertyDH with parcelID: " + getSessionBean().getSessMuni().getMuniPropertyDH().getCountyParcelID());
+            return getSessionBean().navigateToPageCorrespondingToObject(getSessionBean().getSessMuni().getMuniPropertyDH());
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+        }
+        return "";
+    }
  
 
     public List<NavigationItem> getNavList() {

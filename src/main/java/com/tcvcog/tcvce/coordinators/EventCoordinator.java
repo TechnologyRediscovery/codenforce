@@ -113,6 +113,16 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Factory for EventCategories
+     * @return 
+     */
+    public EventCategory getEventCategorySkeleton(){
+        return new EventCategory();
+        
+        
+    }
+    
+    /**
      * Retrieves event Categories by Type
      * @param et
      * @return
@@ -128,6 +138,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    /**
+     * Utility method for getting events in a list by only an ID list
+     * @param evIDList
+     * @return
+     * @throws IntegrationException 
+     */
     public List<EventCnF> getEventList(List<Integer> evIDList) throws IntegrationException{
         List<EventCnF> evList = new ArrayList<>();
         if(evIDList != null && !evIDList.isEmpty()){
@@ -138,6 +154,16 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return evList;
     }
     
+    /**
+     * @deprecated  don't use me! -- too old
+     * @param ua
+     * @return
+     * @throws IntegrationException
+     * @throws EventException
+     * @throws SearchException
+     * @throws BObStatusException
+     * @throws BlobException 
+     */
     public List<EventCnFPropUnitCasePeriodHeavy> getEventHistoryList(UserAuthorized ua) 
             throws IntegrationException, EventException, SearchException, BObStatusException, BlobException{
         EventIntegrator ei = getEventIntegrator();
@@ -448,8 +474,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
          if(ev == null || ua == null){
             throw new BObStatusException("Event and User cannot be null");
         }
-        if(ev.getCategory().getUserRankMinimumToUpdate() > ua.getRole().getRank()){
-            throw new BObStatusException("User's rank does not allow deactivation of given event");
+        if(ev.getCategory() == null || ev.getCategory().getRoleFloorEventUpdate() == null || (ev.getCategory().getRoleFloorEventUpdate().getRank() > ua.getRole().getRank())){
+            throw new BObStatusException("User's rank does not allow deactivation of given event or ranks are not configured properly");
         }
         
         if(targetCat != null && targetCat.getEventType() == ev.getCategory().getEventType()){
@@ -463,6 +489,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
         
     }
+    
+    
     
     
     /**
@@ -482,8 +510,8 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
          if(ev == null || ua == null){
             throw new BObStatusException("Event and User cannot be null");
         }
-        if(ev.getCategory().getUserRankMinimumToUpdate() > ua.getRole().getRank()){
-            throw new BObStatusException("User's rank does not allow deactivation of given event");
+        if(ev.getCategory() == null || ev.getCategory().getRoleFloorEventUpdate() == null || (ev.getCategory().getRoleFloorEventUpdate().getRank() > ua.getRole().getRank())){
+            throw new BObStatusException("User's rank does not allow deactivation of given event or ranks are not configured properly");
         }
         
         auditEvent(ev);
@@ -518,11 +546,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws IntegrationException 
      */
     public void removeEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException, BObStatusException{
-        if(ev == null || ua == null){
+        if(ev == null || ua == null ){
             throw new BObStatusException("Event and User cannot be null");
         }
-        if(ev.getCategory().getUserRankMinimumToUpdate() > ua.getRole().getRank()){
-            throw new BObStatusException("User's rank does not allow deactivation of given event");
+        
+        if(ev.getCategory() == null || ev.getCategory().getRoleFloorEventUpdate() == null || (ev.getCategory().getRoleFloorEventUpdate().getRank() > ua.getRole().getRank())){
+            throw new BObStatusException("User's rank does not allow deactivation of given event or ranks are not configured properly");
         }
         SystemCoordinator sc = getSystemCoordinator();
         EventIntegrator ei = getEventIntegrator();
@@ -702,8 +731,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         List<EventCategory> allowedCats = new ArrayList<>();
         if(catList != null &&!catList.isEmpty()){
             for(EventCategory ec: catList){
-                if(ec.getUserRankMinimumToView() >= ua.getMyCredential().getGoverningAuthPeriod().getRole().getRank()){
-                    allowedCats.add(ec);
+                if(ec.getRoleFloorEventView() != null){
+                    if(ec.getRoleFloorEventView().getRank() >= ua.getMyCredential().getGoverningAuthPeriod().getRole().getRank()){
+                        allowedCats.add(ec);
+                    }
                 }
             }
         }
@@ -869,15 +900,13 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Extracts a complete list of event categories
      * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
-    public List<EventCategory> getEventCategoryList(){
+    public List<EventCategory> getEventCategoryList() throws IntegrationException{
         EventIntegrator ei = getEventIntegrator();
-        try {
-            return ei.getEventCategoryList();
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return null;
+        return ei.getEventCategoryList();
+        
+        
     }
     
     /**
@@ -925,9 +954,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 if(u != null && u.getKeyCard() != null){
                     // ensure that the user's rank is at least what is required 
                     // to enact an event of this Category
-                    if(u.getKeyCard().getGoverningAuthPeriod().getRole().getRank() >= cat.getUserRankMinimumToEnact()){
-                            include = true;
-                    } 
+                    if(cat.getRoleFloorEventEnact() != null){
+                        
+                        if(u.getKeyCard().getGoverningAuthPeriod().getRole().getRank() >= cat.getRoleFloorEventEnact().getRank()){
+                                include = true;
+                        } 
+                    }
                 }       
             }
             if(include){
@@ -962,6 +994,30 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         return chosenEvent;
     }
+    
+    /**
+     * Unprotected event category insert point
+     * @param ec
+     * @return
+     * @throws IntegrationException 
+     */
+    public int addEventCategory(EventCategory ec) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        return ei.insertEventCategory(ec);
+    }
+    
+    /**
+     * Uprotected event category update path.
+     * Legacy active boolean flag preserved even during 2022 updates!!
+     * Set active to false to turn off
+     * @param ec
+     * @throws IntegrationException 
+     */
+    public void updateEventCategory(EventCategory ec) throws IntegrationException{
+        EventIntegrator ei = getEventIntegrator();
+        ei.updateEventCategory(ec);
+    }
+    
     
     
 //    --------------------------------------------------------------------------

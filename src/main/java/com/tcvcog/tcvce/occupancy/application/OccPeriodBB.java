@@ -656,15 +656,19 @@ public class OccPeriodBB
      */
     private void setupPermitTextBlockCandidateLists(Municipality m) throws IntegrationException{
         SystemCoordinator sc = getSystemCoordinator();
-        
-        permitBlockCandidatesStipulations = sc.getTextBlockList(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString(PERMIT_BLOCKS_STIPULATIONS)), m);
-        
-        permitBlockCandidatesNotices = sc.getTextBlockList(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString(PERMIT_BLOCKS_NOTICES)), m);
-        
-        permitBlockCandidatesComments = sc.getTextBlockList(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString(PERMIT_BLOCKS_COMMENTS)), m);
+        try{
+            
+            TextBlockCategory tbc = sc.getTextBlockCategory(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString(PERMIT_BLOCKS_STIPULATIONS)));
+            permitBlockCandidatesStipulations = sc.getTextBlockList(tbc, m);
+
+            tbc = sc.getTextBlockCategory(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString(PERMIT_BLOCKS_NOTICES)));
+            permitBlockCandidatesNotices = sc.getTextBlockList(tbc, m);
+
+            tbc = sc.getTextBlockCategory(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString(PERMIT_BLOCKS_COMMENTS)));
+            permitBlockCandidatesComments = sc.getTextBlockList(tbc, m);
+        } catch (BObStatusException | IntegrationException ex){
+            System.out.println(ex);
+        }
         
         permitBlocksSelectedList = new ArrayList<>();
         permitBlocksFilteredList = new ArrayList<>();

@@ -9,10 +9,12 @@
                  globalOnly="false" />
     </h:form>
 
+    <ui:include src="/restricted/cogstaff/compositions/textBlockTools.xhtml" />
+
     <p:panel id="cecase-notices-panel"
              toggleable="true"
              collapsed="false"
-             header="Notices of Violation (#{ceCaseBB.currentCase.noticeList.size()})"
+             header="Letters (#{ceCaseBB.currentCase.noticeList.size()})"
              rendered="true"
              >
         <h:form id="cecase-notices-form">
@@ -22,13 +24,34 @@
                                 ajax="true"
                                 styleClass="noFill button-size-small"
                                 actionListener="#{noticeOfViolationBB.onStartNewNoticeButtonChange}"
-                                value="New Notice of Violation"
+                                value="New Letter"
                                 oncomplete="PF('nov-template-choose-dialog').show()"
                                 icon="fa fa-plus"
                                 />
 
-            <p:spacer height="5px"/>
+            <p:commandLink  id="manage-blocks-cl" 
+                            ajax="true"
+                            actionListener="#{textBlockBB.onManageBlocksInit}"
+                            value="manage text block templates"
+                            style="color:blue; font-weight: bold; margin-left: 10px;"
+                            oncomplete="PF('nov-templatemanage-dialog-var').show();"
+                            update="nov-template-select-form"
+                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
 
+            <h:outputText value=" | " />
+
+            <p:commandLink      id="nov-managetemplates-init-button"
+                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                style="color:blue; font-weight: bold; margin-left: 10px;"
+                                value="manage Letter Types"
+                                ajax="true"
+                                actionListener="#{noticeOfViolationBB.onNOVTypeManageButtonClick}"
+                                update="@form:@parent:novtype-list-form"
+                                oncomplete="PF('novtype-list-dialog-var').show()"
+                                />
+
+
+            <p:spacer height="5px"/>
 
             <p:dataTable
                 id="cecase-notices-table"
@@ -38,17 +61,19 @@
                 tableStyleClass="primeDataTable"
                 >
 
-                <p:column width="15%">
+                <p:column width="15%"
+                          sortBy="#{nov.novType.title}">
+                    <f:facet name="header">
+                        <h:outputText value="Type"/>
+                    </f:facet>
+                    <h:outputText value="#{nov.novType.title}"/>
+                </p:column>
+
+                <p:column width="20%">
                     <f:facet name="header">
                         <h:outputText value="Date of record"/>
                     </f:facet>
                     <h:outputText value="#{ceCaseBB.getPrettyDate(nov.dateOfRecord)}"/>
-                </p:column>
-                <p:column width="15%">
-                    <f:facet name="header">
-                        <h:outputText value="ID"/>
-                    </f:facet>
-                    <h:outputText value="#{nov.noticeID}"/>
                 </p:column>
 
 
@@ -115,8 +140,7 @@
                         <p:commandLink  ajax="false"
                                         value="#{!(empty nov.lockedAndqueuedTS) ? 'Print' : 'Preview draft'}"
                                         action="#{noticeOfViolationBB.printNotice(nov)}"
-                                        target="_blank"
-                                        styleClass="link-button"/>
+                                        target="_blank"/>
                     </div>
                     <p:spacer height="3px" />
                     <div class="restrict-main-contents-io-link link-button">
@@ -141,46 +165,17 @@
                                             update="novstatus-dialog"
                                             oncomplete="PF('nov-add-edit-dialog-var').show()"/>
                     </div>
+                    <p:spacer height="3px" />
+                    <h:outputText value="(Notice ID: #{nov.noticeID})"/>
+
                 </p:column>
-
             </p:dataTable>
-
         </h:form>
-        <h:form id="nov-tools-form">
-            <p:spacer height="5px" />
-
-            <div class="ui-button gray_button">
-
-                <p:commandButton   id="nov-managetemplates-init-button"
-                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                   value="Manage NOV templates"
-                                   icon="fa fa-paragraph"
-                                   ajax="true"
-                                   actionListener="#{noticeOfViolationBB.onTemplateManageInitButtonChange}"
-                                   update="@form:@parent:nov-template-form"
-                                   oncomplete="PF('nov-templatemanage-dialog-var').show()"
-                                   />
-            </div>
-
-        </h:form>
-
-        <h:form id="nov-header-fileupload"
-                enctype="multipart/form-data">
-            <h4>Upload new header image for this NOV style</h4>
-
-            <p:fileUpload
-                mode="advanced"
-                multiple="true"
-                fileLimit="3"
-                sizeLimit="900000000"
-                allowTypes="/(\.|\/)(jpe?g|png)$/"
-                />
-        </h:form>
-
     </p:panel>
+
     <p:dialog   id="novstatus-dialog"
                 height="650" width="900"
-                header="Notice ID #{noticeOfViolationBB.currentNotice.noticeID} Details"
+                header="Letter ID #{noticeOfViolationBB.currentNotice.noticeID} Details"
                 widgetVar="novstatus-dialog-var"
                 closable="true"
                 dynamic="true"
@@ -196,7 +191,36 @@
             <!-- Violation status; single line-->
             <div class="ui-g data_container_nested_restrict">
 
-                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
+                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field" >
+                    <div class="p-grid">
+                        <div class="p-col-12 restrict-data-field-label-vertical">
+                            <h:outputText value="Type"/>
+                        </div>
+                        <div class="p-col-12 restrict-data-field-value-vertical">
+                            <h:outputText   id="nov-type-ot"
+                                            value="#{noticeOfViolationBB.currentNotice.novType.title} (ID:#{noticeOfViolationBB.currentNotice.novType.typeID})"/>
+                            <p:spacer height="3px" />
+
+                            <p:commandLink      id="nov-edittype-commandlink"
+                                                value="change type" 
+                                                ajax="true"
+                                                actionListener="#{noticeOfViolationBB.onNOVTypeChangeInit}"
+                                                style="color:blue; font-weight: bold;"
+                                                rendered="true"
+                                                disabled="#{!empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}"
+                                                oncomplete="PF('nov-changetype-dialog-var').show();"
+                                                update= "nov-changetype-dialog
+                                                nov-changetype-form">
+                            </p:commandLink> 
+
+
+                        </div>
+                    </div>    
+                </div>
+                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field" >
+
+                </div>
+                <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field" >
 
                     <div class="restrict-data-field-label-inline" >
                         <p:outputLabel for="nov-addressee">
@@ -272,7 +296,7 @@
                     <!--NESTED DATA VALUE VERTICAL -->
                     <div class="restrict-data-field-value-vertical" >
                         <h:outputText   id="nov-queued-ot"
-                                        value="#{noticeOfViolationBB.getPrettyDate(noticeOfViolationBB.currentNotice.lockedAndQueuedTS)}"/>
+                                        value="#{noticeOfViolationBB.getPrettyDate(noticeOfViolationBB.currentNotice.lockedAndqueuedTS)}"/>
                     </div>
                     <!--NESTED DATA VALUE VERTICAL -->
                     <div class="restrict-data-field-value-vertical" >
@@ -332,7 +356,7 @@
                         <p:commandButton id="nov-returned-cb"
                                          ajax="true"
                                          actionListener="#{noticeOfViolationBB.markNoticeOfViolationAsReturned}"
-                                         value="Mark notice as returned"
+                                         value="Mark letter as returned"
                                          styleClass="noFill"
                                          icon="fa fa-mail-reply"
                                          update="nov-profile-form
@@ -368,7 +392,7 @@
                 </div>
             </div>
 
-            <h2>Notice Tools</h2>
+            <h2>Letter Tools</h2>
 
             <div class="ui-g data_container_nested_restrict">
 
@@ -391,13 +415,13 @@
                             icon="fa fa-trash"
                             ajax="false"
                             action="#{noticeOfViolationBB.deleteNoticeOfViolation}"
-                            value="Remove notice of violation ID:#{noticeOfViolationBB.currentNotice.noticeID}"
+                            value="Remove letter of violation ID:#{noticeOfViolationBB.currentNotice.noticeID}"
                             />
                     </div>
                 </div>
             </div>
 
-            <h2>Notice Text</h2>
+            <h2>Letter Text</h2>
             <h:outputText id="nov-text-view-before"
                           value="#{noticeOfViolationBB.currentNotice.noticeTextBeforeViolations}"
                           escape="false" />
@@ -412,7 +436,7 @@
     </p:dialog>
 
     <p:dialog     id="cecase-novfollowup-dialog"
-                  header="Mark Notice ID #{noticeOfViolationBB.currentNotice.noticeID} as mailed"
+                  header="Mark Letter ID #{noticeOfViolationBB.currentNotice.noticeID} as mailed"
                   widgetVar="cecase-novfollowup-dialog-var"
                   responsive="true"
                   resizable="true"
@@ -467,22 +491,115 @@
         </h:form>
     </p:dialog>
 
-    <p:dialog   id="nov-template-choose-dialog"
+    <p:dialog   id="nov-changetype-dialog"
                 height="300" width="750"
+                widgetVar="nov-changetype-dialog-var"
+                closable="true"
+                resizable="true"
+                closeOnEscape="true"
+                dynamic="true"
+                modal="true"
+                header="Change of NOV type (ID:#{noticeOfViolationBB.currentNotice.noticeID})"
+                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                >
+        <h:form id="nov-changetype-form">
+
+            <h:outputText value="The Current Letter type is: #{noticeOfViolationBB.currentNotice.novType.title} (ID:#{noticeOfViolationBB.currentNotice.novType.typeID})"
+                          rendered="#{!empty noticeOfViolationBB.currentNotice.novType}" />
+
+            <p:spacer height="5px" />
+
+            <p:selectOneMenu 
+                id="novtype-change-som" 
+                tabindex="1"
+                value="#{noticeOfViolationBB.selectedNOVType}"
+                required="false"
+                rendered="true">
+
+                <f:selectItem itemLabel="select a letter type..." 
+                              noSelectionOption="true" 
+                              itemDisabled="true"/>
+                <f:selectItems value="#{noticeOfViolationBB.novTypeList}" 
+                               var="novt" 
+                               itemLabel="#{novt.title} (ID:#{novt.typeID})"/>
+                <f:converter converterId="novTypeConverter" />
+            </p:selectOneMenu>
+
+
+            <p:commandButton id="novtype-change-commit-button"
+                             value="Save Change type"
+                             icon="fa fa-save"
+                             ajax="true"
+                             disabled="false"
+                             actionListener="#{noticeOfViolationBB.onNOVTypeChangeCommit}"
+                             oncomplete="PF('novstatus-dialog-var').show(); PF('nov-changetype-dialog-var').hide();"
+                             update="nov-growl-form
+                             nov-profile-form
+                             @form:@parent:cecase-notices-form"/>
+        </h:form>
+
+    </p:dialog>
+
+
+    <p:dialog   id="nov-template-choose-dialog"
+                height="300" width="1000"
                 widgetVar="nov-template-choose-dialog"
                 closable="true"
                 resizable="true"
                 closeOnEscape="true"
                 dynamic="true"
                 modal="true"
-                header="Choose a Notice of Violation Template"
+                header="Choose a Letter Type and Template"
                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                 >
 
         <h:form id="nov-template-choose-form">
 
+            <p:selectOneMenu 
+                id="novtype-som" 
+                tabindex="1"
+                value="#{noticeOfViolationBB.currentNotice.novType}"
+                required="false"
+                rendered="true">
+
+                <f:selectItem itemLabel="select a letter type..." 
+                              noSelectionOption="true" 
+                              itemDisabled="true"/>
+                <f:selectItems value="#{noticeOfViolationBB.novTypeList}" 
+                               var="novt" 
+                               itemLabel="#{novt.title} (ID:#{novt.typeID}) [#{novt.muni.muniName}]"/>
+                <f:converter converterId="novTypeConverter" />
+                <p:ajax update="nov-templateblocks-add-table"
+                        listener="#{noticeOfViolationBB.onNOVTypeChange()}"/>
+            </p:selectOneMenu>
+
+            <div class="p-grid">
+                
+                <div class="p-col-6">
+                    <h:outputText value="Include all municipalities?"
+                                  style="margin-right:8px;"/>
+                    <p:selectBooleanCheckbox value="#{noticeOfViolationBB.showTextBlocksAllMuni}">
+                         <p:ajax update="nov-templateblocks-add-table"
+                                    listener="#{noticeOfViolationBB.onNOVTypeChange()}"/>
+                    </p:selectBooleanCheckbox>
+                </div>
+                <div class="p-col-6">
+                    <h:outputText value="Include all block categories"
+                                  style="margin-right:8px;"/>
+                    <p:selectBooleanCheckbox value="#{noticeOfViolationBB.showTextBlocksAllCategories}">
+                         <p:ajax update="nov-templateblocks-add-table"
+                                    listener="#{noticeOfViolationBB.onNOVTypeChange()}"/>
+                    </p:selectBooleanCheckbox>
+
+                </div>
+
+            </div>
+            
+            <h4>Available templates for letters of selected type:</h4>
+           
+            
             <p:dataTable id="nov-templateblocks-add-table"
-                         value="#{noticeOfViolationBB.injectableBlockList}"
+                         value="#{noticeOfViolationBB.blockList}"
                          var="template"
                          rowKey="#{template.blockID}"
                          tableStyleClass="primeDataTable"
@@ -508,7 +625,25 @@
                     <h:outputText value="#{template.textBlockName}"/>
                 </p:column>
 
-                <p:column>
+                <p:column   width="25%"
+                            sortBy="#{template.category}">
+                    <f:facet name="header">
+                        <h:outputText value="Category"/>
+                    </f:facet>
+                    <h:outputText value="#{template.category.title}"
+                                  rendered="#{!empty template.category}"/>
+                </p:column>
+
+                <p:column   width="15%"
+                            sortBy="#{template.category}">
+                    <f:facet name="header">
+                        <h:outputText value="Muni"/>
+                    </f:facet>
+                    <h:outputText value="#{template.muni.muniName}"
+                                  rendered="#{!empty template.muni}"/>
+                </p:column>
+
+                <p:column width="20%">
                     <f:facet name="header">
                         <h:outputText value="Actions"/>
                     </f:facet>
@@ -519,7 +654,7 @@
                                      disabled="false"
                                      actionListener="#{noticeOfViolationBB.onBuildNOVUsingTemplateBlock(template)}"
                                      oncomplete="PF('nov-add-edit-dialog-var').show(); PF('nov-template-choose-dialog').hide();"
-                                     update="nov-template-form
+                                     update="
                                      nov-add-edit-dialog
                                      nov-date-form
                                      chosen-recipient-form
@@ -528,23 +663,7 @@
                                      nov-preview-textafter-form
                                      nov-submission-form"/>
 
-                    <p:commandButton id="removetemplate-cb"
-                                     value="Preview"
-                                     icon="fa fa-search"
-                                     ajax="true"
-                                     actionListener="#{noticeOfViolationBB.onTemplateViewButtonChange(template)}"
-                                     update="nov-template-view-dialog"
-                                     oncomplete="PF('nov-template-view-dialog-var').show()"/>
 
-                    <p:commandButton id="template-edit-cb"
-                                     value="Edit"
-                                     icon="fa fa-edit"
-                                     ajax="true"
-                                     actionListener="#{noticeOfViolationBB.onTemplateEditButtonChange(template)}"
-                                     update="@form:@parent:nov-template-form
-                                     nov-template-form"
-
-                                     oncomplete="PF('nov-templatemanage-dialog-var').show()"/>
                 </p:column>
             </p:dataTable>
         </h:form>
@@ -559,7 +678,7 @@
                 responsive="true"
                 resizable="true"
                 closeOnEscape="true"
-                header="#{noticeOfViolationBB.currentNotice.noticeID ==0 ? 'Create New Notice of Violation' : 'Edit Notice Of Violation'}"
+                header="#{noticeOfViolationBB.currentNotice.noticeID ==0 ? 'Create New Letter' : 'Edit Letter'}"
                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                 >
 
@@ -572,18 +691,18 @@
 
                     <h2>Date of record</h2>
                     <p:datePicker 	    id="noticeDateOfRecord"
-                                            value="#{noticeOfViolationBB.currentNotice.dateOfRecord}" 
-                                            rendered="true"
-                                            style="width: 100%;"
-                                            pattern="MM/dd/yyyy HH:mm"
-                                            disabled="false"
-                                            hideOnDateTimeSelect="true"
-                                              showOnFocus="false"
-                                              showIcon="true"
-                                            showButtonBar="true"
-                                            mask="true"
-                                            timeInput="true" 
-                                            required="true" />
+                                       value="#{noticeOfViolationBB.currentNotice.dateOfRecord}" 
+                                       rendered="true"
+                                       style="width: 100%;"
+                                       pattern="MM/dd/yyyy HH:mm"
+                                       disabled="false"
+                                       hideOnDateTimeSelect="true"
+                                       showOnFocus="false"
+                                       showIcon="true"
+                                       showButtonBar="true"
+                                       mask="true"
+                                       timeInput="true" 
+                                       required="true" />
 
 
                     <h:message for="noticeDateOfRecord" showDetail="true" showSummary="true" 
@@ -686,7 +805,7 @@
                 <p:commandButton    id="nov-insert-new-cb"
                                     ajax="false"
                                     action="#{noticeOfViolationBB.onInsertNewNoticeButtonChange}"
-                                    value="Create new notice draft"
+                                    value="Done: Create new notice draft"
                                     update="violation-table nov-growl-form"
                                     icon="fa fa-save"
                                     disabled="#{noticeOfViolationBB.currentNotice.noticeID != 0}"/>
@@ -969,7 +1088,7 @@
 
                 <div class="p-col-6">
                     <div style="border: solid black; padding: 10px;">
-                        
+
                         <h2>Selected Recipient and Mailing Address</h2>
                         <h:outputText   id="recip-addressee-name-ot"
                                         value="#{!empty noticeOfViolationBB.selectedRecipientPerson
@@ -984,34 +1103,34 @@
                     </div>
                 </div>
                 <div class="p-col-6">
-                    
-                      <p:commandLink    id="nov-chooseperson-perssearch-cb"
-                                        value="search for persons / create new person"
-                                        ajax="true"
-                                        actionListener="#{personBB.onSelectAndLinkPersonsInit(sessionBean.sessProperty)}"
-                                        style="color: blue; font-weight: bold;"
-                                        oncomplete="PF('human-search-dialog-var').show(); PF('nov-personchoose-dialog-var').hide();"
-                                        update="human-search-dialog
-                                        search-query-form
-                                        log-form
-                                        pers-search-results-form
-                                        pers-selected-form
-                                        hlh-humlist-form">
-                          <f:param name="person-list-component-to-update" value="nov-chooseperson-list-form:newRecipientPersonTD" />
-                      </p:commandLink>
-                    
-                      <p:spacer height="3px" />
-                    
-                      <h2>Person Links</h2>
+
+                    <p:commandLink    id="nov-chooseperson-perssearch-cb"
+                                      value="search for persons / create new person"
+                                      ajax="true"
+                                      actionListener="#{personBB.onSelectAndLinkPersonsInit(sessionBean.sessProperty)}"
+                                      style="color: blue; font-weight: bold;"
+                                      oncomplete="PF('human-search-dialog-var').show(); PF('nov-personchoose-dialog-var').hide();"
+                                      update="human-search-dialog
+                                      search-query-form
+                                      log-form
+                                      pers-search-results-form
+                                      pers-selected-form
+                                      hlh-humlist-form">
+                        <f:param name="person-list-component-to-update" value="nov-chooseperson-list-form:newRecipientPersonTD" />
+                    </p:commandLink>
+
+                    <p:spacer height="3px" />
+
+                    <h2>Person Links</h2>
 
                     <p>Showing all Persons currently connected to this case's property:
                         <h:outputText value="(Parcel ID: #{noticeOfViolationBB.currentCase.property.countyParcelID})" />
                     </p>
 
-                    
+
                     <p:spacer height="3px" />
-                    
-                    
+
+
                     <p:dataTable
                         id="newRecipientPersonTD"
                         var="recipers"
@@ -1046,7 +1165,7 @@
                                              />
 
                             <p:spacer height="3px" />
-                            
+
                             <p:commandLink id="edit-person-from-lookup-cb-1"
                                            ajax="true"
                                            rendered="false"
@@ -1088,21 +1207,21 @@
                 <div class="p-col-6">
 
                     <p:commandLink      id="nov-addresses-add-cb"
-                                              value="Link a new address to property" 
-                                              ajax="true"
-                                              actionListener="#{addressBB.onLinkPersonPropToAddressInitButtonChange(sessionBean.sessProperty)}"
-                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                              oncomplete="PF('address-search-dialog-var').show(); PF('nov-personchoose-dialog-var').hide();"
-                                              style="color:blue; font-weight: bold;"
-                                              update="address-search-dialog">
-                            <f:param name="initiating-address-list-component-id" value="nov-chooseperson-list-form" />
+                                        value="Link a new address to property" 
+                                        ajax="true"
+                                        actionListener="#{addressBB.onLinkPersonPropToAddressInitButtonChange(sessionBean.sessProperty)}"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                        oncomplete="PF('address-search-dialog-var').show(); PF('nov-personchoose-dialog-var').hide();"
+                                        style="color:blue; font-weight: bold;"
+                                        update="address-search-dialog">
+                        <f:param name="initiating-address-list-component-id" value="nov-chooseperson-list-form" />
                     </p:commandLink>
                     <p:spacer height="5px" />
-                    
+
                     <h2>Addresses Links</h2>
-                      
+
                     <p:spacer height="5px" />
-                    
+
                     <p:repeat   id="prop-addr-repeater"
                                 value="#{sessionBean.sessProperty.mailingAddressLinkList}"
                                 var="propaddr">
@@ -1126,185 +1245,619 @@
     </p:dialog>
 
 
-    <p:dialog   id="nov-templatemanage-dialog"
-                height="600" width="800"
-                widgetVar="nov-templatemanage-dialog-var"
+    <!--start NOVTYPE-->
+
+    <p:dialog   id="novtype-list-dialog"
+                height="600" width="800" 
+                widgetVar="novtype-list-dialog-var"
                 closable="true"
                 dynamic="true"
                 modal="true"
+                closeOnEscape="true"
                 responsive="true"
                 resizable="true"
-                closeOnEscape="true"
-                header="Template manager"
-                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                header="Letter Type Manager"
                 >
 
 
-        <h:form id="nov-template-select-form">
-            <p:outputLabel for="nov-templateblocks-table">
-                <h:outputText value="NOV templates in #{systemServicesBB.bbSessionMuni.muniName}"/>
-            </p:outputLabel>
-
-            <p:spacer height="3px" />
-
-            <p:dataTable id="nov-templateblocks-table"
-                         value="#{noticeOfViolationBB.injectableBlockList}"
-                         var="template"
-                         rowKey="#{template.blockID}"
-                         tableStyleClass="primeDataTable"
-                         resizableColumns="true"
-                         rowExpandMode="multiple"
-                         expandedRow="false"
-                         widgetVar="textBlockTableWidgetVar"
-                         selection="#{noticeOfViolationBB.currentTemplateBlock}"
-                         selectionMode="single"
-
-                         >
 
 
-                <p:column width="20%">
-                    <f:facet name="header">
-                        <h:outputText value="ID#" />
-                    </f:facet>
-                    <h:outputText value="#{template.blockID}"/>
-                </p:column>
+        <!--panel:NOVType add/edit-->
+        <p:panel id="novtype-addedit-panel"
+                 toggleable="true"
+                 widgetVar="novtype-addedit-panel-var"
+                 collapsed="false"
+                 header="Letter Types Toolbox">
+            <h:form id="novtype-add-init-form">
 
 
-                <p:column sortBy="#{template.textBlockName}">
-                    <f:facet name="header">
-                        <h:outputText value="Name"/>
-                    </f:facet>
-                    <h:outputText value="#{template.textBlockName}"/>
-                </p:column>
+                <p:commandButton id="novtype-create-init-button"
+                                 value="Create new Letter Type"
+                                 ajax="true"
+                                 actionListener="#{noticeOfViolationBB.onNOVTypeAddInitButtonChange}"
+                                 oncomplete="PF('novtype-addedit-dialog-var').show();"
+                                 disabled="false"
+                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                 icon="fa fa-plus"
+                                 update="novtype-addedit-form"/>
+
+                <p:spacer height="5px"/>
+            </h:form>
 
 
-                <p:column>
-                    <f:facet name="header">
-                        <h:outputText value="Actions"/>
-                    </f:facet>
+        </p:panel>
+
+
+        <!--panel:NOVType List-->
+        <p:panel id="novtype-list-panel"
+                 toggleable="true"
+                 widgetVar="novtype-list-panel-var"
+                 collapsed="false"
+                 header="Letter Types">
+
+
+            <h:form id="novtype-list-form">
+
+
+                <p:dataTable id="novtype-datatable"
+                             var="novt"
+                             rowKey="#{novt.typeID}"
+                             value="#{noticeOfViolationBB.novTypeList}"
+                             tableStyleClass="primeDataTable"
+                             draggableColumns="true"
+                             resizableColumns="true">
+
+
+                    <p:column width="15%">
+                        <f:facet name="header">
+                            <h:outputText value="Title"/>
+                        </f:facet>
+
+                        <h:outputText value="#{novt.title}"/>
+
+                    </p:column>
+
+                    <p:column width="20%"
+                              sortBy="#{novt.muni.muniName}">
+                        <f:facet name="header">
+                            <h:outputText value="Municipality"/>
+                        </f:facet>
+
+                        <h:outputText value="#{novt.muni.muniName}"
+                                      rendered="#{!empty novt.muni}"/>
+                    </p:column>
+
+                    <p:column width="20%"
+                              sortBy="#{novt.injectViolations}">
+                        <f:facet name="header">
+                            <h:outputText value="Inject Viols?"/>
+                        </f:facet>
+
+                        <h:outputText value="#{novt.injectViolations}" />
+                    </p:column>
+
+                    <p:column width="20%">
+                        <f:facet name="header">
+                            <h:outputText value="Actions"/>
+                        </f:facet>
+
+
+                        <p:commandLink  id="novtype-view-cl" 
+                                        ajax="true"
+                                        actionListener="#{noticeOfViolationBB.onNOVTypeView(novt)}"
+                                        value="view"
+                                        style="color:blue; font-weight: bold;"
+                                        oncomplete="PF('novtype-addedit-dialog-var').show();"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                        update="novtype-addedit-dialog
+                                        novtype-addedit-form"/>
+
+                        <p:spacer height="5px" />
 
 
 
-                    <p:commandButton id="removetemplate-cb"
-                                     value="Delete"
-                                     icon="fa fa-trash"
-                                     ajax="true"
-                                     update="nov-growl-form
-                                     nov-templateblocks-table
-                                     "
-                                     actionListener="#{noticeOfViolationBB.onTemplateDeleteButtonChange(template)}"/>
-                </p:column>
+                        <p:commandLink  id="novtype-deac-init-cl" 
+                                        ajax="true"
+                                        actionListener="#{noticeOfViolationBB.onDeactivateNOVTypeInit(novt)}"
+                                        value="remove"
+                                        style="color:blue; font-weight: bold;"
+                                        oncomplete="PF('novtype-deactivate-confirm-dialog-var').show();"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
 
-            </p:dataTable>
-            <p:commandButton    id="viewselectedtemplate-cb"
-                                value="Edit Selected Template"
-                                icon="fa fa-search"
-                                ajax="true" 
-                                style="margin-right: 5px;"
-                                actionListener="#{noticeOfViolationBB.onTemplateViewSelectedButtonChange}"
-                                update="nov-template-form
-                                nov-templatemanage-dialog"
-                                oncomplete="PF('nov-templatemanage-dialog-var').show()"/>
+                        <p:spacer height="5px" />
+                        <h:outputText value="(ID: #{novt.typeID})" />
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </p:dialog>
 
 
-            <p:commandButton
-                id="nov-template-new"
-                value="Create New Template"
-                ajax="true"
-                icon="fa fa-plus"
-                styleClass="buttonOwnLine"
-                tabindex="6"
-                update="@form:@parent:nov-template-form
-                nov-growl-form
-                "
-                actionListener="#{noticeOfViolationBB.onTemplateCreateButton}"/>
+    <p:dialog id="novtype-addedit-dialog"
+              widgetVar="novtype-addedit-dialog-var"
+              width="1200"
+              height="600"
+              header="Add/Edit Letter Type: #{noticeOfViolationBB.currentNOVType.typeID eq 0 ? 'New Record':noticeOfViolationBB.currentNOVType.typeID}"
+              modal="true"
+              dynamic="true"
+              resizable="true"
+              closable="true"
+              closeOnEscape="true"
+              >
+        <h:form id="novtype-addedit-form">
+
+            <p:commandButton id="novtype-edittoggle-button"
+                             value="#{noticeOfViolationBB.editModeNOVType ? 'Save changes':'Edit'}"
+                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                             icon="fa #{noticeOfViolationBB.editModeNOVType ? 'fa-check' : 'fa-pencil'}"
+                             actionListener="#{noticeOfViolationBB.onToggleEditModeNOVType}"
+                             oncomplete="PF('novtype-addedit-dialog-var').show();"
+                             update="@form
+                             @form:@parent:novtype-list-form
+                             nov-growl-form"/>
+
+            <div class="gray_button">
+
+                <p:commandButton id="inspections-inspectiondetails-abort"
+                                 value="Cancel"
+                                 styleClass="gray-button"
+                                 rendered="#{noticeOfViolationBB.editModeNOVType}"
+                                 icon="fa fa-stop"
+                                 actionListener="#{noticeOfViolationBB.onNOVTypeEditAbort}"
+                                 oncomplete="PF('novtype-addedit-dialog-var').show();"
+                                 update="@form
+                                 @form:@parent:nov-growl-form"/>
+            </div>
+
+
+
+            <p:spacer height="5px"/>
+
+            <p:panel id="novtype-addedit-panel"
+                     toggleable="true"
+                     collapsed="false"
+                     header="General">
+
+                <div class="p-grid">
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="ID" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.typeID == 0 ? 'New record':noticeOfViolationBB.currentNOVType.typeID}" 
+                                      rendered="true"/>
+                    </div>
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Title" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.title}" 
+                                      rendered="#{!noticeOfViolationBB.editModeNOVType}"/>
+
+                        <p:inputText value="#{noticeOfViolationBB.currentNOVType.title}" 
+                                     style="width:100%" 
+                                     rendered="#{noticeOfViolationBB.editModeNOVType}"/>
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Description" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.description}" 
+                                      rendered="#{!noticeOfViolationBB.editModeNOVType}"/>
+
+                        <p:inputText value="#{noticeOfViolationBB.currentNOVType.description}" 
+                                     style="width:100%" 
+                                     rendered="#{noticeOfViolationBB.editModeNOVType}"/>
+
+                    </div>
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Default follow-up window" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.followUpWindowDays}" 
+                                      rendered="#{!noticeOfViolationBB.editModeNOVType}"/>
+
+                        <p:inputNumber value="#{noticeOfViolationBB.currentNOVType.followUpWindowDays}" 
+                                     style="width:100%" 
+                                     rendered="#{noticeOfViolationBB.editModeNOVType}"/>
+
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Event Category: Letter Sent" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.eventCatSent.eventCategoryTitle} (ID:#{noticeOfViolationBB.currentNOVType.eventCatSent.categoryID})" 
+                                      rendered="#{!empty noticeOfViolationBB.currentNOVType.eventCatSent}"/>
+
+                        <p:commandLink  id="novtype-eventcat-choose-sent-cl" 
+                                        ajax="true"
+                                        actionListener="#{noticeOfViolationBB.onChooseEventCatInit}"
+                                        value="choose event category"
+                                        style="color:blue; font-weight: bold;"
+                                        oncomplete="PF('novtype-eventcats-dialog-var').show();"
+                                        update="novtype-eventcats-form"
+                                        rendered="#{noticeOfViolationBB.editModeNOVType}" >
+                            <f:param name="novtype-eventcat-field" 
+                                     value="sent" />
+                        </p:commandLink>
+
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Event Category: Letter Follow-up" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.eventCatFollowUp.eventCategoryTitle} (ID:#{noticeOfViolationBB.currentNOVType.eventCatFollowUp.categoryID})" 
+                                      rendered="#{!empty noticeOfViolationBB.currentNOVType.eventCatFollowUp}"/>
+
+                        <p:spacer height="3px" />
+                        <p:commandLink  id="novtype-eventcat-followup-sent-cl" 
+                                        ajax="true"
+                                        actionListener="#{noticeOfViolationBB.onChooseEventCatInit}"
+                                        value="choose event category"
+                                        style="color:blue; font-weight: bold;"
+                                        oncomplete="PF('novtype-eventcats-dialog-var').show();"
+                                        update="novtype-eventcats-form"
+                                        rendered="#{noticeOfViolationBB.editModeNOVType}">
+                            <f:param name="novtype-eventcat-field" 
+                                     value="followup" />
+                        </p:commandLink>
+
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Event Category: Letter Returned" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.eventCatReturned.eventCategoryTitle} (ID:#{noticeOfViolationBB.currentNOVType.eventCatReturned.categoryID})" 
+                                      rendered="#{!empty noticeOfViolationBB.currentNOVType.eventCatReturned}"/>
+
+                        <p:spacer height="3px" />
+                        <p:commandLink  id="novtype-eventcat-choose-returned-cl" 
+                                        ajax="true"
+                                        actionListener="#{noticeOfViolationBB.onChooseEventCatInit}"
+                                        value="choose event category"
+                                        style="color:blue; font-weight: bold;"
+                                        oncomplete="PF('novtype-eventcats-dialog-var').show();"
+                                        update="novtype-eventcats-form"
+                                        rendered="#{noticeOfViolationBB.editModeNOVType}" >
+                            <f:param name="novtype-eventcat-field" 
+                                     value="returned" />
+                        </p:commandLink>
+
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Text block category" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.textBlockCategory.title} (ID:#{noticeOfViolationBB.currentNOVType.textBlockCategory.categoryID})"
+                                      rendered="#{!noticeOfViolationBB.editModeNOVType and !empty noticeOfViolationBB.currentNOVType.textBlockCategory}" />
+                        <p:selectOneMenu 
+                            id="novtype-textblockcat-som" 
+                            tabindex="1"
+                            value="#{noticeOfViolationBB.currentNOVType.textBlockCategory}"
+                            required="false"
+                            rendered="#{noticeOfViolationBB.editModeNOVType}">
+
+                            <f:selectItem itemLabel="select a text block category..." 
+                                          noSelectionOption="true" 
+                                          itemDisabled="true"/>
+                            <f:selectItems value="#{noticeOfViolationBB.blockCatList}" 
+                                           var="tbc" 
+                                           itemLabel="#{tbc.title} (ID:#{tbc.categoryID})"/>
+                            <f:converter converterId="textBlockCategoryConverter" />
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Print style" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.printStyle.description} (ID:#{noticeOfViolationBB.currentNOVType.printStyle.styleID})"
+                                      rendered="#{!noticeOfViolationBB.editModeNOVType and !empty noticeOfViolationBB.currentNOVType.printStyle}" />
+
+                        <p:selectOneMenu 
+                            id="novtype-printstyle-som" 
+                            tabindex="1"
+                            value="#{noticeOfViolationBB.currentNOVType.printStyle}"
+                            required="false"
+                            rendered="#{noticeOfViolationBB.editModeNOVType}">
+
+                            <f:selectItem itemLabel="select a print style..." 
+                                          noSelectionOption="true" 
+                                          itemDisabled="true"/>
+                            <f:selectItems value="#{noticeOfViolationBB.printStyleList}" 
+                                           var="pstyle" 
+                                           itemLabel="#{pstyle.description} (ID:#{pstyle.styleID})"/>
+                            <f:converter converterId="printStyleConverter" />
+                        </p:selectOneMenu>
+
+
+
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Header photo" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.novHeaderBlob.title} (ID:#{noticeOfViolationBB.currentNOVType.novHeaderBlob.photoDocID})"
+                                      rendered="#{!noticeOfViolationBB.editModeNOVType and !empty noticeOfViolationBB.currentNOVType.novHeaderBlob}" />
+
+                        <p:graphicImage     id="headerphoto-preview"
+                                            value="#{blobsterBB.image}"
+                                            alt="no preview available" 
+                                            style="width: 50px; margin-right: 10px;" 
+                                            cache="false"
+                                            rendered="#{!empty noticeOfViolationBB.currentNOVType.novHeaderBlob}">
+                            <f:param name="blobid" value="#{noticeOfViolationBB.currentNOVType.novHeaderBlob.photoDocID}"/>
+                        </p:graphicImage>
+
+                        <p:commandLink  id="novtype-chooseheader-cl" 
+                                        ajax="true"
+                                        actionListener="#{noticeOfViolationBB.onNOVTypeHeaderImageSelectInit}"
+                                        value="choose header image"
+                                        style="color:blue; font-weight: bold;"
+                                        process="@none"
+                                        oncomplete="PF('novtype-headerimage-dialog-var').show();"
+                                        update="novtype-headerimage-form"
+                                        rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions and noticeOfViolationBB.editModeNOVType}"/>
+
+
+
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Municipality" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.muni.muniName} (Code:#{noticeOfViolationBB.currentNOVType.muni.muniCode})"
+                                      rendered="#{!noticeOfViolationBB.editModeNOVType and !empty noticeOfViolationBB.currentNOVType.muni}" />
+                        <p:selectOneMenu 
+                            id="novtype-munilist-som" 
+                            tabindex="1"
+                            value="#{noticeOfViolationBB.currentNOVType.muni}"
+                            required="false"
+                            rendered="#{noticeOfViolationBB.editModeNOVType}">
+
+                            <f:selectItem itemLabel="select a municipality..." 
+                                          noSelectionOption="true" 
+                                          itemDisabled="true"/>
+                            <f:selectItems value="#{systemServicesBB.municipalityListForSearch}" 
+                                           var="muni" 
+                                           itemLabel="#{muni.muniName}"/>
+                            <f:converter converterId="muniConverter" />
+                        </p:selectOneMenu>
+
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Court Document" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.courtDocument ? 'Yes':'No'}" 
+                                      rendered="#{!noticeOfViolationBB.editModeNOVType}" />
+                        <p:selectBooleanCheckbox value="#{noticeOfViolationBB.currentNOVType.courtDocument}"
+                                                 rendered="#{noticeOfViolationBB.editModeNOVType}"  />
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Inject violations" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.injectViolations? 'Yes':'No'}" 
+                                      rendered="#{!noticeOfViolationBB.editModeNOVType}" />
+                        <p:selectBooleanCheckbox value="#{noticeOfViolationBB.currentNOVType.injectViolations}"
+                                                 rendered="#{noticeOfViolationBB.editModeNOVType}"  />
+
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Record status" />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{empty noticeOfViolationBB.currentNOVType.deactivatedTS? 'Active':'Deactivated'}" 
+                                      rendered="#{!noticeOfViolationBB.editModeNOVType}" />
+
+                    </div>
+
+                </div>
+            </p:panel>
         </h:form>
-        <hr />
+    </p:dialog>
 
-        <h:form id="nov-template-form">
-            <h2>NOV Template Editor</h2>
+    <p:dialog id="novtype-eventcats-dialog"
+              modal="true"
+              height="500" 
+              width="800"
+              widgetVar="novtype-eventcats-dialog-var"
+              closable="true"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="true"
+              dynamic="true"
+              header="Choose an event category for NOV Type #{noticeOfViolationBB.currentNOVType.title}"
+              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+              >
+
+        <h:form id="novtype-eventcats-form">
+
+            <h4>
+
+                <h:outputText value="Choose an event category to create for letter operation: #{noticeOfViolationBB.currentNovTypeEventCatField}" />
+            </h4>
+
+            <p:selectOneListbox id="eventtype-solb"
+                                required="false"
+                                value="#{noticeOfViolationBB.eventTypeSelected}"
+                                >
+
+                <p:ajax         listener="#{noticeOfViolationBB.onEventTypeListChange}"
+                                update="@form
+                                evcat-table"/>
+
+                <f:selectItems value="#{noticeOfViolationBB.eventTypeCandidateList}"
+                               var="et" 
+                               itemLabel="#{et.label}"
+                               itemValue="#{et}"/>
+            </p:selectOneListbox>
 
             <p:spacer height="5px" />
-            <p:outputLabel id="tempblockID-ol">
-                <h:outputText value="You are editing template id: #{noticeOfViolationBB.currentTemplateBlock.blockID}"/>
-            </p:outputLabel>
-            <p:spacer height="4px" />
-            <p:outputLabel for="tempblockNameIT">
-                <h:outputText value="Template Name"/>
-            </p:outputLabel>
-            <p:inputText id="tempblockNameIT" value="#{noticeOfViolationBB.currentTemplateBlock.textBlockName}"
-                         style="width: 80%;" tabindex="4" required="true" styleClass="inputText"/>
-            <h:message for="tempblockNameIT" showDetail="false" showSummary="true"
-                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
 
-            <p>
-                Include these exact characters where you want the violation list inserted: ***VIOLATIONS***
+            <h:outputText value="Choose a Category"/>
+
+            <p:spacer height="5px" />
+
+            <p:dataTable id="evcat-table"
+                         value="#{noticeOfViolationBB.eventCatCandidateList}"
+                         var="evcat"
+                         rowKey="#{evcat.categoryID}">
+
+
+                <p:column style="width:40%">
+                    <f:facet name="header">
+                        <h:outputText value="Category Title" />
+                    </f:facet>
+                    <h:outputText value="#{evcat.eventCategoryTitle}" />
+                </p:column>
+
+                <p:column style="width:40%">
+                    <f:facet name="header">
+                        <h:outputText value="Actions" />
+                    </f:facet>
+
+                    <h:outputText value="(ID: #{evcat.categoryID})" />
+
+                    <p:spacer height="3px" />
+
+                    <p:commandLink  id="evcat-select-cl" 
+                                    ajax="true"
+                                    actionListener="#{noticeOfViolationBB.onChooseEventCatCommit(evcat)}"
+                                    value="select"
+                                    style="color:blue; font-weight: bold;"
+                                    oncomplete="PF('novtype-eventcats-dialog-var').hide();"
+                                    update="novtype-addedit-form
+                                    nov-growl-form"
+                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </p:dialog>
+
+    <p:dialog id="novtype-headerimage-dialog"
+              modal="true"
+              height="500" 
+              width="800"
+              widgetVar="novtype-headerimage-dialog-var"
+              closable="true"
+              closeOnEscape="true"
+              responsive="true"
+              resizable="true"
+              dynamic="true"
+              header="Change the header photo on NOV Type: #{noticeOfViolationBB.currentNOVType.title}"
+              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+              >
+
+        <h:form id="novtype-headerimage-form">
+            <p>These are image and doucments attached to your current Municipality's office parcel: 
+                <br />
+                <h:outputText value="#{systemServicesBB.bbSessionMuni.muniPropertyDH.address.addressPretty2LineEscapeFalse}"
+                              escape="false" />
+
             </p>
 
-            <p:textEditor  id="nov-template-editor"
-                           value="#{noticeOfViolationBB.currentTemplateBlock.textBlockText}"
-                           secure="false"
-                           height="700"/>
+            <p:spacer height="5px" />
+
+            <p:dataTable id="novtype-blob-table"
+                         value="#{noticeOfViolationBB.novHeaderImageCandidateList}"
+                         var="headblob"
+                         rowKey="#{headblob.photoDocID}"
+                         resizableColumns="true"
+                         >
+
+                <p:column headerText="PhotoDoc ID"
+                          style="width:5%;">
+                    <h:outputText value="#{headblob.photoDocID}" />
+                </p:column>
+                <p:column headerText="Blob ID"
+                          style="width:5%;">
+                    <h:outputText value="#{headblob.bytesID}" />
+                </p:column>
+
+                <p:column headerText="Type"
+                          style="width:10%;">
+                    <h:outputText value="#{headblob.type.title}" />
+                </p:column>
+                <p:column headerText="Timestamp"
+                          style="width:15%;">
+                    <h:outputText value="#{headblob.createdTS}" />
+                </p:column>
+                <p:column headerText="Title / Descr"
+                          style="width:20%;">
+                    <h:outputText value="#{headblob.title}" />
+                    <p:spacer height="5px" />
+                    <h:outputText value="#{headblob.description}" />
+                </p:column>
+                <p:column headerText="Preview"
+                          style="width:30%;">
+                    <p:graphicImage value="#{blobsterBB.image}"
+                                    alt="no preview available" 
+                                    style="width: 150px" 
+                                    cache="false"
+                                    rendered="#{headblob.type.browserViewable}">
+                        <f:param name="blobid" value="#{headblob.photoDocID}"/>
+                    </p:graphicImage>
+
+                    <h:outputText value="no preview available; download to view"
+                                  rendered="#{!headblob.type.browserViewable}" />
+                </p:column>
+                <p:column headerText="Actions"
+                          style="width:15%;">
 
 
-            <p:commandButton
-                id="nov-template-update"
-                value="Save changes"
-                ajax="true" icon="fa fa-check"
-                styleClass="buttonOwnLine" tabindex="6"
-                disabled="#{noticeOfViolationBB.currentTemplateBlock.blockID == 0}"
-                actionListener="#{noticeOfViolationBB.onTemplateUpdateButtonChange}"
-                update="nov-template-select-form
-                nov-growl-form"/>
+                    <p:commandLink id="headblob-select-cl"
+                                   actionListener="#{noticeOfViolationBB.onNOVTypeHeaderImageSelectBlobLinkClick(headblob)}"
+                                   value="select as header"
+                                   style="color:blue; font-weight: bold;"
+                                   rendered="true"
+                                   update="nov-growl-form
+                                   novtype-addedit-form" 
+                                   oncomplete="PF('novtype-headerimage-dialog-var').hide();"/>
 
-
-            <p:commandButton
-                id="nov-template-insert"
-                value="Insert new template"
-                ajax="true" icon="fa fa-check"
-                styleClass="buttonOwnLine" tabindex="6"
-                disabled="#{noticeOfViolationBB.currentTemplateBlock.blockID != 0}"
-                actionListener="#{noticeOfViolationBB.onTemplateInsertButtonChange}"
-                update="nov-template-select-form
-                nov-growl-form"/>
-
-            <p:commandButton    id="nov-template-manage-cancel"
-                                ajax="true"
-                                tabindex="27"
-                                value="Cancel"
-                                process="@none"
-                                icon="fa fa-stop"
-                                immediate="true"
-                                onclick="PF('nov-template-dialog-var').hide()"
-                                />
+                </p:column>
+            </p:dataTable>
         </h:form>
-
     </p:dialog>
 
 
-    <p:dialog   id="nov-template-view-dialog"
-                height="600" width="800"
-                widgetVar="nov-template-view-dialog-var"
-                closable="true"
-                dynamic="true"
-                modal="true"
-                closeOnEscape="true"
-                responsive="true"
-                resizable="true"
-                header="View template #{noticeOfViolationBB.currentTemplateBlock.textBlockName} (ID:#{noticeOfViolationBB.currentTemplateBlock.blockID}) "
-                >
 
-        <h:form id="nov-template-view-form">
+    <!--p:dialog|permit-nullify-confirm-dialog-->
+    <p:dialog id="novtype-deactivate-confirm-dialog"
+              widgetVar="novtype-deactivate-confirm-dialog-var"
+              header="Confirm Letter Type Deactivation"
+              closable="true"
+              closeOnEscape="true">
 
+        <h:form id="novtype-dectivate-form">
 
-
-            <h:outputText id="nov-template-view-ot"
-                          value="#{noticeOfViolationBB.currentTemplateBlock.textBlockText}"
-                          escape="false" />
+            <p>This deactivation option cannot be undone through the web interface.</p>
+            <p:spacer height="3px" />
+            <p:commandButton  id="novtype-deactivate-commit-button" 
+                              ajax="true"
+                              actionListener="#{noticeOfViolationBB.onDeactivateNOVTypeCommit}"
+                              value="Commit deactivation of letter type ID:#{noticeOfViolationBB.currentNOVType.typeID}"
+                              icon="fa fa-trash"
+                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                              update="novtype-list-form"
+                              oncomplete="PF('novtype-deactivate-confirm-dialog-var').hide();"/>
 
         </h:form>
-
     </p:dialog>
+
+    <!--end NOVTYPE-->
+
 
 
     <p:confirmDialog id= "howto-violation-add-panel"

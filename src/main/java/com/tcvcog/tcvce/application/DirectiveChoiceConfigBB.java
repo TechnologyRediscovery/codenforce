@@ -81,10 +81,10 @@ public class DirectiveChoiceConfigBB extends BackingBeanUtils implements Seriali
         EventCoordinator ec = getEventCoordinator();
         WorkflowCoordinator wc = getWorkflowCoordinator();
         eventTypeListAll = ec.getEventTypesAll();
-        eventCategoryListAllActive = ec.assembleEventCategoryListActiveOnly(ec.getEventCategoryList());
         
         try {
             setEventRuleSetList(wc.rules_getEventRuleSetList());
+        eventCategoryListAllActive = ec.assembleEventCategoryListActiveOnly(ec.getEventCategoryList());
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

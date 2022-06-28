@@ -31,6 +31,7 @@ import com.tcvcog.tcvce.entities.PageModeEnum;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyDataHeavy;
+import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
@@ -72,6 +73,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
     private List<Property> bbSessionPropertyList;
     
     private List<PageModeEnum> pageModeOptions;
+    private List<RoleType> sessRoleTypes;
     
     
     // *************************************************************************
@@ -126,6 +128,7 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
             userListForSearch = uc.user_assembleUserListForSearch(sb.getSessUser());
             propertyListForSearch = sb.getSessPropertyList();
             personListForSearch = sb.getSessPersonList();
+            sessRoleTypes = Arrays.asList(RoleType.values());
             
             if(bbSessionUser != null){
                 municipalityListForSearch = bbSessionUser.getAuthMuniList();
@@ -538,6 +541,20 @@ public class SystemServicesBB extends BackingBeanUtils implements Serializable{
      */
     public void setSourceList(List<BOBSource> sourceList) {
         this.sourceList = sourceList;
+    }
+
+    /**
+     * @return the sessRoleTypes
+     */
+    public List<RoleType> getSessRoleTypes() {
+        return sessRoleTypes;
+    }
+
+    /**
+     * @param sessRoleTypes the sessRoleTypes to set
+     */
+    public void setSessRoleTypes(List<RoleType> sessRoleTypes) {
+        this.sessRoleTypes = sessRoleTypes;
     }
 
     

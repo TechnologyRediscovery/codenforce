@@ -34,6 +34,7 @@ public  class NoticeOfViolation
         Comparable<NoticeOfViolation> {
     
     private int noticeID;
+    private NoticeOfViolationType novType;
     
     /**
      * Not deprecated with humanization
@@ -102,6 +103,7 @@ public  class NoticeOfViolation
     private EventCnF followupEvent;
     
     private boolean active;
+    
     
 
     @Override
@@ -727,6 +729,20 @@ public  class NoticeOfViolation
      */
     public void setRecipientMailingAddress(MailingAddress recipientMailingAddress) {
         this.recipientMailingAddress = recipientMailingAddress;
+    }
+
+    /**
+     * @return the novType
+     */
+    public NoticeOfViolationType getNovType() {
+        return novType;
+    }
+
+    /**
+     * @param novType the novType to set
+     */
+    public void setNovType(NoticeOfViolationType novType) {
+        this.novType = novType;
     }
 
    

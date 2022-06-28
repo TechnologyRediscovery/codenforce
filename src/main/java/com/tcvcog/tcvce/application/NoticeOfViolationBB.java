@@ -32,26 +32,40 @@ import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 
 /**
- *
+ * Premier backing bean for Notices of Violation, which are now called 
+ * generically "Letters"
  * @author ellen bascomb of apt 31y
  */
 public class NoticeOfViolationBB extends BackingBeanUtils implements Serializable {
 
     private CECaseDataHeavy currentCase;
-    private boolean draftNoticeLoaded;
 
     private NoticeOfViolation currentNotice;
     private List<CodeViolation> activeVList;
     private CodeViolation currentViolation;
 
     private Person noticePerson;
-
     private String formNoteText;
 
     private boolean useManualTextBlockMode;
     
     private List<TextBlock> blockList;
-    private List<String> blockCatList;
+    private List<TextBlockCategory> blockCatList;
+    
+    final static String NOV_TYPE_EVCAT_PARAM = "novtype-eventcat-field";
+    private String currentNovTypeEventCatField;
+    
+    private NoticeOfViolationType currentNOVType;
+    private List<NoticeOfViolationType> novTypeList;
+    private boolean editModeNOVType;
+    private List<PrintStyle> printStyleList;
+    private List<EventType> eventTypeCandidateList;
+    private EventType eventTypeSelected;
+    private List<EventCategory> eventCatCandidateList;
+    private List<BlobLight> novHeaderImageCandidateList;
+    private NoticeOfViolationType selectedNOVType;
+    private boolean showTextBlocksAllMuni;
+    private boolean showTextBlocksAllCategories;
     
     private List<TextBlock> injectableBlockList;
     private TextBlock currentTemplateBlock;
@@ -71,7 +85,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     private Person retrievedManualLookupPerson;
     private int recipientPersonID;
 
-    private boolean showTextBlocksAllMuni;
 
     private List<ViewOptionsActiveListsEnum> viewOptionList;
     private ViewOptionsActiveListsEnum selectedViewOption;
@@ -82,17 +95,10 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     
     private List<TextBlock> filteredBlockList;
-    
     private TextBlock selectedBlock;
     
-    private HashMap<String, Integer> categoryList;
     
-    private Municipality formMuni;
     
-    private String formBlockName;
-    private String formBlockText;
-    private int formCategoryID;
-    private int formBlockOrder;
 
     /**
      * Creates a new instance of NoticeOfViolationBB
@@ -101,13 +107,17 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     }
 
+    /**
+     * Sets up bean members based on the session's current CECase
+     */
     @PostConstruct
     public void initBean() {
         CaseCoordinator cc = getCaseCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
-        CaseIntegrator ci = getCaseIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        EventCoordinator evc = getEventCoordinator();
         
-//        currentNotice = getSessionBean().getSessNotice();
+        currentNotice = getSessionBean().getSessNotice();
        
         refreshCurrentCase();
 
@@ -118,32 +128,16 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         Municipality m = getSessionBean().getSessMuni();
         
         try {
-            injectableBlockList = ci.getTextBlockTemplates(m);
-            if(currentTemplateBlock == null){
-                if(injectableBlockList != null && !injectableBlockList.isEmpty()){
-                    currentTemplateBlock = injectableBlockList.get(0);
-                } else {
-                    currentTemplateBlock = cc.nov_getTemplateBlockSekeleton(getSessionBean().getSessMuni());
-                }
-            } 
-            if (blockList == null) {
-                if (showTextBlocksAllMuni) {
-                    blockList = ci.getAllTextBlocks();
-                } else {
-                    blockList = ci.getTextBlocks(m);
-                }
-            }
-            blockCatIDMap = ci.getTextBlockCategoryMap();
-            if(blockCatIDMap != null && !blockCatIDMap.isEmpty()){
-                blockCatList = new ArrayList<>(blockCatIDMap.keySet());
-                if(blockCatList != null && !blockCatList.isEmpty()){
-                    selectedBlockTemplate = blockCatList.get(0);
-                }
-            }
-        } catch (IntegrationException ex) {
+            blockCatList = sc.getTextBlockCategoryListComplete();
+           
+            novTypeList = cc.nov_getNOVTypeList(null);
+            eventCatCandidateList = evc.getEventCategeryList(EventType.Notice);
+            printStyleList = sc.getPrintStyleList();
+        } catch (IntegrationException  | BObStatusException | BlobException  ex) {
             System.out.println(ex);
-        }
+        } 
       
+        
         nov_createNoticeFollowupEvent = true;
         
         UserCoordinator uc = getUserCoordinator();
@@ -172,91 +166,350 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             System.out.println("NoticeOfViolationBuilderBB.initbean "
                     + "| person candidate list size: " + personCandidateList.size());
         }
-        
     }
     
-    // MIGRATED FROM TEXT BLOCK BB
-      public String updateTextBlock(){
-        CaseIntegrator ci = getCaseIntegrator();
-        if(selectedBlock != null){
-            try {
-                ci.updateTextBlock(selectedBlock);
-                 getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,  
-                            "Success! Updated text block id " + selectedBlock.getBlockID(), ""));
-            } catch (IntegrationException ex) {
-                 getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,  
-                            "Please select a text block and try again", ""));
-            }
-        } else {
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, 
-                            "Please select a text block and try again", ""));
-            
-        }
-        // clear block list so the page reload forces a DB SELECT 
-        blockList = null;
-        return "";
-    }
-    
-    public String addNewTextBlock(){
-        CaseIntegrator ci = getCaseIntegrator();
-        TextBlock newBlock = new TextBlock();
-        newBlock.setMuni(getFormMuni());
-        newBlock.setTextBlockCategoryID(getFormCategoryID());
-        newBlock.setTextBlockName(getFormBlockName());
-        newBlock.setTextBlockText(getFormBlockText());
-        newBlock.setPlacementOrder(getFormBlockOrder());
-        
-        try {
-            ci.insertTextBlock(newBlock);
-            getFacesContext().addMessage(null,
-               new FacesMessage(FacesMessage.SEVERITY_INFO,  
-                       "Success! Added a new text block named " + getFormBlockName() + "to the db!", ""));
-        } catch (IntegrationException ex) {
-            getFacesContext().addMessage(null,
-               new FacesMessage(FacesMessage.SEVERITY_ERROR,  
-                       ex.getMessage(), ""));
-            
-        }
-        blockList = null;
-        return "";
-    }
-    
-    public String nukeTextBlock(){
-        CaseIntegrator ci = getCaseIntegrator();
-        if(selectedBlock != null){
-            try {
-                ci.deleteTextBlock(selectedBlock);
-                 getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,  
-                            "Success! Nuked block id " + selectedBlock.getBlockID(), ""));
-            } catch (IntegrationException ex) {
-                 getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,  ex.getMessage(), ""));
-            }
-        } else {
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_WARN, 
-                            "Please select a text block and try again", ""));
-        }
-        blockList = null;
-        return "";
-    }
-
     /**
-     * @return the blockList
+     * listener for type change
+     * @param ev 
      */
-    public List<TextBlock> getBlockList() {
-        CaseIntegrator ci = getCaseIntegrator();
-        if(blockList == null){
+    public void onNOVTypeChangeInit(ActionEvent ev){
+        System.out.println("NoticeOfViolationBB.onNOVTypeChangeInit");
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            novTypeList =cc.nov_getNOVTypeList(getSessionBean().getSessMuni());
+        } catch (IntegrationException | BlobException ex) {
+            System.out.println(ex);
+        } 
+        
+        
+    }
+    
+    /**
+     * Listener for type change commit requests
+     * @param ev 
+     */
+    public void onNOVTypeChangeCommit(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        if(currentNotice != null){
+            currentNotice.setNovType(selectedNOVType);
             try {
-                blockList = ci.getAllTextBlocks();
+                cc.nov_update(currentNotice);
+                currentNotice = cc.nov_getNoticeOfViolation(currentNotice.getNoticeID());
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "You Lucky Duck: Updated of letter type: Success!", ""));
+            } catch (IntegrationException | BObStatusException | BlobException ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Could not update this letter's type due to a fatal error.", ""));
+            }
+        }
+    }
+    
+    /**
+     * Listener to start the NOV type manage process
+     * @param ev 
+     */
+    public void onNOVTypeManageButtonClick(ActionEvent ev){
+        System.out.println("NoticeOfViolationBB.onNOVTypeManageButtonClick");
+        refreshCurrentNOVTypeAndList();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        BlobCoordinator bc = getBlobCoordinator();
+        try {
+            novHeaderImageCandidateList = bc.getBlobLightList(getSessionBean().getSessMuni().getMuniPropertyDH());
+        } catch (BObStatusException | BlobException | IntegrationException  ex) {
+            System.out.println(ex);
+        } 
+        
+    }
+    
+    /**
+     * Gets our total NOV type list showing all munis
+    */
+    private void refreshCurrentNOVTypeAndList(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            if(currentNOVType != null && currentNOVType.getTypeID() != 0){
+                currentNOVType = cc.nov_getNOVType(currentNOVType.getTypeID());
+            }
+            novTypeList = cc.nov_getNOVTypeList(null);
+            System.out.println("NoticeOfViolationBB.refreshCurrentNOVTypeAndList");
+        } catch (IntegrationException | BlobException ex) {
+            System.out.println(ex);
+        }
+        
+    }
+    
+    /**
+     * Listener for user requests to view an NOVType
+     * @param novt 
+     */
+    public void onNOVTypeView(NoticeOfViolationType novt){
+        currentNOVType = novt;
+        editModeNOVType = false;
+    }
+    
+    /**
+     * Listener for user requesets to edit an NOV type
+     * @param novt 
+     */
+    public void onNOVTypeEdit(NoticeOfViolationType novt){
+        currentNOVType = novt;
+        editModeNOVType = true;
+    }
+    
+    /**
+     * Toggles the NOV record edit mode
+     * @param ev 
+     */
+    public void onToggleEditModeNOVType(ActionEvent ev){
+        System.out.println("NoticeOfViolationBB.onToggleEditModeNOVType | incoming edit mode: " + editModeNOVType);
+        if(editModeNOVType){
+            if(currentNOVType != null){
+                if(currentNOVType.getTypeID() == 0){
+                    insertCommitNOVType();
+                } else {
+                    updateCurrentNOVType();
+                }
+            }
+        } else {
+            // do nothing
+        }
+        
+        editModeNOVType = !editModeNOVType;
+        
+        
+    }
+    
+    /**
+     * Starts the NOV type creation process
+     * @param ev 
+     */
+    public void onNOVTypeAddInitButtonChange(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        SystemCoordinator sc = getSystemCoordinator();
+        currentNOVType = cc.nov_getNoticeOfViolationTypeSkeleton();
+        currentNOVType.setMuni(getSessionBean().getSessMuni());
+        try {
+            blockCatList = sc.getTextBlockCategoryListComplete();
+        } catch (IntegrationException | BObStatusException ex) {
+            System.out.println(ex);
+        } 
+        editModeNOVType = true; 
+        
+    }
+    
+    /**
+     * Internal update method for NOV types
+     */
+    private void updateCurrentNOVType(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.nov_updateNOVType(currentNOVType);
+            refreshCurrentNOVTypeAndList();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Successfully updated a new letter type with ID: " + currentNOVType.getTypeID(), ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Could not update a letter type with ID: " + currentNOVType.getTypeID(), ""));
+        } 
+        
+        
+    }
+    
+    /**
+     * Internal insertion method for NOV types
+     */
+    private void insertCommitNOVType(){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            
+            int freshid = cc.nov_insertNOVType(currentNOVType);
+            currentNOVType.setTypeID(freshid);
+            refreshCurrentNOVTypeAndList();
+            getFacesContext().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Successfully added a new letter type with ID: " + currentNOVType.getTypeID(), ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Could not insert a new letter type!", ""));
+        } 
+    }
+    
+    /**
+     * Listener for user requests to start the NOV type deac process
+     * @param novt 
+     */
+    public void onDeactivateNOVTypeInit(NoticeOfViolationType novt){
+        currentNOVType = novt;
+        
+    }
+    
+    /**
+     * Listener for user requests to complete the nov type deac process
+     * @param ev 
+     */
+    public void onDeactivateNOVTypeCommit(ActionEvent ev){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            cc.nov_deactivateNOVType(currentNOVType);
+            refreshCurrentNOVTypeAndList();
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Successfully deactivated a letter type with ID: " + currentNOVType.getTypeID(), ""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Could not deactivated letter type with ID: " + currentNOVType.getTypeID(), ""));
+            
+        } 
+        
+    }
+    
+    /**
+     * Listener for user requests to stop editing an NOV type
+     * @param ev 
+     */
+    public void onNOVTypeEditAbort(ActionEvent ev){
+        editModeNOVType = false;
+    }
+    
+    /**
+     * Listener for use requests to start the header image select process
+     * @param ev 
+     */
+    public void onNOVTypeHeaderImageSelectInit(ActionEvent ev){
+        System.out.println("Header Image select start");
+    }
+    
+    /**
+     * Listener for user requests to select a blob for use as a header image
+     * on an NOV
+     * @param bl 
+     */
+    public void onNOVTypeHeaderImageSelectBlobLinkClick(BlobLight bl){
+        if(currentNOVType != null){
+            currentNOVType.setNovHeaderBlob(bl);
+            
+        }
+    }
+    
+    /**
+     * Listener for user changes to the NOV type drop down box
+     * @param ev 
+     */
+    public void onNOVTypeChange(){
+        if(currentNotice != null && currentNotice.getNovType() != null){
+            SystemCoordinator sc = getSystemCoordinator();
+            
+            try {
+                if (showTextBlocksAllMuni) {
+                    if(showTextBlocksAllCategories){
+                        blockList = sc.getTextBlockList(null, null);
+                    } else {
+                        blockList = sc.getTextBlockList(currentNotice.getNovType().getTextBlockCategory(), null);
+                    }
+                } else {
+                    if(showTextBlocksAllCategories){
+                        blockList = sc.getTextBlockList(null, getSessionBean().getSessMuni());
+                    } else {
+                        blockList = sc.getTextBlockList(currentNotice.getNovType().getTextBlockCategory(), getSessionBean().getSessMuni());
+                    }
+                }
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+            }
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Loaded text blocks for Letter type: " + currentNotice.getNovType().getTitle(),
+                               ""));
+            
+        }
+        if(blockList != null){
+            System.out.println("NoticeOfViolationBB.onNOVTypeChange | Block list size: " + blockList.size());
+        } else {
+            System.out.println("NoticeOfViolationBB.onNOVTypeChange | Block list null");
+        }
+        
+    }
+    
+    /**
+     * Listener to start the event cat choice process for NOV type events
+     * @param ev 
+     */
+    public void onChooseEventCatInit(ActionEvent ev){
+        EventCoordinator ec = getEventCoordinator();
+        currentNovTypeEventCatField = getFacesContext().getExternalContext().getRequestParameterMap().get(NOV_TYPE_EVCAT_PARAM);
+        
+        eventTypeCandidateList = ec.getEventTypesAll();
+         onEventTypeListChange();
+         
+        
+    }
+    
+    /**
+     * listener for user changes of the event type drop down
+     * @param et 
+     */
+    public void onEventTypeListChange(){
+        EventCoordinator ec = getEventCoordinator();
+        if(eventTypeCandidateList != null && !eventTypeCandidateList.isEmpty()){
+            try {
+                if(eventTypeSelected == null){
+                    eventTypeSelected = eventTypeCandidateList.get(0);
+                } 
+                eventCatCandidateList = ec.getEventCategeryList(eventTypeSelected);
+                
+                if(eventCatCandidateList != null && !eventCatCandidateList.isEmpty()){
+                    eventCatCandidateList = ec.assembleEventCategoryListActiveOnly(eventCatCandidateList);
+                    System.out.println("NoticeOfViolationBB.onEventTypeListChange | Candidate cat list size: " + eventCatCandidateList.size());
+                }
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
         }
+    }
+    
+    /**
+     * listener to finalize teh event cat choice process for NOV type events
+     * @param evcat 
+     */
+    public void onChooseEventCatCommit(EventCategory evcat){
+        System.out.println("NoticeOfViolationBB.chooseEventCatCommit | passed in cat id: " + evcat.getCategoryID() );
+        if(currentNovTypeEventCatField != null && currentNOVType != null){
+            switch(currentNovTypeEventCatField){
+                
+                case "sent":
+                    currentNOVType.setEventCatSent(evcat);
+                    break;
+                case "followup":
+                    currentNOVType.setEventCatFollowUp(evcat);
+                    break;
+                case "returned":
+                    currentNOVType.setEventCatReturned(evcat);
+                    break;
+                default:
+                    System.out.println("Unrecognized event cat field on NOV type");
+            }
+        } else {
+            System.out.println("Error on NOV event cat type setup");
+        }
+    }
+    
+    
+    
+    /**
+     * @return the blockList
+     */
+    public List<TextBlock> getBlockList() {
+   
         return blockList;
     }
 
@@ -277,31 +530,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         return selectedBlock;
     }
 
-    /**
-     * @return the categoryList
-     */
-    public HashMap<String, Integer> getCategoryList() {
-        CaseIntegrator ci = getCaseIntegrator();
-        try {
-            setCategoryList(ci.getTextBlockCategoryMap());
-            System.out.println("TextBlockBB.getCategoryMap | isempty: " + categoryList.isEmpty());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-        }
-        return categoryList;
-    }
-
+   
  
-    
-    /**
-     * Listener for user requests to go back to case
-     * @return 
-     */
-    public String onBackToCaseButtonChange(){
-        return "ceCaseSearchProfile";
-        
-    }
-    
+ 
     /**
      * Primary listener method which copies a reference to the selected user
      * from the list and sets it on the selected user perch
@@ -313,7 +544,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         if (nov != null) {
             getSessionBean().setSessNotice(nov);
             currentNotice = nov;
-            refreshCurrentCase();
+            
             
             System.out.println("NoticeOfViolationBB.onObjectViewButtonChange: " + nov.getNoticeID());
         }
@@ -536,9 +767,15 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     
     public void onStartNewNoticeButtonChange(ActionEvent ev){
         onModeInsertInit();
-        getFacesContext().addMessage(null,
-               new FacesMessage(FacesMessage.SEVERITY_INFO,
-                       "Building a new notice; Next: Apply template", ""));
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            novTypeList = cc.nov_getNOVTypeList(getSessionBean().getSessMuni());
+            getFacesContext().addMessage(null,
+                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                           "Building a new notice; Next: Apply template", ""));
+        } catch (IntegrationException | BlobException ex) {
+            System.out.println(ex);
+        }
     }
     
     
@@ -828,15 +1065,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
 
 
-    public void deleteSelectedEvent() {
-
-    }
-    
-    public void onBlockManageInitButtonChange(ActionEvent ev){
-        // nothing to do!
-        
-    }
-
+ 
     /**
      * Listener for changes to text block template list selected items
      * @param tb
@@ -845,95 +1074,8 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         currentTemplateBlock = tb;
     }
     
-    /**
-     * Listener for user requests to delete text block
-     * @param tb 
-     */
-    public void onTemplateDeleteButtonChange(TextBlock tb){
-        System.out.println("NOVBB.deleteTemplate");
-        CaseIntegrator ci = getCaseIntegrator();
-        try {
-            ci.deleteTextBlock(tb);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Removed template!" + tb.getBlockID(), ""));
-             injectableBlockList = ci.getTextBlockTemplates(getSessionBean().getSessMuni());
-        } catch (IntegrationException ex) {
-            
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to delete template", ""));
-        }
-    }
-    
-    /**
-     * Listener for user reuqests to manage templates
-     * @param ev 
-     */
-    public void onTemplateManageInitButtonChange(ActionEvent ev){
-        CaseCoordinator cc = getCaseCoordinator();
-        // only load the a block automatically if not selected
-    }
-    
-    /**
-     * Listener for user requests to make a new template block
-     * @param ev 
-     */
-    public void onTemplateCreateButton(ActionEvent ev){
-        CaseCoordinator cc = getCaseCoordinator();
-        CaseIntegrator ci = getCaseIntegrator();
-        currentTemplateBlock = cc.nov_getTemplateBlockSekeleton(getSessionBean().getSessMuni());
-      
-        getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "New Template block created", ""));
-    }
-    
-    /**
-     * Listener for user requests to add a new template block
-     * @param ev 
-     */
-    public void onTemplateInsertButtonChange(ActionEvent ev){
-        CaseCoordinator cc = getCaseCoordinator();
-        CaseIntegrator ci = getCaseIntegrator();
-        try {
-            if(currentTemplateBlock != null){
-                ci.insertTextBlock(currentTemplateBlock);
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Inserted template !", ""));
-            } else {
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                "No block to insert!", ""));
-            }
-            injectableBlockList = ci.getTextBlockTemplates(getSessionBean().getSessMuni());
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not insert new text block", ""));
-        }
-    }
-    
-    /**
-     * Listener for user requests to update a template block
-     * @param ev 
-     */
-    public void onTemplateUpdateButtonChange(ActionEvent ev){
-        CaseIntegrator ci = getCaseIntegrator();
-        try {
-            ci.updateTextBlock(currentTemplateBlock);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Successfully updated template", ""));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Could not insert new text block", ""));
-        }
-    }
+   
+  
     
    
     /**
@@ -990,7 +1132,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
 
      /**
-      * Special getter for person links--I check the session beean's
+      * Special getter for person links--I check the session bean's
       * PersonLinkList to see if there is a new list to send to the UI
       * 
      * @return the recipientPersonCandidateList
@@ -1246,14 +1388,14 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * @return the blockCatList
      */
-    public List<String> getBlockCatList() {
+    public List<TextBlockCategory> getBlockCatList() {
         return blockCatList;
     }
 
     /**
      * @param blockCatList the blockCatList to set
      */
-    public void setBlockCatList(List<String> blockCatList) {
+    public void setBlockCatList(List<TextBlockCategory> blockCatList) {
         this.blockCatList = blockCatList;
     }
 
@@ -1299,40 +1441,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         this.currentTemplateBlock = currentTemplateBlock;
     }
 
-    /**
-     * @return the formMuni
-     */
-    public Municipality getFormMuni() {
-        return formMuni;
-    }
-
-    /**
-     * @return the formBlockName
-     */
-    public String getFormBlockName() {
-        return formBlockName;
-    }
-
-    /**
-     * @return the formBlockText
-     */
-    public String getFormBlockText() {
-        return formBlockText;
-    }
-
-    /**
-     * @return the formCategoryID
-     */
-    public int getFormCategoryID() {
-        return formCategoryID;
-    }
-
-    /**
-     * @return the formBlockOrder
-     */
-    public int getFormBlockOrder() {
-        return formBlockOrder;
-    }
+   
 
     /**
      * @param filteredBlockList the filteredBlockList to set
@@ -1348,49 +1457,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         this.selectedBlock = selectedBlock;
     }
 
-    /**
-     * @param categoryList the categoryList to set
-     */
-    public void setCategoryList(HashMap<String, Integer> categoryList) {
-        this.categoryList = categoryList;
-    }
-
-    /**
-     * @param formMuni the formMuni to set
-     */
-    public void setFormMuni(Municipality formMuni) {
-        this.formMuni = formMuni;
-    }
-
-    /**
-     * @param formBlockName the formBlockName to set
-     */
-    public void setFormBlockName(String formBlockName) {
-        this.formBlockName = formBlockName;
-    }
-
-    /**
-     * @param formBlockText the formBlockText to set
-     */
-    public void setFormBlockText(String formBlockText) {
-        this.formBlockText = formBlockText;
-    }
-
-    /**
-     * @param formCategoryID the formCategoryID to set
-     */
-    public void setFormCategoryID(int formCategoryID) {
-        this.formCategoryID = formCategoryID;
-    }
-
-    /**
-     * @param formBlockOrder the formBlockOrder to set
-     */
-    public void setFormBlockOrder(int formBlockOrder) {
-        this.formBlockOrder = formBlockOrder;
-    }
-
-   
+  
 
     /**
      * @return the draftNoticeLoaded
@@ -1403,12 +1470,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         return d;
     }
 
-    /**
-     * @param draftNoticeLoaded the draftNoticeLoaded to set
-     */
-    public void setDraftNoticeLoaded(boolean draftNoticeLoaded) {
-        this.draftNoticeLoaded = draftNoticeLoaded;
-    }
+   
 
     /**
      * @return the nov_createNoticeFollowupEvent
@@ -1475,6 +1537,160 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
      */
     public void setSelectedRecipAddr(MailingAddress selectedRecipAddr) {
         this.selectedRecipAddr = selectedRecipAddr;
+    }
+
+    /**
+     * @return the novTypeList
+     */
+    public List<NoticeOfViolationType> getNovTypeList() {
+        return novTypeList;
+    }
+
+    /**
+     * @param novTypeList the novTypeList to set
+     */
+    public void setNovTypeList(List<NoticeOfViolationType> novTypeList) {
+        this.novTypeList = novTypeList;
+    }
+
+    /**
+     * @return the currentNOVType
+     */
+    public NoticeOfViolationType getCurrentNOVType() {
+        return currentNOVType;
+    }
+
+    /**
+     * @param currentNOVType the currentNOVType to set
+     */
+    public void setCurrentNOVType(NoticeOfViolationType currentNOVType) {
+        this.currentNOVType = currentNOVType;
+    }
+
+    /**
+     * @return the editModeNOVType
+     */
+    public boolean isEditModeNOVType() {
+        return editModeNOVType;
+    }
+
+    /**
+     * @param editModeNOVType the editModeNOVType to set
+     */
+    public void setEditModeNOVType(boolean editModeNOVType) {
+        this.editModeNOVType = editModeNOVType;
+    }
+
+    /**
+     * @return the printStyleList
+     */
+    public List<PrintStyle> getPrintStyleList() {
+        return printStyleList;
+    }
+
+    /**
+     * @param printStyleList the printStyleList to set
+     */
+    public void setPrintStyleList(List<PrintStyle> printStyleList) {
+        this.printStyleList = printStyleList;
+    }
+
+    /**
+     * @return the eventCatCandidateList
+     */
+    public List<EventCategory> getEventCatCandidateList() {
+        return eventCatCandidateList;
+    }
+
+    /**
+     * @param eventCatCandidateList the eventCatCandidateList to set
+     */
+    public void setEventCatCandidateList(List<EventCategory> eventCatCandidateList) {
+        this.eventCatCandidateList = eventCatCandidateList;
+    }
+
+    /**
+     * @return the currentNovTypeEventCatField
+     */
+    public String getCurrentNovTypeEventCatField() {
+        return currentNovTypeEventCatField;
+    }
+
+    /**
+     * @param currentNovTypeEventCatField the currentNovTypeEventCatField to set
+     */
+    public void setCurrentNovTypeEventCatField(String currentNovTypeEventCatField) {
+        this.currentNovTypeEventCatField = currentNovTypeEventCatField;
+    }
+
+    /**
+     * @return the eventTypeCandidateList
+     */
+    public List<EventType> getEventTypeCandidateList() {
+        return eventTypeCandidateList;
+    }
+
+    /**
+     * @param eventTypeCandidateList the eventTypeCandidateList to set
+     */
+    public void setEventTypeCandidateList(List<EventType> eventTypeCandidateList) {
+        this.eventTypeCandidateList = eventTypeCandidateList;
+    }
+
+    /**
+     * @return the eventTypeSelected
+     */
+    public EventType getEventTypeSelected() {
+        return eventTypeSelected;
+    }
+
+    /**
+     * @param eventTypeSelected the eventTypeSelected to set
+     */
+    public void setEventTypeSelected(EventType eventTypeSelected) {
+        this.eventTypeSelected = eventTypeSelected;
+    }
+
+    /**
+     * @return the novHeaderImageCandidateList
+     */
+    public List<BlobLight> getNovHeaderImageCandidateList() {
+        return novHeaderImageCandidateList;
+    }
+
+    /**
+     * @param novHeaderImageCandidateList the novHeaderImageCandidateList to set
+     */
+    public void setNovHeaderImageCandidateList(List<BlobLight> novHeaderImageCandidateList) {
+        this.novHeaderImageCandidateList = novHeaderImageCandidateList;
+    }
+
+    /**
+     * @return the selectedNOVType
+     */
+    public NoticeOfViolationType getSelectedNOVType() {
+        return selectedNOVType;
+    }
+
+    /**
+     * @param selectedNOVType the selectedNOVType to set
+     */
+    public void setSelectedNOVType(NoticeOfViolationType selectedNOVType) {
+        this.selectedNOVType = selectedNOVType;
+    }
+
+    /**
+     * @return the showTextBlocksAllCategories
+     */
+    public boolean isShowTextBlocksAllCategories() {
+        return showTextBlocksAllCategories;
+    }
+
+    /**
+     * @param showTextBlocksAllCategories the showTextBlocksAllCategories to set
+     */
+    public void setShowTextBlocksAllCategories(boolean showTextBlocksAllCategories) {
+        this.showTextBlocksAllCategories = showTextBlocksAllCategories;
     }
 
 }

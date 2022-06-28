@@ -30,6 +30,7 @@ import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.IFace_EventHolder;
+import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.io.Serializable;
@@ -793,7 +794,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         String query =  " SELECT categoryid, categorytype, title, description, notifymonitors, \n" +
                         "       hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, \n" +
                         "       hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, \n" +
-                        "       active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate\n" +
+                        "       active, rolefloorenact, rolefloorview, rolefloorupdate \n" +
                         "  FROM public.eventcategory WHERE categoryid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -862,9 +863,17 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         }
         ec.setActive(rs.getBoolean("active"));
         ec.setDefaultDurationMins(rs.getInt("defaultdurationmins"));
-        ec.setUserRankMinimumToEnact(rs.getInt("userrankminimumtoenact"));
-        ec.setUserRankMinimumToView(rs.getInt("userrankminimumtoview"));
-        ec.setUserRankMinimumToUpdate(rs.getInt("userrankminimumtoupdate"));
+        if(rs.getString("rolefloorenact") != null && !rs.getString("rolefloorenact").equals("")){
+            ec.setRoleFloorEventEnact(RoleType.valueOf(rs.getString("rolefloorenact")));
+        }
+        
+        if(rs.getString("rolefloorview") != null && !rs.getString("rolefloorview").equals("")){
+            ec.setRoleFloorEventView(RoleType.valueOf(rs.getString("rolefloorview")));
+        }
+        
+        if(rs.getString("rolefloorupdate") != null && !rs.getString("rolefloorupdate").equals("")){
+            ec.setRoleFloorEventUpdate(RoleType.valueOf(rs.getString("rolefloorupdate")));
+        }
         
         return ec;
     }
@@ -943,21 +952,22 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      * @param ec
      * @throws IntegrationException 
      */
-    public void insertEventCategory(EventCategory ec) throws IntegrationException {
+    public int insertEventCategory(EventCategory ec) throws IntegrationException {
 
         String query = "INSERT INTO public.eventcategory(\n" +
                         "            categoryid, categorytype, title, description, notifymonitors, \n" +
                         "            hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, \n" +
                         "            hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, \n" +
-                        "            active, userrankminimumtoenact, userrankminimumtoview, userrankminimumtoupdate)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, ?, \n" +
+                        "            active, rolefloorenact, rolefloorview, rolefloorupdate)\n" +
+                        "    VALUES (DEFAULT, CAST(? AS EVENTTYPE), ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?);";
+                        "            ?, CAST(? AS role), CAST(? AS ROLE), CAST(? AS ROLE));";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
-
+        ResultSet rs = null;
+        int freshID = 0;
         try {
             stmt = con.prepareStatement(query);
             stmt.setString(1, ec.getEventType().name());
@@ -984,11 +994,34 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(11, ec.getDefaultDurationMins());
 
             stmt.setBoolean(12, ec.isActive());
-            stmt.setInt(13, ec.getUserRankMinimumToEnact());
-            stmt.setInt(14, ec.getUserRankMinimumToView());
-            stmt.setInt(15, ec.getUserRankMinimumToUpdate());
+            if(ec.getRoleFloorEventEnact() != null){
+                stmt.setString(13, ec.getRoleFloorEventEnact().toString());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            
+            if(ec.getRoleFloorEventView() != null){
+                stmt.setString(14, ec.getRoleFloorEventView().toString());
+            } else {
+                stmt.setNull(14, java.sql.Types.NULL);
+            }
+            
+            if(ec.getRoleFloorEventUpdate() != null){
+                stmt.setString(15, ec.getRoleFloorEventUpdate().toString());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
 
             stmt.execute();
+            
+            String retrievalQuery = "SELECT currval('ceeventcategory_categoryid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                freshID = rs.getInt("currval");
+
+            }
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
@@ -997,7 +1030,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
+        return freshID;
     }
 
     /**
@@ -1008,17 +1043,18 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     public void updateEventCategory(EventCategory ec) throws IntegrationException {
 
         String query =  "UPDATE public.eventcategory\n" +
-                        "   SET categorytype=?, title=?, description=?, notifymonitors=?, \n" +
+                        "   SET categorytype=CAST(? AS eventtype), title=?, description=?, notifymonitors=?, \n" +
                         "       hidable=?, icon_iconid=?, relativeorderwithintype=?, relativeorderglobal=?, \n" +
                         "       hosteventdescriptionsuggtext=?, directive_directiveid=?, defaultdurationmins=?, \n" +
-                        "       active=?, userrankminimumtoenact=?, userrankminimumtoview=?, \n" +
-                        "       userrankminimumtoupdate=? WHERE categoryid = ?;";
+                        "       active=?, rolefloorenact=CAST(? AS role), rolefloorview=CAST(? AS role), \n" +
+                        "       rolefloorupdate=CAST(? AS role) WHERE categoryid = ?;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
 
         try {
             stmt = con.prepareStatement(query);
+            
             stmt.setString(1, ec.getEventType().name());
             stmt.setString(2, ec.getEventCategoryTitle());
             stmt.setString(3, ec.getEventCategoryDesc());
@@ -1043,9 +1079,24 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(11, ec.getDefaultDurationMins());
 
             stmt.setBoolean(12, ec.isActive());
-            stmt.setInt(13, ec.getUserRankMinimumToEnact());
-            stmt.setInt(14, ec.getUserRankMinimumToView());
-            stmt.setInt(15, ec.getUserRankMinimumToUpdate());
+            if(ec.getRoleFloorEventEnact() != null){
+                stmt.setString(13, ec.getRoleFloorEventEnact().toString());
+            } else {
+                stmt.setNull(13, java.sql.Types.NULL);
+            }
+            
+            if(ec.getRoleFloorEventView() != null){
+                stmt.setString(14, ec.getRoleFloorEventView().toString());
+            } else {
+                stmt.setNull(14, java.sql.Types.NULL);
+            }
+            
+            if(ec.getRoleFloorEventUpdate() != null){
+                stmt.setString(15, ec.getRoleFloorEventUpdate().toString());
+            } else {
+                stmt.setNull(15, java.sql.Types.NULL);
+            }
+
             
             stmt.setInt(16, ec.getCategoryID());
 

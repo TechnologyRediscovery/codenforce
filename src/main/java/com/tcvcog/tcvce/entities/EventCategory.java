@@ -44,9 +44,9 @@ public class EventCategory implements Serializable {
     private int defaultDurationMins;
     private boolean active;
     
-    private int userRankMinimumToEnact;
-    private int userRankMinimumToView;
-    private int userRankMinimumToUpdate;
+    private RoleType roleFloorEventEnact;
+    private RoleType roleFloorEventView;
+    private RoleType roleFloorEventUpdate;
     
     /**
      * @return the eventType
@@ -277,46 +277,47 @@ public class EventCategory implements Serializable {
         this.active = active;
     }
 
+   
     /**
-     * @return the userRankMinimumToEnact
+     * @return the roleFloorEventEnact
      */
-    public int getUserRankMinimumToEnact() {
-        return userRankMinimumToEnact;
+    public RoleType getRoleFloorEventEnact() {
+        return roleFloorEventEnact;
     }
 
     /**
-     * @return the userRankMinimumToView
+     * @return the roleFloorEventView
      */
-    public int getUserRankMinimumToView() {
-        return userRankMinimumToView;
+    public RoleType getRoleFloorEventView() {
+        return roleFloorEventView;
     }
 
     /**
-     * @return the userRankMinimumToUpdate
+     * @return the roleFloorEventUpdate
      */
-    public int getUserRankMinimumToUpdate() {
-        return userRankMinimumToUpdate;
+    public RoleType getRoleFloorEventUpdate() {
+        return roleFloorEventUpdate;
     }
 
     /**
-     * @param userRankMinimumToEnact the userRankMinimumToEnact to set
+     * @param roleFloorEventEnact the roleFloorEventEnact to set
      */
-    public void setUserRankMinimumToEnact(int userRankMinimumToEnact) {
-        this.userRankMinimumToEnact = userRankMinimumToEnact;
+    public void setRoleFloorEventEnact(RoleType roleFloorEventEnact) {
+        this.roleFloorEventEnact = roleFloorEventEnact;
     }
 
     /**
-     * @param userRankMinimumToView the userRankMinimumToView to set
+     * @param roleFloorEventView the roleFloorEventView to set
      */
-    public void setUserRankMinimumToView(int userRankMinimumToView) {
-        this.userRankMinimumToView = userRankMinimumToView;
+    public void setRoleFloorEventView(RoleType roleFloorEventView) {
+        this.roleFloorEventView = roleFloorEventView;
     }
 
     /**
-     * @param userRankMinimumToUpdate the userRankMinimumToUpdate to set
+     * @param roleFloorEventUpdate the roleFloorEventUpdate to set
      */
-    public void setUserRankMinimumToUpdate(int userRankMinimumToUpdate) {
-        this.userRankMinimumToUpdate = userRankMinimumToUpdate;
+    public void setRoleFloorEventUpdate(RoleType roleFloorEventUpdate) {
+        this.roleFloorEventUpdate = roleFloorEventUpdate;
     }
 
     

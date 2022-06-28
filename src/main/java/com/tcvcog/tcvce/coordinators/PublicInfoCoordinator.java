@@ -215,10 +215,10 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
 
             for (EventCnF ev : c.getEventList()) {
                 //Only add events that are visible to the public.
-                if (ev.getCategory().getUserRankMinimumToView() <= PUBLIC_VIEW_USER_RANK) {
+//                if (ev.getCategory().getUserRankMinimumToView() <= PUBLIC_VIEW_USER_RANK) {
                     // TODO upgrade for parcelization
 //                    eventBundles.add(extractPublicInfo(ev));
-                }
+//                }
             }
 
             pib.setPublicEventList(eventBundles);
@@ -792,7 +792,9 @@ public class PublicInfoCoordinator extends BackingBeanUtils implements Serializa
         pib.setTypeName("EventCnF");
         pib.setShowAddMessageButton(false);
 
-        if (input.getCategory().getUserRankMinimumToView() <= PUBLIC_VIEW_USER_RANK) {
+//        if (input.getCategory().getUserRankMinimumToView() <= PUBLIC_VIEW_USER_RANK) {
+ // TODO: Fix me!        
+if (false) {
 
             if (input.getDomain() == DomainEnum.CODE_ENFORCEMENT) {
                 CaseCoordinator cc = getCaseCoordinator();

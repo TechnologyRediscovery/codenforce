@@ -139,6 +139,16 @@
                                                                           action="#{missionControlBB.reauthenticate}" 
                                                                           ajax="false"/>
                                                     </div>
+                                                    <p:spacer height="3px" />
+                                                    <div class="restrict-main-contents-io-link link-button">
+
+                                                        <p:commandLink    id="aob-muni-property-cl" 
+                                                                          value="Muni Prop: #{sessionBean.sessMuni.muniPropertyDH.countyParcelID}"
+                                                                          action="#{navigationBB.navigateToMuniPropertyDH}" 
+                                                                          ajax="false"/>
+                                                    </div>
+                                                    
+                                                    
                                                 </h:form>
                                             </div>
                                         </div>
@@ -306,12 +316,9 @@
                                             
                                             <ui:include src="/restricted/cogstaff/prop/compositions/addresses.xhtml"/>
                                             <ui:include src="/restricted/cogstaff/prop/compositions/propertySearch.xhtml"/>
-
                                         </div>
-
                                     </div>
                                 </div>
-
 
                                 <div class="activebob-container p-col"
                                      id="aob-person">
@@ -322,9 +329,7 @@
                                         <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-vertical">
 
                                             <div class="aob-container aob-container-iconifiedheader">
-
                                                 <div class="inline-icon">
-
                                                     <i class="material-icons">
                                                         <h:outputText value="person"/>
                                                     </i>
