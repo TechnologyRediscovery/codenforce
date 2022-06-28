@@ -150,6 +150,7 @@ public class EventCatConfigBB extends BackingBeanUtils implements Serializable{
     public void onAddEventCategoryInit(ActionEvent ev){
         EventCoordinator ec = getEventCoordinator();
         currentEventCategory = ec.getEventCategorySkeleton();
+        editModeEventCat = true;
     }
     
     /**
