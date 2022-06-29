@@ -2967,7 +2967,9 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         
         tbc.setCategoryID(rs.getInt("categoryid"));
         tbc.setTitle(rs.getString("categorytitle"));
-        tbc.setIcon(sc.getIcon(rs.getInt("icon_iconid")));
+        if(rs.getInt("icon_iconid") != 0){
+            tbc.setIcon(sc.getIcon(rs.getInt("icon_iconid")));
+        }
         tbc.setMuni(mc.getMuni(rs.getInt("muni_municode")));
         if(rs.getTimestamp("deactivatedts") != null){
             tbc.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());

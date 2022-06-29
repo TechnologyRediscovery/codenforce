@@ -2374,9 +2374,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             throws IntegrationException, BObStatusException, EventException {
         EventCoordinator evCoord = getEventCoordinator();
 
+        // If we've got a type, and that type knows about an event category 
+        if(nov.getNovType() != null){
+            
+        }
         EventCnF noticeEvent = evCoord.initEvent(ceCase, evCoord.initEventCategory(Integer.parseInt(getResourceBundle(
                 Constants.EVENT_CATEGORY_BUNDLE).getString("noticeMailed"))));
-
+        
         String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeMailedEventDesc");
 
         noticeEvent.setDescription(queuedNoticeEventNotes);

@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.Icon;
 import com.tcvcog.tcvce.entities.TextBlock;
 import com.tcvcog.tcvce.entities.TextBlockCategory;
 import com.tcvcog.tcvce.integration.CaseIntegrator;
@@ -33,12 +34,16 @@ public class TextBlockBB extends BackingBeanUtils {
     private List<TextBlock> blockList;
     private boolean editModeTextBlock;
     private boolean loadAllMunisTextBlock;
+    private boolean currentTextBlockActive;
     
     private TextBlockCategory currentTextBlockCategory;
     private List<TextBlockCategory> textBlockCategoryList;
+    private boolean currentTextBlockCategoryActive;
     private boolean editModeTextBlockCategory;
     private boolean loadAllMunisTextBlockCategory;
 
+    private List<Icon> iconList;
+    
     /**
      * Creates a new instance of TextBlockBB
      */
@@ -48,12 +53,18 @@ public class TextBlockBB extends BackingBeanUtils {
     
      @PostConstruct
     public void initBean() {
-        editModeTextBlock = false;
-        editModeTextBlockCategory = false;
-        loadAllMunisTextBlock = false;
-        loadAllMunisTextBlockCategory = false;
-        
-        refreshTextBlockAndCatAndLists();
+        SystemCoordinator sc = getSystemCoordinator();
+        try {
+            iconList = sc.getIconList();
+            editModeTextBlock = false;
+            editModeTextBlockCategory = false;
+            loadAllMunisTextBlock = false;
+            loadAllMunisTextBlockCategory = false;
+            
+            refreshTextBlockAndCatAndLists();
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+        }
     }
     
     /**
@@ -96,12 +107,20 @@ public class TextBlockBB extends BackingBeanUtils {
                 // TODO: customize for muni-specific view?
                 textBlockCategoryList = sc.getTextBlockCategoryListComplete();
             }
-            setTextBlockCategoryList(sc.getTextBlockCategoryListComplete());
+            
         } catch (IntegrationException | BObStatusException ex) {
             System.out.println(ex);
         } 
         
         
+    }
+    
+    /**
+     * Listener to start the cat manage process
+     * @param ev 
+     */
+    public void onTextBlockCategoryManageInit(ActionEvent ev){
+        System.out.println("TextBlockBB.onTextBlockCategoryManageInit");
     }
     
     /**
@@ -138,7 +157,7 @@ public class TextBlockBB extends BackingBeanUtils {
             try {
                 if(currentTextBlock != null){
                     if(currentTextBlock.getBlockID()== 0){
-                            onTextBlockAddCommitButtonChange();
+                        onTextBlockAddCommitButtonChange();
                     } else {
                         onTextBlockUpdateCommit();
                     }
@@ -222,6 +241,14 @@ public class TextBlockBB extends BackingBeanUtils {
       SystemCoordinator sc = getSystemCoordinator();
         if(currentTextBlock != null){
             try {
+                if(currentTextBlock.getDeactivatedTS() == null && !currentTextBlockActive){
+                    System.out.println("TextBlockBB.onTextBlockUpdateCommit | deac trigger! Text block ID: " + currentTextBlock.getBlockID());
+                    onTextBlockDeactivateCommit();
+                }
+                if(currentTextBlock.getDeactivatedTS() != null && currentTextBlockActive){
+                    currentTextBlock.setDeactivatedTS(null);
+                    System.out.println("TextBlockBB.onTextBlockUpdateCommit | reactivating text block ID: " + currentTextBlock.getBlockID());
+                }
                 sc.updateTextBlock(currentTextBlock, getSessionBean().getSessUser());
                 refreshTextBlockAndCatAndLists();
                  getFacesContext().addMessage(null,
@@ -249,7 +276,7 @@ public class TextBlockBB extends BackingBeanUtils {
     }
     
     
-    public void onTextBlockDeactivateCommit(){
+    private void onTextBlockDeactivateCommit(){
         SystemCoordinator sc = getSystemCoordinator();
         if(currentTextBlock != null){
             try {
@@ -257,7 +284,7 @@ public class TextBlockBB extends BackingBeanUtils {
                 refreshTextBlockAndCatAndLists();
                  getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,  
-                            "Success! Nuked block id " + currentTextBlock.getBlockID(), ""));
+                            "Success! Deactivated block id " + currentTextBlock.getBlockID(), ""));
             } catch (IntegrationException | BObStatusException ex) {
                  getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,  ex.getMessage(), ""));
@@ -278,8 +305,9 @@ public class TextBlockBB extends BackingBeanUtils {
         if(editModeTextBlockCategory){
             try {
                 if(currentTextBlockCategory != null){
+                
                     if(currentTextBlockCategory.getCategoryID() == 0){
-                            onTextBlockCategoryAddCommitButtonChange();
+                        onTextBlockCategoryAddCommitButtonChange();
                     } else {
                         onTextBlockCategoryUpdateCommit();
                     }
@@ -349,6 +377,15 @@ public class TextBlockBB extends BackingBeanUtils {
       SystemCoordinator sc = getSystemCoordinator();
         if(currentTextBlockCategory != null){
             try {
+                 // deal with deactivation TS adaptor to boolean box on UI
+                if(currentTextBlockCategory.getDeactivatedTS() == null && !currentTextBlockCategoryActive){
+                        System.out.println("TextBlockBB.onTextBlockCategoryUpdateCommit | deac trigger! text blockCat ID: " + currentTextBlockCategory.getCategoryID());
+                       onTextBlockCategoryDeactivateCommit();
+                }
+                if(currentTextBlockCategory.getDeactivatedTS() != null && currentTextBlockCategoryActive){
+                    currentTextBlockCategory.setDeactivatedTS(null);
+                    System.out.println("TextBlockBB.onTextBlockCategoryUpdateCommit | reactivating text blockCat ID: " + currentTextBlockCategory.getCategoryID());
+                }
                 sc.updateTextBlockCategory(currentTextBlockCategory);
                 refreshTextBlockAndCatAndLists();
                  getFacesContext().addMessage(null,
@@ -376,7 +413,7 @@ public class TextBlockBB extends BackingBeanUtils {
     }
     
     
-    public void onTextBlockCategoryDeactivateCommit(){
+    private void onTextBlockCategoryDeactivateCommit(){
         SystemCoordinator sc = getSystemCoordinator();
         if(currentTextBlockCategory != null){
             try {
@@ -394,6 +431,37 @@ public class TextBlockBB extends BackingBeanUtils {
                     new FacesMessage(FacesMessage.SEVERITY_WARN, 
                             "Please select a text block category and try again", ""));
         }
+    }
+    
+    
+     /**
+      * Special getter that looks at the text block deac TS field
+     * @return the currentTextBlockActive
+     */
+    public boolean isCurrentTextBlockActive() {
+        currentTextBlockActive = false;
+        if(currentTextBlock != null){
+            if(currentTextBlock.getDeactivatedTS() == null){
+                currentTextBlockActive = true;
+            } 
+        }
+        return currentTextBlockActive;
+    }
+
+
+
+    /**
+     * Special adaptor getter that examines the current text block category's deac field
+     * @return the currentTextBlockCategoryActive
+     */
+    public boolean isCurrentTextBlockCategoryActive() {
+        currentTextBlockCategoryActive = false;
+        if(currentTextBlockCategory != null){
+            if(currentTextBlockCategory.getDeactivatedTS() == null){
+                currentTextBlockCategoryActive = true;
+            } 
+        }
+        return currentTextBlockCategoryActive;
     }
     
     
@@ -514,5 +582,35 @@ public class TextBlockBB extends BackingBeanUtils {
      */
     public void setLoadAllMunisTextBlock(boolean loadAllMunisTextBlock) {
         this.loadAllMunisTextBlock = loadAllMunisTextBlock;
+    }
+
+    /**
+     * @return the iconList
+     */
+    public List<Icon> getIconList() {
+        return iconList;
+    }
+
+    /**
+     * @param iconList the iconList to set
+     */
+    public void setIconList(List<Icon> iconList) {
+        this.iconList = iconList;
+    }
+
+   
+    
+        /**
+     * @param currentTextBlockActive the currentTextBlockActive to set
+     */
+    public void setCurrentTextBlockActive(boolean currentTextBlockActive) {
+        this.currentTextBlockActive = currentTextBlockActive;
+    }
+
+    /**
+     * @param currentTextBlockCategoryActive the currentTextBlockCategoryActive to set
+     */
+    public void setCurrentTextBlockCategoryActive(boolean currentTextBlockCategoryActive) {
+        this.currentTextBlockCategoryActive = currentTextBlockCategoryActive;
     }
 }

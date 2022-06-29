@@ -43,6 +43,17 @@
                             actionListener="#{textBlockBB.onTextBlockAddInit}"
                             update="textblocks-growl-form
                             @form:@parent:textblock-viewaddedit-form"/>
+                        
+                        
+                          <p:commandLink  id="textblockcat-manage-init-cl" 
+                                            ajax="true"
+                                            actionListener="#{textBlockBB.onTextBlockCategoryManageInit}"
+                                            value="manage text block categories"
+                                            style="color:blue; font-weight: bold; margin-left: 10px"
+                                            update="@form:@parent:textblockcategory-list-form
+                                            textblockcategory-list-dialog"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                            oncomplete="PF('textblockcategory-list-dialog-var').show()"/>
 
                     </p:panel>
 
@@ -157,7 +168,7 @@
                                                      styleClass="gray-button"
                                                      rendered="#{textBlockBB.editModeTextBlock}"
                                                      icon="fa fa-stop"
-                                                     actionListener="#{textBlockBB.onTextBlockOperationAbort(ev)}"
+                                                     actionListener="#{textBlockBB.onTextBlockOperationAbort}"
                                                      update="@form
                                                      textblocks-growl-form"/>
                                 </div>
@@ -257,12 +268,19 @@
                             </div>
 
                             <div class="p-col-4 restrict-data-field-label-inline">
-                                <h:outputText value="Record status"/>
+                                <h:outputText value="Active record?"/>
 
                             </div>
                             <div class="p-col-8 restrict-data-field-value-inline">
 
-                                <h:outputText value="#{empty textBlockBB.currentTextBlock.deactivatedTS? 'Active':'Deactivated'}"/>
+                                <h:outputText value="#{empty textBlockBB.currentTextBlock.deactivatedTS? 'Active':'Deactivated'}"
+                                              rendered="#{!textBlockBB.editModeTextBlock}"/>
+                                <h:outputText   value="#{textBlockBB.getPrettyDate(textBlockBB.currentTextBlock.deactivatedTS)}"
+                                                rendered="#{!empty textBlockBB.currentTextBlock.deactivatedTS and !textBlockBB.editModeTextBlock}"/>
+                                
+                                <p:selectBooleanCheckbox value="#{textBlockBB.currentTextBlockActive}"
+                                                         rendered="#{textBlockBB.editModeTextBlock}" />
+                                
                             </div>
                         </div>
                     </p:panel>
@@ -297,16 +315,16 @@
     </p:dialog>
     
     
-     <p:dialog   id="nov-templatemanage-dialog"
+     <p:dialog   id="textblockcategory-list-dialog"
                 height="600" width="1300"
-                widgetVar="nov-templatemanage-dialog-var"
+                widgetVar="textblockcategory-list-dialog-var"
                 closable="true"
                 dynamic="true"
                 modal="true"
                 responsive="true"
                 resizable="true"
                 closeOnEscape="true"
-                header="Template manager"
+                header="Text Block category manager"
                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                 >
 
@@ -315,30 +333,30 @@
         <div class="p-grid nested-grid">
             <div class="p-col-5" >
 
-                <h:form id="textblock-tools-form">
+                <h:form id="textblockcategory-list-form">
 
-                    <p:panel id="textblocks-tools-panel"
-                             header="Text Block Tools"
+                    <p:panel id="textblockcategory-tools-panel"
+                             header="Text Block Category Tools"
                              toggleable="true"
                              collapsed="false">
 
                         <p:commandButton
-                            id="nov-template-insert-init"
-                            value="Add new template"
+                            id="textblockcategory-insert-init"
+                            value="Add new text block category"
                             ajax="true" icon="fa fa-plus"
                             styleClass="buttonOwnLine" 
                             tabindex="1"
-                            actionListener="#{textBlockBB.onTextBlockAddInit}"
+                            actionListener="#{textBlockBB.onTextBlockCategoryAddInit}"
                             update="textblocks-growl-form
-                            @form:@parent:textblock-viewaddedit-form"/>
+                            @form:@parent:textblockcategory-viewaddedit-form"/>
 
                     </p:panel>
 
                 </h:form>
-                <h:form id="nov-template-select-form">
+                <h:form id="textblockcategory-select-form">
 
-                    <p:panel id="textblocks-list-panel"
-                             header="Text Blocks"
+                    <p:panel id="textblockcategory-list-panel"
+                             header="Text Block Categories"
                              toggleable="true"
                              collapsed="false">
                         <div class="p-grid">
@@ -347,7 +365,7 @@
                                 <h:outputText value="Include all municipalities?"/>
                             </div>
                             <div class="p-col-9">
-                                <p:selectBooleanCheckbox value="#{textBlockBB.loadAllMunisTextBlock}">
+                                <p:selectBooleanCheckbox value="#{textBlockBB.loadAllMunisTextBlockCategory}">
                                     <p:ajax listener="#{textBlockBB.refreshTextBlockAndCatAndLists}"
                                             update="@form" />
                                 </p:selectBooleanCheckbox>
@@ -357,45 +375,46 @@
 
                             <div class="p-col-12">
 
-                                <p:dataTable id="textblock-list-table"
-                                             value="#{textBlockBB.blockList}"
-                                             var="template"
-                                             rowKey="#{template.blockID}"
+                                <p:dataTable id="textblockcategory-list-table"
+                                             value="#{textBlockBB.textBlockCategoryList}"
+                                             var="cat"
+                                             rowKey="#{cat.categoryID}"
                                              tableStyleClass="primeDataTable"
                                              resizableColumns="true"
                                              expandedRow="false"
-                                             widgetVar="textblock-list-table-var"
+                                             widgetVar="textblockcategory-list-table-var"
                                              >
 
 
+                                <p:column width="10%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Icon" />
+                                    </f:facet>
+                                    <i class="material-icons">
+                                        <h:outputText value="#{cat.icon.materialIcon}"
+                                                      rendered="#{!empty cat.icon}"/>
+                                    </i>
+                                </p:column>
+
                                     <p:column width="50%"
-                                              sortBy="#{template.category.title}">
+                                              sortBy="#{cat.title}">
                                         <f:facet name="header">
-                                            <h:outputText value="Category and Name" />
+                                            <h:outputText value="Title" />
                                         </f:facet>
-                                        <h:outputText value="#{template.category.title} (Cat ID:#{template.category.categoryID})"
-                                                      rendered="#{!empty template.category}"/>
-                                        <p:spacer height="3px" />
-                                        <h:outputText value="#{template.textBlockName}"/>
+                                        <h:outputText value="#{cat.title}"/>
                                     </p:column>
 
 
                                     <p:column   width="20%"
-                                                sortBy="#{template.muni.muniName}">
+                                                sortBy="#{cat.muni.muniName}">
                                         <f:facet name="header">
                                             <h:outputText value="Municipality"/>
                                         </f:facet>
-                                        <h:outputText value="#{template.muni.muniName}"
-                                                      rendered="#{!empty template.muni}"/>
+                                        <h:outputText value="#{cat.muni.muniName}"
+                                                      rendered="#{!empty cat.muni}"/>
                                     </p:column>
 
-                                    <p:column   width="5%"
-                                                sortBy="#{template.injectableTemplate}">
-                                        <f:facet name="header">
-                                            <h:outputText value="Inj?"/>
-                                        </f:facet>
-                                        <h:outputText value="#{template.injectableTemplate ? 'Yes':'No'}" />
-                                    </p:column>
+                                  
 
 
                                     <p:column width="15%">
@@ -405,10 +424,10 @@
 
                                         <p:commandLink  id="textblock-view-init-cl" 
                                                         ajax="true"
-                                                        actionListener="#{textBlockBB.onBlockSelect(template)}"
-                                                        value="view"
+                                                        actionListener="#{textBlockBB.onBlockCategorySelect(cat)}"
+                                                        value="view/edit"
                                                         style="color:blue; font-weight: bold;"
-                                                        update="@form:@parent:textblock-viewaddedit-form"
+                                                        update="@form:@parent:textblockcategory-viewaddedit-form"
                                                         rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
                                         <p:spacer height="5px" />
                                         <h:outputText value="(ID:#{template.blockID})"/>
@@ -420,22 +439,22 @@
                 </h:form>
             </div>
             <div class="p-col-7" >
-                <h:form id="textblock-viewaddedit-form">
-                    <p:panel id="textblock-record-panel"
-                             header="Text Block (ID:#{textBlockBB.currentTextBlock.blockID}) Details"
+                <h:form id="textblockcategory-viewaddedit-form">
+                    <p:panel id="textblockcategory-record-panel"
+                             header="Text Block Category (ID:#{textBlockBB.currentTextBlockCategory.categoryID})"
                              toggleable="true"
                              collapsed="false"
-                             rendered="#{!empty textBlockBB.currentTextBlock}">
+                             rendered="#{!empty textBlockBB.currentTextBlockCategory}">
 
                         <div class="p-grid">
                             <div class="p-col-12">
-                                <p:commandButton  id="textblock-edittoggle-button"
-                                                  value="#{textBlockBB.editModeTextBlock ? 'Save changes':'Edit'}"
+                                <p:commandButton  id="textblockcategory-edittoggle-button"
+                                                  value="#{textBlockBB.editModeTextBlockCategory ? 'Save changes':'Edit'}"
                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                  icon="fa #{textBlockBB.editModeTextBlock ? 'fa-check' : 'fa-pencil'}"
-                                                  actionListener="#{textBlockBB.onEditModeTextBlockToggle}"
+                                                  icon="fa #{textBlockBB.editModeTextBlockCategory ? 'fa-check' : 'fa-pencil'}"
+                                                  actionListener="#{textBlockBB.onEditModeTextBlockCategoryToggle}"
                                                   update="@form
-                                                  @form:@parent:nov-template-select-form
+                                                  @form:@parent:textblockcategory-select-form
                                                   textblocks-growl-form"/>
 
                                 <div class="gray_button">
@@ -443,29 +462,29 @@
                                     <p:commandButton id="textblock-edit-abort"
                                                      value="Cancel"
                                                      styleClass="gray-button"
-                                                     rendered="#{textBlockBB.editModeTextBlock}"
+                                                     rendered="#{textBlockBB.editModeTextBlockCategory}"
                                                      icon="fa fa-stop"
-                                                     actionListener="#{textBlockBB.onTextBlockOperationAbort(ev)}"
+                                                     actionListener="#{textBlockBB.onTextBlockCategoryOperationAbort}"
                                                      update="@form
                                                      textblocks-growl-form"/>
                                 </div>
 
                             </div>
                             <div class="p-col-4 restrict-data-field-label-inline">
-                                <h:outputText value="Block name"/>
+                                <h:outputText value="Category name"/>
 
                             </div>
                             <div class="p-col-8 restrict-data-field-value-inline">
-                                <h:outputText value="#{textBlockBB.currentTextBlock.textBlockName}"
-                                              rendered="#{!textBlockBB.editModeTextBlock}" />
+                                <h:outputText value="#{textBlockBB.currentTextBlockCategory.title}"
+                                              rendered="#{!textBlockBB.editModeTextBlockCategory}" />
 
-                                <p:inputText   id="tempblockNameIT" 
-                                               value="#{textBlockBB.currentTextBlock.textBlockName}"
+                                <p:inputText   id="textblockcategory-name-it" 
+                                               value="#{textBlockBB.currentTextBlockCategory.title}"
                                                style="width: 100%;" 
                                                tabindex="4" 
                                                required="false" 
                                                styleClass="inputText"
-                                               rendered="#{textBlockBB.editModeTextBlock}"/>
+                                               rendered="#{textBlockBB.editModeTextBlockCategory}"/>
                             </div>
 
                             <div class="p-col-4 restrict-data-field-label-inline">
@@ -473,14 +492,14 @@
                                 <h:outputText value="Municipality"/>
                             </div>
                             <div class="p-col-8 restrict-data-field-value-inline">
-                                <h:outputText value="#{textBlockBB.currentTextBlock.muni.muniName} (Code:#{textBlockBB.currentTextBlock.muni.muniCode})"
-                                              rendered="#{!textBlockBB.editModeTextBlock and !empty textBlockBB.currentTextBlock.muni}" />
+                                <h:outputText value="#{textBlockBB.currentTextBlockCategory.muni.muniName} (Code:#{textBlockBB.currentTextBlockCategory.muni.muniCode})"
+                                              rendered="#{!textBlockBB.editModeTextBlockCategory and !empty textBlockBB.currentTextBlockCategory.muni}" />
                                 <p:selectOneMenu 
-                                    id="textblock-munilist-som" 
+                                    id="textblockcategory-munilist-som" 
                                     tabindex="1"
-                                    value="#{textBlockBB.currentTextBlock.muni}"
+                                    value="#{textBlockBB.currentTextBlockCategory.muni}"
                                     required="false"
-                                    rendered="#{textBlockBB.editModeTextBlock}">
+                                    rendered="#{textBlockBB.editModeTextBlockCategory}">
 
                                     <f:selectItem itemLabel="select a municipality..." 
                                                   noSelectionOption="true" 
@@ -491,94 +510,49 @@
                                     <f:converter converterId="muniConverter" />
                                 </p:selectOneMenu>
                             </div>
-
                             <div class="p-col-4 restrict-data-field-label-inline">
-                                <h:outputText value="Placement Order"/>
-
+                                <h:outputText value="Icon"/>
                             </div>
                             <div class="p-col-8 restrict-data-field-value-inline">
-                                <h:outputText value="#{textBlockBB.currentTextBlock.placementOrder}"
-                                              rendered="#{!textBlockBB.editModeTextBlock}"/>
 
-                                <p:inputNumber value="#{textBlockBB.currentTextBlock.placementOrder}"
-                                               rendered="#{textBlockBB.editModeTextBlock}" />
+                                <h:outputText value="#{textBlockBB.currentTextBlockCategory.icon.name} (Icon ID:#{textBlockBB.currentTextBlockCategory.icon.ID})"
+                                              rendered="#{!textBlockBB.editModeTextBlockCategory and !empty textBlockBB.currentTextBlockCategory.icon}" />
 
 
-                            </div>
-
-                            <div class="p-col-4 restrict-data-field-label-inline">
-                                <h:outputText value="Inject Violations?"/>
-
-                            </div>
-                            <div class="p-col-8 restrict-data-field-value-inline">
-                                <h:outputText value="#{textBlockBB.currentTextBlock.injectableTemplate ? 'Yes':'No'}"
-                                              rendered="#{!textBlockBB.editModeTextBlock}" />
-
-                                <p:selectBooleanCheckbox value="#{textBlockBB.currentTextBlock.injectableTemplate}"
-                                                         rendered="#{textBlockBB.editModeTextBlock}" >
-                                    <p:ajax update="@form" />
-                                </p:selectBooleanCheckbox>
-                            </div>
-
-                            <div class="p-col-4 restrict-data-field-label-inline">
-                                <h:outputText value="Category"/>
-
-                            </div>
-                            <div class="p-col-8 restrict-data-field-value-inline">
-                                <h:outputText value="#{textBlockBB.currentTextBlock.category.title} (ID:#{textBlockBB.currentTextBlock.category.categoryID})"
-                                              rendered="#{!textBlockBB.editModeTextBlock and !empty textBlockBB.currentTextBlock.category}" />
-                                <p:selectOneMenu 
-                                    id="textblock-cats-som" 
-                                    tabindex="1"
-                                    value="#{textBlockBB.currentTextBlock.category}"
-                                    required="false"
-                                    rendered="#{textBlockBB.editModeTextBlock}">
-
-                                    <f:selectItem itemLabel="select a category..." 
-                                                  noSelectionOption="true" 
-                                                  itemDisabled="true"/>
-                                    <f:selectItems value="#{textBlockBB.textBlockCategoryList}" 
-                                                   var="cat" 
-                                                   itemLabel="#{cat.title}"/>
-                                    <f:converter converterId="textBlockCategoryConverter" />
+                                <p:selectOneMenu id="icon-som-new" 
+                                                 required="false" 
+                                                 value="#{textBlockBB.currentTextBlockCategory.icon}" 
+                                                 rendered="#{textBlockBB.editModeTextBlockCategory}">
+                                    <f:selectItems value="#{textBlockBB.iconList}" 
+                                                   var="i" 
+                                                   itemLabel="#{i.name}" 
+                                                   itemValue="#{i}" />
+                                    <f:converter converterId="iconConverter" />
                                 </p:selectOneMenu>
                             </div>
 
+                           
+
                             <div class="p-col-4 restrict-data-field-label-inline">
-                                <h:outputText value="Record status"/>
+                                <h:outputText value="Active record?"/>
 
                             </div>
                             <div class="p-col-8 restrict-data-field-value-inline">
 
-                                <h:outputText value="#{empty textBlockBB.currentTextBlock.deactivatedTS? 'Active':'Deactivated'}"/>
+                                <h:outputText value="#{empty textBlockBB.currentTextBlockCategory.deactivatedTS? 'Active':'Deactivated'}"
+                                              rendered="#{!textBlockBB.editModeTextBlockCategory}"/>
+                                <h:outputText   value="#{textBlockBB.getPrettyDate(textBlockBB.currentTextBlockCategory.deactivatedTS)}"
+                                                rendered="#{!empty textBlockBB.currentTextBlockCategory.deactivatedTS and !textBlockBB.editModeTextBlockCategory}"/>
+                                
+                                <p:selectBooleanCheckbox value="#{textBlockBB.currentTextBlockCategoryActive}"
+                                                         rendered="#{textBlockBB.editModeTextBlockCategory}" />
+                                
+                                
                             </div>
                         </div>
                     </p:panel>
 
-                    <p:panel id="textblock-text-panel"
-                             header="Text of Block (ID:#{textBlockBB.currentTextBlock.blockID}) Text"
-                             toggleable="true"
-                             collapsed="false"
-                             rendered="#{!empty textBlockBB.currentTextBlock}">
-
-                        <h:outputText value="#{textBlockBB.currentTextBlock.textBlockText}"
-                                      escape="false"
-                                      rendered="#{!textBlockBB.editModeTextBlock and !empty textBlockBB.currentTextBlock}" />
-                        <p:spacer height="3px" />
-
-                        <h:outputText value="You are editing a violation-injectable block: include these exact characters where you want the violation list inserted: " 
-                                      rendered="#{textBlockBB.editModeTextBlock and !empty textBlockBB.currentTextBlock and textBlockBB.currentTextBlock.injectableTemplate}" />
-
-                        <h:outputText value="#{textBlockBB.violationInjectionMarker}"
-                                      rendered="#{textBlockBB.editModeTextBlock and !empty textBlockBB.currentTextBlock and textBlockBB.currentTextBlock.injectableTemplate}" />
-
-                        <p:spacer height="3px" />
-                        <p:textEditor  id="nov-template-editor"
-                                       value="#{textBlockBB.currentTextBlock.textBlockText}"
-                                       secure="false"
-                                       height="400"
-                                       rendered="#{textBlockBB.editModeTextBlock}"/>
-                    </p:panel>
+                   
                 </h:form>
             </div>
         </div>

@@ -18,7 +18,6 @@ public class TextBlockCategory {
     private String title;
     private Icon icon;
     private Municipality muni;
-    private NoticeOfViolationType novType;
     private LocalDateTime deactivatedTS;
 
     @Override
@@ -28,7 +27,6 @@ public class TextBlockCategory {
         hash = 89 * hash + Objects.hashCode(this.title);
         hash = 89 * hash + Objects.hashCode(this.icon);
         hash = 89 * hash + Objects.hashCode(this.muni);
-        hash = 89 * hash + Objects.hashCode(this.novType);
         hash = 89 * hash + Objects.hashCode(this.deactivatedTS);
         return hash;
     }
@@ -110,19 +108,6 @@ public class TextBlockCategory {
         this.muni = muni;
     }
 
-    /**
-     * @return the novType
-     */
-    public NoticeOfViolationType getNovType() {
-        return novType;
-    }
-
-    /**
-     * @param novType the novType to set
-     */
-    public void setNovType(NoticeOfViolationType novType) {
-        this.novType = novType;
-    }
 
     /**
      * @return the deactivatedTS
