@@ -999,7 +999,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     }
 
     //Sidebar Sub Nav Item: Reports
-//    private final NavigationSubItem events = getNavSubItem("Event Activity", "/restricted/cogstaff/event/events.xhtml", "fa fa-flag", false);
+    private final NavigationSubItem events = getNavSubItem("Event Activity", "/restricted/cogstaff/event/events.xhtml", "fa fa-flag", false);
     private final NavigationSubItem eventConfig = getNavSubItem("Event Setup", "/restricted/cogstaff/event/eventCatConfig.xhtml", "fa fa-sign-in", false);
 //    private final NavigationSubItem eventRuleConfig = getNavSubItem("Event Rules", "/restricted/cogstaff/event/eventRuleConfiguration.xhtml", "fa fa-sign-in", false);
 
@@ -1007,7 +1007,7 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     public List<NavigationSubItem> getSidebarReportList() {
         ArrayList<NavigationSubItem> navList;
         navList = new ArrayList<>();
-//        navList.add(events);
+        navList.add(events);
         navList.add(eventConfig);
 //        navList.add(eventRuleConfig);
         return navList;
@@ -1055,11 +1055,11 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
             NavigationItem OccconfigItem = getNavItem("", "Occupancy", "fa fa-list-alt", getSidebarOccConfigList());
             //NavItem: Code
             NavigationItem codeconfigItem = getNavItem("", "Municipal Code", "fa fa-book", getSidebarCodeConfigList());
-            //NavItem: System
-            NavigationItem reportItem = getNavItem("", "Report", "fa fa-bullhorn", getSidebarReportList());
+            //NavItem: Event Activity
+            NavigationItem reportItem = getNavItem("", "Event Activity", "fa fa-bullhorn", getSidebarReportList());
             //NavItem: Payments
             NavigationItem paymentsItem = getNavItem("", "Payments", "fa fa-cogs", getSidebarPaymentList());
-            //NavItem: Reports
+            //NavItem: System
             NavigationItem systemItem = getNavItem("", "System", "fa fa-cogs", getSidebarSystemList());
             //NavItem: Help
             NavigationItem helpItem = getNavItem("", "Help", "fa fa-question-circle", getSidebarHelpList());

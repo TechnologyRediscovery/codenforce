@@ -372,7 +372,21 @@ INSERT INTO public.noticeofviolationtype(
             NULL, 999, TRUE, TRUE, 
             NULL, 1000);
 
-UPDATE public.noticeofviolation SET letter_typeid = 102;
+UPDATE public.noticeofviolation SET letter_typeid = 101;
+
+
+
+ALTER TABLE eventcategory ADD COLUMN rolefloorenact role;
+ALTER TABLE eventcategory ADD COLUMN rolefloorview role;
+ALTER TABLE eventcategory ADD COLUMN rolefloorupdate role;
+
+UPDATE eventcategory SET rolefloorenact=CAST('MuniStaff' AS role);
+UPDATE eventcategory SET rolefloorview=CAST('MuniStaff' AS role);
+UPDATE eventcategory SET rolefloorupdate=CAST('MuniStaff' AS role);
+
+
+ALTER SEQUENCE IF EXISTS ceeventcategory_categoryid_seq START 100000 MINVALUE 100000 RESTART WITH 100000;
+
 
 
 
@@ -381,8 +395,9 @@ UPDATE public.noticeofviolation SET letter_typeid = 102;
 -- ******************************* run on LIVE DEPLOYED system up to here *******************************
 
 
+ALTER SEQUENCE IF EXISTS blockcategory_categoryid_seq START 8000 MINVALUE 8000 RESTART WITH 8000;
 
-
+-- LOCAL CURSOR
 
 
 

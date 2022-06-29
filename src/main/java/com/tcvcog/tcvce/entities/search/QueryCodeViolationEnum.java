@@ -78,6 +78,11 @@ public  enum QueryCodeViolationEnum
                             RoleType.MuniStaff,
                             true),
     
+    LOGGED_IN_DATE_RANGE      ("Attached to a case during date range",
+                            "Regardless of NOV and Citation status",
+                            RoleType.MuniStaff,
+                            true),
+    
     LOGGED_NO_NOV_EVER      ("Attached to a case but not included in a notice EVER",
                             "Potentially violations attached to a case from a property inspection; there's a window",
                             RoleType.MuniStaff,

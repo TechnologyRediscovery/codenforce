@@ -1136,6 +1136,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 paramsList.add(genParams_cv_allOutstanding(params, cred));
                 
                 break;
+            case LOGGED_IN_DATE_RANGE:
+                paramsList.add(genParams_cv_loggedInDateRange(params, cred));
+                break;
             default:
                 
                 
@@ -2476,6 +2479,27 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         return params;
     }
+    
+    /**
+     * Returns a SearchParams subclass for retrieving code violations
+     * that meet the desired criteria
+     * @param params
+     * @param cred
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCodeViolation genParams_cv_loggedInDateRange(SearchParamsCodeViolation params, Credential cred){
+        params.setFilterName("All violations attached to case in a date range");
+        
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.CASE_ATTACHMENTDOR);
+        
+        return params;
+    }
+    
     
     /**
      * Returns a SearchParams subclass for retrieving code violations

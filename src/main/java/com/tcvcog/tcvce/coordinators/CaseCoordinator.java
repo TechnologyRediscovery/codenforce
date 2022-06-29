@@ -1325,12 +1325,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         rpt.setEventList(sc.runQuery(query_ev).getBOBResultList());
 
         // VIOLATIONS
-//        QueryCodeViolation qcv = sc.initQuery(QueryCodeViolationEnum.LOGGED_PAST30_NOV_CITMAYBE, ua.getKeyCard());
-//        SearchParamsCodeViolation params = qcv.getPrimaryParams();
+//        QueryCodeViolation qcodeVDORInPeriod = sc.initQuery(QueryCodeViolationEnum.LOGGED_IN_DATE_RANGE, ua.getKeyCard());
+//        SearchParamsCodeViolation params = qcodeVDORInPeriod.getPrimaryParams();
 //        params.setDate_relativeDates_ctl(false);
 //        params.setDate_start_val(rpt.getDate_start_val());
 //        params.setDate_end_val(rpt.getDate_end_val());
-//        rpt.setViolationsLoggedNOVDateRange(sc.runQuery(qcv).getResults());
+//        rpt.setViolationsLoggedDateRange(sc.runQuery(qcodeVDORInPeriod).getResults());
+//        System.out.println("CaseCoordinator.report_buildCECaseListReport: Violation DOR in range query log" + qcodeVDORInPeriod.getQueryLog());
+//        
 //        
 //        qcv = sc.initQuery(QueryCodeViolationEnum.COMP_PAST30, ua.getKeyCard());
 //        params = qcv.getPrimaryParams();

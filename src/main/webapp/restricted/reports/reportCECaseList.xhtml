@@ -67,7 +67,8 @@
                                     <h:outputText value="#{reportingBB.reportCECaseList.caseListClosedInDateRange.size()}" />
                                 </div>
                             </div>
-                            
+                            <ui:remove>
+                                
                             <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
 
                                 <!--NESTED DATA LABEL INLINE -->
@@ -78,9 +79,11 @@
                                 <!--NESTED DATA VALUE INLINE -->
                                 <div class="restrict-data-field-value-inline"
                                      style="color:black;" >
-                                    <h:outputText value="[compute]" />
+                                    <h:outputText value="#{reportingBB.reportCECaseList.violationsLoggedDateRange.size()}" />
+                                    
                                 </div>
                             </div>
+                            </ui:remove>
                             
                             <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
 
@@ -92,24 +95,27 @@
                                 <!--NESTED DATA VALUE INLINE -->
                                 <div class="restrict-data-field-value-inline"
                                      style="color:black;" >
-                                    <h:outputText value="[Use number from pie chart]" />
+                                    <h:outputText value="#{reportingBB.reportCECaseList.pieViolCompCount}" />
                                 </div>
                             </div>
                             
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+                            <ui:remove>
 
-                                <!--NESTED DATA LABEL INLINE -->
-                                <div class="restrict-data-field-label-inline" 
-                                     >
-                                    <h:outputLabel value="Total events logged from #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_start_val)} to #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}: "/>
+                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                    <!--NESTED DATA LABEL INLINE -->
+                                    <div class="restrict-data-field-label-inline" 
+                                         >
+                                        <h:outputLabel value="Total events logged from #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_start_val)} to #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}: "/>
+                                    </div>
+                                    <!--NESTED DATA VALUE INLINE -->
+                                    <div class="restrict-data-field-value-inline"
+                                         style="color:black;" >
+                                        <h:outputText value="#{reportingBB.reportCECaseList.eventList.size()} [make muni-specific]" />
+                                    </div>
                                 </div>
-                                <!--NESTED DATA VALUE INLINE -->
-                                <div class="restrict-data-field-value-inline"
-                                     style="color:black;" >
-                                    <h:outputText value="#{reportingBB.reportCECaseList.eventList.size()} [make muni-specific]" />
-                                </div>
-                            </div>
                          
+                            </ui:remove>
                         </div>
                         
                          <div class="report-trailblaze-headerbox">

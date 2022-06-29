@@ -59,12 +59,14 @@ public class ReportConfigCECaseList
     private List<CodeViolationPropCECaseHeavy> violationsLoggedNOVDateRange;
     private List<CodeViolationPropCECaseHeavy> violationsLoggedComplianceDateRange;
     private List<CodeViolationPropCECaseHeavy> violationsCitedDateRange;
+    private List<CodeViolationPropCECaseHeavy> violationsLoggedDateRange;
     private HorizontalBarChartModel barViolationsReport;
     
     private PieChartModel pieViol;
     protected List<LegendItem> pieViolLegend;
     private Map<ViolationStatusEnum, Integer> pieViolStatMap;
     private int pieViolCompCount;
+    
     
     
     private PieChartModel pieEnforcement;
@@ -75,6 +77,7 @@ public class ReportConfigCECaseList
     protected List<LegendItem> pieClosureLegend;
     
     // Metrics
+    
     private double averageAgeOfCasesClosed;
     private String averageAgeOfCasesOpenAsOfReportEndDate;
     
@@ -585,6 +588,22 @@ public class ReportConfigCECaseList
      */
     public void setIncludeStreetLevelSummary(boolean includeStreetLevelSummary) {
         this.includeStreetLevelSummary = includeStreetLevelSummary;
+    }
+
+   
+
+    /**
+     * @return the violationsLoggedDateRange
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsLoggedDateRange() {
+        return violationsLoggedDateRange;
+    }
+
+    /**
+     * @param violationsLoggedDateRange the violationsLoggedDateRange to set
+     */
+    public void setViolationsLoggedDateRange(List<CodeViolationPropCECaseHeavy> violationsLoggedDateRange) {
+        this.violationsLoggedDateRange = violationsLoggedDateRange;
     }
     
     
