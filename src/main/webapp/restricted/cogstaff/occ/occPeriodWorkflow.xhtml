@@ -134,6 +134,104 @@
                                 <!-- Second column -->
                                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                                     <ui:include src="../compositions/eventsPanel.xhtml"/>
+                                    
+
+                                    <p:panel id="events-panel"
+                                             toggleable="true"
+                                             collapsed="false"
+                                             header="Events (#{occPeriodBB.currentOccPeriod.eventList.size()})">
+
+                                        <h:form id="events-form">
+
+                                            <p:commandButton id="events-add-button"
+                                                             styleClass="noFill button-size-small"
+                                                             value="Add event"
+                                                             icon="fa fa-plus"
+                                                             actionListener="#{eventsBB.onEventAddInit(occPeriodBB.currentOccPeriod)}"
+                                                             oncomplete="PF('event-add-dialog-var').show()"
+                                                             update="event-add-dialog"/>
+
+                                            <p:spacer height="5px"/>
+
+                                            <p:selectOneMenu style="width: 300px;"
+                                                             id="prop-viewoptionsevents-solb"
+                                                             value="#{eventsBB.eventListFilterMode}"
+                                                             tabindex="10">
+
+                                                <p:ajax update="events-panel"
+                                                        immediate="true"/>
+
+                                                <f:selectItems id="prop-events-selitems"
+                                                               value="#{eventsBB.eventListFilterModes}"
+                                                               var="evo"
+                                                               itemValue="#{evo}"
+                                                               itemLabel="#{evo.label}"/>
+                                            </p:selectOneMenu>
+
+                                            <p:spacer height="5px"/>
+
+                                            <p:dataTable id="events-table"
+                                                         var="event"
+                                                         sortMode="multiple"
+                                                         value="#{occPeriodBB.currentOccPeriod.eventList}"
+                                                         tableStyleClass="primeDataTable"
+                                                         rowKey="#{event.eventID}"
+                                                         reflow="true">
+
+                                                <p:column headerText="Date"
+                                                          width="20%"
+                                                          sortBy="#{event.timeStart}"
+                                                          styleClass="centeredColumnContent">
+                                                    <h:outputText value="#{empty event.timeStart ? eventsBB.getPrettyDate(event.creationts) : eventsBB.getPrettyDate(event.timeStart) }"/>
+                                                </p:column>
+
+                                                <p:column headerText="Category"
+                                                          width="20%"
+                                                          sortBy="#{event.category.eventCategoryTitle}"
+                                                          styleClass="centeredColumnContent">
+
+                                                    <div class="#{event.category.icon.styleClass}">
+                                                        <i class="material-icons status-display-icon-i"><h:outputText value="#{event.category.icon.materialIcon}"/></i>
+                                                    </div>
+
+                                                    <h:outputText value="#{event.category.eventType.label}:"/>
+
+                                                    <p:spacer height="1px" />
+
+                                                    <h:outputText value="#{event.category.eventCategoryTitle}"/>
+                                                </p:column>
+
+                                                <p:column headerText="Description"
+                                                          width="50%"
+                                                          styleClass="centeredColumnContent wrapText">
+
+                                                    <h:outputText value="#{event.description}"/>
+
+                                                </p:column>
+
+                                                <p:column headerText="Actions"
+                                                          width="10%"
+                                                          styleClass="centeredColumnContent">
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink id="event-open-button"
+                                                                       styleClass="noFill button-size-small"
+                                                                       value="view/edit"
+                                                                       oncomplete="PF('event-profile-dialog-var').show()"
+                                                                       update="event-profile-dialog event-profile-form"
+                                                                       actionListener="#{eventsBB.onViewEvent(event)}">
+                                                        </p:commandLink>
+                                                    </div>
+                                                    <p:spacer height="3px" />
+                                                    <h:outputText value="(ID:#{event.eventID})"/>
+
+                                                </p:column>
+                                            </p:dataTable>
+                                        </h:form>
+                                    </p:panel>
+
+
+                                    
+                                    
                                     <ui:remove>
                                         
                                         <ui:include src="../compositions/chargesPaymentsTools.xhtml"/>

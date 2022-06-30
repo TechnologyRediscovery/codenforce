@@ -519,9 +519,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    pdh.setCeCaseList(sc.runQuery(qcse).getResults());
 
                    // Property info cases
-                   qcse = sc.initQuery(QueryCECaseEnum.PROPINFOCASES, ua.getKeyCard());
-                   qcse.getPrimaryParams().setProperty_val(prop);
-                   pdh.setPropInfoCaseList(cc.cecase_assembleCECaseDataHeavyList(sc.runQuery(qcse).getBOBResultList(), ua));
+                   List<Integer> infocaseIDList = 
+                   pdh.setPropInfoCaseList(cc.cecase_assembleCECaseDataHeavyList(, ua));
 
                    // check list and see if it's emtpy; 
                    if (pdh.getPropInfoCaseList() == null) {

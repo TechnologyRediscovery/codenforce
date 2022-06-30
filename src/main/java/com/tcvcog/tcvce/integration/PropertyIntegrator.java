@@ -2929,6 +2929,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
     }
 
+    
     public PropertyUnitChangeOrder getPropertyUnitChange(int unitChangeId) throws IntegrationException, BObStatusException {
         PropertyUnitChangeOrder uc = new PropertyUnitChangeOrder();
         String query = "SELECT unitchangeid, parcelunit_unitid,\n"

@@ -18,6 +18,29 @@
                         <!-- VALIDATION MESSAGE -->
                         <p:growl id="growl" showDetail="false" globalOnly="false"/>
                     </h:form>
+                    
+                       <p:ajaxStatus onstart="PF('session-status-dialog').show()" 
+                                          onsuccess="PF('session-status-dialog').hide()"
+                                          delay="500" />
+
+                            <p:dialog widgetVar="session-status-dialog" 
+                                      modal="true"
+                                      height="250px"
+                                      width="350px"
+                                      draggable="false" 
+                                      closable="false" 
+                                      resizable="false" 
+                                      showHeader="false">
+                                <div class="p-text-center">
+                                    <h:outputText value="Stand by: loading...loading" />
+                                    <p:spacer height="3px" />
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/27/Skid_Loader_anim.gif"
+                                         alt="loading" 
+                                         width="150px"
+                                         style="display: block; margin-left:auto; margin-right:auto;"/>
+                                    <p style="font-size: 0.7em;">Pasimi, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0, via Wikimedia Commons</p>
+                                </div>
+                            </p:dialog>
 
                     <h:form id="initiateSessionForm">
                         <!-- MAIN CONTAINER -->

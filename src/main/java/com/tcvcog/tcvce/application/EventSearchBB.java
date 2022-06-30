@@ -8,6 +8,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.EventCategory;
@@ -50,7 +51,6 @@ public class EventSearchBB extends BackingBeanUtils{
     private List<EventType> eventTypeList;
     private List<EventCategory> eventCategoryList;
     
-    
     /**
      * Creates a new instance of EventSearchBB
      */
@@ -71,7 +71,10 @@ public class EventSearchBB extends BackingBeanUtils{
         // setup search
         configureParameters();
         
-        eventList = new ArrayList<>();
+        eventList = getSessionBean().getSessEventList();
+        if(eventList == null){
+            eventList = new ArrayList<>();
+        }
         eventListFiltered = new ArrayList<>();
         eventViewList = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
         eventTypeList = Arrays.asList(EventType.values());
@@ -119,18 +122,15 @@ public class EventSearchBB extends BackingBeanUtils{
         if(querySelected != null){
             System.out.println("EventSearchBB.executeQuery | querySelected: " + querySelected.getQueryTitle());
         }
-        
         List<EventCnFPropUnitCasePeriodHeavy> evList;
-        
         try {
-            
             evList = sc.runQuery(querySelected).getBOBResultList();
             if(!appendResultsToList && eventList != null){
                 eventList.clear();
             } 
             if(evList != null && !evList.isEmpty()){
                 eventList.addAll(evList);
-            
+                getSessionBean().setSessEventList(eventList);
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Your search completed with " + evList.size() + " results", ""));
@@ -138,9 +138,7 @@ public class EventSearchBB extends BackingBeanUtils{
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Your search had no results", ""));
-                
             }
-            
         } catch (SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -156,6 +154,57 @@ public class EventSearchBB extends BackingBeanUtils{
     public void onViewEvent(EventCnFPropUnitCasePeriodHeavy evpucph){
         currentEvent = evpucph;
         getSessionBean().setSessEvent(currentEvent);
+    }
+    
+    /**
+     * Listener to go see the property on which an event is attached
+     * @param evpucph 
+     * @return  page ID for nav
+     */
+    public String onViewEventProperty(EventCnFPropUnitCasePeriodHeavy evpucph){
+        try {
+            return getSessionBean().navigateToPageCorrespondingToObject(evpucph.getProperty());
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "FATAL ERROR: Unable to navigate to property, sorry! ", ""));
+            return "";
+        }
+        
+    }
+    
+    /**
+     * Listener to go see the cecase or 
+     * @param evpucph 
+     * @return  page ID for navigation
+     */
+    public String onViewEventHolder(EventCnFPropUnitCasePeriodHeavy evpucph){
+         try {
+            switch(evpucph.getDomain()){
+                case CODE_ENFORCEMENT:
+                    return getSessionBean().navigateToPageCorrespondingToObject(evpucph.getCecase());
+                case OCCUPANCY:
+                    return getSessionBean().navigateToPageCorrespondingToObject(evpucph.getPeriod());
+                case UNIVERSAL:
+                    getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                               "FATAL ERROR: Unable to navigate to case or file, sorry! ", ""));
+                    return "";
+                default:
+                    getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                               "FATAL ERROR: Unable to navigate to case or file, sorry! ", ""));
+                    return "";
+            }
+        } catch (BObStatusException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "FATAL ERROR: Unable to navigate to property, sorry! ", ""));
+            return "";
+        }
+        
     }
     
     /**

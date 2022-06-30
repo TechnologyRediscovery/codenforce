@@ -145,6 +145,15 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
             updateEventList();
         }
     }
+    
+    
+    /**
+     * Listener to view current event
+     * @param ev 
+     */
+    public void onViewEvent(EventCnF ev){
+        currentEvent = ev;
+    }
 
     /**
      * Listener for user requests to make an event either active or inactive
@@ -401,8 +410,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
 
     /**
      * Listener to start the whole event creation process!
+     * @param holder
      */
-    public void onEventAddInit() {
+    public void onEventAddInit(IFace_EventHolder holder) {
+        currentEventHolder = holder;
         // Set potentialEvent to an empty event
         EventCoordinator ec = getEventCoordinator();
 

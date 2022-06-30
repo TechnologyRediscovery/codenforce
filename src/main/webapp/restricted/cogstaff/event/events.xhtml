@@ -29,6 +29,29 @@
 
                             <h1>Event Queries and Notification Manager</h1>
 
+
+                            <p:ajaxStatus onstart="PF('event-status-dialog').show()" 
+                                          onsuccess="PF('event-status-dialog').hide()"
+                                          delay="500" />
+
+                            <p:dialog widgetVar="event-status-dialog" 
+                                      modal="true"
+                                      height="250px"
+                                      width="350px"
+                                      draggable="false" 
+                                      closable="false" 
+                                      resizable="false" 
+                                      showHeader="false">
+                                <div class="p-text-center">
+                                    <h:outputText value="Stand by: loading...loading" />
+                                    <p:spacer height="3px" />
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/27/Skid_Loader_anim.gif"
+                                         alt="loading" 
+                                         width="150px"
+                                         style="margin-left:auto; margin-right:auto;"/>
+                                    <p style="font-size: 0.7em;">Pasimi, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0, via Wikimedia Commons</p>
+                                </div>
+                            </p:dialog>
                             <div class="p-grid nested-grid">
                                 <div class="p-col-6">
 
@@ -62,44 +85,27 @@
                                                             <p:ajax listener="#{eventSearchBB.changeQuerySelected}"
                                                                     update="form-messages-global
                                                                     @form:@parent:eventsearch-params-form
-                                                                    @form
+                                                                    event-search-clear-cb
                                                                     "/>
                                                         </p:selectOneMenu>
                                                     </div>
                                                 </div>
                                                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
-
-
                                                     <div class="restrict-main-contents-io-button gray_button">
                                                         <p:commandButton   id="event-search-clear-cb" 
                                                                            ajax="true" 
                                                                            actionListener="#{eventSearchBB.resetQuery}"
                                                                            icon="fa fa-eraser" 
                                                                            styleClass="button inline-button"
-                                                                           value="clear query" 
-                                                                           disabled="#{!eventSearchBB.querySelected.queryExecuted}"
+                                                                           value="reset query" 
+                                                                           disabled="#{empty eventSearchBB.querySelected.executionTimestamp}"
                                                                            update="form-messages-global
                                                                            @form
+                                                                           eventsearch-params-form
                                                                            event-search-log-form"/>
-
                                                     </div>
                                                 </div>
-                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
 
-                                                    <div class="restrict-data-field-label-inline" >
-
-                                                        <p:outputLabel for="event-search-appendresults-chkbox">
-                                                            <h:outputText value="Append results to list? "/>
-                                                        </p:outputLabel>
-
-                                                    </div>
-                                                    <div class="restrict-data-field-value-inline" >
-                                                        <p:selectBooleanCheckbox   id="event-search-appendresults-chkbox" 
-                                                                                   value="#{eventSearchBB.appendResultsToList}" >
-                                                            <p:ajax />
-                                                        </p:selectBooleanCheckbox>
-                                                    </div>
-                                                </div>
                                                 <div class="restrict-main-contents-io-button gray_button">
                                                     <p:commandButton  value="help" 
                                                                       onclick="PF('helpdlg').show()" 
@@ -116,21 +122,24 @@
                                               collapsed="false"
                                               header="Parameters">
                                         <h:form id="eventsearch-params-form">
-                                            
-                                              <div class="restrict-main-contents-io-button">
+
+                                            <div class="restrict-main-contents-io-button">
                                                 <p:commandButton    id="execute-selected-query-top" 
                                                                     ajax="true"
                                                                     value="perform selected query" 
                                                                     actionListener="#{eventSearchBB.executeQuery}"
-                                                                    disabled="#{eventSearchBB.querySelected.queryExecuted}"
+                                                                    disabled="#{!empty eventSearchBB.querySelected.executionTimestamp}"
                                                                     icon="fa fa-flash"
                                                                     update="event-list-panel
                                                                     event-list-form
+                                                                    @form
+                                                                    event-search-form
                                                                     form-messages-global
                                                                     event-search-log-form
+
                                                                     "/>
                                             </div>
-                                            
+
                                             <p:spacer height="5px" />
 
 
@@ -184,7 +193,8 @@
                                                                 <p:selectOneMenu  id="event-search-date-field-val" 
                                                                                   tabindex="1" 
                                                                                   value="#{eventSearchBB.searchParamsSelected.date_field}"
-                                                                                  disabled="#{!eventSearchBB.searchParamsSelected.date_startEnd_ctl}">
+                                                                                  disabled="#{!eventSearchBB.searchParamsSelected.date_startEnd_ctl}"
+                                                                                  converter="dateFieldConverter">
                                                                     <f:selectItem itemLabel="select a date field..." 
                                                                                   noSelectionOption="true" 
                                                                                   itemDisabled="true"/>
@@ -500,7 +510,7 @@
 
                                             <f:subview id="eventsearch-param-subview-ev4-domainpk"
                                                        rendered="#{eventSearchBB.searchParamsSelected.eventDomainPK_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
-                                               <div class="p-grid">
+                                                <div class="p-grid">
                                                     <div class="p-col-4 restrict-data-field-label-inline">
                                                         <p:outputLabel for="event-search-filter-domainpk-ctl" 
                                                                        value="filter by domain object id (CE case or permit file)"/>
@@ -579,7 +589,7 @@
 
                                             <f:subview id="eventsearch-param-subview-ev7-rolefloor-view"
                                                        rendered="#{eventSearchBB.searchParamsSelected.rolefloor_view_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
-                                               <div class="p-grid">
+                                                <div class="p-grid">
                                                     <div class="p-col-4 restrict-data-field-label-inline">
                                                         <p:outputLabel id="event-filter-rolefloor-view-ol" 
                                                                        for="eventsearch-param-rolefloor-view-sbcb" 
@@ -606,7 +616,7 @@
 
                                             <f:subview id="eventsearch-param-subview-ev8-rolefloor-update"
                                                        rendered="#{eventSearchBB.searchParamsSelected.rolefloor_update_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
-                                               <div class="p-grid">
+                                                <div class="p-grid">
                                                     <div class="p-col-4 restrict-data-field-label-inline">
                                                         <p:outputLabel id="event-filter-rolefloor-update-ol" 
                                                                        for="eventsearch-param-rolefloor-update-sbcb" 
@@ -690,10 +700,13 @@
                                                                     ajax="true"
                                                                     value="perform selected query" 
                                                                     actionListener="#{eventSearchBB.executeQuery}"
-                                                                    disabled="#{eventSearchBB.querySelected.queryExecuted}"
+                                                                    disabled="#{!empty eventSearchBB.querySelected.executionTimestamp}"
                                                                     icon="fa fa-flash"
-                                                                    update="event-list-panel
+                                                                    update="
+                                                                    @form
+                                                                    event-list-panel
                                                                     event-list-form
+                                                                    event-search-form
                                                                     form-messages-global
                                                                     event-search-log-form
                                                                     "/>
@@ -718,6 +731,8 @@
 
                                 </div>
                                 <div class="p-col-6">
+                                    <ui:include src="/restricted/cogstaff/compositions/eventsPanel.xhtml"/>
+
                                     <p:panel    id="event-list-panel"
                                                 toggleable="true"
                                                 style="width: 100%;"
@@ -727,30 +742,41 @@
                                                 header="Event list" >
 
                                         <h:form id="event-list-form">
-                                            <div class="ui-g data_container_nested_restrict">
-                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
 
-                                                    <div class="restrict-data-field-label-inline" >
-                                                        <h:outputLabel  for="event-viewoptions-som">
-                                                            <h:outputText value="Filter" />
-                                                        </h:outputLabel>
-                                                    </div>
-                                                    <div class="restrict-data-field-value-inline" >
-                                                        <p:selectOneMenu    id="event-viewoptions-som"
-                                                                            value="#{eventSearchBB.eventViewSelected}"
-                                                                            tabindex="10">
+                                            <div class="p-grid">
 
-                                                            <f:selectItems  id="event-viewoptions-selitems"
-                                                                            value="#{eventSearchBB.eventViewList}"
-                                                                            var="vo"
-                                                                            itemValue="#{vo}"
-                                                                            itemLabel="#{vo.label}"/>
-                                                            <p:ajax update="events-table"
-                                                                    immediate="true"/>
-                                                        </p:selectOneMenu>
-                                                    </div>
+                                                <div class="p-col-4 restrict-data-field-label-inline">
+                                                    <h:outputLabel  for="event-viewoptions-som">
+                                                        <h:outputText value="Filter" />
+                                                    </h:outputLabel>
+
                                                 </div>
-                                                <div class="restrict-main-contents-io-button">
+                                                <div class="p-col-8 restrict-data-field-value-inline">
+                                                    <p:selectOneMenu    id="event-viewoptions-som"
+                                                                        value="#{eventSearchBB.eventViewSelected}"
+                                                                        tabindex="10">
+
+                                                        <f:selectItems  id="event-viewoptions-selitems"
+                                                                        value="#{eventSearchBB.eventViewList}"
+                                                                        var="vo"
+                                                                        itemValue="#{vo}"
+                                                                        itemLabel="#{vo.label}"/>
+                                                        <p:ajax update="events-table"
+                                                                immediate="true"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                                <div class="p-col-4 restrict-data-field-label-inline">
+                                                    <p:outputLabel for="event-search-appendresults-chkbox">
+                                                        <h:outputText value="Append results to list? "/>
+                                                    </p:outputLabel>
+                                                </div>
+                                                <div class="p-col-8 restrict-data-field-value-inline">
+                                                    <p:selectBooleanCheckbox   id="event-search-appendresults-chkbox" 
+                                                                               value="#{eventSearchBB.appendResultsToList}" >
+                                                        <p:ajax />
+                                                    </p:selectBooleanCheckbox>
+                                                </div>
+                                                <div class="p-col-4">
                                                     <p:commandButton   id="print-event-list-report-cb" 
                                                                        ajax="true" actionListener="#{eventSearchBB.prepareEventReport}"
                                                                        icon="fa fa-print" styleClass="button"
@@ -759,8 +785,9 @@
                                                                        update="report-eventlist-form
                                                                        form-messages-global"/>
 
+
                                                 </div>
-                                                <div class="restrict-main-contents-io-button gray_button">
+                                                <div class="p-col-4">
                                                     <p:commandButton   id="event-search-clear-button" 
                                                                        ajax="true" 
                                                                        actionListener="#{eventSearchBB.clearEventList}"
@@ -773,6 +800,14 @@
                                                 </div>
                                             </div>
 
+                                            <p:spacer height="5px" />
+
+                                            <h:outputText   id="eventlist-size-ot"
+                                                            value="listing (#{eventSearchBB.eventList.size()}) events" />
+
+                                            <p:spacer height="5px" />
+
+
                                             <p:dataTable
                                                 id="events-table"
                                                 var="e"
@@ -784,76 +819,109 @@
                                                 widgetVar="events-table-var"
                                                 >
 
-                                                <p:column width="4%">
-                                                    <i class="material-icons"><h:outputText value="#{e.category.icon.materialIcon}"
-                                                                                            rendered="#{!empty e.category.icon}"/>
+                                                <p:column width="10%">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Domain" />
+                                                        <p:spacer height="3px" />
+                                                        <h:outputText value="Icon" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{e.domain.abbrev}"/>
+                                                    <p:spacer height="3px" />
+                                                    <i class="material-icons">
+                                                        <h:outputText value="#{e.category.icon.materialIcon}"
+                                                                      rendered="#{!empty e.category.icon}"/>
                                                     </i>
                                                 </p:column>
 
-                                                <p:column width="4%" sortBy="#{e.domain.abbrev}"
-                                                          >
+                                                <p:column width="10%"
+                                                          sortBy="#{e.property.muni.muniName}">
                                                     <f:facet name="header">
-                                                        <h:outputText value="Dom" />
+                                                        <h:outputText value="Municipality" />
                                                     </f:facet>
-                                                    <h:outputText value="#{e.domain.abbrev}"/>
+                                                    <h:outputText value="#{e.property.muni.muniName}"/>
                                                 </p:column>
-
-                                                <p:column width="12%" sortBy="#{e.category.eventType.label}"
+                                                <p:column width="40%" sortBy="#{e.category.eventCategoryTitle}"
                                                           >
                                                     <f:facet name="header">
                                                         <h:outputText value="Category" />
+                                                        <p:spacer height="3px" />   
+                                                        <h:outputText value="Property" />
+                                                        <p:spacer height="3px" />   
+                                                        <h:outputText value="Parent" />
                                                     </f:facet>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{e.category.eventType.label}"/>
-                                                        <p:spacer height="5px" />
+                                                    <div class="wrapText">
                                                         <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                                        <h:outputText value="(#{e.category.eventType.label})"/>
                                                     </div>
-                                                    <div class="rowExpansion">
-                                                        <h:outputText value="#{e.property.address}"/>
-                                                        <p:spacer height="5px" />
-                                                        <h:outputText value="Case ID: #{e.cecase.caseID}"/>
-                                                    </div>
+                                                    
+                                                    <p:spacer height="3px" />
+                                                    
+                                                    <p:commandLink id="event-prop-cl"
+                                                                   action="#{eventSearchBB.onViewEventProperty(e)}"
+                                                                   style="font-weight: bold; color:blue;">
+                                                        <h:outputText value="#{e.property.address.addressPretty2LineEscapeFalse}"
+                                                                      escape="false"/>
+                                                    </p:commandLink>
+                                                    
+                                                    <p:spacer height="5px" />
+                                                    
+                                                    <p:commandLink id="event-holder-cl"
+                                                                   action="#{eventSearchBB.onViewEventHolder(e)}"
+                                                                   style="font-weight: bold; color:blue;">
+                                                        <h:outputText value="#{e.cecase.caseID eq 0 ? 'Permit File ID:':'Case ID:'}"/>
+                                                        <h:outputText value="#{e.cecase.caseID eq 0 ? e.occPeriodID : e.ceCaseID  }"/>
+                                                    </p:commandLink>
                                                 </p:column>
 
-                                                <p:column width="9%" sortBy="#{e.timeStart}">
+                                                <p:column width="20%" sortBy="#{e.timeStart}">
                                                     <f:facet name="header">
-                                                        <h:outputText value="Date" />
+                                                        <h:outputText value="Start date" />
+                                                        <p:spacer height="3px" />
+                                                        <h:outputText value="(dur. mins)" />
                                                     </f:facet>
                                                     <div class="rowExpansion">
-                                                        <h:outputText value="#{e.timeStart}"/>
+                                                        <h:outputText value="#{eventSearchBB.getPrettyDate(e.timeStart)}"/>
+                                                        <h:outputText value="(#{e.duration})"/>
                                                     </div>
                                                 </p:column>
 
-                                                <p:column width="4%" sortBy="#{e.eventID}">
+                                                <p:column width="20%" exportable="false">
                                                     <f:facet name="header">
-                                                        <h:outputText value="ID" />
-                                                    </f:facet>
-                                                    <h:outputText value="#{e.eventID}"/>
-                                                </p:column>
-
-                                                <p:column width="8%" exportable="false">
-                                                    <f:facet name="header">
-                                                        <h:outputText value="Action" />
+                                                        <h:outputText value="Actions" />
                                                     </f:facet>
 
-                                                    <p:commandButton ajax="true" 
-                                                                     actionListener="#{eventSearchBB.onViewEvent(e)}"
-                                                                     />
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink id="event-open-button"
+                                                                       styleClass="noFill button-size-small"
+                                                                       value="view/edit"
+                                                                       oncomplete="PF('event-profile-dialog-var').show()"
+                                                                       update="event-profile-dialog event-profile-form"
+                                                                       actionListener="#{eventsBB.onViewEvent(event)}">
+                                                        </p:commandLink>
+                                                    </div>
+                                                    <h:outputText value=" | " />
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink  id="event-hide-cl"
+                                                                        ajax="true"
+                                                                        disabled="#{e.hidden}"
+                                                                        actionListener="#{eventSearchBB.onEventHide(e)}" 
+                                                                        update="event-list-panel
+                                                                        form-messages-global"
+                                                                        />
+                                                    </div>
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink id="event-unhide-cl"
+                                                                       ajax="true"
+                                                                       disabled="#{!e.hidden}"
+                                                                       actionListener="#{eventSearchBB.onEventUnHide(e)}" 
+                                                                       update="event-list-panel
+                                                                       form-messages-global"
+                                                                       />
+                                                    </div>
 
-                                                    <p:commandButton icon="fa fa-eye-slash"
-                                                                     ajax="true"
-                                                                     disabled="#{e.hidden}"
-                                                                     actionListener="#{eventSearchBB.onEventHide(e)}" 
-                                                                     update="event-list-panel
-                                                                     form-messages-global"
-                                                                     />
-                                                    <p:commandButton icon="fa fa-eye"
-                                                                     ajax="true"
-                                                                     disabled="#{!e.hidden}"
-                                                                     actionListener="#{eventSearchBB.onEventUnHide(e)}" 
-                                                                     update="event-list-panel
-                                                                     form-messages-global"
-                                                                     />
+                                                    <p:spacer height="3px" />
+
+                                                    <h:outputText value="(Event ID: #{e.eventID})"/>
 
                                                 </p:column>
                                             </p:dataTable>

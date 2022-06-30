@@ -54,6 +54,7 @@ import com.tcvcog.tcvce.entities.CitationDocketRecord;
 import com.tcvcog.tcvce.entities.CitationStatus;
 import com.tcvcog.tcvce.entities.IFace_transferrable;
 import com.tcvcog.tcvce.entities.NoticeOfViolationType;
+import com.tcvcog.tcvce.entities.Parcel;
 import com.tcvcog.tcvce.entities.TextBlockCategory;
 import com.tcvcog.tcvce.entities.ViolationStatusEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsDateRule;
@@ -718,7 +719,43 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         return caseList;
     }
     
-  
+  /**
+     * Asks the cecase table for all case id's that are property info cases for a given parcel
+     * @param pcl
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public List<Integer> getParcelInfoCaseIDList(Parcel pcl) throws IntegrationException, BObStatusException {
+        if(pcl == null){
+            throw new BObStatusException("cannot get parcel info cases with null parcel input");
+        }
+        
+        String query = "SELECT caseid FROM cecase WHERE propertyinfocase = TRUE AND parcel_parcelkey=?;";
+        List<Integer> idl = new ArrayList<>();
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(query);
+            stmt.setInt(1, pcl.getParcelKey());
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                idl.add(rs.getInt("caseid"));
+            }
+        } catch (SQLException ex) {
+
+            System.out.println(ex);
+            throw new IntegrationException("PropertyIntegrator.getPropertyUnitChange | Unable to get property unit, ", ex);
+        } finally {
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+
+        return idl;
+    }
     /**
      * Insertion point for CECaseDataHeavy objects; must be called by Coordinator who checks 
      * logic before sending to the DB. This method only copies from the passed in CECaseDataHeavy
