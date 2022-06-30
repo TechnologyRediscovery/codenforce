@@ -343,7 +343,7 @@ public class    SessionBean
     private ReportConfigCECase reportConfigCECase;
     private ReportConfigCECaseList reportConfigCECaseList;
     
-    private ReportConfigCEEventList reportConfigCEEventList;
+    private ReportConfigCEEventList reportConfigEventList;
     
     private ReportConfigOccInspection reportConfigFieldInspection;
     private ReportConfigOccPermit reportConfigOccPermit;
@@ -1091,17 +1091,17 @@ public class    SessionBean
     }
 
     /**
-     * @return the reportConfigCEEventList
+     * @return the reportConfigEventList
      */
-    public ReportConfigCEEventList getReportConfigCEEventList() {
-        return reportConfigCEEventList;
+    public ReportConfigCEEventList getReportConfigEventList() {
+        return reportConfigEventList;
     }
 
     /**
-     * @param reportConfigCEEventList the reportConfigCEEventList to set
+     * @param reportConfigEventList the reportConfigEventList to set
      */
-    public void setReportConfigCEEventList(ReportConfigCEEventList reportConfigCEEventList) {
-        this.reportConfigCEEventList = reportConfigCEEventList;
+    public void setReportConfigEventList(ReportConfigCEEventList reportConfigEventList) {
+        this.reportConfigEventList = reportConfigEventList;
     }
 
     /**

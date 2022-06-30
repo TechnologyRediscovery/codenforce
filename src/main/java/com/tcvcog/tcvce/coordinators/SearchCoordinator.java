@@ -1910,14 +1910,6 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setPerson_ctl(false);
         params.setPerson_val(null);
         
-        // filter EVENT-6
-        params.setDiscloseToMuni_ctl(false);
-        params.setDiscloseToMuni_val(false);
-        
-        // filter EVENT-7
-        params.setDiscloseToPublic_ctl(false);
-        params.setDiscloseToPublic_val(false);
-        
         return params;
         
     }

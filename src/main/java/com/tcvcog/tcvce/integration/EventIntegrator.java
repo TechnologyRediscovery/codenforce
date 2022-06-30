@@ -641,32 +641,45 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             }
 
            // *******************************
-           // **    6.DISCLOSE TO MUNI     **
+           // **    6.ROLE FLOOR TO ENACT**
            // *******************************
-            if (params.isDiscloseToMuni_ctl()) {
-                params.appendSQL("AND disclosetomunicipality=");
-                if (params.isDiscloseToMuni_val()) {
-                    params.appendSQL("TRUE ");
+            if (params.isRolefloor_enact_ctl()) {
+                if (params.getRoleFloor_enact_val() != null) {
+                    params.appendSQL("AND eventcategory.rolefloorenact=CAST(? AS role)");
                 } else {
-                    params.appendSQL("FALSE ");
+                    params.setRolefloor_enact_ctl(false);
+                    params.appendToParamLog("EVENT ROLE FLOOR ENACT: No role object included in value field; enact role floor filter disabled; | ");
+                }
+            }
+
+           // *******************************
+           // **    7.ROLE FLOOR TO VIEW**
+           // *******************************
+            if (params.isRolefloor_view_ctl()) {
+                if (params.getRoleFloor_view_val() != null) {
+                    params.appendSQL("AND eventcategory.rolefloorviewt=CAST(? AS role)");
+                } else {
+                    params.setRolefloor_view_ctl(false);
+                    params.appendToParamLog("EVENT ROLE FLOOR VIEW: No role object included in value field; view role floor filter disabled; | ");
+                }
+            }
+
+           // *******************************
+           // **    8.ROLE FLOOR TO UPDATE**
+           // *******************************
+            if (params.isRolefloor_update_ctl()) {
+                if (params.getRoleFloor_update_val() != null) {
+                    params.appendSQL("AND eventcategory.rolefloorupdate=CAST(? AS role)");
+                } else {
+                    params.setRolefloor_update_ctl(false);
+                    params.appendToParamLog("EVENT ROLE FLOOR UPDATE: No role object included in value field; update role floor filter disabled; | ");
                 }
             }
 
 
-           // *******************************
-           // **    7.DISCLOSE TO PUBLIC   **
-           // *******************************
-            if (params.isDiscloseToPublic_ctl()) {
-                params.appendSQL("AND disclosetopublic=");
-                if (params.isDiscloseToPublic_val()) {
-                    params.appendSQL("TRUE ");
-                } else {
-                    params.appendSQL("FALSE ");
-                }
-            }
             
            // *******************************
-           // **   8.PROPERTY              **
+           // **   9.PROPERTY              **
            // *******************************
             if (params.isProperty_ctl()) {
                 if(params.getProperty_val()!= null){
@@ -677,24 +690,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 }
             }
             
-           // *******************************
-           // **   9.PROP USE TYPE         **
-           // *******************************
-            if (params.isPropertyUseType_ctl()) {
-                if(params.getPropertyUseType_val()!= null){
-                    params.appendSQL("AND property.propertyid=? ");
-                } else {
-                    params.setPropertyUseType_ctl(false);
-                    params.appendToParamLog("PROPERTY USE TYPE: No PROPERTY object specified; filter disabled; | ");
-                }
-            }
             
              // *******************************
-           // **   10. LAND BANK HELD        **
+           // **   10. NOTIFY        **
            // *******************************
-            if (params.isDiscloseToPublic_ctl()) {
-                params.appendSQL("AND property.landbankheld=");
-                if (params.isDiscloseToPublic_val()) {
+            if (params.isNotify_ctl()) {
+                params.appendSQL("AND eventcategory.notifymonitors=");
+                if (params.isNotify_val()) {
                     params.appendSQL("TRUE ");
                 } else {
                     params.appendSQL("FALSE ");
@@ -702,7 +704,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             }
             
         } else {
-            params.appendSQL("AND eventid=? "); // will be param 1 with ID search
+            params.appendSQL("AND event.eventid=? "); // will be param 1 with ID search
         }
         int paramCounter = 0;
         params.appendSQL(";");
@@ -741,13 +743,21 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                     stmt.setInt(++paramCounter, params.getPerson_val().getHumanID());
                 }
                 
+                if(params.isRolefloor_enact_ctl()) {
+                    stmt.setString(++paramCounter, params.getRoleFloor_enact_val().name());
+                }
+                if(params.isRolefloor_view_ctl()) {
+                    stmt.setString(++paramCounter, params.getRoleFloor_view_val().name());
+                }
+                if(params.isRolefloor_update_ctl()) {
+                    stmt.setString(++paramCounter, params.getRoleFloor_update_val().name());
+                }
+                
                 if (params.isProperty_ctl()) {
                     stmt.setInt(++paramCounter, params.getProperty_val().getParcelKey());
                 }
                 
-                if (params.isPropertyUseType_ctl()) {
-                    stmt.setInt(++paramCounter, params.getPropertyUseType_val().getTypeID());
-                }
+                
                 
             } else {
                 stmt.setInt(++paramCounter, params.getBobID_val());
@@ -950,6 +960,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     /**
      * Creates a new record in the eventcategory table
      * @param ec
+     * @return 
      * @throws IntegrationException 
      */
     public int insertEventCategory(EventCategory ec) throws IntegrationException {

@@ -1959,4 +1959,10 @@
         <managed-bean-class>com.tcvcog.tcvce.application.TextBlockBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    <managed-bean>
+        <description>Permier backing bean supporting event search utilities</description>
+        <managed-bean-name>eventSearchBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventSearchBB</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
 </faces-config>

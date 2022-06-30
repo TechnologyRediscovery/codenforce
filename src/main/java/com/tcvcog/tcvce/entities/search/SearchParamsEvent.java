@@ -11,6 +11,7 @@ import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.Person;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.PropertyUseType;
+import com.tcvcog.tcvce.entities.RoleType;
 
 /**
  *
@@ -41,25 +42,25 @@ public class        SearchParamsEvent
     private boolean person_ctl;
     private Person person_val;
     
-    // filter EVENT-6
-    private boolean discloseToMuni_ctl;
-    private boolean discloseToMuni_val;
+    // filter EVENT-6: role floor enact
+    private boolean rolefloor_enact_ctl;
+    private RoleType roleFloor_enact_val;
     
-    // filter EVENT-7
-    private boolean discloseToPublic_ctl;
-    private boolean discloseToPublic_val;
+    // filter EVENT-7: role floor view
+    private boolean rolefloor_view_ctl;
+    private RoleType roleFloor_view_val;
     
-    // filter EVENT-8
+    // filter EVENT-8: role floor update
+    private boolean rolefloor_update_ctl;
+    private RoleType roleFloor_update_val;
+    
+    // filter EVENT-9
     private boolean property_ctl;
     private Property property_val;
     
-    // filter EVENT-9
-    private boolean propertyUseType_ctl;
-    private PropertyUseType propertyUseType_val;
-    
     // filter EVENT-10
-    private boolean propertyLandBankHeld_ctl;
-    private boolean propertyLandBankHeld_val;
+    private boolean notify_ctl;
+    private boolean notify_val;
     
     
    public SearchParamsEvent(){
@@ -201,61 +202,7 @@ public class        SearchParamsEvent
         this.eventDomain_val = eventDomain_val;
     }
 
-    /**
-     * @return the discloseToMuni_ctl
-     */
-    public boolean isDiscloseToMuni_ctl() {
-        return discloseToMuni_ctl;
-    }
-
-    /**
-     * @return the discloseToMuni_val
-     */
-    public boolean isDiscloseToMuni_val() {
-        return discloseToMuni_val;
-    }
-
-    /**
-     * @return the discloseToPublic_ctl
-     */
-    public boolean isDiscloseToPublic_ctl() {
-        return discloseToPublic_ctl;
-    }
-
-    /**
-     * @return the discloseToPublic_val
-     */
-    public boolean isDiscloseToPublic_val() {
-        return discloseToPublic_val;
-    }
-
-    /**
-     * @param discloseToMuni_ctl the discloseToMuni_ctl to set
-     */
-    public void setDiscloseToMuni_ctl(boolean discloseToMuni_ctl) {
-        this.discloseToMuni_ctl = discloseToMuni_ctl;
-    }
-
-    /**
-     * @param discloseToMuni_val the discloseToMuni_val to set
-     */
-    public void setDiscloseToMuni_val(boolean discloseToMuni_val) {
-        this.discloseToMuni_val = discloseToMuni_val;
-    }
-
-    /**
-     * @param discloseToPublic_ctl the discloseToPublic_ctl to set
-     */
-    public void setDiscloseToPublic_ctl(boolean discloseToPublic_ctl) {
-        this.discloseToPublic_ctl = discloseToPublic_ctl;
-    }
-
-    /**
-     * @param discloseToPublic_val the discloseToPublic_val to set
-     */
-    public void setDiscloseToPublic_val(boolean discloseToPublic_val) {
-        this.discloseToPublic_val = discloseToPublic_val;
-    }
+   
 
     /**
      * @return the eventDomainPK_ctl
@@ -299,61 +246,7 @@ public class        SearchParamsEvent
         this.property_ctl = property_ctl;
     }
 
-    /**
-     * @return the propertyUseType_ctl
-     */
-    public boolean isPropertyUseType_ctl() {
-        return propertyUseType_ctl;
-    }
-
-    /**
-     * @param propertyUseType_ctl the propertyUseType_ctl to set
-     */
-    public void setPropertyUseType_ctl(boolean propertyUseType_ctl) {
-        this.propertyUseType_ctl = propertyUseType_ctl;
-    }
-
-    /**
-     * @return the propertyLandBankHeld_ctl
-     */
-    public boolean isPropertyLandBankHeld_ctl() {
-        return propertyLandBankHeld_ctl;
-    }
-
-    /**
-     * @param propertyLandBankHeld_ctl the propertyLandBankHeld_ctl to set
-     */
-    public void setPropertyLandBankHeld_ctl(boolean propertyLandBankHeld_ctl) {
-        this.propertyLandBankHeld_ctl = propertyLandBankHeld_ctl;
-    }
-
-    /**
-     * @return the propertyLandBankHeld_val
-     */
-    public boolean isPropertyLandBankHeld_val() {
-        return propertyLandBankHeld_val;
-    }
-
-    /**
-     * @param propertyLandBankHeld_val the propertyLandBankHeld_val to set
-     */
-    public void setPropertyLandBankHeld_val(boolean propertyLandBankHeld_val) {
-        this.propertyLandBankHeld_val = propertyLandBankHeld_val;
-    }
-
-    /**
-     * @return the propertyUseType_val
-     */
-    public PropertyUseType getPropertyUseType_val() {
-        return propertyUseType_val;
-    }
-
-    /**
-     * @param propertyUseType_val the propertyUseType_val to set
-     */
-    public void setPropertyUseType_val(PropertyUseType propertyUseType_val) {
-        this.propertyUseType_val = propertyUseType_val;
-    }
+   
 
     /**
      * @return the property_val
@@ -367,6 +260,118 @@ public class        SearchParamsEvent
      */
     public void setProperty_val(Property property_val) {
         this.property_val = property_val;
+    }
+
+    /**
+     * @return the rolefloor_enact_ctl
+     */
+    public boolean isRolefloor_enact_ctl() {
+        return rolefloor_enact_ctl;
+    }
+
+    /**
+     * @return the roleFloor_enact_val
+     */
+    public RoleType getRoleFloor_enact_val() {
+        return roleFloor_enact_val;
+    }
+
+    /**
+     * @return the rolefloor_view_ctl
+     */
+    public boolean isRolefloor_view_ctl() {
+        return rolefloor_view_ctl;
+    }
+
+    /**
+     * @return the roleFloor_view_val
+     */
+    public RoleType getRoleFloor_view_val() {
+        return roleFloor_view_val;
+    }
+
+    /**
+     * @return the rolefloor_update_ctl
+     */
+    public boolean isRolefloor_update_ctl() {
+        return rolefloor_update_ctl;
+    }
+
+    /**
+     * @return the roleFloor_update_val
+     */
+    public RoleType getRoleFloor_update_val() {
+        return roleFloor_update_val;
+    }
+
+    /**
+     * @return the notify_ctl
+     */
+    public boolean isNotify_ctl() {
+        return notify_ctl;
+    }
+
+    /**
+     * @return the notify_val
+     */
+    public boolean isNotify_val() {
+        return notify_val;
+    }
+
+    /**
+     * @param rolefloor_enact_ctl the rolefloor_enact_ctl to set
+     */
+    public void setRolefloor_enact_ctl(boolean rolefloor_enact_ctl) {
+        this.rolefloor_enact_ctl = rolefloor_enact_ctl;
+    }
+
+    /**
+     * @param roleFloor_enact_val the roleFloor_enact_val to set
+     */
+    public void setRoleFloor_enact_val(RoleType roleFloor_enact_val) {
+        this.roleFloor_enact_val = roleFloor_enact_val;
+    }
+
+    /**
+     * @param rolefloor_view_ctl the rolefloor_view_ctl to set
+     */
+    public void setRolefloor_view_ctl(boolean rolefloor_view_ctl) {
+        this.rolefloor_view_ctl = rolefloor_view_ctl;
+    }
+
+    /**
+     * @param roleFloor_view_val the roleFloor_view_val to set
+     */
+    public void setRoleFloor_view_val(RoleType roleFloor_view_val) {
+        this.roleFloor_view_val = roleFloor_view_val;
+    }
+
+    /**
+     * @param rolefloor_update_ctl the rolefloor_update_ctl to set
+     */
+    public void setRolefloor_update_ctl(boolean rolefloor_update_ctl) {
+        this.rolefloor_update_ctl = rolefloor_update_ctl;
+    }
+
+    /**
+     * @param roleFloor_update_val the roleFloor_update_val to set
+     */
+    public void setRoleFloor_update_val(RoleType roleFloor_update_val) {
+        this.roleFloor_update_val = roleFloor_update_val;
+    }
+
+    /**
+     * @param notify_ctl the notify_ctl to set
+     */
+    public void setNotify_ctl(boolean notify_ctl) {
+        this.notify_ctl = notify_ctl;
+    }
+
+    /**
+     * @param notify_val the notify_val to set
+     */
+    public void setNotify_val(boolean notify_val) {
+        this.notify_val = notify_val;
     }
 
    

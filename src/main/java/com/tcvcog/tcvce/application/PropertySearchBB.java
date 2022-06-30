@@ -57,7 +57,7 @@ public class PropertySearchBB extends BackingBeanUtils{
     
     private List<PropertyUseType> putList;
     
-     private List<IntensityClass> conditionIntensityList;
+    private List<IntensityClass> conditionIntensityList;
     private List<IntensityClass> landBankProspectIntensityList;
     private List<BOBSource> sourceList;
     
