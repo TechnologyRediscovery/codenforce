@@ -7,7 +7,7 @@ const { Client, Query } =require('pg');
 // Setup Connection
 var username = "sylvia";
 var password = "c0d3";
-var host = "localhost:20000";
+var host = "localhost:3000";
 var database = "cogdb";
 var connString = "postgres://" + username + ":" + password + "@" + host + "/" + database;
 
@@ -52,7 +52,7 @@ var other = ["None", "OTHER", "Other", "NULL"]
 const fs = require('fs');
 const path = require('path');
 
-imageFiles = fs.readdirSync('/codenforce/repo/codenforce/codenforce_map/public/images/');
+imageFiles = fs.readdirSync('./public/images/');
 
 var imageBank = [];
 
