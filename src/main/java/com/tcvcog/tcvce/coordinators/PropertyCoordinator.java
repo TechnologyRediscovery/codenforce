@@ -519,8 +519,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    pdh.setCeCaseList(sc.runQuery(qcse).getResults());
 
                    // Property info cases
-                   List<Integer> infocaseIDList = 
-                   pdh.setPropInfoCaseList(cc.cecase_assembleCECaseDataHeavyList(, ua));
+                   List<Integer> infocaseIDList = cc.getPropertyInfoCaseIDList(pdh);
+                   
+                   pdh.setPropInfoCaseList(cc.cecase_assembleCECaseDataHeavyList(cc.getCaseListFromIDList(infocaseIDList), ua));
 
                    // check list and see if it's emtpy; 
                    if (pdh.getPropInfoCaseList() == null) {
@@ -562,6 +563,27 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         } 
         return pdh;
     }
+    
+    /**
+     * Utility for getting propert list from a list of IDs
+     * @param idl
+     * @return
+     * @throws IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     */
+    public List<Property> getPropertyListFromIDList(List<Integer> idl) throws IntegrationException, BObStatusException{
+        List<Property> plist = new ArrayList<>();
+        if(idl != null && !idl.isEmpty()){
+            for(Integer i: idl){
+                plist.add(getProperty(i));
+            }
+        }
+        return plist;
+        
+        
+    }
+    
+    
 
    
     /**
@@ -815,7 +837,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             chosenCECase = cseList.get(0);
         } else {
             //There's no existing info case, let's make one.
-            chosenCECase = createPropertyInfoCase(pdh, ua);
+            // Try turning off info case creation
+            //chosenCECase = createPropertyInfoCase(pdh, ua);
         }
         return chosenCECase;
     }
@@ -1067,7 +1090,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
-    public Property getProperty(int parcelID) throws IntegrationException, BObStatusException {
+     public Property getProperty(int parcelID) throws IntegrationException, BObStatusException {
         PropertyIntegrator pi = getPropertyIntegrator();
         Parcel par = pi.getParcel(parcelID);
         if(par == null){

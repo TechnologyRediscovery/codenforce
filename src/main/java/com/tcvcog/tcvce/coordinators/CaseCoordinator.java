@@ -1026,7 +1026,50 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         ci.updateCECaseMetadata(cse);
 
     }
+    
+        /**
+     * Utility for getting propert list from a list of IDs
+     * @param idl
+     * @return
+     * @throws IntegrationException
+     * @throws IntegrationException 
+     */
+    public List<CECase> getCaseListFromIDList(List<Integer> idl) throws IntegrationException, IntegrationException{
+        List<CECase> clist = new ArrayList<>();
+        if(idl != null && !idl.isEmpty()){
+            for(Integer i: idl){
+                clist.add(cecase_getCECase(i));
+            }
+        }
+        return clist;
+        
+        
+    }
+    
 
+    /**
+     * Logic passthrough for parcel info cases
+     * @param pcl
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public List<Integer> getPropertyInfoCaseIDList(Parcel pcl) throws IntegrationException, BObStatusException{
+        CaseIntegrator ci = getCaseIntegrator();
+        // Temporary work around--only return the first and most recent one
+        List<Integer> infoCaseIDList = ci.getParcelInfoCaseIDList(pcl);
+        List<Integer> abbreviatedList = new ArrayList<>();
+        if(pcl == null){
+            return abbreviatedList;
+        }
+        if(infoCaseIDList != null && !infoCaseIDList.isEmpty()){
+            System.out.println("CaseCoordinator.getPropertyInfoCaseIDList | ParcelID : " + pcl.getParcelKey());
+            System.out.println("CaseCoordinator.getPropertyInfoCaseIDList | Found raw list of size: " + infoCaseIDList.size());
+            abbreviatedList.add(infoCaseIDList.get(0));
+        }
+        return abbreviatedList;
+    }
+    
     private String cecase_generateCaseInitNoteFromCEAR(CEActionRequest cear) {
         StringBuilder sb = new StringBuilder();
 
