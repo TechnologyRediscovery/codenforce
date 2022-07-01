@@ -52,7 +52,7 @@ var other = ["None", "OTHER", "Other", "NULL"]
 const fs = require('fs');
 const path = require('path');
 
-imageFiles = fs.readdirSync('/home/wwalk/codenforce/repo/codenforce/codenforce_map/codenforce_map/public/images/');
+imageFiles = fs.readdirSync('/home/wwalk/codenforce/codenforce_map/public/images/');
 
 var imageBank = [];
 
