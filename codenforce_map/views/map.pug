@@ -1,0 +1,167 @@
+extends layout
+block content
+	// Loading screen test
+	<div class="container"><img src="/images/favicon.png" alt="Avatar" class="image"><div class="overlay"></div></div>
+	// filter based on municipality, experiment with other or multiple properties later
+	<form id="cityInput" action="/filter"></form>
+	#map
+	script.
+		//HTML String load in
+		var formHTML = document.getElementById('cityInput');
+		formHTML.insertAdjacentHTML('beforeend', '!{htmlFormString}');
+		//jsonData variable load in
+		var myData = !{JSON.stringify(jsonData)};
+		// zipView variable load in
+		var zipCenter = [!{zipView}];
+		// TEST for "cases" data load in
+		//console.log(myData);
+		//Create variable to hold map element, give initial settings to map
+		var map = L.map('map', { center: [zipCenter[0], zipCenter[1]], zoom: zipCenter[2]});
+		// Add OpenStreetMap tile layer to map element
+		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+			attribution: '© OpenStreetMap, WPRDC.org'
+		}).addTo(map);
+		// Add JSON to map
+		L.geoJson(myData, {
+			style: function(feature) {
+				var caseCount = feature.properties.f9;
+				if (caseCount == 1) {
+					return{color: "#ff7b02"}
+				} else if (caseCount == 2) {
+					return {color: "#ff0208"};
+				} else if (caseCount == 3) {
+					return {color: "#b50043"};
+				} else if (caseCount > 3 && caseCount <= 5) {
+					return {color: "#1800b5"};
+				} else if (caseCount > 5 && caseCount <= 10) {
+					return {color: "#7200b5"};
+				} else if (caseCount > 10) {
+					return {color: "#000000"};
+				} else {
+					return {color: "#0286ff"};
+				}
+				}, 
+			onEachFeature: onEachFeature
+		}).addTo(map);
+		// Feature option
+		function onEachFeature(feature, layer) {
+			var address = feature.properties.f1 + ' ' + feature.properties.f2;
+			var countTest = feature.properties.countTest;
+
+			var casesArray = feature.properties.cases;
+
+			var image = feature.properties.image;
+
+			var ownerAdd = feature.properties.f12;
+			var ownerCity = feature.properties.f13;
+
+			var ownerAddress = "<br>" + ownerAdd + "<br>" + ownerCity;
+
+
+			if (casesArray) {
+				if (casesArray[0]) {
+					var tr = "<tr>";
+
+					var headerCol = ["Case ID", "Violation ID", "Violation", "Status"];
+					var timeNow = new Date();
+					for (var h = 0; h <= headerCol.length -1; h++) {
+						tr += "<th>" + headerCol[h] + "</th>";
+					}
+					tr += "</tr>";
+
+
+					for (var i = 0; i <= casesArray.length - 1; i++) {
+						var openOrClosed = '<strong style=\"color:red\">Open</strong>';
+						tr += "<tr>"
+						if (casesArray[i].f5) {
+						var violationString = casesArray[i].f5;
+						var violation = violationString.split(';')[0];
+						} else {
+							var violation = casesArray[i].f5;
+						}
+						if (casesArray[i].f10) {
+							var actualComplianceDate = new Date(casesArray[i].f10);
+							if (actualComplianceDate <= timeNow) {
+								openOrClosed = '<strong style=\"color:green\">Closed</strong>';
+							}
+						}
+						casesFeatures = [casesArray[i].f2, casesArray[i].f3, violation, openOrClosed];
+
+						for (var j=0; j <= casesFeatures.length - 1; j++) {
+								tr += "<td>" + casesFeatures[j] + "</td>";
+								}
+						tr += "</tr>";
+						}
+					layer.bindPopup(
+						"<img src=\"" + image + "\" style=\"width:300px;height:200px;\"/>" +
+						"<h1>" + address +
+						"</h1><b>Township: </b>" + feature.properties.f4 +
+						"<br><b>Usage: </b>" + feature.properties.f3 +
+						"<br><b>Owner Mailing Address: </b>" + ownerAddress +
+						"<br><table>" + tr + "</table>"
+						);
+				} else {
+					layer.bindPopup(
+						"<img src=\"" + image + "\" style=\"width:300px;height:200px;\"/>" +
+						"<h1>" + address +
+						"</h1><b>Township: </b>" + feature.properties.f4 +
+						"<br><b>Usage: </b>" + feature.properties.f3 +
+						"<br><b>Owner Mailing Address: </b>" + ownerAddress
+					);
+			}} else {
+				layer.bindPopup(
+					"<img src=\"" + image + "\" style=\"width:300px;height:200px;\"/>" +
+					"<h1>" + address +
+					"</h1><b>Township: </b>" + feature.properties.f4 +
+					"<br><b>Usage: </b>" + feature.properties.f3 +
+					"<br><b>Owner Mailing Address: </b>" + ownerAddress
+			)};
+			layer.on({
+				click: zoomToFeature
+			});
+		};
+		// Interactivity Trial
+		function zoomToFeature(e) {
+			var newViewBounds = [[e.target.getBounds().getNorthEast()['lat'] + 0.0090, e.target.getBounds().getNorthEast()['lng']], [e.target.getBounds().getSouthWest()['lat'] - 0.0017, e.target.getBounds().getSouthWest()['lng']]];
+	
+			map.fitBounds(newViewBounds);
+		};
+		// Adding CodeNforce logo
+		L.control.Watermark = L.Control.extend({
+			onAdd: function(map) {
+				img 
+				var img = L.DomUtil.create('img');
+
+				img.src = '/images/logonpublic.png';
+				img.style.width = '200px';
+
+				return img;
+			},
+ 
+			onRemove: function(map) {
+
+			}
+		});
+
+		L.control.watermark = function(opts) {
+			return new L.control.Watermark(opts);
+		}
+
+		L.control.watermark({position: 'bottomleft'}).addTo(map);
+		//Legend
+		var legend = L.control({position: 'bottomright'});
+		legend.onAdd = function (map) {
+			var div = L.DomUtil.create('div', 'info legend'),
+				colors = ['#0286ff', '#ff7b02', '#b50043', '#1800b5', '#7200b5', '#000000'],
+				grades = ['0', '1', '2', '3', '4-5', '6-10+'],
+				labels = [];
+
+			for (var i = 0; i <= grades.length -1 ; i++) {
+				div.innerHTML +=
+					'<i style="background:' + colors[i] +'"></i><b>' +
+					grades[i] + '</b><br><br>';
+			}
+			return div
+		};
+
+		legend.addTo(map);
