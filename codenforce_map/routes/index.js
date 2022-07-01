@@ -7,7 +7,7 @@ const { Client, Query } =require('pg');
 // Setup Connection
 var username = "sylvia";
 var password = "c0d3";
-var host = "localhost:3000";
+var host = "localhost:5432";
 var database = "cogdb";
 var connString = "postgres://" + username + ":" + password + "@" + host + "/" + database;
 
