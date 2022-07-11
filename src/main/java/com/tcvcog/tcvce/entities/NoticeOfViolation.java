@@ -31,10 +31,19 @@ import java.util.List;
 public  class NoticeOfViolation  
         extends BOb 
         implements Serializable, 
-        Comparable<NoticeOfViolation> {
+        Comparable<NoticeOfViolation>,
+        Iface_eventEmitter{
+    
+    
+    final static String TABLE_NAME = "noticeofviolation";
+    final static String PK_FIELD = "noticeid";
+    
+    
     
     private int noticeID;
     private NoticeOfViolationType novType;
+    
+    private List<EventCnFEmitted> emittedEventList;
     
     /**
      * Not deprecated with humanization
@@ -743,6 +752,50 @@ public  class NoticeOfViolation
      */
     public void setNovType(NoticeOfViolationType novType) {
         this.novType = novType;
+    }
+
+    @Override
+    public EventCategory getEventCategoryEmitted(EventEmissionEnum eeenum) {
+        if(novType != null){
+            if(eeenum != null){
+                switch(eeenum){
+                    case NOTICE_OF_VIOLATION_FOLLOWUP:
+                        return novType.getEventCatFollowUp();
+                    case NOTICE_OF_VIOLATION_SENT:
+                        return novType.getEventCatSent();
+                    case NOTICE_OF_VIOLATION_RETURNED:
+                        return novType.getEventCatReturned();
+                    default:
+                        return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public String getPKFieldName() {
+        return PK_FIELD;
+    }
+
+    @Override
+    public int getDBKey() {
+        return noticeID;
+    }
+
+    @Override
+    public String getDBTableName() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    public void setEmittedEvents(List<EventCnFEmitted> evList) {
+        emittedEventList = evList;
+    }
+
+    @Override
+    public List<EventCnFEmitted> getEmittedEvents() {
+        return emittedEventList;
     }
 
    

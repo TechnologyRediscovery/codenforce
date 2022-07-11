@@ -2149,12 +2149,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      */
     public NoticeOfViolation nov_getNoticeOfViolation(int noticeID)
             throws IntegrationException, BObStatusException, BlobException {
+        EventCoordinator ec = getEventCoordinator();
         CaseIntegrator ci = getCaseIntegrator();
         NoticeOfViolation nov = ci.novGet(noticeID);
         if (nov != null) {
             if (nov.getNotifyingOfficer() == null && nov.getCreationBy() != null) {
                 nov.setNotifyingOfficer(nov.getCreationBy());
             }
+            nov.setEmittedEvents(ec.getEmittedEvents(nov));
         }
 
         return nov;
@@ -2398,12 +2400,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public void nov_markAsSent(CECaseDataHeavy ceCase, NoticeOfViolation nov, UserAuthorized user) throws BObStatusException, EventException, IntegrationException {
 
         CaseIntegrator ci = getCaseIntegrator();
+        EventCoordinator ec = getEventCoordinator();
 
         nov.setSentTS(LocalDateTime.now());
         nov.setSentBy(user);
         ci.novRecordMailing(nov);
 
-        nov_logNOVSentEvent(ceCase, nov, user);
+        ec.processEventEmitter(nov, EventEmissionEnum.NOTICE_OF_VIOLATION_SENT, user, ceCase);
+//        nov_logNOVSentEvent(ceCase, nov, user);
 
     }
 

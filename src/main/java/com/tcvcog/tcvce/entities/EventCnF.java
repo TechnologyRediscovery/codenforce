@@ -26,7 +26,7 @@ import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 
 /**
- *
+ * Behold the base class of the EventCnF family!
  * @author ellen bascomb of apt 31y
  */
 public  class       EventCnF 

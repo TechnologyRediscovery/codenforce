@@ -271,7 +271,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     public void onEventRemoveCommitButtonChange(ActionEvent ev){
         EventCoordinator ec = getEventCoordinator();
         try {
-            ec.removeEvent(getCurrentEvent(), getSessionBean().getSessUser());
+            ec.deactivateEvent(getCurrentEvent(), getSessionBean().getSessUser());
              getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Removed event ID " + getCurrentEvent().getEventID(), ""));

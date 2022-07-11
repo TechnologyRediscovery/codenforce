@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.reports.ReportConfigCEEventList;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodDataHeavy;
+import com.tcvcog.tcvce.integration.CaseIntegrator;
 import com.tcvcog.tcvce.integration.EventIntegrator;
 import com.tcvcog.tcvce.integration.PersonIntegrator;
 import java.io.Serializable;
@@ -545,7 +546,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @param ua
      * @throws IntegrationException 
      */
-    public void removeEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException, BObStatusException{
+    public void deactivateEvent(EventCnF ev, UserAuthorized ua) throws IntegrationException, BObStatusException{
         if(ev == null || ua == null ){
             throw new BObStatusException("Event and User cannot be null");
         }
@@ -1023,6 +1024,118 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //    --------------------------------------------------------------------------
 //    **************** OPERATION SPECIFIC EVENT CONFIG *************************
 //    --------------------------------------------------------------------------
+    
+    
+    /**
+     * Logic pass through for extracting a list of events that are emitted
+     * by another object in the system, such as an NOV or a Citation
+     * @param emitter
+     * @return 
+     */
+    public List<EventCnFEmitted> getEmittedEvents(Iface_eventEmitter emitter) throws IntegrationException, BObStatusException{
+        EventIntegrator ei = getEventIntegrator();
+        return ei.getEmittedEventsByEmitter(emitter);
+        
+    }
+    
+    
+    /**
+     * Asks the emitter for its event category and creates the event and tracks that 
+     * creation in the eventemission table
+     * 
+     * @param emitter
+     * @param eeenum
+     * @param ua
+     * @param holder
+     * @return the new primary key of the emission written in
+     * @throws BObStatusException
+     * @throws EventException
+     * @throws IntegrationException 
+     */
+    public int processEventEmitter(Iface_eventEmitter emitter, EventEmissionEnum eeenum, UserAuthorized ua, IFace_EventHolder holder) 
+            throws BObStatusException, EventException, IntegrationException {
+        
+        EventIntegrator ei = getEventIntegrator();
+        
+        if(emitter == null || eeenum == null || ua == null || holder == null){
+            throw new BObStatusException("Cannot process event emission with null emitter, enum, or user");
+        }
+        
+        int freshEmissionID = 0;
+        switch(eeenum){
+            case CITATION_HEARING:
+                break;
+            case NOTICE_OF_VIOLATION_FOLLOWUP:
+                break;
+            case NOTICE_OF_VIOLATION_RETURNED:
+                break;
+            case NOTICE_OF_VIOLATION_SENT:
+                EventCategory ec = emitter.getEventCategoryEmitted(eeenum);
+                EventCnF freshEvent = initEvent(holder, ec);
+                List<EventCnF> evList = addEvent(freshEvent, holder, ua);
+                if(evList != null && !evList.isEmpty()){
+                    freshEvent = evList.get(0);
+                }
+                freshEmissionID = ei.recordEventEmission(emitter, eeenum, freshEvent, ua);
+                // now do the follow-up event work
+                if(emitter instanceof NoticeOfViolation){
+                    System.out.println("EventCoordinator.processEventEmission | processing NOV, creating followup event");
+                    NoticeOfViolation nov = (NoticeOfViolation) emitter;
+                    ec = emitter.getEventCategoryEmitted(EventEmissionEnum.NOTICE_OF_VIOLATION_FOLLOWUP);
+                    freshEvent = initEvent(holder, ec);
+                    freshEvent.setTimeStart(LocalDateTime.now().plusDays(nov.getFollowupEventDaysRequest()));
+                    freshEvent.setTimeEnd(freshEvent.getTimeStart().minusMinutes(ec.getDefaultDurationMins()));
+                    evList = addEvent(freshEvent, holder, ua);
+                    if(evList != null && !evList.isEmpty()){
+                        freshEvent = evList.get(0);
+                    }
+                    freshEmissionID = ei.recordEventEmission(emitter, EventEmissionEnum.NOTICE_OF_VIOLATION_FOLLOWUP, freshEvent, ua);
+                    
+                }
+                
+                
+                break;
+            case TRANSACTION:
+                break;
+            default:
+                throw new EventException("Encountered unsupported event emission enum value: " + eeenum.name());
+                
+        }
+        
+        
+        
+        
+        return freshEmissionID;
+    }
+    
+    
+    /**
+     * Checks for any records in the event emission table and deactivates them along with
+     * the emitter object that we also pass in
+     * 
+     * @param emitter
+     * @param ua
+     * @return 
+     */
+    public int processDeactivatedEventEmissittor(Iface_eventEmitter emitter, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(emitter == null || ua == null){
+            throw new BObStatusException("Cannot deactivate event emissions with null emitter or user");
+        }
+
+        int deacCount = 0;
+        List<EventCnFEmitted> evEList = emitter.getEmittedEvents();
+        if(evEList != null && !evEList.isEmpty()){
+            for(EventCnFEmitted ee: evEList){
+                if(ee.getEmissionEnum() != null && ee.getEmissionEnum().isDeactivateEventOnParentDeactivation()){
+                    deactivateEvent(ee, ua);
+                    deacCount++;
+                }
+            }
+        }
+        
+       return deacCount; 
+    }
+    
     
     /**
      * Creates a populated event to log the change of a code violation update. 

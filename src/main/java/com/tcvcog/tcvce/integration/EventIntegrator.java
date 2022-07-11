@@ -25,12 +25,18 @@ import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECase;
+import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.EventCnF;
 import com.tcvcog.tcvce.entities.EventCategory;
 import com.tcvcog.tcvce.entities.DomainEnum;
+import com.tcvcog.tcvce.entities.EventCnFEmitted;
+import com.tcvcog.tcvce.entities.EventEmissionEnum;
 import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.IFace_EventHolder;
+import com.tcvcog.tcvce.entities.Iface_eventEmitter;
+import com.tcvcog.tcvce.entities.NoticeOfViolation;
 import com.tcvcog.tcvce.entities.RoleType;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import java.io.Serializable;
@@ -789,9 +795,267 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
     }
         
 //    --------------------------------------------------------------------------
-//    ************************** EVENT CATEGORIES ****************************** 
+//    *************************** EVENT EMISSION ******************************* 
 //    --------------------------------------------------------------------------
     
+    /**
+     * Writes a record to the eventemission table that allows objects which
+     * trigger events to monitor and respond to notifications related to that event emission
+     * 
+     * @param emitter
+     * @param eeenum
+     * @param ev
+     * @param ua
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public int recordEventEmission( Iface_eventEmitter emitter, 
+                                    EventEmissionEnum eeenum, 
+                                    EventCnF ev, 
+                                    UserAuthorized ua) 
+            throws IntegrationException, BObStatusException {
+
+        if(emitter == null || eeenum == null || ev == null || ev.getEventID() == 0 || ua == null){
+            throw new BObStatusException("Cannot insert an event emission with null emitter, emission enum or event");
+        }
+        
+        String query =  "INSERT INTO public.eventemission(\n" +
+                        "            emissionid, emissionenum, emissionts, event_eventid, emittedby_userid, \n" +
+                        "            emitter_novid, emitter_citationid, deactivatedts, deactivatedby_userid, emissionresponsets, emissionresponse_userid, \n" +
+                        "            notes)\n" +
+                        "    VALUES (DEFAULT, CAST(? AS eventemissionenum), now(), ?, ?, \n" +
+                        "            ?, ?, NULL, NULL, NULL, NULL, \n" +
+                        "            ?);";
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        
+        int freshEmissionID = 0;
+
+        try {
+            stmt = con.prepareStatement(query);
+            
+            stmt.setString(1, eeenum.name());
+            stmt.setInt(2, ev.getEventID());
+            stmt.setInt(3, ua.getUserID());
+            
+            switch(eeenum){
+                // param 4 = noticeID
+                // param 5 = citationid
+                case CITATION_HEARING:
+                    stmt.setNull(4, java.sql.Types.NULL);
+                    stmt.setInt(5, emitter.getDBKey());
+                    break;
+                case NOTICE_OF_VIOLATION_FOLLOWUP:
+                    stmt.setInt(4, emitter.getDBKey());
+                    stmt.setNull(5, java.sql.Types.NULL);
+                    break;
+                case NOTICE_OF_VIOLATION_RETURNED:
+                    stmt.setInt(4, emitter.getDBKey());
+                    stmt.setNull(5, java.sql.Types.NULL);
+                    break;
+                case NOTICE_OF_VIOLATION_SENT:
+                    stmt.setInt(4, emitter.getDBKey());
+                    stmt.setNull(5, java.sql.Types.NULL);
+                    break;
+                case TRANSACTION:
+                    stmt.setNull(4, java.sql.Types.NULL);
+                    stmt.setNull(5, java.sql.Types.NULL);
+                    break;
+                default:
+                    throw new BObStatusException("Received unsupported event emission enum value");
+            }
+            
+            stmt.setString(6, ev.getNotes());
+            
+            stmt.execute();
+
+            String retrievalQuery = "SELECT currval('eventemission_emissionid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                freshEmissionID = rs.getInt("currval");
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get fresh emission ID", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return freshEmissionID;
+    }
+    
+    /**
+     * Writes the current time and a userID to the response fields on the eventemission table
+     * @param emitter
+     * @param eeenum
+     * @param ev
+     * @param ua
+     * @throws IntegrationException 
+     */
+    public void respondToEventEmission(Iface_eventEmitter emitter, 
+                                    EventEmissionEnum eeenum, 
+                                    EventCnF ev, 
+                                    UserAuthorized ua) throws IntegrationException{
+        
+        String query =  "UPDATE public.eventemission\n" +
+                        "   emissionresponsets=now(), emissionresponse_userid=?, \n" +
+                        "       notes=? \n" +
+                        " WHERE emissionid=?;";
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            
+            stmt = con.prepareStatement(query);
+            // FINISH ME
+//            stmt.setInt(1, );
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot respond to event emission;", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    /**
+     * Writes a timestamp and user to the deactivation fields on eventemission table
+     * @param emitter
+     * @param eeenum
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void deactivateEventEmission(Iface_eventEmitter emitter, 
+                                    EventEmissionEnum eeenum, 
+                                    UserAuthorized ua) throws IntegrationException{
+        
+        if(emitter == null || eeenum == null || ua == null){
+            throw new IntegrationException("Cannot process event emitter deactivation with null emitter, eeenum, or user");
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("UPDATE public.eventemission\n");
+        sb.append("   SET deactivatedts=now(), \n");
+        sb.append("       deactivatedby_userid=? ");
+        if(emitter instanceof NoticeOfViolation){
+            sb.append("WHERE emitter_novid=?;");
+        } else if(emitter instanceof Citation){
+            sb.append("WHERE emitter_citationid=?;");
+        } else {
+            throw new IntegrationException("Emitter is of unsupported object type for deactivation");
+        }
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, ua.getUserID());
+            stmt.setInt(2, emitter.getDBKey());
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot deactiate eventemissions", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+        
+    }
+    
+    /**
+     * Returns a list of Integers which are event IDs for events associated with
+     * a given emitted which are NOT already deactivated
+     * 
+     * @param emitter
+     * @return the list of event IDs associated with a given emitter
+     */
+    public List<EventCnFEmitted> getEmittedEventsByEmitter(Iface_eventEmitter emitter) throws IntegrationException, BObStatusException{
+        if(emitter == null){
+            throw new IntegrationException("Cannot get Events by null emitter");
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT emissionid, emissionenum, emissionts, event_eventid, emittedby_userid, \n" +
+                    "       emitter_novid, emitter_citationid, deactivatedts, deactivatedby_userid, \n" +
+                    "       emissionresponsets, emissionresponse_userid, notes FROM eventemission WHERE deactivatedts IS NULL ");
+        
+        if(emitter instanceof NoticeOfViolation){
+            sb.append("AND emitter_novid=?;");
+        } else if(emitter instanceof Citation){
+            sb.append("AND emitter_citationid=?;");
+        } else {
+            throw new IntegrationException("Emitter is of unsupported object type for searching");
+        }
+        
+        List<EventCnFEmitted> eelist = new ArrayList<>();
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, emitter.getDBKey());
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                eelist.add(generateEventCnFEmitted(rs));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot get event ID list be event emitter", ex);
+
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return eelist;
+    }
+    
+
+    /**
+     * Internal generator for event emission processing
+     * @param rs
+     * @return 
+     */
+    private EventCnFEmitted generateEventCnFEmitted(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
+        EventCoordinator ec = getEventCoordinator();
+        UserCoordinator uc = getUserCoordinator();
+        EventCnFEmitted eventEmitted = new EventCnFEmitted(ec.getEvent(rs.getInt("event_eventid")));
+        eventEmitted.setEmissionID(rs.getInt("emissionid"));
+        if(rs.getTimestamp("emissionts") != null){
+            eventEmitted.setEmissionTS(rs.getTimestamp("emissionts").toLocalDateTime());
+        }
+        if(rs.getInt("emittedby_userid") != 0){
+            eventEmitted.setEmissionUser(uc.user_getUser(rs.getInt("emittedby_userid")));
+        }
+        eventEmitted.setEmissionEnum(EventEmissionEnum.valueOf(rs.getString("emissionenum")));
+        return eventEmitted;
+        
+    }
+    
+//    --------------------------------------------------------------------------
+//    ************************** EVENT CATEGORIES ****************************** 
+//    --------------------------------------------------------------------------
     
      /**
      * Base record retrieval method for EventCategory objects
