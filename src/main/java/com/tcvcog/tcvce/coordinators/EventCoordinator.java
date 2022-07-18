@@ -75,6 +75,97 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //    *************************** EVENT MAIN ***********************************
 //    --------------------------------------------------------------------------
     
+    
+    /**
+     * Filtering tool for a list of events and a given view option
+     * @param eventList for filtering
+     * @param voahle if null, all events will be added 
+     * @return A new list, containing zero or more events that were in the inputted list
+     */
+    public List<EventCnF> filterEventList(List<EventCnF> eventList, ViewOptionsActiveHiddenListsEnum voahle){
+        
+       List<EventCnF> visEventList = new ArrayList<>();
+        if (eventList != null) {
+            for (EventCnF ev : eventList) {
+                if(voahle != null){
+
+                    switch (voahle) {
+                        case VIEW_ACTIVE_HIDDEN:
+                            if (ev.getDeactivatedTS() == null
+                                    && ev.isHidden()) {
+                                visEventList.add(ev);
+                            }
+                            break;
+                        case VIEW_ACTIVE_NOTHIDDEN:
+                            if (ev.getDeactivatedTS() == null
+                                    && !ev.isHidden()) {
+                                visEventList.add(ev);
+                            }
+                            break;
+                        case VIEW_ALL:
+                            visEventList.add(ev);
+                            break;
+                        case VIEW_INACTIVE:
+                            if (ev.getDeactivatedTS() != null) {
+                                visEventList.add(ev);
+                            }
+                            break;
+                        default:
+                            visEventList.add(ev);
+                    } // close switch
+                } else {
+                    visEventList.add(ev);
+                }
+            } // close for   
+        } // close null check
+        return visEventList;
+    }
+    
+    
+    /**
+     * Filtering tool for a list of events and a given view option
+     * @param eventList for filtering
+     * @param voahle if null, all events will be added 
+     * @return A new list, containing zero or more events that were in the inputted list
+     */
+    public List<EventCnFPropUnitCasePeriodHeavy> filterEventPropUnitCasePeriodHeavyList(List<EventCnFPropUnitCasePeriodHeavy> eventList, ViewOptionsActiveHiddenListsEnum voahle){
+        
+       List<EventCnFPropUnitCasePeriodHeavy> visEventList = new ArrayList<>();
+        if (eventList != null) {
+            for (EventCnFPropUnitCasePeriodHeavy ev : eventList) {
+                if(voahle != null){
+                    switch (voahle) {
+                        case VIEW_ACTIVE_HIDDEN:
+                            if (ev.getDeactivatedTS() == null
+                                    && ev.isHidden()) {
+                                visEventList.add(ev);
+                            }
+                            break;
+                        case VIEW_ACTIVE_NOTHIDDEN:
+                            if (ev.getDeactivatedTS() == null
+                                    && !ev.isHidden()) {
+                                visEventList.add(ev);
+                            }
+                            break;
+                        case VIEW_ALL:
+                            visEventList.add(ev);
+                            break;
+                        case VIEW_INACTIVE:
+                            if (ev.getDeactivatedTS() != null) {
+                                visEventList.add(ev);
+                            }
+                            break;
+                        default:
+                            visEventList.add(ev);
+                    } // close switch
+                } else {
+                    visEventList.add(ev);
+                }
+            } // close for   
+        } // close null check
+        return visEventList;
+    }
+    
     /**
      * Primary access point for events by ID
      * @param eventID
@@ -271,11 +362,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // ****************
         // Event essentials
         // ****************
-        ev.setUserCreator(ua);
+        ev.setCreatedBy(ua);
         ev.setLastUpdatedBy(ua);
         ev.setLastUpdatedTS(LocalDateTime.now());
         
-        ev.setActive(true);
         ev.setHidden(false);
 
         // **********************************
@@ -397,7 +487,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
-     * Called by the EventIntegrator and other getEventCnF methods to set member variables based on business
+     * Called by this class ONLY to set member variables based on business
      * rules before sending the event onto its requesting method. Checks for request processing, 
      * sets intended responder for action requests, etc.
      * @param ev
@@ -522,6 +612,33 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
     }
     
+    
+    /**
+     * Toggles active bac
+     * @param ev
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.EventException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void reactivateEvent(EventCnF ev, UserAuthorized ua) throws EventException, BObStatusException, IntegrationException{
+         if(ev == null || ua == null){
+            throw new BObStatusException("Event and User cannot be null");
+        }
+        if(ev.getCategory() == null || ev.getCategory().getRoleFloorEventUpdate() == null || (ev.getCategory().getRoleFloorEventUpdate().getRank() > ua.getRole().getRank())){
+            throw new BObStatusException("User's rank does not allow deactivation of given event or ranks are not configured properly");
+        }
+        EventIntegrator ei = getEventIntegrator();
+        ev.setDeactivatedBy(null);
+        ev.setDeactivatedTS(null);
+        auditEvent(ev);
+        ev.setLastUpdatedBy(ua);
+        ev.setLastUpdatedTS(LocalDateTime.now());
+        ei.updateEvent(ev);
+        
+        
+    }
+    
     /**
      * Writes the given mbp to the notes field of a given event
      * @param mbp
@@ -552,13 +669,14 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         if(ev.getCategory() == null || ev.getCategory().getRoleFloorEventUpdate() == null || (ev.getCategory().getRoleFloorEventUpdate().getRank() > ua.getRole().getRank())){
-            throw new BObStatusException("User's rank does not allow deactivation of given event or ranks are not configured properly");
+            throw new BObStatusException("User's rank does not allow deactivation of given event or ranks are not configured properly or event doesn't have a category");
         }
         SystemCoordinator sc = getSystemCoordinator();
         EventIntegrator ei = getEventIntegrator();
-        ev.setActive(false);
         ev.setLastUpdatedBy(ua);
         ev.setLastUpdatedTS(LocalDateTime.now());
+        ev.setDeactivatedBy(ua);
+        ev.setDeactivatedTS(LocalDateTime.now());
         ev.setNotes(sc.formatAndAppendNote(ua, "Event deactivated by User with credential sig " + ua.getMyCredential().getSignature(), ev.getNotes()));
         ei.updateEvent(ev);
         
@@ -589,6 +707,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         if(erg != null){
             if(erg instanceof CECase){
                 cse = (CECase) erg;
+                // TODO: Update for priority
                 if(cse.getStatusBundle() != null){
                     
                     if(cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed && 
@@ -625,7 +744,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return e;
     }
     
-    
+    /**
+     * Used by workflow BB
+     * @param evDoneList
+     * @return 
+     */
     public String buildEventInfoMessage(List<EventCnF> evDoneList){
         StringBuilder sb = new StringBuilder();
             for(EventCnF evZ: evDoneList){
@@ -1090,9 +1213,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                         freshEvent = evList.get(0);
                     }
                     freshEmissionID = ei.recordEventEmission(emitter, EventEmissionEnum.NOTICE_OF_VIOLATION_FOLLOWUP, freshEvent, ua);
-                    
                 }
-                
                 
                 break;
             case TRANSACTION:
@@ -1163,7 +1284,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //        event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(updateViolationDescr);
         //even descr set by violation coordinator
-        event.setUserCreator(getSessionBean().getSessUser());
+        event.setCreatedBy(getSessionBean().getSessUser());
         // disclose to muni from violation coord
         // disclose to public from violation coord
         event.setActive(true);
@@ -1193,7 +1314,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         event.setCategory(ec);
 //        event.setDateOfRecord(LocalDateTime.now());
         event.setDescription(message);
-        event.setUserCreator(uc.user_getUserRobot());
+        event.setCreatedBy(uc.user_getUserRobot());
         event.setActive(true);
         event.setHidden(false);
         event.setNotes("Event created by a public user");
@@ -1268,7 +1389,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
 //        event.set(LocalDateTime.now());
         // not sure if I can access the session level info for the specific user here in the
         // coordinator bean
-        event.setUserCreator(getSessionBean().getSessUser());
+        event.setCreatedBy(getSessionBean().getSessUser());
         event.setActive(true);
         
 //        cc.events_addEvent_processForCECaseDomain(currentCase, event, null);

@@ -56,7 +56,7 @@ import com.tcvcog.tcvce.entities.IFace_transferrable;
 import com.tcvcog.tcvce.entities.NoticeOfViolationType;
 import com.tcvcog.tcvce.entities.Parcel;
 import com.tcvcog.tcvce.entities.TextBlockCategory;
-import com.tcvcog.tcvce.entities.ViolationStatusEnum;
+import com.tcvcog.tcvce.entities.CodeViolationStatusEnum;
 import com.tcvcog.tcvce.entities.search.SearchParamsDateRule;
 import java.io.Serializable;
 import java.sql.Connection;

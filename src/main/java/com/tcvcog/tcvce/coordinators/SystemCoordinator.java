@@ -306,6 +306,21 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
     public String stampCurrentTimeForNote() {
         return DateTimeUtil.getPrettyDate(LocalDateTime.now());
     }
+    
+    /**
+     * Logic block for intensity classes
+     * @param classid
+     * @return 
+     */
+    public IntensityClass getIntensityClass(int classid) throws IntegrationException{
+        SystemIntegrator si = getSystemIntegrator();
+        if(classid != 0){
+            return si.getIntensityClass(classid);
+        }
+        return null;
+    }
+    
+    
 
     /**
      * Assembles an intensity schema with only active classes inside

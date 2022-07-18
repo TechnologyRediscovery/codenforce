@@ -52,14 +52,6 @@ public class CECaseBB
     private boolean formCurrentCaseUnitAssociated;
     private PropertyUnit formSelectedUnit;
     
-    private List<EventCategory> closingEventCategoryList;
-    private List<EventCategory> originationEventCategoryList;
-    private EventCategory formCECaseOriginationEventCat;
-    private EventCategory closingEventCategorySelected;
-    protected int eventPersonIDForLookup;
-    
-    private ViewOptionsActiveHiddenListsEnum eventViewOptionSelected;
-    private List<ViewOptionsActiveHiddenListsEnum> eventViewOptions;
     
     private List<User> userManagerOptionList;
     private List<BOBSource> bobSourceOptionList;
@@ -67,6 +59,18 @@ public class CECaseBB
     private String formNoteText;
     private String formViolationStipCompDateExtReason;
     private ReportConfigCECase reportCECase;
+    
+    /*******************************************************
+     *              EVENTS
+    /*******************************************************/
+    private List<EventCnF> managedEventList;
+    private List<EventCategory> closingEventCategoryList;
+    private List<EventCategory> originationEventCategoryList;
+    private EventCategory formCECaseOriginationEventCat;
+    private EventCategory closingEventCategorySelected;
+    protected int eventPersonIDForLookup;
+    
+   
     
     /*******************************************************
      *              Violation collapse fields
@@ -135,7 +139,7 @@ public class CECaseBB
             System.out.println(ex);
         }
         
-        
+     
         formNOVFollowupDays = getSessionBean().getSessMuni().getProfile().getNovDefaultDaysForFollowup();
         if(formNOVFollowupDays == 0){
             formNOVFollowupDays = 20;
@@ -512,6 +516,7 @@ public class CECaseBB
      * @return the CECases's updated blob list
      */
     public List<BlobLight> getManagedBlobLightListFromCECase(){
+        System.out.println("ceCaseBB.getBlobLightListFromCECase ");
         List<BlobLight> sessBlobListForUpdate = getSessionBean().getSessBlobLightListForRefreshUptake();
         if(sessBlobListForUpdate != null && currentCase != null){
             System.out.println("ceCaseBB.getBlobLightListFromCECase | found non-null session blob list for uptake: " + sessBlobListForUpdate.size());
@@ -720,12 +725,16 @@ public class CECaseBB
      * @param ece
      */
      private CodeViolation injectOrdinanceIntoViolation(EnforcableCodeElement ece) throws BObStatusException {
-
-       
         CaseCoordinator cc = getCaseCoordinator();
         CodeViolation cv = null;
-        cv = cc.violation_injectOrdinance(cc.violation_getCodeViolationSkeleton(currentCase), ece);
-       
+        try {
+            cv = cc.violation_injectOrdinance(cc.violation_getCodeViolationSkeleton(currentCase), ece);
+        } catch (IntegrationException ex) {
+            System.out.println(ex);
+             getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    ex.getMessage(), ""));
+        }
         return cv;
     }
     
@@ -994,7 +1003,7 @@ public class CECaseBB
     /**
      * Listener for user requests to commit a violation compliance event
      *
-     * @return 
+     * @param ev
      */
     public void onViolationRecordComplianceCommitButtonChange(ActionEvent ev) {
         EventCoordinator ec = getEventCoordinator();
@@ -1015,7 +1024,7 @@ public class CECaseBB
             // ************ TODO: Finish me with events ******************//
             // ************ TODO: Finish me with events ******************//
             e = ec.generateViolationComplianceEvent(currentViolation);
-            e.setUserCreator(getSessionBean().getSessUser());
+            e.setCreatedBy(getSessionBean().getSessUser());
             e.setTimeStart(LocalDateTime.now());
 
             // ************ TODO: Finish me with events ******************//
@@ -1052,12 +1061,16 @@ public class CECaseBB
     /**
      * Listener for commencement of note writing process
      *
-     * @param cv
+     * @param ev
      */
     public void onViolationNotesInitButtonChange(ActionEvent ev) {
         formNoteTextViolation = "";
 
     }
+    
+    
+   
+    
     
     
     /**
@@ -1289,34 +1302,7 @@ public class CECaseBB
    
     
 
-    /**
-     * @return the eventViewOptions
-     */
-    public List<ViewOptionsActiveHiddenListsEnum> getEventViewOptions() {
-        return eventViewOptions;
-    }
-
-    /**
-     * @param eventViewOptions the eventViewOptions to set
-     */
-    public void setEventViewOptions(List<ViewOptionsActiveHiddenListsEnum> eventViewOptions) {
-        this.eventViewOptions = eventViewOptions;
-    }
-
-    /**
-     * @return the eventViewOptionSelected
-     */
-    public ViewOptionsActiveHiddenListsEnum getEventViewOptionSelected() {
-        return eventViewOptionSelected;
-    }
-
-    /**
-     * @param eventViewOptionSelected the eventViewOptionSelected to set
-     */
-    public void setEventViewOptionSelected(ViewOptionsActiveHiddenListsEnum eventViewOptionSelected) {
-        this.eventViewOptionSelected = eventViewOptionSelected;
-    }
-
+   
     /**
      * @return the userManagerOptionList
      */

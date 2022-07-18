@@ -1416,7 +1416,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         if(period.getOriginationEventCategory() != null){
             EventCoordinator ec = getEventCoordinator();
             EventCnF ev = ec.initEvent(period, period.getOriginationEventCategory());
-            ev.setUserCreator(ua);
+            ev.setCreatedBy(ua);
             ev.setLastUpdatedBy(ua);
             ev.setOccPeriodID(freshID);
             ec.addEvent(ev, period, ua);

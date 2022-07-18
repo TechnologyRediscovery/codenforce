@@ -1276,6 +1276,12 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
     }
     
     
+    /**
+     * Fetches intensity class by ID
+     * @param intensityClassID
+     * @return
+     * @throws IntegrationException 
+     */
     public IntensityClass getIntensityClass(int intensityClassID) throws IntegrationException{
         
         IntensityClass in = null;

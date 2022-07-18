@@ -29,215 +29,19 @@
                             <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
 
-                                <p:panel    id="event-search-panel"
+                                <p:panel    id="dash-event-search-panel"
                                             toggleable="true"
                                             style="width: 100%;"
                                             widgetVar="event-serach-panel-var"
-                                            collapsed="true"
+                                            collapsed="false"
                                             rendered="true"
                                             header="Activity in #{sessionBean.sessMuni.muniName}" >
-                                    <h:form id="event-bar-form">
-
-                                        <ui:remove>
-
-                                            <p:pieChart id="event-bar"
-                                                        rendered="false"
-                                                        model="#{missionControlBB.pieEvents}" />
-                                        </ui:remove>
-                                    </h:form>
-
-                                    <h:form id="event-search-form">
-                                        <div class="ui-g data_container_nested_restrict">
-
-                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
-
-                                                <div class="help-link">
-
-                                                    <div class="restrict-main-contents-io-link">
-
-
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                            <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field" >
-
-
-                                                <div class="restrict-data-field-label-inline" >
-
-                                                    <h:outputLabel value="Select a query:" 
-                                                                   for="eventquery-som" />
-                                                </div>
-
-                                                <!--                                                <div class="restrict-data-field-value-inline" >-->
-
-                                                <!--                                                    <p:selectOneMenu id="eventquery-som" -->
-                                                <!--                                                                     tabindex="1" -->
-                                                <!--                                                                     value="!{eventsBB.querySelected}"-->
-                                                <!--                                                                     style="margin-right: 10px;">-->
-                                                <!--                                                        <f:converter converterId="bOBQueryConverter"/>-->
-                                                <!--                                                        <f:selectItem itemLabel="select a query..." noSelectionOption="true" itemDisabled="true"/>-->
-                                                <!--                                                        <f:selectItems id="querylist-si" value="!{eventsBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />-->
-                                                <!--                                                        <p:ajax listener="!{eventsBB.changeQuerySelected}"-->
-                                                <!--                                                                update="messages-global-form-->
-                                                <!--                                                                @form-->
-                                                <!--                                                                "/>-->
-                                                <!--                                                    </p:selectOneMenu>-->
-                                                <!--                                                </div>-->
-
-                                            </div>
-
-                                            <div class="ui-g-12 ui-md-12 ui-lg-6 restrict-data-field" >
-
-                                                <!--                                                <div class="restrict-main-contents-io-button">-->
-                                                <!--                                                    <p:commandButton icon="fa fa-search"-->
-                                                <!--                                                                     ajax="true"-->
-                                                <!--                                                                     value="Search"-->
-                                                <!--                                                                     style="clear:none; display: block; float: left;"-->
-                                                <!--                                                                     disabled="false"-->
-                                                <!--                                                                     actionListener="!{eventsBB.executeQuery}" -->
-                                                <!--                                                                     update="event-list-form-->
-                                                <!--                                                                     event-search-log-panel-->
-                                                <!--                                                                     messages-global-form"-->
-                                                <!--                                                                     />-->
-
-                                                <!--                                                    <p:commandButton   id="event-search-clear-cb" -->
-                                                <!--                                                                       ajax="true" -->
-                                                <!--                                                                       actionListener="!{eventsBB.resetQuery}"-->
-                                                <!--                                                                       icon="fa fa-eraser" -->
-                                                <!--                                                                       style="padding-left: 5px; clear:none; display: block; float:left;"-->
-                                                <!--                                                                       styleClass="button inline-button"-->
-                                                <!--                                                                       value="Reset Query" -->
-                                                <!--                                                                       disabled="false"-->
-                                                <!--                                                                       update="messages-global-form-->
-                                                <!--                                                                       event-list-form-->
-                                                <!--                                                                       event-search-log-form"/>-->
-
-                                                <!--                                                </div>-->
-                                            </div>
-                                        </div>
-                                    </h:form>
-
-                                    <h:form id="event-list-form">
-                                        <!--                                        <h:outputText id="event-list-info-ot-0"-->
-                                        <!--                                                      rendered="!{!(empty eventsBB.querySelected.BOBResultList)}"-->
-                                        <!--                                                      value="showing !{eventsBB.querySelected.BOBResultList.size()} events" -->
-                                        <!--                                                      style="font-style: italic"/>-->
-                                        <!--                                        <h:outputText id="event-list-info-ot-1"-->
-                                        <!--                                                      rendered="!{eventsBB.querySelected.queryExecuted}"-->
-                                        <!--                                                      value=" | query executed at !{eventsBB.querySelected.executionTimestampPretty} " -->
-                                        <!--                                                      style="font-style: italic"/>-->
-
-                                        <p:dataTable
-                                            id="events-table"
-                                            var="e"
-                                            rowKey="#{e.eventID}"
-                                            value="#{eventsBB.eventList}"
-                                            tableStyleClass="primeDataTable"
-                                            resizableColumns="true"
-                                            widgetVar="events-table-var"
-                                            >
-                                            <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
-
-                                            <p:column width="4%">
-                                                <i class="material-icons"><h:outputText value="#{e.category.icon.materialIcon}"/></i>
-                                                <p:spacer height="2px" />
-                                                <h:outputText value="#{e.domain.abbrev}"/>
-                                                <p:spacer height="2px" />
-                                                <h:outputText value="#{e.eventID}"/>
-                                            </p:column>
-
-                                            <p:column width="20%" sortBy="#{e.category.eventType.label}"
-                                                      >
-                                                <f:facet name="header">
-                                                    <h:outputText value="Description" />
-                                                </f:facet>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{e.category.eventType.label}: #{e.category.eventCategoryTitle}"
-                                                                  style="font-weight: bold;"/>
-                                                    <p:spacer height="5px" />
-                                                    <!--                                                    <h:outputText value="!{e.property.address} (!{e.property.muni.muniName}): Case ID: !{e.cecase.caseID}"/>-->
-                                                </div>
-                                            </p:column>
-
-                                            <p:column width="9%" sortBy="#{e.timeStart}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Date" />
-                                                </f:facet>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{missionControlBB.getPrettyDate(e.timeStart)}"/>
-                                                    <p:spacer height="2px" />
-                                                    <h:outputText value="#{e.duration} mins"/>
-                                                </div>
-                                            </p:column>
-
-                                            <p:column width="4%" exportable="false">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Action" />
-                                                </f:facet>
-
-                                                <div class="restrict-main-contents-io-link">
-
-                                                    <p:commandLink id="violation-ord-details-cl" 
-                                                                   ajax="false"
-                                                                   action="#{missionControlBB.onViewEventButtonChange(e)}"
-                                                                   value="view" 
-                                                                   style="color:blue;"
-                                                                   type="button" />
-                                                </div>
-
-
-                                            </p:column>
-
-
-
-                                        </p:dataTable>
-                                        <!--                                        <div class="ui-g data_container_nested_restrict">-->
-
-                                        <!--                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">-->
-
-                                        <!--                                                <div class="restrict-data-field-label-inline" >-->
-                                        <!--                                                    <h:outputLabel  for="event-viewoptions-som">-->
-                                        <!--                                                        <h:outputText value="Filter" />-->
-                                        <!--                                                    </h:outputLabel>-->
-                                        <!--                                                </div>-->
-                                        <!--                                                <div class="restrict-data-field-value-inline" >-->
-
-                                        <!--                                                    <p:selectOneMenu    id="event-viewoptions-som"-->
-                                        <!--                                                                        value="!{eventsBB.selectedEventView}"-->
-                                        <!--                                                                        tabindex="10">-->
-
-                                        <!--                                                        <f:selectItems  id="event-viewoptions-selitems"-->
-                                        <!--                                                                        value="!{eventsBB.eventsViewOptionsCandidates}"-->
-                                        <!--                                                                        var="vo"-->
-                                        <!--                                                                        itemValue="#{vo}"-->
-                                        <!--                                                                        itemLabel="#{vo.label}"/>-->
-                                        <!--                                                        <p:ajax update="events-table"-->
-                                        <!--                                                                immediate="true"/>-->
-                                        <!--                                                    </p:selectOneMenu>-->
-                                        <!--                                                </div>-->
-                                        <!--                                            </div>-->
-                                        <!--                                        </div>-->
-                                    </h:form>
+                                   
+                                    
+                                    <ui:include src="cogstaff/compositions/eventSearch.xhtml" />
                                 </p:panel>
 
-                                <!--                                <p:panel  id="event-search-log-panel"-->
-                                <!--                                          toggleable="true"-->
-                                <!--                                          widgetVar="event-search-log-panel-var"-->
-                                <!--                                          collapsed="true"-->
-                                <!--                                          style="width:100%;"-->
-                                <!--                                          header="Query log">-->
-
-                                <!--                                    <h:form id="event-search-log-form">-->
-                                <!--                                        <div class='search-query-desc'>-->
-                                <!--                                            <h:outputText id="event-search-log-ot" -->
-                                <!--                                                          value="!{eventsBB.querySelected.queryLog}"-->
-                                <!--                                                          escape="false"/>-->
-                                <!--                                        </div>-->
-                                <!--                                    </h:form>-->
-                                <!--                                </p:panel>-->
-                                <!--                                -->
-
+                        
                                 <ui:include src="cogstaff/occ/compositions/occPeriodListSearch.xhtml"/>
                                 <ui:include src="cogstaff/occ/compositions/occPermitListSearch.xhtml"/>
 
@@ -461,15 +265,26 @@
                                             tableStyleClass="primeDataTable"
                                             rowExpandMode="single"
                                             expandedRow="false"
-                                            resizableColumns="true">
+                                            resizableColumns="true"
+                                            rowStyleClass="#{!empty cse.priority ? cse.priority.rowStyleClass:''}">
 
-                                            <p:column width="5%" sortBy="#{cse.caseManager.human.name}">
+                                            <p:column width="5%">
                                                 <f:facet name="header">
                                                     <h:outputText value="Exp" />
                                                 </f:facet>
                                                 <p:rowToggler />
                                             </p:column>
+                                            <p:column width="10%" sortBy="#{cse.priority.label}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Priority" />
+                                                </f:facet>
+                                                  <i class="material-icons">
+                                                      <h:outputText value="#{!empty cse.priorityIcon ? cse.priorityIcon.materialIcon:''}"/>
+                                                  </i>
+                                                <p:spacer height="3px" />
+                                                <h:outputText value="#{cse.priority.label}" style="font-size:0.7em;" />
 
+                                            </p:column>
                                             <p:column width="20%" sortBy="#{cse.caseManager.human.name}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Manager" />
@@ -514,17 +329,7 @@
                                                 
                                             
                                             </p:column>
-                                            <p:column width="10%" sortBy="#{cse.statusBundle.phase.caseStage.label}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Stage" />
-                                                </f:facet>
-                                                <div class="#{cse.statusBundle.phaseIcon.styleClass}">
-                                                    <i class="material-icons status-display-icon-i"><h:outputText value="#{cse.statusBundle.phaseIcon.materialIcon}"/></i>
-                                                </div>
-                                                <p:spacer height="1px" />
-                                                <h:outputText value="#{cse.statusBundle.phase.caseStage.label}" style="font-size:0.7em;" />
-
-                                            </p:column>
+                                            
                                             <p:column width="10%">
                                                 <f:facet name="header">
                                                     <h:outputText value="Actions" />
@@ -547,6 +352,9 @@
                                                     <h:outputText value=" (#{cse.daysSinceLastEvent} days since last event)" />
 
                                                 </h4>
+                                               
+                                                    <p:spacer height="3px" />
+                                                                  
                                                  <p:accordionPanel id="case-expansioninfo-panel">
                                                      <p:tab title="Violations (#{cse.violationList.size()})">
 
@@ -620,6 +428,11 @@
                                                         </p:dataScroller>
                                                      </p:tab>
                                                  </p:accordionPanel>
+                                                <h4>
+                                                    Priority log
+                                                </h4>
+                                                <h:outputText value="#{cse.priorityAssignmentLog}"
+                                                              escape="false"/>
                                             </p:rowExpansion>
                                         </p:dataTable>
 

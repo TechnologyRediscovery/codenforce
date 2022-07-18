@@ -45,7 +45,7 @@ public  class       CodeViolation
     protected EnforcableCodeElement violatedEnfElement;
     protected int ceCaseID;
        
-    protected ViolationStatusEnum status;
+    protected CodeViolationStatusEnum status;
     protected boolean active;
     protected Icon icon;
     protected String ageLeadText;
@@ -581,14 +581,14 @@ public  class       CodeViolation
     /**
      * @return the status
      */
-    public ViolationStatusEnum getStatus() {
+    public CodeViolationStatusEnum getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(ViolationStatusEnum status) {
+    public void setStatus(CodeViolationStatusEnum status) {
         this.status = status;
     }
 

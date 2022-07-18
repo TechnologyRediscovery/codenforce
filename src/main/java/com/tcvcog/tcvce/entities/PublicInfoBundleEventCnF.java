@@ -52,8 +52,8 @@ public class PublicInfoBundleEventCnF extends PublicInfoBundle{
      */
     public void setBundledEvent(EventCnF input) {
         
-        input.setUserCreator(new User());
-        input.setCreationts(LocalDateTime.MIN);
+        input.setCreatedBy(new User());
+        
         
         input.setLastUpdatedBy(new User());
         input.setLastUpdatedTS(LocalDateTime.MIN);

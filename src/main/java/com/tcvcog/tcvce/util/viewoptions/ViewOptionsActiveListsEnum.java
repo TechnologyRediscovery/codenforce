@@ -17,7 +17,8 @@
 package com.tcvcog.tcvce.util.viewoptions;
 
 /**
- *
+ * Represents list states of all, active only, or inactive only
+ * What qualifies as active or inactive is implementation dependent.
  * @author Nathan Dietz
  */
 public enum ViewOptionsActiveListsEnum {

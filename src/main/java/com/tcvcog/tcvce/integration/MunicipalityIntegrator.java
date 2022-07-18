@@ -184,7 +184,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         return mdh;
     }
     
-    private MuniProfile getMuniProfile(int profileID) throws IntegrationException, BObStatusException{
+    public MuniProfile getMuniProfile(int profileID) throws IntegrationException, BObStatusException{
         MuniProfile mp = null;
         PreparedStatement stmt = null;
         Connection con = null;

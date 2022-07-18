@@ -339,7 +339,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 // search params here before adding the new objects to the
                 // final query result list
                 if(params.isCaseStage_ctl() && params.getCaseStage_val() != null){
-                    if(cse.getStatusBundle().getPhase().getCaseStage() == params.getCaseStage_val()){
+                    if(cse.getStatusBundle() != null && cse.getStatusBundle().getPhase().getCaseStage() == params.getCaseStage_val()){
                         caseListTemp.add(cse);
                     } else {
                         // skip adding

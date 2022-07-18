@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.domain.BObStatusException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -145,44 +146,87 @@ public abstract class   TrackedEntity
     }
 
     /**
+     * Special getter that will return the object User creator's user id if not null
      * @return the createdByUserID
      */
     public int getCreatedByUserID() {
+        if(createdBy != null){
+            createdByUserID = createdBy.getUserID();
+        }
         return createdByUserID;
     }
 
     /**
+     * Special getter that will return the object last updator's user id if not null
      * @return the lastUpdatedByUserID
      */
     public int getLastUpdatedByUserID() {
+        if(lastUpdatedBy != null){
+            lastUpdatedByUserID = lastUpdatedBy.getUserID();
+        }
         return lastUpdatedByUserID;
     }
 
     /**
+     *  Special getter that will return the object User deactivator's user id if not null
      * @return the deactivatedByUserID
      */
     public int getDeactivatedByUserID() {
+        if(deactivatedBy != null){
+            deactivatedByUserID = deactivatedBy.getUserID();
+        }
         return deactivatedByUserID;
     }
 
     /**
+     * Special setter for the integer version of the creating user which will
+     * throw and catch an error if user tries to write an int ID to this object
+     * which conflicts with a (non null) object user creator's user ID
      * @param createdByUserID the createdByUserID to set
      */
     public void setCreatedByUserID(int createdByUserID) {
+        if(createdBy != null && createdBy.getUserID() != createdByUserID ){
+            try {
+                throw new BObStatusException("TrackedEntity.setCreatedByUserID | int id parameter disagrees with createdby user object ");
+            } catch (BObStatusException ex) {
+                System.out.println(ex);
+            }
+        }
         this.createdByUserID = createdByUserID;
     }
 
     /**
+     * * Special setter for the integer version of the last updating user which will
+     * throw and catch an error if user tries to write an int ID to this object
+     * which conflicts with a (non null) object user creator's user ID
+     * 
      * @param lastUpdatedByUserID the lastUpdatedByUserID to set
      */
     public void setLastUpdatedByUserID(int lastUpdatedByUserID) {
+        if(lastUpdatedBy != null && lastUpdatedBy.getUserID() != lastUpdatedByUserID ){
+            try {
+                throw new BObStatusException("TrackedEntity.setLastUpdateddByUserID | int id parameter disagrees with user object ");
+            } catch (BObStatusException ex) {
+                System.out.println(ex);
+            }
+        }
         this.lastUpdatedByUserID = lastUpdatedByUserID;
     }
 
     /**
+     * Special setter for the integer version of the deactivating user which will
+     * throw and catch an error if user tries to write an int ID to this object
+     * which conflicts with a (non null) object user creator's user ID
      * @param deactivatedByUserID the deactivatedByUserID to set
      */
     public void setDeactivatedByUserID(int deactivatedByUserID) {
+        if(deactivatedBy != null && deactivatedBy.getUserID() != deactivatedByUserID ){
+            try {
+                throw new BObStatusException("TrackedEntity.setDeactivatedByUserID | int id parameter disagrees with user object ");
+            } catch (BObStatusException ex) {
+                System.out.println(ex);
+            }
+        }
         this.deactivatedByUserID = deactivatedByUserID;
     }
 

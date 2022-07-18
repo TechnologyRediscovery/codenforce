@@ -14,7 +14,7 @@ import com.tcvcog.tcvce.entities.CasePhaseEnum;
 import com.tcvcog.tcvce.entities.CaseStageEnum;
 import com.tcvcog.tcvce.entities.CodeViolation;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
-import com.tcvcog.tcvce.entities.ViolationStatusEnum;
+import com.tcvcog.tcvce.entities.CodeViolationStatusEnum;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -83,19 +83,19 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
         return stageCountMap;
     }
     
-    public Map<ViolationStatusEnum, Integer> getViolationCountsByStatus(CECaseDataHeavy cse){
-    Map<ViolationStatusEnum, Integer> statusCountMap = null;
+    public Map<CodeViolationStatusEnum, Integer> getViolationCountsByStatus(CECaseDataHeavy cse){
+    Map<CodeViolationStatusEnum, Integer> statusCountMap = null;
     
         if(cse != null){
 
             statusCountMap = new LinkedHashMap<>();
-            List<ViolationStatusEnum> statusList = Arrays.asList(ViolationStatusEnum.values());
-            for (ViolationStatusEnum vs : statusList) {
+            List<CodeViolationStatusEnum> statusList = Arrays.asList(CodeViolationStatusEnum.values());
+            for (CodeViolationStatusEnum vs : statusList) {
                 statusCountMap.put(vs, 0);
             }
 
             for (CodeViolation cv : cse.getViolationList()) {
-                ViolationStatusEnum status = cv.getStatus();
+                CodeViolationStatusEnum status = cv.getStatus();
                 statusCountMap.put(status, statusCountMap.get(status) + 1);
             }
         }
@@ -107,11 +107,11 @@ public class DataCoordinator extends BackingBeanUtils implements Serializable{
     public DonutChartModel generateModelViolationDonut(CECaseDataHeavy cse){
         if(cse != null){
 
-            Map<ViolationStatusEnum, Integer> statusCountMap = getViolationCountsByStatus(cse);
+            Map<CodeViolationStatusEnum, Integer> statusCountMap = getViolationCountsByStatus(cse);
             Map<String, Number> chartMap = new LinkedHashMap<>();
 
-            List<ViolationStatusEnum> statusList = Arrays.asList(ViolationStatusEnum.values());
-            for (ViolationStatusEnum vs : statusList) {
+            List<CodeViolationStatusEnum> statusList = Arrays.asList(CodeViolationStatusEnum.values());
+            for (CodeViolationStatusEnum vs : statusList) {
                 chartMap.put(vs.getLabel(), statusCountMap.get(vs));
             }
 

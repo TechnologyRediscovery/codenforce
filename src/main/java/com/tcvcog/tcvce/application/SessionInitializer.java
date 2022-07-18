@@ -283,7 +283,7 @@ public  class       SessionInitializer
         
         Credential cred = ua.getMyCredential();
         List<SessionException> exlist = new ArrayList<>();
-     
+        System.out.println("SessionInitializer.initializeSubsystems for " + ua.getUsername());
         for(SubSysEnum ss: SubSysEnum.values()){
             
             if(ss.isInitialize()){

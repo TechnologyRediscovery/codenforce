@@ -30,7 +30,7 @@ import com.tcvcog.tcvce.util.DateTimeUtil;
  * @author ellen bascomb of apt 31y
  */
 public  class       EventCnF 
-        extends     BOb
+        extends     TrackedEntity
         implements  Comparable<EventCnF>,
                     IFace_Loggable,
                     IFace_noteHolder,
@@ -64,12 +64,6 @@ public  class       EventCnF
     protected LocalDateTime timeStart;
     protected LocalDateTime timeEnd;
     
-    protected User userCreator;
-    protected LocalDateTime creationTS;
-    
-    protected User lastUpdatedBy;
-    protected LocalDateTime lastUpdatedTS;
-    
     protected boolean active;
     protected String notes;
     
@@ -87,6 +81,7 @@ public  class       EventCnF
     
     public EventCnF(EventCnF ev){
         
+        
         this.eventID = ev.eventID;
         this.category = ev.category;
         this.description = ev.description;
@@ -98,9 +93,6 @@ public  class       EventCnF
         this.timeStart = ev.timeStart;
         this.timeEnd = ev.timeEnd;
         
-        this.userCreator = ev.userCreator;
-        this.creationTS = ev.creationTS;
-        
         this.lastUpdatedBy = ev.lastUpdatedBy;
         this.lastUpdatedTS = ev.lastUpdatedTS;
         
@@ -108,6 +100,9 @@ public  class       EventCnF
 
         this.hidden = ev.hidden;
         this.notes = ev.notes;
+        
+        
+        
         
     }
     
@@ -129,13 +124,6 @@ public  class       EventCnF
 
    
     /**
-     * @return the creationts
-     */
-    public LocalDateTime getCreationts() {
-        return creationTS;
-    }
-
-    /**
      * @return the description
      */
     public String getDescription() {
@@ -143,19 +131,12 @@ public  class       EventCnF
     }
 
     /**
-     * @return the userCreator
-     */
-    public User getUserCreator() {
-        return userCreator;
-    }
-
- 
-
-    /**
+     * Special: I read for the presence of deac ts
      * @return the active
      */
+    @Override
     public boolean isActive() {
-        return active;
+        return deactivatedTS == null;
     }
 
     /**
@@ -168,6 +149,7 @@ public  class       EventCnF
     /**
      * @return the notes
      */
+    @Override
     public String getNotes() {
         return notes;
     }
@@ -187,13 +169,6 @@ public  class       EventCnF
     }
 
 
-    
-    /**
-     * @param creationts the creationts to set
-     */
-    public void setCreationts(LocalDateTime creationts) {
-        this.creationTS = creationts;
-    }
 
     /**
      * @param description the description to set
@@ -202,12 +177,6 @@ public  class       EventCnF
         this.description = description;
     }
 
-    /**
-     * @param userCreator the userCreator to set
-     */
-    public void setUserCreator(User userCreator) {
-        this.userCreator = userCreator;
-    }
 
    
     /**
@@ -227,14 +196,10 @@ public  class       EventCnF
     /**
      * @param notes the notes to set
      */
+    @Override
     public void setNotes(String notes) {
         this.notes = notes;
     }
-
-  
-
-
-    
 
   
     @Override
@@ -242,8 +207,8 @@ public  class       EventCnF
         int c = 0;
         if(this.timeStart != null && e.timeStart != null){
              c = this.timeStart.compareTo(e.timeStart);
-        } else if(this.creationTS != null && e.creationTS != null){
-             c = this.creationTS.compareTo(e.creationTS);
+        } else if(this.createdTS != null && e.createdTS != null){
+             c = this.createdTS.compareTo(e.createdTS);
         } 
         return c;
         
@@ -254,15 +219,21 @@ public  class       EventCnF
         int hash = 5;
         hash = 97 * hash + this.eventID;
         hash = 97 * hash + Objects.hashCode(this.category);
-        hash = 97 * hash + Objects.hashCode(this.creationTS);
         hash = 97 * hash + Objects.hashCode(this.description);
-        hash = 97 * hash + Objects.hashCode(this.userCreator);
         hash = 97 * hash + (this.active ? 1 : 0);
         hash = 97 * hash + (this.hidden ? 1 : 0);
         hash = 97 * hash + Objects.hashCode(this.notes);
         return hash;
     }
 
+    /**
+     * Uses only the event ID for equality checking! Not all fields
+     * within the event itself, so this method should not be used to
+     * figure out if, say, an event object has had its description changed
+     * or not
+     * @param obj
+     * @return 
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

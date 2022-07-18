@@ -1,0 +1,1113 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="form-messages-global">
+        <p:growl id="events-messages-growl"
+                 />
+    </h:form>
+    <div class="mainContainer">
+
+        <h1>Event Queries and Notification Manager</h1>
+
+
+        <p:ajaxStatus onstart="PF('event-status-dialog').show()" 
+                      onsuccess="PF('event-status-dialog').hide()"
+                      delay="500" />
+
+        <p:dialog widgetVar="event-status-dialog" 
+                  modal="true"
+                  height="250px"
+                  width="350px"
+                  draggable="false" 
+                  closable="false" 
+                  resizable="false" 
+                  showHeader="false">
+            <div class="p-text-center">
+                <h:outputText value="Stand by: loading...loading" />
+                <p:spacer height="3px" />
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/27/Skid_Loader_anim.gif"
+                     alt="loading" 
+                     width="150px"
+                     style="margin-left:auto; margin-right:auto;"/>
+                <p style="font-size: 0.7em;">Pasimi, CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0, via Wikimedia Commons</p>
+            </div>
+        </p:dialog>
+        <div class="p-grid nested-grid">
+            <div class="p-col-12">
+   <p:panel    id="event-list-panel"
+                            toggleable="true"
+                            style="width: 100%;"
+                            widgetVar="event-list-panel-var"
+                            collapsed="false"
+                            rendered="true"
+                            header="Event list" >
+
+                    <h:form id="event-list-form">
+
+                        <div class="p-grid">
+
+                            <div class="p-col-4 restrict-data-field-label-inline">
+                                <h:outputLabel  for="event-viewoptions-som">
+                                    <h:outputText value="Filter" />
+                                </h:outputLabel>
+
+                            </div>
+                            <div class="p-col-8 restrict-data-field-value-inline">
+                                <p:selectOneMenu    id="event-viewoptions-som"
+                                                    value="#{eventSearchBB.eventViewSelected}"
+                                                    tabindex="10">
+
+                                    <f:selectItems  id="event-viewoptions-selitems"
+                                                    value="#{eventSearchBB.eventViewList}"
+                                                    var="vo"
+                                                    itemValue="#{vo}"
+                                                    itemLabel="#{vo.label}"/>
+                                    <p:ajax update="events-table"
+                                            listener="#{eventSearchBB.manageRawEventList()}"
+                                            />
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="p-col-4 restrict-data-field-label-inline">
+                                <p:outputLabel for="event-search-appendresults-chkbox">
+                                    <h:outputText value="Append results to list? "/>
+                                </p:outputLabel>
+                            </div>
+                            <div class="p-col-8 restrict-data-field-value-inline">
+                                <p:selectBooleanCheckbox   id="event-search-appendresults-chkbox" 
+                                                           value="#{eventSearchBB.appendResultsToList}" >
+                                    <p:ajax />
+                                </p:selectBooleanCheckbox>
+                            </div>
+                            <div class="p-col-4">
+                                <p:commandButton   id="print-event-list-report-cb" 
+                                                   ajax="true" actionListener="#{eventSearchBB.prepareEventReport}"
+                                                   icon="fa fa-print" styleClass="button"
+                                                   oncomplete="PF('report-event-diaglog-var').show()"
+                                                   value="prepare event report" 
+                                                   update="report-eventlist-form
+                                                   form-messages-global"/>
+
+
+                            </div>
+                            <div class="p-col-4">
+                                <p:commandButton   id="event-search-clear-button" 
+                                                   ajax="true" 
+                                                   actionListener="#{eventSearchBB.clearEventList}"
+                                                   icon="fa fa-eraser" 
+                                                   disabled="false"
+                                                   styleClass="button"
+                                                   value="clear results list" 
+                                                   update="event-list-panel
+                                                   form-messages-global"/>
+                            </div>
+                        </div>
+
+                        <p:spacer height="5px" />
+
+                        <h:outputText   id="eventlist-size-ot"
+                                        value="listing (#{eventSearchBB.eventListManaged.size()}) events" />
+
+                        <p:spacer height="5px" />
+
+
+                        <p:dataTable
+                            id="events-table"
+                            var="e"
+                            rowKey="#{e.eventID}"
+                            value="#{eventSearchBB.eventListManaged}"
+                            filteredValue="#{eventSearchBB.eventListFiltered}"
+                            tableStyleClass="primeDataTable"
+                            resizableColumns="true"
+                            widgetVar="events-table-var"
+                            >
+
+                            <p:column width="10%">
+                                <f:facet name="header">
+                                    <h:outputText value="Domain" />
+                                    <p:spacer height="3px" />
+                                    <h:outputText value="Icon" />
+                                </f:facet>
+                                <h:outputText value="#{e.domain.abbrev}"/>
+                                <p:spacer height="3px" />
+                                <i class="material-icons">
+                                    <h:outputText value="#{e.category.icon.materialIcon}"
+                                                  rendered="#{!empty e.category.icon}"/>
+                                </i>
+                            </p:column>
+
+                            <p:column width="10%"
+                                      sortBy="#{e.property.muni.muniName}">
+                                <f:facet name="header">
+                                    <h:outputText value="Municipality" />
+                                </f:facet>
+                                <h:outputText value="#{e.property.muni.muniName}"/>
+                            </p:column>
+                            <p:column width="40%" 
+                                      sortBy="#{e.category.eventCategoryTitle}"
+                                      filterBy="#{e.category.eventCategoryTitle}"
+                                      >
+                                <f:facet name="header">
+                                    <h:outputText value="Category" />
+                                    <p:spacer height="3px" />   
+                                    <h:outputText value="Property" />
+                                    <p:spacer height="3px" />   
+                                    <h:outputText value="Parent" />
+                                </f:facet>
+                                <div class="wrapText">
+                                    <h:outputText value="#{e.category.eventCategoryTitle}"/>
+                                    <h:outputText value="(#{e.category.eventType.label})"/>
+                                </div>
+
+                                <p:spacer height="3px" />
+
+                                <p:commandLink id="event-prop-cl"
+                                               action="#{eventSearchBB.onViewEventProperty(e)}"
+                                               style="font-weight: bold; color:blue;">
+                                    <h:outputText value="#{e.property.address.addressPretty2LineEscapeFalse}"
+                                                  escape="false"/>
+                                </p:commandLink>
+
+                                <p:spacer height="5px" />
+
+                                <p:commandLink id="event-holder-cl"
+                                               action="#{eventSearchBB.onViewEventHolder(e)}"
+                                               style="font-weight: bold; color:blue;">
+                                    <h:outputText value="#{e.cecase.caseID eq 0 ? 'Permit File ID:':'Case ID:'}"/>
+                                    <h:outputText value="#{e.cecase.caseID eq 0 ? e.occPeriodID : e.ceCaseID  }"/>
+                                </p:commandLink>
+                            </p:column>
+
+                            <p:column width="20%" sortBy="#{e.timeStart}">
+                                <f:facet name="header">
+                                    <h:outputText value="Start date" />
+                                    <p:spacer height="3px" />
+                                    <h:outputText value="(dur. mins)" />
+                                </f:facet>
+                                <div class="rowExpansion">
+                                    <h:outputText value="#{eventSearchBB.getPrettyDate(e.timeStart)}"/>
+                                    <h:outputText value="(#{e.duration})"/>
+                                </div>
+                            </p:column>
+
+                            <p:column width="20%" exportable="false">
+                                <f:facet name="header">
+                                    <h:outputText value="Actions" />
+                                </f:facet>
+
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <p:commandLink id="event-open-button"
+                                                   styleClass="noFill button-size-small"
+                                                   value="view/edit"
+                                                   oncomplete="PF('event-profile-dialog-var').show()"
+                                                   update="event-profile-dialog event-profile-form"
+                                                   actionListener="#{eventBB.onViewEvent(e)}">
+                                    </p:commandLink>
+                                </div>
+                                <h:outputText value=" | " />
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <p:commandLink  id="event-hide-cl"
+                                                    ajax="true"
+                                                    value="hide"
+                                                    disabled="#{e.hidden}"
+                                                    actionListener="#{eventSearchBB.onEventHide(e)}" 
+                                                    update="event-list-panel
+                                                    form-messages-global"
+                                                    />
+                                </div>
+                                <div class="restrict-main-contents-io-link link-button">
+                                    <p:commandLink id="event-unhide-cl"
+                                                   ajax="true"
+                                                   disabled="#{!e.hidden}"
+                                                   value="unhide"
+                                                   actionListener="#{eventSearchBB.onEventUnHide(e)}" 
+                                                   update="event-list-panel
+                                                   form-messages-global"
+                                                   />
+                                </div>
+
+                                <p:spacer height="3px" />
+
+                                <h:outputText value="(Event ID: #{e.eventID})"/>
+
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+                </p:panel>
+                <p:panel    id="event-search-panel"
+                            toggleable="true"
+                            style="width: 100%;"
+                            widgetVar="event-serach-panel-var"
+                            collapsed="false"
+                            rendered="true"
+                            header="Search tools" >
+
+                    <h:form id="event-search-form">
+                        <div class="ui-g data_container_nested_restrict">
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
+                                <div class="restrict-data-field-label-inline" >
+
+                                    <h:outputLabel value="Select a query:" 
+                                                   for="eventquery-som" />
+                                </div>
+                                <div class="restrict-data-field-value-inline" >
+
+                                    <p:selectOneMenu id="eventquery-som" 
+                                                     tabindex="1" 
+                                                     value="#{eventSearchBB.querySelected}"
+                                                     style="margin-right: 10px;">
+                                        <f:converter converterId="bOBQueryConverter"/>
+                                        <f:selectItem itemLabel="select a query..." 
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
+                                        <f:selectItems id="querylist-si" value="#{eventSearchBB.queryList}" var="ql" itemValue="#{ql}" itemLabel="#{ql.queryTitle}" />
+                                        <p:ajax listener="#{eventSearchBB.changeQuerySelected}"
+                                                update="form-messages-global
+                                                @form:@parent:eventsearch-params-form
+                                                event-search-clear-cb
+                                                "/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field" >
+                                <div class="restrict-main-contents-io-button gray_button">
+                                    <p:commandButton   id="event-search-clear-cb" 
+                                                       ajax="true" 
+                                                       actionListener="#{eventSearchBB.resetQuery}"
+                                                       icon="fa fa-eraser" 
+                                                       styleClass="button inline-button"
+                                                       value="reset query" 
+                                                       disabled="#{empty eventSearchBB.querySelected.executionTimestamp}"
+                                                       update="form-messages-global
+                                                       @form
+                                                       eventsearch-params-form
+                                                       event-search-log-form"/>
+                                </div>
+                            </div>
+
+                            <div class="restrict-main-contents-io-button gray_button">
+                                <p:commandButton  value="help" 
+                                                  onclick="PF('helpdlg').show()" 
+                                                  styleClass="noFill button-float-right" 
+                                                  icon="fa fa-question-circle"/>    
+                            </div>
+                        </div>
+                    </h:form>
+                </p:panel>
+
+                <p:panel  id="event-params--panel"
+                          toggleable="true"
+                          widgetVar="event-params-panel-var"
+                          collapsed="false"
+                          header="Parameters">
+                    <h:form id="eventsearch-params-form">
+
+                        <div class="restrict-main-contents-io-button">
+                            <p:commandButton    id="execute-selected-query-top" 
+                                                ajax="true"
+                                                value="perform selected query" 
+                                                actionListener="#{eventSearchBB.executeQuery}"
+                                                disabled="#{!empty eventSearchBB.querySelected.executionTimestamp}"
+                                                icon="fa fa-flash"
+                                                update="event-list-panel
+                                                @form:@parent:event-list-form:events-table
+                                                @form:@parent:event-list-form
+                                                @form
+                                                event-search-form
+                                                form-messages-global
+                                                event-search-log-form
+
+                                                "/>
+                        </div>
+
+                        <p:spacer height="5px" />
+
+
+                        <f:subview id="eventsearch-param-subview-muni"
+                                   rendered="#{eventSearchBB.searchParamsSelected.muni_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel id="event-filter-muni-ol" 
+                                                   for="seev-filter-muni-chkbx" 
+                                                   value="filter by municipality "/>
+                                    <p:selectBooleanCheckbox id="seev-filter-muni-chkbx" 
+                                                             value="#{eventSearchBB.searchParamsSelected.muni_ctl}" >
+                                        <p:ajax update="event-search-muni-som"/>
+                                    </p:selectBooleanCheckbox>
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:selectOneMenu id="event-search-muni-som" tabindex="1" value="#{eventSearchBB.searchParamsSelected.muni_val}"
+                                                     disabled="#{!eventSearchBB.searchParamsSelected.muni_ctl}">
+                                        <f:converter converterId="muniConverter"/>
+                                        <f:selectItem itemLabel="select municipality..." noSelectionOption="true" itemDisabled="true"/>
+                                        <f:selectItems id="muniNameList" value="#{systemServicesBB.municipalityListForSearch}" var="m" itemValue="#{m}" itemLabel="#{m.muniName}" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="eventsearch-param-subview-dates"
+                                   rendered="#{eventSearchBB.searchParamsSelected.date_startEnd_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel id="event-search-startend-chkbx-ol" 
+                                                   for="event-search-startend-chkbx" 
+                                                   value="filter by date range "/>
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="event-search-startend-chkbx" 
+                                                             value="#{eventSearchBB.searchParamsSelected.date_startEnd_ctl}" >
+                                        <p:ajax update="event-search-date-field-val
+                                                event-search-date-start-val
+                                                event-search-date-end-val
+                                                event-search-date-relative-ctl" />
+                                    </p:selectBooleanCheckbox>
+
+                                </div>
+                                <div class="p-col-8 nested-grid restrict-data-field-value-inline">
+                                    <div class="p-grid">
+                                        <div class="p-col-12">
+                                        </div>
+
+                                        <div class="p-col-12">
+                                            <p:selectOneMenu  id="event-search-date-field-val" 
+                                                              tabindex="1" 
+                                                              value="#{eventSearchBB.searchParamsSelected.date_field}"
+                                                              disabled="#{!eventSearchBB.searchParamsSelected.date_startEnd_ctl}"
+                                                              converter="dateFieldConverter">
+                                                <f:selectItem itemLabel="select a date field..." 
+                                                              noSelectionOption="true" 
+                                                              itemDisabled="true"/>
+                                                <f:selectItems id="event-search-date-field-val-items" 
+                                                               value="#{eventSearchBB.searchParamsSelected.dateFieldList}" 
+                                                               var="f" itemValue="#{f}" itemLabel="#{f.title}" />
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-label-vertical">
+
+                                            <p:outputLabel for="event-search-date-start-val" 
+                                                           value="start date"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-vertical">
+
+                                            <p:datePicker 	id="event-search-date-start-val" 
+                                                           value="#{eventSearchBB.searchParamsSelected.date_start_val}" 
+                                                           disabled="#{(!eventSearchBB.searchParamsSelected.date_startEnd_ctl) or eventSearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                           rendered="true"
+                                                           style="width: 100%;"
+                                                           pattern="MM/dd/yyyy HH:mm"
+                                                           hideOnDateTimeSelect="true"
+                                                           showOnFocus="false"
+                                                           showIcon="true"
+                                                           showButtonBar="true"
+                                                           mask="true"
+                                                           timeInput="true" 
+                                                           required="true" />
+                                        </div>
+
+                                        <div class="p-col-12 restrict-data-field-label-vertical">
+                                            <p:outputLabel for="event-search-date-end-val" 
+                                                           value="end date"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-vertical">
+
+                                            <p:datePicker id="event-search-date-end-val" 
+                                                          value="#{eventSearchBB.searchParamsSelected.date_end_val}" 
+                                                          disabled="#{(!eventSearchBB.searchParamsSelected.date_startEnd_ctl) or eventSearchBB.searchParamsSelected.date_relativeDates_ctl}"
+                                                          rendered="true"
+                                                          style="width: 100%;"
+                                                          pattern="MM/dd/yyyy HH:mm"
+                                                          hideOnDateTimeSelect="true"
+                                                          showOnFocus="false"
+                                                          showIcon="true"
+                                                          showButtonBar="true"
+                                                          mask="true"
+                                                          timeInput="true" 
+                                                          required="true" />
+                                        </div>
+
+                                        <div class="p-col-12 restrict-data-field-label-vertical">
+
+                                            <p:outputLabel for="event-search-date-relative-ctl" 
+                                                           value="Relative dates"
+                                                           styleClass="datum-label"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-vertical">
+
+                                            <p:selectBooleanCheckbox id="event-search-date-relative-ctl" 
+                                                                     value="#{eventSearchBB.searchParamsSelected.date_relativeDates_ctl}" 
+                                                                     disabled="#{!eventSearchBB.searchParamsSelected.date_startEnd_ctl}">
+                                                <p:ajax update="event-search-date-end-val
+                                                        event-search-date-start-val
+                                                        event-search-date-end-val
+                                                        event-search-date-relative-start-val
+                                                        event-search-date-relative-end-val" />
+                                            </p:selectBooleanCheckbox>
+                                        </div>
+
+                                        <div class="p-col-12 restrict-data-field-label-vertical">
+                                            <p:outputLabel for="event-search-date-relative-start-val" 
+                                                           value="start x days from today"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-vertical">
+                                            <p:inputText id="event-search-date-relative-start-val" 
+                                                         value="#{eventSearchBB.searchParamsSelected.date_relativeDates_start_val}" 
+                                                         disabled="#{!(eventSearchBB.searchParamsSelected.date_startEnd_ctl and eventSearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                            <h:message for="event-search-date-relative-start-val" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </div>
+
+                                        <div class="p-col-12 restrict-data-field-label-vertical">
+                                            <p:outputLabel for="event-search-date-relative-end-val" 
+                                                           value="end x days from today"/>
+                                        </div>
+                                        <div class="p-col-12 restrict-data-field-value-vertical">
+                                            <p:inputText id="event-search-date-relative-end-val" 
+                                                         value="#{eventSearchBB.searchParamsSelected.date_realtiveDates_end_val}" 
+                                                         disabled="#{!(eventSearchBB.searchParamsSelected.date_startEnd_ctl and eventSearchBB.searchParamsSelected.date_relativeDates_ctl)}" />
+                                            <h:message for="event-search-date-relative-end-val" showDetail="false" showSummary="true" 
+                                                       warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </f:subview>        
+
+
+
+                        <f:subview id="eventsearch-param-subview-user"
+                                   rendered="#{eventSearchBB.searchParamsSelected.user_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel for="event-search-filter-user-ctl" 
+                                                   value="User filter"/>
+
+
+                                    <p:selectBooleanCheckbox id="event-search-filter-user-ctl" 
+                                                             value="#{eventSearchBB.searchParamsSelected.user_ctl}"
+                                                             disabled="#{!(eventSearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
+                                        <p:ajax update="event-search-filter-user-som
+                                                event-search-user-field-val" />
+                                    </p:selectBooleanCheckbox>
+
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+
+                                    <p:selectOneMenu  id="event-search-user-field-val" 
+                                                      tabindex="1" 
+                                                      value="#{eventSearchBB.searchParamsSelected.user_field}"
+                                                      disabled="#{!eventSearchBB.searchParamsSelected.user_ctl}">
+                                        <f:selectItem itemLabel="select a user field..." 
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
+                                        <f:selectItems id="event-search-user-field-val-items" 
+                                                       value="#{eventSearchBB.searchParamsSelected.userFieldList}" 
+                                                       var="uf" itemValue="#{uf}" itemLabel="#{uf.title}" />
+                                    </p:selectOneMenu>
+                                    <p:selectOneMenu id="event-search-filter-user-som" required="false" 
+                                                     value="#{eventSearchBB.searchParamsSelected.user_val}"
+                                                     disabled="#{!eventSearchBB.searchParamsSelected.user_ctl}">
+                                        <f:selectItem itemLabel="select a user..." noSelectionOption="true" />
+                                        <f:selectItems value="#{systemServicesBB.userListForSearch}"  var="u" itemValue="#{u}" 
+                                                       itemLabel="#{u.human.name} (username:#{u.username})"/>
+                                        <f:converter converterId="userConverter"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-id"
+                                   rendered="#{eventSearchBB.searchParamsSelected.bobID_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel for="event-search-filter-id-ctl" 
+                                                   value="filter by event id"/>
+
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="event-search-filter-id-ctl" 
+                                                             value="#{eventSearchBB.searchParamsSelected.bobID_ctl}"
+                                                             disabled="false">
+                                        <p:ajax update="event-search-filter-id-val" />
+                                    </p:selectBooleanCheckbox>
+
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:inputText id="event-search-filter-id-val"
+                                                 type="number"
+                                                 value="#{eventSearchBB.searchParamsSelected.bobID_val}"
+                                                 disabled="#{!eventSearchBB.searchParamsSelected.bobID_ctl}"/>
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-resultcap"
+                                   rendered="#{eventSearchBB.searchParamsSelected.limitResultCount_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel id="event-query-limit-ol" 
+                                                   for="event-query-limit" 
+                                                   value="limit results"/>
+                                    <p:selectBooleanCheckbox id="event-query-limit" 
+                                                             value="#{eventSearchBB.searchParamsSelected.limitResultCount_ctl}" />
+
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+
+                                    <p:inputText id="event-filter-limit-it"
+                                                 type="number"
+                                                 value="#{eventSearchBB.searchParamsSelected.limitResultCount_val}"
+                                                 disabled="#{!eventSearchBB.searchParamsSelected.limitResultCount_ctl}"/>
+                                    <h:message for="event-filter-limit-it" showDetail="false" showSummary="true"
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-active"
+                                   rendered="#{eventSearchBB.searchParamsSelected.active_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel for="event-search-filter-active-ctl" 
+                                                   value="filter by active"/>
+                                    <p:selectBooleanCheckbox id="event-search-filter-active-ctl" 
+                                                             value="#{eventSearchBB.searchParamsSelected.active_ctl}"
+                                                             disabled="false">
+                                        <p:ajax update="event-search-filter-active-val" />
+                                    </p:selectBooleanCheckbox>
+
+
+
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:outputLabel for="event-search-filter-active-val" 
+                                                   value="is active"/>
+                                    <p:selectBooleanCheckbox id="event-search-filter-active-val" 
+                                                             value="#{eventSearchBB.searchParamsSelected.active_val}"
+                                                             disabled="#{!eventSearchBB.searchParamsSelected.active_ctl}">
+                                    </p:selectBooleanCheckbox>
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-ev1-eventcat"
+                                   rendered="#{eventSearchBB.searchParamsSelected.eventCat_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+
+
+                                    <p:outputLabel id="ceev-filter-cat-ol" for="ceev-filter-cat" value="filter by event category "/>
+
+                                    <p:selectBooleanCheckbox id="ceev-filter-cat" value="#{eventSearchBB.searchParamsSelected.eventCat_ctl}">
+                                        <p:ajax update="ceev-criteria-cat" />
+                                    </p:selectBooleanCheckbox>
+
+
+
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <h:outputLabel for="ceev-criteria-cat" id="ceev-criteria-cat-ol">
+                                        <h:outputText value="Event Categories system wide"/>
+                                    </h:outputLabel>
+
+
+                                    <p:selectOneMenu id="ceev-criteria-cat" style="width: 300px;" 
+                                                     value="#{eventSearchBB.searchParamsSelected.eventCat_val}" tabindex="10"
+                                                     disabled="#{!eventSearchBB.searchParamsSelected.eventCat_ctl}">
+                                        <f:selectItem itemLabel="select an event category..." noSelectionOption="true" />
+                                        <f:converter converterId="eventCategoryConverter"/>
+                                        <f:selectItems  id="catItemsList" value="#{eventSearchBB.eventCategoryList}" 
+                                                        var="ec" 
+                                                        itemValue="#{ec}" 
+                                                        itemLabel="#{ec.eventCategoryTitle} (ID:#{ec.categoryID})"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="ceev-criteria-cat" showDetail="false" showSummary="true"  
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-ev2-eventtype"
+                                   rendered="#{eventSearchBB.searchParamsSelected.eventType_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+
+                                    <p:outputLabel id="seev-filter-type-ol" for="seev-filter-type" value="filter by event type"/>
+
+                                    <p:selectBooleanCheckbox id="seev-filter-type" 
+                                                             value="#{eventSearchBB.searchParamsSelected.eventType_ctl}">
+                                        <p:ajax update="ceev-critera-type" />
+                                    </p:selectBooleanCheckbox>
+
+
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+
+                                    <p:selectOneMenu id="ceev-critera-type" required="false" 
+                                                     value="#{eventSearchBB.searchParamsSelected.eventType_val}" tabindex="10"
+                                                     disabled="#{!eventSearchBB.searchParamsSelected.eventType_ctl}">
+                                        <f:selectItem itemLabel="select an event type..." noSelectionOption="true" />
+                                        <f:selectItems value="#{eventSearchBB.eventTypeList}"/>
+                                    </p:selectOneMenu>
+                                    <h:message for="ceev-critera-type" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-ev3-domain"
+                                   rendered="#{eventSearchBB.searchParamsSelected.eventDomain_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+
+                                    <p:outputLabel for="event-search-filter-domain-ctl" 
+                                                   value="Event Domain"/>
+
+
+                                    <p:selectBooleanCheckbox id="event-search-filter-domain-ctl" 
+                                                             value="#{eventSearchBB.searchParamsSelected.eventDomain_ctl}"
+                                                             disabled="#{!(eventSearchBB.searchParamsSelected.user_rtMin.rank lt systemServicesBB.bbSessionUser.keyCard.governingAuthPeriod.role.rank)}">
+                                        <p:ajax update="event-search-filter-domain-val" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+
+                                    <p:selectOneMenu  id="event-search-filter-domain-val" 
+                                                      tabindex="1" 
+                                                      value="#{eventSearchBB.searchParamsSelected.eventDomain_val}"
+                                                      disabled="#{!eventSearchBB.searchParamsSelected.eventDomain_ctl}">
+                                        <f:selectItem itemLabel="select an event domain..." 
+                                                      noSelectionOption="true" 
+                                                      itemDisabled="true"/>
+                                        <f:selectItems id="event-search-filter-domain-items" 
+                                                       value="#{eventSearchBB.searchParamsSelected.eventDomainList}" 
+                                                       var="ed" itemValue="#{ed}" itemLabel="#{ed.title}" />
+                                        <f:converter converterId="eventDomainConverter" />
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-ev4-domainpk"
+                                   rendered="#{eventSearchBB.searchParamsSelected.eventDomainPK_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel for="event-search-filter-domainpk-ctl" 
+                                                   value="filter by domain object id (CE case or permit file)"/>
+
+                                    <p:spacer height="3px" />
+                                    <p:selectBooleanCheckbox id="event-search-filter-domainpk-ctl" 
+                                                             value="#{eventSearchBB.searchParamsSelected.eventDomainPK_ctl}"
+                                                             disabled="false">
+                                        <p:ajax update="event-search-filter-domainpk-val" />
+                                    </p:selectBooleanCheckbox>
+
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:inputText id="event-search-filter-domainpk-val"
+                                                 type="number"
+                                                 value="#{eventSearchBB.searchParamsSelected.eventDomainPK_val}"
+                                                 disabled="#{!eventSearchBB.searchParamsSelected.eventDomainPK_ctl}"/>
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-ev5-person"
+                                   rendered="#{eventSearchBB.searchParamsSelected.person_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel id="event-filter-person-ol" 
+                                                   for="event-criteria-person-val" 
+                                                   value="filter by person"/>
+                                    <p:selectBooleanCheckbox id="event-filter-person-ctl" 
+                                                             value="#{eventSearchBB.searchParamsSelected.person_ctl}" >
+                                        <p:ajax update="event-criteria-person-val" />
+                                    </p:selectBooleanCheckbox>
+
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:selectOneMenu id="event-criteria-person-val" required="false" 
+                                                     value="#{eventSearchBB.searchParamsSelected.person_val}"
+                                                     disabled="#{!eventSearchBB.searchParamsSelected.person_ctl}">
+
+                                        <f:selectItem itemLabel="select a person..." noSelectionOption="true" />
+                                        <f:selectItems value="#{systemServicesBB.personListForSearch}"  var="p" itemValue="#{p}" 
+                                                       itemLabel="#{p.firstName} #{p.lastName} (ID:#{p.personID})"/>
+                                        <f:converter converterId="personConverter"/>
+
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-ev6-rolefloor-enact"
+                                   rendered="#{eventSearchBB.searchParamsSelected.rolefloor_enact_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel id="event-filter-rolefloor-enact-ol" 
+                                                   for="eventsearch-param-rolefloor-enact-sbcb" 
+                                                   value="filter by role floor to enact"/>
+                                    <p:selectBooleanCheckbox id="eventsearch-param-rolefloor-enact-sbcb" 
+                                                             value="#{eventSearchBB.searchParamsSelected.rolefloor_enact_ctl}" >
+                                        <p:ajax update="eventsearch-param-rolefloor-enact-som" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:selectOneMenu id="eventsearch-param-rolefloor-enact-som" 
+                                                     required="false" 
+                                                     value="#{eventSearchBB.searchParamsSelected.roleFloor_enact_val}"
+                                                     disabled="#{!eventSearchBB.searchParamsSelected.rolefloor_enact_ctl}">
+                                        <f:selectItem itemLabel="select a role..." noSelectionOption="true" />
+                                        <f:selectItems value="#{systemServicesBB.sessRoleTypes}"  
+                                                       var="rt" 
+                                                       itemValue="#{rt}" 
+                                                       itemLabel="#{rt.label}, (RNK: #{rt.rank})"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-ev7-rolefloor-view"
+                                   rendered="#{eventSearchBB.searchParamsSelected.rolefloor_view_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel id="event-filter-rolefloor-view-ol" 
+                                                   for="eventsearch-param-rolefloor-view-sbcb" 
+                                                   value="filter by role floor to view"/>
+                                    <p:selectBooleanCheckbox id="eventsearch-param-rolefloor-view-sbcb" 
+                                                             value="#{eventSearchBB.searchParamsSelected.rolefloor_view_ctl}" >
+                                        <p:ajax update="eventsearch-param-rolefloor-view-som" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:selectOneMenu id="eventsearch-param-rolefloor-view-som" 
+                                                     required="false" 
+                                                     value="#{eventSearchBB.searchParamsSelected.roleFloor_view_val}"
+                                                     disabled="#{!eventSearchBB.searchParamsSelected.rolefloor_view_ctl}">
+                                        <f:selectItem itemLabel="select a role..." noSelectionOption="true" />
+                                        <f:selectItems value="#{systemServicesBB.sessRoleTypes}"  
+                                                       var="rt" 
+                                                       itemValue="#{rt}" 
+                                                       itemLabel="#{rt.label}, (RNK: #{rt.rank})"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-ev8-rolefloor-update"
+                                   rendered="#{eventSearchBB.searchParamsSelected.rolefloor_update_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel id="event-filter-rolefloor-update-ol" 
+                                                   for="eventsearch-param-rolefloor-update-sbcb" 
+                                                   value="filter by role floor to update"/>
+                                    <p:selectBooleanCheckbox id="eventsearch-param-rolefloor-update-sbcb" 
+                                                             value="#{eventSearchBB.searchParamsSelected.rolefloor_update_ctl}" >
+                                        <p:ajax update="eventsearch-param-rolefloor-update-som" />
+                                    </p:selectBooleanCheckbox>
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:selectOneMenu id="eventsearch-param-rolefloor-update-som" 
+                                                     required="false" 
+                                                     value="#{eventSearchBB.searchParamsSelected.roleFloor_update_val}"
+                                                     disabled="#{!eventSearchBB.searchParamsSelected.rolefloor_update_ctl}">
+                                        <f:selectItem itemLabel="select a role..." noSelectionOption="true" />
+                                        <f:selectItems value="#{systemServicesBB.sessRoleTypes}"  
+                                                       var="rt" 
+                                                       itemValue="#{rt}" 
+                                                       itemLabel="#{rt.label}, (RNK: #{rt.rank})"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <f:subview id="eventsearch-param-subview-ev9-property"
+                                   rendered="#{eventSearchBB.searchParamsSelected.property_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+
+                                    <p:outputLabel id="event-filter-property-ol" 
+                                                   for="event-filter-property" 
+                                                   value="filter by property "/>
+
+                                    <p:selectBooleanCheckbox id="event-filter-property" value="#{eventSearchBB.searchParamsSelected.property_ctl}" >
+                                        <p:ajax update="event-criteria-property-som" />
+                                    </p:selectBooleanCheckbox>
+
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:selectOneMenu id="event-criteria-property-som" required="false" 
+                                                     value="#{eventSearchBB.searchParamsSelected.property_val}"
+                                                     disabled="#{!eventSearchBB.searchParamsSelected.property_ctl}">
+
+                                        <f:selectItem itemLabel="select a propery..." noSelectionOption="true" />
+                                        <f:selectItems value="#{systemServicesBB.propertyListForSearch}"  var="prop" itemValue="#{prop}" 
+                                                       itemLabel="#{prop.addressString} (#{prop.muni.muniName})"/>
+                                        <f:converter converterId="propertyConverter"/>
+
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                        </f:subview>        
+                        <f:subview id="eventsearch-param-subview-ev10-notify"
+                                   rendered="#{eventSearchBB.searchParamsSelected.notify_ctl or eventSearchBB.querySelected.queryName.showAllControls}">
+                            <div class="p-grid">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    <p:outputLabel for="event-search-filter-notify-ctl" 
+                                                   value="filter by notification"/>
+                                    <p:selectBooleanCheckbox id="event-search-filter-notify-ctl" 
+                                                             value="#{eventSearchBB.searchParamsSelected.notify_ctl}"
+                                                             disabled="false">
+                                        <p:ajax update="event-search-filter-notify-val" />
+                                    </p:selectBooleanCheckbox>
+
+
+
+                                </div>
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:outputLabel for="event-search-filter-notify-val" 
+                                                   value="notification"/>
+                                    <p:selectBooleanCheckbox id="event-search-filter-notify-val" 
+                                                             value="#{eventSearchBB.searchParamsSelected.notify_val}"
+                                                             disabled="#{!eventSearchBB.searchParamsSelected.notify_ctl}">
+                                    </p:selectBooleanCheckbox>
+                                </div>
+                            </div>
+                        </f:subview>        
+
+                        <div class="restrict-main-contents-io-button">
+                            <p:commandButton    id="execute-selected-query" 
+                                                ajax="true"
+                                                value="perform selected query" 
+                                                actionListener="#{eventSearchBB.executeQuery}"
+                                                disabled="#{!empty eventSearchBB.querySelected.executionTimestamp}"
+                                                icon="fa fa-flash"
+                                                update="
+                                                @form
+                                                event-list-panel
+                                                @form:@parent:event-list-form:events-table
+                                                @form:@parent:event-list-form
+                                                event-search-form
+                                                form-messages-global
+                                                event-search-log-form
+                                                "/>
+                        </div>
+                    </h:form>
+                </p:panel>
+                <p:panel  id="event-search-log-panel"
+                          toggleable="true"
+                          widgetVar="event-search-log-panel-var"
+                          collapsed="false"
+                          style="width:100%;"
+                          header="Query log">
+
+                    <h:form id="event-search-log-form">
+                        <div class='search-query-desc'>
+                            <h:outputText id="event-search-log-ot" 
+                                          value="#{eventSearchBB.querySelected.queryLog}"
+                                          escape="false"/>
+                        </div>
+                    </h:form>
+                </p:panel>
+
+                <ui:include src="/restricted/cogstaff/compositions/eventTools.xhtml"/>
+
+             
+            </div>
+        </div>
+    </div>
+    <p:dialog header="Building activity reports" 
+              widgetVar="helpdlg"
+              responsive="true"
+              width="80%">
+        <h1>Steps to building an activity report:</h1>
+        <h2>1. Choose a pre-built query</h2>
+
+        <p>Events are selected from the database through a query, which is made up of many parameters
+            (i.e. criteria) which define which events to retrieve. A set of pre-made queries are designed
+            to speed up the reporting process. Browse those pre-built queries with the drop-down box and then click
+            "perform selected query" to see the results. </p>
+
+
+        <p>The list view is more compact and reflects what is printed in event reports. The data table view contains exactly the same
+            <br /> events but with more complete info for in-depth analysis.</p>
+
+
+        <h2>2. Trim your event list by hiding events</h2>
+
+        <p>After performing the query, hide any unwanted events from the results using the 
+            "hide event" button with the moon icon located on the right side of each event's display box.
+            A hidden event is not displayed in your final report, but is still attached to the code enforcement case
+            and can be viewed in the case's event history.</p>
+
+        <p>NOTE: Hiding an event on this page for report generation ALSO hides the event when viewing the event history 
+            for that event's respective case. You can always un-hide an event by toggling the "view hidden events" switch
+            underneath the event history table in the case manager. </p>
+
+        <h2>3. Customize your query</h2>
+        <p>Expand the search options to customize your query. The query controls are automatically updated to match 
+            the pre-built queries in the drop-down list above, allowing you to start with the settings associated with
+            a pre-built query and then tune the results to fit your needs.</p>
+
+        <p>For example, pre-built queries are pre-set to useful date ranges for searching, such as events that occurred in
+            the past month or events about to occur in the next week. By first performing a pre-built query which produces 
+            events you're interested in but over undesirable date range, you can just change the specified date range in the
+            customized query parameters to arrive at your desired output.</p>
+
+        <h2>4. Preparing and generating an event report</h2>
+
+        <p>The button labeled "prepare event report" pops up a settings window to configure an event report based on the currently
+            visible events in your list. Additional guidance is provided for each setting inside that dialog box. Remember: the report
+            is generated based on only the events you can see in your result list; hidden events are not included.</p>
+
+
+    </p:dialog>
+    <p:dialog  id="ceevents-configure-report-dialog"
+               widgetVar="report-event-diaglog-var"
+               closable="true" responsive="true"
+               dynamic="true"
+               rendered="#{sessionBeasessionUserer.keyCard.hasMuniReaderPermissions}">
+
+        <h:form id="events-reportconfig-messages-form">
+            <h:messages id="ceev-messages-in-report-dialog" globalOnly="true" showDetail="false" showSummary="true"
+                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+            </h:messages>
+        </h:form>
+
+        <h:form id="report-eventlist-form">
+            <div class="ui-g data_container_nested_restrict">
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title" >
+                        <h:outputLabel for="report-case-profile-title-it" 
+                                       value="Report title"/>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content" >
+                        <p:inputText id="report-case-profile-title-it" style="width: 300px;" value="#{eventSearchBB.reportConfig.title}"/>
+                        <p:spacer height="5px" />
+                        <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title" >
+                        <h:outputLabel for="report-case-profile-notes-ita" value="Notes"/>
+                    </div>
+
+                    <div class="restrict-main-contents-io-content" >
+                        <p:inputText id="report-case-profile-notes-ita" style="width: 300px; height: 100px;" value="#{eventSearchBB.reportConfig.notes}"/>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                    <h2>Event display options</h2>
+
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title" >
+                        <h:outputLabel value="Sort events: " 
+                                       for="sort-reverse-chrono-is" />
+                    </div>
+
+                    <div class="restrict-main-contents-io-content" >
+                        <p:inputSwitch  id="sort-reverse-chrono-is"
+                                        value="#{eventSearchBB.reportConfig.sortInRevChrono}" 
+                                        onLabel="Reverse chrono (newest first)" 
+                                        offLabel="Timeline order (oldest first)" />
+
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title" >
+                        <h:outputLabel value="Include persons attached to events" 
+                                       for="include-attached-persons-is" />
+                    </div>
+
+                    <div class="restrict-main-contents-io-content" >
+                        <p:inputSwitch  id="include-attached-persons-is"
+                                        value="#{eventSearchBB.reportConfig.includeAttachedPersons}" 
+                                        onLabel="Yes" offLabel="No" />
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title" >
+                        <h:outputLabel value="Include event summary chart on page 1" 
+                                       for="include-event-summary-chart-is" />
+
+                    </div>
+
+                    <div class="restrict-main-contents-io-content" >
+                        <p:inputSwitch  id="include-event-summary-chart-is"
+                                        value="#{eventSearchBB.reportConfig.includeEventTypeSummaryChart}" 
+                                        onLabel="Yes" offLabel="No" />
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title" >
+                        <h:outputLabel value="Include list of all active cases" 
+                                       for="include-active-case-list-is" />
+
+                    </div>
+
+                    <div class="restrict-main-contents-io-content" >
+                        <p:inputSwitch  id="include-active-case-list-is"
+                                        value="#{eventSearchBB.reportConfig.includeActiveCaseListing}" 
+                                        onLabel="Yes" offLabel="No" />
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title" >
+                        <h:outputLabel value="Include info about events requesting user action" 
+                                       for="include-action-requests-is" />
+
+                    </div>
+
+                    <div class="restrict-main-contents-io-content" >
+                        <p:inputSwitch  id="include-action-requests-is"
+                                        value="#{eventSearchBB.reportConfig.includeCaseActionRequestInfo}" 
+                                        onLabel="Yes" offLabel="No" />
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+                    <div class="restrict-main-contents-io-title" >
+                        <h:outputLabel value="Include complete query parameters" 
+                                       for="include-queryparams-is" />
+
+                    </div>
+
+                    <div class="restrict-main-contents-io-content" >
+                        <p:inputSwitch  id="include-queryparams-is"
+                                        value="#{eventSearchBB.reportConfig.includeCompleteQueryParamsDump}" 
+                                        onLabel="Yes" offLabel="No" />
+
+                    </div>
+                </div>
+                <div class="ui-g-12 ui-md-6 ui-lg-4 restrict-data-field">
+
+                    <div class="restrict-main-contents-io-button gray_button">
+
+                        <p:commandButton ajax="true" 
+                                         value="Cancel" icon="fa fa-stop" 
+                                         onclick="PF('report-event-diaglog-var').hide()"/>
+                    </div>
+
+                    <div class="restrict-main-contents-io-button">
+                        <p:commandButton ajax="false" action="#{eventSearchBB.generateEventReport}"
+                                         value="Generate report" icon="fa fa-print" 
+                                         rendered="#{sessionBsessionUserUser.keyCard.hasMuniReaderPermissions}"
+                                         />
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>

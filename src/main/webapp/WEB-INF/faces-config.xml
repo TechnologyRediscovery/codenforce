@@ -793,8 +793,8 @@
     </managed-bean>
 
     <managed-bean>
-        <managed-bean-name>eventsBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.EventsBB</managed-bean-class>
+        <managed-bean-name>eventBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
 
@@ -1964,5 +1964,10 @@
         <managed-bean-name>eventSearchBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.EventSearchBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>cECaseEventListBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.CECaseEventListBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
     </managed-bean>
 </faces-config>

@@ -159,6 +159,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                                 <div class="p-col-4 restrict-data-field-label-inline">
+                                                    <h:outputText value="Priority" />    
+                                                </div>
+                                                <div class="p-col-8 restrict-data-field-value-inline">
+                                                    <div class="#{!empty ceCaseBB.currentCase.priority ? ceCaseBB.currentCase.priority.rowStyleClass : ''}">
+                                                        <i class="material-icons">
+                                                          <h:outputText value="#{!empty ceCaseBB.currentCase.priorityIcon ? ceCaseBB.currentCase.priorityIcon.materialIcon:''}"/>
+                                                        </i>
+                                                    </div> 
+                                                    
+                                                    <p:spacer height="3px" />
+                                                    <h:outputText value="#{!empty ceCaseBB.currentCase.priority ? ceCaseBB.currentCase.priority.label :''}" />
+                                                     
+                                                    <p:commandButton id="prioritylog-button"
+                                                                         icon="fa fa-question-circle-o"
+                                                                         styleClass="button-help"
+                                                                         type="button" />
+
+                                                        <p:overlayPanel for="prioritylog-button"
+                                                                        style="width:350px;" 
+                                                                        dismissable="true"
+                                                                        showCloseIcon="true">
+                                                            <h3>Priority Assignment Log</h3>
+                                                            <h:outputText value="#{ceCaseBB.currentCase.priorityAssignmentLog}" 
+                                                                          escape="false"/>
+                                                        </p:overlayPanel>
+                                                    
+                                                </div>
+
+                                                <div class="p-col-4 restrict-data-field-label-inline">
                                                     <h:outputText value="Property" />    
                                                 </div>
                                                 <div class="p-col-8 restrict-data-field-value-inline">
@@ -282,7 +311,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 <div class="p-col-4 restrict-data-field-label-inline">
 
 
-                                                    <h:form id="cecase-profile-casename-help-form">
 
                                                         <h:outputText value="Name "/>
                                                         <p:commandButton id="casename-help-button"
@@ -299,7 +327,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                 such as 'deer feeding lady' or 'fridge in front yard' or 'imploded garage'. The case name appears on the dashboard's
                                                                 case list for easy ID but does not by default print on case list reports .</p>
                                                         </p:overlayPanel>
-                                                    </h:form>
                                                 </div>
                                                 <div class="p-col-8 restrict-data-field-value-inline">
 
@@ -904,12 +931,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                         </h:form>
                                     </p:panel>
 
-                                    <ui:include src="../compositions/eventsPanel.xhtml"/>
+                                    <ui:include src="../compositions/eventTools.xhtml"/>
 
                                     <p:panel id="events-panel"
                                              toggleable="true"
                                              collapsed="false"
-                                             header="Events (#{eventsBB.eventListSize}) on #{eventsBB.currentEventHolder.eventDomain.title} (ID:#{eventsBB.currentEventHolder.BObID})">
+                                             header="Events (#{cECaseEventListBB.managedEventList.size()}) on CECase (ID:#{cECaseEventListBB.currentCase.caseID})">
 
                                         <h:form id="events-form">
 
@@ -917,65 +944,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              styleClass="noFill button-size-small"
                                                              value="Add event"
                                                              icon="fa fa-plus"
-                                                             actionListener="#{eventsBB.onEventAddInit(ceCaseBB.currentCase) }"
+                                                             actionListener="#{eventBB.onEventAddInit(ceCaseBB.currentCase) }"
                                                              oncomplete="PF('event-add-dialog-var').show()"
                                                              update="event-add-dialog"/>
 
                                             <p:spacer height="5px"/>
 
-                                            <p:selectOneMenu style="width: 300px;"
-                                                             id="prop-viewoptionsevents-solb"
-                                                             value="#{eventsBB.eventListFilterMode}"
-                                                             tabindex="10">
-
-                                                <p:ajax update="events-panel"
-                                                        immediate="true"/>
-
-                                                <f:selectItems id="prop-events-selitems"
-                                                               value="#{eventsBB.eventListFilterModes}"
-                                                               var="evo"
-                                                               itemValue="#{evo}"
-                                                               itemLabel="#{evo.label}"/>
-                                            </p:selectOneMenu>
-
+                                            <h:outputText value="include deactivated events?  " />
+                                            <p:selectBooleanCheckbox id="events-viewdeac-sbcb"
+                                                                     value="#{sessionBean.sessFlagIncludeDeactivatedEvents}" >
+                                                <p:ajax listener="#{cECaseEventListBB.configureManagedEventList}" 
+                                                        update="events-table
+                                                        events-panel"/>
+                                            </p:selectBooleanCheckbox>
+                                                                     
                                             <p:spacer height="5px"/>
 
                                             <p:dataTable id="events-table"
-                                                         var="event"
-                                                         sortMode="multiple"
-                                                         value="#{ceCaseBB.currentCase.eventList}"
+                                                         var="eventcecase"
+                                                         value="#{cECaseEventListBB.managedEventList}"
                                                          tableStyleClass="primeDataTable"
-                                                         rowKey="#{event.eventID}"
-                                                         reflow="true">
+                                                         rowKey="#{eventcecase.eventID}"
+                                                         reflow="false">
 
                                                 <p:column headerText="Date"
                                                           width="20%"
-                                                          sortBy="#{event.timeStart}"
+                                                          sortBy="#{eventcecase.timeStart}"
                                                           styleClass="centeredColumnContent">
-                                                    <h:outputText value="#{empty event.timeStart ? eventsBB.getPrettyDate(event.creationts) : eventsBB.getPrettyDate(event.timeStart) }"/>
+                                                    <h:outputText value="#{empty eventcecase.timeStart ? eventBB.getPrettyDate(eventcecase.createdTS) : eventBB.getPrettyDate(eventcecase.timeStart) }"/>
                                                 </p:column>
 
                                                 <p:column headerText="Category"
                                                           width="20%"
-                                                          sortBy="#{event.category.eventCategoryTitle}"
+                                                          sortBy="#{eventcecase.category.eventCategoryTitle}"
                                                           styleClass="centeredColumnContent">
 
-                                                    <div class="#{event.category.icon.styleClass}">
-                                                        <i class="material-icons status-display-icon-i"><h:outputText value="#{event.category.icon.materialIcon}"/></i>
+                                                    <div class="#{eventcecase.category.icon.styleClass}">
+                                                        <i class="material-icons status-display-icon-i"><h:outputText value="#{eventcecase.category.icon.materialIcon}"/></i>
                                                     </div>
 
-                                                    <h:outputText value="#{event.category.eventType.label}:"/>
+                                                    <h:outputText value="#{eventcecase.category.eventType.label}:"/>
 
                                                     <p:spacer height="1px" />
 
-                                                    <h:outputText value="#{event.category.eventCategoryTitle}"/>
+                                                    <h:outputText value="#{eventcecase.category.eventCategoryTitle}"/>
                                                 </p:column>
 
                                                 <p:column headerText="Description"
                                                           width="50%"
                                                           styleClass="centeredColumnContent wrapText">
 
-                                                    <h:outputText value="#{event.description}"/>
+                                                    <h:outputText value="#{eventcecase.description}"/>
 
                                                 </p:column>
 
@@ -986,13 +1005,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                         <p:commandLink id="event-open-button"
                                                                        styleClass="noFill button-size-small"
                                                                        value="view/edit"
+                                                                       type="button"
+                                                                       ajax="true"
                                                                        oncomplete="PF('event-profile-dialog-var').show()"
-                                                                       update="event-profile-dialog event-profile-form"
-                                                                       actionListener="#{eventsBB.onViewEvent(event)}">
+                                                                       update="event-profile-dialog
+                                                                                event-profile-form"
+                                                                       >
+                                                            <p:ajax listener="#{eventBB.onViewEvent(eventcecase)}" />
+                                                            <f:param name="event-list-component-to-update" value="events-form:events-table" />
                                                         </p:commandLink>
                                                     </div>
                                                     <p:spacer height="3px" />
-                                                    <h:outputText value="(ID:#{event.eventID})"/>
+                                                    <h:outputText value="(ID:#{eventcecase.eventID})"/>
+                                                    <p:spacer height="3px" />
+                                                    <h:outputText value="#{empty eventcecase.deactivatedTS ? 'Active' : 'Deactivated'}"
+                                                                  styleClass="italic"/>
 
                                                 </p:column>
                                             </p:dataTable>

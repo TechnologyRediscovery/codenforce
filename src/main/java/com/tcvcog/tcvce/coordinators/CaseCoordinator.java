@@ -146,7 +146,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse.setPropertyUnit(pc.getPropertyUnit(c.getPropertyUnitID()));
 
             // PROPOSAL LIST
-            cse.setProposalList(wc.getProposalList(cse, cred));
+//            cse.setProposalList(wc.getProposalList(cse, cred));
 
             // EVENT RULE LIST
 //            cse.setEventRuleList(wc.rules_getEventRuleImpList(cse, cred));
@@ -158,16 +158,16 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cse.setInspectionList(oic.getOccInspectionList(cse));
 
             // CEAR LIST
-            QueryCEAR qcear = sc.initQuery(QueryCEAREnum.ATTACHED_TO_CECASE, cred);
-            qcear.getPrimaryParams().setCecase_ctl(true);
-            qcear.getPrimaryParams().setCecase_val(c);
-
-            cse.setCeActionRequestList(sc.runQuery(qcear).getBOBResultList());
+//            QueryCEAR qcear = sc.initQuery(QueryCEAREnum.ATTACHED_TO_CECASE, cred);
+//            qcear.getPrimaryParams().setCecase_ctl(true);
+//            qcear.getPrimaryParams().setCecase_val(c);
+//
+//            cse.setCeActionRequestList(sc.runQuery(qcear).getBOBResultList());
 
             // BLOB
             cse.setBlobList(bc.getBlobLightList(cse));
 
-        } catch (SearchException | BlobException | BObStatusException ex) {
+        } catch (BlobException | BObStatusException ex) {
             System.out.println(ex);
         }
 
@@ -329,9 +329,24 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 cse.setOriginationEvent(ec.findMostRecentEventByType(cse.getEventList(), EventType.Origination));
                 cse.setClosingEvent(ec.findMostRecentEventByType(cse.getEventList(), EventType.Closing));
                 
-                cecase_auditCECase(cse, getSessionBean().getSessUser());
+                boolean rl = cecase_auditCECase(cse, getSessionBean().getSessUser());
                 
-                cecase_configureCECaseStageAndPhase(cse);
+                if(rl){
+                    System.out.println("CaseCoordinator.cecase_getCECase | reloading due to audit trigger = true");
+                    cse = ci.getCECase(caseID);
+                }
+                cecase_computeDaysSinceLastEvent(cse);
+                cecase_configureCECasePriority(cse);
+                
+        if (cse.getPriority() != null) {
+            SystemIntegrator si = getSystemIntegrator();
+            //now set the icon based on what phase we just assigned the case to
+            cse.setPriorityIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                    .getString(cse.getPriority().getIconPropertyLookup()))));
+        }
+                
+                // Replaced with priorities!
+//                cecase_configureCECaseStageAndPhase(cse);
             }
         } catch (BObStatusException | BlobException ex) {
             System.out.println(ex);
@@ -350,12 +365,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param cse at any stage, or phase, even before a DB write!
      * @param ua 
      */
-    private void cecase_auditCECase(CECase cse, UserAuthorized ua) throws BObStatusException{
+    private boolean cecase_auditCECase(CECase cse, UserAuthorized ua) throws BObStatusException{
        
         if(cse == null || ua == null){
            throw new BObStatusException("Cannot audit null case or null user");
        }
-        
+        boolean reloadTrigger = false;
         StringBuilder auditLog = new StringBuilder();
         auditLog.append("AUDIT LOG for CECase ID: ");
         auditLog.append(cse.getCaseID());
@@ -376,6 +391,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
         
        // for cases that aren't just getting written to DB
+    /*
+       
        if(cse.getCaseID() != 0){
            try {
 
@@ -383,13 +400,17 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                if(cse.getOriginationEvent() == null){
                    auditLog.append("Creating generic opening event;");
                    cecase_auditcase_attachGenericOriginationEvent(cse, ua);
-                   cse = cecase_getCECase(cse.getCaseID());
+                  // turn off to avoid cycles
+//                   cse = cecase_getCECase(cse.getCaseID());
+                    reloadTrigger = true;
                }
 
                if(cse.getClosingDate() != null && cse.getClosingEvent() == null){
                    auditLog.append("Creating generic closingevent;");
                    cecase_auditcase_attachGenericClosingEvent(cse, ua);
-                   cse = cecase_getCECase(cse.getCaseID());
+                  // turn off to avoid cycles
+//                   cse = cecase_getCECase(cse.getCaseID());
+                    reloadTrigger= true;
                }
            } catch (BObStatusException | EventException | IntegrationException e) {
                auditLog.append("Could not add new origination or closing event");
@@ -405,7 +426,11 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 }
             }
        }
+    */
+       return reloadTrigger;
     }
+    
+    
     
     /**
      * Used during the case audit process to add an origination event to a case
@@ -420,7 +445,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                                                     .getString("cecase_genericoriginationeventcatid")));
         
         EventCnF origEv = ec.initEvent(cse, origCat);
-        origEv.setUserCreator(uc.user_getUserRobot());
+        origEv.setCreatedBy(uc.user_getUserRobot());
         origEv.setTimeStart(cse.getOriginationDate());
         origEv.setTimeEnd(origEv.getTimeStart().plusMinutes(origCat.getDefaultDurationMins()));
         origEv.setDescription(origCat.getEventCategoryDesc());
@@ -442,7 +467,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                                                             .getString("cecase_genericclosingeventcatid")));
         
         EventCnF origEv = ec.initEvent(cse, origCat);
-        origEv.setUserCreator(uc.user_getUserRobot());
+        origEv.setCreatedBy(uc.user_getUserRobot());
         origEv.setTimeStart(cse.getOriginationDate());
         origEv.setTimeEnd(origEv.getTimeStart().plusMinutes(origCat.getDefaultDurationMins()));
         origEv.setDescription(origCat.getEventCategoryDesc());
@@ -463,14 +488,9 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if(cse != null && cse.getEventList() != null && !cse.getEventList().isEmpty()){
             if(cse.getEventList().get(0).getTimeStart() != null){
                 LocalDateTime le = cse.getEventList().get(0).getTimeStart();
-                long secBetween = LocalDateTime.now().toInstant(ZoneOffset.ofHours(-5)).getEpochSecond() - le.toInstant(ZoneOffset.ofHours(-5)).getEpochSecond();
-                dsle = (double) secBetween / (double) (60*60*24);
-                
+                cse.setDaysSinceLastEvent(DateTimeUtil.getTimePeriodAsDays(le, LocalDateTime.now()));
             }
-            
-            cse.setDaysSinceLastEvent(df.format(dsle));
         }
-        
     }
     
 
@@ -590,10 +610,228 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         return ci.getIcon(phase);
     }
 
+    
+    /**
+     * Primary logic block for interrogating a case to assign it a priority Enum 
+     * and write a meaningful log
+     * @param cse
+     * @return 
+     */
+    private CECase cecase_configureCECasePriority(CECase cse) throws BObStatusException, IntegrationException{
+        if(cse == null){
+            throw new BObStatusException("Cannot assign priority to null");
+        }
+        MunicipalityCoordinator mc = getMuniCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        Parcel parcel = pc.getProperty(cse.getParcelKey());
+        
+        
+        // Get all letters that have been sent
+        List<NoticeOfViolation> novSentList = cse.assembleNoticeList(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
+        // Get all violations that are active
+        List<CodeViolation> codeViolActiveList = cse.assembleViolationList(ViewOptionsActiveListsEnum.VIEW_ACTIVE);
+        
+       cse.logPriorityAssignmentMessage("Assigning priority to CECase ID: ", false);
+       cse.logPriorityAssignmentMessage(String.valueOf(cse.getCaseID()), true);
+        
+        if (cse.getPersonInfoPersonID() != 0 || cse.isPropertyInfoCase()) {
+            cse.logPriorityAssignmentMessage("Found non-zero person info ID or prop info case TRUE;", true);
+            cse.logPriorityAssignmentMessage("Assigning priorirty: CONTAINER.", true);
+            cse.setPriority(CasePriorityEnum.CONTAINER);
+            
+        } else if (cse.getClosingDate() != null){
+            cse.logPriorityAssignmentMessage("Case has a closing date;", true);
+            cse.logPriorityAssignmentMessage("Assigning priority: CLOSED.", true);
+            cse.setPriority(CasePriorityEnum.CLOSED);
+            
+        } else if (parcel != null && parcel.getParcelInfo() != null && parcel.getParcelInfo().isAbandoned()){
+            cse.logPriorityAssignmentMessage("Case is not closed but is attached to a parcel inside abandonment window;", true);
+            cse.logPriorityAssignmentMessage("This is an overriding priority and the logic is ignoring all citation and violation statuses;", true);
+            cse.logPriorityAssignmentMessage("Assigning priority: ABANDONED STALL.", true);
+            cse.setPriority(CasePriorityEnum.ABANDONMENT_STALL);
+            
+        } else if (!cecase_buildCitationListForPhaseAssignment(cse).isEmpty()) {
+            cse.logPriorityAssignmentMessage("Found at least one citation;", true);
+            cse.logPriorityAssignmentMessage("Assigning priority: CITATION.", true);
+            cse.setPriority(CasePriorityEnum.CITATION);
+            
+        } else if (cse.getViolationList() == null || cse.getViolationList().isEmpty()) {
+            cse.logPriorityAssignmentMessage("Found zero violations but I'm not a container case;", true);
+            cse.logPriorityAssignmentMessage("Assigning priority: OPENING.", true);
+            cse.setPriority(CasePriorityEnum.OPENING);
+            // we have at least one violation
+            // Let's figure out if we've been sitting open beyond allotted buffer
+        } else if (codeViolActiveList != null && !codeViolActiveList.isEmpty()) {
+            cse.logPriorityAssignmentMessage("Found ", false);
+            cse.logPriorityAssignmentMessage(String.valueOf(codeViolActiveList.size()), false);
+            cse.logPriorityAssignmentMessage(" active violations on case;", true);
+            // see if we have at least one letter
+            if(novSentList != null && !novSentList.isEmpty()){
+                cse.logPriorityAssignmentMessage("Found ", false);
+                cse.logPriorityAssignmentMessage(String.valueOf(novSentList.size()), false);
+                cse.logPriorityAssignmentMessage(" sent letters on case;", true);
+                
+                NoticeOfViolation mostRecentLetter = novSentList.get(0);
+                cse.logPriorityAssignmentMessage("Using letter follow up window of : ", false);
+                cse.logPriorityAssignmentMessage(String.valueOf(mostRecentLetter.getNovType().getFollowUpWindowDays()), false);
+                cse.logPriorityAssignmentMessage(" days for letters of type: ", false);
+                cse.logPriorityAssignmentMessage(mostRecentLetter.getNovType().getTitle(), false);
+                cse.logPriorityAssignmentMessage(";", true);
+                
+                long daysSinceLatestLetter = DateTimeUtil.getTimePeriodAsDays(mostRecentLetter.getDateOfRecord(), LocalDateTime.now());
+                
+                cse.logPriorityAssignmentMessage("Most recent letter was marked as sent ", false);
+                cse.logPriorityAssignmentMessage(String.valueOf(daysSinceLatestLetter), false);
+                cse.logPriorityAssignmentMessage(" days ago on ", false);
+                cse.logPriorityAssignmentMessage(getPrettyDateNoTime(mostRecentLetter.getDateOfRecord()), false);
+                cse.logPriorityAssignmentMessage(" (Letter ID: ", false);
+                cse.logPriorityAssignmentMessage(String.valueOf(mostRecentLetter.getNoticeID()), false);
+                cse.logPriorityAssignmentMessage(")", true);
+                
+                
+                if(daysSinceLatestLetter < 0){
+                    cse.logPriorityAssignmentMessage("Most recent letter was sent in the future? Hark!", true);
+                    cse.setPriority(CasePriorityEnum.UNKNOWN);
+//                    return cse;
+                } else if(daysSinceLatestLetter <= mostRecentLetter.getNovType().getFollowUpWindowDays()) {
+                    cse.logPriorityAssignmentMessage("Case is inside letter type appeals/waiting window;", true);
+                    cse.logPriorityAssignmentMessage("Assigning priority: MONITORING", true);
+                    cse.setPriority(CasePriorityEnum.MONITORING);
+//                    return cse;
+                    // if we're within administrative buffer, then we're yellow
+                } else if(daysSinceLatestLetter > mostRecentLetter.getNovType().getFollowUpWindowDays() 
+                        && daysSinceLatestLetter <= DateTimeUtil.getTimePeriodAsDays(mostRecentLetter.getDateOfRecord(), mostRecentLetter.getDateOfRecord().plusDays(mc.DEFAULT_DEADLINE_BUFFER_DAYS)) ){
+                    cse.logPriorityAssignmentMessage("Letter appeals/waiting period has expired, but inside administrative buffer;", true);
+                    cse.logPriorityAssignmentMessage("Assigning priority: ACTION REQUIRED", true);
+                    cse.setPriority(CasePriorityEnum.ACTION_REQUIRED);
+//                    return cse;
+                    
+                } else {
+                    cse.logPriorityAssignmentMessage("Letter appeals/waiting period has expired, and you're OUTSIDE administrative buffer;", true);
+                    cse.logPriorityAssignmentMessage("Assigning priority: ACTION PAST DUE", true);
+                    cse.setPriority(CasePriorityEnum.ACTION_PASTDUE);
+//                    return cse;
+                }
+                
+            } else {
+                // we have No letters sent, so we need to know are we yellow or red?
+                cse.logPriorityAssignmentMessage("Found zero sent letters;", true);
+                CodeViolation earliestV = codeViolActiveList.get(codeViolActiveList.size() - 1);
+                long daysSinceEarliestActiveViolation = DateTimeUtil.getTimePeriodAsDays(earliestV.getDateOfRecord(), LocalDateTime.now());
+                cse.logPriorityAssignmentMessage("Using violation-letter buffer: ", false);
+                cse.logPriorityAssignmentMessage(String.valueOf(mc.DEFAULT_VIOLATION_NO_LETTER_BUFFER_DAYS), false);
+                cse.logPriorityAssignmentMessage(" days; ", true);
+                
+                cse.logPriorityAssignmentMessage("Earliest code violation's date of record is ", false);
+                cse.logPriorityAssignmentMessage(String.valueOf(daysSinceEarliestActiveViolation), false);
+                cse.logPriorityAssignmentMessage(" days ago (Violaion ID: ", false);
+                cse.logPriorityAssignmentMessage(String.valueOf(earliestV.getViolationID()), false);
+                cse.logPriorityAssignmentMessage(", DOR: ", true);
+                cse.logPriorityAssignmentMessage(getPrettyDate(earliestV.getDateOfRecord()), false);
+                cse.logPriorityAssignmentMessage(");", true);
+                
+                if(daysSinceEarliestActiveViolation <= mc.DEFAULT_VIOLATION_NO_LETTER_BUFFER_DAYS){
+                    cse.logPriorityAssignmentMessage("Assigning  priority: ACTION REQUIRED (Yellow).", true);
+                    cse.setPriority(CasePriorityEnum.ACTION_REQUIRED);
+                } else {
+                    cse.logPriorityAssignmentMessage("Assigning  priority: PAST DUE ACTION (Red).", true);
+                    cse.setPriority(CasePriorityEnum.ACTION_PASTDUE);
+                }
+//                return cse;
+            } // close if/then based on NOV list size
+            
+            // Check stip comp dates and see if we need to adjust priority as assigned by letters
+            LocalDateTime earliestStipCompDate = violation_determineEarliestStipCompDate(codeViolActiveList);
+            if(earliestStipCompDate != null){
+                long daysToEarliestStipComp = DateTimeUtil.getTimePeriodAsDays(LocalDateTime.now(), earliestStipCompDate);
+                
+                cse.logPriorityAssignmentMessage("Determined earliest stipulated compliance date is ", false);
+                cse.logPriorityAssignmentMessage(getPrettyDate(earliestStipCompDate), false);
+                
+                cse.logPriorityAssignmentMessage(", which is ", false);
+                cse.logPriorityAssignmentMessage(String.valueOf(daysToEarliestStipComp), false);
+                if(daysToEarliestStipComp >= 0){
+                    cse.logPriorityAssignmentMessage(" days away;", true);
+                    cse.logPriorityAssignmentMessage("Hence: we are inside a stip comp window;", true);
+                    cse.logPriorityAssignmentMessage("Governing object in this muni is set to ", false);
+                    if(mc.PRIORITIZE_LETTER_BUFFER){
+                        cse.logPriorityAssignmentMessage("Letters/NOVs;", true);
+                        cse.logPriorityAssignmentMessage("Priority assigned by Letters/NOVs will not be altered", true);
+                    } else {
+                        cse.logPriorityAssignmentMessage("Stipulated compliance dates;", true);
+                        cse.logPriorityAssignmentMessage("Letter/NOV-based priority assignment will be overriden;", true);
+                        cse.logPriorityAssignmentMessage("Assigning override priority: MONITORING;", true);
+                        cse.setPriority(CasePriorityEnum.MONITORING);
+                        return cse;
+                    }
+                    
+                  // okay, our stip comp date is in the past, so we need to check governing object and then check for buffers  
+                  // we are either yellow or red, depending on the administrative buffer
+                } else {
+                    CasePriorityEnum priorityStipComp;
+                    cse.logPriorityAssignmentMessage(" days ago;", true);
+                    long stipCompPositivePast = -1l * daysToEarliestStipComp;
+                    if(DateTimeUtil.getTimePeriodAsDays(earliestStipCompDate, LocalDateTime.now()) <= mc.DEFAULT_DEADLINE_BUFFER_DAYS){
+                        cse.logPriorityAssignmentMessage("We are INSIDE administrative buffer following the most recent violation stipulated compliance date;", true);
+                        cse.logPriorityAssignmentMessage("Priority as governed by stipulated compliance dates is ACTION REQUIRED/Yellow;", true);
+                        priorityStipComp = CasePriorityEnum.ACTION_REQUIRED;
+                        if(cse.getPriority() != null && cse.getPriority() != priorityStipComp){
+                            cse.logPriorityAssignmentMessage("Priority conflict between letter/NOV rules and stipulated compliance date rules!;", true);
+                            if(mc.PRIORITIZE_LETTER_BUFFER){
+                                cse.logPriorityAssignmentMessage("Priority assigned by letter/NOV rules will NOT be altered;", true);
+                            } else {
+                                cse.logPriorityAssignmentMessage("Priority assigned by letter/NOV rules will be overriden by stipulated compliance date;", true);
+                                cse.logPriorityAssignmentMessage("Assignign Priority ACTION REQUIRED/Yellow;", true);
+                                cse.setPriority(priorityStipComp);
+                            }
+                        } else {
+                            cse.logPriorityAssignmentMessage("Priority agreement between letters/NOVs and stip comp date;", true);
+                        }
+                        
+                    } else {
+                        cse.logPriorityAssignmentMessage("We are OUTSIDE administrative buffer following the most recent violation stipulated compliance date;", true);
+                        cse.logPriorityAssignmentMessage("Priority as governed by stipulated compliance dates is ACTION PAST DUE/Red;", true);
+                        priorityStipComp = CasePriorityEnum.ACTION_PASTDUE;
+                        if(cse.getPriority() != null && cse.getPriority() != priorityStipComp){
+                            cse.logPriorityAssignmentMessage("Priority conflict between letter/NOV rules and stipulated compliance date rules!;", true);
+                            if(mc.PRIORITIZE_LETTER_BUFFER){
+                                cse.logPriorityAssignmentMessage("Priority assigned by letter/NOV rules will NOT be altered;", true);
+                            } else {
+                                cse.logPriorityAssignmentMessage("Priority assigned by letter/NOV rules will be overriden by stipulated compliance date;", true);
+                                cse.logPriorityAssignmentMessage("Assignign Priority ACTION PAST DUE/RED;", true);
+                                cse.setPriority(priorityStipComp);
+                            }
+                        } else {
+                            cse.logPriorityAssignmentMessage("Priority agreement between letters/NOVs and stip comp date;", true);
+                        }
+                    }
+                }
+            } else {
+                cse.logPriorityAssignmentMessage("Violation status anomaly: Violation list is not null but no stip comp date could be determined;", true);
+            }
+        // we have no violations 
+        } else {
+            cse.logPriorityAssignmentMessage("Cannot determine priority;", true);
+            cse.logPriorityAssignmentMessage("Assigning priority: UNKNOWN", true);
+            cse.setPriority(CasePriorityEnum.UNKNOWN);
+        }
+        
+        if(cse.getPriority() == null){
+            cse.logPriorityAssignmentMessage("Cannot determine priority;", true);
+            cse.logPriorityAssignmentMessage("Assigning priority: UNKNOWN", true);
+            cse.setPriority(CasePriorityEnum.UNKNOWN);
+        }
+        
+        return cse;
+    }
+    
+    
+    
+    
     /**
      * A CECaseDataHeavy's Stage is derived from its Phase based on the set of
      * business rules encoded in this method.
-     *
+     * @deprecated replaced in July 2022 with CasePriority
      * @param cse which needs its StageConfigured
      * @return the same CECas passed in with the CaseStageEnum configured
      * @throws BObStatusException
@@ -625,7 +863,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         } else {
             // find overriding factors to have a closed 
-            if (cse.getViolationList().isEmpty()) {
+            if (cse.getViolationList() != null && cse.getViolationList().isEmpty()) {
                 // Open case, no violations yet: only one mapping
                 statusBundle.setPhase(CasePhaseEnum.PrelimInvestigationPending);
                 // we have at least one violation attached  
@@ -660,7 +898,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         cse.setStatusBundle(statusBundle);
 
-        if (cse.getStatusBundle().getPhase() != null) {
+        if (cse.getStatusBundle() != null && cse.getStatusBundle().getPhase() != null) {
             //now set the icon based on what phase we just assigned the case to
             statusBundle.setPhaseIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                     .getString(cse.getStatusBundle().getPhase().getCaseStage().getIconPropertyLookup()))));
@@ -999,7 +1237,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 //            originationEvent.setNotes(generateCaseInitNoteFromCEAR(cear));
 
         }
-        originationEvent.setUserCreator(uc.user_getUser(ua.getUserID()));
+        originationEvent.setCreatedBy(uc.user_getUser(ua.getUserID()));
         originationEvent.setTimeStart(cedh.getOriginationDate());
         // logic in our event coordinator will set the end time based on the event cat
         ec.addEvent(originationEvent, cedh, ua);
@@ -1392,7 +1630,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 //        rpt.setViolationsCitedDateRange(sc.runQuery(qcv).getResults());
 //        
 //        initBarViolationsPastMonth(rpt);
-        initPieEnforcement(rpt);
+//        initPieEnforcement(rpt);
         initPieViols(rpt);
         initPieCitation(rpt);
         initPieClosure(rpt);
@@ -1524,31 +1762,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         }
 
         // build our count map
-        Map<ViolationStatusEnum, Integer> violMap = new HashMap<>();
-        violMap.put(ViolationStatusEnum.UNRESOLVED_WITHINCOMPTIMEFRAME, 0);
-        violMap.put(ViolationStatusEnum.UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME, 0);
-        violMap.put(ViolationStatusEnum.RESOLVED, 0);
-        violMap.put(ViolationStatusEnum.UNRESOLVED_CITED, 0);
-        violMap.put(ViolationStatusEnum.NULLIFIED, 0);
-        violMap.put(ViolationStatusEnum.TRANSFERRED, 0);
+        Map<CodeViolationStatusEnum, Integer> violMap = new HashMap<>();
+        violMap.put(CodeViolationStatusEnum.UNRESOLVED_WITHINCOMPTIMEFRAME, 0);
+        violMap.put(CodeViolationStatusEnum.UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME, 0);
+        violMap.put(CodeViolationStatusEnum.RESOLVED, 0);
+        violMap.put(CodeViolationStatusEnum.UNRESOLVED_CITED, 0);
+        violMap.put(CodeViolationStatusEnum.NULLIFIED, 0);
+        violMap.put(CodeViolationStatusEnum.TRANSFERRED, 0);
         
 
         for (CodeViolation cv : vl) {
-            ViolationStatusEnum vs = cv.getStatus();
+            CodeViolationStatusEnum vs = cv.getStatus();
             Integer catCount = violMap.get(vs);
             catCount += 1;
             violMap.put(cv.getStatus(), catCount);
         }
 
         rpt.setPieViolStatMap(violMap);
-        rpt.setPieViolCompCount(violMap.get(ViolationStatusEnum.RESOLVED));
-        Set<ViolationStatusEnum> keySet = violMap.keySet();
+        rpt.setPieViolCompCount(violMap.get(CodeViolationStatusEnum.RESOLVED));
+        Set<CodeViolationStatusEnum> keySet = violMap.keySet();
         List<String> pieColors = new ArrayList<>();
         List<LegendItem> legend = new ArrayList<>();
 
         SystemCoordinator sc = getSystemCoordinator();
 
-        for (ViolationStatusEnum vse : keySet) {
+        for (CodeViolationStatusEnum vse : keySet) {
             Integer i = violMap.get(vse);
             violationCounts.add(i);
             String color = sc.generateRandomRGBColor();
@@ -1571,6 +1809,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * Builds a pie chart about case enforcement status
      *
      * @param rpt
+     * @deprecated use priority instead
      */
     private void initPieEnforcement(ReportConfigCECaseList rpt) {
 
@@ -2113,7 +2352,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         // now load up the closing event before inserting it
         // we'll probably want to get this text from a resource file instead of
         // hardcoding it down here in the Java
-        e.setUserCreator(getSessionBean().getSessUser());
+        e.setCreatedBy(getSessionBean().getSessUser());
         e.setDescription(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventDescription"));
         e.setNotes(getResourceBundle(Constants.MESSAGE_TEXT).getString("automaticClosingEventNotes"));
         return ei.insertEvent(e);
@@ -2411,33 +2650,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
     }
 
-    /**
-     *
-     * @param ceCase
-     * @param nov
-     * @param user
-     * @throws IntegrationException
-     * @throws BObStatusException
-     */
-    private void nov_logNOVSentEvent(CECaseDataHeavy ceCase, NoticeOfViolation nov, UserAuthorized user)
-            throws IntegrationException, BObStatusException, EventException {
-        EventCoordinator evCoord = getEventCoordinator();
-
-        // If we've got a type, and that type knows about an event category 
-        if(nov.getNovType() != null){
-            
-        }
-        EventCnF noticeEvent = evCoord.initEvent(ceCase, evCoord.initEventCategory(Integer.parseInt(getResourceBundle(
-                Constants.EVENT_CATEGORY_BUNDLE).getString("noticeMailed"))));
-        
-        String queuedNoticeEventNotes = getResourceBundle(Constants.MESSAGE_TEXT).getString("noticeMailedEventDesc");
-
-        noticeEvent.setDescription(queuedNoticeEventNotes);
-        noticeEvent.setUserCreator(user);
-
-        evCoord.addEvent(noticeEvent, ceCase, user);
-
-    }
+   
 
     /**
      * Logic container for configuring a NOV as returned by the postal service
@@ -2543,36 +2756,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         return nov;
     }
 
-    /**
-     * Connects with the EventCoordinator to create a follow-up event for NOVs
-     *
-     * @param cse
-     * @param nov
-     * @param ua
-     * @return the generated event
-     * @throws com.tcvcog.tcvce.domain.BObStatusException
-     * @throws com.tcvcog.tcvce.domain.IntegrationException
-     * @throws com.tcvcog.tcvce.domain.EventException
-     */
-    public EventCnF nov_createFollowupEvent(CECase cse, NoticeOfViolation nov, UserAuthorized ua) throws BObStatusException, IntegrationException, EventException {
-        if (cse == null || nov == null || ua == null) {
-            throw new BObStatusException("Cannot create followup event for NOV with null Case, NOV, or User");
-        }
-
-        EventCoordinator ec = getEventCoordinator();
-        EventCategory cat = ec.getEventCategory(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                .getString("nov_followupeventcatid")));
-        EventCnF fuev = ec.initEvent((IFace_EventRuleGoverned) cse, cat);
-
-        fuev.setUserCreator(ua);
-        fuev.setTimeStart(LocalDateTime.now().plusDays(nov.getFollowupEventDaysRequest()));
-        fuev.setTimeEnd(fuev.getTimeStart().minusMinutes(cat.getDefaultDurationMins()));
-
-        List<EventCnF> evlist = ec.addEvent(fuev, (IFace_EventRuleGoverned) cse, ua);
-        return evlist.get(0);
-
-    }
-
+   
     /**
      * Tool for building an NOV from a template block
      *
@@ -3392,6 +3576,36 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     // *************************************************************************
     // *                     VIOLATIONS                                        *
     // *************************************************************************
+    
+    /**
+     * Utility method for iterating over a given list of violations
+     * and determining the soonest stip comp date
+     * 
+     * @param vlist
+     * @return perhaps a non-null date if at least one violation is in the inputted list
+     * and has a stip comp date
+     */
+    private LocalDateTime violation_determineEarliestStipCompDate(List<CodeViolation> vlist){
+        LocalDateTime earliesSCD = null;
+        
+        if(vlist != null && !vlist.isEmpty()){
+            for(CodeViolation cv: vlist){
+                if(cv.getStipulatedComplianceDate() != null){
+                    if(earliesSCD == null){
+                        earliesSCD = cv.getStipulatedComplianceDate();
+                    } else {
+                        if(earliesSCD.isAfter(cv.getStipulatedComplianceDate())){
+                            earliesSCD = cv.getStipulatedComplianceDate();
+                        }
+                    }
+                }
+            }
+        }
+        return earliesSCD;
+    }
+    
+    
+    
     /**
      * Violation status enum values have associated ordinal values which this
      * method looks at to determine the highest one, which it returns and then
@@ -3465,10 +3679,13 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @param c
      * @return
      * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    public CodeViolation violation_getCodeViolationSkeleton(CECaseDataHeavy c) throws BObStatusException {
+    public CodeViolation violation_getCodeViolationSkeleton(CECaseDataHeavy c) throws BObStatusException, IntegrationException {
         CodeViolation v = new CodeViolation();
-
+        SystemCoordinator sc = getSystemCoordinator();
+         
+        v.setSeverityIntensity(sc.getIntensityClass(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("defaultviolationseverity"))));
         v.setDateOfRecord(LocalDateTime.now());
         if (c != null) {
             v.setCeCaseID(c.getCaseID());
@@ -3581,12 +3798,12 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         // nullification overrides all
         if (cv.getNullifiedTS() != null) {
-            cv.setStatus(ViolationStatusEnum.NULLIFIED);
+            cv.setStatus(CodeViolationStatusEnum.NULLIFIED);
             cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                     .getString(cv.getStatus().getIconPropertyName()))));
 
         }  else if(cv.getTransferredTS() != null){
-            cv.setStatus(ViolationStatusEnum.TRANSFERRED);
+            cv.setStatus(CodeViolationStatusEnum.TRANSFERRED);
             cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                     .getString(cv.getStatus().getIconPropertyName()))));
             
@@ -3594,26 +3811,26 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             // violation still within compliance timeframe
             if (cv.getDaysUntilStipulatedComplianceDate() >= 0) {
 
-                cv.setStatus(ViolationStatusEnum.UNRESOLVED_WITHINCOMPTIMEFRAME);
+                cv.setStatus(CodeViolationStatusEnum.UNRESOLVED_WITHINCOMPTIMEFRAME);
                 cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString(cv.getStatus().getIconPropertyName()))));
 
                 // violation has NOT been cited, but is past compliance timeframe end date
             } else if (cv.getCitationIDList().isEmpty()) {
 
-                cv.setStatus(ViolationStatusEnum.UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME);
+                cv.setStatus(CodeViolationStatusEnum.UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME);
                 cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString(cv.getStatus().getIconPropertyName()))));
 
                 // violation has been cited on at least one citation
             } else {
-                cv.setStatus(ViolationStatusEnum.UNRESOLVED_CITED);
+                cv.setStatus(CodeViolationStatusEnum.UNRESOLVED_CITED);
                 cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                         .getString(cv.getStatus().getIconPropertyName()))));
             }
             // we have a resolved violation
         } else {
-            cv.setStatus(ViolationStatusEnum.RESOLVED);
+            cv.setStatus(CodeViolationStatusEnum.RESOLVED);
             cv.setIcon(si.getIcon(Integer.parseInt(getResourceBundle(Constants.VIOLATIONS_BUNDLE)
                     .getString(cv.getStatus().getIconPropertyName()))));
         }
@@ -3637,7 +3854,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             throw new ViolationException("Violation is not mapped to parent case ID");
         }
 
-        if (cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed) {
+        if (cse.getPriority() != null && !cse.getPriority().isQualifiesAsOpen()) {
+            throw new ViolationException("Cannot update code violations on closed cases!");
+        }
+        if (cse.getStatusBundle() != null && cse.getStatusBundle().getPhase() == CasePhaseEnum.Closed) {
             throw new ViolationException("Cannot update code violations on closed cases!");
         }
         if (cv.getStipulatedComplianceDate().isBefore(cv.getDateOfRecord())) {

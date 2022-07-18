@@ -17,31 +17,41 @@
 package com.tcvcog.tcvce.entities;
 
 /**
- *
+ * Represents possible outcomes for code violations attached to a citation
  * @author sylvia
  */
 public enum CitationViolationStatusEnum {
 
-    FILED ("Filed"),
-    AWAITING_PLEA ("Awaiting Plea"),
-    CONTINUED ("Continued"),
-    GUILTY ("Guilty"),
-    NO_CONTEST("No Contest"),
-    DISMISSED ("Dismissed"),
-    COMPLIANCE ("Compliance"),
-    INVALID ("Deemed invalid by judge"),
-    WITHDRAWN ("Withdrawn"),
-    NOT_GUILTY ("Not Guilty"),
-    OTHER ("Other");
+    FILED               ("Filed", false),
+    AWAITING_PLEA       ("Awaiting Plea", false),
+    CONTINUED           ("Continued", false),
+    GUILTY              ("Guilty", true),
+    NO_CONTEST          ("No Contest", true),
+    DISMISSED           ("Dismissed", true),
+    COMPLIANCE          ("Compliance", true),
+    INVALID             ("Deemed invalid by judge", true),
+    WITHDRAWN           ("Withdrawn", true),
+    NOT_GUILTY          ("Not Guilty", true),
+    OTHER               ("Other", false);
     
     private final String label;
+    protected final boolean terminalStatus;
     
-    private CitationViolationStatusEnum(String lab){
-        label = lab;
+    
+    private CitationViolationStatusEnum(String lab, boolean term){
+        this.label = lab;
+        this.terminalStatus = term;
     }
     
     public String getLabel(){
         return label;
+    }
+
+    /**
+     * @return the terminalStatus
+     */
+    public boolean isTerminalStatus() {
+        return terminalStatus;
     }
     
 

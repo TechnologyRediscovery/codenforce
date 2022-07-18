@@ -656,7 +656,7 @@
                             <p:column headerText="Creator"
                                       width="20%"
                                       styleClass="centeredColumnContent">
-                                <h:outputText value="#{event.userCreator.human.name}"/>
+                                <h:outputText value="#{!empty event.createdBy ? event.createdBy.human.name : ''}"/>
                             </p:column>
 
 

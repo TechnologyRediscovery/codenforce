@@ -16,18 +16,13 @@
  */
 package com.tcvcog.tcvce.application;
 
-import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
-import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.EventException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.*;
-import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
-
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import java.io.Serializable;
@@ -35,24 +30,21 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 /**
  * The premier backing bean for universal events panel workflow.
  *
- * @author jurplel
+ * @author jurplel and Ellen Bascomb of Apartment 31Y
  */
-public class EventsBB extends BackingBeanUtils implements Serializable {
+public class EventBB extends BackingBeanUtils implements Serializable {
     private DomainEnum pageDomain;
     private boolean eventEditMode;
+    private EventCnF currentEvent;
     
     private IFace_EventHolder currentEventHolder;
-    private List<EventCnF> eventList = new ArrayList<>();
-    private List<HumanLink> eventHumanLinkList;
-
-    private ViewOptionsActiveHiddenListsEnum eventListFilterMode;
+    private String eventListComponentForRefreshTrigger;
 
     private Map<EventType, List<EventCategory>> typeCategoryMap;
     
@@ -68,23 +60,15 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     private long skeletonDuration;
     private EventType skeletonType;
 
-    // Single event that is currently used for editing/viewing
-    // and also a copy of its last saved state to restore on edit cancel
-    private EventCnF lastSavedSelectedEvent;
-    private EventCnF currentEvent;
-
-    public EventsBB() {}
+    public EventBB() {}
 
     @PostConstruct
     public void initBean() {
         SessionBean sb = getSessionBean();
         EventCoordinator ec = getEventCoordinator();
 
-        // Default events list filter mode
-        setEventListFilterMode(ec.determineDefaultEventView(sb.getSessUser()));
-
         // Find event holder and setup event list
-        updateEventHolder();
+        loadSessionEventHolder();
 
         // Populate map of event types and categories
         typeCategoryMap = ec.assembleEventTypeCatMap_toEnact(pageDomain, currentEventHolder, getSessionBean().getSessUser());
@@ -95,7 +79,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
      * Grabs the current page event type from the sessionBean and uses that to populate
      * the currentEventHolder object with something we can grab events from!
      */
-    public void updateEventHolder() {
+    public void loadSessionEventHolder() {
         SessionBean sb = getSessionBean();
 
         pageDomain = sb.getSessEventsPageEventDomainRequest();
@@ -107,29 +91,33 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
                 currentEventHolder = sb.getSessOccPeriod();
                 break;
             case UNIVERSAL:
-                System.out.println("EventsBB reached universal case in updateEventHolder()--do something about this maybe?");
+                System.out.println("eventBB reached universal case in updateEventHolder()--do something about this maybe?");
                 break;
         }
-        updateEventList();
-    }
-
-    /**
-     * Repopulates eventList parameter with the latest and greatest events from
-     * our special guest the event-containing object.
-     * This method also filters the events according to eventListFilterMode
-     */
-    public void updateEventList() {
-        if (currentEventHolder == null)
-            return;
-
-        eventList.clear();
-        if (eventListFilterMode == null)
-            eventList.addAll(currentEventHolder.getEventList());
-        else
-            eventList.addAll(currentEventHolder.getEventList(eventListFilterMode));
-
     }
     
+    /**
+     * Grabs a new set of events from the DB and sends it to the session bean
+     * and the UI will trigger the event holder's management BB to get a new
+     * copy of the session event list and display that to the user
+     */
+    public void refreshEventHolderListAndTriggerSessionReload(){
+        EventCoordinator ec = getEventCoordinator();
+        if(currentEventHolder != null){
+            try {
+                System.out.println("EventBB.refreshEventHolderListAndTriggerSessionReload | eventHolder ID: " + currentEventHolder.getBObID() );
+                getSessionBean().setSessEventListForRefreshUptake(ec.getEventList(currentEventHolder));
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Upded session event holder", ""));
+            } catch (IntegrationException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        ex.getMessage(), ""));
+                
+            }
+        }
+    }
+
     /**
      * Retrieves a new copy of our current event
      */
@@ -138,11 +126,11 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         if(currentEvent != null){
             try {
                 currentEvent = ec.getEvent(currentEvent.getEventID());
-                System.out.println("EventsBB.refreshCurrentEvent: Refreshed Event");
+                System.out.println("eventBB.refreshCurrentEvent: Refreshed Event");
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
-            updateEventList();
+        
         }
     }
     
@@ -153,35 +141,30 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
      */
     public void onViewEvent(EventCnF ev){
         currentEvent = ev;
+        extractEventListComponentForRefresh();
+        refreshCurrentEvent();
+    }
+    
+    private void extractEventListComponentForRefresh(){
+         
+           eventListComponentForRefreshTrigger = 
+                FacesContext.getCurrentInstance()
+                        .getExternalContext()
+                        .getRequestParameterMap()
+                        .get("event-list-component-to-update");
+           System.out.println("EventBB.extractEventListComponentForRefresh | " + eventListComponentForRefreshTrigger);
+        
+        
     }
 
-    /**
-     * Listener for user requests to make an event either active or inactive
-     */
-    public void toggleEventActive() {
-        EventCoordinator ec = getEventCoordinator();
-        currentEvent.setActive(!currentEvent.isActive());
-        try {
-            ec.updateEvent(currentEvent, getSessionBean().getSessUser());
-             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Event ID " + currentEvent.getEventID() + " has been deactivated!", ""));
-             refreshCurrentEvent();
-        } catch (IntegrationException | BObStatusException | EventException ex) {
-            System.out.println(ex);
-             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Could not deactivate event ID: " + currentEvent.getEventID() , ""));
-             // in case we didn't get the update
-             // toggle it back to what it was before the call
-            currentEvent.setActive(!currentEvent.isActive());
-        }
-    }
+   
     
     /**
      * Listener for when the user starts editing the person links
      * to this particular event
      */
     public void onManageEventPersonButtonChange(){
-        System.out.println("EventsBB.onManageEventPersonButtonChange");
+        System.out.println("eventBB.onManageEventPersonButtonChange");
         
     }
     
@@ -191,13 +174,23 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
      * @param ev 
      */
     public void onEventEditModeToggleButtonPress(ActionEvent ev){
-        System.out.println("EventsBB.onEventEditModeToggleButtonPress | edit mode: " + eventEditMode);
+        System.out.println("eventBB.onEventEditModeToggleButtonPress | edit mode: " + eventEditMode);
         if(eventEditMode){
-            saveEventChanges();
+            if(currentEvent != null && currentEvent.getEventID() != 0){
+                
+                eventUpdateCommit();
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Success: Event update ID:"+getCurrentEvent().getEventID(), ""));
+            } else {
+                getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+                        "Mostly fatal error: null current event or evid=0: error code EV007", ""));
+            }
             
         }
         eventEditMode = !eventEditMode;
     }
+    
+    
     
     /**
      * listener for user requests to cancel an even edit oepration
@@ -206,7 +199,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     public void onEventEditCancelButtonChange(ActionEvent ev){
         System.out.println("EventBB.onEventEditCancelButtonChange");
         eventEditMode = !eventEditMode;
-          getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+        getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Edit aborted--changes discarded", ""));
     
     }
@@ -216,25 +209,22 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
      * It will fail in certain conditions, in which case the selectedEvent is returned to
      * a backup made before any current unsaved changes.
      */
-    public void saveEventChanges() {
+    public void eventUpdateCommit() {
         EventCoordinator ec = getEventCoordinator();
 
         try {
             ec.updateEvent(currentEvent, getSessionBean().getSessUser());
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Save successful on event ID: " + currentEvent.getEventID(), ""));
-            System.out.println("EventsBB.saveEventChanges successful");
-
+            System.out.println("eventBB.saveEventChanges successful");
+            refreshCurrentEvent();
+            refreshEventHolderListAndTriggerSessionReload();
             // Set backup copy in case of failure if saving to database succeeds
-            lastSavedSelectedEvent = new EventCnF(currentEvent);
+//            lastSavedSelectedEvent = new EventCnF(currentEvent);
         } catch (IntegrationException | BObStatusException | EventException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     ex.getMessage(), ""));
-            System.out.println("EventsBB.saveEventChanges failure");
-
-
-            // Restore working copy of occ period to last working one if saving to database fails.
-            discardEventChanges();
+            System.out.println("eventBB.saveEventChanges failure");
+            // don't turn off editing yet!
+//            discardEventChanges();
         }
     }
 
@@ -243,36 +233,39 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
      * set its value to that of the event present in the last successful save.
      */
     public void discardEventChanges() {
-        System.out.println("EventsBB.discardEventChanges");
-
-        setCurrentEvent(new EventCnF(lastSavedSelectedEvent));
+        System.out.println("eventBB.discardEventChanges");
+        eventEditMode = false;
     }
     
     /**
-     * Listener for user requests to end the vent deactivation process.
+     * listener for user requests to start the vent remove process that 
+     * applies only to the bean's current event. I won't just take
+     * in any old random event.
      * @param ev 
      */
-    public void onEventNukeCancelButtonChange(ActionEvent ev){
-        System.out.println("EvntsBB.onEventNukeCancelButtonChange-Cancel!");
-    }
-  
-    /**
-     * listener for user requests to start the vent remove process
-     * @param ev 
-     */
-    public void onEventRemoveInitButtonChange(ActionEvent ev){
-        // do nothing yet
+    public void onEventDeactivateInit(ActionEvent ev){
+        if(currentEvent != null){
+            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                "Beginning deactivation of event ID: " + currentEvent.getEventID(), ""));
+            System.out.println("eventBB.onEventDeactivate ID: " + currentEvent.getEventID());
+            
+        } else {
+            System.out.println("eventBB.onEventDeactivate | current event null");
+            
+        }
     }
     
     /**
      * Listener for user request to remove an event
      * @param ev 
      */
-    public void onEventRemoveCommitButtonChange(ActionEvent ev){
+    public void onEventDeactivateCommit(ActionEvent ev){
         EventCoordinator ec = getEventCoordinator();
         try {
             ec.deactivateEvent(getCurrentEvent(), getSessionBean().getSessUser());
-             getFacesContext().addMessage(null,
+            refreshCurrentEvent();
+            refreshEventHolderListAndTriggerSessionReload();
+            getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Removed event ID " + getCurrentEvent().getEventID(), ""));
         } catch (IntegrationException | BObStatusException ex) {
@@ -281,7 +274,14 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
                         new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                 ex.getMessage(), ""));
         }
-        
+    }
+    
+    /**
+     * Listener for user cancels to event deac
+     * @param ev 
+     */
+    public void onEventDeactivateAbort(ActionEvent ev){
+        System.out.println("EventBB.onEventDeactivateAbort");
     }
     
       
@@ -292,8 +292,9 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     public void onEventReactivateCommitButtonChange(ActionEvent ev){
         EventCoordinator ec = getEventCoordinator();
         try {
-            currentEvent.setActive(true);
-            ec.updateEvent(currentEvent, getSessionBean().getSessUser());
+            ec.reactivateEvent(currentEvent, getSessionBean().getSessUser());
+            refreshCurrentEvent();
+            refreshEventHolderListAndTriggerSessionReload();
              getFacesContext().addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO,
                                 "Reactivated event ID " + getCurrentEvent().getEventID(), ""));
@@ -315,18 +316,6 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     }
 
 
-    public int getEventListSize() {
-        int size = 0;
-        if (eventList != null)
-            size = eventList.size();
-
-        return size;
-    }
-
-    public List<ViewOptionsActiveHiddenListsEnum> getEventListFilterModes() {
-        return Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
-    }
-
     //
     // New event stuff
     //
@@ -334,7 +323,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     /**
      * Primary listener for creating a new event
      */
-    public void createNewEvent() {
+    public void eventAddCommit() {
         if (pageDomain == null || currentEventHolder == null ||
                 skeletonEvent == null || skeletonEvent.getCategory() == null) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -364,25 +353,15 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
             return;
         }
 
-        // Update session event holder variable so we can display new events
-
-        switch (pageDomain) {
-            case CODE_ENFORCEMENT:
-                CECase ceCase = (CECase) currentEventHolder;
-                sb.setSessCECase(ceCase);
-                break;
-            case OCCUPANCY:
-                OccPeriod occPeriod = (OccPeriod) currentEventHolder;
-                sb.setSessOccPeriodFromPeriodBase(occPeriod);
-                break;
-            case UNIVERSAL:
-                System.out.println("EventsBB reached universal case in createNewEvent()--do something about this maybe?");
-                break;
-        }
-
-        updateEventHolder();
+        refreshCurrentEvent();
+        refreshEventHolderListAndTriggerSessionReload();
+        
     }
 
+    /**
+     * Special getter for event reconfiguration and add
+     * @return 
+     */
     public List<EventType> getListOfPotentialTypes() {
         List<EventType> keys = new ArrayList(typeCategoryMap.keySet());
         // Sort the keys so they are always in the same order
@@ -394,6 +373,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         return keys;
     }
 
+    /**
+     * Special getter for event config
+     * @return 
+     */
     public List<EventCategory> getListOfPotentialCategories() {
         if (skeletonEvent != null && skeletonType != null && typeCategoryMap.containsKey(skeletonType)) {
             List<EventCategory> eventCategories = typeCategoryMap.get(skeletonType);
@@ -501,15 +484,19 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         SystemCoordinator sc = getSystemCoordinator();
         
         MessageBuilderParams mbp = new MessageBuilderParams();
-        
-        mbp.setCred(getSessionBean().getSessUser().getKeyCard());
-        mbp.setExistingContent(currentEvent.getNotes());
-        mbp.setNewMessageContent(getFormNoteText());
-        mbp.setHeader("Event Note");
-        mbp.setUser(getSessionBean().getSessUser());
-        currentEvent.setNotes(sc.appendNoteBlock(mbp));
-        
         try {
+            if(currentEvent != null){
+
+            mbp.setCred(getSessionBean().getSessUser().getKeyCard());
+            mbp.setExistingContent(currentEvent.getNotes());
+            mbp.setNewMessageContent(getFormNoteText());
+            mbp.setHeader("Event Note");
+            mbp.setUser(getSessionBean().getSessUser());
+            currentEvent.setNotes(sc.appendNoteBlock(mbp));
+            } else {
+                throw new BObStatusException("No current event on which to write note");
+            }
+        
             sc.writeNotes(currentEvent, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -528,23 +515,10 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     // Mostly boring getters and setters start here.
     //
 
-    public List<EventCnF> getEventList() {
-        return eventList;
-    }
-
     public IFace_EventHolder getCurrentEventHolder() {
         return currentEventHolder;
     }
 
-    public ViewOptionsActiveHiddenListsEnum getEventListFilterMode() {
-        return eventListFilterMode;
-    }
-
-    // Not completely boring
-    public void setEventListFilterMode(ViewOptionsActiveHiddenListsEnum eventListFilterMode) {
-        this.eventListFilterMode = eventListFilterMode;
-        updateEventList();
-    }
     
     /**
      * "Wrapper" member to avoid lots of calls to session bean to check for the trigger
@@ -553,12 +527,16 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
      */
     public List<HumanLink> getManagedEventHumanLinkList() {
         List<HumanLink> hll = getSessionBean().getSessHumanListRefreshedList();
-        if(hll != null){
-            currentEvent.setHumanLinkList(hll);
-            // clear our refreshed list
-            getSessionBean().setSessHumanListRefreshedList(null);
+        if(currentEvent != null){
+            if(hll != null){
+                currentEvent.setHumanLinkList(hll);
+                // clear our refreshed list
+                getSessionBean().setSessHumanListRefreshedList(null);
+            }
+            return currentEvent.getHumanLinkList();
+        } else {
+            return new ArrayList<>();
         }
-        return currentEvent.getHumanLinkList();
        
     }
    
@@ -577,7 +555,7 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
         if (currentEvent.getTimeStart() != null && currentEvent.getTimeEnd() != null)
             formEventDuration = ChronoUnit.MINUTES.between(currentEvent.getTimeStart(), currentEvent.getTimeEnd());
 
-        this.lastSavedSelectedEvent = new EventCnF(this.currentEvent);
+//        this.lastSavedSelectedEvent = new EventCnF(this.currentEvent);
     }
 
     public String getFormNoteText() {
@@ -642,13 +620,18 @@ public class EventsBB extends BackingBeanUtils implements Serializable {
     public void setEventEditMode(boolean eventEditMode) {
         this.eventEditMode = eventEditMode;
     }
-
    
+    /**
+     * @return the eventListComponentForRefreshTrigger
+     */
+    public String getEventListComponentForRefreshTrigger() {
+        return eventListComponentForRefreshTrigger;
+    }
 
     /**
-     * @param eventHumanLinkList the eventHumanLinkList to set
+     * @param eventListComponentForRefreshTrigger the eventListComponentForRefreshTrigger to set
      */
-    public void setEventHumanLinkList(List<HumanLink> eventHumanLinkList) {
-        this.eventHumanLinkList = eventHumanLinkList;
+    public void setEventListComponentForRefreshTrigger(String eventListComponentForRefreshTrigger) {
+        this.eventListComponentForRefreshTrigger = eventListComponentForRefreshTrigger;
     }
 }

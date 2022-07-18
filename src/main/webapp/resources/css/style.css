@@ -683,6 +683,89 @@ div.printer-friendly-report .ui-widget-content{
 
 
 
+
+
+/* ----------- Case Priorities -------- */
+
+.cse-priority-openblue{
+        background-color: #afeafc !important;
+        background-image: none !important;
+        color: #000000 !important; 
+    
+}
+
+.cse-priority-monitoringgreen{
+    background-color: #99fb4e !important;
+    background-image: none !important;
+    color: #000000 !important; 
+    
+}
+
+.cse-priority-actionrequiredyellow{
+    background-color: #f9e14c !important;
+    background-image: none !important;
+    color: #000000 !important; 
+    
+    
+}
+
+.cse-priority-actionpastduered{
+    background-color: #a9392d !important;
+    background-image: none !important;
+    color: #ffffff !important; 
+    
+    
+}
+
+.cse-priority-citation{
+    background-color: #962af5 !important;
+    background-image: none !important;
+    color: #ffffff !important; 
+    
+    
+}
+
+.cse-priority-review{
+    background-color: #1c484e !important;
+    background-image: none !important;
+    color: #ffffff !important; 
+    
+    
+}
+
+.cse-priority-abandoneddarkyellow{
+    background-color: #e0ae3b !important;
+    background-image: none !important;
+    color: #ffffff !important; 
+    
+    
+}
+
+.cse-priority-closedgray{
+    background-color: #ababb3 !important;
+    background-image: none !important;
+    color: #000000 !important; 
+    
+    
+}
+
+.cse-priority-unknowngray{
+    background-color: #ababb3 !important;
+    background-image: none !important;
+    color: #000000 !important; 
+    
+    
+}
+
+.cse-priority-containergray{
+    background-color: #ababb3 !important;
+    background-image: none !important;
+    color: #000000 !important; 
+    
+    
+}
+
+
 /* ----------- Horizontal bars: LAYOUT BOXES  (OLD)-------- */
 
 

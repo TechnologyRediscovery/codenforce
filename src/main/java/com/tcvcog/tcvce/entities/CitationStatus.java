@@ -29,6 +29,7 @@ implements Comparable<Object>{
     protected boolean editsForbidden;
     private EventRuleAbstract eventRuleAbstract;
     protected int displayOrder;
+    protected boolean terminalStatus;
 
     /**
      * @return the editsForbidden
@@ -87,6 +88,20 @@ implements Comparable<Object>{
             }
         }
         else return 0;
+    }
+
+    /**
+     * @return the terminalStatus
+     */
+    public boolean isTerminalStatus() {
+        return terminalStatus;
+    }
+
+    /**
+     * @param terminalStatus the terminalStatus to set
+     */
+    public void setTerminalStatus(boolean terminalStatus) {
+        this.terminalStatus = terminalStatus;
     }
     
 }

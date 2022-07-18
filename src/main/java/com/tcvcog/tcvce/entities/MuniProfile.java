@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
+ * Represents a random slew of settings applying to operations across CNF
+ * that are customizable by muni, and bundled here for easy municipal onboarding
+ * 
  * @author sylvia
  */
 public class MuniProfile {
@@ -35,6 +37,10 @@ public class MuniProfile {
     private String notes;
     private int continuousoccupancybufferdays;
     private int minimumuserranktodeclarerentalintent;
+    
+    protected int priorityDeadlineBufferDays;
+    protected int violationsWithoutLetterBufferDays;
+    protected boolean prioritizeLetterFollowUpWindowOverStipCompDate;
     
     private int novDefaultDaysForFollowup;
     
@@ -253,5 +259,47 @@ public class MuniProfile {
      */
     public void setFeeList(List<Fee> feeList) {
         this.feeList = feeList;
+    }
+
+    /**
+     * @return the priorityDeadlineBufferDays
+     */
+    public int getPriorityDeadlineBufferDays() {
+        return priorityDeadlineBufferDays;
+    }
+
+    /**
+     * @param priorityDeadlineBufferDays the priorityDeadlineBufferDays to set
+     */
+    public void setPriorityDeadlineBufferDays(int priorityDeadlineBufferDays) {
+        this.priorityDeadlineBufferDays = priorityDeadlineBufferDays;
+    }
+
+    /**
+     * @return the violationsWithoutLetterBufferDays
+     */
+    public int getViolationsWithoutLetterBufferDays() {
+        return violationsWithoutLetterBufferDays;
+    }
+
+    /**
+     * @param violationsWithoutLetterBufferDays the violationsWithoutLetterBufferDays to set
+     */
+    public void setViolationsWithoutLetterBufferDays(int violationsWithoutLetterBufferDays) {
+        this.violationsWithoutLetterBufferDays = violationsWithoutLetterBufferDays;
+    }
+
+    /**
+     * @return the prioritizeLetterFollowUpWindowOverStipCompDate
+     */
+    public boolean isPrioritizeLetterFollowUpWindowOverStipCompDate() {
+        return prioritizeLetterFollowUpWindowOverStipCompDate;
+    }
+
+    /**
+     * @param prioritizeLetterFollowUpWindowOverStipCompDate the prioritizeLetterFollowUpWindowOverStipCompDate to set
+     */
+    public void setPrioritizeLetterFollowUpWindowOverStipCompDate(boolean prioritizeLetterFollowUpWindowOverStipCompDate) {
+        this.prioritizeLetterFollowUpWindowOverStipCompDate = prioritizeLetterFollowUpWindowOverStipCompDate;
     }
 }

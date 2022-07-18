@@ -356,7 +356,7 @@ public class OccPeriodBB
     
     /**
      * Listener for user requests to view or add blobs to this period
-     * @param ev
+     * @param eveventList
      */
     public void manageBlobsOnOccPeriod(ActionEvent ev){
         try {
@@ -966,6 +966,24 @@ public class OccPeriodBB
         
     }
     
+    
+     /**
+     * Special getter for the event list whose contents is managed by a shared 
+     * set of utility methods on EventBB
+     * @return the fresh list of events for this case
+     */
+    public List<EventCnF> getManagedEventList(){
+        List<EventCnF> evlist = getSessionBean().getSessEventListForRefreshUptake();
+        if(currentOccPeriod != null){
+            if(evlist != null){
+                System.out.println("CECaseBB.getManagedEventList | fresh event list found on sessionbean of size: " + evlist.size());
+                currentOccPeriod.setEventList(evlist);
+                getSessionBean().setSessEventListForRefreshUptake(null);
+            } 
+            return currentOccPeriod.getEventList();
+        }
+        return new ArrayList<>();
+    }
 
     
     

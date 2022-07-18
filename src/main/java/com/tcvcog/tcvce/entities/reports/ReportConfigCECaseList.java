@@ -10,7 +10,7 @@ import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
-import com.tcvcog.tcvce.entities.ViolationStatusEnum;
+import com.tcvcog.tcvce.entities.CodeViolationStatusEnum;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryBacked;
 import java.io.Serializable;
@@ -64,7 +64,7 @@ public class ReportConfigCECaseList
     
     private PieChartModel pieViol;
     protected List<LegendItem> pieViolLegend;
-    private Map<ViolationStatusEnum, Integer> pieViolStatMap;
+    private Map<CodeViolationStatusEnum, Integer> pieViolStatMap;
     private int pieViolCompCount;
     
     
@@ -537,14 +537,14 @@ public class ReportConfigCECaseList
     /**
      * @return the pieViolStatMap
      */
-    public Map<ViolationStatusEnum, Integer> getPieViolStatMap() {
+    public Map<CodeViolationStatusEnum, Integer> getPieViolStatMap() {
         return pieViolStatMap;
     }
 
     /**
      * @param pieViolStatMap the pieViolStatMap to set
      */
-    public void setPieViolStatMap(Map<ViolationStatusEnum, Integer> pieViolStatMap) {
+    public void setPieViolStatMap(Map<CodeViolationStatusEnum, Integer> pieViolStatMap) {
         this.pieViolStatMap = pieViolStatMap;
     }
 

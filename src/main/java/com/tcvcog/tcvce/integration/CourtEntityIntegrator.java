@@ -32,7 +32,7 @@ import com.tcvcog.tcvce.entities.CitationStatusLogEntry;
 import com.tcvcog.tcvce.entities.CitationViolationStatusEnum;
 import com.tcvcog.tcvce.entities.CourtEntity;
 import com.tcvcog.tcvce.entities.Property;
-import com.tcvcog.tcvce.entities.ViolationStatusEnum;
+import com.tcvcog.tcvce.entities.CodeViolationStatusEnum;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -1582,7 +1582,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
     public CitationStatus getCitationStatus(int statusID) throws IntegrationException{
             
         String query =  "SELECT statusid, statusname, description, icon_iconid, editsforbidden, \n" +
-                        "       eventrule_ruleid, displayorder "
+                        "       eventrule_ruleid, displayorder, terminalstatus "
                         + "FROM citationStatus WHERE statusid=?";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1669,6 +1669,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             cs.setEditsForbidden(rs.getBoolean("editsforbidden"));
             cs.setDisplayOrder(rs.getInt("displayorder"));
             cs.setEventRuleAbstract(wi.rules_getEventRuleAbstract(rs.getInt("eventrule_ruleid")));
+            cs.setTerminalStatus(rs.getBoolean("terminalstatus"));
         
         } catch (SQLException | BObStatusException ex) {
             
@@ -1691,8 +1692,8 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
         
         String query =  "INSERT INTO public.citationstatus(\n" +
                         "            statusid, statusname, description, icon_iconid, editsforbidden, \n" +
-                        "       eventrule_ruleid)\n" +
-                        "    VALUES (DEFAULT, ?, ?, ?, ?, ?);";
+                        "       eventrule_ruleid, terminalstatus)\n" +
+                        "    VALUES (DEFAULT, ?, ?, ?, ?, ?, ?);";
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         
@@ -1708,6 +1709,7 @@ public class CourtEntityIntegrator extends BackingBeanUtils implements Serializa
             } else {
                 stmt.setNull(5, java.sql.Types.NULL);
             }
+            stmt.setBoolean(6, cs.isTerminalStatus());
             stmt.execute();
             
         } catch (SQLException ex) {

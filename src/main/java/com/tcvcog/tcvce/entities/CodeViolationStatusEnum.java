@@ -25,49 +25,57 @@ package com.tcvcog.tcvce.entities;
  * 
  * @author ellen bascomb of apt 31y
  */
-public enum ViolationStatusEnum {
+public enum CodeViolationStatusEnum {
 
     RESOLVED(                               "Compliance achieved within reporting period", 
                                             "Issue no longer remains on property",
                                             "codeviolation_resolved_iconid",
-                                            0),
+                                            0,
+                                            true),
     
     UNRESOLVED_WITHINCOMPTIMEFRAME(         "Within compliance timeframe",
                                             "Compliance days remaining: ",
                                             "codeviolation_unresolved_withincomptimeframe_iconid",
-                                            1),
+                                            1,
+                                            false),
     
     UNRESOLVED_EXPIREDCOMPLIANCETIMEFRAME(  "Requiring ongoing officer action", 
                                             "Days since end of compliance timeframe: ",
                                             "codeviolation_unresolved_overdue_iconid",
-                                             2),
+                                             2,
+                                            false),
     
     UNRESOLVED_CITED(                       "Cited", 
                                             "Days since end of compliance timeframe: ",
                                             "codeviolation_unresolved_citation_iconid",
-                                            3),
+                                            3,
+                                            false),
     
     NULLIFIED(                              "Nullified",
                                             "",
                                             "codeviolation_nullified_iconid",
-                                            -1),
+                                            -1,
+                                            true),
     TRANSFERRED(                              "Transferred",
                                             "",
                                             "codeviolation_nullified_iconid",
-                                            -1);
+                                            -1,
+                                            true);
     
     
     private final String label;
     private final String leadText;
     private final String iconPropertyName;
     private final int phaseOrder;
+    private final boolean terminalStatus;
     
     
-    private ViolationStatusEnum(String label, String lt, String icn, int ord){
+    private CodeViolationStatusEnum(String label, String lt, String icn, int ord, boolean term){
         this.label = label;
         this.leadText = lt;
         this.iconPropertyName = icn;
         this.phaseOrder = ord;
+        this.terminalStatus = term;
     }
     
     public String getLabel(){
@@ -84,6 +92,13 @@ public enum ViolationStatusEnum {
     
     public String getIconPropertyName(){
         return iconPropertyName;
+    }
+
+    /**
+     * @return the terminalStatus
+     */
+    public boolean isTerminalStatus() {
+        return terminalStatus;
     }
 }
 

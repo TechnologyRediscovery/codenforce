@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.entities.occupancy.OccLocationDescriptor;
 import java.time.LocalDate;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -138,6 +139,24 @@ public class ParcelInfo
             return false;
         }
         return true;
+    }
+    
+    /**
+     * Convenience method for asking the parcel info if
+     * it's inside an abandonment range.
+     * @return 
+     */
+    public boolean isAbandoned(){
+        boolean ab = false;
+        if(abandonedDateStart != null && abandonedDateStart.isBefore(LocalDate.now())){
+            if(abandonedDateStop == null){
+                ab = true;
+            } else if(abandonedDateStop.isAfter(LocalDate.now())){
+                ab = true;
+            }
+        }
+        
+        return ab;
     }
     
 

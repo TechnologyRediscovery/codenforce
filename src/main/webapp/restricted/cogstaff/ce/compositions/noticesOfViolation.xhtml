@@ -448,17 +448,9 @@
                   height="450">
         <h:form id="cecase-novfollowup-form">
 
-            <p:outputLabel for="nov-createfollupupevent-sbcb"
-                           value="Create follow up event" />
-            <p:selectBooleanCheckbox id="nov-createfollupupevent-sbcb"
-                                     value="#{noticeOfViolationBB.nov_createNoticeFollowupEvent}"
-                                     >
-                <p:ajax update="nov-followup-days-innum" />
-            </p:selectBooleanCheckbox>
-            <p:spacer height="5px" />
 
             <p:outputLabel for="nov-followup-days-innum"
-                           value="Number of days in future:" />
+                           value="Create follow-up event X days in future:" />
             <p:inputNumber id="nov-followup-days-innum"
                            value="#{noticeOfViolationBB.currentNotice.followupEventDaysRequest}"
                            disabled="#{!noticeOfViolationBB.nov_createNoticeFollowupEvent}"
@@ -479,13 +471,16 @@
                                 />
 
             <p:commandButton id="nov-mailednotice-cb"
-                             ajax="false"
+                             ajax="true"
                              actionListener="#{noticeOfViolationBB.markNoticeOfViolationAsSent}"
+                             oncomplete="PF('cecase-novfollowup-dialog-var').hide()"
                              value="Mark as mailed!"
                              styleClass="noFill"
                              icon="fa fa-send"
-
                              disabled="false"
+                             update=" nov-profile-form
+                             @form:@parent:cecase-notices-form
+                             nov-growl-form"
                              />
 
         </h:form>

@@ -4,8 +4,8 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
 
-    <h:form id="events-growl-form">
-        <p:growl id="events-growl" 
+    <h:form id="event-growl-form">
+        <p:growl id="event-growl" 
                  globalOnly="false"/>
     </h:form>
 
@@ -21,7 +21,7 @@
               closeOnEscape="true"
               dynamic="true"
               modal="true"
-              header="Event (ID: #{eventsBB.currentEvent.eventID}) Profile">
+              header="Event (ID: #{eventBB.currentEvent.eventID}) Profile">
 
         <div class="p-grid nested-grid">
             <div class="p-col">
@@ -34,32 +34,46 @@
 
 
                         <p:commandButton id="event-edit-toggle-button"
-                                         value="#{eventsBB.eventEditMode ? 'Save changes' : 'Edit'}"
+                                         value="#{eventBB.eventEditMode ? 'Save changes' : 'Edit'}"
                                          rendered="true"
-                                         disabled="#{!eventsBB.currentEvent.active}"
+                                         disabled="#{!eventBB.currentEvent.active}"
                                          ajax="true"
                                          style="margin-right:10px;"
-                                         icon="fa #{eventsBB.eventEditMode ? 'fa-check' : 'fa-pencil'}"
-                                         actionListener="#{eventsBB.onEventEditModeToggleButtonPress}"
+                                         icon="fa #{eventBB.eventEditMode ? 'fa-check' : 'fa-pencil'}"
+                                         actionListener="#{eventBB.onEventEditModeToggleButtonPress}"
                                          update="@form
-                                         events-growl-form"
+                                         event-growl-form
+                                         @form:@parent:#{eventBB.eventListComponentForRefreshTrigger}"
                                          />
 
 
 
                             <p:commandButton    id="event-edit-cancel-button"
                                                 ajax="true"
-                                                rendered="#{eventsBB.eventEditMode}"
+                                                rendered="#{eventBB.eventEditMode}"
                                                 value="Abort edit"
-                                                actionListener="#{eventsBB.onEventEditCancelButtonChange}"
+                                                actionListener="#{eventBB.onEventEditCancelButtonChange}"
                                                 update="@form
-                                                events-growl-form"
+                                                event-growl-form"
                                                 icon="fa fa-stop" />
 
 
                         <p:spacer height="5px" />
                         <div class="p-grid">
 
+
+                         
+
+                            <div class="p-col-4">
+                                <p:outputLabel for="event-id-ot">
+                                    <h:outputText value="ID"/>
+                                </p:outputLabel>
+                            </div>
+                            <div class="p-col-8">
+                                <h:outputText id="event-id-ot"
+                                              value="#{eventBB.currentEvent.eventID} "/>
+                            </div>
+                         
 
                             <div class="p-col-4">
                                 <p:outputLabel for="event-domain-ot">
@@ -68,7 +82,7 @@
                             </div>
                             <div class="p-col-8">
                                 <h:outputText id="event-domain-ot"
-                                              value="#{eventsBB.currentEvent.domain.title} "/>
+                                              value="#{eventBB.currentEvent.domain.title} "/>
                             </div>
 
                             <div class="p-col-4">
@@ -79,7 +93,7 @@
                             <div class="p-col-8">
 
                                 <h:outputText id="event-et-ot"
-                                              value="#{eventsBB.currentEvent.category.eventType.label} "/>
+                                              value="#{eventBB.currentEvent.category.eventType.label} "/>
                             </div>
 
                             <div class="p-col-4">
@@ -89,7 +103,7 @@
                             </div>
                             <div class="p-col-8">
                                 <h:outputText id="event-ec-ot"
-                                              value="#{eventsBB.currentEvent.category.eventCategoryTitle}"/>
+                                              value="#{eventBB.currentEvent.category.eventCategoryTitle}"/>
                             </div>
 
                             <div class="p-col-4">
@@ -99,12 +113,12 @@
                             </div>
                             <div class="p-col-8">
                                 <h:outputText id="event-descr-ot"
-                                              value="#{eventsBB.currentEvent.description}"
-                                              rendered="#{!eventsBB.eventEditMode}"/>
+                                              value="#{eventBB.currentEvent.description}"
+                                              rendered="#{!eventBB.eventEditMode}"/>
 
                                 <p:inputTextarea id="event-edit-descr"
-                                             value="#{eventsBB.currentEvent.description}"
-                                             rendered="#{eventsBB.eventEditMode}"
+                                             value="#{eventBB.currentEvent.description}"
+                                             rendered="#{eventBB.eventEditMode}"
                                              style="width: 100%;"
                                              rows="5"
                                              cols="40"
@@ -120,12 +134,12 @@
                             <div class="p-col-8">
 
                                 <h:outputText id="event-st-ot"
-                                              value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.timeStart)}"
-                                              rendered="#{!eventsBB.eventEditMode}"/>
+                                              value="#{eventBB.getPrettyDate(eventBB.currentEvent.timeStart)}"
+                                              rendered="#{!eventBB.eventEditMode}"/>
 
-                                <p:datePicker value="#{eventsBB.currentEvent.timeStart}"
+                                <p:datePicker value="#{eventBB.currentEvent.timeStart}"
                                             id="event-edit-time-start-cal"
-                                            rendered="#{eventsBB.eventEditMode}"
+                                            rendered="#{eventBB.eventEditMode}"
                                             style="width: 100%;"
                                             pattern="MM/dd/yyyy HH:mm"
                                             disabled="false"
@@ -143,20 +157,20 @@
 
                                 <p:spacer height="5px" />
                                 <h:outputLabel for="event-edit-time-start-cal"
-                                               rendered="#{eventsBB.eventEditMode}">
+                                               rendered="#{eventBB.eventEditMode}">
                                     <h:outputText value="Duration (mins)"/>
                                 </h:outputLabel>
                                 <p:spacer height="3px" />
                                 <p:inputNumber id="event-edit-duration-in"
-                                               value="#{eventsBB.formEventDuration}"
-                                               rendered="#{eventsBB.eventEditMode}"
+                                               value="#{eventBB.formEventDuration}"
+                                               rendered="#{eventBB.eventEditMode}"
                                                style="width: 50px;">
-                                    <p:ajax listener="#{eventsBB.updateTimeEndFromDuration}"
+                                    <p:ajax listener="#{eventBB.updateTimeEndFromDuration}"
                                             update="event-edit-time-end-cal"/>
                                 </p:inputNumber>
                                 <p:spacer height="2px" />
                                 <h:outputText value="enter mins then press tab to update event end time" 
-                                              rendered="#{eventsBB.eventEditMode}"
+                                              rendered="#{eventBB.eventEditMode}"
                                               style="font-style: italic; font-size: 0.7em;"/>
                             </div>
 
@@ -167,13 +181,13 @@
                             </div>
                             <div class="p-col-8">
                                 <h:outputText id="event-time-end-ot"
-                                              value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.timeEnd)}"
-                                              rendered="#{!eventsBB.eventEditMode}"/>
+                                              value="#{eventBB.getPrettyDate(eventBB.currentEvent.timeEnd)}"
+                                              rendered="#{!eventBB.eventEditMode}"/>
                                 
                                 
-                                <p:datePicker value="#{eventsBB.currentEvent.timeEnd}"
+                                <p:datePicker value="#{eventBB.currentEvent.timeEnd}"
                                             id="event-edit-time-end-cal"
-                                            rendered="#{eventsBB.eventEditMode}"
+                                            rendered="#{eventBB.eventEditMode}"
                                             showButtonBar="true"
                                             style="width: 100%;"
                                             disabled="true"
@@ -195,15 +209,15 @@
                             <div class="p-col-8">
 
                                 <h:outputText id="event-creationts"
-                                              value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.creationts)}"/>
+                                              value="#{eventBB.getPrettyDate(eventBB.currentEvent.createdTS)}"/>
                                 <p:spacer height="3px" />
                                 <h:outputText id="event-creator-by"
-                                              value="#{ !empty eventsBB.currentEvent.userCreator
+                                              value="#{ !empty eventBB.currentEvent.createdBy
                                                         ? 'By '
                                                         : ''}"/>
                                 <h:outputText id="event-creator"
-                                              value="#{ !empty eventsBB.currentEvent.userCreator
-                                                        ? eventsBB.currentEvent.userCreator.human.name
+                                              value="#{ !empty eventBB.currentEvent.createdBy
+                                                        ? eventBB.currentEvent.createdBy.human.name
                                                         : ''}"/>
                             </div>
                             <div class="p-col-4">
@@ -214,20 +228,20 @@
                             <div class="p-col-8">
 
                                 <h:outputText id="event-lastupdatedts"
-                                              value="#{eventsBB.getPrettyDate(eventsBB.currentEvent.lastUpdatedTS)}"
-                                              rendered="#{!eventsBB.eventEditMode}"/>
+                                              value="#{eventBB.getPrettyDate(eventBB.currentEvent.lastUpdatedTS)}"
+                                              rendered="#{!eventBB.eventEditMode}"/>
                                 <p:spacer height="3px"
-                                          rendered="#{!eventsBB.eventEditMode}"/>
+                                          rendered="#{!eventBB.eventEditMode}"/>
                                 <h:outputText id="event-lastupdator-by"
-                                              value="#{ !empty eventsBB.currentEvent.lastUpdatedBy
+                                              value="#{ !empty eventBB.currentEvent.lastUpdatedBy
                                                         ? 'By '
                                                         : ''}"
-                                              rendered="#{!eventsBB.eventEditMode}"/>
+                                              rendered="#{!eventBB.eventEditMode}"/>
                                 <h:outputText id="event-lastupdatorname"
-                                              value="#{ !empty eventsBB.currentEvent.lastUpdatedBy
-                                                        ? eventsBB.currentEvent.lastUpdatedBy.human.name
+                                              value="#{ !empty eventBB.currentEvent.lastUpdatedBy
+                                                        ? eventBB.currentEvent.lastUpdatedBy.human.name
                                                         : ''}"
-                                              rendered="#{!eventsBB.eventEditMode}"/>
+                                              rendered="#{!eventBB.eventEditMode}"/>
                             </div>
 
                             <div class="p-col-4">
@@ -238,34 +252,47 @@
                                     <h:outputText value="Rank req. to view: "/>
                                 </p:outputLabel>
                                 <h:outputText id="event-mintoview-ot"
-                                              value="#{eventsBB.currentEvent.category.userRankMinimumToView}"
-                                              rendered="#{!eventsBB.eventEditMode}"/>
+                                              value="#{eventBB.currentEvent.category.roleFloorEventView.label}"
+                                              rendered="#{!eventBB.eventEditMode}"/>
                                 <p:spacer height="5px" 
-                                          rendered="#{!eventsBB.eventEditMode}"/>
+                                          rendered="#{!eventBB.eventEditMode}"/>
                                 <p:outputLabel for="event-mintoedit-ot">
                                     <h:outputText value="Rank req. to edit: "/>
                                 </p:outputLabel>
                                 <h:outputText id="event-mintoedit-ot"
-                                              value="#{eventsBB.currentEvent.category.userRankMinimumToUpdate}"
-                                              rendered="#{!eventsBB.eventEditMode}"/>
+                                              value="#{eventBB.currentEvent.category.roleFloorEventUpdate.label}"
+                                              rendered="#{!eventBB.eventEditMode}"/>
                             </div>
                             <div class="p-col-4">
                                 <p:outputLabel for="event-active-ot">
                                     <h:outputText value="Active"/>
                                     <p:spacer height="5px" />
                                 </p:outputLabel>
-                                <p:commandLink id="case-reactivate-cb"
-                                               actionListener="#{eventsBB.toggleEventActive}"
-                                               disabled="#{eventsBB.eventEditMode}"
-                                               style="color:blue;"
-                                               value="#{eventsBB.currentEvent.active ? 'deactivate event' : 'reactivate event'}"
-                                               update="events-panel
-                                               events-growl-form"
-                                               oncomplete="PF('event-profile-dialog-var').hide();"/>
+                                <p:commandLink id="event-deactivate-cb"
+                                               actionListener="#{eventBB.onEventDeactivateInit}"
+                                               rendered="#{empty eventBB.currentEvent.deactivatedTS}"
+                                               disabled="#{eventBB.eventEditMode}"
+                                               style="color:blue; font-weight: bold;"
+                                               value="deactivate event"
+                                               update="event-deactivate-dialog
+                                                        event-deactivate-form"
+                                               oncomplete="PF('event-deactivate-dialog-var').show();"/>
+                                
+                                <p:commandLink id="event-reactivate-cb"
+                                               actionListener="#{eventBB.onEventReactivateCommitButtonChange}"
+                                               rendered="#{!empty eventBB.currentEvent.deactivatedTS}"
+                                               disabled="#{eventBB.eventEditMode}"
+                                               style="color:blue; font-weight: bold;"
+                                               value="restore event"
+                                               update="@form
+                                                        event-growl-form
+                                                        @form:@parent:#{eventBB.eventListComponentForRefreshTrigger}"
+                                               >
+                                </p:commandLink>
                             </div>
                             <div class="p-col-8">
                                 <h:outputText id="event-active-ot"
-                                              value="#{eventsBB.currentEvent.active ? 'Yes' : 'No'}"/>
+                                              value="#{eventBB.currentEvent.active ? 'Yes' : 'No'}"/>
                             </div>
                         </div>
                     </h:form>
@@ -281,13 +308,13 @@
 
                         <p:commandButton   id="event-persons-manage-button"
                                            ajax="true"
-                                           actionListener="#{personBB.onSelectAndLinkPersonsInit(eventsBB.currentEvent)}"
+                                           actionListener="#{personBB.onSelectAndLinkPersonsInit(eventBB.currentEvent)}"
                                            oncomplete="PF('human-search-dialog-var').show()"
-                                           disabled="#{!eventsBB.currentEvent.active}"
+                                           disabled="#{!eventBB.currentEvent.active}"
                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                            value="Manage event-person links"
                                            update=" human-search-dialog
-                                           events-growl-form
+                                           event-growl-form
                                            search-query-form
                                            pers-selected-form
                                            hlh-humlist-form"
@@ -295,14 +322,14 @@
                                            >
                             <f:param name="person-list-component-to-update"
                                      value="event-persons-panel-form" />
-                            <p:ajax listener="#{eventsBB.onManageEventPersonButtonChange}" />
+                            <p:ajax listener="#{eventBB.onManageEventPersonButtonChange}" />
                         </p:commandButton>
 
                         <p:spacer height="5px" />
 
                         <p:dataTable id="event-persons-table"
                                      var="human"
-                                     value="#{eventsBB.managedEventHumanLinkList}"
+                                     value="#{eventBB.managedEventHumanLinkList}"
                                      tableStyleClass="primeDataTable"
                                      rowKey="#{human.humanID}"
                                      >
@@ -312,7 +339,7 @@
                                       styleClass="centeredColumnContent">
                                 <h:outputText value="#{human.name} is #{human.linkedObjectRole.title} this event"/>
                                 <p:spacer height="3px" />
-                                <h:outputText value="Link timestamp: #{eventsBB.getPrettyDate(human.linkCreatedTS)}"/>
+                                <h:outputText value="Link timestamp: #{eventBB.getPrettyDate(human.linkCreatedTS)}"/>
                                 <p:spacer height="3px" />
                                 <h:outputText value="(Human ID: #{human.humanID}; Link ID: #{human.linkID})"/>
 
@@ -351,13 +378,13 @@
                                           value="Add New Note"
                                           disabled="false"
                                           icon="fa fa-sticky-note"
-                                          actionListener="#{eventsBB.onNoteInitButtonChange}"
+                                          actionListener="#{eventBB.onNoteInitButtonChange}"
                                           oncomplete="PF('event-note-dialog-var').show()"
                                           update="event-note-form
-                                          events-growl-form"/>
+                                          event-growl-form"/>
                         <p:spacer height="5px" />
                         <h:outputText id="event-note-ot"
-                                      value="#{eventsBB.currentEvent.notes}"
+                                      value="#{eventBB.currentEvent.notes}"
                                       escape="false"/>
                     </h:form>
                 </p:panel>
@@ -377,7 +404,7 @@
               closeOnEscape="true"
               dynamic="true"
               modal="true"
-              header="Attaching new event to object with ID #{eventsBB.currentEventHolder.BObID}"
+              header="Attaching new event to object with ID #{eventBB.currentEventHolder.BObID}"
               rendered="true">
 
         <h:form id="event-add-form">
@@ -394,12 +421,12 @@
                         <p:growl for="event-add-type-solb"/>
                         <p:selectOneListbox id="event-add-type-solb"
                                             required="true"
-                                            value="#{eventsBB.skeletonType}"
+                                            value="#{eventBB.skeletonType}"
                                             tabindex="10">
 
                             <p:ajax update="event-add-form"/>
 
-                            <f:selectItems value="#{eventsBB.listOfPotentialTypes}" var="et" itemLabel="#{et.label}"/>
+                            <f:selectItems value="#{eventBB.listOfPotentialTypes}" var="et" itemLabel="#{et.label}"/>
                         </p:selectOneListbox>
                     </div>
                 </div>
@@ -414,15 +441,15 @@
                     <div class="restrict-main-contents-io-content">
                         <p:selectOneListbox id="event-add-cat-solb"
                                             style="width: 100%;"
-                                            value="#{eventsBB.skeletonEvent.category}"
+                                            value="#{eventBB.skeletonEvent.category}"
                                             tabindex="11">
 
-                            <p:ajax listener="#{eventsBB.onCategoryChangeUpdateSkeletonEventMembers}"
+                            <p:ajax listener="#{eventBB.onCategoryChangeUpdateSkeletonEventMembers}"
                                     update="event-add-form" />
 
                             <f:converter converterId="eventCategoryConverter"/>
 
-                            <f:selectItems value="#{eventsBB.listOfPotentialCategories}" var="ec" itemValue="#{ec}"
+                            <f:selectItems value="#{eventBB.listOfPotentialCategories}" var="ec" itemValue="#{ec}"
                                            itemLabel="#{ec.eventCategoryTitle}"/>
 
                         </p:selectOneListbox>
@@ -434,7 +461,7 @@
                         <p:selectBooleanCheckbox id="event-add-updatefields-sbb"
                                                  itemLabel="Auto fill event details"
                                                  title="Description and duration will be set automatically"
-                                                 value="#{eventsBB.updateFieldsOnCategoryChange}">
+                                                 value="#{eventBB.updateFieldsOnCategoryChange}">
                             <p:ajax/>
                         </p:selectBooleanCheckbox>
                     </div>
@@ -443,14 +470,14 @@
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <h2>
                         <h:outputText id="event-add-currtypecat-type-ot"
-                                      value="#{eventsBB.skeletonType.label}"/>
+                                      value="#{eventBB.skeletonType.label}"/>
                         <h:outputText value=": "/>
                         <h:outputText id="event-add-currtypecat-cat-ot"
-                                      value="#{eventsBB.skeletonEvent.category.eventCategoryTitle}"/>
+                                      value="#{eventBB.skeletonEvent.category.eventCategoryTitle}"/>
                     </h2>
                     <p:spacer height="3px"/>
                     <h:outputText id="event-add-currtypecat-desc"
-                                  value="#{eventsBB.skeletonEvent.category.eventCategoryDesc}"/>
+                                  value="#{eventBB.skeletonEvent.category.eventCategoryDesc}"/>
                 </div>
 
                 <div class="ui-g-12 ui-md-12 ui-lg-4 restrict-data-field">
@@ -464,7 +491,7 @@
                     <div class="restrict-main-contents-io-content">
                         <p:growl for="event-add-time-start-cal"/>
 
-                        <p:datePicker value="#{eventsBB.skeletonEvent.timeStart}"
+                        <p:datePicker value="#{eventBB.skeletonEvent.timeStart}"
                                     id="event-add-time-start-cal"
                                     pattern="MM/dd/yyyy HH:mm"
                                     tabindex="16" 
@@ -472,12 +499,12 @@
                                     showButtonBar="false"
                                     inline="false"
                                     hideOnDateTimeSelect="true"
-                                              showOnFocus="false"
-                                              showIcon="true"
+                                    showOnFocus="false"
+                                    showIcon="true"
                                     mask="true"
                                     hourFormat="24"
                                     required="true">
-                            <p:ajax update="event-add-time-end-cal" listener="#{eventsBB.recalculateEndTime}"/>
+                            <p:ajax update="event-add-time-end-cal" listener="#{eventBB.recalculateEndTime}"/>
                         </p:datePicker>
                     </div>
                 </div>
@@ -491,9 +518,9 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:inputNumber id="event-add-duration-in"
-                                       value="#{eventsBB.skeletonDuration}"
+                                       value="#{eventBB.skeletonDuration}"
                                        style="width: 50px;">
-                            <p:ajax     listener="#{eventsBB.recalculateEndTime}"
+                            <p:ajax     listener="#{eventBB.recalculateEndTime}"
                                         update="event-add-time-end-cal"/>
                         </p:inputNumber>
                     </div>
@@ -509,14 +536,14 @@
                     <div class="restrict-main-contents-io-content">
                         <p:growl for="event-add-time-end-cal" />
                         <p:datePicker id="event-add-time-end-cal"
-                                    value="#{eventsBB.skeletonEvent.timeEnd}"
+                                    value="#{eventBB.skeletonEvent.timeEnd}"
                                     disabled="true"
                                     showButtonBar="false"
                                     mask="true"
                                     pattern="MM/dd/yyyy HH:mm"
                                     hideOnDateTimeSelect="true"
-                                              showOnFocus="false"
-                                              showIcon="true"
+                                    showOnFocus="false"
+                                    showIcon="true"
                                     tabindex="16" 
                                     timeInput="true" 
                                     hourFormat="24"
@@ -533,7 +560,7 @@
 
                     <div class="restrict-main-contents-io-content">
                         <p:inputTextarea  id="event-add-descr-it" 
-                                          value="#{eventsBB.skeletonEvent.description}" 
+                                          value="#{eventBB.skeletonEvent.description}" 
                                           style="width: 100%; height: 150px;" 
                                           tabindex="3" 
                                           required="false" />
@@ -543,14 +570,15 @@
 
             <div class="restrict-main-contents-io-button">
                 <p:commandButton id="event-add-dialog-show-cb"
-                                 disabled="#{empty eventsBB.skeletonEvent.category}"
+                                 disabled="#{empty eventBB.skeletonEvent.category}"
                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                  value="Create new event"
                                  icon="fa fa-bolt"
-                                 actionListener="#{eventsBB.createNewEvent}"
+                                 actionListener="#{eventBB.eventAddCommit}"
                                  oncomplete="PF('event-add-dialog-var').hide()"
                                  update="events-panel
-                                 events-growl-form"/>
+                                 event-growl-form
+                                 @form:@parent:#{eventBB.eventListComponentForRefreshTrigger}"/>
             </div>
 
             <div class="restrict-main-contents-io-button gray_button">
@@ -572,13 +600,13 @@
               closeOnEscape="true"
               dynamic="true"
               modal="true"
-              header="New note on event ID:#{eventsBB.currentEvent.eventID}">
+              header="New note on event ID:#{eventBB.currentEvent.eventID}">
 
 
         <h:form id="event-note-form">
             <h:outputText styleClass="ui-label" value="Note text: "/>
             <p:inputTextarea id="event-notes-editor"
-                          value="#{eventsBB.formNoteText}"
+                          value="#{eventBB.formNoteText}"
                           required="false"
                           rows="5"
                           cols="40"
@@ -591,14 +619,15 @@
             <p:commandButton id="event-dialog-notes-button-addnote"
                              ajax="true"
                              disabled="false"
-                             actionListener="#{eventsBB.onNoteCommitButtonChange}"
+                             actionListener="#{eventBB.onNoteCommitButtonChange}"
                              oncomplete="PF('event-note-dialog-var').hide()"
                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                              value="Attach Note"
                              styleClass="inline-button"
                              icon="fa fa-sticky-note-o"
                              update="event-notes-form
-                             events-growl-form
+                             event-growl-form
+                             @form:@parent:#{eventBB.eventListComponentForRefreshTrigger}
                              "/>
         </h:form>
 
@@ -619,15 +648,15 @@
               closeOnEscape="true"
               dynamic="true"
               modal="true"
-              header="Deactivate event id #{eventsBB.currentEvent.eventID}"
+              header="Deactivate event id #{eventBB.currentEvent.eventID}"
               rendered="true">
 
-        <h:form id="event-remove-form">
+        <h:form id="event-deactivate-form">
             <div class="ui-g data_container_nested_restrict">
                 <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
                     <div class="restrict-data-field-label-inline">
                         <h:outputLabel for="event-remove-button">
-                            <h:outputText value="Deactivated events can be recovered by changing event view options"/>
+                            <h:outputText value="Deactivated events can be seen by changing event view options"/>
                         </h:outputLabel>
                     </div>
                 </div>
@@ -640,7 +669,7 @@
                                          process="@none"
                                          immediate="true"
                                          oncomplete="PF('event-deactivate-dialog-var').hide()"
-                                         actionListener="#{eventsBB.onEventNukeCancelButtonChange}"
+                                         actionListener="#{eventBB.onEventDeactivateAbort}"
                                          icon="fa fa-stop"/>
                     </div>
                 </div>
@@ -648,11 +677,14 @@
                 <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
                     <div class="restrict-main-contents-io-button red_button">
                         <p:commandButton ajax="true" 
-                                         actionListener="#{eventsBB.onEventRemoveCommitButtonChange}"
+                                         actionListener="#{eventBB.onEventDeactivateCommit}"
                                          value="Deactivate event"
                                          icon="fa fa-close"
-                                         update="events-panel
-                                         events-growl-form"
+                                         oncomplete="PF('event-deactivate-dialog-var').hide()"
+                                         update="event-profile-form
+                                         event-profile-dialog
+                                         event-growl-form
+                                        @form:@parent:#{eventBB.eventListComponentForRefreshTrigger}"
                                          rendered="true"/>
                     </div>
                 </div>

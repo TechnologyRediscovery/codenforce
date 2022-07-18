@@ -214,7 +214,8 @@ public class    SessionBean
     private ActivatableRouteEnum sessEventRoute;
     private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
     private ActivatableRouteEnum sessEventListRoute;
-    
+    private List<EventCnF> sessEventListForRefreshUptake;
+    private boolean sessFlagIncludeDeactivatedEvents;
     
     /* >>> QUERY EVENT <<< */
     private QueryEvent queryEvent;
@@ -2262,6 +2263,34 @@ public class    SessionBean
      */
     public void setQueryOccPermit(QueryOccPermit queryOccPermit) {
         this.queryOccPermit = queryOccPermit;
+    }
+
+    /**
+     * @return the sessEventListForRefreshUptake
+     */
+    public List<EventCnF> getSessEventListForRefreshUptake() {
+        return sessEventListForRefreshUptake;
+    }
+
+    /**
+     * @param sessEventListForRefreshUptake the sessEventListForRefreshUptake to set
+     */
+    public void setSessEventListForRefreshUptake(List<EventCnF> sessEventListForRefreshUptake) {
+        this.sessEventListForRefreshUptake = sessEventListForRefreshUptake;
+    }
+
+    /**
+     * @return the sessFlagIncludeDeactivatedEvents
+     */
+    public boolean isSessFlagIncludeDeactivatedEvents() {
+        return sessFlagIncludeDeactivatedEvents;
+    }
+
+    /**
+     * @param sessFlagIncludeDeactivatedEvents the sessFlagIncludeDeactivatedEvents to set
+     */
+    public void setSessFlagIncludeDeactivatedEvents(boolean sessFlagIncludeDeactivatedEvents) {
+        this.sessFlagIncludeDeactivatedEvents = sessFlagIncludeDeactivatedEvents;
     }
 
     

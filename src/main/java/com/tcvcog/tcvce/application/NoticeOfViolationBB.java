@@ -145,6 +145,9 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         
     } // close initbean
     
+    /**
+     * Asks coordinator for new case data
+     */
     private void refreshCurrentCase(){
         PropertyCoordinator pc = getPropertyCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
@@ -153,7 +156,13 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         } catch (BObStatusException | IntegrationException | SearchException ex) {
             System.out.println(ex);
         }
-          PropertyDataHeavy pdh = null;
+        
+    }
+    
+    
+    private void refreshCurrentPersonCandidateList(){
+        PropertyCoordinator pc = getPropertyCoordinator();
+         PropertyDataHeavy pdh = null;
         try {
             pdh = pc.assemblePropertyDataHeavy(currentCase.getProperty(), getSessionBean().getSessUser());
         } catch (IntegrationException | BObStatusException | SearchException | BlobException ex) {
@@ -166,7 +175,12 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
             System.out.println("NoticeOfViolationBuilderBB.initbean "
                     + "| person candidate list size: " + personCandidateList.size());
         }
+        
     }
+    
+    
+    
+    
     
     /**
      * listener for type change
@@ -552,7 +566,10 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
 
     }
 
-    
+    /**
+     * Listener for user requests to start the sending dialog 
+     * @param nov 
+     */
     public void markNoticeOfViolationAsSentInit(NoticeOfViolation nov){
         currentNotice = nov;
         currentNotice.setFollowupEventDaysRequest(20);
@@ -561,7 +578,12 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     }
     
     
-    public String markNoticeOfViolationAsSent(ActionEvent ev) {
+    /**
+     * Listener for finalization of NOV sending
+     * @param ev
+     * @return 
+     */
+    public void markNoticeOfViolationAsSent(ActionEvent ev) {
         CaseCoordinator caseCoord = getCaseCoordinator();
         currentNotice = getSessionBean().getSessNotice();
         try {
@@ -583,37 +605,21 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                             + "has probably succeeded"));
         }
 
-        if(nov_createNoticeFollowupEvent){
-            nov_createFollowupEvent(); 
-        }
-        return "ceCaseProfile";
+        
         
     }
     
-    
+    /***
+     * Listener for user requests to start follow-up event creation
+     * @param ev 
+     */
     public void onNOVFollowupEventCreateButtonPush(ActionEvent ev){
-        nov_createFollowupEvent();
+        if(currentNotice != null){
+            currentNotice.setFollowupEventDaysRequest(recipientPersonID);
+        }
     }
     
-    
-    public void nov_createFollowupEvent(){
-        CaseCoordinator cc = getCaseCoordinator();
-        currentCase = getSessionBean().getSessCECase();
-        currentNotice = getSessionBean().getSessNotice();
-        try {
-            EventCnF even = cc.nov_createFollowupEvent(currentCase, currentNotice, getSessionBean().getSessUser());
-            if(even != null){
-                
-                getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Successfully created follow-up event ID " + even.getEventID() + " on " + DateTimeUtil.getPrettyDate(even.getTimeStart()), ""));
-            }
-        } catch (BObStatusException | EventException | IntegrationException ex) {
-             getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to generate follow-up event due to an object status, event, or integration error", ""));
-        } 
-    }
+   
     
     public void onNoticeDetailsButtonChange(NoticeOfViolation nov){
         currentNotice = nov;

@@ -47,6 +47,10 @@ import java.util.logging.Logger;
  */
 public class MunicipalityCoordinator extends BackingBeanUtils implements Serializable {
 
+    public final int DEFAULT_DEADLINE_BUFFER_DAYS = 10;
+    public final int DEFAULT_VIOLATION_NO_LETTER_BUFFER_DAYS = 3;
+    public final boolean PRIORITIZE_LETTER_BUFFER = false;
+    
     /**
      * Creates a new instance of MuniCoordinator
      */
@@ -190,6 +194,21 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
         muni.setLastUpdatedBy(user);
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         mi.insertMuniDataHeavy(muni);
+    }
+    
+    /**
+     * Logic pass through for muni profiles. Set's default values where needed.
+     * @param profileID
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public MuniProfile getMuniProfile(int profileID) throws IntegrationException, BObStatusException{
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        MuniProfile mp = mi.getMuniProfile(profileID);
+        mp.setPriorityDeadlineBufferDays(DEFAULT_DEADLINE_BUFFER_DAYS);
+        return mp;
+        
     }
     
     /**

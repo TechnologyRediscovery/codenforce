@@ -32,8 +32,6 @@ public  class Parcel
     final static String PKFIELD = "parcelkey";
     final static String HF_NAME = "Parcel";
     
-    
-    
     protected int parcelKey;
     protected String countyParcelID;
     protected String lotAndBlock;

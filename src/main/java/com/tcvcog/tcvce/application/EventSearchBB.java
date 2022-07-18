@@ -41,7 +41,8 @@ public class EventSearchBB extends BackingBeanUtils{
     
     private EventCnFPropUnitCasePeriodHeavy currentEvent;
     
-    private List<EventCnFPropUnitCasePeriodHeavy> eventList;
+    private List<EventCnFPropUnitCasePeriodHeavy> eventListRaw;
+    private List<EventCnFPropUnitCasePeriodHeavy> eventListManaged;
     private List<EventCnFPropUnitCasePeriodHeavy> eventListFiltered;
     private List<ViewOptionsActiveHiddenListsEnum> eventViewList;
     private ViewOptionsActiveHiddenListsEnum eventViewSelected;
@@ -71,13 +72,16 @@ public class EventSearchBB extends BackingBeanUtils{
         // setup search
         configureParameters();
         
-        eventList = getSessionBean().getSessEventList();
-        if(eventList == null){
-            eventList = new ArrayList<>();
+        eventListRaw = getSessionBean().getSessEventList();
+        if(eventListRaw == null){
+            eventListRaw = new ArrayList<>();
         }
+        eventListManaged = new ArrayList<>();
+        manageRawEventList();
         eventListFiltered = new ArrayList<>();
         eventViewList = Arrays.asList(ViewOptionsActiveHiddenListsEnum.values());
         eventTypeList = Arrays.asList(EventType.values());
+        eventViewSelected = ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN;
         try {
             eventCategoryList = ec.getEventCategoryList();
         } catch (IntegrationException ex) {
@@ -103,8 +107,8 @@ public class EventSearchBB extends BackingBeanUtils{
     }
     
     public void clearEventList(ActionEvent ev){
-        if(eventList != null && !eventList.isEmpty()){
-            eventList.clear();
+        if(eventListManaged != null && !eventListManaged.isEmpty()){
+            eventListManaged.clear();
               getFacesContext().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, 
                         "Event List Reset!", ""));
@@ -125,12 +129,14 @@ public class EventSearchBB extends BackingBeanUtils{
         List<EventCnFPropUnitCasePeriodHeavy> evList;
         try {
             evList = sc.runQuery(querySelected).getBOBResultList();
-            if(!appendResultsToList && eventList != null){
-                eventList.clear();
+            if(!appendResultsToList && eventListManaged != null){
+                eventListRaw.clear();
             } 
             if(evList != null && !evList.isEmpty()){
-                eventList.addAll(evList);
-                getSessionBean().setSessEventList(eventList);
+                eventListRaw.addAll(evList);
+                getSessionBean().setSessEventList(eventListRaw);
+                eventViewSelected = ViewOptionsActiveHiddenListsEnum.VIEW_ALL;
+                manageRawEventList();
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, 
                             "Your search completed with " + evList.size() + " results", ""));
@@ -208,6 +214,17 @@ public class EventSearchBB extends BackingBeanUtils{
     }
     
     /**
+     * Listener for the event list view options drop down list change
+     */
+    public void manageRawEventList(){
+        EventCoordinator ec = getEventCoordinator();
+        if(eventListManaged != null && eventListRaw != null && !eventListRaw.isEmpty() && eventViewSelected != null){
+            System.out.println("EventSearchBB.filterEventList | selected view " + eventViewSelected.name());
+            eventListManaged = ec.filterEventPropUnitCasePeriodHeavyList(eventListRaw, eventViewSelected);
+        }
+    }
+    
+    /**
      * Listener method for changes in the selected query;
      * Updates search params and UI updates based on this changed value
      */
@@ -223,6 +240,7 @@ public class EventSearchBB extends BackingBeanUtils{
      */
     public void onEventHide(EventCnFPropUnitCasePeriodHeavy evpucph){
         evpucph.setHidden(true);
+        manageRawEventList();
         
         
     }
@@ -233,6 +251,7 @@ public class EventSearchBB extends BackingBeanUtils{
      */
     public void onEventUnHide(EventCnFPropUnitCasePeriodHeavy evpucph){
         evpucph.setHidden(false);
+        manageRawEventList();
         
     }
     
@@ -250,8 +269,8 @@ public class EventSearchBB extends BackingBeanUtils{
             querySelected = queryList.get(0);
         }
         if(appendResultsToList == false){
-            if(eventList != null && !eventList.isEmpty()){
-                eventList.clear();
+            if(eventListManaged != null && !eventListManaged.isEmpty()){
+                eventListManaged.clear();
             }
         }
         getFacesContext().addMessage(null,
@@ -351,10 +370,10 @@ public class EventSearchBB extends BackingBeanUtils{
     }
 
     /**
-     * @return the eventList
+     * @return the eventListManaged
      */
-    public List<EventCnFPropUnitCasePeriodHeavy> getEventList() {
-        return eventList;
+    public List<EventCnFPropUnitCasePeriodHeavy> getEventListManaged() {
+        return eventListManaged;
     }
 
     /**
@@ -365,10 +384,10 @@ public class EventSearchBB extends BackingBeanUtils{
     }
 
     /**
-     * @param eventList the eventList to set
+     * @param eventListManaged the eventListManaged to set
      */
-    public void setEventList(List<EventCnFPropUnitCasePeriodHeavy> eventList) {
-        this.eventList = eventList;
+    public void setEventListManaged(List<EventCnFPropUnitCasePeriodHeavy> eventListManaged) {
+        this.eventListManaged = eventListManaged;
     }
 
     /**

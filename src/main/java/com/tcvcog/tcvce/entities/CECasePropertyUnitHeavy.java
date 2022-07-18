@@ -36,47 +36,12 @@ public class CECasePropertyUnitHeavy
     
     
     public CECasePropertyUnitHeavy(CECase cse) {
-        this.caseID = cse.caseID;
-        this.publicControlCode = cse.publicControlCode;
-        this.paccEnabled = cse.paccEnabled;
-
-        this.allowForwardLinkedPublicAccess = cse.allowForwardLinkedPublicAccess;
-
-        this.parcelKey = cse.parcelKey;
-        this.propertyUnitID = cse.propertyUnitID;
-
-        this.caseManager = cse.caseManager;
-        this.caseName = cse.caseName;
-
-        this.statusBundle = cse.statusBundle;
-        this.statusAssignmentLog = cse.statusAssignmentLog;
-
-        this.originationDate = cse.originationDate;
-        this.closingDate = cse.closingDate;
-        this.creationTimestamp = cse.creationTimestamp;
-
-        this.notes = cse.notes;
-
-        this.source = cse.source;
-
-        this.citationList = cse.citationList;
-        this.noticeList = cse.noticeList;
-        this.violationList = cse.violationList;
-       
-        this.active = cse.active;
-        this.propertyInfoCase = cse.propertyInfoCase;
-        this.personInfoPersonID = cse.getPersonInfoPersonID();
-        
-        this.lastUpdatedBy = cse.lastUpdatedBy;
-        this.lastUpdatedTS = cse.lastUpdatedTS;
-        
-        this.eventList = cse.eventList;
-        
-        this.originationEvent = cse.originationEvent;
-        this.closingEvent = cse.closingEvent;
-        this.daysSinceLastEvent = cse.daysSinceLastEvent;
-        
-
+        super(cse);
+    }
+    
+    public CECasePropertyUnitHeavy(CECasePropertyUnitHeavy csepuh){
+        this.property = csepuh.property;
+        this.propUnit = csepuh.propUnit;
     }
 
     /**

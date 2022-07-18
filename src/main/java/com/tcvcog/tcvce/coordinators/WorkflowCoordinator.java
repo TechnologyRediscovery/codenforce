@@ -333,8 +333,7 @@ public class WorkflowCoordinator extends BackingBeanUtils implements Serializabl
 
         ev.setTimeStart(LocalDateTime.now());
         ev.setTimeEnd(ev.getTimeStart().plusMinutes(workflowCat.getDefaultDurationMins()));
-        ev.setUserCreator(ua);
-        ev.setCreationts(LocalDateTime.now());
+        ev.setCreatedBy(ua);
         StringBuilder descBldr = new StringBuilder();
         descBldr.append("User ");
         descBldr.append(ua.getHuman().getName());

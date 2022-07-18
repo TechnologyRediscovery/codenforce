@@ -725,7 +725,7 @@
 
                             <div class="restrict-data-field-value-inline" >
                                 <h:outputText id="ord-cd-ot" 
-                                              value="#{eventsBB.currentEvent.category.eventCategoryDesc}" />
+                                              value="#{eventBB.currentEvent.category.eventCategoryDesc}" />
                             </div>
                         </div>
                     </p:dialog>
@@ -746,7 +746,7 @@
 
 
                             <h:outputText id="ord-note-ot"
-                                          value="#{eventsBB.currentEvent.notes}"
+                                          value="#{eventBB.currentEvent.notes}"
                                           escape="false" />
 
 
@@ -770,7 +770,7 @@
 
                             <p:commandButton   id="ord-dialog-notes-button-addnote"
                                                ajax="false" 
-                                               actionListener="#{eventsBB.onNoteCommitButtonChange}"
+                                               actionListener="#{eventBB.onNoteCommitButtonChange}"
                                                oncomplete="PF('ord-note-dialog-var').hide()"
                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
                                                value="Attach Note"  

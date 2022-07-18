@@ -14,6 +14,7 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveListsEnum;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,9 +37,6 @@ public class        CECase
     final static String CASE_FRIENDLY_NAME = "Code Enforcement Case";
     final static DomainEnum CECASE_ENUM = DomainEnum.CODE_ENFORCEMENT;
     
-    
-    
-    
     protected int caseID;
     protected int publicControlCode;
     protected boolean paccEnabled;
@@ -56,6 +54,11 @@ public class        CECase
     
     protected User caseManager;
     protected String caseName;
+    
+    protected CasePriorityEnum priority;
+    protected String priorityAssignmentLog;
+    private StringBuilder pLog;
+    protected Icon priorityIcon;
     
     protected CECaseStatus statusBundle;
     protected String statusAssignmentLog;
@@ -83,7 +86,7 @@ public class        CECase
     
     protected EventCnF originationEvent;
     protected EventCnF closingEvent;
-    protected String daysSinceLastEvent;
+    protected long daysSinceLastEvent;
     
     
     public CECase(){
@@ -99,6 +102,11 @@ public class        CECase
         propertyUnitID = input.getPropertyUnitID();
         caseManager = input.getCaseManager();
         caseName = input.getCaseName();
+        
+        this.priority = input.getPriority();
+        this.priorityAssignmentLog = input.getPriorityAssignmentLog();
+        this.priorityIcon = input.priorityIcon;
+        
         statusBundle = input.getStatusBundle();
         statusAssignmentLog = input.getStatusLog();
         originationDate = input.getOriginationDate();
@@ -118,7 +126,38 @@ public class        CECase
         originationEvent = input.originationEvent;
         closingEvent = input.closingEvent;
         daysSinceLastEvent = input.daysSinceLastEvent;
+        
     }
+    
+    
+    /**
+     * Writes a string to the priority assignment log and then a break
+     * @param msg 
+     * @param postpendBreak if true, an HTML break is inserted
+     */
+    public void logPriorityAssignmentMessage(String msg, boolean postpendBreak){
+        if(pLog == null){
+            pLog = new StringBuilder();
+        }
+        pLog.append(msg);
+        if(postpendBreak) {
+            pLog.append(Constants.FMT_HTML_BREAK);
+        }
+        
+    }
+    
+    /**
+     * Special getter for the priority log which comes from an internal StringBuilder
+     * @return the priorityAssignmentLog
+     */
+    public String getPriorityAssignmentLog() {
+        if(pLog != null){
+            priorityAssignmentLog = pLog.toString();
+        }
+        return priorityAssignmentLog;
+    }
+
+    
     
     @Override
     public String toString() {
@@ -189,6 +228,7 @@ public class        CECase
                 } // close switch
             } // close for   
         } // close null check
+        Collections.sort(visEventList);
         return visEventList;
     }
 
@@ -209,7 +249,9 @@ public class        CECase
                 switch(viewOption){
                     case VIEW_ACTIVE:
                         if(cv.isActive()){
-                            displayedViolations.add(cv);
+                            if(cv.getStatus() != null && !cv.getStatus().isTerminalStatus()){
+                                displayedViolations.add(cv);
+                            }
                         }
                         break;
                     case VIEW_ALL:
@@ -225,11 +267,14 @@ public class        CECase
                 }
             }
         }
+        Collections.sort(displayedViolations);
+        Collections.reverse(displayedViolations);
         return displayedViolations;
     }
     
     /**
-     * Builds our violation list based on inputted view options
+     * Builds our violation list based on inputted view options. Sorts by date DESC
+     * 
      * @param viewOption
      * @return 
      */
@@ -256,6 +301,8 @@ public class        CECase
                 }
             }
         }
+        Collections.sort(displayedNOVs);
+        Collections.reverse(displayedNOVs);
         return displayedNOVs;
     }
     
@@ -271,14 +318,17 @@ public class        CECase
                 switch(viewOption){
                     case VIEW_ACTIVE:
                         if(cit.isActive()){
-                            dispCits.add(cit);
+                            CitationStatusLogEntry csle = cit.getMostRecentStatusLogEntry();
+                            if(csle != null && csle.getStatus() != null && !csle.getStatus().isTerminalStatus()){
+                                dispCits.add(cit);
+                            }
                         }
                         break;
                     case VIEW_ALL:
                             dispCits.add(cit);
                         break;
                     case VIEW_INACTIVE:
-                        if(!cit.isActive()){
+                        if(!cit.isActive() || cit.getMostRecentStatusLogEntry() != null){
                             dispCits.add(cit);
                         }
                         break;
@@ -287,6 +337,7 @@ public class        CECase
                 }
             }
         }
+        
         return dispCits;
     }
     
@@ -780,7 +831,7 @@ public class        CECase
     /**
      * @return the daysSinceLastEvent
      */
-    public String getDaysSinceLastEvent() {
+    public Long getDaysSinceLastEvent() {
         
         return daysSinceLastEvent;
     }
@@ -788,9 +839,38 @@ public class        CECase
     /**
      * @param daysSinceLastEvent the daysSinceLastEvent to set
      */
-    public void setDaysSinceLastEvent(String daysSinceLastEvent) {
+    public void setDaysSinceLastEvent(Long daysSinceLastEvent) {
         this.daysSinceLastEvent = daysSinceLastEvent;
     }
+
+    /**
+     * @return the priority
+     */
+    public CasePriorityEnum getPriority() {
+        return priority;
+    }
+
+    /**
+     * @param priority the priority to set
+     */
+    public void setPriority(CasePriorityEnum priority) {
+        this.priority = priority;
+    }
+
+    /**
+     * @return the priorityIcon
+     */
+    public Icon getPriorityIcon() {
+        return priorityIcon;
+    }
+
+    /**
+     * @param priorityIcon the priorityIcon to set
+     */
+    public void setPriorityIcon(Icon priorityIcon) {
+        this.priorityIcon = priorityIcon;
+    }
+
 
    
 }
