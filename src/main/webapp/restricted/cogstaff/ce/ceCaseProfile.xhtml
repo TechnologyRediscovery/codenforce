@@ -213,27 +213,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                 </div>
 
 
-                                                <div class="p-col-4 restrict-data-field-label-inline">
-                                                    <p:outputLabel for="case-status-ot">
-                                                        <h:outputText value="Case status"/>
-                                                    </p:outputLabel>
-                                                </div>
-                                                <div class="p-col-8 restrict-data-field-value-inline">
-                                                    <h:outputLabel id="case-status-ot"
-                                                                   value="#{ceCaseBB.currentCase.statusBundle.phase.caseOpen ? 'Open' : 'Closed'}"/>
-                                                </div>
-
-
-                                                <div class="p-col-4 restrict-data-field-label-inline">
-                                                    <p:outputLabel for="case-phase-ot">
-                                                        <h:outputText value="Phase"/>
-                                                    </p:outputLabel>
-                                                </div>
-                                                <div class="p-col-8 restrict-data-field-value-inline">
-                                                    <h:outputText id="case-phase-ot" 
-                                                                  value="#{ceCaseBB.currentCase.statusBundle.phase.label}"/>
-                                                </div>
-
+                                           
 
                                                 <div class="p-col-4 restrict-data-field-label-inline">
                                                     <h:outputText value="Property Unit associated?" />
@@ -406,7 +386,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                     <p:spacer height="3px" />
 
                                                     <p:commandLink      id="cecase-forceclose-init-cb" 
-                                                                        value="#{!empty ceCaseBB.currentCase.closingDate and !ceCaseBB.currentCase.statusBundle.phase.allowCaseClosure ? 'close case' : 'case closure not allowed'}"
+                                                                        value="#{empty ceCaseBB.currentCase.closingDate ? 'close case' : 'case already closed'}"
                                                                         ajax="true" 
                                                                         actionListener="#{ceCaseBB.onCaseCloseInitButtonChange}"
                                                                         disabled="#{!empty ceCaseBB.currentCase.closingDate and !ceCaseBB.currentCase.statusBundle.phase.allowCaseClosure}"
@@ -589,44 +569,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                                     <h:outputText value="Last updated: #{ceCaseBB.getPrettyDate(ceCaseBB.currentCase.lastUpdatedTS)}" />
 
-                                                    <p:spacer height="3px" />
-
-                                                    <h:outputText      id="cecase-propinfo-ot"
-                                                                       value="#{ceCaseBB.currentCase.propertyInfoCase ? 'Property info case':'Normal Code Enf Case'}"  />
 
                                                     <p:spacer height="3px" />
 
-                                                    <div class="restrict-main-contents-io-link link-button">
-
-                                                        <p:commandLink      id="cecase-recordstatus-edit-init-clink"
-                                                                            ajax="true"
-                                                                            actionListener="#{ceCaseBB.onToggleEditCECaseRecordStatus}"
-                                                                            value="#{ceCaseBB.editModeCurrentCaseRecord ? 'save changes':'designate a property info case'}"
-                                                                            update="@form
-                                                                            cecase-growl-form"
-                                                                            />
-
-
-                                                        <p:commandLink      id="cecase-recordstatus-edit-abort-clink"
-                                                                            ajax="true"
-                                                                            actionListener="#{ceCaseBB.onEditRecordAbort(ev)}"
-                                                                            value="cancel"
-                                                                            rendered="#{ceCaseBB.editModeCurrentCaseRecord}"
-                                                                            update="@form
-                                                                            cecase-growl-form"
-                                                                            />
-
-                                                    </div>
-
-                                                    <p:spacer height="5px" />
-                                                    <h:outputText value="Is this case a property info container?" 
-                                                                  rendered="#{ceCaseBB.editModeCurrentCaseRecord}"/>
-                                                    <p:selectBooleanCheckbox  id="cecase-propinfo-sb"
-                                                                              value="#{ceCaseBB.currentCase.propertyInfoCase}"
-                                                                              styleClass="data_field_value"
-                                                                              rendered="#{ceCaseBB.editModeCurrentCaseRecord}"
-                                                                              disabled="#{ceCaseBB.currentCase.violationList.size() ne 0}">
-                                                    </p:selectBooleanCheckbox>
+                                                  
+                                                    
                                                 </h:form>
                                             </div>
                                         </div>
@@ -936,7 +883,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:panel id="events-panel"
                                              toggleable="true"
                                              collapsed="false"
-                                             header="Events (#{cECaseEventListBB.managedEventList.size()}) on CECase (ID:#{cECaseEventListBB.currentCase.caseID})">
+                                             header="Events (#{eventListRequestScopedBB.managedEventList.size()}) on #{!empty sessionBean.sessEventsPageEventDomainRequest ? sessionBean.sessEventsPageEventDomainRequest.title : ''} (ID:#{!empty eventListRequestScopedBB.currentEvHolder ? eventListRequestScopedBB.currentEvHolder.BObID : ''})">
 
                                         <h:form id="events-form">
 
@@ -953,7 +900,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <h:outputText value="include deactivated events?  " />
                                             <p:selectBooleanCheckbox id="events-viewdeac-sbcb"
                                                                      value="#{sessionBean.sessFlagIncludeDeactivatedEvents}" >
-                                                <p:ajax listener="#{cECaseEventListBB.configureManagedEventList}" 
+                                                <p:ajax listener="#{eventListRequestScopedBB.configureManagedEventList}" 
                                                         update="events-table
                                                         events-panel"/>
                                             </p:selectBooleanCheckbox>
@@ -961,40 +908,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                             <p:spacer height="5px"/>
 
                                             <p:dataTable id="events-table"
-                                                         var="eventcecase"
-                                                         value="#{cECaseEventListBB.managedEventList}"
+                                                         var="genevent"
+                                                         value="#{eventListRequestScopedBB.managedEventList}"
                                                          tableStyleClass="primeDataTable"
-                                                         rowKey="#{eventcecase.eventID}"
+                                                         rowKey="#{genevent.eventID}"
                                                          reflow="false">
 
                                                 <p:column headerText="Date"
                                                           width="20%"
-                                                          sortBy="#{eventcecase.timeStart}"
+                                                          sortBy="#{genevent.timeStart}"
                                                           styleClass="centeredColumnContent">
-                                                    <h:outputText value="#{empty eventcecase.timeStart ? eventBB.getPrettyDate(eventcecase.createdTS) : eventBB.getPrettyDate(eventcecase.timeStart) }"/>
+                                                    <h:outputText value="#{empty genevent.timeStart ? eventBB.getPrettyDate(genevent.createdTS) : eventBB.getPrettyDate(genevent.timeStart) }"/>
                                                 </p:column>
 
                                                 <p:column headerText="Category"
                                                           width="20%"
-                                                          sortBy="#{eventcecase.category.eventCategoryTitle}"
+                                                          sortBy="#{genevent.category.eventCategoryTitle}"
                                                           styleClass="centeredColumnContent">
 
-                                                    <div class="#{eventcecase.category.icon.styleClass}">
-                                                        <i class="material-icons status-display-icon-i"><h:outputText value="#{eventcecase.category.icon.materialIcon}"/></i>
+                                                    <div class="#{genevent.category.icon.styleClass}">
+                                                        <i class="material-icons status-display-icon-i"><h:outputText value="#{genevent.category.icon.materialIcon}"/></i>
                                                     </div>
 
-                                                    <h:outputText value="#{eventcecase.category.eventType.label}:"/>
+                                                    <h:outputText value="#{genevent.category.eventType.label}:"/>
 
                                                     <p:spacer height="1px" />
 
-                                                    <h:outputText value="#{eventcecase.category.eventCategoryTitle}"/>
+                                                    <h:outputText value="#{genevent.category.eventCategoryTitle}"/>
                                                 </p:column>
 
                                                 <p:column headerText="Description"
                                                           width="50%"
                                                           styleClass="centeredColumnContent wrapText">
 
-                                                    <h:outputText value="#{eventcecase.description}"/>
+                                                    <h:outputText value="#{genevent.description}"/>
 
                                                 </p:column>
 
@@ -1011,14 +958,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                        update="event-profile-dialog
                                                                                 event-profile-form"
                                                                        >
-                                                            <p:ajax listener="#{eventBB.onViewEvent(eventcecase)}" />
+                                                            <p:ajax listener="#{eventBB.onViewEvent(genevent)}" />
                                                             <f:param name="event-list-component-to-update" value="events-form:events-table" />
                                                         </p:commandLink>
                                                     </div>
                                                     <p:spacer height="3px" />
-                                                    <h:outputText value="(ID:#{eventcecase.eventID})"/>
+                                                    <h:outputText value="(ID:#{genevent.eventID})"/>
                                                     <p:spacer height="3px" />
-                                                    <h:outputText value="#{empty eventcecase.deactivatedTS ? 'Active' : 'Deactivated'}"
+                                                    <h:outputText value="#{empty genevent.deactivatedTS ? 'Active' : 'Deactivated'}"
                                                                   styleClass="italic"/>
 
                                                 </p:column>

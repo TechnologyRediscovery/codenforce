@@ -48,6 +48,16 @@
                                                 <p:spacer height="20px" />
                                                 <h2>Release notes</h2>
                                                 <p:accordionPanel id="release-panel">
+                                                    <p:tab title="Release Alpha 0.862: Tuesday 19-Jul-2022 @ 1204h">
+                                                        <ul>
+                                                            <li><span style="font-weight: bold;">Property info cases and their events are now...gone!</span> This should de-gum the event query output to not include auto events related to these non-real cases </li>
+                                                            <li><span style="font-weight: bold;">Person links can now be managed on a property unit! </span> Just like we manage persons on other objects, Units can have tenants and managers and general associations</li>
+                                                            <li><span style="font-weight: bold;">Parcel unfitness, abandonment, and vacancy date starts and stops are now working on the property info page. </span> The current case priority logic says that if a case is attached to a property that is inside an abandonment window, its priority will immediately be marked as "abandonment stall". Please talk to Emily if we want different prioritization behavior.</li>
+                                                            <li><span style="font-weight: bold;">Parcel notes and parcel unit notes </span> are working again after debugging--try it out!</li>
+                                                            <li><span style="font-weight: bold;">Parcel land bank prospect, candidacy, acquisition, and ownership date flags </span> are now live on parcel info. Searchability of these fields coming soon.</li>
+                                                            <li>All CE Cases <span style="font-weight: bold;">no longer show up as all closed.</span> </li>
+                                                        </ul>
+                                                    </p:tab>
                                                     <p:tab title="Release Alpha 0.861: Monday 18-Jul-2022 @ 0856h">
                                                         <ul>
                                                             <li><span style="font-weight: bold;">Event list on cecase report now includes deactivation and reactivation of events</span> </li>

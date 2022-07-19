@@ -634,7 +634,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
        cse.logPriorityAssignmentMessage("Assigning priority to CECase ID: ", false);
        cse.logPriorityAssignmentMessage(String.valueOf(cse.getCaseID()), true);
         
-        if (cse.getPersonInfoPersonID() != 0 || cse.isPropertyInfoCase()) {
+        if (cse.getPersonInfoPersonID() != 0 ) {
             cse.logPriorityAssignmentMessage("Found non-zero person info ID or prop info case TRUE;", true);
             cse.logPriorityAssignmentMessage("Assigning priorirty: CONTAINER.", true);
             cse.setPriority(CasePriorityEnum.CONTAINER);
@@ -1289,6 +1289,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * Logic passthrough for parcel info cases
      * @param pcl
      * @return
+     * @deprecated events connected directly to parcels instead as of JULY 2022
      * @throws IntegrationException
      * @throws BObStatusException 
      */

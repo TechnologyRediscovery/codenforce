@@ -1966,8 +1966,7 @@
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
     <managed-bean>
-        <managed-bean-name>cECaseEventListBB</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.CECaseEventListBB</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-name>eventListRequestScopedBB</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.application.EventListRequestScopedBB</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope></managed-bean>
 </faces-config>

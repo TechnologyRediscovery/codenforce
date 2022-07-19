@@ -117,7 +117,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
             parcel.setLotAndBlock(rs.getString("lotandblock"));
             parcel.setBroadviewPhotoID(rs.getInt("broadview_photodocid"));
-          
+            parcel.setNotes(rs.getString("notes"));
             si.populateTrackedFields(parcel, rs, false);
             return parcel;
         } catch (BObStatusException  ex) {
@@ -219,7 +219,16 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                         "       abandoneddatestop, abandonedby_userid, vacantdatestart, vacantdatestop, \n" +
                         "       vacantby_userid, condition_intensityclassid, landbankprospect_intensityclassid, \n" +
                         "       landbankheld, nonaddressable, usetype_typeid, createdts, createdby_userid, \n" +
-                        "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid\n" +
+                        "       lastupdatedts, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
+                        "       landbankprospectstart, landbankprospectstop, landbankprospectnotes, \n" +
+                        "       landbankacqcandidatestart, landbankacqcandidatestop, landbankacqcandidatenotes, \n" +
+                        "       landbankpursuingstart, landbankpursuingstop, landbankpursuingnotes, \n" +
+                        "       landbankownedstart, landbankownedstop, landbankownednotes," +
+                        "       landbankprospectstartby_userid, \n" +
+                        "       landbankprospectstopby_userid, landbankacqcandidatestartby_userid, \n" +
+                        "       landbankacqcandidatestopby_userid, landbankpursuingstartby_userid, \n" +
+                        "       landbankpursuingstopby_userid, landbankownedstartby_userid, landbankownedstopby_userid" +
+                
                         "   FROM public.parcelinfo WHERE parcelinfoid = ?;";
 
         Connection con = getPostgresCon();
@@ -418,8 +427,6 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         }
            Connection con = getPostgresCon();
         PreparedStatement stmt = null;
-        ResultSet rs = null;
-        int freshID = 0;
 
         try {
             
@@ -431,7 +438,11 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                         "       vacantdatestart=?, vacantdatestop=?, vacantby_userid=?, condition_intensityclassid=?, \n" +
                         "       landbankprospect_intensityclassid=?, landbankheld=?, nonaddressable=?, \n" +
                         "       usetype_typeid=?, lastupdatedts=now(), \n" +
-                        "       lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?\n" +
+                        "       lastupdatedby_userid=?, deactivatedts=?, deactivatedby_userid=?,   "
+                    +   "       landbankprospectstart=?, landbankprospectstop=?, landbankprospectnotes=?, \n" +
+                        "       landbankacqcandidatestart=?, landbankacqcandidatestop=?, landbankacqcandidatenotes=?, \n" +
+                        "       landbankpursuingstart=?, landbankpursuingstop=?, landbankpursuingnotes=?, \n" +
+                        "       landbankownedstart=?, landbankownedstop=?, landbankownednotes=? \n" +
                         " WHERE parcelinfoid=?;";
             
             stmt = con.prepareStatement(s);
@@ -505,15 +516,15 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
                 stmt.setNull(18, java.sql.Types.NULL);
             }
             
-            if(info.getCondition() != null){
+            if(info.getCondition() != null && info.getCondition().getClassID() != 0){
                 stmt.setInt(19, info.getCondition().getClassID());
             } else {
                 stmt.setNull(19, java.sql.Types.NULL);
             }
-            if(info.getLandBankProspect() != null){
+            if(info.getLandBankProspect() != null && info.getLandBankProspect().getClassID() != 0){
                 stmt.setInt(20, info.getLandBankProspect().getClassID());
             } else {
-                stmt.setInt(20, java.sql.Types.NULL);
+                stmt.setNull(20, java.sql.Types.NULL);
             }
             
             stmt.setBoolean(21, info.isLandBankHeld());
@@ -542,11 +553,65 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             } else {
                 stmt.setNull(26, java.sql.Types.NULL);
             }
+            // ***************** LAND BANK *************************
             
-            stmt.setInt(27, info.getParcelInfoID());
-            stmt.execute();
+             if(info.getLandbankProspectStart() != null){
+                stmt.setTimestamp(27, java.sql.Timestamp.valueOf(info.getLandbankProspectStart().atStartOfDay()));
+            } else {
+                stmt.setNull(27, java.sql.Types.NULL);
+            }
+            
+            if(info.getLandbankProspectStop() != null){
+                stmt.setTimestamp(28, java.sql.Timestamp.valueOf(info.getLandbankProspectStop().atStartOfDay()));
+            } else {
+                stmt.setNull(28, java.sql.Types.NULL);
+            }
+            stmt.setString(29, info.getLandbankProspectNotes());
+            
+            if(info.getLandbankAcqCandidateStart() != null){
+                stmt.setTimestamp(30, java.sql.Timestamp.valueOf(info.getLandbankAcqCandidateStart().atStartOfDay()));
+            } else {
+                stmt.setNull(30, java.sql.Types.NULL);
+            }
+            
+            if(info.getLandbankAcqCandidateStop() != null){
+                stmt.setTimestamp(31, java.sql.Timestamp.valueOf(info.getLandbankAcqCandidateStop().atStartOfDay()));
+            } else {
+                stmt.setNull(31, java.sql.Types.NULL);
+            }
+            stmt.setString(32, info.getLandbankAcqCandidateNotes());
+            
+            if(info.getLandbankPursuingStart() != null){
+                stmt.setTimestamp(33, java.sql.Timestamp.valueOf(info.getLandbankPursuingStart().atStartOfDay()));
+            } else {
+                stmt.setNull(33, java.sql.Types.NULL);
+            }
+            
+            if(info.getLandbankPursuingStop() != null){
+                stmt.setTimestamp(34, java.sql.Timestamp.valueOf(info.getLandbankPursuingStop().atStartOfDay()));
+            } else {
+                stmt.setNull(34, java.sql.Types.NULL);
+            }
+            stmt.setString(35, info.getLandbankPursuingNotes());
+            
+            if(info.getLandbankOwnedStart() != null){
+                stmt.setTimestamp(36, java.sql.Timestamp.valueOf(info.getLandbankOwnedStart().atStartOfDay()));
+            } else {
+                stmt.setNull(36, java.sql.Types.NULL);
+            }
+            
+            if(info.getLandbankOwnedStop() != null){
+                stmt.setTimestamp(37, java.sql.Timestamp.valueOf(info.getLandbankOwnedStop().atStartOfDay()));
+            } else {
+                stmt.setNull(37, java.sql.Types.NULL);
+            }
+            stmt.setString(38, info.getLandbankOwnedNotes());
+            
+            stmt.setInt(39, info.getParcelInfoID());
+            stmt.executeUpdate();
             
         } catch (SQLException ex){
+            System.out.println(ex);
             throw new IntegrationException("cannot update parcel info");
             
         } finally {
@@ -570,7 +635,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         OccInspectionIntegrator ci = getOccInspectionIntegrator();
         SystemIntegrator si = getSystemIntegrator();
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         
 
         ParcelInfo pi = new ParcelInfo();
@@ -602,7 +667,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
             
             if(rs.getInt("unfitby_userid") != 0){
-                pi.setUnfitBy(ui.getUser(rs.getInt("unfitby_userid")));
+                pi.setUnfitBy(uc.user_getUser(rs.getInt("unfitby_userid")));
             }
                 
             if(rs.getTimestamp("abandoneddatestart") != null){
@@ -614,7 +679,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
             
             if(rs.getInt("abandonedby_userid") != 0){
-                pi.setAbandonedBy(ui.getUser(rs.getInt("abandonedby_userid")));
+                pi.setAbandonedBy(uc.user_getUser(rs.getInt("abandonedby_userid")));
             }
             
             if(rs.getTimestamp("vacantdatestart") != null){
@@ -626,7 +691,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             }
             
             if(rs.getInt("vacantby_userid") != 0){
-                pi.setVacantBy(ui.getUser(rs.getInt("vacantby_userid")));
+                pi.setVacantBy(uc.user_getUser(rs.getInt("vacantby_userid")));
             }
             
             if(rs.getInt("condition_intensityclassid") != 0){
@@ -643,6 +708,49 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             if(rs.getInt("usetype_typeid") != 0){
                 pi.setUseType(getPropertyUseType(rs.getInt("usetype_typeid")));
             }
+            
+            // *********************** NOTE *********************************
+            // User ID stamps for each of these four land bank date pairs
+            // was strategically not implemented at first pass in July 2022
+            // **************************************************************
+          
+            if(rs.getTimestamp("landbankprospectstart") != null){
+                pi.setLandbankProspectStart(LocalDate.from(rs.getTimestamp("landbankprospectstart").toLocalDateTime()));
+            }
+            
+            if(rs.getTimestamp("landbankprospectstop") != null){
+                pi.setLandbankProspectStop(LocalDate.from(rs.getTimestamp("landbankprospectstop").toLocalDateTime()));
+            }
+            
+            if(rs.getTimestamp("landbankacqcandidatestart") != null){
+                pi.setLandbankAcqCandidateStart(LocalDate.from(rs.getTimestamp("landbankacqcandidatestart").toLocalDateTime()));
+            }
+            
+            if(rs.getTimestamp("landbankacqcandidatestop") != null){
+                pi.setLandbankAcqCandidateStop(LocalDate.from(rs.getTimestamp("landbankacqcandidatestop").toLocalDateTime()));
+            }
+            
+            if(rs.getTimestamp("landbankpursuingstart") != null){
+                pi.setLandbankPursuingStart(LocalDate.from(rs.getTimestamp("landbankpursuingstart").toLocalDateTime()));
+            }
+            
+            if(rs.getTimestamp("landbankpursuingstop") != null){
+                pi.setLandbankPursuingStop(LocalDate.from(rs.getTimestamp("landbankpursuingstop").toLocalDateTime()));
+            }
+            
+            
+            if(rs.getTimestamp("landbankownedstart") != null){
+                pi.setLandbankOwnedStart(LocalDate.from(rs.getTimestamp("landbankownedstart").toLocalDateTime()));
+            }
+            
+            if(rs.getTimestamp("landbankownedstop") != null){
+                pi.setLandbankOwnedStop(LocalDate.from(rs.getTimestamp("landbankownedstop").toLocalDateTime()));
+            }
+            
+            pi.setLandbankProspectNotes(rs.getString("landbankprospectnotes"));
+            pi.setLandbankAcqCandidateNotes(rs.getString("landbankacqcandidatenotes"));
+            pi.setLandbankPursuingNotes(rs.getString("landbankpursuingnotes"));
+            pi.setLandbankOwnedNotes(rs.getString("landbankownednotes"));
             
             si.populateTrackedFields(pi, rs, false);
            
@@ -787,6 +895,42 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+    }
+    
+    /**
+     * Takes in notes to write to parcel. It's the job of the caller to NOT
+     * overwrite what was there originally.
+     * @param pcl 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateParcelNotes(Parcel pcl) throws IntegrationException{
+        if(pcl == null){
+            throw new IntegrationException("Cannot write notes from null parcel");
+        }
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            
+            String s =  "UPDATE public.parcel\n" +
+                        "   SET notes=? " +
+                        " WHERE parcelkey=?;";
+            
+            stmt = con.prepareStatement(s);
+            
+            stmt.setString(1, pcl.getNotes());
+            
+            stmt.setInt(2, pcl.getParcelKey());
+            
+            stmt.execute();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Unable to updaet Parcel info in DB, sorry!", ex);
+        } finally {
+           if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+           if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
     }
     

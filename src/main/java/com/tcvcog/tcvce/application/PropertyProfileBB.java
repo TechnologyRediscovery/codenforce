@@ -218,6 +218,42 @@ public class PropertyProfileBB
         } 
     }
     
+    /**
+     * Listener for user reqeusts to start the note process on the parcel
+     * @param ev 
+     */
+    public void onParcelNoteAppendInit(ActionEvent ev){
+        formNoteText = "";
+        System.out.println("PropertyProfileBB.onParcelNoteAppendInit");
+        
+    }
+    
+    /**
+     * Finishes note process.
+     * @param ev 
+     */
+    public void onParcelNoteAppendCommit(ActionEvent ev){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.updateParcelNotes(currentProperty, formNoteText, getSessionBean().getSessUser());
+            reloadCurrentPropertyDataHeavy();
+            System.out.println("PropertyProfileBB.onParcelNoteAppendCommit");
+            getFacesContext().addMessage(null,
+             new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                      "Successfully appended note to parcel", 
+                      ""));
+            formNoteText = "";
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Database error writing parcel note", 
+                        ""));
+            
+        } 
+        
+    }
+    
     
     /**
      * Listener for user requests to start property creation 
@@ -494,6 +530,21 @@ public class PropertyProfileBB
    
     
     
+    /**
+     * Special wrapper getter around the current property Unit's human
+     * link list that asks the session for a new link list
+     * on table load that might occur during a link edit operation
+     * @return the new human link list
+     */
+    public List<HumanLink> getManagedUnitHumanLinkList(){
+        List<HumanLink> hll = getSessionBean().getSessHumanListRefreshedList();
+        if(hll != null){
+            currentPropertyUnit.setHumanLinkList(hll);
+            // clear our refreshed list
+            getSessionBean().setSessHumanListRefreshedList(null);
+        }
+        return currentPropertyUnit.getHumanLinkList();
+    }
     /**
      * Special wrapper getter around the current property's human
      * link list that asks the session for a new link list
@@ -781,6 +832,14 @@ public class PropertyProfileBB
       }
       
       /**
+       * Listener to start the human linking process
+       * @param ev 
+       */
+      public void onUnitPersonManageInit(ActionEvent ev){
+          System.out.println("PropertyProfileBB.onUnitPersonManageInit");
+      }
+      
+      /**
        * Listener for user requests to start the note on unit process
        * @param ev 
        */
@@ -800,6 +859,7 @@ public class PropertyProfileBB
         try {
             pc.updatePropertyUnit(currentPropertyUnit, getSessionBean().getSessUser());
             currentPropertyUnit = pc.getPropertyUnitDataHeavy(currentPropertyUnit, getSessionBean().getSessUser());
+            formUnitNoteText = "";
             getFacesContext().addMessage(null,
                   new FacesMessage(FacesMessage.SEVERITY_INFO,
                           "Unit note update succses! Great work!", ""));

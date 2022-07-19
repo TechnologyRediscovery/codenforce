@@ -338,13 +338,13 @@
                                         </div>
                                         <p:spacer height="5px"/>    
                                         <div class="p-grid">
-                                            <div class="p-col-4 data_field_label">
+                                            <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Info record ID"/>
                                             </div>
                                             <div class="p-col-8">
                                                 <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.parcelInfoID}" />
                                             </div>
-                                            <div class="p-col-4 data_field_label">
+                                            <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="County"/>
                                             </div>
                                             <div class="p-col-8">
@@ -352,7 +352,7 @@
                                                               rendered="#{!propertyProfileBB.currentParcelInfoEditMode}" />
                                             </div>
 
-                                            <div class="p-col-4 data_field_label">
+                                            <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Condition"/>
                                             </div>
                                             <div class="p-col-8">
@@ -374,7 +374,7 @@
                                                 </h:selectOneMenu>
                                             </div>
 
-                                            <div class="p-col-4 data_field_label">
+                                            <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Use Type"/>
                                             </div>
                                             <div class="p-col-8">
@@ -394,7 +394,7 @@
                                                 </h:selectOneMenu>
                                             </div>
 
-                                            <div class="p-col-4 data_field_label">
+                                            <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Non-Addressable"/>
                                             </div>
                                             <div class="p-col-8">
@@ -408,7 +408,7 @@
 
                                             </div>
 
-                                            <div class="p-col-4 data_field_label">
+                                            <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="TCLB Held"/>
                                             </div>
                                             <div class="p-col-8">
@@ -422,7 +422,7 @@
 
                                             </div>
 
-                                            <div class="p-col-4 data_field_label">
+                                            <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Land bank prospect"/>
                                             </div>
                                             <div class="p-col-8">
@@ -444,7 +444,7 @@
                                             </div>
 
 
-                                            <div class="p-col-4 data_field_label">
+                                            <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Info record source"/>
                                             </div>
                                             <div class="p-col-8">
@@ -463,14 +463,14 @@
                                                 </h:selectOneMenu>
                                             </div>
 
-                                            <div class="p-col-4 data_field_label">
+                                            <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Info record creation"/>
                                             </div>
-                                            <div class="p-col-8">
+                                            <div class="p-col-8 restrict-data-field-value-inline">
                                                 <h:outputText value="#{propertyProfileBB.getPrettyDate(propertyProfileBB.currentProperty.parcelInfo.createdTS)}" 
                                                               rendered="true" />
                                             </div>
-                                            <div class="p-col-4 data_field_label">
+                                            <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Info record last update"/>
                                             </div>
                                             <div class="p-col-8">
@@ -484,20 +484,20 @@
                                                 <h:outputText value="&nbsp;"
                                                               escape="false" />
                                             </div>
-                                            <div class="p-col-3" >
+                                            <div class="p-col-3 restrict-data-field-label-inline" >
                                                 <h:outputLabel value="Unfitness of Occupancy"/>
                                             </div>
 
-                                            <div class="p-col-3" >
+                                            <div class="p-col-3 restrict-data-field-label-inline" >
                                                 <h:outputLabel value="Vacancy"/>
                                             </div>
 
-                                            <div class="p-col-3" >
+                                            <div class="p-col-3 restrict-data-field-label-inline" >
                                                 <h:outputLabel value="Abandonment"/>
                                             </div>
 
 
-                                            <div class="p-col-3">
+                                            <div class="p-col-3 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Start date" />
                                             </div>
 
@@ -583,7 +583,7 @@
 
                                             </div>
 
-                                            <div class="p-col-3">
+                                            <div class="p-col-3 restrict-data-field-label-inline">
                                                 <h:outputLabel value="End date" />
                                             </div>
 
@@ -664,9 +664,308 @@
                                                 </p:datePicker>
 
                                             </div>
+                                            
+                                            <div class="p-col-12">
+                                                <h3>
+                                                    <h:outputText value="Tri-Cog Landbank Tracking" />
+                                                </h3>
+                                            </div>
+                                            
+                                            <!--LAND BANK-->
+                                            
+                                            <div class="p-col-4" >
+                                                  <h:outputText value="&nbsp;"
+                                                               escape="false" />
+                                            </div>
+                                            <div class="p-col-4 restrict-data-field-label-inline">
+                                                <h:outputLabel value="Start date" />
+                                            </div>
+                                            <div class="p-col-4 restrict-data-field-label-inline">
+                                                <h:outputLabel value="Stop date" />
+                                            </div>
+                                            
+                                            
+                                            
+                                            <div class="p-col-4 restrict-data-field-label-inline" >
+                                                <h:outputLabel value="LB Prospect"/>
+                                            </div>
+
+                                            <div class="p-col-4">
+                                                <h:outputText id="lb-prospect-start-ot"
+                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landbankProspectStart) 
+                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.landbankProspectStart) 
+                                                                       : ''}" 
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+
+
+                                                <p:datePicker id="lb-prospect-start-cal"
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.landbankProspectStart}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              hideOnDateTimeSelect="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
+                                                              showTime="false"
+                                                              yearNavigator="true"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                </p:datePicker>
+                                            </div>
+                                            
+                                            
+                                            <div class="p-col-4">
+                                                <h:outputText id="lb-prospect-stop-ot"
+                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landbankProspectStop) 
+                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.landbankProspectStop) 
+                                                                       : ''}" 
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+
+
+                                                <p:datePicker id="lb-prospect-stop-cal"
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.landbankProspectStop}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              hideOnDateTimeSelect="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
+                                                              showTime="false"
+                                                              yearNavigator="true"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                </p:datePicker>
+                                            </div>
+                                            
+                                            <div class="p-col-4 restrict-data-field-label-inline" >
+                                                <h:outputLabel value="LB Candidate "/>
+                                            </div>
+                                            <div class="p-col-4">
+                                                <h:outputText id="lb-acqcand-start-ot"
+                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landbankAcqCandidateStart) 
+                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.landbankAcqCandidateStart) 
+                                                                       : ''}" 
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+
+
+                                                <p:datePicker id="lb-acqcand-start-cal"
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.landbankAcqCandidateStart}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              hideOnDateTimeSelect="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
+                                                              showTime="false"
+                                                              yearNavigator="true"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                </p:datePicker>
+                                            </div>
+                                            <div class="p-col-4">
+                                                <h:outputText id="lb-acqcand-stop-ot"
+                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landbankAcqCandidateStop) 
+                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.landbankAcqCandidateStop) 
+                                                                       : ''}" 
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+
+
+                                                <p:datePicker id="lb-acqcand-stop-cal"
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.landbankAcqCandidateStop}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              hideOnDateTimeSelect="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
+                                                              showTime="false"
+                                                              yearNavigator="true"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                </p:datePicker>
+                                            </div>
+
+                                            <div class="p-col-4 restrict-data-field-label-inline" >
+                                                <h:outputLabel value="LB Pursuing"/>
+                                            </div>
+
+
+                                            <div class="p-col-4">
+                                                <h:outputText id="lb-pursuing-start-ot"
+                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landbankPursuingStart) 
+                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.landbankPursuingStart) 
+                                                                       : ''}" 
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+
+
+                                                <p:datePicker id="lb-purusing-start-cal"
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.landbankPursuingStart}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              hideOnDateTimeSelect="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
+                                                              showTime="false"
+                                                              yearNavigator="true"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                </p:datePicker>
+                                            </div>
+                                            
+                                      
+                                            <div class="p-col-4">
+                                                <h:outputText id="lb-pursuing-stop-ot"
+                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landbankPursuingStop) 
+                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.landbankPursuingStop) 
+                                                                       : ''}" 
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+
+
+                                                <p:datePicker id="lb-purusing-stop-cal"
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.landbankPursuingStop}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              hideOnDateTimeSelect="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
+                                                              showTime="false"
+                                                              yearNavigator="true"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                </p:datePicker>
+                                            </div>
+
+                                            <div class="p-col-4 restrict-data-field-label-inline">
+                                                <h:outputLabel value="LB Owned" />
+                                            </div>
+
+
+                                            <div class="p-col-4">
+                                                <h:outputText id="lb-owned-start-ot"
+                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landbankOwnedStart) 
+                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.landbankOwnedStart) 
+                                                                       : ''}" 
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+
+
+                                                <p:datePicker id="lb-owned-start-cal"
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.landbankOwnedStart}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              hideOnDateTimeSelect="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
+                                                              showTime="false"
+                                                              yearNavigator="true"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                </p:datePicker>
+                                            </div>
+                                    
+
+                                            
+                                            
+
+                                            
+                                            <div class="p-col-4">
+                                                <h:outputText id="lb-owned-stop-ot"
+                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landbankOwnedStop) 
+                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.landbankOwnedStop) 
+                                                                       : ''}" 
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+
+
+                                                <p:datePicker id="lb-owned-stop-cal"
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.landbankOwnedStop}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              hideOnDateTimeSelect="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
+                                                              showTime="false"
+                                                              yearNavigator="true"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                </p:datePicker>
+                                            </div>
+                                            
+                                            <div class="p-col-4 restrict-data-field-label-inline">
+                                                <h:outputText value="LB Prospect Notes" />
+                                            </div>
+                                            <div class="p-col-8 restrict-data-field-value-inline">
+                                                <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.landbankProspectNotes}"
+                                                              escape="false"
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+                                                
+                                                <p:inputTextarea    value="#{propertyProfileBB.currentProperty.parcelInfo.landbankProspectNotes}"
+                                                                    cols="20"
+                                                                    rows="5"
+                                                                    rendered="#{propertyProfileBB.currentParcelInfoEditMode}"/>
+                                            </div>
+                                            
+                                            <div class="p-col-4 restrict-data-field-label-inline">
+                                                <h:outputText value="LB Candidate Notes" />
+                                            </div>
+                                            <div class="p-col-8 restrict-data-field-vale-inline">
+                                                <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.landbankAcqCandidateNotes}"
+                                                              escape="false"
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+                                                
+                                                <p:inputTextarea    value="#{propertyProfileBB.currentProperty.parcelInfo.landbankAcqCandidateNotes}"
+                                                                    cols="20"
+                                                                    rows="5"
+                                                                    rendered="#{propertyProfileBB.currentParcelInfoEditMode}"/>
+                                            </div>
+                                            
+                                            <div class="p-col-4 restrict-data-field-label-inline">
+                                                <h:outputText value="LB Pursuing Notes" />
+                                            </div>
+                                            <div class="p-col-8 restrict-data-field-value-inline">
+                                                <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.landbankPursuingNotes}"
+                                                              escape="false"
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+                                                
+                                                <p:inputTextarea    value="#{propertyProfileBB.currentProperty.parcelInfo.landbankPursuingNotes}"
+                                                                    cols="20"
+                                                                    rows="5"
+                                                                    rendered="#{propertyProfileBB.currentParcelInfoEditMode}"/>
+                                            </div>
+                                            
+                                            <div class="p-col-4 restrict-data-field-label-inline">
+                                                <h:outputText value="LB Owned Notes" />
+                                            </div>
+                                            <div class="p-col-8 restrict-data-field-value-inline">
+                                                <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.landbankOwnedNotes}"
+                                                              escape="false"
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
+                                                
+                                                <p:inputTextarea    value="#{propertyProfileBB.currentProperty.parcelInfo.landbankOwnedNotes}"
+                                                                    cols="20"
+                                                                    rows="5"
+                                                                    rendered="#{propertyProfileBB.currentParcelInfoEditMode}"/>
+                                            </div>
+                                            
                                         </div>
-
-
                                     </h:form>
                                 </p:panel>
 
@@ -687,9 +986,11 @@
                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                                                value="Add new note"  
                                                                icon="fa fa-sticky-note-o"
-                                                               actionListener="#{propertyProfileBB.onNoteInitButtonChange}"
+                                                               actionListener="#{propertyProfileBB.onParcelNoteAppendInit}"
+                                                               disabled="false"
                                                                oncomplete="PF('propinfo-notes-dialog-var').show()"
                                                                update="propinfo-note-create-form" />
+                                        </div>
                                             <p:spacer height="5px" />
                                             <div    id="propinf-ot-notes-div"
                                                     class="data_field"
@@ -703,7 +1004,6 @@
                                                                 value="#{propertyProfileBB.currentProperty.notes}"
                                                                 escape="false"/>
                                             </div>
-                                        </div>
 
                                     </h:form>
                                 </p:panel>
@@ -1054,7 +1354,7 @@
                                             widgetVar="prop-events-panel-var"
                                             collapsed="false"
                                             header="Events"
-                                            rendered="true">
+                                            rendered="false">
 
                                     <h:form id="prop-events-panel-form">
 
@@ -1413,10 +1713,12 @@
 
 
                         <p:dialog   id="propinfo-notes-dialog"
-                                    height="300" width="750"
+                                    height="450" width="750"
                                     widgetVar="propinfo-notes-dialog-var"
                                     closable="true"
-                                    header="Note Builder"
+                                    dynamic="true"
+                                    closeOnEscape="true"
+                                    header="Append note to Property with parcelkey #{propertyProfileBB.currentProperty.parcelKey}"
                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                     >
 
@@ -1427,38 +1729,35 @@
                                             warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                                 </h:messages>
 
-                                <h:panelGrid columns="1"
-                                             columnClasses="gridTd, gridTd">
 
-                                    <h:panelGroup>
-                                        <h:outputText styleClass="ui-label" value="Note text: "/>
-                                        <p:textEditor   id="propinfo-notes-editor"
-                                                        value="#{propertyProfileBB.formNoteText}"
-                                                        secure="false"
-                                                        required="false"
-                                                        height="200"/>
+                                <h:outputText styleClass="ui-label" value="Note text: (Your name and date are automatically included) "/>
+                                <p:spacer height="5px" />
+                                <p:textEditor   id="propinfo-notes-editor"
+                                                value="#{propertyProfileBB.formNoteText}"
+                                                secure="false"
+                                                required="false"
+                                                height="200"/>
 
 
-                                        <p:spacer height="5px" />
-                                        <p:commandButton    id="propinfo-updatemetadata-button-cancel"
-                                                            ajax="true"  tabindex="27"
-                                                            value="Cancel"
-                                                            icon="fa fa-stop"
-                                                            immediate="true"
-                                                            onclick="PF('propinfo-notes-dialog-var').hide()"
-                                                            />
+                                <p:spacer height="5px" />
+                                <p:commandButton    id="propinfo-updatemetadata-button-cancel"
+                                                    ajax="true"  tabindex="27"
+                                                    value="Cancel"
+                                                    icon="fa fa-stop"
+                                                    immediate="true"
+                                                    onclick="PF('propinfo-notes-dialog-var').hide()"
+                                                    />
 
-                                        <p:commandButton   id="propinfo-dialog-notes-button-addnote"
-                                                           ajax="true" 
-                                                           actionListener="#{propertyProfileBB.onNoteCommitButtonChange}"
-                                                           oncomplete="PF('propinfo-notes-dialog-var').hide()"
-                                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
-                                                           value="Attach Note"  
-                                                           styleClass="inline-button"
-                                                           icon="fa fa-sticky-note-o"
-                                                           update="propinfo-notes-form"/>
-                                    </h:panelGroup>
-                                </h:panelGrid>
+                                <p:commandButton   id="propinfo-dialog-notes-button-addnote"
+                                                   ajax="true" 
+                                                   actionListener="#{propertyProfileBB.onParcelNoteAppendCommit}"
+                                                   oncomplete="PF('propinfo-notes-dialog-var').hide()"
+                                                   rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"                                                                               
+                                                   value="Attach Note"  
+                                                   styleClass="inline-button"
+                                                   icon="fa fa-sticky-note-o"
+                                                   update="propinfo-notes-form
+                                                   property-messages-global"/>
                             </h:form>
                         </p:dialog>
                     </div>

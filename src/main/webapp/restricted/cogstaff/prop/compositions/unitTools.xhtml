@@ -262,6 +262,9 @@
                     </h:form>
                 </p:panel>
 
+                
+                
+
                 <p:panel    id="unit-persons-panel"
                             toggleable="true"
                             widgetVar="unit-persons-panel-var"
@@ -269,48 +272,62 @@
                             header="Persons">
                     <h:form id="unit-persons-form" >
 
-                        <p:dataTable
-                            id="unit-persons-table"
-                            var="per"
-                            value="#{propertyProfileBB.currentPropertyUnit.humanLinkList}"
-                            rowKey="#{per.humanID}"
-                            tableStyleClass="primeDataTable"
-                            rowExpandMode="single"
-                            resizableColumns="true"
-                            expandedRow="false"
-                            widgetVar="personSelectListTable">
+                        <p:commandButton   id="unit-persons-manage-button"
+                                           ajax="true"
+                                           actionListener="#{personBB.onSelectAndLinkPersonsInit(propertyProfileBB.currentPropertyUnit)}"
+                                           oncomplete="PF('human-search-dialog-var').show()"
+                                           disabled="#{!propertyProfileBB.currentPropertyUnit.active}"
+                                           rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
+                                           value="Manage unit-person links"
+                                           update=" human-search-dialog
+                                           search-query-form
+                                           pers-selected-form
+                                           hlh-humlist-form"
+                                           icon="fa fa-user-plus"
+                                           >
+                            <f:param name="person-list-component-to-update"
+                                     value="unit-persons-form" />
+                            <p:ajax listener="#{eventBB.onManageEventPersonButtonChange}" />
+                        </p:commandButton>
 
-                            <p:column width="10%">
-                                <f:facet name="header">
-                                    <h:outputText value="ID" />
-                                </f:facet>
-                                <h:outputText value="#{per.humanID}"/>
+                        <p:spacer height="5px" />
+
+                        <p:dataTable id="unit-persons-table"
+                                     var="human"
+                                     value="#{propertyProfileBB.managedUnitHumanLinkList}"
+                                     tableStyleClass="primeDataTable"
+                                     rowKey="#{human.humanID}"
+                                     >
+
+                            <p:column headerText="Name"
+                                      width="85%"
+                                      styleClass="centeredColumnContent">
+                                <h:outputText value="#{human.name} is #{human.linkedObjectRole.title} this event"/>
+                                <p:spacer height="3px" />
+                                <h:outputText value="Link timestamp: #{eventBB.getPrettyDate(human.linkCreatedTS)}"/>
+                                <p:spacer height="3px" />
+                                <h:outputText value="(Human ID: #{human.humanID}; Link ID: #{human.linkID})"/>
+
                             </p:column>
 
-                            <p:column width="40%" sortBy="#{per.name}"
-                                      filterBy="#{per.name}">
-                                <f:facet name="header">
-                                    <h:outputText value="Name" />
-                                </f:facet>
-                                <h:outputText value="#{per.name}"/>
-                            </p:column>
+                            <p:column headerText="Actions"
+                                      width="15%"
+                                      styleClass="centeredColumnContent">
+                                <p:commandLink      id="unit-person-exploreperson-button"
+                                                    ajax="true"
+                                                    style="color:blue;"
+                                                    action="#{personBB.onHumanViewLinkClick(human)}"
+                                                    value="view"
+                                                    update="person-info-form
+                                                            person-profile-addresses-form
+                                                            person-profile-phones-form
+                                                            person-profile-emails-form
+                                                            person-links-form
+                                                            person-profile-dialog
+                                                            persontools-growl-form"
+                                                    oncomplete="PF('person-profile-dialog-var').show();"
+                                                    />
 
-                            <p:column width="10%" >
-                                <f:facet name="header">
-                                    <h:outputText value="Actions" />
-                                </f:facet>
-                                <p:commandLink  id="person-view-commandlink"
-                                                ajax="true" 
-                                                value="view"
-                                                actionListener="#{personBB.onHumanLinkEditInitButtonChange(per, propertyProfileBB.currentPropertyUnit)}"
-                                                oncomplete="PF('person-profile-dialog-var').show();"
-                                                update="person-info-form
-                                                person-profile-addresses-form
-                                                person-profile-phones-form
-                                                person-profile-emails-form
-                                                person-links-form
-                                                person-profile-dialog"
-                                                />
                             </p:column>
                         </p:dataTable>
                     </h:form>
@@ -444,7 +461,7 @@
                                 value="Save Note"
                                 actionListener="#{propertyProfileBB.onUnitNoteAddCommitButtonChange}"
                                 icon="fa fa-save"
-                                oncomplete="PF('unit-note-dialog').hide()"
+                                oncomplete="PF('unit-note-dialog-var').hide()"
                                 update="unit-notes-form
                                 units-growl-form"/>
         </h:form>

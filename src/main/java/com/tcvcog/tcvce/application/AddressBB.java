@@ -105,9 +105,11 @@ public  class   AddressBB
      */
     private void setupCSZQuery(){
         SearchCoordinator srchc = getSearchCoordinator();
-        qcszEnumList = srchc.buildQueryMailingCityStateZipList(getSessionBean().getSessUser().getMyCredential());
-        if(qcszEnumList != null && !qcszEnumList.isEmpty()){
-            selectedCSZQuery = qcszEnumList.get(0);
+        if(srchc != null){
+            qcszEnumList = srchc.buildQueryMailingCityStateZipList(getSessionBean().getSessUser().getMyCredential());
+            if(qcszEnumList != null && !qcszEnumList.isEmpty()){
+                selectedCSZQuery = qcszEnumList.get(0);
+            }
         }
     }
     

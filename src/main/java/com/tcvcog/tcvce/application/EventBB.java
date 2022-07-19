@@ -94,6 +94,7 @@ public class EventBB extends BackingBeanUtils implements Serializable {
                 System.out.println("eventBB reached universal case in updateEventHolder()--do something about this maybe?");
                 break;
         }
+        System.out.println("EventBB.loadSessionEventHolder page domain | " + pageDomain.getTitle());
     }
     
     /**
@@ -126,7 +127,7 @@ public class EventBB extends BackingBeanUtils implements Serializable {
         if(currentEvent != null){
             try {
                 currentEvent = ec.getEvent(currentEvent.getEventID());
-                System.out.println("eventBB.refreshCurrentEvent: Refreshed Event");
+                System.out.println("eventBB.refreshCurrentEvent: Refreshed Event ID " + currentEvent.getEventID());
             } catch (IntegrationException ex) {
                 System.out.println(ex);
             }
@@ -319,7 +320,28 @@ public class EventBB extends BackingBeanUtils implements Serializable {
     //
     // New event stuff
     //
+   /**
+     * Listener to start the whole event creation process!
+     * @param holder
+     */
+    public void onEventAddInit(IFace_EventHolder holder) {
+        currentEventHolder = holder;
+        System.out.println("EventBB.onEventAddInit | event holder ID "+ currentEventHolder.getBObID() + " domain: " + currentEventHolder.getEventDomain().getTitle());
+        // Set potentialEvent to an empty event
+        EventCoordinator ec = getEventCoordinator();
 
+        try {
+            skeletonEvent = ec.initEvent(currentEventHolder, null);
+        } catch (BObStatusException | EventException ex) {
+            System.out.println("Failed to initialize new event:" + ex);
+            return;
+        }
+
+        // Set fields not included in potentialEvent to default values
+        setUpdateFieldsOnCategoryChange(true);
+        setSkeletonType(null);
+        setSkeletonDuration(10);
+    }
     /**
      * Primary listener for creating a new event
      */
@@ -341,7 +363,7 @@ public class EventBB extends BackingBeanUtils implements Serializable {
 
             if(evlist != null && !evlist.isEmpty()){
                 for(EventCnF ev: evlist){
-                    
+                    currentEvent = ev;
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully logged event with an ID of  " + ev.getEventID(), ""));
 
@@ -391,30 +413,7 @@ public class EventBB extends BackingBeanUtils implements Serializable {
         }
     }
 
-    /**
-     * Listener to start the whole event creation process!
-     * @param holder
-     */
-    public void onEventAddInit(IFace_EventHolder holder) {
-        currentEventHolder = holder;
-        // Set potentialEvent to an empty event
-        EventCoordinator ec = getEventCoordinator();
-
-        try {
-            skeletonEvent = ec.initEvent(currentEventHolder, null);
-        } catch (BObStatusException | EventException ex) {
-            System.out.println("Failed to initialize new event:" + ex);
-            return;
-        }
-
-        // ...with this domain
-        skeletonEvent.setDomain(pageDomain);
-
-        // Set fields not included in potentialEvent to default values
-        setUpdateFieldsOnCategoryChange(true);
-        setSkeletonType(null);
-        setSkeletonDuration(0);
-    }
+ 
 
 
     /**

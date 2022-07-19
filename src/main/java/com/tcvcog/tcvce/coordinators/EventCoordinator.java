@@ -451,11 +451,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return
      * @throws IntegrationException 
      */
-    private List<EventCnF> addEvent_processStack(List<EventCnF> qu) throws IntegrationException, BObStatusException{
+    private List<EventCnF> addEvent_processStack(List<EventCnF> qu) throws IntegrationException, BObStatusException, EventException{
         EventIntegrator ei = getEventIntegrator();
         List<EventCnF> doneList = new ArrayList<>();
         if(qu != null && !qu.isEmpty()){
             for(EventCnF ev: qu){
+                auditEvent(ev);
                 int id = ei.insertEvent(ev);
                 if(id != 0){
                     doneList.add(getEvent(id));
@@ -464,10 +465,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 }
             }
         }
-        
         return doneList;
-        
     }
+    
+    
+    
     
      /**
      * Utility for downcasting a list of CECasePropertyUnitDataHeavy 
@@ -513,17 +515,16 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         // Declare this event as either in the CE or Occ domain with 
         // our hacky little enum thingy
-            if(ev.getCeCaseID() !=0 && ev.getOccPeriodID() != 0 ){
-                throw new EventException("EventCnF cannot have a non-zero CECase and OccPeriod ID");
-            }
-            if(ev.getCeCaseID() != 0){
+          if(ev.getCeCaseID() != 0){
                 ev.setDomain(DomainEnum.CODE_ENFORCEMENT);
             } else if(ev.getOccPeriodID() != 0){
                 ev.setDomain(DomainEnum.OCCUPANCY);
             } else {
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
-       
+//        
+//        auditEvent(ev);
+//       
         ev.setHumanLinkList(pc.getHumanLinkList(ev));
         
         return ev;
@@ -545,6 +546,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 throw new EventException("Events with end times must not have an end time before start time");
             }
         }
+         if(ev.getCeCaseID() !=0 && ev.getOccPeriodID() != 0 ){
+                throw new EventException("EventCnF cannot have a non-zero CECase and OccPeriod ID");
+            }
+          
+        
     }
     
     
@@ -728,19 +734,16 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 op = (OccPeriod) erg;
                 e.setOccPeriodID(op.getPeriodID());
                 e.setDomain(DomainEnum.OCCUPANCY);
+                System.out.println("EventCoordinator.initEvent | Event is getting occ period set to " + e.getOccPeriodID());
             }
         }
-        
         if(ec != null){
-            
             e.setCategory(ec);
             e.setTimeStart(LocalDateTime.now());
             e.setTimeEnd(e.getTimeStart().plusMinutes(ec.getDefaultDurationMins()));
         }
-        
         e.setActive(true);
         e.setHidden(false);
-        
         return e;
     }
     

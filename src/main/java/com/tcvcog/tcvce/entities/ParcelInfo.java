@@ -82,6 +82,30 @@ public class ParcelInfo
     protected int taxYear;
     
     protected String notes;
+    
+    // LAND BANK FIELDS
+    private User landbankProspectStartby_userID;
+    private User landbankProspectStopby_userID;
+    private User landbankAcqCandidateStartby_userID;
+    private User landbankAcqCandidateStopby_userID;
+    private User landbankPursuingStartby_userID;
+    private User landbankPursuingStopby_userID;
+    private User landbankOwnedStartby_userID;
+    private User landbankOwnedStopby_user;
+    
+    private LocalDate landbankProspectStart;
+    private LocalDate landbankProspectStop;
+    private LocalDate landbankAcqCandidateStart;
+    private LocalDate landbankAcqCandidateStop;
+    private LocalDate landbankPursuingStart;
+    private LocalDate landbankPursuingStop;
+    private LocalDate landbankOwnedStart;
+    private LocalDate landbankOwnedStop;
+    
+    private String landbankProspectNotes;
+    private String landbankAcqCandidateNotes;
+    private String landbankPursuingNotes;
+    private String landbankOwnedNotes;
 
     @Override
     public int hashCode() {
@@ -649,6 +673,286 @@ public class ParcelInfo
      */
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    /**
+     * @return the landbankProspectStartby_userID
+     */
+    public User getLandbankProspectStartby_userID() {
+        return landbankProspectStartby_userID;
+    }
+
+    /**
+     * @return the landbankProspectStopby_userID
+     */
+    public User getLandbankProspectStopby_userID() {
+        return landbankProspectStopby_userID;
+    }
+
+    /**
+     * @return the landbankAcqCandidateStartby_userID
+     */
+    public User getLandbankAcqCandidateStartby_userID() {
+        return landbankAcqCandidateStartby_userID;
+    }
+
+    /**
+     * @return the landbankAcqCandidateStopby_userID
+     */
+    public User getLandbankAcqCandidateStopby_userID() {
+        return landbankAcqCandidateStopby_userID;
+    }
+
+    /**
+     * @return the landbankPursuingStartby_userID
+     */
+    public User getLandbankPursuingStartby_userID() {
+        return landbankPursuingStartby_userID;
+    }
+
+    /**
+     * @return the landbankPursuingStopby_userID
+     */
+    public User getLandbankPursuingStopby_userID() {
+        return landbankPursuingStopby_userID;
+    }
+
+    /**
+     * @return the landbankOwnedStartby_userID
+     */
+    public User getLandbankOwnedStartby_userID() {
+        return landbankOwnedStartby_userID;
+    }
+
+    /**
+     * @return the landbankOwnedStopby_user
+     */
+    public User getLandbankOwnedStopby_user() {
+        return landbankOwnedStopby_user;
+    }
+
+    /**
+     * @return the landbankProspectStart
+     */
+    public LocalDate getLandbankProspectStart() {
+        return landbankProspectStart;
+    }
+
+    /**
+     * @return the landbankProspectStop
+     */
+    public LocalDate getLandbankProspectStop() {
+        return landbankProspectStop;
+    }
+
+    /**
+     * @return the landbankAcqCandidateStart
+     */
+    public LocalDate getLandbankAcqCandidateStart() {
+        return landbankAcqCandidateStart;
+    }
+
+    /**
+     * @return the landbankAcqCandidateStop
+     */
+    public LocalDate getLandbankAcqCandidateStop() {
+        return landbankAcqCandidateStop;
+    }
+
+    /**
+     * @return the landbankPursuingStart
+     */
+    public LocalDate getLandbankPursuingStart() {
+        return landbankPursuingStart;
+    }
+
+    /**
+     * @return the landbankPursuingStop
+     */
+    public LocalDate getLandbankPursuingStop() {
+        return landbankPursuingStop;
+    }
+
+    /**
+     * @return the landbankOwnedStart
+     */
+    public LocalDate getLandbankOwnedStart() {
+        return landbankOwnedStart;
+    }
+
+    /**
+     * @return the landbankOwnedStop
+     */
+    public LocalDate getLandbankOwnedStop() {
+        return landbankOwnedStop;
+    }
+
+    /**
+     * @return the landbankProspectNotes
+     */
+    public String getLandbankProspectNotes() {
+        return landbankProspectNotes;
+    }
+
+    /**
+     * @return the landbankAcqCandidateNotes
+     */
+    public String getLandbankAcqCandidateNotes() {
+        return landbankAcqCandidateNotes;
+    }
+
+    /**
+     * @return the landbankPursuingNotes
+     */
+    public String getLandbankPursuingNotes() {
+        return landbankPursuingNotes;
+    }
+
+    /**
+     * @return the landbankOwnedNotes
+     */
+    public String getLandbankOwnedNotes() {
+        return landbankOwnedNotes;
+    }
+
+    /**
+     * @param landbankProspectStartby_userID the landbankProspectStartby_userID to set
+     */
+    public void setLandbankProspectStartby_userID(User landbankProspectStartby_userID) {
+        this.landbankProspectStartby_userID = landbankProspectStartby_userID;
+    }
+
+    /**
+     * @param landbankProspectStopby_userID the landbankProspectStopby_userID to set
+     */
+    public void setLandbankProspectStopby_userID(User landbankProspectStopby_userID) {
+        this.landbankProspectStopby_userID = landbankProspectStopby_userID;
+    }
+
+    /**
+     * @param landbankAcqCandidateStartby_userID the landbankAcqCandidateStartby_userID to set
+     */
+    public void setLandbankAcqCandidateStartby_userID(User landbankAcqCandidateStartby_userID) {
+        this.landbankAcqCandidateStartby_userID = landbankAcqCandidateStartby_userID;
+    }
+
+    /**
+     * @param landbankAcqCandidateStopby_userID the landbankAcqCandidateStopby_userID to set
+     */
+    public void setLandbankAcqCandidateStopby_userID(User landbankAcqCandidateStopby_userID) {
+        this.landbankAcqCandidateStopby_userID = landbankAcqCandidateStopby_userID;
+    }
+
+    /**
+     * @param landbankPursuingStartby_userID the landbankPursuingStartby_userID to set
+     */
+    public void setLandbankPursuingStartby_userID(User landbankPursuingStartby_userID) {
+        this.landbankPursuingStartby_userID = landbankPursuingStartby_userID;
+    }
+
+    /**
+     * @param landbankPursuingStopby_userID the landbankPursuingStopby_userID to set
+     */
+    public void setLandbankPursuingStopby_userID(User landbankPursuingStopby_userID) {
+        this.landbankPursuingStopby_userID = landbankPursuingStopby_userID;
+    }
+
+    /**
+     * @param landbankOwnedStartby_userID the landbankOwnedStartby_userID to set
+     */
+    public void setLandbankOwnedStartby_userID(User landbankOwnedStartby_userID) {
+        this.landbankOwnedStartby_userID = landbankOwnedStartby_userID;
+    }
+
+    /**
+     * @param landbankOwnedStopby_user the landbankOwnedStopby_user to set
+     */
+    public void setLandbankOwnedStopby_user(User landbankOwnedStopby_user) {
+        this.landbankOwnedStopby_user = landbankOwnedStopby_user;
+    }
+
+    /**
+     * @param landbankProspectStart the landbankProspectStart to set
+     */
+    public void setLandbankProspectStart(LocalDate landbankProspectStart) {
+        this.landbankProspectStart = landbankProspectStart;
+    }
+
+    /**
+     * @param landbankProspectStop the landbankProspectStop to set
+     */
+    public void setLandbankProspectStop(LocalDate landbankProspectStop) {
+        this.landbankProspectStop = landbankProspectStop;
+    }
+
+    /**
+     * @param landbankAcqCandidateStart the landbankAcqCandidateStart to set
+     */
+    public void setLandbankAcqCandidateStart(LocalDate landbankAcqCandidateStart) {
+        this.landbankAcqCandidateStart = landbankAcqCandidateStart;
+    }
+
+    /**
+     * @param landbankAcqCandidateStop the landbankAcqCandidateStop to set
+     */
+    public void setLandbankAcqCandidateStop(LocalDate landbankAcqCandidateStop) {
+        this.landbankAcqCandidateStop = landbankAcqCandidateStop;
+    }
+
+    /**
+     * @param landbankPursuingStart the landbankPursuingStart to set
+     */
+    public void setLandbankPursuingStart(LocalDate landbankPursuingStart) {
+        this.landbankPursuingStart = landbankPursuingStart;
+    }
+
+    /**
+     * @param landbankPursuingStop the landbankPursuingStop to set
+     */
+    public void setLandbankPursuingStop(LocalDate landbankPursuingStop) {
+        this.landbankPursuingStop = landbankPursuingStop;
+    }
+
+    /**
+     * @param landbankOwnedStart the landbankOwnedStart to set
+     */
+    public void setLandbankOwnedStart(LocalDate landbankOwnedStart) {
+        this.landbankOwnedStart = landbankOwnedStart;
+    }
+
+    /**
+     * @param landbankOwnedStop the landbankOwnedStop to set
+     */
+    public void setLandbankOwnedStop(LocalDate landbankOwnedStop) {
+        this.landbankOwnedStop = landbankOwnedStop;
+    }
+
+    /**
+     * @param landbankProspectNotes the landbankProspectNotes to set
+     */
+    public void setLandbankProspectNotes(String landbankProspectNotes) {
+        this.landbankProspectNotes = landbankProspectNotes;
+    }
+
+    /**
+     * @param landbankAcqCandidateNotes the landbankAcqCandidateNotes to set
+     */
+    public void setLandbankAcqCandidateNotes(String landbankAcqCandidateNotes) {
+        this.landbankAcqCandidateNotes = landbankAcqCandidateNotes;
+    }
+
+    /**
+     * @param landbankPursuingNotes the landbankPursuingNotes to set
+     */
+    public void setLandbankPursuingNotes(String landbankPursuingNotes) {
+        this.landbankPursuingNotes = landbankPursuingNotes;
+    }
+
+    /**
+     * @param landbankOwnedNotes the landbankOwnedNotes to set
+     */
+    public void setLandbankOwnedNotes(String landbankOwnedNotes) {
+        this.landbankOwnedNotes = landbankOwnedNotes;
     }
 
    

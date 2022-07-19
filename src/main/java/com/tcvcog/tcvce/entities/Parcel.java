@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,11 +27,13 @@ import java.util.List;
 public  class Parcel 
         extends TrackedEntity
         implements IFace_keyIdentified,
-                   IFace_noteHolder{
+                   IFace_noteHolder,
+                   IFace_EventHolder{
         
     final static String TABLE_NAME = "parcel";
     final static String PKFIELD = "parcelkey";
     final static String HF_NAME = "Parcel";
+    final static DomainEnum PARCEL_DOMAIN = DomainEnum.PARCEL;
     
     protected int parcelKey;
     protected String countyParcelID;
@@ -42,6 +45,7 @@ public  class Parcel
     protected ParcelInfo parcelInfo;
     protected int broadviewPhotoID;
     
+    protected List<EventCnF> eventList;
     
     public Parcel(){
         
@@ -242,6 +246,31 @@ public  class Parcel
      */
     public void setBroadviewPhotoID(int broadviewPhotoID) {
         this.broadviewPhotoID = broadviewPhotoID;
+    }
+
+    @Override
+    public DomainEnum getEventDomain() {
+        return PARCEL_DOMAIN;
+    }
+
+    @Override
+    public void setEventList(List<EventCnF> evList) {
+        eventList = evList;
+    }
+
+    @Override
+    public List<EventCnF> getEventList(ViewOptionsActiveHiddenListsEnum evViewOpt) {
+        return eventList;
+    }
+
+    @Override
+    public List<EventCnF> getEventList() {
+        return eventList;
+    }
+
+    @Override
+    public int getBObID() {
+        return parcelKey;
     }
 
     

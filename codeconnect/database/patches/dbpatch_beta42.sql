@@ -1,4 +1,31 @@
 -- PATCH 42
+
+
+ALTER TABLE public.parcelinfo ADD COLUMN landbankprospectstart TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.parcelinfo ADD COLUMN landbankprospectstop TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.parcelinfo ADD COLUMN landbankprospectnotes TEXT;
+ALTER TABLE public.parcelinfo ADD COLUMN landbankacqcandidatestart TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.parcelinfo ADD COLUMN landbankacqcandidatestop TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.parcelinfo ADD COLUMN landbankacqcandidatenotes TEXT;
+ALTER TABLE public.parcelinfo ADD COLUMN landbankpursuingstart TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.parcelinfo ADD COLUMN landbankpursuingstop TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.parcelinfo ADD COLUMN landbankpursuingnotes TEXT;
+ALTER TABLE public.parcelinfo ADD COLUMN landbankownedstart TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.parcelinfo ADD COLUMN landbankownedstop TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.parcelinfo ADD COLUMN landbankownednotes TEXT;
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- drop these columns and check integration methods/objects for compat
 -- DETAIL:  drop cascades to constraint codesetelement_feeid_fk on table codesetelement
 -- drop cascades to constraint muniprofilefee__feeid_fk on table muniprofilefee

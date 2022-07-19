@@ -26,6 +26,7 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import com.tcvcog.tcvce.util.Constants;
+import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -519,18 +520,19 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    pdh.setCeCaseList(sc.runQuery(qcse).getResults());
 
                    // Property info cases
-                   List<Integer> infocaseIDList = cc.getPropertyInfoCaseIDList(pdh);
+                   // DISABLED PROPERTY INFO CASES JULY 2022
+//                   List<Integer> infocaseIDList = cc.getPropertyInfoCaseIDList(pdh);
                    
-                   pdh.setPropInfoCaseList(cc.cecase_assembleCECaseDataHeavyList(cc.getCaseListFromIDList(infocaseIDList), ua));
+//                   pdh.setPropInfoCaseList(cc.cecase_assembleCECaseDataHeavyList(cc.getCaseListFromIDList(infocaseIDList), ua));
 
                    // check list and see if it's emtpy; 
                    if (pdh.getPropInfoCaseList() == null) {
                        pdh.setPropInfoCaseList(new ArrayList<>());
                    }
 
-                   if (pdh.getPropInfoCaseList().isEmpty()) {
-                       pdh.getPropInfoCaseList().add(createPropertyInfoCase(pdh, ua));
-                   }
+//                   if (pdh.getPropInfoCaseList().isEmpty()) {
+//                       pdh.getPropInfoCaseList().add(createPropertyInfoCase(pdh, ua));
+//                   }
 
                    // UnitDataHeavy list
                    // remember that units data heavy contain all our occ periods, inspections, and PropertyUnitChangeOrders
@@ -850,6 +852,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      * @param p
      * @param ua
      * @return
+     * @deprecated replaced by events linked directly to parcels as of JULY 2022
      * @throws com.tcvcog.tcvce.domain.SearchException
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
@@ -928,11 +931,36 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         pi.updateParcel(pcl);
 
     }
+    
+    /**
+     * Builds a note and appends it to the passed in parcel 
+     * @param pcl
+     * @param noteText
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateParcelNotes(Parcel pcl, String noteText, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(pcl == null || noteText == null || ua == null){
+            throw new BObStatusException("Cannot append note to null parcel, or with null notes or null user");
+        }
+        PropertyIntegrator pi = getPropertyIntegrator();
+        SystemCoordinator sc = getSystemCoordinator();
+        
+        MessageBuilderParams mpb = new MessageBuilderParams(pcl.getNotes(), "PARCEL NOTE", null, noteText, ua, null);
+        pcl.setNotes(sc.appendNoteBlock(mpb));
+        pi.updateParcelNotes(pcl);
+        System.out.println("PropertyCoordinator.updateParcelNotes | finished appending: total parcel notes are " + pcl.getNotes());
+        
+        
+    }
 
     /**
      * Updates a parcel's broadview photo for reporting and profile
-     * @param pcl
+     * @param pdh
      * @param ua 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
      */
     public void updatePropertyDataHeavyBroadviewPhoto(PropertyDataHeavy pdh, UserAuthorized ua) throws BObStatusException, IntegrationException {
         PropertyIntegrator pi = getPropertyIntegrator();

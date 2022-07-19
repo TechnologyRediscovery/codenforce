@@ -8,39 +8,58 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.coordinators.EventCoordinator;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
+import com.tcvcog.tcvce.entities.DomainEnum;
 import com.tcvcog.tcvce.entities.EventCnF;
-import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
+import com.tcvcog.tcvce.entities.IFace_EventHolder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
  * Attempt at a new approach to shared list services
  * @author sylvia
  */
-public class CECaseEventListBB extends BackingBeanUtils{
+public class EventListRequestScopedBB extends BackingBeanUtils{
 
     private List<EventCnF> managedEventList;
-    private CECaseDataHeavy currentCase;
+    private IFace_EventHolder currentEvHolder;
     private boolean includeDeactivatedEvents;
     
     /**
      * Creates a new instance of CECaseEventListBB
      */
-    public CECaseEventListBB() {
+    public EventListRequestScopedBB() {
     }
     
     @PostConstruct
     public void initBean(){
         EventCoordinator ec = getEventCoordinator();
-        System.out.println("CECaseEventListBB.initBean");
+        System.out.println("EventListRequestScopedBB.initBean");
         
-        currentCase = getSessionBean().getSessCECase();
+        DomainEnum domain = getSessionBean().getSessEventsPageEventDomainRequest();
         try {
-            managedEventList = ec.getEventList(currentCase);
+        if(domain != null){
+            switch(domain){
+                case CODE_ENFORCEMENT:
+                    managedEventList = ec.getEventList(getSessionBean().getSessCECase());
+                    currentEvHolder = getSessionBean().getSessOccPeriod();
+                    break;
+                case OCCUPANCY:
+                    managedEventList = ec.getEventList(getSessionBean().getSessOccPeriod());
+                    currentEvHolder = getSessionBean().getSessOccPeriod();
+                    break;
+                case PARCEL:
+                    managedEventList = ec.getEventList(getSessionBean().getSessProperty());
+                    currentEvHolder = getSessionBean().getSessProperty();
+                    break;
+                case UNIVERSAL:
+                    managedEventList = new ArrayList<>();
+                    break;
+                default: 
+                    managedEventList = new ArrayList<>();
+            }
+        }
+            
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }
@@ -52,7 +71,7 @@ public class CECaseEventListBB extends BackingBeanUtils{
 //        if(getCurrentCase() != null){
 //            if(evlist != null){
 //                setManagedEventList(evlist);
-//                System.out.println("CECaseEventListBB.getManagedEventList | fresh event list found on sessionbean of size: " + evlist.size());
+//                System.out.println("EventListRequestScopedBB.getManagedEventList | fresh event list found on sessionbean of size: " + evlist.size());
 //                getSessionBean().setSessEventListForRefreshUptake(null);
 //            } else {
 //                setManagedEventList(getCurrentCase().getEventList());
@@ -62,10 +81,10 @@ public class CECaseEventListBB extends BackingBeanUtils{
 //                // something's wrong and we just need a list
 //                setManagedEventList(new ArrayList<>());
 //            }
-            System.out.println("CECaseEventListBB.getManagedEventList | size BEFORE weeding: " + managedEventList.size() );
+            System.out.println("EventListRequestScopedBB.getManagedEventList | size BEFORE weeding: " + managedEventList.size() );
             configureManagedEventList();
 //        }
-        System.out.println("CECaseEventListBB.getManagedEventList | size AFTER weeding: " + managedEventList.size() );
+        System.out.println("EventListRequestScopedBB.getManagedEventList | size AFTER weeding: " + managedEventList.size() );
     }
     
     /**
@@ -101,21 +120,7 @@ public class CECaseEventListBB extends BackingBeanUtils{
         this.managedEventList = managedEventList;
     }
 
-    /**
-     * @return the currentCase
-     */
-    public CECaseDataHeavy getCurrentCase() {
-        return currentCase;
-    }
-
-
-    /**
-     * @param currentCase the currentCase to set
-     */
-    public void setCurrentCase(CECaseDataHeavy currentCase) {
-        this.currentCase = currentCase;
-    }
-
+  
     /**
      * @return the includeDeactivatedEvents
      */
@@ -128,6 +133,20 @@ public class CECaseEventListBB extends BackingBeanUtils{
      */
     public void setIncludeDeactivatedEvents(boolean includeDeactivatedEvents) {
         this.includeDeactivatedEvents = includeDeactivatedEvents;
+    }
+
+    /**
+     * @return the currentEvHolder
+     */
+    public IFace_EventHolder getCurrentEvHolder() {
+        return currentEvHolder;
+    }
+
+    /**
+     * @param currentEvHolder the currentEvHolder to set
+     */
+    public void setCurrentEvHolder(IFace_EventHolder currentEvHolder) {
+        this.currentEvHolder = currentEvHolder;
     }
     
     
