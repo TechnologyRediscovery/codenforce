@@ -291,7 +291,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             stmt = con.prepareStatement(s);
             
-            stmt.setInt(1, info.getParcelInternalID());
+            stmt.setInt(1, info.getParcelParcelKey());
             stmt.setString(2, info.getUseGroup());
             stmt.setString(3, info.getConstructionType());
             stmt.setString(4, info.getCountyCode());
@@ -365,11 +365,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             } else {
                 stmt.setNull(19, java.sql.Types.NULL);
             }
-            if(info.getLandBankProspect() != null){
-                stmt.setInt(20, info.getLandBankProspect().getClassID());
-            } else {
-                stmt.setInt(20, java.sql.Types.NULL);
-            }
+            // condition -- deprecated
+            stmt.setNull(20, java.sql.Types.NULL);
             
             stmt.setBoolean(21, info.isLandBankHeld());
             stmt.setBoolean(22, info.isNonAddressable());
@@ -403,7 +400,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());
-            throw new IntegrationException("Unable to insert Parcel into DB, sorry!", ex);
+            throw new IntegrationException("Unable to insert Parcel info into DB, sorry!", ex);
         } finally {
            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
@@ -425,8 +422,13 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         if(info == null){
             throw new BObStatusException("Cannot update parcel info with null info input!");
         }
+        if(info.getParcelParcelKey() == 0){
+            throw new BObStatusException("Parcel key of 0");
+        }
            Connection con = getPostgresCon();
         PreparedStatement stmt = null;
+        
+        
 
         try {
             
@@ -447,7 +449,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             
             stmt = con.prepareStatement(s);
             
-            stmt.setInt(1, info.getParcelInternalID());
+            stmt.setInt(1, info.getParcelParcelKey());
             stmt.setString(2, info.getUseGroup());
             stmt.setString(3, info.getConstructionType());
             stmt.setString(4, info.getCountyCode());
@@ -521,11 +523,8 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
             } else {
                 stmt.setNull(19, java.sql.Types.NULL);
             }
-            if(info.getLandBankProspect() != null && info.getLandBankProspect().getClassID() != 0){
-                stmt.setInt(20, info.getLandBankProspect().getClassID());
-            } else {
-                stmt.setNull(20, java.sql.Types.NULL);
-            }
+            // deprecated with date pairs
+            stmt.setNull(20, java.sql.Types.NULL);
             
             stmt.setBoolean(21, info.isLandBankHeld());
             stmt.setBoolean(22, info.isNonAddressable());
@@ -642,7 +641,10 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
 
         try {
             pi.setParcelInfoID(rs.getInt("parcelinfoid"));
-            pi.setParcelInternalID(rs.getInt("parcel_parcelkey"));
+            pi.setParcelParcelKey(rs.getInt("parcel_parcelkey"));
+            if(pi.getParcelParcelKey() == 0){
+                System.out.println("GenerateParcelInfo : Parcelkey of 0 on parcelinfo " + pi.getParcelInfoID() );
+            }
             pi.setUseGroup(rs.getString("usegroup"));
             
             pi.setConstructionType(rs.getString("constructiontype"));

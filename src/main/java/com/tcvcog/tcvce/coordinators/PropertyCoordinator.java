@@ -1010,6 +1010,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
         if(info == null || ua == null){
             throw new BObStatusException("cannot insert a parcel info record with null info or UA");
         }
+        if(info.getParcelParcelKey() == 0){
+            throw new BObStatusException("Found parcel KEY of 0 on parcelinfo ID " + info.getParcelInfoID());
+        }
         info.setLastUpdatedBy(ua);
         pi.updateParcelInfo(info);
         
@@ -1130,7 +1133,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
             par.setParcelInfo(pi.getParcelInfo(infoIDL.get(0)));
         } else {
             // inject an empty object if we have none to avoid null pointers
-            par.setParcelInfo(new ParcelInfo());
+            par.setParcelInfo(pi.getParcelInfo(pi.insertParcelInfo(new ParcelInfo(parcelID))));
         }
         Property p = new Property(par);
         
@@ -1250,7 +1253,8 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public Property generatePropertySkeleton(Municipality muni) {
         Property prop = new Property(new Parcel());
-        prop.setParcelInfo(new ParcelInfo());
+        // don't make this until we pull it out for the first time
+//        prop.setParcelInfo(new ParcelInfo());
         prop.getParcelInfo().setNonAddressable(false);
         prop.setParcelKey(0);
         prop.setMuni(muni);

@@ -406,6 +406,7 @@ public class PropertyProfileBB
      */
     public void onParcelInfoEditModeOperationAbortButtonChange(ActionEvent ev){
         System.out.println("PropertyProfileBB.abortParcelInfoEditmode");
+        currentParcelInfoEditMode = false;
     }
     
     /**

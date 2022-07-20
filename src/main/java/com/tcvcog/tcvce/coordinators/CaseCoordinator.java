@@ -672,47 +672,55 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 cse.logPriorityAssignmentMessage(" sent letters on case;", true);
                 
                 NoticeOfViolation mostRecentLetter = novSentList.get(0);
-                cse.logPriorityAssignmentMessage("Using letter follow up window of : ", false);
-                cse.logPriorityAssignmentMessage(String.valueOf(mostRecentLetter.getNovType().getFollowUpWindowDays()), false);
-                cse.logPriorityAssignmentMessage(" days for letters of type: ", false);
-                cse.logPriorityAssignmentMessage(mostRecentLetter.getNovType().getTitle(), false);
-                cse.logPriorityAssignmentMessage(";", true);
-                
-                long daysSinceLatestLetter = DateTimeUtil.getTimePeriodAsDays(mostRecentLetter.getDateOfRecord(), LocalDateTime.now());
-                
-                cse.logPriorityAssignmentMessage("Most recent letter was marked as sent ", false);
-                cse.logPriorityAssignmentMessage(String.valueOf(daysSinceLatestLetter), false);
-                cse.logPriorityAssignmentMessage(" days ago on ", false);
-                cse.logPriorityAssignmentMessage(getPrettyDateNoTime(mostRecentLetter.getDateOfRecord()), false);
-                cse.logPriorityAssignmentMessage(" (Letter ID: ", false);
-                cse.logPriorityAssignmentMessage(String.valueOf(mostRecentLetter.getNoticeID()), false);
-                cse.logPriorityAssignmentMessage(")", true);
-                
-                
-                if(daysSinceLatestLetter < 0){
-                    cse.logPriorityAssignmentMessage("Most recent letter was sent in the future? Hark!", true);
-                    cse.setPriority(CasePriorityEnum.UNKNOWN);
-//                    return cse;
-                } else if(daysSinceLatestLetter <= mostRecentLetter.getNovType().getFollowUpWindowDays()) {
-                    cse.logPriorityAssignmentMessage("Case is inside letter type appeals/waiting window;", true);
-                    cse.logPriorityAssignmentMessage("Assigning priority: MONITORING", true);
-                    cse.setPriority(CasePriorityEnum.MONITORING);
-//                    return cse;
-                    // if we're within administrative buffer, then we're yellow
-                } else if(daysSinceLatestLetter > mostRecentLetter.getNovType().getFollowUpWindowDays() 
-                        && daysSinceLatestLetter <= DateTimeUtil.getTimePeriodAsDays(mostRecentLetter.getDateOfRecord(), mostRecentLetter.getDateOfRecord().plusDays(mc.DEFAULT_DEADLINE_BUFFER_DAYS)) ){
-                    cse.logPriorityAssignmentMessage("Letter appeals/waiting period has expired, but inside administrative buffer;", true);
-                    cse.logPriorityAssignmentMessage("Assigning priority: ACTION REQUIRED", true);
-                    cse.setPriority(CasePriorityEnum.ACTION_REQUIRED);
-//                    return cse;
-                    
+                // bug fix for letters without type
+                if(mostRecentLetter != null && mostRecentLetter.getNovType() != null){
+
+                    cse.logPriorityAssignmentMessage("Using letter follow up window of : ", false);
+                    cse.logPriorityAssignmentMessage(String.valueOf(mostRecentLetter.getNovType().getFollowUpWindowDays()), false);
+                    cse.logPriorityAssignmentMessage(" days for letters of type: ", false);
+                    cse.logPriorityAssignmentMessage(mostRecentLetter.getNovType().getTitle(), false);
+                    cse.logPriorityAssignmentMessage(";", true);
+
+                    long daysSinceLatestLetter = DateTimeUtil.getTimePeriodAsDays(mostRecentLetter.getDateOfRecord(), LocalDateTime.now());
+
+                    cse.logPriorityAssignmentMessage("Most recent letter was marked as sent ", false);
+                    cse.logPriorityAssignmentMessage(String.valueOf(daysSinceLatestLetter), false);
+                    cse.logPriorityAssignmentMessage(" days ago on ", false);
+                    cse.logPriorityAssignmentMessage(getPrettyDateNoTime(mostRecentLetter.getDateOfRecord()), false);
+                    cse.logPriorityAssignmentMessage(" (Letter ID: ", false);
+                    cse.logPriorityAssignmentMessage(String.valueOf(mostRecentLetter.getNoticeID()), false);
+                    cse.logPriorityAssignmentMessage(")", true);
+
+
+                    if(daysSinceLatestLetter < 0){
+                        cse.logPriorityAssignmentMessage("Most recent letter was sent in the future? Hark!", true);
+                        cse.setPriority(CasePriorityEnum.UNKNOWN);
+    //                    return cse;
+                    } else if(daysSinceLatestLetter <= mostRecentLetter.getNovType().getFollowUpWindowDays()) {
+                        cse.logPriorityAssignmentMessage("Case is inside letter type appeals/waiting window;", true);
+                        cse.logPriorityAssignmentMessage("Assigning priority: MONITORING", true);
+                        cse.setPriority(CasePriorityEnum.MONITORING);
+    //                    return cse;
+                        // if we're within administrative buffer, then we're yellow
+                    } else if(daysSinceLatestLetter > mostRecentLetter.getNovType().getFollowUpWindowDays() 
+                            && daysSinceLatestLetter <= DateTimeUtil.getTimePeriodAsDays(mostRecentLetter.getDateOfRecord(), mostRecentLetter.getDateOfRecord().plusDays(mc.DEFAULT_DEADLINE_BUFFER_DAYS)) ){
+                        cse.logPriorityAssignmentMessage("Letter appeals/waiting period has expired, but inside administrative buffer;", true);
+                        cse.logPriorityAssignmentMessage("Assigning priority: ACTION REQUIRED", true);
+                        cse.setPriority(CasePriorityEnum.ACTION_REQUIRED);
+    //                    return cse;
+
+                    } else {
+                        cse.logPriorityAssignmentMessage("Letter appeals/waiting period has expired, and you're OUTSIDE administrative buffer;", true);
+                        cse.logPriorityAssignmentMessage("Assigning priority: ACTION PAST DUE", true);
+                        cse.setPriority(CasePriorityEnum.ACTION_PASTDUE);
+    //                    return cse;
+                    }
                 } else {
-                    cse.logPriorityAssignmentMessage("Letter appeals/waiting period has expired, and you're OUTSIDE administrative buffer;", true);
-                    cse.logPriorityAssignmentMessage("Assigning priority: ACTION PAST DUE", true);
-                    cse.setPriority(CasePriorityEnum.ACTION_PASTDUE);
-//                    return cse;
-                }
-                
+                    cse.logPriorityAssignmentMessage("Object status error (Fatal): Most recent letter is null or type is null;", false);
+                    cse.setPriority(CasePriorityEnum.UNKNOWN);
+                    
+                }// close we have a most recent NOV and not null type
+
             } else {
                 // we have No letters sent, so we need to know are we yellow or red?
                 cse.logPriorityAssignmentMessage("Found zero sent letters;", true);

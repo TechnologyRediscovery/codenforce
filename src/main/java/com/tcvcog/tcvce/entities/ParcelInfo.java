@@ -42,7 +42,7 @@ public class ParcelInfo
     
     protected PropertyUseType useType;
     protected int parcelInfoID;
-    protected int parcelInternalID;
+    protected int parcelParcelKey;
     
     protected String useGroup;
     protected String constructionType;
@@ -107,12 +107,31 @@ public class ParcelInfo
     private String landbankPursuingNotes;
     private String landbankOwnedNotes;
 
+    /**
+     * NO arg constructor
+     */
+    public ParcelInfo(){
+        
+    }
+    
+    /**
+     * INjects the most important member of parcel info for DB write
+     * @param parcelkey_internal 
+     */
+    public ParcelInfo(int parcelkey_internal){
+        parcelParcelKey = parcelkey_internal;
+    }
+    
+    
+    
+    
+    
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 67 * hash + Objects.hashCode(this.useType);
         hash = 67 * hash + this.parcelInfoID;
-        hash = 67 * hash + this.parcelInternalID;
+        hash = 67 * hash + this.parcelParcelKey;
         hash = 67 * hash + Objects.hashCode(this.useGroup);
         hash = 67 * hash + Objects.hashCode(this.constructionType);
         hash = 67 * hash + Objects.hashCode(this.countyCode);
@@ -633,17 +652,17 @@ public class ParcelInfo
     }
 
     /**
-     * @return the parcelInternalID
+     * @return the parcelParcelKey
      */
-    public int getParcelInternalID() {
-        return parcelInternalID;
+    public int getParcelParcelKey() {
+        return parcelParcelKey;
     }
 
     /**
-     * @param parcelInternalID the parcelInternalID to set
+     * @param parcelParcelKey the parcelParcelKey to set
      */
-    public void setParcelInternalID(int parcelInternalID) {
-        this.parcelInternalID = parcelInternalID;
+    public void setParcelParcelKey(int parcelParcelKey) {
+        this.parcelParcelKey = parcelParcelKey;
     }
 
     @Override

@@ -136,7 +136,15 @@
                                             <h:form id="parcel-id-form">
                                                 <div class="p-grid">
                                                     <div class="p-col-12">
-
+                                                            <p:commandButton    id="parcel-id-edit-abort-button"
+                                                                                ajax="true"
+                                                                                style="margin-left: 5px;"
+                                                                                rendered="#{propertyProfileBB.currentPropertyEditMode}"
+                                                                                value="Abort edit"
+                                                                                actionListener="#{propertyProfileBB.onPropertyEditModeOperationAbortButtonChange}"
+                                                                                update="property-messages-global
+                                                                                @form"
+                                                                                icon="fa fa-stop" />
                                                         <p:commandButton id="parcel-id-edit-button"
                                                                          value="#{propertyProfileBB.currentPropertyEditMode ? 'Save changes' : 'Edit'}"
                                                                          rendered="true"
@@ -146,20 +154,8 @@
                                                                          update="@form
                                                                          property-messages-global"
                                                                          />
+                                                                       
 
-
-                                                        <div class="restrict-main-contents-io-button gray_button">
-
-                                                            <p:commandButton    id="parcel-id-edit-abort-button"
-                                                                                ajax="true"
-                                                                                rendered="#{propertyProfileBB.currentPropertyEditMode}"
-                                                                                value="Abort edit"
-                                                                                actionListener="#{propertyProfileBB.onPropertyEditModeOperationAbortButtonChange}"
-                                                                                update="property-messages-global
-                                                                                @form"
-                                                                                icon="fa fa-stop" />
-
-                                                        </div>
                                                     </div>
 
                                                     <div class="p-col-6 data_field_label">
@@ -322,20 +318,16 @@
                                                          property-messages-global"
                                                          />
 
-                                        <div class="restrict-main-contents-io-button gray_button">
-
                                             <p:commandButton    id="parcel-info-edit-abort-button"
                                                                 ajax="true"
                                                                 rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
                                                                 value="Abort edit"
                                                                 actionListener="#{propertyProfileBB.onParcelInfoEditModeOperationAbortButtonChange}"
+                                                                style="margin-left: 5px;"
                                                                 update="property-messages-global
-                                                                @form"
-                                                                process="@none"
-                                                                immediate="true"
+                                                                        @form"
                                                                 icon="fa fa-stop" />
 
-                                        </div>
                                         <p:spacer height="5px"/>    
                                         <div class="p-grid">
                                             <div class="p-col-4 restrict-data-field-label-inline">
@@ -343,6 +335,12 @@
                                             </div>
                                             <div class="p-col-8">
                                                 <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.parcelInfoID}" />
+                                            </div>
+                                            <div class="p-col-4 restrict-data-field-label-inline">
+                                                <h:outputLabel value="Parcel Key (internal)"/>
+                                            </div>
+                                            <div class="p-col-8">
+                                                <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.parcelParcelKey}" />
                                             </div>
                                             <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="County"/>
@@ -409,7 +407,7 @@
                                             </div>
 
                                             <div class="p-col-4 restrict-data-field-label-inline">
-                                                <h:outputLabel value="TCLB Held"/>
+                                                <h:outputLabel value="TCLB Held (old)"/>
                                             </div>
                                             <div class="p-col-8">
                                                 <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.landBankHeld ? 'Yes': 'No'}" 
@@ -423,7 +421,7 @@
                                             </div>
 
                                             <div class="p-col-4 restrict-data-field-label-inline">
-                                                <h:outputLabel value="Land bank prospect"/>
+                                                <h:outputLabel value="Land bank prospect (old)"/>
                                             </div>
                                             <div class="p-col-8">
                                                 <h:outputText value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landBankProspect)
@@ -480,30 +478,34 @@
 
 
 
-                                            <div class="p-col-3" >
+                                            <div class="p-col-12" >
+                                                <p:separator />
+                                            </div>
+                                            
+                                            <div class="p-col-4" >
                                                 <h:outputText value="&nbsp;"
                                                               escape="false" />
                                             </div>
-                                            <div class="p-col-3 restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Unfitness of Occupancy"/>
-                                            </div>
-
-                                            <div class="p-col-3 restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Vacancy"/>
-                                            </div>
-
-                                            <div class="p-col-3 restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Abandonment"/>
-                                            </div>
-
-
-                                            <div class="p-col-3 restrict-data-field-label-inline">
+                                            
+                                            
+                                            <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Start date" />
                                             </div>
-
-
-
-                                            <div class="p-col-3">
+                                            <div class="p-col-4 restrict-data-field-label-inline">
+                                                <h:outputLabel value="Stop date" />
+                                            </div>
+                                            
+                                            <div class="p-col-12 restrict-data-field-label-inline" >
+                                                <p:separator />
+                                                <h3>
+                                                    Property Status Designations
+                                                </h3>
+                                            </div>
+                                            
+                                            <div class="p-col-4 restrict-data-field-label-inline" >
+                                                <h:outputLabel value="Unfitness of Occupancy"/>
+                                            </div>
+                                            <div class="p-col-4">
                                                 <h:outputText id="propinfo-ot-unfitstart-1"
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.unfitDateStart) 
                                                                        ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.unfitDateStart) 
@@ -530,64 +532,8 @@
 
 
                                             </div>
-                                            <div class="p-col-3">
-                                                <h:outputText id="propinfo-ot-vacantstart-1"
-                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.vacantDateStart) 
-                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.vacantDateStart) 
-                                                                       : ''}" 
-                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}" />
 
-                                                <p:datePicker id="prop-add-vacant-start-cal"
-                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.vacantDateStart}"
-                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
-                                                              showButtonBar="true"
-                                                              pattern="MM/dd/yyyy"
-                                                              monthNavigator="true"
-                                                              yearNavigator="true"
-                                                              hideOnDateTimeSelect="true"
-                                                              showOnFocus="false"
-                                                              showIcon="true"
-                                                              showTime="false"
-                                                              mask="true"
-                                                              tabindex="16" >
-                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
-                                                </p:datePicker>
-
-
-                                            </div>
-
-                                            <div class="p-col-3">
-                                                <h:outputText id="propinfo-ot-abandonedstart-1"
-                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.abandonedDateStart) 
-                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.abandonedDateStart) 
-                                                                       : ''}" 
-                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}" />
-
-                                                <p:datePicker id="prop-add-abandoned-start-cal"
-                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.abandonedDateStart}"
-                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
-                                                              showButtonBar="true"
-                                                              pattern="MM/dd/yyyy"
-                                                              monthNavigator="true"
-                                                              yearNavigator="true"
-                                                              hideOnDateTimeSelect="true"
-                                                              showOnFocus="false"
-                                                              showIcon="true"
-                                                              showTime="false"
-                                                              mask="true"
-                                                              tabindex="16"
-                                                              >
-                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
-                                                </p:datePicker>
-
-
-                                            </div>
-
-                                            <div class="p-col-3 restrict-data-field-label-inline">
-                                                <h:outputLabel value="End date" />
-                                            </div>
-
-                                            <div class="p-col-3">
+                                            <div class="p-col-4">
                                                 <h:outputText id="propinfo-ot-unfitstop-1"
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.unfitDateStop) 
                                                                        ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.unfitDateStop) 
@@ -613,7 +559,38 @@
                                             </div>
 
 
-                                            <div class="p-col-3">
+                                            <div class="p-col-4 restrict-data-field-label-inline" >
+                                                <h:outputLabel value="Vacancy"/>
+                                            </div>
+
+
+                                            <div class="p-col-4">
+                                                <h:outputText id="propinfo-ot-vacantstart-1"
+                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.vacantDateStart) 
+                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.vacantDateStart) 
+                                                                       : ''}" 
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}" />
+
+                                                <p:datePicker id="prop-add-vacant-start-cal"
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.vacantDateStart}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              yearNavigator="true"
+                                                              hideOnDateTimeSelect="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
+                                                              showTime="false"
+                                                              mask="true"
+                                                              tabindex="16" >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                </p:datePicker>
+
+
+                                            </div>
+                                            
+                                               <div class="p-col-4">
                                                 <h:outputText id="propinfo-ot-vacantstop-1"
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.vacantDateStop) 
                                                                        ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.vacantDateStop) 
@@ -639,8 +616,43 @@
 
 
                                             </div>
+                                    
+                                            
 
-                                            <div class="p-col-3">
+                                            <div class="p-col-4 restrict-data-field-label-inline" >
+                                                <h:outputLabel value="Abandonment"/>
+                                            </div>
+
+
+                                            <div class="p-col-4">
+                                                <h:outputText id="propinfo-ot-abandonedstart-1"
+                                                              value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.abandonedDateStart) 
+                                                                       ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.abandonedDateStart) 
+                                                                       : ''}" 
+                                                              rendered="#{!propertyProfileBB.currentParcelInfoEditMode}" />
+
+                                                <p:datePicker id="prop-add-abandoned-start-cal"
+                                                              value="#{propertyProfileBB.currentProperty.parcelInfo.abandonedDateStart}"
+                                                              rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
+                                                              showButtonBar="true"
+                                                              pattern="MM/dd/yyyy"
+                                                              monthNavigator="true"
+                                                              yearNavigator="true"
+                                                              hideOnDateTimeSelect="true"
+                                                              showOnFocus="false"
+                                                              showIcon="true"
+                                                              showTime="false"
+                                                              mask="true"
+                                                              tabindex="16"
+                                                              >
+                                                    <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
+                                                </p:datePicker>
+
+                                            
+
+                                            </div>
+
+                                            <div class="p-col-4">
                                                 <h:outputText id="propinfo-ot-abandonedstop-1"
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.abandonedDateStop) 
                                                                        ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.abandonedDateStop) 
@@ -664,27 +676,16 @@
                                                 </p:datePicker>
 
                                             </div>
+
+                                         
                                             
-                                            <div class="p-col-12">
+                                            
+                                            <div class="p-col-12 restrict-data-field-label-inline" >
+                                                <p:separator />
                                                 <h3>
-                                                    <h:outputText value="Tri-Cog Landbank Tracking" />
+                                                    TCLB Designations
                                                 </h3>
                                             </div>
-                                            
-                                            <!--LAND BANK-->
-                                            
-                                            <div class="p-col-4" >
-                                                  <h:outputText value="&nbsp;"
-                                                               escape="false" />
-                                            </div>
-                                            <div class="p-col-4 restrict-data-field-label-inline">
-                                                <h:outputLabel value="Start date" />
-                                            </div>
-                                            <div class="p-col-4 restrict-data-field-label-inline">
-                                                <h:outputLabel value="Stop date" />
-                                            </div>
-                                            
-                                            
                                             
                                             <div class="p-col-4 restrict-data-field-label-inline" >
                                                 <h:outputLabel value="LB Prospect"/>
@@ -907,6 +908,14 @@
                                                               tabindex="16" >
                                                     <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
+                                            </div>
+                                            
+                                            
+                                            <div class="p-col-12 restrict-data-field-label-inline" >
+                                                <p:separator />
+                                                <h3>
+                                                    TCLB Notes
+                                                </h3>
                                             </div>
                                             
                                             <div class="p-col-4 restrict-data-field-label-inline">
