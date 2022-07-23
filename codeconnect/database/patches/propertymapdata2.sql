@@ -1,3 +1,5 @@
+CREATE OR REPLACE VIEW public.propertymapdata2
+ AS
  SELECT p.parid,
     p.propertyid,
     p.lotandblock,
@@ -14,7 +16,7 @@
     propertyexternaldata.address_citystatezip,
     s.geom,
     count(c.caseid) AS casecount,
-    COALESCE(c.casename, 'NONE'::text) AS casename,
+    COALESCE(c.casename, 'NONE'::text) AS casename
    FROM spatialdata8 s
      FULL JOIN property p ON s.pin::text = p.parid
      FULL JOIN cecase c ON c.property_propertyid = p.propertyid

@@ -46,7 +46,7 @@ var school = ["DAYCARE/PRIVATE SCHOOL", "OWNED BY COLLEGE/UNIV/ACADEMY"];
 
 var lot = [">10 ACRES VACANT", "PUBLIC PARK", "CEMETERY/MONUMENTS", "BUILDERS LOT", "VACANT LAND"];
 
-var other = ["None", "OTHER", "Other", "NULL"];
+var other = ["None", "OTHER", "Other", "NULL"]
 
 //Retrieves image data for later use
 const fs = require('fs');
@@ -190,32 +190,12 @@ router.get('/filter*', function (req, res) {
         var propertyLoadIn = newPropertyData[i];
         var casesPerProperty = [];                      //case package
         var casesPresent = 0;                       //tracks case loading for map color coding
-
-        //if statement to prevent binding of null property ids 7.22.22
-        if(propertyPropID != null){
-        //
-
         for (var j=0; j < casesJSONObject.length - 1; j++) {        //Runs through every case
           var casesPropID = casesJSONObject[j].properties.f1;
           var caseID = casesJSONObject[j].properties.f2;
-
-          /* DEPRECATED 7.19.22
           if (propertyPropID == casesPropID) {              //If the propertyIDs match, add all case data to the package to be loaded in
             casesPerProperty.push(casesJSONObject[j].properties);   //creates individual case data based on case ID to load into case package
             casesPresent += 1;                      //increases casesPresent
-        }
-        */
-
-        //******* Change to root out inactive violations. Added 7.19.22
-          if (propertyPropID == casesPropID) {              //If the propertyIDs match, add all case data to the package to be loaded in
-            var actualComplianceDate = casesJSONObject[j].properties.f10;
-            var violationID = casesJSONObject[j].properties.f3;
-            if (actualComplianceDate == null && violationID != null){
-              casesPerProperty.push(casesJSONObject[j].properties);   //creates individual case data based on case ID to load into case package
-              casesPresent += 1;                      //increases casesPresent
-             }
-          }
-          //*******
         }
       }
 
