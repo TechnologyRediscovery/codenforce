@@ -437,7 +437,7 @@ public class ManageBlobBB extends BackingBeanUtils implements Serializable{
 
             FieldInspection ins = oii.getOccInspection(space.getInspectionID());
 
-            getSessionBean().setSessOccPeriodFromPeriodBase(oc.getOccPeriod(ins.getOccPeriodID()));
+            getSessionBean().setSessOccPeriodFromPeriodBase(oc.getOccPeriod(ins.getOccPeriodID(), getSessionBean().getSessUser()));
             return "occInspectionAdd";
         } catch (IntegrationException ex) {
             System.out.println("manageBlobBB.goToInspectedSpaceElement() | ERROR: " + ex);

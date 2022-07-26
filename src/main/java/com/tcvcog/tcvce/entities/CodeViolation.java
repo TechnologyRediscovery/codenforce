@@ -71,6 +71,8 @@ public  class       CodeViolation
     protected boolean makeFindingsDefault;
     
     // compliance fields
+    
+    protected boolean queuedForStipCompExtDate;
     protected LocalDateTime stipulatedComplianceDate;
     protected LocalDateTime actualComplianceDate;
     protected LocalDateTime complianceTimeStamp;
@@ -128,6 +130,7 @@ public  class       CodeViolation
         this.complianceTimeStamp = cv.complianceTimeStamp;
         this.complianceUser = cv.complianceUser;
         this.complianceNote = cv.complianceNote;
+        this.queuedForStipCompExtDate = cv.queuedForStipCompExtDate;
         this.nullifiedTS = cv.nullifiedTS;
         this.nullifiedUser = cv.nullifiedUser;
         this.leagacyImport = cv.leagacyImport;
@@ -877,6 +880,20 @@ public  class       CodeViolation
     @Override
     public TransferrableEnum getTransferEnum() {
         return TRANSFER_ENUM;
+    }
+
+    /**
+     * @return the queuedForStipCompExtDate
+     */
+    public boolean isQueuedForStipCompExtDate() {
+        return queuedForStipCompExtDate;
+    }
+
+    /**
+     * @param queuedForStipCompExtDate the queuedForStipCompExtDate to set
+     */
+    public void setQueuedForStipCompExtDate(boolean queuedForStipCompExtDate) {
+        this.queuedForStipCompExtDate = queuedForStipCompExtDate;
     }
 
    

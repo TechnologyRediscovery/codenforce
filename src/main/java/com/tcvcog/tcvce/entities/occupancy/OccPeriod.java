@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.entities.occupancy;
 
+import com.tcvcog.tcvce.application.IFace_pinnable;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.util.DateTimeUtil;
@@ -38,12 +39,17 @@ public  class       OccPeriod
                     IFace_EventHolder,
                     Comparable<OccPeriod>,
                     IFace_ActivatableBOB,
-                    IFace_noteHolder {
+                    IFace_noteHolder,
+                    IFace_pinnable{
     
     final static String OCCPERIOD_TABLE_NAME = "occperiod";
     final static String OCCPERIOD_PK_FIELD = "periodid";
     final static String OCCPERIOD_HFNAME = "Occupancy Period";
+    
     final static DomainEnum OCC_DOMAIN = DomainEnum.OCCUPANCY;
+    
+    final static String PIN_TABLE_NAME = "public.occperiodpin";
+    final static String PIN_FK_FIELD = "occperiod_periodid";
     
     protected int periodID;
     protected int propertyUnitID;
@@ -54,7 +60,10 @@ public  class       OccPeriod
     protected FieldInspection governingInspection;
     
     protected User manager;
-     
+    
+    protected boolean pinned;
+    protected User pinner;
+    
     protected User periodTypeCertifiedBy;
     protected LocalDateTime periodTypeCertifiedTS;
     protected List<EventCnF> eventList;
@@ -543,5 +552,46 @@ public  class       OccPeriod
      */
     public void setPermitList(List<OccPermit> permitList) {
         this.permitList = permitList;
+    }
+
+    /**
+     * @return the pinned
+     */
+    @Override
+    public boolean isPinned() {
+        return pinned;
+    }
+
+    /**
+     * @return the pinner
+     */
+    @Override
+    public User getPinner() {
+        return pinner;
+    }
+
+    /**
+     * @param pinner the pinner to set
+     */
+    @Override
+    public void setPinner(User pinner) {
+        this.pinner = pinner;
+    }
+
+    @Override
+    public String getPinTableFKString() {
+        return PIN_FK_FIELD;
+    }
+
+    @Override
+    public String getPinTableName() {
+        return PIN_TABLE_NAME;
+    }
+
+    /**
+     * @param pinned the pinned to set
+     */
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
     }
 }

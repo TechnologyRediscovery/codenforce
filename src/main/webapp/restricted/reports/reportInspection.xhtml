@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <link rel="stylesheet" type="text/css" href="css/style.css"></link>
-        <title>Occupancy Inspection Report</title>
+        <title>Field Inspection Report</title>
     </h:head>
     <h:body>
         <ui:composition template="./../report_template_occinsp.xhtml">
@@ -16,9 +16,17 @@
                     <div class="flexing-box-topbar">
                         <div class="logoBox">
                             <div class="logo-image-wrapper">
-                                <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" 
-                                                height="50"
-                                                style="margin-right:10px;"/>
+                                             
+                                
+                                <p:graphicImage     id="report-headerphoto"
+                                                     value="#{blobsterBB.image}"
+                                                     alt="no preview available" 
+                                                     height="#{reportingBB.headerImageHeightPx}"
+                                                     cache="false"
+                                                     rendered="#{!empty reportingBB.headerImageBlob}">
+                                     <f:param name="blobid" value="#{reportingBB.headerImageBlob.photoDocID}"/>
+                                 </p:graphicImage>
+                    
                             </div>
                             <div class="logo-title-wrapper">
                                 <div class="report-title">

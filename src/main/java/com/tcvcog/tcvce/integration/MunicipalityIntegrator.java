@@ -18,12 +18,14 @@
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.MetadataException;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -43,7 +45,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Business object factory for all Things Municipality
+ * 
  * @author ellen bascomb of apt 31y
  */
 public class MunicipalityIntegrator extends BackingBeanUtils implements Serializable {
@@ -98,7 +101,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "       profile_profileid, enablecodeenforcement, enableoccupancy, enablepublicceactionreqsub, \n" +
                         "       enablepublicceactionreqinfo, enablepublicoccpermitapp, enablepublicoccinspectodo, \n" +
                         "       munimanager_userid, notes, lastupdatedts, \n" +
-                        "       lastupdated_userid, primarystaffcontact_userid, defaultoccperiod, officeparcel_parcelid    \n" +
+                        "       lastupdated_userid, primarystaffcontact_userid, defaultoccperiod, officeparcel_parcelid, defaultheaderimage_photodocid, defaultheaderimageheightpx    \n" +
                         "  FROM public.municipality"
                       + "  WHERE municode=? AND activeinprogram = true;";
         ResultSet rs = null;
@@ -112,7 +115,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                 muniComplete = generateMuniDataHeavy(rs);
             }
             
-        } catch (SQLException ex) {
+        } catch (SQLException | MetadataException ex) {
             System.out.println("MunicipalityIntegrator.getMuni | " + ex.toString());
             throw new IntegrationException("Exception in MunicipalityIntegrator.getMuni", ex);
         } finally{
@@ -135,10 +138,12 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         return muni;
     }
     
-    private MunicipalityDataHeavy generateMuniDataHeavy(ResultSet rs) throws SQLException, IntegrationException, AuthorizationException, BObStatusException{
+    private MunicipalityDataHeavy generateMuniDataHeavy(ResultSet rs) throws SQLException, IntegrationException, AuthorizationException, BObStatusException, MetadataException{
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
         UserIntegrator ui = getUserIntegrator();
         CodeIntegrator ci = getCodeIntegrator();
+        UserCoordinator uc = getUserCoordinator();
+        BlobCoordinator bc = getBlobCoordinator();
         
         MunicipalityDataHeavy mdh = new MunicipalityDataHeavy(generateMuni(rs));
         
@@ -166,10 +171,13 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mdh.setEnablePublicOccPermitApp(rs.getBoolean("enablepublicoccpermitapp"));
         mdh.setEnablePublicOccInspectionTODOs(rs.getBoolean("enablepublicoccinspectodo"));
 
-        mdh.setMuniManager(ui.getUser(rs.getInt("munimanager_userid")));
+        mdh.setMuniManager(uc.user_getUser(rs.getInt("munimanager_userid")));
         mdh.setMuniOfficePropertyId(rs.getInt("officeparcel_parcelid"));
         mdh.setDefaultOccPeriodID(rs.getInt("defaultoccperiod"));
-        
+        if(rs.getInt("defaultheaderimage_photodocid") != 0){
+            mdh.setDefaultMuniHeaderImage(bc.getBlob(rs.getInt("defaultheaderimage_photodocid")));
+        }
+        mdh.setDefaultMuniHeaderImageHeightPx(rs.getInt("defaultheaderimageheightpx"));
         
         mdh.setNotes(rs.getString("notes"));
         
@@ -177,8 +185,8 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             mdh.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
         }
         
-        mdh.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdated_userid")));
-        mdh.setPrimaryStaffContact(ui.getUser(rs.getInt("primarystaffcontact_userid")));
+        mdh.setLastUpdatedBy(uc.user_getUser(rs.getInt("lastupdated_userid")));
+        mdh.setPrimaryStaffContact(uc.user_getUser(rs.getInt("primarystaffcontact_userid")));
         
         
         return mdh;
@@ -190,7 +198,9 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         Connection con = null;
         // note that muniCode is not returned in this query since it is specified in the WHERE
         String query =  "SELECT profileid, title, description, lastupdatedts, lastupdatedby_userid, \n" +
-                        "       notes, continuousoccupancybufferdays, minimumuserranktodeclarerentalintent, novfollowupdefaultdays \n" +
+                        "       notes, continuousoccupancybufferdays, minimumuserranktodeclarerentalintent, novfollowupdefaultdays,"
+                    +   " priorityparamdeadlineadminbufferdays, priorityparamnoletterbufferdays, \n" +
+                        "       priorityparamprioritizeletterfollowupbuffer, priorityparamalloweventcatgreenbuffers \n" +
                         "  FROM public.muniprofile WHERE profileid=?;";
         ResultSet rs = null;
  
@@ -219,7 +229,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             throws SQLException, IntegrationException, BObStatusException{
         MuniProfile mp = new MuniProfile();
         EventIntegrator ei = getEventIntegrator();
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc =getUserCoordinator();
         OccupancyIntegrator oi = getOccupancyIntegrator();
         WorkflowIntegrator wi = getWorkflowIntegrator();
         
@@ -227,7 +237,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mp.setTitle(rs.getString("title"));
         mp.setDescription(rs.getString("description"));
         mp.setLastupdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
-        mp.setLastupdatedUser(ui.getUser(rs.getInt("lastupdatedby_userid")));
+        mp.setLastupdatedUser(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
         mp.setNotes(rs.getString("notes"));
         mp.setContinuousoccupancybufferdays(rs.getInt("continuousoccupancybufferdays"));
         mp.setMinimumuserranktodeclarerentalintent(rs.getInt("minimumuserranktodeclarerentalintent"));
@@ -236,11 +246,15 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         mp.setEventRuleSetCE(wi.rules_getEventRuleSet(rs.getInt("profileid")));
         mp.setOccPermitTypeList(oi.getOccPermitTypeList(rs.getInt("profileid")));
         if(mp.getOccPermitTypeList() == null){
-            mp.setOccPermitTypeList(new ArrayList<OccPermitType>());
+            mp.setOccPermitTypeList(new ArrayList<>());
         }
         
+        //priority params
+        mp.setPriorityParamDeadlineAdministrativeBufferDays(rs.getInt("priorityparamdeadlineadminbufferdays"));
+        mp.setPriorityParamLetterSendBufferDays(rs.getInt("priorityparamnoletterbufferdays"));
+        mp.setPrioritizeLetterFollowUpBuffer(rs.getBoolean("priorityparamprioritizeletterfollowupbuffer"));
+        mp.setPriorityAllowEventCategoryGreenBuffers(rs.getBoolean("priorityparamalloweventcatgreenbuffers"));
         return mp;
-        
     }
     
     public List<Municipality> getMuniList() throws IntegrationException{
@@ -267,7 +281,6 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         } // close finally
         
         return mList;
-        
     }
    
     
@@ -282,7 +295,7 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
                         "       enablepublicceactionreqsub=?, enablepublicceactionreqinfo=?, \n" +
                         "       enablepublicoccpermitapp=?, enablepublicoccinspectodo=?, munimanager_userid=?, \n" +
                         "       officeparcel_parcelid=?, notes=?, lastupdatedts=now(), lastupdated_userid=?, \n" +
-                        "       primarystaffcontact_userid=?, defaultoccperiod=?\n" +
+                        "       primarystaffcontact_userid=?, defaultoccperiod=?, defaultheaderimage_photodocid=?, defaultheaderimageheightpx=?\n" +
                         " WHERE municode=?;";
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -327,7 +340,14 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             
             stmt.setInt(26, muni.getDefaultOccPeriodID());
             
-            stmt.setInt(27, muni.getMuniCode());
+            if(muni.getDefaultMuniHeaderImage() != null){
+                stmt.setInt(27, muni.getDefaultMuniHeaderImage().getPhotoDocID());
+            } else {
+                stmt.setNull(27, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(28, muni.getDefaultMuniHeaderImageHeightPx());
+            stmt.setInt(29, muni.getMuniCode());
 
             stmt.executeUpdate();
             
@@ -614,11 +634,5 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
         } // close finally
-        
-        
-        
-        
     }
-    
-    
 }

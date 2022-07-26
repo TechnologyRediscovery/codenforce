@@ -1,6 +1,7 @@
 -- PATCH 42
 
 
+
 ALTER TABLE public.parcelinfo ADD COLUMN landbankprospectstart TIMESTAMP WITH TIME ZONE;
 ALTER TABLE public.parcelinfo ADD COLUMN landbankprospectstop TIMESTAMP WITH TIME ZONE;
 ALTER TABLE public.parcelinfo ADD COLUMN landbankprospectnotes TEXT;
@@ -15,6 +16,34 @@ ALTER TABLE public.parcelinfo ADD COLUMN landbankownedstop TIMESTAMP WITH TIME Z
 ALTER TABLE public.parcelinfo ADD COLUMN landbankownednotes TEXT;
 
 
+ALTER TABLE public.parcelinfo ADD COLUMN landbankprospectstartby_userid INTEGER CONSTRAINT parcelinfo_landbankprospectstart_userid_fk REFERENCES login (userid);
+ALTER TABLE public.parcelinfo ADD COLUMN landbankprospectstopby_userid INTEGER CONSTRAINT parcelinfo_landbankprospectstop_userid_fk REFERENCES login (userid);
+ALTER TABLE public.parcelinfo ADD COLUMN landbankacqcandidatestartby_userid INTEGER CONSTRAINT parcelinfo_landbankacqcandidatestart_userid_fk REFERENCES login (userid);
+ALTER TABLE public.parcelinfo ADD COLUMN landbankacqcandidatestopby_userid INTEGER CONSTRAINT parcelinfo_landbankacqcandidatestop_userid_fk REFERENCES login (userid);
+ALTER TABLE public.parcelinfo ADD COLUMN landbankpursuingstartby_userid INTEGER CONSTRAINT parcelinfo_landbankpursuingstart_userid_fk REFERENCES login (userid);
+ALTER TABLE public.parcelinfo ADD COLUMN landbankpursuingstopby_userid INTEGER CONSTRAINT parcelinfo_landbankpursuingstop_userid_fk REFERENCES login (userid);
+ALTER TABLE public.parcelinfo ADD COLUMN landbankownedstartby_userid INTEGER CONSTRAINT parcelinfo_landbankownedstart_userid_fk REFERENCES login (userid);
+ALTER TABLE public.parcelinfo ADD COLUMN landbankownedstopby_userid INTEGER CONSTRAINT parcelinfo_landbankownedstop_userid_fk REFERENCES login (userid);
+
+
+
+
+-- TEST
+-- SELECT * FROM public.event WHERE cecase_caseid IN (SELECT caseid FROM public.cecase WHERE propertyinfocase = TRUE);
+-- SELECT * FROM public.cecase WHERE proeprtyinfocase = TRUE;
+
+-- live server execution results
+DELETE FROM public.event WHERE cecase_caseid IN (SELECT caseid FROM public.cecase WHERE propertyinfocase = TRUE);
+--Query returned successfully: 16236 rows affected, 02:21 minutes execution time.
+DELETE FROM public.cecase WHERE proeprtyinfocase = TRUE;
+--
+
+
+
+ALTER TABLE public.muniprofile ADD COLUMN priorityparamdeadlineadminbufferdays INTEGER DEFAULT 10;
+ALTER TABLE public.muniprofile ADD COLUMN priorityparamnoletterbufferdays INTEGER DEFAULT 3;
+ALTER TABLE public.muniprofile ADD COLUMN priorityparamprioritizeletterfollowupbuffer BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.muniprofile ADD COLUMN priorityparamalloweventcatgreenbuffers BOOLEAN DEFAULT TRUE;
 
 
 
@@ -22,141 +51,37 @@ ALTER TABLE public.parcelinfo ADD COLUMN landbankownednotes TEXT;
 
 
 
+CREATE TABLE public.cecasepin
+(
+    cecase_caseid INTEGER CONSTRAINT cecasepin_caseid_fk REFERENCES cecase (caseid),
+    pinnedby_userid INTEGER CONSTRAINT cecasepin_userid_fk REFERENCES login (userid),
+    createdts TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    deactivatedts TIMESTAMP WITH TIME ZONE,
+    CONSTRAINT cecasepin_pk PRIMARY KEY (cecase_caseid, pinnedby_userid)
+);
 
 
 
-
--- drop these columns and check integration methods/objects for compat
--- DETAIL:  drop cascades to constraint codesetelement_feeid_fk on table codesetelement
--- drop cascades to constraint muniprofilefee__feeid_fk on table muniprofilefee
--- Query returned successfully with no result in 184 msec.
-DROP TABLE public.muniprofilefee;
-
-
-
-
--- |^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^ END GRAND TRANSACTION REVAMP |^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^|^
-
-
-
-
-
-
-
-
--- WIP fields
-ALTER TABLE public.login DROP CONSTRAINT login_personlink_personid_fk;
-ALTER TABLE public.login
-  ADD CONSTRAINT login_humanlink_humanid_fk FOREIGN KEY (personlink)
-      REFERENCES public.human (humanid) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION;
-
-
-ALTER TABLE public.cecase RENAME COLUMN login_userid TO manager_userid;
-ALTER TABLE public.cecase ADD COLUMN createdby_userid INTEGER
-	CONSTRAINT cecase_createdby_userid_fk REFERENCES login (userid);
-ALTER TABLE public.cecase ADD COLUMN createdts TIMESTAMP WITH TIME ZONE DEFAULT now();
-ALTER TABLE public.cecase ADD COLUMN deactivatedby_userid INTEGER
-	CONSTRAINT cecase_deactivatedby_userid_fk REFERENCES login (userid);
-ALTER TABLE public.cecase ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE DEFAULT now();
-UPDATE TABLE public.cecase SET createdby_userid = manager_userid;
-
-
--- finish me
-ALTER TABLE occchecklist ADD COLUMN inspectionspecific INTEGER
-    CONSTRAINT occchecklist_inspspecific_fk REFERENCES 
-
-
-ALTER TABLE public.municipality DROP COLUMN office_propertyid;
+CREATE TABLE public.occperiodpin
+(
+    occperiod_periodid INTEGER CONSTRAINT occperiodpin_caseid_fk REFERENCES occperiod (periodid),
+    pinnedby_userid INTEGER CONSTRAINT occperiodpin_userid_fk REFERENCES login (userid),
+    createdts TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    deactivatedts TIMESTAMP WITH TIME ZONE,
+    CONSTRAINT occperiodpin_pk PRIMARY KEY (occperiod_periodid, pinnedby_userid)
+);
 
 
 
 
 
+ALTER TABLE public.eventcategory ADD COLUMN prioritygreenbufferdays INTEGER DEFAULT 0;
 
+ALTER TABLE public.municipality ADD COLUMN defaultheaderimage_photodocid INTEGER CONSTRAINT muni_defheader_fk REFERENCES public.photodoc (photodocid);
+ALTER TABLE public.municipality ADD COLUMN defaultheaderimageheightpx INTEGER DEFAULT 250;
 
--- EXTRA STUFF 
-CREATE OR REPLACE FUNCTION public.cnf_nov_udpatestaticsendersigfields(targetmunicode INTEGER)
-    RETURNS INTEGER AS
-$BODY$
-    DECLARE
-        nov_rec RECORD;
-        pers_rec RECORD;
-        fullname TEXT;
-        fixedname TEXT;
-        nov_count INTEGER;
-    BEGIN
-        nov_count := 0;
-        FOR nov_rec IN SELECT noticeid, notifyingofficer_userid FROM public.noticeofviolation 
-            INNER JOIN public.cecase ON (noticeofviolation.caseid = cecase.caseid)
-            INNER JOIN public.property ON (cecase.property_propertyid = property.propertyid)
-            WHERE municipality_municode = targetmunicode AND notifyingofficer_userid IS NOT NULL
-
-            LOOP -- over NOVs by MUNI
-                SELECT personid, fname, lname, jobtitle, phonework, email 
-                    FROM public.login 
-                    LEFT OUTER JOIN public.person ON (login.personlink = person.personid) 
-                    WHERE userid = nov_rec.notifyingofficer_userid INTO pers_rec;
-
-                RAISE NOTICE 'WRITING FIXED SENDER ID % INTO NOV ID %', nov_rec.notifyingofficer_userid, nov_rec.noticeid;
-                fullname := pers_rec.fname || ' ' || pers_rec.lname;
-
-                EXECUTE format('UPDATE noticeofviolation SET 
-                    fixednotifyingofficername = %L,
-                    fixednotifyingofficertitle = %L,
-                    fixednotifyingofficerphone = %L,
-                    fixednotifyingofficeremail = %L,
-                    notifyingofficer_humanid = %L WHERE noticeid=%L;',
-                    fullname,
-                    pers_rec.jobtitle,
-                    pers_rec.phonework,
-                    pers_rec.email,
-                    pers_rec.personid,
-                    nov_rec.noticeid);
-                nov_count := nov_count + 1;
-                RAISE NOTICE 'UPDATE SUCCESS! Count: % ', nov_count;
-            END LOOP; -- loop over NOVs by MUNI
-        RETURN nov_count;
-    END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
-
-
-
--- extra gunk - not run remotely
-
-
-DROP TABLE humanmailingrole;
-
--- TODO: Remove personid_recipient on NOV after full migration to human and mailing address
--- todo clean up old citation stuff
-
-
--- TODO: Remove the codeelment_id column of occchecklistspacetypeelement
--- after the refactor 
-
-
-CREATE SEQUENCE IF NOT EXISTS occperiodlease_leaseid_seq
-    START WITH 100
-    INCREMENT BY 1
-    MINVALUE 100
-    NO MAXVALUE
-    CACHE 1;
-
-CREATE TABLE public.occperiodlease
-    (
-        leaseid             INTEGER PRIMARY KEY DEFAULT nextval('parcelunithumanlease_leaseid_seq'),
-        datestart           DATE,
-        dateend             DATE,
-        signeddate          DATE,
-        monthlyrent         MONEY,
-        -- finish me??
-        --leasor_humanid      INTEGER CONSTRAINT parcelhumanlease 
-    
-    );
-
+--******************************* LOCAL CURSOR HERE  ******************************* 
+--******************************* REMOTE CURSOR HERE  ******************************* 
 
 
 

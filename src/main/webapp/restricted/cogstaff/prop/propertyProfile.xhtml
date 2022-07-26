@@ -1141,8 +1141,8 @@
 
                                             <p:column headerText="Status"
                                                       styleClass="centeredColumnContent"
-                                                      sortBy="#{cse.statusBundle.phase.caseOpen}">
-                                                <h:outputText value="#{cse.statusBundle.phase.caseOpen ? 'Open' : 'Closed'}"/>
+                                                      sortBy="#{cse.closingDate}">
+                                                <h:outputText value="#{empty cse.closingDate ? 'Open':'Closed'}"/>
                                             </p:column>
 
                                             <p:column headerText="Name"

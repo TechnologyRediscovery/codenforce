@@ -158,7 +158,7 @@ public class PropertyProfileBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
             int newID = oc.insertOccPeriod(currentOccPeriod, getSessionBean().getSessUser());
-            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID), getSessionBean().getSessUser()));
+            getSessionBean().setSessOccPeriod(oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(newID, getSessionBean().getSessUser()), getSessionBean().getSessUser()));
         } catch (IntegrationException | BObStatusException | EventException | SearchException ex) {
             System.out.println("PropertyProfileBB.onAddOccperiodCommitButtonChange | " + ex.getClass().getCanonicalName());
             System.out.println(ex.getMessage());
@@ -209,7 +209,7 @@ public class PropertyProfileBB
                         "Unable to start occ period creation process, sorry. ", 
                         ""));
         }
-        occPeriodOriginiationEventCandidateList = ec.determinePermittedEventCategories(EventType.Occupancy, getSessionBean().getSessUser());
+        occPeriodOriginiationEventCandidateList = ec.determinePermittedEventCategories(EventType.OccupancyOrigination, getSessionBean().getSessUser());
         
         try {
             currentPropertyUnit = pc.getPropertyUnitDataHeavy(pu, getSessionBean().getSessUser());
@@ -714,7 +714,8 @@ public class PropertyProfileBB
                     getSessionBean().getSessUser(),
                     ceCaseOriginationEventSelected,
                     cear);
-            getSessionBean().setSessCECase(cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(freshID), getSessionBean().getSessUser()));
+            getSessionBean().setSessCECase( cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(freshID, getSessionBean().getSessUser()), 
+                                            getSessionBean().getSessUser()));
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully added case to property! Access the case from the list below.", ""));

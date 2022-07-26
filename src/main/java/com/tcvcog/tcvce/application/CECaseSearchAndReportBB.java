@@ -132,9 +132,9 @@ public class CECaseSearchAndReportBB
         if (!isAppendResultsToList()) {
             getCaseList().clear();
         }
-
+        querySelected.setRequestingUser(getSessionBean().getSessUser());
         try {
-            getCaseList().addAll(sc.runQuery(getQuerySelected()).getResults());
+            getCaseList().addAll(sc.runQuery(querySelected, getSessionBean().getSessUser()).getResults());
             if (getCaseList() != null) {
                 listSize = getCaseList().size();
             }

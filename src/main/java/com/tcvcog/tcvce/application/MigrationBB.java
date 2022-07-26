@@ -168,7 +168,7 @@ public class MigrationBB extends BackingBeanUtils{
             }
                 
             try {
-                currentMigrationSettings = cc.violation_migration_migrateViolations(currentMigrationSettings);
+                currentMigrationSettings = cc.violation_migration_migrateViolations(currentMigrationSettings, getSessionBean().getSessUser());
                 getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully migrated " + currentMigrationSettings.getViolationListSuccessfullyMigrated().size() + " violations!", ""));
             } catch (BObStatusException ex) {

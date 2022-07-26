@@ -22,7 +22,8 @@ import java.util.Objects;
 
 
  /**
- * @author Eric Darsow
+  * Represents a setting basket for Events
+ * @author Ellen Bascomb of Aparment 31Y
  */
 public class EventCategory implements Serializable {
     
@@ -47,6 +48,8 @@ public class EventCategory implements Serializable {
     private RoleType roleFloorEventEnact;
     private RoleType roleFloorEventView;
     private RoleType roleFloorEventUpdate;
+    
+    private int greenBufferDays;
     
     /**
      * @return the eventType
@@ -318,6 +321,20 @@ public class EventCategory implements Serializable {
      */
     public void setRoleFloorEventUpdate(RoleType roleFloorEventUpdate) {
         this.roleFloorEventUpdate = roleFloorEventUpdate;
+    }
+
+    /**
+     * @return the greenBufferDays
+     */
+    public int getGreenBufferDays() {
+        return greenBufferDays;
+    }
+
+    /**
+     * @param greenBufferDays the greenBufferDays to set
+     */
+    public void setGreenBufferDays(int greenBufferDays) {
+        this.greenBufferDays = greenBufferDays;
     }
 
     

@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -165,7 +166,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      * @throws IntegrationException 
      */
     private OccInspectedSpace generateOccInspectedSpace(ResultSet rs) throws SQLException, IntegrationException {
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         OccChecklistIntegrator oci = getOccChecklistIntegrator();
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         OccInspectedSpace inSpace = null;
@@ -177,7 +178,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             
             inSpace.setType(oci.getOccSpaceTypeChecklistified(rs.getInt("occchecklistspacetype_chklstspctypid")));
             
-            inSpace.setAddedToChecklistBy(ui.getUser(rs.getInt("addedtochecklistby_userid")));
+            inSpace.setAddedToChecklistBy(uc.user_getUser(rs.getInt("addedtochecklistby_userid")));
             inSpace.setInspectionID(rs.getInt("occinspection_inspectionid"));
             
             if (rs.getTimestamp("addedtochecklistts") != null) {
@@ -259,7 +260,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      */
     private OccInspectedSpaceElement generateInspectedSpaceElement(ResultSet rs) throws SQLException, IntegrationException {
             CodeIntegrator ci = getCodeIntegrator();
-            UserIntegrator ui = getUserIntegrator();
+            UserCoordinator uc = getUserCoordinator();
             CaseIntegrator cseint = getCaseIntegrator();
             BlobCoordinator bc = getBlobCoordinator();
             SystemIntegrator si = getSystemIntegrator();
@@ -273,17 +274,17 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             
             inspectedEle.setInspectionNotes(rs.getString("oisenotes"));
             inspectedEle.setLocation(getLocationDescriptor(rs.getInt("locationdescription_id")));
-            inspectedEle.setLastInspectedBy(ui.getUser(rs.getInt("lastinspectedby_userid")));
+            inspectedEle.setLastInspectedBy(uc.user_getUser(rs.getInt("lastinspectedby_userid")));
             
             if (rs.getTimestamp("lastinspectedts") != null) {
                 inspectedEle.setLastInspectedTS(rs.getTimestamp("lastinspectedts").toLocalDateTime());
             }
-            inspectedEle.setComplianceGrantedBy(ui.getUser(rs.getInt("compliancegrantedby_userid")));
+            inspectedEle.setComplianceGrantedBy(uc.user_getUser(rs.getInt("compliancegrantedby_userid")));
             if (rs.getTimestamp("compliancegrantedts") != null) {
                 inspectedEle.setComplianceGrantedTS(rs.getTimestamp("compliancegrantedts").toLocalDateTime());
             }
             inspectedEle.setInspectedSpaceID(rs.getInt("inspectedspace_inspectedspaceid"));
-            inspectedEle.setOverrideRequiredFlag_thisElementNotInspectedBy(ui.getUser(rs.getInt("overriderequiredflagnotinspected_userid")));
+            inspectedEle.setOverrideRequiredFlag_thisElementNotInspectedBy(uc.user_getUser(rs.getInt("overriderequiredflagnotinspected_userid")));
             
             inspectedEle.setFaillureSeverity(si.getIntensityClass(rs.getInt("failureseverity_intensityclassid")));
             
@@ -946,16 +947,14 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      */
     private FieldInspection generateOccInspection(ResultSet rs) throws IntegrationException, SQLException {
             FieldInspection ins = new FieldInspection();
-            
-            
-            UserIntegrator ui = getUserIntegrator();
+            UserCoordinator uc = getUserCoordinator();
             PersonCoordinator pc = getPersonCoordinator();
         try {
             
             ins.setInspectionID(rs.getInt("inspectionid"));
             ins.setOccPeriodID(rs.getInt("occperiod_periodid"));
             ins.setCecaseID(rs.getInt("cecase_caseid"));
-            ins.setInspector(ui.getUser(rs.getInt("inspector_userid")));
+            ins.setInspector(uc.user_getUser(rs.getInt("inspector_userid")));
             ins.setPacc(rs.getInt("publicaccesscc"));
             
             ins.setEnablePacc(rs.getBoolean("enablepacc"));
@@ -968,7 +967,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             }
             
             if (rs.getInt("thirdpartyinspectorapprovalby") != 0) {
-                ins.setThirdPartyApprovalBy(ui.getUser(rs.getInt("thirdpartyinspectorapprovalby")));
+                ins.setThirdPartyApprovalBy(uc.user_getUser(rs.getInt("thirdpartyinspectorapprovalby")));
             }
             ins.setMaxOccupantsAllowed(rs.getInt("maxoccupantsallowed"));
             ins.setNumBedrooms(rs.getInt("numbedrooms"));
@@ -989,7 +988,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
                 ins.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
             }
             if (rs.getInt("deactivatedby_userid") != 0) {
-                ins.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+                ins.setDeactivatedBy(uc.user_getUser(rs.getInt("deactivatedby_userid")));
             }
             if (rs.getTimestamp("timestart") != null) {
                 ins.setTimeStart(rs.getTimestamp("timestart").toLocalDateTime());
@@ -999,20 +998,20 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             }
             
             if (rs.getInt("createdby_userid") != 0) {
-                ins.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+                ins.setCreatedBy(uc.user_getUser(rs.getInt("createdby_userid")));
             }
             if (rs.getTimestamp("lastupdatedts") != null) {
                 ins.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
             }
             if (rs.getInt("lastupdatedby_userid") != 0) {
-                ins.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+                ins.setLastUpdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
             }
             if (rs.getInt("determination_detid") != 0) {
                 ins.setDetermination(getDetermination(rs.getInt("determination_detid")));
             }
             
             if (rs.getInt("determinationby_userid") != 0) {
-                ins.setLastUpdatedBy(ui.getUser(rs.getInt("determinationby_userid")));
+                ins.setLastUpdatedBy(uc.user_getUser(rs.getInt("determinationby_userid")));
             }
             if (rs.getTimestamp("determinationts") != null) {
                 ins.setDeterminationTS(rs.getTimestamp("determinationts").toLocalDateTime());
@@ -1745,7 +1744,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         if(rs == null){
             return reqAssigned;
         }
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         try {            
             //check for null rs
             //if not null make a new instance of OccInspectionRequirementAssigned
@@ -1753,12 +1752,12 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
             reqAssigned = new OccInspectionRequirementAssigned(getRequirement(rs.getInt("occrequirement_requirementid")));
             reqAssigned.setInspectionID(rs.getInt("occinspection_inspectionid"));
             
-            reqAssigned.setAssignedBy(ui.getUser(rs.getInt("assignedby")));
+            reqAssigned.setAssignedBy(uc.user_getUser(rs.getInt("assignedby")));
             reqAssigned.setAssignedDate(rs.getTimestamp("assigneddate").toLocalDateTime());
             reqAssigned.setAssignedNotes(rs.getString("assignednotes"));
             
             if(rs.getTimestamp("fulfilleddate") != null){
-                reqAssigned.setFulfilledBy(ui.getUser(rs.getInt("fulfilledby")));
+                reqAssigned.setFulfilledBy(uc.user_getUser(rs.getInt("fulfilledby")));
                 reqAssigned.setFulfilledDate(rs.getTimestamp("fulfilleddate").toLocalDateTime());
                 reqAssigned.setFulfilledNotes(rs.getString("fulfillednotes"));
             }

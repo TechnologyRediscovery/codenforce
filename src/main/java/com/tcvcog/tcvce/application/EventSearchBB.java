@@ -128,7 +128,7 @@ public class EventSearchBB extends BackingBeanUtils{
         }
         List<EventCnFPropUnitCasePeriodHeavy> evList;
         try {
-            evList = sc.runQuery(querySelected).getBOBResultList();
+            evList = sc.runQuery(querySelected, getSessionBean().getSessUser()).getBOBResultList();
             if(!appendResultsToList && eventListManaged != null){
                 eventListRaw.clear();
             } 

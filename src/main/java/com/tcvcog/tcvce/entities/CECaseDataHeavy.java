@@ -200,39 +200,7 @@ public class CECaseDataHeavy
         this.ceActionRequestList = ceActionRequestList;
     }
 
-    /**
-     * @return the violationListUnresolved
-     */
-    public List<CodeViolation> getViolationListUnresolved() {
-
-        List<CodeViolation> violationListUnresolved = new ArrayList<>();
-        if (violationList != null && violationList.size() > 0) {
-            for (CodeViolation v : violationList) {
-                if (v.getActualComplianceDate() == null) {
-                    violationListUnresolved.add(v);
-                }
-            }
-        }
-
-        return violationListUnresolved;
-    }
-
-    /**
-     * @return the violationListResolved
-     */
-    public List<CodeViolation> getViolationListResolved() {
-        List<CodeViolation> violationListResolved = new ArrayList<>();
-        if (violationList != null && violationList.size() > 0) {
-            for (CodeViolation v : violationList) {
-                if (v.getActualComplianceDate() != null) {
-                    violationListResolved.add(v);
-                }
-            }
-        }
-
-        return violationListResolved;
-    }
-
+  
     /**
      * @return the proposalList
      */

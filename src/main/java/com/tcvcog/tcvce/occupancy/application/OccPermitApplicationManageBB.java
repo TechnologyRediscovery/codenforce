@@ -587,7 +587,7 @@ public class OccPermitApplicationManageBB extends BackingBeanUtils implements Se
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Application successfully attached to Occ Period!", ""));
 
-            selectedApplication.setConnectedPeriod(oc.getOccPeriod(newPeriodID));
+            selectedApplication.setConnectedPeriod(oc.getOccPeriod(newPeriodID, getSessionBean().getSessUser()));
 
             getSessionBean().setSessOccPermitApplication(selectedApplication);
 

@@ -23,6 +23,7 @@ import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
@@ -261,7 +262,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         PersonIntegrator pi = getPersonIntegrator();
         PersonCoordinator perc = getPersonCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         
         actionRequest.setRequestStatus(getRequestStatus(rs.getInt("status_id")));
         actionRequest.setPaccEnabled(rs.getBoolean("paccenabled"));
@@ -290,7 +291,7 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         java.sql.Timestamp ts = rs.getTimestamp("caseattachmenttimestamp");
         if(ts != null){
             actionRequest.setCaseAttachmentTimeStamp(ts.toLocalDateTime());
-            actionRequest.setCaseAttachmentUser(ui.getUser(rs.getInt("caseattachment_userid")));
+            actionRequest.setCaseAttachmentUser(uc.user_getUser(rs.getInt("caseattachment_userid")));
         }
         
         actionRequest.setAnonymitiyRequested(rs.getBoolean("anonymityRequested"));
@@ -317,8 +318,9 @@ public class CEActionRequestIntegrator extends BackingBeanUtils implements Seria
         
         
         try {
-            cecase = cc.cecase_getCECase(cecaseID);
+            cecase = cc.cecase_getCECase(cecaseID, getSessionBean().getSessUser());
         } catch (IntegrationException ex) {
+            System.out.println(ex);
             throw new BObStatusException("Cannot find a CECase to which the action request can be connected");
         }
         if (cecase == null) {

@@ -453,7 +453,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
              if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
              if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
         } // close finally
-        return oc.configureOccPeriod(op);
+        return op;
     }
 
     /**
@@ -466,7 +466,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
      */
     private OccPeriod generateOccPeriod(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
         SystemIntegrator si = getSystemIntegrator();
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
 
         OccPeriod op = new OccPeriod();
 
@@ -479,7 +479,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             op.setStartDate(rs.getTimestamp("startdate").toLocalDateTime());
         }
             
-        op.setStartDateCertifiedBy(ui.getUser(rs.getInt("startdatecertifiedby_userid")));
+        op.setStartDateCertifiedBy(uc.user_getUser(rs.getInt("startdatecertifiedby_userid")));
         if(rs.getTimestamp("startdatecertifiedts") != null){
             op.setStartDateCertifiedTS(rs.getTimestamp("startdatecertifiedts").toLocalDateTime());
         }
@@ -487,17 +487,17 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         if(rs.getTimestamp("enddate") != null){
             op.setEndDate(rs.getTimestamp("enddate").toLocalDateTime());
         }
-        op.setEndDateCertifiedBy(ui.getUser(rs.getInt("enddatecertifiedby_userid")));
+        op.setEndDateCertifiedBy(uc.user_getUser(rs.getInt("enddatecertifiedby_userid")));
         if(rs.getTimestamp("enddatecterifiedts") != null){
             op.setEndDateCertifiedTS(rs.getTimestamp("enddatecterifiedts").toLocalDateTime());
         }
 
-        op.setManager(ui.getUser(rs.getInt("manager_userid")));
+        op.setManager(uc.user_getUser(rs.getInt("manager_userid")));
 
         if(rs.getTimestamp("authorizationts") != null){
             op.setAuthorizedTS(rs.getTimestamp("authorizationts").toLocalDateTime());
         }
-        op.setAuthorizedBy(ui.getUser(rs.getInt("authorizedby_userid")));
+        op.setAuthorizedBy(uc.user_getUser(rs.getInt("authorizedby_userid")));
 
         op.setOverrideTypeConfig(rs.getBoolean("overrideperiodtypeconfig"));
         op.setNotes(rs.getString("notes"));

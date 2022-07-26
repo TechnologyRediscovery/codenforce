@@ -517,7 +517,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    // CECase list
                    QueryCECase qcse = sc.initQuery(QueryCECaseEnum.PROPERTY, ua.getKeyCard());
                    qcse.getPrimaryParams().setProperty_val(prop);
-                   pdh.setCeCaseList(sc.runQuery(qcse).getResults());
+                   pdh.setCeCaseList(sc.runQuery(qcse, ua).getResults());
 
                    // Property info cases
                    // DISABLED PROPERTY INFO CASES JULY 2022
@@ -626,6 +626,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
     /**
      *
      * @param propUnit
+     * @param ua
      * @param cred
      * @return
      * @throws IntegrationException
@@ -871,7 +872,7 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                     cse.setNotes("This is a Case object that contains information and events attached to " + p.getAddressString() + ". "
                             + "This case does not represent an actual code enforcement case.");
                     int freshid = cc.cecase_insertNewCECase(cse, ua, null, null);
-                    csehv = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(freshid), ua);
+                    csehv = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(freshid, ua), ua);
 
                 } catch (IntegrationException | BObStatusException | EventException | ViolationException ex) {
                     System.out.println(ex);

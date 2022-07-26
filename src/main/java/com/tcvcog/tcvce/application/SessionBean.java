@@ -65,6 +65,14 @@ import java.util.logging.Logger;
 public class    SessionBean 
         extends BackingBeanUtils {
     
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                      N Managed Lists                           <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    
+    
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                      N User                                    <<< */
     /* >>> -------------------------------------------------------------- <<< */
@@ -442,6 +450,7 @@ public class    SessionBean
      * get flagged with a marker enum indicating that's it's the user chosen
      * object
      * @return the page to navigate to
+     * @deprecated replaced in phases by IFace_managedSessionListed
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public String navigateToPageCorrespondingToObject(IFace_ActivatableBOB bob) throws BObStatusException{
@@ -486,7 +495,7 @@ public class    SessionBean
                 if  (sessCECaseList != null && !sessCECaseList.isEmpty()) {
                     sessCECase = cc.cecase_assembleCECaseDataHeavy(sessCECaseList.get(0), ua);
                     sessEventList = ec.assembleEventCnFPropUnitCasePeriodHeavyList(
-                            sessCECase.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN));
+                            sessCECase.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN), sessUser);
                     sessCEARList = sessCECase.getCeActionRequestList();
                     
                     sessCECaseRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
@@ -620,7 +629,7 @@ public class    SessionBean
                 CEActionRequest cear = (CEActionRequest) bob;
             } else if (bob instanceof OccPermit){
                 OccPermit permit = (OccPermit) bob;
-                OccPeriod period = oc.getOccPeriod(permit.getPeriodID());
+                OccPeriod period = oc.getOccPeriod(permit.getPeriodID(), ua);
                 setSessOccPeriodFromPeriodBase(period);
                 setSessProperty(sessOccPeriod.getPropUnitProp().getProperty());
                 sessCECaseList = sessProperty.getCeCaseList();
@@ -1219,7 +1228,7 @@ public class    SessionBean
     public void setSessOccPeriodListLight(List<OccPeriod> lightOccPeriodList) {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            setSessOccPeriodList(oc.getOccPeriodPropertyUnitHeavyList(lightOccPeriodList));
+            setSessOccPeriodList(oc.getOccPeriodPropertyUnitHeavyList(lightOccPeriodList, sessUser));
         } catch (IntegrationException ex) {
             System.out.println(ex);
         }

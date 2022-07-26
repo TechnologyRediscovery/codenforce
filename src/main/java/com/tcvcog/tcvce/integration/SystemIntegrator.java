@@ -18,8 +18,10 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.IFace_pinnable;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.BOBSource;
@@ -117,6 +119,133 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
         
     }
     
+    /**
+     * Writes an entry to the pinning tables for a given pinnable
+     * @param pinnable 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void pinObject(IFace_pinnable pinnable) throws IntegrationException{
+    
+        if(pinnable == null || pinnable.getDBKey() == 0 || pinnable.getPinner() == null){
+            throw new IntegrationException("Cannot pin object with null pinnable, user, or cecase");
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("INSERT INTO ");
+        sb.append(pinnable.getPinTableName());
+        sb.append("(");
+        sb.append(pinnable.getPinTableFKString());
+        sb.append(", pinnedby_userid, createdts, deactivatedts) VALUES (?, ?, now(), NULL);");
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, pinnable.getPinner().getUserID());
+            stmt.setInt(2, pinnable.getDBKey());
+
+            stmt.execute();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("SystemIntegrator.pinObject | Tracked Entity has been deactivated", ex);
+
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    /**
+     * Deactivates the pinning entry for the given pinnable
+     * @param pinnable 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void unPinObject(IFace_pinnable pinnable) throws IntegrationException{
+        
+        if(pinnable == null || pinnable.getDBKey() == 0 || pinnable.getPinner() == null){
+            throw new IntegrationException("Cannot pin object with null pinnable, user, or cecase");
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("UPDATE public.cecasepin\n");
+        sb.append("   SET deactivatedts=now() WHERE ");
+        sb.append(pinnable.getPinTableFKString());
+        sb.append("=? AND pinnedby_userid=?;");
+        
+        Connection con = getPostgresCon();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, pinnable.getDBKey());
+            stmt.setInt(2, pinnable.getPinner().getUserID());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("SystemIntegrator.unPinObject: Database error: Pin record cannot be deactivated", ex);
+
+        } finally{
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+             if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    
+    /**
+     * Queries the appropriate pinning table to determine the 
+     * current pinning status of the given pinnable
+     * @param pinnable
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public boolean getPinnedStatus(IFace_pinnable pinnable) throws IntegrationException{
+        boolean pinned = false;
+        if(pinnable == null || pinnable.getPinner() == null){
+            throw new IntegrationException("Cannot query pinned status with null pinable or null user");
+        }
+        
+
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT createdts ");
+        sb.append(" FROM ");
+        sb.append(pinnable.getPinTableName());
+        sb.append(" WHERE ");
+        sb.append(pinnable.getPinTableFKString());
+        sb.append("=? AND pinnedby_userid=?;");
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+
+            stmt.setInt(1, pinnable.getDBKey());
+            stmt.setInt(2, pinnable.getPinner().getUserID());
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) { 
+                System.out.println("SystemIntegrator.getPinnedStatus | Found record in " + pinnable.getPinTableName() + " for PK " + pinnable.getDBKey());
+                pinned = true;
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("SystemIntegrator.getPinnedStatus | fatal integration error", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        
+        return pinned;
+    }
+    
+    
     
     /**
      * Utility method for populating record tracking fields:
@@ -133,7 +262,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
      * @throws SQLException 
      */
     public void populateTrackedFields(TrackedEntity te, ResultSet rs, boolean userIDOnly) throws SQLException, IntegrationException, BObStatusException{
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         
         if(rs != null){
             
@@ -144,7 +273,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 if(userIDOnly){
                     te.setCreatedByUserID(rs.getInt("createdby_userid"));
                 } else {
-                    te.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+                    te.setCreatedBy(uc.user_getUser(rs.getInt("createdby_userid")));
                 }
             }
             
@@ -155,7 +284,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 if(userIDOnly){
                     te.setLastUpdatedByUserID((rs.getInt("lastupdatedby_userid")));
                 } else {
-                    te.setLastUpdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+                    te.setLastUpdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
                 }
             }
             
@@ -166,7 +295,7 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
                 if(userIDOnly){
                     te.setDeactivatedByUserID(rs.getInt("deactivatedby_userid"));
                 } else {
-                    te.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+                    te.setDeactivatedBy(uc.user_getUser(rs.getInt("deactivatedby_userid")));
                 }
             }
         }
@@ -1081,10 +1210,10 @@ public class SystemIntegrator extends BackingBeanUtils implements Serializable {
     }
 
     private ImprovementSuggestion generateImprovementSuggestion(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         ImprovementSuggestion is = new ImprovementSuggestion();
         is.setSuggestionID(rs.getInt("improvementid"));
-        is.setSubmitter(ui.getUser(rs.getInt("submitterid")));
+        is.setSubmitter(uc.user_getUser(rs.getInt("submitterid")));
         is.setImprovementTypeID(rs.getInt("improvementtypeid"));
         is.setImprovementTypeStr(rs.getString("typetitle"));
         is.setReply(rs.getString("improvementreply"));

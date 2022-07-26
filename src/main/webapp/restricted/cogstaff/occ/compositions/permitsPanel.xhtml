@@ -1253,7 +1253,8 @@
                                   style="font-weight: bold; font-size:1.4em;"/>
                     <p:spacer height="3px" />
                     <h:outputText value="#{occPeriodBB.currentOccPermit.staticmuniaddress}"
-                                  escape="false"/>
+                                  escape="false"
+                                  rendered="#{!empty occPeriodBB.currentOccPermit.staticmuniaddress}"/>
                 </div>
                 <div class="p-col-4 restrict-data-field-label-inline">
                     <h:outputText value="Property:" />

@@ -38,15 +38,18 @@ public class MuniProfile {
     private int continuousoccupancybufferdays;
     private int minimumuserranktodeclarerentalintent;
     
-    protected int priorityDeadlineBufferDays;
-    protected int violationsWithoutLetterBufferDays;
-    protected boolean prioritizeLetterFollowUpWindowOverStipCompDate;
-    
     private int novDefaultDaysForFollowup;
     
     private EventRuleSet eventRuleSetCE;
     private List<OccPermitType> occPermitTypeList;
     private List<Fee> feeList;
+    
+    // CECASE PRIORITY PARAMETERS
+    private int priorityParamDeadlineAdministrativeBufferDays;
+    private int priorityParamLetterSendBufferDays;
+    private boolean prioritizeLetterFollowUpBuffer;
+    private boolean priorityAllowEventCategoryGreenBuffers;
+    
 
     /**
      * @return the profileID
@@ -261,45 +264,61 @@ public class MuniProfile {
         this.feeList = feeList;
     }
 
+   
+
     /**
-     * @return the priorityDeadlineBufferDays
+     * @return the priorityParamDeadlineAdministrativeBufferDays
      */
-    public int getPriorityDeadlineBufferDays() {
-        return priorityDeadlineBufferDays;
+    public int getPriorityParamDeadlineAdministrativeBufferDays() {
+        return priorityParamDeadlineAdministrativeBufferDays;
     }
 
     /**
-     * @param priorityDeadlineBufferDays the priorityDeadlineBufferDays to set
+     * @return the priorityParamLetterSendBufferDays
      */
-    public void setPriorityDeadlineBufferDays(int priorityDeadlineBufferDays) {
-        this.priorityDeadlineBufferDays = priorityDeadlineBufferDays;
+    public int getPriorityParamLetterSendBufferDays() {
+        return priorityParamLetterSendBufferDays;
     }
 
     /**
-     * @return the violationsWithoutLetterBufferDays
+     * @return the prioritizeLetterFollowUpBuffer
      */
-    public int getViolationsWithoutLetterBufferDays() {
-        return violationsWithoutLetterBufferDays;
+    public boolean isPrioritizeLetterFollowUpBuffer() {
+        return prioritizeLetterFollowUpBuffer;
     }
 
     /**
-     * @param violationsWithoutLetterBufferDays the violationsWithoutLetterBufferDays to set
+     * @return the priorityAllowEventCategoryGreenBuffers
      */
-    public void setViolationsWithoutLetterBufferDays(int violationsWithoutLetterBufferDays) {
-        this.violationsWithoutLetterBufferDays = violationsWithoutLetterBufferDays;
+    public boolean isPriorityAllowEventCategoryGreenBuffers() {
+        return priorityAllowEventCategoryGreenBuffers;
     }
 
     /**
-     * @return the prioritizeLetterFollowUpWindowOverStipCompDate
+     * @param priorityParamDeadlineAdministrativeBufferDays the priorityParamDeadlineAdministrativeBufferDays to set
      */
-    public boolean isPrioritizeLetterFollowUpWindowOverStipCompDate() {
-        return prioritizeLetterFollowUpWindowOverStipCompDate;
+    public void setPriorityParamDeadlineAdministrativeBufferDays(int priorityParamDeadlineAdministrativeBufferDays) {
+        this.priorityParamDeadlineAdministrativeBufferDays = priorityParamDeadlineAdministrativeBufferDays;
     }
 
     /**
-     * @param prioritizeLetterFollowUpWindowOverStipCompDate the prioritizeLetterFollowUpWindowOverStipCompDate to set
+     * @param priorityParamLetterSendBufferDays the priorityParamLetterSendBufferDays to set
      */
-    public void setPrioritizeLetterFollowUpWindowOverStipCompDate(boolean prioritizeLetterFollowUpWindowOverStipCompDate) {
-        this.prioritizeLetterFollowUpWindowOverStipCompDate = prioritizeLetterFollowUpWindowOverStipCompDate;
+    public void setPriorityParamLetterSendBufferDays(int priorityParamLetterSendBufferDays) {
+        this.priorityParamLetterSendBufferDays = priorityParamLetterSendBufferDays;
+    }
+
+    /**
+     * @param prioritizeLetterFollowUpBuffer the prioritizeLetterFollowUpBuffer to set
+     */
+    public void setPrioritizeLetterFollowUpBuffer(boolean prioritizeLetterFollowUpBuffer) {
+        this.prioritizeLetterFollowUpBuffer = prioritizeLetterFollowUpBuffer;
+    }
+
+    /**
+     * @param priorityAllowEventCategoryGreenBuffers the priorityAllowEventCategoryGreenBuffers to set
+     */
+    public void setPriorityAllowEventCategoryGreenBuffers(boolean priorityAllowEventCategoryGreenBuffers) {
+        this.priorityAllowEventCategoryGreenBuffers = priorityAllowEventCategoryGreenBuffers;
     }
 }

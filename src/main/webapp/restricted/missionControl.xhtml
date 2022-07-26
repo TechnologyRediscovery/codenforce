@@ -36,12 +36,12 @@
                                             collapsed="false"
                                             rendered="true"
                                             header="Activity in #{sessionBean.sessMuni.muniName}" >
-                                   
-                                    
+
+
                                     <ui:include src="cogstaff/compositions/eventSearch.xhtml" />
                                 </p:panel>
 
-                        
+
                                 <ui:include src="cogstaff/occ/compositions/occPeriodListSearch.xhtml"/>
                                 <ui:include src="cogstaff/occ/compositions/occPermitListSearch.xhtml"/>
 
@@ -117,18 +117,10 @@
 
                                         </p:dataTable>
                                     </h:form>
-
                                 </p:panel>
-
-
-
-
-
                             </div>
 
-
                             <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
-
                                 <p:panel    id="cecase-query-panel"
                                             toggleable="true"
                                             widgetVar="cecase-query-panel-var"
@@ -266,7 +258,7 @@
                                             rowExpandMode="single"
                                             expandedRow="false"
                                             resizableColumns="true"
-                                            rowStyleClass="#{!empty cse.priority ? cse.priority.rowStyleClass:''}">
+                                            >
 
                                             <p:column width="5%">
                                                 <f:facet name="header">
@@ -274,18 +266,20 @@
                                                 </f:facet>
                                                 <p:rowToggler />
                                             </p:column>
-                                            <p:column width="10%" sortBy="#{cse.priority.label}">
+                                            <p:column width="15%" 
+                                                      sortBy="#{cse.priority.label}"
+                                                      styleClass="#{!empty cse.priority ? cse.priority.rowStyleClass:''}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Priority" />
                                                 </f:facet>
-                                                  <i class="material-icons">
-                                                      <h:outputText value="#{!empty cse.priorityIcon ? cse.priorityIcon.materialIcon:''}"/>
-                                                  </i>
+                                                <i class="material-icons">
+                                                    <h:outputText value="#{!empty cse.priorityIcon ? cse.priorityIcon.materialIcon:''}"/>
+                                                </i>
                                                 <p:spacer height="3px" />
                                                 <h:outputText value="#{cse.priority.label}" style="font-size:0.7em;" />
 
                                             </p:column>
-                                            <p:column width="20%" sortBy="#{cse.caseManager.human.name}">
+                                            <p:column width="15%" sortBy="#{cse.caseManager.human.name}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Manager" />
                                                 </f:facet>
@@ -303,33 +297,31 @@
                                             <p:column width="35%" 
                                                       sortBy="#{cse.property.address.buildingNo}"
                                                       filterBy="#{cse.originationEvent.category.eventCategoryTitle}">
-                                                      
+
                                                 <f:facet name="header">
                                                     <h:outputText value="Info" />
                                                 </f:facet>
-                                                
+
                                                 <h:outputText value="#{cse.property.address.addressPretty1Line} "
                                                               styleClass="bold"/>
-                                                    
+
                                                 <f:subview id="case-property-unit-subview"
-                                                               rendered="#{!empty cse.propUnit}" >
-                                                        
-                                                            <p:spacer height="2px"
-                                                                          rendered="#{!(empty cse.propUnit)}"/>
-                                                            <h:outputText value="Unit: #{cse.propUnit.unitNumber}" />
-                                                    </f:subview>
+                                                           rendered="#{!empty cse.propUnit}" >
+
                                                     <p:spacer height="2px"
-                                                                  rendered="#{!(empty cse.originationEvent)}"/>
+                                                              rendered="#{!(empty cse.propUnit)}"/>
+                                                    <h:outputText value="Unit: #{cse.propUnit.unitNumber}" />
+                                                </f:subview>
+                                                <p:spacer height="2px"
+                                                          rendered="#{!(empty cse.originationEvent)}"/>
 
-                                                    <h:outputText value="Origin: #{cse.originationEvent.category.eventCategoryTitle}"
-                                                                  rendered="#{!empty cse.originationEvent}"/>
-                                                    <p:spacer height="2px" />
-                                                    <h:outputText value="Name: #{cse.caseName}"/>
+                                                <h:outputText value="Origin: #{cse.originationEvent.category.eventCategoryTitle}"
+                                                              rendered="#{!empty cse.originationEvent}"/>
+                                                <p:spacer height="2px" />
+                                                <h:outputText value="Name: #{cse.caseName}"/>
 
-                                                
-                                            
                                             </p:column>
-                                            
+
                                             <p:column width="10%">
                                                 <f:facet name="header">
                                                     <h:outputText value="Actions" />
@@ -340,60 +332,106 @@
                                                     <p:commandLink  id="cecase-search-view-case"
                                                                     value="view"
                                                                     action="#{navigationBB.onCECaseListItemSelect(cse)}"
-                                                                    ajax="false"/>
+                                                                    ajax="false" />
+                                                    <p:spacer height="2px" />
+                                                    <p:commandLink  id="cecase-search-action-link"
+                                                                    value="actions"
+                                                                    type="button"
+                                                                    disabled="true"
+                                                                    ajax="true" />
                                                     <p:spacer height="2px" />
                                                     <h:outputText value="(ID: #{cse.caseID})" />
-                                                   
+
 
                                                 </div>
+                                                <p:overlayPanel for="cecase-search-action-link"
+                                                                style="width:350px;" 
+                                                                dismissable="true"
+                                                                showCloseIcon="true" >
+
+                                                    <h4>Actions available for case id 
+                                                        <h:outputText value="#{cse.caseID}" />
+                                                    </h4>
+
+                                                    <div class="restrict-main-contents-io-link">
+                                                        <p:commandLink  id="cecase-action-pincase"
+                                                                        value="#{cse.pinned ? 'unpin case':'pin case'}"
+                                                                        actionListener="#{pinningBB.togglePin(cse)}"
+                                                                        style="button"
+                                                                        ajax="true"
+                                                                        update="@form" />
+
+                                                        <p:spacer height="3px" />
+
+                                                        <p:commandLink  id="cecase-action-logevent"
+                                                                        value="log new event"
+                                                                        style="button"
+                                                                        ajax="true"
+                                                                        actionListener="#{eventBB.onEventAddInit(cse)}"
+                                                                        oncomplete="PF('event-add-dialog-var').show()"
+                                                                        update="event-add-dialog"/>
+
+                                                        <p:spacer height="3px" />
+
+                                                        <p:commandLink  id="cecase-action-extendstipcomp"
+                                                                        value="extend stipulated compliance date(s)"
+                                                                        style="button"
+                                                                        actionListener="#{ceCaseBB.onViolationUpdateStipCompDateBatch(cse)}"
+                                                                        update="violation-update-stipdates-batch-form"
+                                                                        oncomplete="PF('violation-update-stipdates-batch-dialog-var').show();"
+                                                                        ajax="true" />
+                                                    </div>
+
+                                                </p:overlayPanel>
+
                                             </p:column>
                                             <p:rowExpansion>
                                                 <h4>Case Details 
                                                     <h:outputText value=" (#{cse.daysSinceLastEvent} days since last event)" />
 
                                                 </h4>
-                                               
-                                                    <p:spacer height="3px" />
-                                                                  
-                                                 <p:accordionPanel id="case-expansioninfo-panel">
-                                                     <p:tab title="Violations (#{cse.violationList.size()})">
+
+                                                <p:spacer height="3px" />
+
+                                                <p:accordionPanel id="case-expansioninfo-panel">
+                                                    <p:tab title="Violations (#{cse.violationList.size()})">
 
                                                         <p:dataScroller id="violations-scroller"
-                                                                      value="#{cse.violationList}"
-                                                                      var="viol"
-                                                                      style="font-family: sans-serif;">
+                                                                        value="#{cse.violationList}"
+                                                                        var="viol"
+                                                                        style="font-family: sans-serif;">
 
-                                                          <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
-                                                                        style="font-weight: bold;"/>
-
-
-                                                          <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
-                                                                        style="font-weight: bold;"/>
-
-                                                          <h:outputText    id="violation-scroller-chapter-ot"
-                                                                           value="#{viol.violatedEnfElement.headerString}"
-                                                                           escape="false"/>
+                                                            <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
+                                                                          style="font-weight: bold;"/>
 
 
-                                                      </p:dataScroller>
-                                                         
-                                                     </p:tab>
-                                                     <p:tab title="Notices (#{cse.noticeList.size()})">
+                                                            <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
+                                                                          style="font-weight: bold;"/>
+
+                                                            <h:outputText    id="violation-scroller-chapter-ot"
+                                                                             value="#{viol.violatedEnfElement.headerString}"
+                                                                             escape="false"/>
+
+
+                                                        </p:dataScroller>
+
+                                                    </p:tab>
+                                                    <p:tab title="Notices (#{cse.noticeList.size()})">
 
                                                         <p:dataScroller id="case-nov-scroller"
-                                                                       value="#{cse.noticeList}"
-                                                                       var="nov"
-                                                                       style="font-family: sans-serif;">
+                                                                        value="#{cse.noticeList}"
+                                                                        var="nov"
+                                                                        style="font-family: sans-serif;">
 
-                                                           <h:outputText value="Mailed on: " 
-                                                                         rendered="#{!(empty nov.sentTS)}"/>
-                                                           <h:outputText value="#{nov.sentTSPretty}"
-                                                                         rendered="#{!(empty nov.sentTS)}"/>
+                                                            <h:outputText value="Mailed on: " 
+                                                                          rendered="#{!(empty nov.sentTS)}"/>
+                                                            <h:outputText value="#{nov.sentTSPretty}"
+                                                                          rendered="#{!(empty nov.sentTS)}"/>
 
-                                                       </p:dataScroller>
-                                                         
-                                                     </p:tab>
-                                                     <p:tab title="Citations (#{cse.citationList.size()})">
+                                                        </p:dataScroller>
+
+                                                    </p:tab>
+                                                    <p:tab title="Citations (#{cse.citationList.size()})">
 
                                                         <p:dataScroller id="case-citations-scroller"
                                                                         value="#{cse.citationList}"
@@ -403,31 +441,31 @@
                                                                 <h:outputText value="ID: #{cit.citationNo}" />
                                                             </div>
                                                             <p:spacer height="3px" />
-                                                              <ui:repeat id="citation-status-uir"
-                                                                        value="#{cit.statusLog}"
-                                                                        var="logentry">
-                                                                 <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
-                                                                 <p:spacer height="3px" />
-                                                             </ui:repeat>
+                                                            <ui:repeat id="citation-status-uir"
+                                                                       value="#{cit.statusLog}"
+                                                                       var="logentry">
+                                                                <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
+                                                                <p:spacer height="3px" />
+                                                            </ui:repeat>
                                                         </p:dataScroller>
-                                                         
-                                                     </p:tab>
-                                                     <p:tab title="Events (#{cse.eventList.size()})">
+
+                                                    </p:tab>
+                                                    <p:tab title="Events (#{cse.eventList.size()})">
                                                         <p:dataScroller id="case-events-scroller"
                                                                         value="#{cse.eventList}"
                                                                         var="ev">
-                                                                <h:outputText value="#{missionControlBB.getPrettyDate(ev.timeStart)}" 
-                                                                              style="font-weight: bold;"/>
-                                                                <h:outputText value=": "
-                                                                              style="font-weight: bold;"/>
+                                                            <h:outputText value="#{missionControlBB.getPrettyDate(ev.timeStart)}" 
+                                                                          style="font-weight: bold;"/>
+                                                            <h:outputText value=": "
+                                                                          style="font-weight: bold;"/>
 
-                                                                <h:outputText value="#{ev.category.eventCategoryTitle}" />
-                                                                 <p:spacer height="3px" />
-                                                                
+                                                            <h:outputText value="#{ev.category.eventCategoryTitle}" />
+                                                            <p:spacer height="3px" />
+
 
                                                         </p:dataScroller>
-                                                     </p:tab>
-                                                 </p:accordionPanel>
+                                                    </p:tab>
+                                                </p:accordionPanel>
                                                 <h4>
                                                     Priority log
                                                 </h4>
@@ -435,13 +473,240 @@
                                                               escape="false"/>
                                             </p:rowExpansion>
                                         </p:dataTable>
-
-
-                                        <p:spacer height="10px"/>
-
                                     </h:form>
-
                                 </p:panel>
+
+                                <p:dialog   id="violation-update-stipdates-batch-dialog"
+                                            height="500" width="700"
+                                            widgetVar="violation-update-stipdates-batch-dialog-var"
+                                            responsive="true"
+                                            dynamic="true"
+                                            modal="true"
+                                            resizable="true"
+                                            closable="true"
+                                            closeOnEscape="true"
+                                            header="Extend compliance timeframe for violations "
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                            >
+
+                                    <h:form id="violation-update-stipdates-batch-form">
+                                        <h4>Current Compliance dates</h4>
+                                        <p>
+                                            <h:outputText value="#{ceCaseBB.getPrettyDate(ceCaseBB.currentViolation.stipulatedComplianceDate)}"/>
+                                        </p>
+
+                                        <div class="p-grid">
+                                            <div class="p-col-12 restrict-data-field">
+                                                <p:dataTable
+                                                    id="updatestipdate-violations-table" 
+                                                    var="vstpdt"
+                                                    rowKey="#{vstpdt.violationID}"
+                                                    value="#{ceCaseBB.currentCase.violationList}"
+                                                    tableStyleClass="primeDataTable"
+                                                    draggableColumns="false"
+                                                    reflow="true" >
+
+
+
+                                                    <p:column width="10%" 
+                                                              sortBy="#{vstpdt.queuedForStipCompExtDate}"
+                                                              headerText="Sel" >
+                                                        <p:selectBooleanCheckbox value="#{vstpdt.queuedForStipCompExtDate}" />
+                                                        <p:spacer height="3px" />
+                                                        <h:outputText value="(ID:#{vstpdt.violationID})" />        
+                                                    </p:column>
+
+                                                    <p:column width="10%" sortBy="#{vstpdt.status.label}">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Status" />
+                                                        </f:facet>
+                                                        <i class="material-icons"><h:outputText value="#{vstpdt.icon.materialIcon}" /></i>
+                                                        <p:spacer height="2px" />
+                                                        <h:outputText value="#{!(empty vstpdt.status) ? vstpdt.status.label : ''}" />
+
+                                                    </p:column>
+
+                                                    <p:column width="30%"
+                                                              styleClass="wrapText">
+
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Ordinance" />
+                                                        </f:facet>
+
+                                                        <h:outputText  value="#{vstpdt.violatedEnfElement.headerString}"
+                                                                       escape="false"/>
+
+                                                    </p:column>
+
+                                                    <p:column width="20%"
+                                                              styleClass="wrapText">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Date" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{(empty vstpdt.actualComplianceDate) and (empty vstpdt.nullifiedTS) ? 'Compliance due on ' : ''}"
+                                                                      styleClass="compliance-date-stipulated"/>
+                                                        <p:spacer height="3px"
+                                                                  rendered="#{empty(vstpdt.actualComplianceDate) }"/>
+                                                        <h:outputText value="#{(empty vstpdt.actualComplianceDate) and (empty vstpdt.nullifiedTS)  ? ceCaseBB.getPrettyDate(vstpdt.stipulatedComplianceDate) : ''}"
+                                                                      styleClass="compliance-date-stipulated"/>
+
+                                                        <h:outputText value="#{!empty(vstpdt.actualComplianceDate) ? 'Compliance achieved on '  : ''}"
+                                                                      styleClass="compliance-date"/>
+                                                        <p:spacer height="3px"
+                                                                  rendered="#{!empty(vstpdt.actualComplianceDate) }"/>
+                                                        <h:outputText value="#{!empty(vstpdt.actualComplianceDate) ? ceCaseBB.getPrettyDate(vstpdt.actualComplianceDate) : ''}"
+                                                                      styleClass="compliance-date"/>
+
+                                                        <h:outputText value="#{!empty(vstpdt.nullifiedTS) ? 'Nullified on '  : ''}"
+                                                                      styleClass="compliance-date-nullified"/>
+                                                        <p:spacer height="3px"
+                                                                  rendered="#{!empty(vstpdt.nullifiedTS) }"/>
+                                                        <h:outputText value="#{!empty(vstpdt.nullifiedTS) ? ceCaseBB.getPrettyDate(vstpdt.nullifiedTS): ''}"
+                                                                      styleClass="compliance-date-nullified"/>
+                                                    </p:column>
+
+                                                    <p:column width="5%"
+                                                              sortBy="#{vstpdt.daysUntilStipulatedComplianceDate}">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Days left" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{empty vstpdt.actualComplianceDate and empty vstpdt.nullifiedTS ? vstpdt.daysUntilStipulatedComplianceDate: ''}"/>
+
+                                                    </p:column>
+
+
+                                                </p:dataTable>
+                                            </div>
+                                            <div class="p-col-4 restrict-data-field">
+                                                <div class="restrict-main-contents-io-title" >
+
+                                                    <p:outputLabel for="update-stipdate-sbb"
+                                                                   styleClass="data_field_label">
+                                                        <h:outputText value="Select an extension method:"
+                                                                      rendered="true"/>
+                                                    </p:outputLabel>
+                                                </div>
+                                            </div>
+                                            <div class="p-col-8 restrict-data-field">
+                                                <div class="restrict-main-contents-io-content" >
+
+                                                    <p:selectBooleanButton id="violation-update-stipdate-sbb"
+                                                                           onLabel="Pick a date"
+                                                                           offLabel="Enter a number of days from today"
+                                                                           styleClass="selectButton"
+                                                                           rendered="true"
+                                                                           value="#{ceCaseBB.formExtendStipCompUsingDate}"
+                                                                           >
+                                                        <p:ajax update="update-stipdate-cal
+                                                                update-stipdate-numdays-it" />
+                                                    </p:selectBooleanButton>
+                                                </div>
+
+                                            </div>
+                                            <div class="p-col-6 restrict-data-field">
+
+                                                <div class="restrict-main-contents-io-title" >
+                                                    <h:outputLabel for="update-stipdate-cal">
+                                                        <h:outputText value="New stipulated compliance date"/>
+                                                    </h:outputLabel>
+                                                </div>
+
+                                                <div class="restrict-main-contents-io-content" >
+                                                    <p:growl for="update-stipdate-cal"/>
+
+                                                    <p:datePicker  id="update-stipdate-cal"
+                                                                   value="#{ceCaseBB.currentViolation.stipulatedComplianceDate}"
+                                                                   disabled="#{!ceCaseBB.formExtendStipCompUsingDate}"
+                                                                   rendered="true"
+                                                                   style="width: 100%;"
+                                                                   pattern="MM/dd/yyyy HH:mm"
+                                                                   showButtonBar="true"
+                                                                   hideOnDateTimeSelect="true"
+                                                                   showOnFocus="false"
+                                                                   showIcon="true"
+                                                                   mask="true"
+                                                                   tabindex="16"
+                                                                   timeInput="true"
+                                                                   required="true" />
+
+
+                                                </div>
+                                            </div>
+
+
+                                            <div class="p-col-6 restrict-data-field">
+                                                <div class="restrict-main-contents-io-title" >
+
+                                                    <p:outputLabel  for="update-stipdate-numdays-it"
+                                                                    value="Set new compliance date this Number of days from today"/>
+                                                </div>
+
+                                                <div class="restrict-main-contents-io-content" >
+
+                                                    <p:inputText id="update-stipdate-numdays-it"
+                                                                 disabled="#{ceCaseBB.formExtendStipCompUsingDate}"
+                                                                 value="#{ceCaseBB.formExtendedStipCompDaysFromToday}"
+                                                                 style="width: 50px;"
+                                                                 tabindex="3"
+                                                                 type="number"
+                                                                 required="false"
+                                                                 styleClass="inputText"/>
+
+                                                    <h:message for="update-stipdate-numdays-it" showDetail="false" showSummary="true"
+                                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="p-col-4 restrict-data-field-label-inline">
+                                                <h:outputLabel for="update-stipdate-cal">
+                                                    <h:outputText value="Event log description"/>
+                                                </h:outputLabel>
+                                            </div>
+
+                                            <div class="p-col-8 restrict-data-field-value-inline" >
+                                                <div class="restrict-main-contents-io-content" >
+                                                    <p:inputTextarea id="violation-updatestipdate-evreason-ita"
+                                                                     value="#{ceCaseBB.formViolationStipCompDateExtReason}" />
+                                                </div>
+                                            </div>
+
+                                            <div class="p-col-12 restrict-data-field-value-inline" >
+
+                                                <p:commandButton
+                                                    id="update-stipdate-sbb"
+                                                    icon="fa fa-calendar"
+                                                    ajax="true"
+                                                    actionListener="#{ceCaseBB.onViolationExtendStipCompDateCommitButtonChange}"
+                                                    value="Extend stipulated compliance dates"
+                                                    disabled="false"
+                                                    oncomplete="PF('violation-update-stipdate-dialog-var').hide();"
+                                                    update="cecase-violations-form
+                                                    cecase-violations-panel
+                                                    violation-details-dialog
+                                                    violation-details-form
+                                                    violation-growl-form"
+                                                    />
+
+                                                <p:spacer height="5px" />
+
+                                                <div class="gray_button">
+                                                    <p:commandButton    id="violation-update-stipdate-cancel-button"
+                                                                        ajax="true"  tabindex="27"
+                                                                        value="Cancel"
+                                                                        icon="fa fa-stop"
+                                                                        immediate="true"
+                                                                        process="@none"
+                                                                        onclick="PF('violation-update-stipdate-dialog-var').hide()"
+                                                                        />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:form>
+                                </p:dialog>
+
 
 
                                 <p:panel  id="cecase-search-log-panel"
@@ -665,7 +930,7 @@
                                     <p:spacer height="5px"/>
                                     <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
 
-                                  
+
 
                                     <p:spacer height="5px" />
                                     <p:outputLabel for="cecase-list-report-date-start-cal" 
@@ -679,8 +944,8 @@
                                                     pattern="MM/dd/yyyy HH:mm"
                                                     disabled="false"
                                                     hideOnDateTimeSelect="true"
-                                              showOnFocus="false"
-                                              showIcon="true"
+                                                    showOnFocus="false"
+                                                    showIcon="true"
                                                     showButtonBar="true"
                                                     mask="true"
                                                     timeInput="true" 
@@ -702,8 +967,8 @@
                                                     pattern="MM/dd/yyyy HH:mm"
                                                     disabled="false"
                                                     hideOnDateTimeSelect="true"
-                                              showOnFocus="false"
-                                              showIcon="true"
+                                                    showOnFocus="false"
+                                                    showIcon="true"
                                                     showButtonBar="true"
                                                     mask="true"
                                                     timeInput="true" 
@@ -720,38 +985,38 @@
                                     <h3>Additional case list report options</h3>
                                     <div class="p-grid">
                                         <div class="p-col">
-                                                <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeCaseNames}" />
+                                            <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
+                                            <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeCaseNames}" />
 
-                                                <p:spacer height="5px"/>
+                                            <p:spacer height="5px"/>
 
-                                                <h:outputLabel class="bold" value="Include street level summary" for="report-caselist-streetsummary-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-streetsummary-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeStreetLevelSummary}" />
+                                            <h:outputLabel class="bold" value="Include street level summary" for="report-caselist-streetsummary-chkbox" />
+                                            <p:selectBooleanCheckbox id="report-caselist-streetsummary-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeStreetLevelSummary}" />
 
-                                                <p:spacer height="5px"/>
+                                            <p:spacer height="5px"/>
 
-                                                <h:outputLabel class="bold" value="Include case status pie" for="report-caselist-casestatus-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-casestatus-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeCECaseStatusPie}" />
+                                            <h:outputLabel class="bold" value="Include case status pie" for="report-caselist-casestatus-chkbox" />
+                                            <p:selectBooleanCheckbox id="report-caselist-casestatus-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeCECaseStatusPie}" />
 
-                                                <p:spacer height="5px"/>
+                                            <p:spacer height="5px"/>
 
-                                                <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeListSummaryFigures}" />
+                                            <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
+                                            <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeListSummaryFigures}" />
 
                                         </div>
                                         <div class="p-col">
-                                                <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeViolationList}" />
+                                            <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
+                                            <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeViolationList}" />
 
-                                                <p:spacer height="5px"/>
+                                            <p:spacer height="5px"/>
 
-                                                <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
-                                                <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeEventSummaryByCase}" />
+                                            <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
+                                            <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeEventSummaryByCase}" />
 
-                                                <p:spacer height="5px"/>
+                                            <p:spacer height="5px"/>
 
-                                                <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
-                                                <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeExtendedPropertyDetails}" />
+                                            <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
+                                            <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeExtendedPropertyDetails}" />
 
                                         </div>
                                     </div>

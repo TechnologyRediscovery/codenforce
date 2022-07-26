@@ -757,7 +757,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     public String onOccPeriodXferButtonClick(){
         OccupancyCoordinator oc = getOccupancyCoordinator();
         try {
-            oc.transferInspectionOccPeriod(currentInspection, occPeriodIDFortransferFormField);
+            oc.transferInspectionOccPeriod(currentInspection, occPeriodIDFortransferFormField, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                "Transfer success!", ""));

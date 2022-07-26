@@ -527,7 +527,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
      * @throws IntegrationException 
      */
     private Directive generateDirective(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         SystemIntegrator si = getSystemIntegrator();
 
         Directive dir = new Directive();
@@ -535,7 +535,7 @@ public class WorkflowIntegrator extends BackingBeanUtils implements Serializable
         dir.setDirectiveID(rs.getInt("directiveid"));
         dir.setTitle(rs.getString("title"));
         dir.setDescription(rs.getString("overalldescription"));
-        dir.setCreator(ui.getUser(rs.getInt("creator_userid")));
+        dir.setCreator(uc.user_getUser(rs.getInt("creator_userid")));
         dir.setDirectPropToDefaultMuniCEO(rs.getBoolean("directtodefaultmuniceo"));
         
         dir.setDirectPropToDefaultMuniStaffer(rs.getBoolean("directtodefaultmunistaffer"));

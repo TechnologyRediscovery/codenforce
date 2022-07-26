@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.occupancy.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
@@ -640,18 +641,18 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
     public FeeAssigned generateFeeAssigned(ResultSet rs) throws IntegrationException {
 
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
 
         FeeAssigned fee = new FeeAssigned();
 
         try {
             fee = new FeeAssigned(getFee(rs.getInt("fee_feeid")));
-            fee.setAssignedBy(ui.getUser(rs.getInt("assignedby_userid")));
+            fee.setAssignedBy(uc.user_getUser(rs.getInt("assignedby_userid")));
             fee.setAssigned(rs.getTimestamp("assignedbyts").toLocalDateTime());
-            fee.setWaivedBy(ui.getUser(rs.getInt("waivedby_userid")));
+            fee.setWaivedBy(uc.user_getUser(rs.getInt("waivedby_userid")));
             fee.setLastModified(rs.getTimestamp("lastmodifiedts").toLocalDateTime());
             fee.setReducedBy(rs.getDouble("reduceby"));
-            fee.setReducedByUser(ui.getUser(rs.getInt("reduceby_userid")));
+            fee.setReducedByUser(uc.user_getUser(rs.getInt("reduceby_userid")));
             fee.setNotes(rs.getString("notes"));
 
         } catch (SQLException | BObStatusException ex) {
@@ -1575,7 +1576,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
 
         PersonCoordinator pc = getPersonCoordinator();
 
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
 
         try {
             newPayment.setPaymentID(rs.getInt("paymentid"));
@@ -1607,7 +1608,7 @@ public class PaymentIntegrator extends BackingBeanUtils implements Serializable 
             newPayment.setCheckNum(rs.getInt("checkno"));
             newPayment.setCleared(rs.getBoolean("cleared"));
             newPayment.setNotes(rs.getString("notes"));
-            newPayment.setRecordedBy(ui.getUser(rs.getInt("recordedby_userid")));
+            newPayment.setRecordedBy(uc.user_getUser(rs.getInt("recordedby_userid")));
             newPayment.setDomain(domain);
 
         } catch (SQLException | BObStatusException ex) {

@@ -2056,8 +2056,9 @@ tr.caseOpen{
 /* fieldset */
 
 .ui-fieldset-toggleable .ui-fieldset-legend{
-    background-color: white;
-    font-weight: normal;
+    background-color: white !important;
+    color:black !important;
+    font-weight: normal !important;
 
 }
 

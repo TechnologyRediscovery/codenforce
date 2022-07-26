@@ -90,6 +90,7 @@ public class CECaseBB
     private List<EnforcableCodeElement> filteredElementList;
     private List<EnforcableCodeElement> selectedElementList;
     private List<CodeViolation> selectedViolationList;
+    private List<CodeViolation> selectedViolationListForBatchStipCompDateUpdate;
 
     private CodeSet currentCodeSet;
 
@@ -125,8 +126,10 @@ public class CECaseBB
         EventCoordinator ec = getEventCoordinator();
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sysCor = getSystemCoordinator();
+        
         try {
-            currentCase = cc.cecase_assembleCECaseDataHeavy(getSessionBean().getSessCECase(), getSessionBean().getSessUser());
+            configureCurrentCase(getSessionBean().getSessCECase());
+            
             userManagerOptionList = uc.user_assembleUserListForSearch(getSessionBean().getSessUser());
             bobSourceOptionList = sysCor.getBobSourceListComplete();
             severityList = sysCor.getIntensitySchemaWithClasses(
@@ -172,6 +175,19 @@ public class CECaseBB
         editModeCurrentCaseRecord = false;
         editModeCurrentViolation = false;
         editModeCurrentCloseCase = false;
+    }
+    
+    /**
+     * takes in a base case and sets it as the bean's current case
+     * @param cse
+     * @throws BObStatusException
+     * @throws IntegrationException
+     * @throws IntegrationException
+     * @throws SearchException 
+     */
+    private void configureCurrentCase(CECase cse) throws BObStatusException, IntegrationException, IntegrationException, SearchException{
+        CaseCoordinator cc = getCaseCoordinator();
+        currentCase = cc.cecase_assembleCECaseDataHeavy(cse, getSessionBean().getSessUser());
     }
     
  
@@ -919,19 +935,60 @@ public class CECaseBB
                             ex.getMessage(), "Please revise the stipulated compliance date"));
 
         }
-
         return "ceCaseProfile";
     }
     
     /**
-     * Listener for user requests to start the update stip date operation
+     * Listener for user requests to start the update stip date operation from a single violation
+     * 
      * @param ev 
      */
     public void onViolationUpdateStipDateInitButtonChange(ActionEvent ev){
         System.out.println("ceCaseBB.onViolationUpdateStipDateInitButtonChange");
         // nothing to do here yet
+        initViolationUpdateStipCompDateBatch();
+        if(currentViolation != null){
+            currentViolation.setQueuedForStipCompExtDate(true);
+        }
+    }
+    
+    /**
+     * Responds to requests from the dashboard for updates stip comp dates on a case
+     * @param cse 
+     */
+    public void onViolationUpdateStipCompDateBatch(CECase cse){
+        CaseCoordinator cc = getCaseCoordinator();
+        try {
+            configureCurrentCase(cse);
+        } catch (BObStatusException | IntegrationException | SearchException ex) {
+            System.out.println(ex);
+        } 
+        initViolationUpdateStipCompDateBatch();
         
     }
+    
+    
+    
+    
+    /**
+     * Creates list of violations eligible for stip comp date extensions
+     */
+    private void initViolationUpdateStipCompDateBatch(){
+        selectedViolationListForBatchStipCompDateUpdate = new ArrayList<>();
+        List<CodeViolation> eleVList = currentCase.getViolationListUnresolved();
+        if(currentCase != null && eleVList != null && !eleVList.isEmpty() ){
+            selectedViolationListForBatchStipCompDateUpdate.addAll(eleVList);
+        }
+        // turn off all queue flags from previous clicks
+        for(CodeViolation cv: selectedViolationListForBatchStipCompDateUpdate){
+            cv.setQueuedForStipCompExtDate(false);
+        }
+    }
+    
+    
+    
+    
+    
     
     /**
      * Listener for user requests to commit updates to a codeViolation
@@ -1790,6 +1847,20 @@ public class CECaseBB
      */
     public void setFormCECaseOriginationEventCat(EventCategory formCECaseOriginationEventCat) {
         this.formCECaseOriginationEventCat = formCECaseOriginationEventCat;
+    }
+
+    /**
+     * @return the selectedViolationListForBatchStipCompDateUpdate
+     */
+    public List<CodeViolation> getSelectedViolationListForBatchStipCompDateUpdate() {
+        return selectedViolationListForBatchStipCompDateUpdate;
+    }
+
+    /**
+     * @param selectedViolationListForBatchStipCompDateUpdate the selectedViolationListForBatchStipCompDateUpdate to set
+     */
+    public void setSelectedViolationListForBatchStipCompDateUpdate(List<CodeViolation> selectedViolationListForBatchStipCompDateUpdate) {
+        this.selectedViolationListForBatchStipCompDateUpdate = selectedViolationListForBatchStipCompDateUpdate;
     }
 
    

@@ -273,6 +273,21 @@
                                                      rendered="#{eventCatConfigBB.editModeEventCat}" />
                                     </div>
 
+                                    <div class="p-col-4 restrict-data-field-label-inline">
+                                        <h:outputText value="Green Priority Buffer (Days)"/>
+                                    </div>
+                                    <div class="p-col-8 restrict-data-field-value-inline">
+                                        <h:outputText id="evcat-greenbuffer-ot"
+                                                      value="#{eventCatConfigBB.currentEventCategory.greenBufferDays}" 
+                                                      rendered="#{!eventCatConfigBB.editModeEventCat}" />
+
+                                        <p:inputText id="evcat-greenbuffer-it" 
+                                                     value="#{eventCatConfigBB.currentEventCategory.greenBufferDays}" 
+                                                     style="width: 100%;" 
+                                                     required="false" 
+                                                     rendered="#{eventCatConfigBB.editModeEventCat}" />
+                                    </div>
+
 
 
                                     <div class="p-col-4 restrict-data-field-label-inline">

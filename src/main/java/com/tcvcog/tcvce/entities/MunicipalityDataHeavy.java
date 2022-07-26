@@ -52,6 +52,9 @@ public  class       MunicipalityDataHeavy
     private CodeSource issuingCodeSource;
     private int defaultNOVStyleID;
     
+    private BlobLight defaultMuniHeaderImage;
+    private int defaultMuniHeaderImageHeightPx;
+    
     private PropertyDataHeavy muniPropertyDH;
 
     private MuniProfile profile;
@@ -771,6 +774,34 @@ public  class       MunicipalityDataHeavy
      */
     public void setZipList(List<MailingCityStateZip> zipList) {
         this.zipList = zipList;
+    }
+
+    /**
+     * @return the defaultMuniHeaderImage
+     */
+    public BlobLight getDefaultMuniHeaderImage() {
+        return defaultMuniHeaderImage;
+    }
+
+    /**
+     * @param defaultMuniHeaderImage the defaultMuniHeaderImage to set
+     */
+    public void setDefaultMuniHeaderImage(BlobLight defaultMuniHeaderImage) {
+        this.defaultMuniHeaderImage = defaultMuniHeaderImage;
+    }
+
+    /**
+     * @return the defaultMuniHeaderImageHeightPx
+     */
+    public int getDefaultMuniHeaderImageHeightPx() {
+        return defaultMuniHeaderImageHeightPx;
+    }
+
+    /**
+     * @param defaultMuniHeaderImageHeightPx the defaultMuniHeaderImageHeightPx to set
+     */
+    public void setDefaultMuniHeaderImageHeightPx(int defaultMuniHeaderImageHeightPx) {
+        this.defaultMuniHeaderImageHeightPx = defaultMuniHeaderImageHeightPx;
     }
   
     

@@ -1233,11 +1233,11 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                         "            categoryid, categorytype, title, description, notifymonitors, \n" +
                         "            hidable, icon_iconid, relativeorderwithintype, relativeorderglobal, \n" +
                         "            hosteventdescriptionsuggtext, directive_directiveid, defaultdurationmins, \n" +
-                        "            active, rolefloorenact, rolefloorview, rolefloorupdate)\n" +
+                        "            active, rolefloorenact, rolefloorview, rolefloorupdate, prioritygreenbufferdays)\n" +
                         "    VALUES (DEFAULT, CAST(? AS EVENTTYPE), ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, \n" +
-                        "            ?, CAST(? AS role), CAST(? AS ROLE), CAST(? AS ROLE));";
+                        "            ?, CAST(? AS role), CAST(? AS ROLE), CAST(? AS ROLE), ?);";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1286,6 +1286,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(15, java.sql.Types.NULL);
             }
+            
+            if(ec.getGreenBufferDays() != 0){
+                stmt.setInt(16, ec.getGreenBufferDays());
+            } else {
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
 
             stmt.execute();
             
@@ -1322,7 +1328,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                         "       hidable=?, icon_iconid=?, relativeorderwithintype=?, relativeorderglobal=?, \n" +
                         "       hosteventdescriptionsuggtext=?, directive_directiveid=?, defaultdurationmins=?, \n" +
                         "       active=?, rolefloorenact=CAST(? AS role), rolefloorview=CAST(? AS role), \n" +
-                        "       rolefloorupdate=CAST(? AS role) WHERE categoryid = ?;";
+                        "       rolefloorupdate=CAST(? AS role), prioritygreenbufferdays=? "
+                + "        WHERE categoryid = ?;";
 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
@@ -1371,11 +1378,16 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             } else {
                 stmt.setNull(15, java.sql.Types.NULL);
             }
-
             
-            stmt.setInt(16, ec.getCategoryID());
+            if(ec.getGreenBufferDays() != 0){
+                stmt.setInt(16, ec.getGreenBufferDays());
+            } else {
+                stmt.setNull(16, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(17, ec.getCategoryID());
 
-            stmt.executeUpdate();
+            stmt.execute();
 
         } catch (SQLException ex) {
             System.out.println(ex.toString());

@@ -174,7 +174,7 @@ public class    OccPermitSearchBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
         try{
-            OccPeriod op = oc.getOccPeriod(permit.getPeriodID());
+            OccPeriod op = oc.getOccPeriod(permit.getPeriodID(), getSessionBean().getSessUser());
             ReportConfigOccPermit rcop = oc.getOccPermitReportConfigDefault(
                     permit, 
                     op, 
@@ -215,7 +215,7 @@ public class    OccPermitSearchBB
             
             PropertyCoordinator pc = getPropertyCoordinator();
             OccupancyCoordinator oc = getOccupancyCoordinator();
-            OccPeriod period = oc.getOccPeriod(permit.getPeriodID());
+            OccPeriod period = oc.getOccPeriod(permit.getPeriodID(), getSessionBean().getSessUser());
             PropertyUnitWithProp puwp = pc.getPropertyUnitWithProp(period.getPropertyUnitID());
             return getSessionBean().navigateToPageCorrespondingToObject(puwp.getProperty());
         } catch (BObStatusException | IntegrationException ex){

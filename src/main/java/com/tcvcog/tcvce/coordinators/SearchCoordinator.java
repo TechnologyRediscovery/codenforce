@@ -21,8 +21,10 @@ import com.tcvcog.tcvce.entities.Human;
 import com.tcvcog.tcvce.entities.MailingCityStateZip;
 import com.tcvcog.tcvce.entities.MailingCityStateZipDefaultTypeEnum;
 import com.tcvcog.tcvce.entities.MailingCityStateZipRecordTypeEnum;
+import com.tcvcog.tcvce.entities.MuniProfile;
 import com.tcvcog.tcvce.entities.Property;
 import com.tcvcog.tcvce.entities.RoleType;
+import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy;
 import com.tcvcog.tcvce.entities.occupancy.OccPermitPropUnitHeavy;
 import com.tcvcog.tcvce.entities.search.*;
@@ -165,10 +167,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     /**
      * Single point of entry for queries against the EventCnF tables
      * @param q
+     * @param ua
      * @return
      * @throws SearchException 
      */
-     public QueryEvent runQuery(QueryEvent q) throws SearchException{
+     public QueryEvent runQuery(QueryEvent q, UserAuthorized ua) throws SearchException{
          EventCoordinator ec = getEventCoordinator();
          if(q == null) return null;
         
@@ -193,7 +196,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
              try {
                  // add each batch of OccPeriod objects from the SearchParam run to our
                  // ongoing list
-                 q.addToResults(ec.assembleEventCnFPropUnitCasePeriodHeavyList(evTempList));
+                 q.addToResults(ec.assembleEventCnFPropUnitCasePeriodHeavyList(evTempList, ua));
              } catch (EventException | IntegrationException | BObStatusException | BlobException ex) {
                  System.out.println(ex);
              }
@@ -257,7 +260,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             periodListTemp.clear();
             for(Integer i: oi.searchForOccPeriods(sp)){
                 try {
-                    periodListTemp.add(oc.getOccPeriodPropertyUnitHeavy(i));
+                    periodListTemp.add(oc.getOccPeriodPropertyUnitHeavy(i, q.getRequestingUser()));
                 } catch (IntegrationException ex) {
                     System.out.println(ex);
                     throw new SearchException("Integration exception when querying OccPeriods");
@@ -296,7 +299,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             
             try {
                 for(Integer i: oi.searchForOccPermits(sp)){
-                    permitListTemp.add(oc.getOccPermitPropertyUnitHeavy(oc.getOccPermit(i, q.getRequestingUser())));
+                    permitListTemp.add(oc.getOccPermitPropertyUnitHeavy(oc.getOccPermit(i, q.getRequestingUser()), q.getRequestingUser()));
                 }
             } catch (IntegrationException | BObStatusException ex) {
                 System.out.println(ex);
@@ -314,10 +317,11 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      /**
       * Single point of entry for queries against the CECase table
       * @param q search params with the credential set
+     * @param ua
       * @return a Query subclass with results accessible via q.getResults
       * @throws SearchException 
       */
-     public QueryCECase runQuery(QueryCECase q) throws SearchException {
+     public QueryCECase runQuery(QueryCECase q, UserAuthorized ua) throws SearchException {
         CaseIntegrator ci = getCaseIntegrator();
         CaseCoordinator cc = getCaseCoordinator();
         
@@ -334,7 +338,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             // the integrator will only look at the single muni val, 
             // so we'll call searchForXXX once for each muni
             for(Integer i: ci.searchForCECases(params)){
-                CECase cse = cc.cecase_getCECase(i);
+                CECase cse = cc.cecase_getCECase(i, ua);
                 // Case Phases only exist in JavaJavaLand, so we'll evaluate the
                 // search params here before adding the new objects to the
                 // final query result list

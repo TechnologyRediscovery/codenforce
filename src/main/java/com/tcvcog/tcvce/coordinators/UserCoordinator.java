@@ -752,9 +752,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException 
      */
     public User user_getUserRobot() throws IntegrationException, BObStatusException{
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         User u;
-        u = ui.getUser(Integer.parseInt(
+        u = uc.user_getUser(Integer.parseInt(
                 getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
                         .getString("cogRobotUserID")));
         return u;

@@ -20,6 +20,7 @@ package com.tcvcog.tcvce.integration;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
+import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import java.io.Serializable;
@@ -365,7 +366,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     private CodeElement generateCodeElement(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         if(rs == null) return null;
         CodeElement e = new CodeElement();
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
 
         // to ease the eyes, line spacing corresponds to the field spacing in CodeElement
 
@@ -404,21 +405,21 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             e.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
         }
         if(rs.getInt("createdby_userid") != 0){
-            e.setCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+            e.setCreatedBy(uc.user_getUser(rs.getInt("createdby_userid")));
         }
 
         if(rs.getTimestamp("lastupdatedts") != null){
             e.setLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
         }
         if(rs.getInt("lastupdatedby_userid") != 0){
-            e.setLastupdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+            e.setLastupdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
         }
 
         if(rs.getTimestamp("deactivatedts") != null){
             e.setDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
         }
         if(rs.getInt("deactivatedby_userid") != 0){
-            e.setDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+            e.setDeactivatedBy(uc.user_getUser(rs.getInt("deactivatedby_userid")));
         }
 
                 
@@ -986,7 +987,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
     private EnforcableCodeElement generateEnforcableCodeElement(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
         
         PaymentIntegrator pi = getPaymentIntegrator();
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         CodeCoordinator cc = getCodeCoordinator();
         CodeElement ele = cc.getCodeElement(rs.getInt("codelement_elementid"));
         
@@ -1011,21 +1012,21 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             newEce.setEceCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());                
         }
         if(rs.getInt("createdby_userid") != 0){
-            newEce.setEceCreatedBy(ui.getUser(rs.getInt("createdby_userid")));
+            newEce.setEceCreatedBy(uc.user_getUser(rs.getInt("createdby_userid")));
         }
 
         if(rs.getTimestamp("lastupdatedts") != null){
             newEce.setEceLastUpdatedTS(rs.getTimestamp("lastupdatedts").toLocalDateTime());
         }
         if(rs.getInt("lastupdatedby_userid") != 0){
-            newEce.setEceLastupdatedBy(ui.getUser(rs.getInt("lastupdatedby_userid")));
+            newEce.setEceLastupdatedBy(uc.user_getUser(rs.getInt("lastupdatedby_userid")));
         }
 
         if(rs.getTimestamp("deactivatedts") != null){
             newEce.setEceDeactivatedTS(rs.getTimestamp("deactivatedts").toLocalDateTime());
         }
         if(rs.getInt("deactivatedby_userid") != 0){
-            newEce.setEceDeactivatedBy(ui.getUser(rs.getInt("deactivatedby_userid")));
+            newEce.setEceDeactivatedBy(uc.user_getUser(rs.getInt("deactivatedby_userid")));
         }
 
         return newEce;

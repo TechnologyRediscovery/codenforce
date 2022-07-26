@@ -95,6 +95,8 @@
                                                 <p:column headerText="Inspector"
                                                           style="width:25%;">
                                                     <h:outputText value="#{inspection.inspector.human.name}" />
+                                                    <p:spacer height="3px" />
+                                                    <h:outputText value="#{inspection.inspector.username} (ID:#{inspection.inspector.userID})" />
                                                 </p:column>
                                                 <p:column headerText="Determination"
                                                           style="width:30%;">

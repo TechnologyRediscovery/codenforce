@@ -3111,7 +3111,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
     }
 
     public PropertyUnitChangeOrder generatePropertyUnitChange(ResultSet rs) throws SQLException, IntegrationException, BObStatusException {
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator usrc = getUserCoordinator();
         PropertyUnitChangeOrder uc = new PropertyUnitChangeOrder();
         uc.setUnitChangeID(rs.getInt("unitchangeid"));
         uc.setUnitID(rs.getInt("parcelunit_unitid"));
@@ -3122,7 +3122,7 @@ public class PropertyIntegrator extends BackingBeanUtils implements Serializable
         uc.setAdded(rs.getBoolean("added"));
         uc.setRemoved(rs.getBoolean("removed"));
         uc.setApprovedOn(rs.getTimestamp("approvedondate"));
-        uc.setApprovedBy(ui.getUser(rs.getInt("approvedby_userid")));
+        uc.setApprovedBy(usrc.user_getUser(rs.getInt("approvedby_userid")));
         uc.setChangedBy(rs.getInt("changedby_personid"));
         uc.setActive(rs.getBoolean("active"));
         return uc;

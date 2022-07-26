@@ -10,10 +10,11 @@ package com.tcvcog.tcvce.entities;
  * 
  * @author Ellen Bascomb of Apartment 31Y
  */
-public enum CasePriorityEnum {
+public enum PriorityEnum {
     
     OPENING             ("Opening","Blue", 1, true, "cse-priority-openblue", "caseStageInvestigationIconID"),
     MONITORING          ("Monitoring","Green", 2, true, "cse-priority-monitoringgreen", "caseStageEnforcementIconID"),
+    MON_OVERRIDE        ("Green Override","Green", 2, true, "cse-priority-monitoringgreen", "caseStageEnforcementIconID"),
     ACTION_REQUIRED     ("Action Required","Yellow", 3, true,  "cse-priority-actionrequiredyellow","caseStageEnforcementIconID"),
     ACTION_PASTDUE      ("Action Past Due","Red", 4, true,  "cse-priority-actionpastduered","caseStagePastdueIconID"),
     CITATION            ("Citation","Purple", 5, true,  "cse-priority-citation","caseStageCitationIconID"),
@@ -30,7 +31,7 @@ public enum CasePriorityEnum {
     protected final String rowStyleClass;
     private final String iconPropertyLookup;
      
-    private CasePriorityEnum(String label, String color, int ord, boolean os, String rsc, String icon){
+    private PriorityEnum(String label, String color, int ord, boolean os, String rsc, String icon){
         this.label = label;
         this.color = color;
         this.priorityOrder = ord;

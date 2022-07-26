@@ -129,7 +129,7 @@ public  class       SessionInitializer
             }
         } 
         try {
-            tmpUser = ui.getUser(ui.getUserID(usernameQueuedForSession));
+            tmpUser = uc.user_getUser(ui.getUserID(usernameQueuedForSession));
             userAuthorizedQueuedForSession = uc.auth_prepareUserForSessionChoice(tmpUser);
             sb.setSessUser(userAuthorizedQueuedForSession);
         } catch (IntegrationException | BObStatusException  ex) {
@@ -468,6 +468,13 @@ public  class       SessionInitializer
             throw new SessionException("Error creating muni data heavy", ex, ss, ExceptionSeverityEnum.SESSION_FATAL);
         }
         sb.setSessMuni(muniHeavy);
+        if(sb.getSessMuni() != null && sb.getSessMuni().getProfile() != null){
+            ua.setGoverningMuniProfile(sb.getSessMuni().getProfile());
+            System.out.println("I:muni | setting governing muni profile to object ID: " + ua.getGoverningMuniProfile().getProfileID());
+        } else {
+            throw new SessionException("No muni profile available for injection into UserAuthorized", null, ss, ExceptionSeverityEnum.SESSION_RESTRICTING_FAILURE);
+            
+        }
     }
 
 
@@ -667,7 +674,7 @@ public  class       SessionInitializer
         SearchCoordinator sc = getSearchCoordinator();
         QueryCECase cseQ = sc.initQuery(QueryCECaseEnum.OPENCASES, ua.getKeyCard());
         try {
-            cseQ = sc.runQuery(cseQ);
+            cseQ = sc.runQuery(cseQ,ua);
             
 //            List<CECase> hist = cc.cecase_getCECaseHistory(ua);
             // NEXT LINE: YUCK!!!!!!!!

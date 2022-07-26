@@ -20,7 +20,13 @@
                 <div class="p-grid">
                     <div class="p-col-6">
                         <div class="logo-image-wrapper">
-                            <h:graphicImage value="/images/Logo-N_Font.png" height="50"/>
+                            <p:graphicImage     id="report-headerphoto"
+                                                     value="#{blobsterBB.image}"
+                                                     alt="no preview available" 
+                                                     cache="false"
+                                                     rendered="#{!empty reportingBB.headerImageBlob}">
+                                     <f:param name="blobid" value="#{reportingBB.headerImageBlob.photoDocID}"/>
+                                 </p:graphicImage>
                         </div>
                     </div>
                     <div class="p-col-6 nested-grid" >

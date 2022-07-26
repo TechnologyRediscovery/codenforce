@@ -246,22 +246,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         return evList;
     }
     
-    /**
-     * @deprecated  don't use me! -- too old
-     * @param ua
-     * @return
-     * @throws IntegrationException
-     * @throws EventException
-     * @throws SearchException
-     * @throws BObStatusException
-     * @throws BlobException 
-     */
-    public List<EventCnFPropUnitCasePeriodHeavy> getEventHistoryList(UserAuthorized ua) 
-            throws IntegrationException, EventException, SearchException, BObStatusException, BlobException{
-        EventIntegrator ei = getEventIntegrator();
-        return assembleEventCnFPropUnitCasePeriodHeavyList(getEventList(ei.getEventHistory(ua.getUserID())));
-        
-    }
+ 
     
     
     /**
@@ -269,12 +254,15 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * and Property unit data useful for displaying the event without its parent
      * object context (i.e. in an activity report)
      * @param ev
+     * @param ua
      * @return the data-rich subclass of EventCnF
      * @throws EventException
      * @throws IntegrationException 
      * @throws com.tcvcog.tcvce.domain.SearchException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public EventCnFPropUnitCasePeriodHeavy assembleEventCnFPropUnitCasePeriodHeavy(EventCnF ev) 
+    public EventCnFPropUnitCasePeriodHeavy assembleEventCnFPropUnitCasePeriodHeavy(EventCnF ev, UserAuthorized ua) 
                            throws EventException, IntegrationException, SearchException, BObStatusException, BlobException{
 
         OccupancyCoordinator oc = getOccupancyCoordinator();
@@ -287,9 +275,9 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
              edh = new EventCnFPropUnitCasePeriodHeavy(ev);
         }
         if(ev.getDomain() == DomainEnum.OCCUPANCY && ev.getOccPeriodID() != 0){
-            edh.setPeriod(oc.getOccPeriodPropertyUnitHeavy(edh.getOccPeriodID()));
+            edh.setPeriod(oc.getOccPeriodPropertyUnitHeavy(edh.getOccPeriodID(), ua));
         } else if(ev.getDomain() == DomainEnum.CODE_ENFORCEMENT && ev.getCeCaseID() != 0){
-            edh.setCecase(cc.cecase_assembleCECasePropertyUnitHeavy(cc.cecase_getCECase(edh.getCeCaseID())));
+            edh.setCecase(cc.cecase_assembleCECasePropertyUnitHeavy(cc.cecase_getCECase(edh.getCeCaseID(), ua)));
             // note that a Property object is already inside our CECase base class
         } else {
             throw new EventException("Cannot build data heavy event");
@@ -301,6 +289,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * Utility method for assembling a list of data-heavy events from a List of 
      * plain old events
      * @param evList
+     * @param ua
      * @return the list of data heavy events, never null
      * @throws EventException
      * @throws IntegrationException 
@@ -308,12 +297,12 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      * @throws com.tcvcog.tcvce.domain.BlobException 
      */
-    public List<EventCnFPropUnitCasePeriodHeavy> assembleEventCnFPropUnitCasePeriodHeavyList(List<EventCnF> evList) 
+    public List<EventCnFPropUnitCasePeriodHeavy> assembleEventCnFPropUnitCasePeriodHeavyList(List<EventCnF> evList, UserAuthorized ua) 
             throws EventException, IntegrationException, SearchException, BObStatusException, BlobException{
         List<EventCnFPropUnitCasePeriodHeavy> edhList = new ArrayList<>();
         if(evList != null && !evList.isEmpty() ){
             for(EventCnF ev: evList){
-                edhList.add(assembleEventCnFPropUnitCasePeriodHeavy(ev));
+                edhList.add(assembleEventCnFPropUnitCasePeriodHeavy(ev, ua));
             }
         }
         return edhList;

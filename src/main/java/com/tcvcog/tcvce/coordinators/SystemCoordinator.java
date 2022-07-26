@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.coordinators;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.application.IFace_pinnable;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
 import com.tcvcog.tcvce.entities.Manageable;
 import com.tcvcog.tcvce.domain.BObStatusException;
@@ -106,6 +107,27 @@ public class SystemCoordinator extends BackingBeanUtils implements Serializable 
         return li.writeLogEntry(entry);
     }
 
+    
+    /**
+     * Toggles the pinned status of a given object
+     * @param pinnable 
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException if either param == null
+     */
+    public void togglePinning(IFace_pinnable pinnable, UserAuthorized ua) throws IntegrationException{
+        if(pinnable == null || ua == null){
+            throw new IntegrationException("SystemCoordinator.togglePinning | Cannot toggle pinned status of a null pinnable or user");
+        }
+        SystemIntegrator si = getSystemIntegrator();
+        
+        if(pinnable.isPinned()){
+            si.unPinObject(pinnable);
+        } else {
+            si.pinObject(pinnable);
+        }
+    }
+    
+    
     /**
      * Generates a rich-text (contains HTML to be NOT escaped) given various
      * input values

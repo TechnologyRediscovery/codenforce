@@ -410,9 +410,6 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         return auth;
     }
 
-    
-    
-    
     /**
      * Assembles a list of all OccInspections for a given instance of IFace_inspectable
      * @param inspectable

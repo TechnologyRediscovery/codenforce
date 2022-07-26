@@ -9,6 +9,7 @@ import com.tcvcog.tcvce.coordinators.CaseCoordinator;
 import com.tcvcog.tcvce.coordinators.DataCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import com.tcvcog.tcvce.entities.CECasePropertyUnitHeavy;
@@ -57,6 +58,9 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
     
     private DonutChartModel violreauthenticateationDonut;
     
+    private BlobLight headerImageBlob;
+    private int headerImageHeightPx;
+    
     
 
     private Map<CasePhaseEnum, Integer> cPhaseMap;
@@ -83,6 +87,8 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
 //            generateModelCaseCountsByStage();
 //        }
         
+        headerImageBlob = getSessionBean().getSessMuni().getDefaultMuniHeaderImage();
+        headerImageHeightPx = getSessionBean().getSessMuni().getDefaultMuniHeaderImageHeightPx();
         reportCECase = getSessionBean().getReportConfigCECase();
         reportCECaseList = getSessionBean().getReportConfigCECaseList();
         
@@ -351,6 +357,34 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
      */
     public void setReportCECaseListCustom(ReportConfigCECaseList reportCECaseListCustom) {
         this.reportCECaseListCustom = reportCECaseListCustom;
+    }
+
+    /**
+     * @return the headerImageBlob
+     */
+    public BlobLight getHeaderImageBlob() {
+        return headerImageBlob;
+    }
+
+    /**
+     * @param headerImageBlob the headerImageBlob to set
+     */
+    public void setHeaderImageBlob(BlobLight headerImageBlob) {
+        this.headerImageBlob = headerImageBlob;
+    }
+
+    /**
+     * @return the headerImageHeightPx
+     */
+    public int getHeaderImageHeightPx() {
+        return headerImageHeightPx;
+    }
+
+    /**
+     * @param headerImageHeightPx the headerImageHeightPx to set
+     */
+    public void setHeaderImageHeightPx(int headerImageHeightPx) {
+        this.headerImageHeightPx = headerImageHeightPx;
     }
 
    

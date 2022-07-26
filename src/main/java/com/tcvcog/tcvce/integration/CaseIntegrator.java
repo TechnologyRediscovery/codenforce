@@ -550,7 +550,6 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, ceCaseID);
-            //System.out.println("CaseIntegrator.cecase_getCECase| sql: " + stmt.toString());
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -594,7 +593,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             con = getPostgresCon();
             stmt = con.prepareStatement(query);
             stmt.setInt(1, propID);
-            //System.out.println("CaseIntegrator.cecase_getCECase| sql: " + stmt.toString());
+            
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -1389,7 +1388,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         CodeViolation v = new CodeViolation();
         CodeIntegrator ci = getCodeIntegrator();
-        UserIntegrator ui = getUserIntegrator();
+        UserCoordinator uc = getUserCoordinator();
         WorkflowCoordinator wc = getWorkflowCoordinator();
         SystemIntegrator si = getSystemIntegrator();
         
@@ -1398,7 +1397,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         v.setViolatedEnfElement(ci.getEnforcableCodeElement(rs.getInt("codesetelement_elementid")));
         
         if(rs.getString("createdby") != null){
-            v.setCreatedBy(ui.getUser(rs.getInt("createdby")));
+            v.setCreatedBy(uc.user_getUser(rs.getInt("createdby")));
         }
         
         v.setCeCaseID(rs.getInt("cecase_caseid"));
@@ -1431,7 +1430,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
 
         if(rs.getTimestamp("compliancetimestamp") != null){
             v.setComplianceTimeStamp(rs.getTimestamp("compliancetimestamp").toLocalDateTime());
-            v.setComplianceUser(ui.getUser(rs.getInt("complianceUser")));
+            v.setComplianceUser(uc.user_getUser(rs.getInt("complianceUser")));
         }
         
         v.setComplianceNote(rs.getString("compliancenote"));
@@ -1450,7 +1449,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
         }
 
         if(rs.getInt("nullifiedby") != 0){
-            v.setNullifiedUser(ui.getUser(rs.getInt("nullifiedby")));
+            v.setNullifiedUser(uc.user_getUser(rs.getInt("nullifiedby")));
         } 
         
         if(rs.getInt("severity_classid") != 0){

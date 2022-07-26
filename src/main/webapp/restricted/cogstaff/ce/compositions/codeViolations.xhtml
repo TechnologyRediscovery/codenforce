@@ -153,6 +153,8 @@
                                         violation-notes-form"
                                         oncomplete="PF('violation-details-dialog-var').show()"/>
                     </div>
+                    <p:spacer height="3px" />
+                    <h:outputText value="(ID:#{v.violationID})" />
                 </p:column>
             </p:dataTable>
         </h:form>
@@ -273,7 +275,6 @@
                         </div>
 
                         <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
                             <div class="restrict-main-contents-io-title" >
                                 <p:outputLabel for="viol-descr">
                                     <h:outputText value="Description of code violation"/>
@@ -289,9 +290,7 @@
                             </div>
                         </div>
 
-
                         <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-
                             <div class="restrict-main-contents-io-content" >
                                 <p:selectBooleanCheckbox id="violation-findings-makedefault-chkbx-0"
                                                          value="#{bcv.makeFindingsDefault}"
@@ -299,20 +298,15 @@
                                                          tabindex="5"
                                                          />
                             </div>
-
                         </div>
 
                         <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
-
                             <div class="restrict-main-contents-io-title" >
                                 <h:outputLabel for="viol-date-dor">
                                     <h:outputText value="Date of Record"/>
                                 </h:outputLabel>
                             </div>
-
                             <div class="restrict-main-contents-io-content" >
-
-
                                 <p:datePicker id="viol-date-dor"
                                               value="#{bcv.dateOfRecord}"
                                               rendered="true"
@@ -326,13 +320,10 @@
                                               tabindex="2"
                                               timeInput="true"
                                               required="true" />
-
-
                             </div>
                         </div>
 
                         <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
-
                             <div class="restrict-main-contents-io-title" >
                                 <h:outputLabel for="viol-date-stipcomp">
                                     <h:outputText value="Stipulated Compliance Date"/>
@@ -341,7 +332,6 @@
 
                             <div class="restrict-main-contents-io-content" >
                                 <p:growl for="viol-date-stipcomp"/>
-
                                 <p:datePicker id="viol-date-stipcomp"
                                               value="#{bcv.stipulatedComplianceDate}"
                                               rendered="true"
@@ -365,7 +355,6 @@
                         </div>
 
                         <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
-
                             <div class="restrict-main-contents-io-title" >
 
                                 <p:outputLabel for="viol-penalty">
@@ -380,21 +369,15 @@
                                              required="true"
                                              type="number"/>
                             </div>
-
                         </div>
 
-
-
-
                         <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field">
-
                             <div class="restrict-main-contents-io-title" >
                                 <p:outputLabel  for="violation-severity-som">
                                     <h:outputText value="Violation severity" />
                                 </p:outputLabel>
                             </div>
                             <div class="restrict-main-contents-io-content" >
-
                                 <p:selectOneMenu id="violation-severity-som"
                                                  value="#{bcv.severityIntensity}"
                                                  style="width: 100%;"
@@ -409,13 +392,10 @@
                                     <f:selectItems id="violation-severity-selitems"
                                                    value="#{ceCaseBB.severityList}"
                                                    var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
-
                                 </p:selectOneMenu>
-
                             </div>
                         </div>
                         <div class="restrict-main-contents-io-button gray_button">
-
                             <p:commandButton    id="violation-removefrombatch"
                                                 ajax="true"
                                                 value="Remove violation"
@@ -1198,7 +1178,6 @@
         </h:form>
     </p:dialog>
 
-
     <p:dialog   id="violation-compliance-dialog"
                 height="600" width="600"
                 widgetVar="violation-compliance-dialog-var"
@@ -1488,7 +1467,7 @@
             <p:spacer height="5px" />
             <p>Note note: your name, username, and the current date/time are automatically included.</p>
             <p:spacer height="5px" />
-            
+
             <p:commandButton    id="violation-note-button-cancel"
                                 ajax="true"  tabindex="27"
                                 value="Cancel"

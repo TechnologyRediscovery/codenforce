@@ -106,18 +106,10 @@ public class    OccPeriodSearchBB
 
     /**
      * Asks the Coordinator for the OccPeriod viewing history
+     * @deprecated : use search 
      */
     public void loadOccPeriodHistory() {
-        OccupancyCoordinator oc = getOccupancyCoordinator();
-        try {
-            occPeriodList.addAll(oc.getOccPeriodPropertyUnitHeavyList(oc.assembleOccPeriodHistoryList(getSessionBean().getSessUser().getMyCredential())));
-        } catch (IntegrationException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Unable to assemble the data-rich occ period", ""));
-
-        }
+        System.out.println("OccPeriodSearchBB.loadOccPeriodHistory | DEPRECATED API USE");
     }
 
     /**
@@ -132,6 +124,7 @@ public class    OccPeriodSearchBB
         if (!appendResultsToList) {
             occPeriodList.clear();
         }
+        occPeriodQuerySelected.setRequestingUser(getSessionBean().getSessUser());
         try {
             occPeriodList.addAll(sc.runQuery(occPeriodQuerySelected).getBOBResultList());
             if (occPeriodList != null) {

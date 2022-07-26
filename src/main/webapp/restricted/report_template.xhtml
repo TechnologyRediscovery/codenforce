@@ -20,7 +20,14 @@
                     <div class="ui-g-4 ui-md-4 ui-lg-4 restrict-data-field-value-vertical">
                         <div class="ui-g-12 ui-md-12 ui-lg-12">
                             <div class="logo-image-wrapper">
-                                <h:graphicImage value="/images/Logo-N_Font.png" height="50"/>
+                                <p:graphicImage     id="report-headerphoto"
+                                                     value="#{blobsterBB.image}"
+                                                     alt="no preview available" 
+                                                     height="#{reportingBB.headerImageHeightPx}"
+                                                     cache="false"
+                                                     rendered="#{!empty reportingBB.headerImageBlob}">
+                                     <f:param name="blobid" value="#{reportingBB.headerImageBlob.photoDocID}"/>
+                                 </p:graphicImage>
                             </div>
                         </div>
                         <div class="ui-g-12 ui-md-12 ui-lg-12">
@@ -49,7 +56,7 @@
                             </div>
                             <div class="report-title-sub">
 
-                                <h:outputText id="report-subtitle-ot"  value="#{reportingBB.currentReport.muni.muniName}, #{reportingBB.currentReport.muni.address_state}"/> 
+                                <h:outputText id="report-subtitle-ot"  value="#{reportingBB.currentReport.muni.muniName}"/> 
 
                             </div>
                             <div class="report-period-label">

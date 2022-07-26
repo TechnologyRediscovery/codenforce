@@ -18,7 +18,14 @@
                 <div class="flexing-box-topbar">
                         <div class="logoBox">
                             <div class="logo-image-wrapper">
-                                <h:graphicImage value="/images/tcvcog_logo_inverted.jpg" height="50"/>
+                                    <p:graphicImage     id="report-headerphoto"
+                                                     value="#{blobsterBB.image}"
+                                                     alt="no preview available" 
+                                                     height="#{reportingBB.headerImageHeightPx}"
+                                                     cache="false"
+                                                     rendered="#{!empty reportingBB.headerImageBlob}">
+                                     <f:param name="blobid" value="#{reportingBB.headerImageBlob.photoDocID}"/>
+                                 </p:graphicImage>
                             </div>
                             <div class="logo-title-wrapper">
                                 <div class="report-title">

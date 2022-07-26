@@ -42,7 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Business logic container for all things municipality
  * @author ellen bascomb
  */
 public class MunicipalityCoordinator extends BackingBeanUtils implements Serializable {
@@ -116,7 +116,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
                 System.out.println(ex);
             }
             if (mdh != null && mdh.getDefaultOccPeriodID() != 0) {
-                return oc.getOccPeriod(mdh.getDefaultOccPeriodID());
+                return oc.getOccPeriod(mdh.getDefaultOccPeriodID(), ua);
             }
         }
         return null;
@@ -206,7 +206,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
     public MuniProfile getMuniProfile(int profileID) throws IntegrationException, BObStatusException{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         MuniProfile mp = mi.getMuniProfile(profileID);
-        mp.setPriorityDeadlineBufferDays(DEFAULT_DEADLINE_BUFFER_DAYS);
+        
         return mp;
         
     }

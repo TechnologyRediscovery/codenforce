@@ -798,12 +798,13 @@ if (false) {
 
             if (input.getDomain() == DomainEnum.CODE_ENFORCEMENT) {
                 CaseCoordinator cc = getCaseCoordinator();
-                CECase c = cc.cecase_getCECase(input.getCeCaseID());
+                CECase c = cc.cecase_getCECase(input.getCeCaseID(), getSessionBean().getSessUser());
                 pib.setCaseManager(c.getCaseManager());
                 pib.setCecaseID(c.getCaseID());
             } else if (input.getDomain() == DomainEnum.OCCUPANCY) {
                 OccupancyCoordinator oc = getOccupancyCoordinator();
-                OccPeriod period = oc.getOccPeriod(input.getOccPeriodID());
+                // FORBIDDEN CALL TO NARROWER SCOPED BEAN WITHOUT PARAM REF
+                OccPeriod period = oc.getOccPeriod(input.getOccPeriodID(), getSessionBean().getSessUser());
                 pib.setCaseManager(period.getManager());
                 pib.setPeriodID(period.getPeriodID());
             }
@@ -987,7 +988,7 @@ if (false) {
 
         try {
 
-            exportable = ec.assembleEventCnFPropUnitCasePeriodHeavy(ec.getEvent(unbundled.getEventID()));
+            exportable = ec.assembleEventCnFPropUnitCasePeriodHeavy(ec.getEvent(unbundled.getEventID()), getSessionBean().getSessUser());
 
         } catch (IntegrationException ex) {
             System.out.println("Exporting event failed. Assuming exported event is new, and could not be found in DB.");
@@ -997,13 +998,13 @@ if (false) {
 
         if (unbundled.getDomain() == DomainEnum.CODE_ENFORCEMENT) {
 
-            CECase ceLight = cc.cecase_getCECase(input.getCecaseID());
+            CECase ceLight = cc.cecase_getCECase(input.getCecaseID(), getSessionBean().getSessUser());
 
             exportable.setCecase(cc.cecase_assembleCECasePropertyUnitHeavy(ceLight));
 
         } else if (unbundled.getDomain() == DomainEnum.OCCUPANCY) {
-
-            OccPeriod opLight = oc.getOccPeriod(input.getPeriodID());
+            // FORBIDDEN CALL TO NARROWER SCOPED BEAN WITHOUT PARAM REF
+            OccPeriod opLight = oc.getOccPeriod(input.getPeriodID(), getSessionBean().getSessUser());
 
             exportable.setPeriod(new OccPeriodPropertyUnitHeavy(opLight));
         }
@@ -1042,7 +1043,7 @@ if (false) {
 
         CaseCoordinator cc = getCaseCoordinator();
         setPublicUser();
-        CECaseDataHeavy exportable = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(input.getBundledCase().getCaseID()), publicUser);
+        CECaseDataHeavy exportable = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(input.getBundledCase().getCaseID(),getSessionBean().getSessUser()), publicUser);
 
         return exportable;
 
@@ -1133,7 +1134,8 @@ if (false) {
 
         OccPeriod unbundled = input.getBundledPeriod();
         setPublicUser();
-        OccPeriodDataHeavy exportable = oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(unbundled.getPeriodID()), publicUser);
+        // FORBIDDEN CALL TO NARROWER SCOPED BEAN WITHOUT PARAM REF
+        OccPeriodDataHeavy exportable = oc.assembleOccPeriodDataHeavy(oc.getOccPeriod(unbundled.getPeriodID(), getSessionBean().getSessUser()), publicUser);
 
         ArrayList<Person> skeletonHorde = new ArrayList<>();
 
@@ -1616,12 +1618,12 @@ if (false) {
                 throw new BObStatusException("Cannot assemble data heavy property");
             }
             //determine the governing property info case and then assemble a CECaseDataHeavy with it
-            CECaseDataHeavy propertyInfoCase = cc.cecase_assembleCECaseDataHeavy(pc.determineGoverningPropertyInfoCase(heavyProp, publicUser), publicUser);
+//            CECaseDataHeavy propertyInfoCase = cc.cecase_assembleCECaseDataHeavy(pc.determineGoverningPropertyInfoCase(heavyProp, publicUser), publicUser, getSessionBean());
             
-            EventCnF ev = ec.initEvent(propertyInfoCase,
-                    ec.getEventCategory(Integer.parseInt(
-                            getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
-                                    .getString("publicnoteeventcatid"))));
+//            EventCnF ev = ec.initEvent(propertyInfoCase,
+//                    ec.getEventCategory(Integer.parseInt(
+//                            getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+//                                    .getString("publicnoteeventcatid"))));
             
             sb = new StringBuilder();
             sb.append(getResourceBundle(Constants.MESSAGE_TEXT)
@@ -1631,10 +1633,10 @@ if (false) {
             sb.append(objectID);
             sb.append(")");
             
-            ev.setDescription(sb.toString());
-            
-            ec.addEvent(ev, propertyInfoCase, publicUser);
-            
+//            ev.setDescription(sb.toString());
+//            
+//            ec.addEvent(ev, propertyInfoCase, publicUser);
+//            
         } else {
             System.out.println("PublicInfoCoordinator.attachMessageToBundle() | ERROR: The system tried to attach a message to a bundle "
                     + "that did not have a property attached to it. Look in this method for a comment explaining more.");

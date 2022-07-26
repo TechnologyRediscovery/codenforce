@@ -313,7 +313,7 @@ public class MunicipalityManageBB extends BackingBeanUtils implements Serializab
         OccupancyCoordinator oc = getOccupancyCoordinator();
         OccPeriod occperiod = null;
         try {
-            occperiod = oc.getOccPeriod(currentMuniDataheavy.getDefaultOccPeriodID());
+            occperiod = oc.getOccPeriod(currentMuniDataheavy.getDefaultOccPeriodID(), getSessionBean().getSessUser());
         } catch (IntegrationException ex) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fail To Load Default Occpancy Period", ""));
         }

@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.application.IFace_pinnable;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.application.interfaces.IFace_EventRuleGoverned;
 import com.tcvcog.tcvce.application.interfaces.IFace_Loggable;
@@ -30,16 +31,23 @@ public class        CECase
                     IFace_StatusLogHolder,
                     Comparable<CECase>,
                     IFace_ActivatableBOB,
-                    IFace_noteHolder {
+                    IFace_noteHolder,
+                    IFace_pinnable{
     
     final static String CASE_TABLE_NAME = "cecase";
     final static String CASE_PK_FIELD = "caseid";
     final static String CASE_FRIENDLY_NAME = "Code Enforcement Case";
     final static DomainEnum CECASE_ENUM = DomainEnum.CODE_ENFORCEMENT;
+    final static String PIN_TABLE_NAME = "public.cecasepin";
+    final static String PIN_FK_FIELD = "cecase_caseid";
+    
     
     protected int caseID;
     protected int publicControlCode;
     protected boolean paccEnabled;
+    protected boolean pinned;
+    protected User pinner;
+    
     /**
      * Code enforcement action requests are generally linked
      * to a code enforcement case by the code officers.
@@ -55,7 +63,7 @@ public class        CECase
     protected User caseManager;
     protected String caseName;
     
-    protected CasePriorityEnum priority;
+    protected PriorityEnum priority;
     protected String priorityAssignmentLog;
     private StringBuilder pLog;
     protected Icon priorityIcon;
@@ -83,6 +91,7 @@ public class        CECase
     protected LocalDateTime lastUpdatedTS;
     
     protected List<EventCnF> eventList;
+    protected EventCnF mostRecentPastEvent;
     
     protected EventCnF originationEvent;
     protected EventCnF closingEvent;
@@ -97,6 +106,7 @@ public class        CECase
         caseID = input.getCaseID();
         publicControlCode = input.getPublicControlCode();
         paccEnabled = input.isPaccEnabled();
+        pinned = input.pinned;
         allowForwardLinkedPublicAccess = input.isAllowForwardLinkedPublicAccess();
         parcelKey = input.getParcelKey();
         propertyUnitID = input.getPropertyUnitID();
@@ -123,6 +133,7 @@ public class        CECase
         lastUpdatedBy = input.getLastUpdatedBy();
         lastUpdatedTS = input.getLastUpdatedTS();
         eventList = input.getEventList();
+        mostRecentPastEvent = input.getMostRecentPastEvent();
         originationEvent = input.originationEvent;
         closingEvent = input.closingEvent;
         daysSinceLastEvent = input.daysSinceLastEvent;
@@ -375,6 +386,40 @@ public class        CECase
         return DateTimeUtil.getTimePeriodAsDays(originationDate, ageEndTime);
         
     }
+    
+      /**
+     * @return the violationListUnresolved
+     */
+    public List<CodeViolation> getViolationListUnresolved() {
+
+        List<CodeViolation> violationListUnresolved = new ArrayList<>();
+        if (violationList != null && violationList.size() > 0) {
+            for (CodeViolation v : violationList) {
+                if (v.getActualComplianceDate() == null) {
+                    violationListUnresolved.add(v);
+                }
+            }
+        }
+
+        return violationListUnresolved;
+    }
+
+    /**
+     * @return the violationListResolved
+     */
+    public List<CodeViolation> getViolationListResolved() {
+        List<CodeViolation> violationListResolved = new ArrayList<>();
+        if (violationList != null && violationList.size() > 0) {
+            for (CodeViolation v : violationList) {
+                if (v.getActualComplianceDate() != null) {
+                    violationListResolved.add(v);
+                }
+            }
+        }
+
+        return violationListResolved;
+    }
+
     
     /**
      * @return the caseID
@@ -846,14 +891,14 @@ public class        CECase
     /**
      * @return the priority
      */
-    public CasePriorityEnum getPriority() {
+    public PriorityEnum getPriority() {
         return priority;
     }
 
     /**
      * @param priority the priority to set
      */
-    public void setPriority(CasePriorityEnum priority) {
+    public void setPriority(PriorityEnum priority) {
         this.priority = priority;
     }
 
@@ -871,6 +916,53 @@ public class        CECase
         this.priorityIcon = priorityIcon;
     }
 
+    /**
+     * @return the mostRecentPastEvent
+     */
+    public EventCnF getMostRecentPastEvent() {
+        return mostRecentPastEvent;
+    }
 
+    /**
+     * @param mostRecentPastEvent the mostRecentPastEvent to set
+     */
+    public void setMostRecentPastEvent(EventCnF mostRecentPastEvent) {
+        this.mostRecentPastEvent = mostRecentPastEvent;
+    }
+
+    /**
+     * @return the pinned
+     */
+    @Override
+    public boolean isPinned() {
+        return pinned;
+    }
+
+    /**
+     * @param pinned the pinned to set
+     */
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
+    }
+
+    @Override
+    public void setPinner(User usr) {
+        pinner = usr;
+    }
+
+    @Override
+    public User getPinner() {
+        return pinner;
+    }
+
+    @Override
+    public String getPinTableFKString() {
+        return PIN_FK_FIELD;
+    }
+
+    @Override
+    public String getPinTableName() {
+        return PIN_TABLE_NAME;
+    }
    
 }

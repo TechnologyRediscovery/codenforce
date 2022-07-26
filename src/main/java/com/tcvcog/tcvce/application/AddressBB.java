@@ -105,11 +105,15 @@ public  class   AddressBB
      */
     private void setupCSZQuery(){
         SearchCoordinator srchc = getSearchCoordinator();
-        if(srchc != null){
+        if(srchc != null && getSessionBean() != null && getSessionBean().getSessUser() != null && getSessionBean().getSessUser().getMyCredential() != null){
             qcszEnumList = srchc.buildQueryMailingCityStateZipList(getSessionBean().getSessUser().getMyCredential());
             if(qcszEnumList != null && !qcszEnumList.isEmpty()){
                 selectedCSZQuery = qcszEnumList.get(0);
             }
+        } else {
+                getFacesContext().addMessage(null,
+                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                             "Fatal error: Null session bean or session user or session credential",""));
         }
     }
     
@@ -121,10 +125,17 @@ public  class   AddressBB
     public void onQueryCSZExecuteButtonChange(ActionEvent ev){
         SearchCoordinator sc = getSearchCoordinator();
         try {
-            sc.runQuery(selectedCSZQuery);
-            getFacesContext().addMessage(null,
-                 new FacesMessage(FacesMessage.SEVERITY_INFO,
-                         "Search Returned " + selectedCSZQuery.getResults().size() + " records!",""));
+            if(selectedCSZQuery != null){
+                sc.runQuery(selectedCSZQuery);
+                getFacesContext().addMessage(null,
+                     new FacesMessage(FacesMessage.SEVERITY_INFO,
+                             "Search Returned " + selectedCSZQuery.getResults().size() + " records!",""));
+            } else {
+                getFacesContext().addMessage(null,
+                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                             "Fatal error: Null selected query" + " records!",""));
+                
+            }
         } catch (SearchException ex) {
             System.out.println(ex);
                getFacesContext().addMessage(null,

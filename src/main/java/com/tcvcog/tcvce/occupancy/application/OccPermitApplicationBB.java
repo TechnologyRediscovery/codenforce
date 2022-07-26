@@ -761,7 +761,7 @@ public class OccPermitApplicationBB extends BackingBeanUtils implements Serializ
             //But also attaches the selected unit to the application.
             submitUnitChangeList();
 
-            oc.insertOccPermitApplication(currentApplication);
+            oc.insertOccPermitApplication(currentApplication, getSessionBean().getSessUser());
 
             getSessionBean().setSessOccPermitApplication(currentApplication);
             

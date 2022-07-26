@@ -46,6 +46,8 @@ public class UserAuthorized extends User{
     protected LocalDateTime forcePasswordResetTS;
     protected int forcePasswordResetByUserID;
     
+    protected MuniProfile governingMuniProfile;
+    
 
     
     /**
@@ -62,6 +64,7 @@ public class UserAuthorized extends User{
             this.pswdLastUpdated = ua.pswdLastUpdated;
             this.forcePasswordResetTS = ua.forcePasswordResetTS;
             this.forcePasswordResetByUserID = ua.forcePasswordResetByUserID;
+            this.governingMuniProfile = ua.governingMuniProfile;
         }
       
     }
@@ -197,6 +200,20 @@ public class UserAuthorized extends User{
      */
     public void setForcePasswordResetByUserID(int forcePasswordResetByUserID) {
         this.forcePasswordResetByUserID = forcePasswordResetByUserID;
+    }
+
+    /**
+     * @return the governingMuniProfile
+     */
+    public MuniProfile getGoverningMuniProfile() {
+        return governingMuniProfile;
+    }
+
+    /**
+     * @param governingMuniProfile the governingMuniProfile to set
+     */
+    public void setGoverningMuniProfile(MuniProfile governingMuniProfile) {
+        this.governingMuniProfile = governingMuniProfile;
     }
     /**
      * @return the homeMuni

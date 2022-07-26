@@ -91,14 +91,15 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * to configureBObXXXX() method
      *
      * @param periodID
-     * @return
+     * @param ua the value of ua
      * @throws IntegrationException
+     * @return the com.tcvcog.tcvce.entities.occupancy.OccPeriod
      */
-    public OccPeriod getOccPeriod(int periodID) throws IntegrationException {
+    public OccPeriod getOccPeriod(int periodID, UserAuthorized ua) throws IntegrationException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
         OccPeriod op = null;
         try {
-            op = configureOccPeriod(oi.getOccPeriod(periodID));
+            op = configureOccPeriod(oi.getOccPeriod(periodID), ua);
         } catch (EventException | AuthorizationException | BObStatusException | ViolationException ex) {
             System.out.println(ex);
         }
@@ -111,12 +112,13 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * PropertyUnitWithProp object for displaying property address info
      *
      * @param periodid
-     * @return
+     * @param ua the value of ua
      * @throws IntegrationException
+     * @return the com.tcvcog.tcvce.entities.occupancy.OccPeriodPropertyUnitHeavy
      */
-    public OccPeriodPropertyUnitHeavy getOccPeriodPropertyUnitHeavy(int periodid) throws IntegrationException {
+    public OccPeriodPropertyUnitHeavy getOccPeriodPropertyUnitHeavy(int periodid, UserAuthorized ua) throws IntegrationException {
         PropertyCoordinator pc = getPropertyCoordinator();
-        OccPeriodPropertyUnitHeavy oppu = new OccPeriodPropertyUnitHeavy(getOccPeriod(periodid));
+        OccPeriodPropertyUnitHeavy oppu = new OccPeriodPropertyUnitHeavy(getOccPeriod(periodid, ua));
         try {
             oppu.setPropUnitProp(pc.getPropertyUnitWithProp(oppu.getPropertyUnitID()));
         } catch (BObStatusException ex) {
@@ -131,13 +133,14 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * cannot look up the tree.
      * 
      * @param perList
+     * @param ua
      * @return
      * @throws IntegrationException 
      */
-    public List<OccPeriodPropertyUnitHeavy> getOccPeriodPropertyUnitHeavyList(List<OccPeriod> perList) throws IntegrationException {
+    public List<OccPeriodPropertyUnitHeavy> getOccPeriodPropertyUnitHeavyList(List<OccPeriod> perList, UserAuthorized ua) throws IntegrationException {
         List<OccPeriodPropertyUnitHeavy> oppuList = new ArrayList<>();
         for (OccPeriod op : perList) {
-            oppuList.add(OccupancyCoordinator.this.getOccPeriodPropertyUnitHeavy(op.getPeriodID()));
+            oppuList.add(OccupancyCoordinator.this.getOccPeriodPropertyUnitHeavy(op.getPeriodID(), ua));
         }
 
         return oppuList;
@@ -172,7 +175,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         List<OccPeriod> occPeriodList = new ArrayList<>();
         if(opidl != null && !opidl.isEmpty()){
             for(Integer i: opidl){
-                occPeriodList.add(configureOccPeriod(oi.getOccPeriod(i)));
+                occPeriodList.add(configureOccPeriod(oi.getOccPeriod(i), u));
             }
         }
         
@@ -224,7 +227,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             if (!qe.getParamsList().isEmpty()) {
                 qe.getParamsList().get(0).setEventDomainPK_val(per.getPeriodID());
             }
-            qe = sc.runQuery(qe);
+            qe = sc.runQuery(qe, ua);
             
             opdh.setEventList(ec.downcastEventCnFPropertyUnitHeavy(qe.getBOBResultList()));
 
@@ -270,11 +273,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @param periodIDTarget ID of the period to which the given inspection should
      * be attached
      */
-    public void transferInspectionOccPeriod(FieldInspection ins, int periodIDTarget) throws BObStatusException, IntegrationException{
+    public void transferInspectionOccPeriod(FieldInspection ins, int periodIDTarget, UserAuthorized ua) throws BObStatusException, IntegrationException{
         if(ins == null || periodIDTarget == 0){
             throw new BObStatusException("Cannot xcer an inspection to a new period with null Inspection or target ID of 0");
         }
-        OccPeriod per = getOccPeriod(periodIDTarget);
+        OccPeriod per = getOccPeriod(periodIDTarget, ua);
         if(per == null){
             throw new BObStatusException("Invalid target occupancy period ID");
         }
@@ -333,6 +336,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * minus their many lists
      *
      * @param period
+     * @param ua
      * @return
      * @throws EventException
      * @throws AuthorizationException
@@ -340,9 +344,13 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * @throws BObStatusException
      * @throws ViolationException
      */
-    public OccPeriod configureOccPeriod(OccPeriod period)
+    public OccPeriod configureOccPeriod(OccPeriod period, UserAuthorized ua)
             throws EventException, AuthorizationException, IntegrationException, BObStatusException, ViolationException {
 
+        SystemIntegrator si = getSystemIntegrator();
+        
+        period.setPinner(ua);
+        period.setPinned(si.getPinnedStatus(period));
 
         return period;
 
@@ -366,7 +374,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         
         if(permit.getFinalizedts() == null){
             try {
-                OccPeriod op = getOccPeriod(permit.getPeriodID());
+                OccPeriod op = getOccPeriod(permit.getPeriodID(), ua);
                 PropertyDataHeavy pdh = pc.assemblePropertyDataHeavy(pc.getPropertyByPropUnitID(op.getPropertyUnitID()), ua);
                 permit.setParcelInfo(pdh.getParcelInfo());
             } catch (SearchException | BObStatusException | BlobException | IntegrationException ex) {
@@ -412,16 +420,17 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
     /**
      * Coordinates with the integrator to build an occ period history list
+     * @param ua
      * @param cred
      * @return 
      */
-    public List<OccPeriod> assembleOccPeriodHistoryList(Credential cred) {
+    public List<OccPeriod> assembleOccPeriodHistoryList(UserAuthorized ua) {
         OccupancyIntegrator oi = getOccupancyIntegrator();
 
         List<OccPeriod> opList = new ArrayList<>();
         try {
-            for (Integer i : oi.getOccPeriodHistoryList(cred.getGoverningAuthPeriod().getUserID())) {
-                opList.add(getOccPeriod(i));
+            for (Integer i : oi.getOccPeriodHistoryList(ua.getKeyCard().getGoverningAuthPeriod().getUserID())) {
+                opList.add(getOccPeriod(i, ua));
             }
         } catch (IntegrationException ex) {
             System.out.println(ex);
@@ -707,11 +716,12 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * parcels
      * 
      * @param permitLight
+     * @param ua
      * @return 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
      * @throws com.tcvcog.tcvce.domain.BObStatusException 
      */
-    public OccPermitPropUnitHeavy getOccPermitPropertyUnitHeavy(OccPermit permitLight) throws IntegrationException, BObStatusException{
+    public OccPermitPropUnitHeavy getOccPermitPropertyUnitHeavy(OccPermit permitLight, UserAuthorized ua) throws IntegrationException, BObStatusException{
         if(permitLight == null){
             return null;
         }
@@ -720,7 +730,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         OccupancyCoordinator oc = getOccupancyCoordinator();
         
         OccPermitPropUnitHeavy oppuh = new OccPermitPropUnitHeavy(permitLight);
-        oppuh.setPropUnitWithProp(pc.getPropertyUnitWithProp(oc.getOccPeriod(permitLight.getPeriodID()).getPropertyUnitID()));
+        oppuh.setPropUnitWithProp(pc.getPropertyUnitWithProp(oc.getOccPeriod(permitLight.getPeriodID(), ua).getPropertyUnitID()));
         
         return oppuh;
     }
@@ -997,8 +1007,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
            }
        }
        
-       
-       
        if(auditPass){
            permit.setFinalizationAuditPassTS(LocalDateTime.now());
            permit.appendToFinalizationAuditLog("Audit result: Pass timestamp injected!");
@@ -1077,7 +1085,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             permit.setStaticpropertyinfo(sb.toString());
         }
         // muni addresss
-        System.out.println("OccupancyCoordinator.setStaticFields: Setting muni address: " + mdh.getMuniPropertyDH().getAddress().getAddressPretty2LineEscapeFalse());
+//        System.out.println("OccupancyCoordinator.setStaticFields: Setting muni address: " + mdh.getMuniPropertyDH().getAddress().getAddressPretty2LineEscapeFalse());
         sb = new StringBuilder();
         sb.append(mdh.getMuniName());
         sb.append(Constants.FMT_HTML_BREAK);
@@ -1539,13 +1547,15 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * Inserts an application to the database and attaches it to the default
      *
      * @param application
+     * @param ua
      * @return the application ID
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.AuthorizationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
      * @throws com.tcvcog.tcvce.domain.EventException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public int insertOccPermitApplication(OccPermitApplication application)
+    public int insertOccPermitApplication(OccPermitApplication application, UserAuthorized ua)
             throws IntegrationException, AuthorizationException,
             BObStatusException, EventException, BlobException {
 
@@ -1555,7 +1565,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         if (getSessionBean().getSessUser() != null) {
             //if we are in the middle of an internal session, the muni will be stored in the SessMuni field.
-            connectedPeriod = getOccPeriod(getSessionBean().getSessMuni().getDefaultOccPeriodID());
+            connectedPeriod = getOccPeriod(getSessionBean().getSessMuni().getDefaultOccPeriodID(), ua);
         } else {
             //if sessUser is null, we're in an external session, which stores the current muni in sessMuniQueued
             MunicipalityCoordinator mc = getMuniCoordinator();
@@ -1563,7 +1573,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
             MunicipalityDataHeavy temp = mc.assembleMuniDataHeavy(getSessionBean().getSessMuniQueued(), uc.auth_getPublicUserAuthorized());
 
-            connectedPeriod = getOccPeriod(temp.getDefaultOccPeriodID());
+            connectedPeriod = getOccPeriod(temp.getDefaultOccPeriodID(), ua);
 
         }
         application.setConnectedPeriod(connectedPeriod);
