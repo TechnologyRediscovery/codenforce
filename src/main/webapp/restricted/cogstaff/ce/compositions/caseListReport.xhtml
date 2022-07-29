@@ -1,0 +1,157 @@
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+
+    <h:form id="caselistreport-growl-form">
+        <p:growl id="caselistreport-growl"
+                 globalOnly="false" 
+                 />
+    </h:form>
+
+
+    <p:dialog   id="cecase-list-report-dialog"
+                widgetVar="cecase-list-report-dialog-var"
+                closable="true" 
+                responsive="true"
+                dynamic="true"
+                header="Configure Code Enforcement Case List Report"
+                >
+
+        <h:form id="cecase-list-report-form">
+
+            <div class="ui-g data_container_nested_restrict">
+
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+
+                    <h:outputLabel for="report-caselist-profile-title-it" value="Report title"/>
+
+                    <p:spacer height="5px"/>
+
+                    <p:inputText id="report-caselist-title-it" style="width: 300px;" value="#{ceCaseSearchAndReportBB.reportCECaseList.title}"/>
+                    <p:spacer height="5px"/>
+                    <h:outputText styleClass="italic" value="note: your name and the current date and time will be automatically inserted" />
+
+
+
+                    <p:spacer height="5px" />
+                    <p:outputLabel for="cecase-list-report-date-start-cal" 
+                                   value="start date"/>
+
+                    <p:spacer height="1px" />
+                    <p:datePicker 	 id="cecase-list-report-date-start-cal" 
+                                    value="#{ceCaseSearchAndReportBB.reportCECaseList.date_start_val}" 
+                                    rendered="true"
+                                    style="width: 100%;"
+                                    pattern="MM/dd/yyyy HH:mm"
+                                    disabled="false"
+                                    hideOnDateTimeSelect="true"
+                                    showOnFocus="false"
+                                    showIcon="true"
+                                    showButtonBar="true"
+                                    mask="true"
+                                    timeInput="true" 
+                                    required="true" />
+
+
+
+
+
+                    <p:outputLabel for="cecase-list-report-date-end-cal" 
+                                   value="end date"/>
+
+                    <p:spacer height="1px" />
+
+                    <p:datePicker 	 id="cecase-list-report-date-end-cal" 
+                                    value="#{ceCaseSearchAndReportBB.reportCECaseList.date_end_val}" 
+                                    rendered="true"
+                                    style="width: 100%;"
+                                    pattern="MM/dd/yyyy HH:mm"
+                                    disabled="false"
+                                    hideOnDateTimeSelect="true"
+                                    showOnFocus="false"
+                                    showIcon="true"
+                                    showButtonBar="true"
+                                    mask="true"
+                                    timeInput="true" 
+                                    required="true" />
+
+
+                    <h:outputLabel for="report-caselist-notes-ita" value="Notes"/>
+                    <p:spacer height="5px"/>
+                    <p:inputText id="report-caselist-notes-ita" style="width: 300px; height: 100px;" value="#{ceCaseSearchAndReportBB.reportCECaseList.notes}"/>
+                </div>
+                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+
+
+                    <h3>Additional case list report options</h3>
+                    <div class="p-grid">
+                        <div class="p-col">
+                            <h:outputLabel class="bold" value="Include case names" for="report-caselist-casename-chkbox" />
+                            <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeCaseNames}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include street level summary" for="report-caselist-streetsummary-chkbox" />
+                            <p:selectBooleanCheckbox id="report-caselist-streetsummary-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeStreetLevelSummary}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include case status pie" for="report-caselist-casestatus-chkbox" />
+                            <p:selectBooleanCheckbox id="report-caselist-casestatus-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeCECaseStatusPie}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include full owner contact info: " for="report-caselist-ownercontact-chkbox" />
+                            <p:selectBooleanCheckbox id="report-caselist-ownercontact-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeListSummaryFigures}" />
+
+                        </div>
+                        <div class="p-col">
+                            <h:outputLabel class="bold" value="Include violation list for each case: " for="report-caselist-viols-chkbox" />
+                            <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeViolationList}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include summary of each case's event history: " for="report-caselist-eventhist-chkbox" />
+                            <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeEventSummaryByCase}" />
+
+                            <p:spacer height="5px"/>
+
+                            <h:outputLabel class="bold" value="Include extended property info for each listing: " for="report-caselist-propertyinfo" />
+                            <p:selectBooleanCheckbox id="report-caselist-propertyinfo" value="#{ceCaseSearchAndReportBB.reportCECaseList.includeExtendedPropertyDetails}" />
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                    <div class="restrict-main-contents-io-link">
+                        <h2>
+
+                            <p:commandLink  ajax="false" 
+                                            action="#{ceCaseSearchAndReportBB.generateReportCECaseList}"
+                                            value="Click to generate report in new tab" 
+                                            target="_blank"
+                                            styleClass="font-size:2em;"
+                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
+                                            />
+                        </h2>
+                    </div>
+                    <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+                        <div class="ui-button gray_button">
+
+                            <p:commandButton ajax="true" 
+                                             value="Cancel" icon="fa fa-stop" immediate="true"
+                                             onclick="PF('report-caselist-profile-diaglog-var').hide()"/>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </p:dialog>
+
+</ui:composition>

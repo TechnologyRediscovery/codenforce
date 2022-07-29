@@ -12,6 +12,12 @@ package com.tcvcog.tcvce.entities;
  * 
  * @author sylvia
  */
-public interface IFace_managedSessionListed {
+public interface IFace_managedSessionListed extends IFace_stateful{
+    
+    /**
+     * Returns to which silo of listing this object belongs
+     * @return 
+     */
+    public DomainEnum getSystemDomain();
     
 }

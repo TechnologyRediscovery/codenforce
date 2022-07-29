@@ -400,7 +400,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         LocalDateTime timeEndComputed = null;
         
         // deal with no end time
-        if(ev.getTimeEnd() == null){
+        if(ev.getTimeStart() != null && ev.getTimeEnd() == null && ev.getCategory() != null){
             timeEndComputed = ev.getTimeStart().plusMinutes(ev.getCategory().getDefaultDurationMins());
             ev.setTimeEnd(timeEndComputed);
      
@@ -415,7 +415,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         }
         
         // Deal with non-chronological start and end times
-        if(ev.getTimeEnd().isBefore(ev.getTimeStart())){
+        if(ev.getTimeStart() != null && ev.getTimeEnd() != null && ev.getTimeEnd().isBefore(ev.getTimeStart())){
             ev.setTimeEnd(timeEndComputed);
             mbp = new MessageBuilderParams();
             mbp.setExistingContent(ev.getNotes());

@@ -32,7 +32,8 @@ public class        CECase
                     Comparable<CECase>,
                     IFace_ActivatableBOB,
                     IFace_noteHolder,
-                    IFace_pinnable{
+                    IFace_pinnable,
+                    IFace_stateful{
     
     final static String CASE_TABLE_NAME = "cecase";
     final static String CASE_PK_FIELD = "caseid";
@@ -963,6 +964,16 @@ public class        CECase
     @Override
     public String getPinTableName() {
         return PIN_TABLE_NAME;
+    }
+
+    @Override
+    public StateEnum getState() {
+        if(closingDate == null){
+            return StateEnum.OPEN;
+        } else {
+            return StateEnum.CLOSED;
+        }
+                
     }
    
 }

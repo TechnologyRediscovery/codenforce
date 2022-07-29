@@ -557,6 +557,10 @@ public  class       SessionInitializer
         sb.setSessHumanListRefreshedList(null);
         
         try {
+            if(getSessionBean().getSessProperty() == null){
+                throw new SessionException("Null property during person init");
+                
+            }
             sb.setSessPersonList(persc.getPersonListFromHumanLinkList(getSessionBean().getSessProperty().getHumanLinkList()));
             if(sb.getSessPersonList().isEmpty()){
                 sb.setSessPerson(persc.selectDefaultPerson(cred));

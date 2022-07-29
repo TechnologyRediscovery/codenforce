@@ -152,7 +152,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         PropertyCoordinator pc = getPropertyCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
          try {
-            currentCase = cc.cecase_assembleCECaseDataHeavy(getSessionBean().getSessCECase(), getSessionBean().getSessUser());
+            currentCase = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(getSessionBean().getSessCECase().getCaseID(), getSessionBean().getSessUser()), getSessionBean().getSessUser());
         } catch (BObStatusException | IntegrationException | SearchException ex) {
             System.out.println(ex);
         }
@@ -581,7 +581,6 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
     /**
      * Listener for finalization of NOV sending
      * @param ev
-     * @return 
      */
     public void markNoticeOfViolationAsSent(ActionEvent ev) {
         CaseCoordinator caseCoord = getCaseCoordinator();
@@ -666,7 +665,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
         CaseCoordinator caseCoord = getCaseCoordinator();
         try {
             caseCoord.nov_delete(getCurrentNotice());
-            currentCase = caseCoord.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            refreshCurrentCase();
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Notice no. " + getCurrentNotice().getNoticeID() + " has been nuked forever", ""));
@@ -678,11 +677,7 @@ public class NoticeOfViolationBB extends BackingBeanUtils implements Serializabl
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Unable to delete this notice of violation, "
                             + "probably because it has been sent already", ""));
-        } catch (IntegrationException | SearchException ex) {
-            System.out.println(ex);
-            getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
-
-        }
+        } 
         return "";
     }
     

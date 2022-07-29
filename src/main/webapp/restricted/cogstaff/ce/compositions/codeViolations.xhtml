@@ -18,10 +18,7 @@
              >
 
 
-        <h:form id="violationedit-test-form">
-
-
-        </h:form>
+      
 
         <h:form id="cecase-violations-form">
 
@@ -224,27 +221,32 @@
             <p:growl id="violation-add-growl"/>
 
 
-            <div class="ui-g data_container_nested_restrict">
-
+           <div class="ui-g data_container_nested_restrict">
 
                 <div class="restrict-main-contents-io-button">
 
 
                     <p:commandButton    id="violation-insert-button0"
-                                        ajax="false"
+                                        ajax="true"
                                         value="Record Violations"
-                                        action="#{ceCaseBB.onViolationAddCommitButtonChange}"
-                                        icon="fa fa-warning" />
+                                        actionListener="#{ceCaseBB.onViolationAddCommitButtonChange}"
+                                        icon="fa fa-warning" 
+                                        oncomplete="PF('violation-add-dialog-var').hide();"
+                                        update="violation-growl-form
+                                        cecase-violations-panel
+                                        cecase-violations-form" />
                 </div>
 
                 <div class="restrict-main-contents-io-button gray_button">
 
                     <p:commandButton    id="violation-insert-abort-button0"
-                                        ajax="false"
+                                        ajax="true"
                                         value="Cancel"
                                         process="@none"
                                         immediate="true"
-                                        action="#{ceCaseBB.onViolationAddAbortButtonChange}"
+                                        update="violation-growl-form"
+                                        oncomplete="PF('violation-add-dialog-var').hide();"
+                                        actionListener="#{ceCaseBB.onViolationAddAbortButtonChange}"
                                         icon="fa fa-stop" />
                 </div>
             </div>
@@ -417,20 +419,26 @@
 
 
                     <p:commandButton    id="violation-insert-button1"
-                                        ajax="false"
+                                        ajax="true"
                                         value="Record Violations"
-                                        action="#{ceCaseBB.onViolationAddCommitButtonChange}"
-                                        icon="fa fa-warning" />
+                                        actionListener="#{ceCaseBB.onViolationAddCommitButtonChange}"
+                                        icon="fa fa-warning" 
+                                        oncomplete="PF('violation-add-dialog-var').hide();"
+                                        update="violation-growl-form
+                                         cecase-violations-panel
+                                        cecase-violations-form" />
                 </div>
 
                 <div class="restrict-main-contents-io-button gray_button">
 
                     <p:commandButton    id="violation-insert-abort-button1"
-                                        ajax="false"
+                                        ajax="true"
                                         value="Cancel"
                                         process="@none"
                                         immediate="true"
-                                        action="#{ceCaseBB.onViolationAddAbortButtonChange}"
+                                        update="violation-growl-form"
+                                        oncomplete="PF('violation-add-dialog-var').hide();"
+                                        actionListener="#{ceCaseBB.onViolationAddAbortButtonChange}"
                                         icon="fa fa-stop" />
                 </div>
             </div>
@@ -1297,14 +1305,16 @@
                         <p:commandButton
                             id="violation-remove-button"
                             icon="fa fa-trash"
-                            ajax="false"
-                            action="#{ceCaseBB.onViolationRemoveCommitButtonChange}"
+                            ajax="true"
+                            actionListener="#{ceCaseBB.onViolationRemoveCommitButtonChange}"
                             value="Remove Violation ID:#{ceCaseBB.currentViolation.violationID}"
+                            update="violation-growl-form
+                                         cecase-violations-panel
+                                        cecase-violations-form"
                             />
                     </div>
 
                     <div class="restrict-main-contents-io-button gray_button">
-
 
                         <p:commandButton    id="violation-nuke-cancel-button"
                                             ajax="true"
@@ -1515,8 +1525,9 @@
                                 value="Add selected violations"
                                 icon="fa fa-check"
                                 actionListener="#{ceCaseBB.onOrdinanceSelectionCompleteButtonChange}"
-                                oncomplete="PF('violation-add-dialog-var').show()"
-                                update="violation-add-form"/>
+                                oncomplete="PF('violation-add-dialog-var').show(); PF('violation-selectelement-dialog-var').hide();"
+                                update="violation-add-form
+                                violation-growl-form"/>
 
             <p:spacer height="5px" />
 

@@ -42,6 +42,7 @@ import com.tcvcog.tcvce.coordinators.OccInspectionCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.EventException;
+import com.tcvcog.tcvce.domain.SessionException;
 import com.tcvcog.tcvce.integration.PropertyIntegrator;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsActiveHiddenListsEnum;
 import java.time.LocalDateTime;
@@ -238,9 +239,6 @@ public class    SessionBean
     
     private OccPeriodDataHeavy sessOccPeriod;
 
-    private ActivatableRouteEnum sessOccPeriodRoute;
-    private OccPeriod sessOccPeriodQueued;
-    private ActivatableRouteEnum sessOccPeriodListRoute;
     private List<OccPeriodPropertyUnitHeavy> sessOccPeriodList;
     
     private OccPermit sessOccPermit;
@@ -427,6 +425,137 @@ public class    SessionBean
     private NavigationStack navStack;
     
     /* >>> -------------------------------------------------------------- <<< */
+    /* >>>                  MANAGED LIST MANAGEMENT                       <<< */
+    /* >>> -------------------------------------------------------------- <<< */
+    
+    
+    
+    /**
+     * Asks the database for a fresh copy of the specified object
+     * and appends it to the appropriate managed list
+     * 
+     * @param msled 
+     * @throws com.tcvcog.tcvce.domain.SessionException 
+     */
+    public void managedSessionList_addObject(IFace_managedSessionListed msled) throws SessionException{
+        if(msled == null || msled.getSystemDomain() == null){
+            throw new SessionException("Cannot add a null instance of managedSessionListed or null domain");
+        }
+        try {
+            switch(msled.getSystemDomain()){
+                case CODE_ENFORCEMENT:
+                    CaseCoordinator cc = getCaseCoordinator();
+                    if(sessCECaseList != null){
+                        sessCECaseList.add(cc.cecase_assembleCECasePropertyUnitHeavy(cc.cecase_getCECase(msled.getDBKey(), sessUser)));
+                    }
+                    break;
+                case OCCUPANCY:
+                    OccupancyCoordinator oc = getOccupancyCoordinator();
+                    if(sessOccPeriodList != null){
+                        sessOccPeriodList.add(oc.getOccPeriodPropertyUnitHeavy(msled.getDBKey(), sessUser));
+                    }
+                    break;
+                default:
+                    throw new SessionException("Received unsupported domain enum for managedSessionListed");
+            }
+        } catch (IntegrationException | BObStatusException | BlobException | SearchException ex) {
+            System.out.println(ex);
+            throw new SessionException("error during adding of object to managed session list");
+        }
+    }
+    
+    /**
+     * Gets a new copy of the specified object and injects ref in the managed list
+     * 
+     * @param msled 
+     * @throws com.tcvcog.tcvce.domain.SessionException 
+     */
+    public void managedSessionList_refreshObject(IFace_managedSessionListed msled) throws SessionException{
+        if(msled == null || msled.getSystemDomain() == null){
+            throw new SessionException("Cannot add a null instance of managedSessionListed or null domain");
+        }
+        try {
+            switch(msled.getSystemDomain()){
+                case CODE_ENFORCEMENT:
+                    CaseCoordinator cc = getCaseCoordinator();
+                    if(sessCECaseList != null){
+                        CECasePropertyUnitHeavy csepuh = (CECasePropertyUnitHeavy) msled;
+                        int loc = sessCECaseList.indexOf(csepuh);
+                        if(loc == -1){
+                            managedSessionList_addObject(msled);
+                        } else {
+                            sessCECaseList.set(loc, cc.cecase_assembleCECasePropertyUnitHeavy(cc.cecase_getCECase(msled.getDBKey(), sessUser)));
+                        }
+                    }
+                    break;
+                case OCCUPANCY:
+                    OccupancyCoordinator oc = getOccupancyCoordinator();
+                    if(sessOccPeriodList != null){
+                        OccPeriodPropertyUnitHeavy oppuh = (OccPeriodPropertyUnitHeavy) msled;
+                        int loc = sessOccPeriodList.indexOf(oppuh);
+                        if(loc == -1){
+                            managedSessionList_addObject(msled);
+                        } else {
+                            sessOccPeriodList.set(loc, oc.getOccPeriodPropertyUnitHeavy(msled.getDBKey(), sessUser));    
+                        }
+                    }
+                    break;
+                default:
+                    throw new SessionException("Received unsupported domain enum for managedSessionListed");
+            }
+        } catch (IntegrationException | BObStatusException | BlobException | SearchException ex) {
+            System.out.println(ex);
+            throw new SessionException("error during adding of object to managed session list");
+        }
+        
+    }
+    
+    /**
+     * Removes closed objects from the appropriate managed session list
+     * @param dom 
+     * @throws com.tcvcog.tcvce.domain.SessionException 
+     */
+    public void manageSessionList_clearClosed(DomainEnum dom) throws SessionException{
+        if(dom == null){
+            throw new SessionException("Cannot clear a null domain enum list");
+        }
+        
+        switch(dom){
+            case CODE_ENFORCEMENT:
+                if(sessCECaseList != null && sessCECaseList.isEmpty()){
+                    List<CECasePropertyUnitHeavy> freshList = new ArrayList<>();
+                    for(CECasePropertyUnitHeavy cspuh: sessCECaseList){
+                        if(cspuh.getState() != null && cspuh.getState() == StateEnum.OPEN){
+                            freshList.add(cspuh);
+                        }
+                    }
+                    sessCECaseList.clear();
+                    sessCECaseList.addAll(freshList);
+                }
+                break;
+            case OCCUPANCY:
+                if(sessOccPeriodList != null && sessOccPeriodList.isEmpty()){
+                    List<OccPeriodPropertyUnitHeavy> freshList = new ArrayList<>();
+                    for(OccPeriodPropertyUnitHeavy oppuh: sessOccPeriodList){
+                        if(oppuh.getState() != null && oppuh.getState() == StateEnum.OPEN){
+                            freshList.add(oppuh);
+                        }
+                    }
+                    sessOccPeriodList.clear();
+                    sessOccPeriodList.addAll(freshList);
+                }
+                break;
+            default:
+                System.out.println("Nothing to do");
+        }
+        
+    }
+    
+    
+    
+    
+    
+    /* >>> -------------------------------------------------------------- <<< */
     /* >>>                  SESSION SERVICES                              <<< */
     /* >>> -------------------------------------------------------------- <<< */
     
@@ -493,7 +622,7 @@ public class    SessionBean
                 // CASES 
                 sessCECaseList = pdh.getCeCaseList();
                 if  (sessCECaseList != null && !sessCECaseList.isEmpty()) {
-                    sessCECase = cc.cecase_assembleCECaseDataHeavy(sessCECaseList.get(0), ua);
+                    sessCECase = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(sessCECaseList.get(0).getCaseID(),ua), ua);
                     sessEventList = ec.assembleEventCnFPropUnitCasePeriodHeavyList(
                             sessCECase.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN), sessUser);
                     sessCEARList = sessCECase.getCeActionRequestList();
@@ -511,11 +640,7 @@ public class    SessionBean
 
                 if (sessOccPeriodList != null && !sessOccPeriodList.isEmpty()) {
                     setSessOccPeriodFromPeriodBase(sessOccPeriodList.get(0));
-                    sessOccPeriodRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
-                    sessOccPeriodListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
                 } else {
-                    sessOccPeriodRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
-                    sessOccPeriodListRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
                 }
                 
                  
@@ -566,7 +691,7 @@ public class    SessionBean
                 
             } else if (bob instanceof CECase) {
                 CECase cse = (CECase) bob;
-                CECaseDataHeavy csedh = cc.cecase_assembleCECaseDataHeavy(cse, ua);
+                CECaseDataHeavy csedh = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(cse.getCaseID(), ua), ua);
                 // make sure property is the one hosting the case
                 sessCECase = csedh;
                 
@@ -964,7 +1089,7 @@ public class    SessionBean
     public void setSessCECase(CECase cse){
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            sessCECase = cc.cecase_assembleCECaseDataHeavy(cse, sessUser);
+            sessCECase = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(cse.getCaseID(),sessUser), sessUser);
         } catch (BObStatusException | IntegrationException | SearchException ex) {
             System.out.println(ex);
         }
@@ -1730,19 +1855,7 @@ public class    SessionBean
         this.sessEvent = sessEvent;
     }
 
-    /**
-     * @return the sessOccPeriodQueued
-     */
-    public OccPeriod getSessOccPeriodQueued() {
-        return sessOccPeriodQueued;
-    }
-
-    /**
-     * @param sessOccPeriodQueued the sessOccPeriodQueued to set
-     */
-    public void setSessOccPeriodQueued(OccPeriod sessOccPeriodQueued) {
-        this.sessOccPeriodQueued = sessOccPeriodQueued;
-    }
+  
 
     /**
      * @return the sessCECaseQueued

@@ -40,7 +40,8 @@ public  class       OccPeriod
                     Comparable<OccPeriod>,
                     IFace_ActivatableBOB,
                     IFace_noteHolder,
-                    IFace_pinnable{
+                    IFace_pinnable,
+                    IFace_stateful{
     
     final static String OCCPERIOD_TABLE_NAME = "occperiod";
     final static String OCCPERIOD_PK_FIELD = "periodid";
@@ -593,5 +594,18 @@ public  class       OccPeriod
      */
     public void setPinned(boolean pinned) {
         this.pinned = pinned;
+    }
+
+    @Override
+    public StateEnum getState() {
+        if(permitList == null || permitList.isEmpty()){
+            return StateEnum.OPEN;
+        }
+        for(OccPermit pmt: permitList){
+            if(pmt.getFinalizedts() != null){
+                return StateEnum.CLOSED;
+            }
+        }
+        return StateEnum.OPEN;
     }
 }

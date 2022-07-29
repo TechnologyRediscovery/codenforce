@@ -891,9 +891,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              styleClass="noFill button-size-small"
                                                              value="Add event"
                                                              icon="fa fa-plus"
-                                                             actionListener="#{eventBB.onEventAddInit(ceCaseBB.currentCase) }"
+                                                             actionListener="#{eventBB.onEventAddInit(ceCaseBB.currentCase)}"
                                                              oncomplete="PF('event-add-dialog-var').show()"
-                                                             update="event-add-dialog"/>
+                                                             update="event-add-dialog"
+                                                             >
+                                                
+                                                <f:param name="event-list-component-to-update" value="events-form:events-table" />
+                                                
+                                            </p:commandButton>
 
                                             <p:spacer height="5px"/>
 

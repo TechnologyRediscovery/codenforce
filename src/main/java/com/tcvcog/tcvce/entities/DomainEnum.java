@@ -24,13 +24,13 @@ package com.tcvcog.tcvce.entities;
  */
 public enum DomainEnum {
     
-    CODE_ENFORCEMENT        (   "Code enforcement cases", 
+    CODE_ENFORCEMENT        (   "Code enforcement case(s)", 
                                 "cecase_caseid",
                                 "CE",
                                 "fee"),
-    OCCUPANCY               (   "Occupancy Periods", 
+    OCCUPANCY               (   "Permit File(s)", 
                                 "occperiod_periodid",
-                                "OCC",
+                                "PERMIT",
                                 "fine"),
     PARCEL                  (   "Parcels", 
                                 "parcel_parcelid",

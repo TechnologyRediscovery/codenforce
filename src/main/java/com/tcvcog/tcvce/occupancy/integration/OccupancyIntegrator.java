@@ -472,7 +472,9 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
         op.setPeriodID(rs.getInt("periodid"));
 
-        op.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
+        if(rs.getInt("source_sourceid") != 0){
+            op.setSource(si.getBOBSource(rs.getInt("source_sourceid")));
+        }
         op.setPropertyUnitID(rs.getInt("parcelunit_unitid"));
 
         if(rs.getTimestamp("startdate") != null){

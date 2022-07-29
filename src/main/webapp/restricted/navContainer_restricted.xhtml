@@ -440,12 +440,22 @@
                                                                         value="change"
                                                                         oncomplete="PF('activebob-cecaselist-overlay-var').show();"/>
                                                     </div>
+                                                    <p:spacer height="3px" />
+                                                    <div class="restrict-main-contents-io-link link-button">
+                                                        <p:commandLink   id="print-case-list-cl" 
+                                                                        ajax="true" 
+                                                                        actionListener="#{ceCaseSearchAndReportBB.prepareReportCECaseList}"
+                                                                        styleClass="button"
+                                                                        oncomplete="PF('cecase-list-report-dialog-var').show()"
+                                                                        value="prepare Case List Report" 
+                                                                        update="cecase-list-report-form"/>
 
-
+                                                    </div>
                                                 </div>
                                             </h:form>
 
                                         </div>
+                                        
                                         <p:overlayPanel id="activebob-cecaselist-overlay"
                                                         widgetVar="activebob-cecaselist-overlay-var"
                                                         appendTo="activebob-cecase"
@@ -535,6 +545,8 @@
                                     </div>
                                 </div>
                             </div>
+                            
+
                             <div style="float:right;">
                                 <h:form id="userform">
 
@@ -561,6 +573,7 @@
                                     </div>
                                 </h:form>
                             </div>
+                            <ui:include src="/restricted/cogstaff/ce/compositions/caseListReport.xhtml" />
 
 
                             <p:dialog header="User settings" 
@@ -950,16 +963,9 @@
                                 </ui:insert>
                             </div>
                         </div>
-
-
-
-
                     </f:view>
                 </div>
             </div>
         </div>
-
-
-
     </h:body>
 </html>

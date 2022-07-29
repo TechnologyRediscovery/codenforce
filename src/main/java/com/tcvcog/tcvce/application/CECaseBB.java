@@ -187,7 +187,7 @@ public class CECaseBB
      */
     private void configureCurrentCase(CECase cse) throws BObStatusException, IntegrationException, IntegrationException, SearchException{
         CaseCoordinator cc = getCaseCoordinator();
-        currentCase = cc.cecase_assembleCECaseDataHeavy(cse, getSessionBean().getSessUser());
+        currentCase = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(cse.getCaseID(), getSessionBean().getSessUser()),getSessionBean().getSessUser());
     }
     
  
@@ -389,7 +389,7 @@ public class CECaseBB
     public void reloadCurrentCase(){
         CaseCoordinator cc = getCaseCoordinator();
         try {
-            currentCase = cc.cecase_assembleCECaseDataHeavy(currentCase, getSessionBean().getSessUser());
+            currentCase = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(currentCase.getCaseID(), getSessionBean().getSessUser()), getSessionBean().getSessUser());
             getSessionBean().setSessCECase(currentCase);
             getSessionBean().setNoteholderRefreshTimestampTrigger(LocalDateTime.now());
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
@@ -786,9 +786,9 @@ public class CECaseBB
     /**
      * Responds to user requests to commit a new code violation to the CECase
      *
-     * @return
+     * @param ev
     */
-    public String onViolationAddCommitButtonChange() {
+    public void onViolationAddCommitButtonChange(ActionEvent ev) {
 
 
         CaseCoordinator cc = getCaseCoordinator();
@@ -815,9 +815,8 @@ public class CECaseBB
                                     ex.getMessage(), ""));
                 }
             }
+            reloadCurrentCase();
         }
-        
-        return "ceCaseProfile";
     }
     
       /**
@@ -1014,6 +1013,7 @@ public class CECaseBB
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Success! Violation updated and notice event generated", ""));
+            reloadCurrentCase();
         } catch (IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
@@ -1191,32 +1191,32 @@ public class CECaseBB
     
     /**
      * Listener for user requests to abort violation add process
-     * @return 
+     * @param ev
      */
-    public String onViolationAddAbortButtonChange(){
-        return "";  //reload our current page with dialogs closed
+    public void onViolationAddAbortButtonChange(ActionEvent ev){
+        System.out.println("CECaseBB.onViolationAddAbortButtonChange");  //reload our current page with dialogs closed
         
     }
 
     /**
      * Listener for user requests to remove a violation from a case
      *
-     * @return
+     * @param ev
      */
-    public String onViolationRemoveCommitButtonChange() {
+    public void onViolationRemoveCommitButtonChange(ActionEvent ev) {
         CaseCoordinator cc = getCaseCoordinator();
         try {
             cc.violation_deactivateCodeViolation(getCurrentViolation(), getSessionBean().getSessUser());
+            reloadCurrentCase();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Violation deactivated with ID: " + currentViolation.getViolationID(), null));
         } catch (BObStatusException | IntegrationException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), null));
-            return "";
-
         }
-        return "ceCaseProfile";
-
     }
     
     /**

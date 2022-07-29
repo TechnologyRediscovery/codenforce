@@ -197,7 +197,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if (cseList != null && !cseList.isEmpty()) {
             for (CECase cse : cseList) {
                 try {
-                    cseDHList.add(cecase_assembleCECaseDataHeavy(cse, ua));
+                    cseDHList.add(cecase_assembleCECaseDataHeavy(cecase_getCECase(cse.getCaseID(), ua), ua));
                 } catch (BObStatusException | IntegrationException | SearchException ex) {
                     System.out.println("CaseCoordinator.assembleCECaseDataHeavy" + ex.toString());
                 }
@@ -226,26 +226,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         return cslist;
     }
 
-    /**
-     * Utility for assembling a list of data heavy cases from a list of base
-     * class instances
-     *
-     * @param cseList
-     * @param ua
-     * @return
-     */
-    public List<CECaseDataHeavy> cecase_getCECaseDataHeavyList(List<CECase> cseList, UserAuthorized ua) {
-        List<CECaseDataHeavy> heavyList = new ArrayList<>();
-        for (CECase cse : cseList) {
-            try {
-                heavyList.add(cecase_assembleCECaseDataHeavy(cse, ua));
-            } catch (BObStatusException | IntegrationException | SearchException ex) {
-                System.out.println(ex);
-            }
-        }
-        return heavyList;
-
-    }
+  
 
     /**
      * Manages the closing of a case prior to full violation compliance. Will
@@ -4314,7 +4295,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      */
     public CodeViolation violation_injectOrdinance(CodeViolation cv,
             EnforcableCodeElement ece)
-            throws BObStatusException {
+            throws BObStatusException, IntegrationException {
 
         if (ece != null) {
 
@@ -4334,6 +4315,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             cv.setStipulatedComplianceDate(LocalDateTime.now().plusDays(daysInFuture));
             cv.setDateOfRecord(LocalDateTime.now());
             cv.setPenalty(ece.getNormPenalty());
+            if(cv.getSeverityIntensity() == null){
+                SystemCoordinator sc = getSystemCoordinator();
+                cv.setSeverityIntensity(sc.getIntensityClass(Integer.parseInt(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE).getString("defaultviolationseverity"))));
+            }
 
         } else {
             throw new BObStatusException("Cannot inject null ordinance or cannot inject into null code violation");

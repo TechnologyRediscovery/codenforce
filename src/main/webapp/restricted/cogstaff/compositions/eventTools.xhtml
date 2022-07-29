@@ -9,8 +9,6 @@
                  globalOnly="false"/>
     </h:form>
 
-
-
     <!-- Event profile dialog -->
     <p:dialog id="event-profile-dialog"
               height="600" width="1000"
@@ -576,7 +574,7 @@
                                  icon="fa fa-bolt"
                                  actionListener="#{eventBB.eventAddCommit}"
                                  oncomplete="PF('event-add-dialog-var').hide()"
-                                 update="events-panel
+                                 update="
                                  event-growl-form
                                  @form:@parent:#{eventBB.eventListComponentForRefreshTrigger}"/>
             </div>

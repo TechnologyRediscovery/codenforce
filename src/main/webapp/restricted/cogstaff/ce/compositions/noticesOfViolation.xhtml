@@ -125,7 +125,7 @@
                                          value="record mailing"
                                          styleClass="noFill"
                                          update="cecase-novfollowup-dialog
-                                         cecase-novfollowup-form:nov-followup-days-innum"
+                                                cecase-novfollowup-form"
                                          oncomplete="PF('cecase-novfollowup-dialog-var').show()"
                                          disabled="#{!(empty nov.sentTS) or (empty nov.lockedAndqueuedTS) }"/>
                     </div>
@@ -449,15 +449,8 @@
         <h:form id="cecase-novfollowup-form">
 
 
-            <p:outputLabel for="nov-followup-days-innum"
-                           value="Create follow-up event X days in future:" />
-            <p:inputNumber id="nov-followup-days-innum"
-                           value="#{noticeOfViolationBB.currentNotice.followupEventDaysRequest}"
-                           disabled="#{!noticeOfViolationBB.nov_createNoticeFollowupEvent}"
-                           required="true" >
-
-            </p:inputNumber>
-
+            <h:outputText value="Based on this letter's type of #{noticeOfViolationBB.currentNotice.novType.title}, a follow up event will automatically be added to this case #{noticeOfViolationBB.currentNotice.novType.followUpWindowDays} days in the future." />
+            
             <p:spacer height="5px" />
 
 
@@ -480,7 +473,9 @@
                              disabled="false"
                              update=" nov-profile-form
                              @form:@parent:cecase-notices-form
-                             nov-growl-form"
+                             nov-growl-form
+                             @form:@parent:events-panel
+                             @form:@parent:events-form"
                              />
 
         </h:form>

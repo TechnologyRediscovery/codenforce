@@ -146,6 +146,9 @@ public class EventBB extends BackingBeanUtils implements Serializable {
         refreshCurrentEvent();
     }
     
+    /**
+     * Reaches into the request object to pull out a K:V pair for component update
+     */
     private void extractEventListComponentForRefresh(){
          
            eventListComponentForRefreshTrigger = 
@@ -325,7 +328,15 @@ public class EventBB extends BackingBeanUtils implements Serializable {
      * @param holder
      */
     public void onEventAddInit(IFace_EventHolder holder) {
-        currentEventHolder = holder;
+        if(holder != null){
+            currentEventHolder = holder;
+            pageDomain = holder.getEventDomain();
+        } else {
+             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "EventBB.onEventAddInit: null event holder", ""));
+        }
+               
+        
         System.out.println("EventBB.onEventAddInit | event holder ID "+ currentEventHolder.getBObID() + " domain: " + currentEventHolder.getEventDomain().getTitle());
         // Set potentialEvent to an empty event
         EventCoordinator ec = getEventCoordinator();
@@ -338,6 +349,7 @@ public class EventBB extends BackingBeanUtils implements Serializable {
         }
 
         // Set fields not included in potentialEvent to default values
+        extractEventListComponentForRefresh();
         setUpdateFieldsOnCategoryChange(true);
         setSkeletonType(null);
         setSkeletonDuration(10);
@@ -349,15 +361,13 @@ public class EventBB extends BackingBeanUtils implements Serializable {
         if (pageDomain == null || currentEventHolder == null ||
                 skeletonEvent == null || skeletonEvent.getCategory() == null) {
             getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Event must have a category ", ""));
+                    "Event must have a category or I found a null page domain, event holder, or skeleton", ""));
             return;
         }
 
         EventCoordinator ec = getEventCoordinator();
         SessionBean sb = getSessionBean();
-
         // Add new event to database and to the event holder
-
         try {
             List<EventCnF> evlist = ec.addEvent(skeletonEvent, currentEventHolder, sb.getSessUser());
 
@@ -366,18 +376,14 @@ public class EventBB extends BackingBeanUtils implements Serializable {
                     currentEvent = ev;
                     getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                             "Successfully logged event with an ID of  " + ev.getEventID(), ""));
-
                 }
             }
-                
         } catch (BObStatusException | EventException | IntegrationException ex) {
             System.out.println("Failed to update new event with entered details:" + ex);
             return;
         }
-
         refreshCurrentEvent();
         refreshEventHolderListAndTriggerSessionReload();
-        
     }
 
     /**

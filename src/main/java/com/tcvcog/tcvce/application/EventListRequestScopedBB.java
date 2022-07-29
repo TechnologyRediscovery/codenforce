@@ -34,15 +34,19 @@ public class EventListRequestScopedBB extends BackingBeanUtils{
     @PostConstruct
     public void initBean(){
         EventCoordinator ec = getEventCoordinator();
-        System.out.println("EventListRequestScopedBB.initBean");
         
         DomainEnum domain = getSessionBean().getSessEventsPageEventDomainRequest();
+        if(domain != null){
+            System.out.println("EventListRequestScopedBB.initBean | domain enum: " + domain.getTitle());
+        } else {
+            System.out.println("EventListRequestScopedBB.initBean | domain enum null: " );
+        }
         try {
         if(domain != null){
             switch(domain){
                 case CODE_ENFORCEMENT:
                     managedEventList = ec.getEventList(getSessionBean().getSessCECase());
-                    currentEvHolder = getSessionBean().getSessOccPeriod();
+                    currentEvHolder = getSessionBean().getSessCECase();
                     break;
                 case OCCUPANCY:
                     managedEventList = ec.getEventList(getSessionBean().getSessOccPeriod());
