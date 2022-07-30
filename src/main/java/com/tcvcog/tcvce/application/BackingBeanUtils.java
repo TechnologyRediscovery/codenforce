@@ -16,6 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.session.SessionBean;
 import com.tcvcog.tcvce.coordinators.*;
 
 import java.io.Serializable;

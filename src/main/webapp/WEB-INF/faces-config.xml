@@ -120,16 +120,16 @@
     
     <managed-bean>
         <managed-bean-name>sessionBean</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.SessionBean</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionBean</managed-bean-class>
+    
+        <managed-bean-scope>session</managed-bean-scope></managed-bean>
     
 
     <managed-bean>
         <managed-bean-name>sessionInitializer</managed-bean-name>
-        <managed-bean-class>com.tcvcog.tcvce.application.SessionInitializer</managed-bean-class>
-        <managed-bean-scope>view</managed-bean-scope>
-    </managed-bean>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionInitializer</managed-bean-class>
+    
+        <managed-bean-scope>view</managed-bean-scope></managed-bean>
    
     <managed-bean>
         <managed-bean-name>loginBB</managed-bean-name>

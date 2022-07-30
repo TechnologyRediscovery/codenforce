@@ -5,6 +5,7 @@
  */
 package com.tcvcog.tcvce.application;
 
+import com.tcvcog.tcvce.session.SessionBean;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.PropertyCoordinator;
 import com.tcvcog.tcvce.coordinators.SearchCoordinator;

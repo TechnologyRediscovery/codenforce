@@ -389,6 +389,21 @@ div.headerLink a:before, a:visited{
 /************** END LINKS ******************/
 
 
+/* ------------------- START DASH CALENDAR ------------------- */
+
+
+.dashcal-dayheader{
+    font-weight: bold;
+}
+
+
+
+
+
+
+/* ******************* END LINKS  ******************************/
+
+
 /* ------------------- START PAGE LAYOUT  ------------------- */
 
 

@@ -15,7 +15,6 @@
             <ui:define name="content">
                 <f:view id="missionControlView">
                     <div class="mainContainer">
-
                         <h:form id="messages-global-form">
 
                             <p:growl id="messages-global-growl"
@@ -24,7 +23,10 @@
                         </h:form>
 
                         <div class="ui-g data_container_nested_restrict">
-
+                            
+                            
+                            
+                            
                             <!--NESTED DATA FIELD VERTICAL-->
                             <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
 
@@ -41,10 +43,8 @@
                                     <ui:include src="cogstaff/compositions/eventSearch.xhtml" />
                                 </p:panel>
 
-
                                 <ui:include src="cogstaff/occ/compositions/occPeriodListSearch.xhtml"/>
                                 <ui:include src="cogstaff/occ/compositions/occPermitListSearch.xhtml"/>
-
 
                                 <p:panel  id="event-future-list-panel"
                                           toggleable="true"
@@ -111,10 +111,7 @@
                                                                    style="color:blue;"
                                                                    type="button" />
                                                 </div>
-
-
                                             </p:column>
-
                                         </p:dataTable>
                                     </h:form>
                                 </p:panel>
@@ -226,7 +223,7 @@
                                                            value="Export CSV" 
                                                            >
                                             <p:dataExporter type="csv" 
-                                                            target="cecase-search-results-table"
+                                                             target="cecase-search-results-table"
                                                             fileName="caseExport" />
                                         </p:commandButton>
 
@@ -255,6 +252,7 @@
                                                 </f:facet>
                                                 <p:rowToggler />
                                             </p:column>
+                                            
                                             <p:column width="15%" 
                                                       sortBy="#{cse.priority.label}"
                                                       styleClass="#{!empty cse.priority ? cse.priority.rowStyleClass:''}">
@@ -266,14 +264,15 @@
                                                 </i>
                                                 <p:spacer height="3px" />
                                                 <h:outputText value="#{cse.priority.label}" style="font-size:0.7em;" />
-
                                             </p:column>
+                                            
                                             <p:column width="15%" sortBy="#{cse.caseManager.human.name}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Manager" />
                                                 </f:facet>
                                                 <h:outputText value="#{cse.caseManager.human.name}"/>
                                             </p:column>
+                                            
                                             <p:column width="20%" sortBy="#{cse.originationDate}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Opened" />
@@ -283,6 +282,7 @@
                                                 <h:outputText value="Age: #{cse.caseAge} days"
                                                               style="font-style: italic"/>
                                             </p:column>
+                                            
                                             <p:column width="35%" 
                                                       sortBy="#{cse.property.address.buildingNo}"
                                                       filterBy="#{cse.property.address.buildingNo}">
