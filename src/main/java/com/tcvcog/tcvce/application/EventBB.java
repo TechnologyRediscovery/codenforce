@@ -83,7 +83,7 @@ public class EventBB extends BackingBeanUtils implements Serializable {
     public void loadSessionEventHolder() {
         SessionBean sb = getSessionBean();
 
-        pageDomain = sb.getSessEventsPageEventDomainRequest();
+        pageDomain = getSessionEventConductor().getSessEventsPageEventDomainRequest();
         switch (pageDomain) {
             case CODE_ENFORCEMENT:
                 currentEventHolder = sb.getSessCECase();
@@ -108,7 +108,7 @@ public class EventBB extends BackingBeanUtils implements Serializable {
         if(currentEventHolder != null){
             try {
                 System.out.println("EventBB.refreshEventHolderListAndTriggerSessionReload | eventHolder ID: " + currentEventHolder.getBObID() );
-                getSessionBean().setSessEventListForRefreshUptake(ec.getEventList(currentEventHolder));
+                getSessionEventConductor().setSessEventListForRefreshUptake(ec.getEventList(currentEventHolder));
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Upded session event holder", ""));
             } catch (IntegrationException ex) {

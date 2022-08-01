@@ -389,10 +389,10 @@ div.headerLink a:before, a:visited{
 /************** END LINKS ******************/
 
 
-/* ------------------- START DASH CALENDAR ------------------- */
+/* ------------------- START EVENT CALENDAR ------------------- */
 
 
-.dashcal-dayheader{
+.evcal-dayheader{
     font-weight: bold;
 }
 
@@ -401,7 +401,7 @@ div.headerLink a:before, a:visited{
 
 
 
-/* ******************* END LINKS  ******************************/
+/* ******************* END EVENT CAL  ******************************/
 
 
 /* ------------------- START PAGE LAYOUT  ------------------- */

@@ -369,7 +369,7 @@ public class MissionControlBB extends BackingBeanUtils implements Serializable {
      * @return 
      */
     public String onViewEventButtonChange(EventCnFPropUnitCasePeriodHeavy ev){
-        getSessionBean().setSessEvent(ev);
+        getSessionEventConductor().setSessEvent(ev);
         return "events";
         
     }

@@ -26,6 +26,20 @@ public class DateTimeUtil {
     }
     
     /**
+     * Builds a string of just HH:mm out of a LocalDateTime
+     * @param input can be null
+     * @return surely an empty string, and perhaps one of the input's the HH:mm
+     */
+    public static String getPrettyTimeOnly(LocalDateTime input) {
+        String formattedDateTime = "";
+        if(input != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+            formattedDateTime = input.format(formatter);
+        }
+        return formattedDateTime;
+    }
+    
+    /**
      * Converts a local date to a no time string. 
      * @param input if null, empty string returned
      * @return String representing a date only

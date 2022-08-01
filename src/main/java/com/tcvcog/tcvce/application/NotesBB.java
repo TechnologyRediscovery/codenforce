@@ -61,7 +61,7 @@ public class NotesBB extends BackingBeanUtils implements Serializable {
      */
     public void updateNoteHolder() {
         SessionBean sb = getSessionBean();
-        pageDomain = sb.getSessEventsPageEventDomainRequest();
+        pageDomain = getSessionEventConductor().getSessEventsPageEventDomainRequest();
         switch (pageDomain) {
             case CODE_ENFORCEMENT:
                 currentNoteHolder = sb.getSessCECase();

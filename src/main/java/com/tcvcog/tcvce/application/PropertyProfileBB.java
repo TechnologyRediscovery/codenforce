@@ -612,7 +612,7 @@ public class PropertyProfileBB
      */
     public String onViewEventButtonChange(EventCnF ev) {
         if (ev != null) {
-            getSessionBean().setSessEvent(ev);
+            getSessionEventConductor().setSessEvent(ev);
             return "eventAddEdit";
         }
         return "";

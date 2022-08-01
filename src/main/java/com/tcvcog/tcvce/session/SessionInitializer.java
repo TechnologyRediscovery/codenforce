@@ -592,21 +592,8 @@ public  class       SessionInitializer
      * @throws SessionException for all initialization issues
      */
     private void initSubsystem_V_Event(Credential cred, SubSysEnum ss) throws SessionException{
-        SearchCoordinator sc = getSearchCoordinator();
-        sb.setQueryEventList(sc.buildQueryEventList(cred));
-        if(!sb.getQueryEventList().isEmpty()){
-            sb.setQueryEvent(sb.getQueryEventList().get(0));
-        }
-        // start with default CE domain
-        sb.setSessEventsPageEventDomainRequest(DomainEnum.CODE_ENFORCEMENT);
-        
-//        QueryEvent futureEvents = sc.initQuery(QueryEventEnum.MUINI_FUTURE_7DAYS, cred);
-//        try {
-            // TODO: Debug hanging issues
-//            sb.setQueryEventFuture7Days(sc.runQuery(futureEvents));
-//        } catch (SearchException ex) {
-//            System.out.println(ex);
-//        }
+       // nothing to do--replaced with SessionEventConductor
+       
     }
 
 

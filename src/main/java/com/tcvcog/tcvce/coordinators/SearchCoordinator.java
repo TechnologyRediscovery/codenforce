@@ -186,7 +186,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             if(sp.getEventDomain_val() == DomainEnum.UNIVERSAL){
                 // query for Code Enf
                 sp.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
+                
                 runQuery_event_IntegratorCall(sp, evTempList);
+                
                 // now add Occ events as well
                 sp.setEventDomain_val(DomainEnum.OCCUPANCY);
                 runQuery_event_IntegratorCall(sp, evTempList);
@@ -208,6 +210,24 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return q;
      }
      
+     /**
+      * A single SQL statement querying events cannot query for events attached to both 
+      * occupancy and ce cases and properties
+      * 
+      * @param q
+      * @param ua 
+      */
+     private void runQuery_event_spliceParamsForUniversalDomain(QueryEvent q, UserAuthorized ua){
+         
+     
+     }
+     
+     /**
+      * Silly name, but useful purpose--calls the EventIntegrator's search method
+      * @param params
+      * @param evList
+      * @throws SearchException 
+      */
      private void runQuery_event_IntegratorCall(SearchParamsEvent params, List<EventCnF> evList) throws SearchException{
         EventCoordinator ec = getEventCoordinator();
         
@@ -1957,7 +1977,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setDate_start_val(LocalDateTime.now().minusDays(30));
         params.setLimitResultCount_ctl(false);
         params.setEventDomain_ctl(true);
-        params.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
+        params.setEventDomain_val(DomainEnum.UNIVERSAL);
         
         // all other event controls are off by default
         
@@ -1973,7 +1993,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setDate_start_val(LocalDateTime.now().minusHours(HOURS_IN_DAY));
         params.setLimitResultCount_ctl(false);
         params.setEventDomain_ctl(true);
-        params.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
+        params.setEventDomain_val(DomainEnum.UNIVERSAL);
         
         // all other event controls are off by default
         
@@ -1989,7 +2009,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setDate_start_val(LocalDateTime.now().minusDays(DAYS_IN_WEEK));
         params.setLimitResultCount_ctl(false);
         params.setEventDomain_ctl(true);
-        params.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
+        params.setEventDomain_val(DomainEnum.UNIVERSAL);
         
         // all other event controls are off by default
         
@@ -2006,7 +2026,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setDate_end_val(LocalDateTime.now().plusDays(DAYS_IN_WEEK));
         params.setLimitResultCount_ctl(false);
         params.setEventDomain_ctl(true);
-        params.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
+        params.setEventDomain_val(DomainEnum.UNIVERSAL);
         
         // all other event controls are off by default
         

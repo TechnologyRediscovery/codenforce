@@ -208,31 +208,8 @@ public class    SessionBean
     
     
     
-    /* >>> -------------------------------------------------------------- <<< */
-    /* >>>                   V Event                                      <<< */
-    /* >>> -------------------------------------------------------------- <<< */
-    
-    /**
-     * There is no longer a notion of a session event domain, only a requested
-     * event domain for event manipulators to use as guidance to figure out 
-     * if the relevant event list is extracted from the proper session business 
-     * objects
-     */
-    private PageModeEnum sessEventsPagePageModeRequest;
-    private DomainEnum sessEventsPageEventDomainRequest;
-    
-    private EventCnF sessEvent;
-    private ActivatableRouteEnum sessEventRoute;
-    private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
-    private ActivatableRouteEnum sessEventListRoute;
-    private List<EventCnF> sessEventListForRefreshUptake;
     private boolean sessFlagIncludeDeactivatedEvents;
     
-    /* >>> QUERY EVENT <<< */
-    private QueryEvent queryEvent;
-    private List<QueryEvent> queryEventList;
-    
-    private QueryEvent queryEventFuture7Days;
     
     
     /* >>> -------------------------------------------------------------- <<< */
@@ -625,8 +602,8 @@ public class    SessionBean
                 sessCECaseList = pdh.getCeCaseList();
                 if  (sessCECaseList != null && !sessCECaseList.isEmpty()) {
                     sessCECase = cc.cecase_assembleCECaseDataHeavy(cc.cecase_getCECase(sessCECaseList.get(0).getCaseID(),ua), ua);
-                    sessEventList = ec.assembleEventCnFPropUnitCasePeriodHeavyList(
-                            sessCECase.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN), sessUser);
+//                    sessEventList = ec.assembleEventCnFPropUnitCasePeriodHeavyList(
+//                            sessCECase.getEventList(ViewOptionsActiveHiddenListsEnum.VIEW_ACTIVE_NOTHIDDEN), sessUser);
                     sessCEARList = sessCECase.getCeActionRequestList();
                     
                     sessCECaseRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
@@ -647,14 +624,14 @@ public class    SessionBean
                 
                  
                 // EVENTS
-                if (sessEventList != null && !sessEventList.isEmpty()) {
-                    sessEvent = sessEventList.get(0);
-                    sessEventRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
-                    sessEventListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
-                } else {
-                    sessEventRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
-                    sessEventListRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
-                }
+//                if (sessEventList != null && !sessEventList.isEmpty()) {
+//                    sessEvent = sessEventList.get(0);
+//                    sessEventRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+//                    sessEventListRoute = ActivatableRouteEnum.ASSOCIATED_WITH_CHOSEN;
+//                } else {
+//                    sessEventRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+//                    sessEventListRoute = ActivatableRouteEnum.NO_ASSOCIATED_OBJECTS;
+//                }
                 
                 // CEARS
                 if (sessCEARList != null && !sessCEARList.isEmpty()) {
@@ -713,7 +690,7 @@ public class    SessionBean
                     setSessOccPeriodFromPeriodBase(sessOccPeriodList.get(0));
                 }
 
-                setSessEventsPageEventDomainRequest(DomainEnum.CODE_ENFORCEMENT);
+//                setSessEventsPageEventDomainRequest(DomainEnum.CODE_ENFORCEMENT);
 
                 return "ceCaseProfile";
 
@@ -745,7 +722,7 @@ public class    SessionBean
                     setSessCECase(sessCECaseList.get(0));
                 }
 
-                setSessEventsPageEventDomainRequest(DomainEnum.OCCUPANCY);
+//                setSessEventsPageEventDomainRequest(DomainEnum.OCCUPANCY);
 
                 return "occPeriodWorkflow";
 
@@ -764,7 +741,7 @@ public class    SessionBean
                     setSessCECase(sessCECaseList.get(0));
                 }
 
-                setSessEventsPageEventDomainRequest(DomainEnum.OCCUPANCY);
+//                setSessEventsPageEventDomainRequest(DomainEnum.OCCUPANCY);
                 
                 return "occPeriodWorkflow";
             }
@@ -773,7 +750,7 @@ public class    SessionBean
                 throw new BObStatusException("Unsupported instance of ActivatableBOB sent with call to setSessionActiveObject");
             }
 
-        } catch (BObStatusException | IntegrationException | SearchException | EventException | BlobException ex) {
+        } catch (BObStatusException | IntegrationException | SearchException | BlobException ex) {
             System.out.println(ex);
             
         } 
@@ -867,12 +844,6 @@ public class    SessionBean
         return sessCitation;
     }
 
-    /**
-     * @return the sessEnforcableCodeElement
-     */
-    public EnforcableCodeElement getSessEnforcableCodeElement() {
-        return sessEnforcableCodeElement;
-    }
 
     /**
      * @return the sessCodeViolation
@@ -1389,12 +1360,6 @@ public class    SessionBean
         return queryPerson;
     }
 
-    /**
-     * @return the queryEvent
-     */
-    public QueryEvent getQueryEvent() {
-        return queryEvent;
-    }
 
     /**
      * @param queryProperty the queryProperty to set
@@ -1410,12 +1375,6 @@ public class    SessionBean
         this.queryPerson = queryPerson;
     }
 
-    /**
-     * @param queryEvent the queryEvent to set
-     */
-    public void setQueryEvent(QueryEvent queryEvent) {
-        this.queryEvent = queryEvent;
-    }
 
     /**
      * @return the occPermitAppActiveProp
@@ -1729,33 +1688,7 @@ public class    SessionBean
         this.queryCEARList = queryCEARList;
     }
 
-    /**
-     * @return the queryEventList
-     */
-    public List<QueryEvent> getQueryEventList() {
-        return queryEventList;
-    }
 
-    /**
-     * @param queryEventList the queryEventList to set
-     */
-    public void setQueryEventList(List<QueryEvent> queryEventList) {
-        this.queryEventList = queryEventList;
-    }
-
-    /**
-     * @return the sessEventList
-     */
-    public List<EventCnFPropUnitCasePeriodHeavy> getSessEventList() {
-        return sessEventList;
-    }
-
-    /**
-     * @param sessEventList the sessEventList to set
-     */
-    public void setSessEventList(List<EventCnFPropUnitCasePeriodHeavy> sessEventList) {
-        this.sessEventList = sessEventList;
-    }
 
     /**
      * @return the sessUMAPListValidOnly
@@ -1843,19 +1776,6 @@ public class    SessionBean
 
   
 
-    /**
-     * @return the sessEvent
-     */
-    public EventCnF getSessEvent() {
-        return sessEvent;
-    }
-
-    /**
-     * @param sessEvent the sessEvent to set
-     */
-    public void setSessEvent(EventCnF sessEvent) {
-        this.sessEvent = sessEvent;
-    }
 
   
 
@@ -1901,19 +1821,6 @@ public class    SessionBean
         this.sessionPayment = sessionPayment;
     }
 
-    /**
-     * @return the sessEventsPageEventDomainRequest
-     */
-    public DomainEnum getSessEventsPageEventDomainRequest() {
-        return sessEventsPageEventDomainRequest;
-    }
-
-    /**
-     * @param sessEventsPageEventDomainRequest the sessEventsPageEventDomainRequest to set
-     */
-    public void setSessEventsPageEventDomainRequest(DomainEnum sessEventsPageEventDomainRequest) {
-        this.sessEventsPageEventDomainRequest = sessEventsPageEventDomainRequest;
-    }
 
         
     public List<PublicInfoBundlePerson> getOccPermitAttachedPersons() {
@@ -2004,19 +1911,6 @@ public class    SessionBean
         this.ceCaseCitationsPageModeRequest = ceCaseCitationsPageModeRequest;
     }
 
-    /**
-     * @return the sessEventsPagePageModeRequest
-     */
-    public PageModeEnum getSessEventsPagePageModeRequest() {
-        return sessEventsPagePageModeRequest;
-    }
-
-    /**
-     * @param sessEventsPagePageModeRequest the sessEventsPagePageModeRequest to set
-     */
-    public void setSessEventsPagePageModeRequest(PageModeEnum sessEventsPagePageModeRequest) {
-        this.sessEventsPagePageModeRequest = sessEventsPagePageModeRequest;
-    }
 
     /**
      * @return the blobPageModeRequest
@@ -2046,19 +1940,6 @@ public class    SessionBean
         this.ceCaseSearchProfilePageModeRequest = ceCaseSearchProfilePageModeRequest;
     }
 
-    /**
-     * @return the queryEventFuture7Days
-     */
-    public QueryEvent getQueryEventFuture7Days() {
-        return queryEventFuture7Days;
-    }
-
-    /**
-     * @param queryEventFuture7Days the queryEventFuture7Days to set
-     */
-    public void setQueryEventFuture7Days(QueryEvent queryEventFuture7Days) {
-        this.queryEventFuture7Days = queryEventFuture7Days;
-    }
 
     /**
      * @return the onPageLoad_sessionSwitch_viewProfile
@@ -2389,19 +2270,6 @@ public class    SessionBean
         this.queryOccPermit = queryOccPermit;
     }
 
-    /**
-     * @return the sessEventListForRefreshUptake
-     */
-    public List<EventCnF> getSessEventListForRefreshUptake() {
-        return sessEventListForRefreshUptake;
-    }
-
-    /**
-     * @param sessEventListForRefreshUptake the sessEventListForRefreshUptake to set
-     */
-    public void setSessEventListForRefreshUptake(List<EventCnF> sessEventListForRefreshUptake) {
-        this.sessEventListForRefreshUptake = sessEventListForRefreshUptake;
-    }
 
     /**
      * @return the sessFlagIncludeDeactivatedEvents
@@ -2415,6 +2283,15 @@ public class    SessionBean
      */
     public void setSessFlagIncludeDeactivatedEvents(boolean sessFlagIncludeDeactivatedEvents) {
         this.sessFlagIncludeDeactivatedEvents = sessFlagIncludeDeactivatedEvents;
+    }
+
+    /**
+     *
+     *
+     * @return the sessEnforcableCodeElement
+     */
+    public EnforcableCodeElement getSessEnforcableCodeElement() {
+        return this.sessEnforcableCodeElement;
     }
 
     

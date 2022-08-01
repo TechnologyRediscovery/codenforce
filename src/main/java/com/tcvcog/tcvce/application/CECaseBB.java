@@ -198,7 +198,7 @@ public class CECaseBB
      */
     public void injectSessionEvent(EventCnF ev){
         if(ev != null){
-            getSessionBean().setSessEvent(ev);
+            getSessionEventConductor().setSessEvent(ev);
         }
         
     }

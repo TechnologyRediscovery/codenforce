@@ -35,7 +35,7 @@ public class EventListRequestScopedBB extends BackingBeanUtils{
     public void initBean(){
         EventCoordinator ec = getEventCoordinator();
         
-        DomainEnum domain = getSessionBean().getSessEventsPageEventDomainRequest();
+        DomainEnum domain = getSessionEventConductor().getSessEventsPageEventDomainRequest();
         if(domain != null){
             System.out.println("EventListRequestScopedBB.initBean | domain enum: " + domain.getTitle());
         } else {

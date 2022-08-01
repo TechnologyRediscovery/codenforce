@@ -72,7 +72,7 @@ public class EventSearchBB extends BackingBeanUtils{
         // setup search
         configureParameters();
         
-        eventListRaw = getSessionBean().getSessEventList();
+        eventListRaw = getSessionEventConductor().getSessEventList();
         if(eventListRaw == null){
             eventListRaw = new ArrayList<>();
         }
@@ -134,7 +134,7 @@ public class EventSearchBB extends BackingBeanUtils{
             } 
             if(evList != null && !evList.isEmpty()){
                 eventListRaw.addAll(evList);
-                getSessionBean().setSessEventList(eventListRaw);
+                getSessionEventConductor().setSessEventList(eventListRaw);
                 eventViewSelected = ViewOptionsActiveHiddenListsEnum.VIEW_ALL;
                 manageRawEventList();
                 getFacesContext().addMessage(null,
@@ -159,7 +159,7 @@ public class EventSearchBB extends BackingBeanUtils{
      */
     public void onViewEvent(EventCnFPropUnitCasePeriodHeavy evpucph){
         currentEvent = evpucph;
-        getSessionBean().setSessEvent(currentEvent);
+        getSessionEventConductor().setSessEvent(currentEvent);
     }
     
     /**

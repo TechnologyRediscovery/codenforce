@@ -89,6 +89,7 @@
         <managed-bean-class>com.tcvcog.tcvce.application.BackingBeanUtils</managed-bean-class>
         <managed-bean-scope>none</managed-bean-scope>
     </managed-bean>
+    
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~ logging  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~--> 
     <managed-bean>
         <managed-bean-name>logIntegrator</managed-bean-name>
@@ -121,8 +122,8 @@
     <managed-bean>
         <managed-bean-name>sessionBean</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.session.SessionBean</managed-bean-class>
-    
-        <managed-bean-scope>session</managed-bean-scope></managed-bean>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
     
 
     <managed-bean>
@@ -1965,13 +1966,78 @@
         <managed-bean-class>com.tcvcog.tcvce.application.EventSearchBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>eventListRequestScopedBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.EventListRequestScopedBB</managed-bean-class>
-        <managed-bean-scope>request</managed-bean-scope></managed-bean>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    
     <managed-bean>
         <managed-bean-name>pinningBB</managed-bean-name>
         <managed-bean-class>com.tcvcog.tcvce.application.PinningBB</managed-bean-class>
         <managed-bean-scope>view</managed-bean-scope>
     </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>sessionEventConductor</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionEventConductor</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>sessionConductor</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionConductor</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <description>Inter-subsystem, session-level arbitration utilities</description>
+        <managed-bean-name>sessionUserConductor</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionUserConductor</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>sessionMuniConductor</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionMuniConductor</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>sessionCodeConductor</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionCodeConductor</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>sessionPropertyConductor</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionPropertyConductor</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>sessionPersonConductor</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionPersonConductor</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>sessionOccConductor</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionOccConductor</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>sessionCECaseConductor</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionCECaseConductor</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <managed-bean>
+        <managed-bean-name>sessionPaymentConductor</managed-bean-name>
+        <managed-bean-class>com.tcvcog.tcvce.session.SessionPaymentConductor</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
 </faces-config>

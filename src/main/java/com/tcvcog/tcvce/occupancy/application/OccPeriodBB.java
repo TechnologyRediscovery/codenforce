@@ -973,12 +973,12 @@ public class OccPeriodBB
      * @return the fresh list of events for this case
      */
     public List<EventCnF> getManagedEventList(){
-        List<EventCnF> evlist = getSessionBean().getSessEventListForRefreshUptake();
+        List<EventCnF> evlist = getSessionEventConductor().getSessEventListForRefreshUptake();
         if(currentOccPeriod != null){
             if(evlist != null){
                 System.out.println("CECaseBB.getManagedEventList | fresh event list found on sessionbean of size: " + evlist.size());
                 currentOccPeriod.setEventList(evlist);
-                getSessionBean().setSessEventListForRefreshUptake(null);
+                getSessionEventConductor().setSessEventListForRefreshUptake(null);
             } 
             return currentOccPeriod.getEventList();
         }

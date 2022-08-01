@@ -80,9 +80,14 @@ ALTER TABLE public.eventcategory ADD COLUMN prioritygreenbufferdays INTEGER DEFA
 ALTER TABLE public.municipality ADD COLUMN defaultheaderimage_photodocid INTEGER CONSTRAINT muni_defheader_fk REFERENCES public.photodoc (photodocid);
 ALTER TABLE public.municipality ADD COLUMN defaultheaderimageheightpx INTEGER DEFAULT 250;
 
---******************************* LOCAL CURSOR HERE  ******************************* 
+
+ALTER TYPE eventtype ADD VALUE 'OccupancyOrigination';
+ALTER TYPE eventtype ADD VALUE 'OccupancyClosing';
+ALTER TYPE eventtype ADD VALUE 'Inspection';
 --******************************* REMOTE CURSOR HERE  ******************************* 
 
+ALTER TABLE public.event ADD COLUMN parcel_parcelkey INTEGER CONSTRAINT event_parcelkey_fk REFERENCES parcel (parcelkey);
+--******************************* LOCAL CURSOR HERE  ******************************* 
 
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)

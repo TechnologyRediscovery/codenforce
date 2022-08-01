@@ -54,7 +54,7 @@ public class PaymentsBB extends BackingBeanUtils implements Serializable {
     public void updatePaymentHolder() {
         SessionBean sb = getSessionBean();
 
-        pageDomain = sb.getSessEventsPageEventDomainRequest();
+        pageDomain = getSessionEventConductor().getSessEventsPageEventDomainRequest();
         switch (pageDomain) {
             case CODE_ENFORCEMENT:
                 currentPaymentHolder = sb.getSessCECase();

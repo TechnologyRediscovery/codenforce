@@ -1,0 +1,60 @@
+
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <h:form id="calendar-growl-form">
+        <p:growl id="calendar-growl"
+                 keepAlive="true"
+                 life="6000"/>
+    </h:form>
+
+
+
+        <p:panel id="cal-panel"
+                 header="Event Calendar"
+                 collapsed="false"
+                 closable="true"
+                 rendered="true" >
+
+            <div class="p-grid"
+                 id="cal-grid">
+
+                <ui:repeat id="evcal-calendar-6day"
+                           value="#{sessionEventConductor.eventCalendar6Day}"
+                           var="day">
+
+                    <div class="p-col-2">
+                        <div class="evcal-dayheader">
+                            <h:outputText value="#{day.dayPrettyPrefix}" />
+                            <h:outputText value="#{sessionEventConductor.getPrettyLocalDateOnlyNoTime(day.day)} " />
+                            <ui:repeat id="evcal-evlist-day-minus1"
+                                       value="#{day.evList}"
+                                       var="ev">
+                                <div class="evcal-evrow">
+                                    <div class="evcal-evicon-container">
+
+                                    </div>
+                                    <div class="evcal-evtime-container">
+                                        <h:outputText value="#{sessionEventConductor.getPrettyTimeOnly(ev.timeStart)}" />
+                                        <h:outputText value="(" />
+                                        <h:outputText value="#{ev.duration}" />
+                                        <h:outputText value="(" />
+                                    </div>
+                                    <div class="evcal-evcat-container">
+
+                                        <h:outputText value="#{ev.category.eventCategoryTitle}" />
+
+                                    </div>
+
+                                </div>
+                                <p:spacer height="2px" />
+                            </ui:repeat>
+                        </div>
+                    </div>
+                </ui:repeat>
+            </div>
+        </p:panel>
+</ui:composition>

@@ -16,20 +16,19 @@
                 <f:view id="missionControlView">
                     <div class="mainContainer">
                         <h:form id="messages-global-form">
-
                             <p:growl id="messages-global-growl"
                                      redisplay="false"
                                      />
                         </h:form>
 
                         <div class="ui-g data_container_nested_restrict">
-                            
-                            
-                            
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
+                                <ui:include src="/restricted/compositions/eventCalendar.xhtml"/>
+                                
+                            </div>
                             
                             <!--NESTED DATA FIELD VERTICAL-->
                             <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
-
 
                                 <p:panel    id="dash-event-search-panel"
                                             toggleable="true"
@@ -46,75 +45,7 @@
                                 <ui:include src="cogstaff/occ/compositions/occPeriodListSearch.xhtml"/>
                                 <ui:include src="cogstaff/occ/compositions/occPermitListSearch.xhtml"/>
 
-                                <p:panel  id="event-future-list-panel"
-                                          toggleable="true"
-                                          widgetVar="event-future-list-panel-var"
-                                          collapsed="false"
-                                          style="width:100%;"
-                                          header="Upcoming events">
-                                    <h:form id="event-future-list-form">
-                                        <p:dataTable
-                                            id="events-future-table"
-                                            var="ef"
-                                            rowKey="#{ef.eventID}"
-                                            value="#{sessionBean.queryEventFuture7Days.BOBResultList}"
-                                            tableStyleClass="primeDataTable"
-                                            resizableColumns="true"
-                                            widgetVar="events-table-var"
-                                            >
-                                            <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
-
-                                            <p:column width="4%">
-                                                <i class="material-icons"><h:outputText value="#{ef.category.icon.materialIcon}"/></i>
-                                                <p:spacer height="2px" />
-                                                <h:outputText value="#{ef.domain.abbrev}"/>
-                                                <p:spacer height="2px" />
-                                                <h:outputText value="#{ef.eventID}"/>
-                                            </p:column>
-
-
-                                            <p:column width="20%" sortBy="#{ef.category.eventType.label}"
-                                                      >
-                                                <f:facet name="header">
-                                                    <h:outputText value="Description" />
-                                                </f:facet>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{ef.category.eventType.label}: #{ef.category.eventCategoryTitle}"
-                                                                  style="font-weight: bold;"/>
-                                                    <p:spacer height="5px" />
-                                                    <h:outputText value="#{ef.property.addressString} (#{ef.property.muni.muniName}): Case ID: #{ef.cecase.caseID}"/>
-                                                </div>
-                                            </p:column>
-
-                                            <p:column width="9%" sortBy="#{ef.timeStart}">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Date" />
-                                                </f:facet>
-                                                <div class="rowExpansion">
-                                                    <h:outputText value="#{missionControlBB.getPrettyDate(ef.timeStart)}"/>
-                                                    <p:spacer height="2px" />
-                                                    <h:outputText value="#{ef.duration} mins"/>
-                                                </div>
-                                            </p:column>
-
-                                            <p:column width="4%" exportable="false">
-                                                <f:facet name="header">
-                                                    <h:outputText value="Action" />
-                                                </f:facet>
-
-                                                <div class="restrict-main-contents-io-link">
-
-                                                    <p:commandLink id="violation-ord-details-cl" 
-                                                                   ajax="false"
-                                                                   action="#{missionControlBB.onViewEventButtonChange(e)}"
-                                                                   value="view" 
-                                                                   style="color:blue;"
-                                                                   type="button" />
-                                                </div>
-                                            </p:column>
-                                        </p:dataTable>
-                                    </h:form>
-                                </p:panel>
+                             
                             </div>
 
                             <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">

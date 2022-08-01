@@ -54,6 +54,16 @@ import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.domain.ViolationException;
 import com.tcvcog.tcvce.entities.PublicInfoBundle;
 import com.tcvcog.tcvce.occupancy.integration.OccChecklistIntegrator;
+import com.tcvcog.tcvce.session.SessionCECaseConductor;
+import com.tcvcog.tcvce.session.SessionCodeConductor;
+import com.tcvcog.tcvce.session.SessionConductor;
+import com.tcvcog.tcvce.session.SessionEventConductor;
+import com.tcvcog.tcvce.session.SessionMuniConductor;
+import com.tcvcog.tcvce.session.SessionOccConductor;
+import com.tcvcog.tcvce.session.SessionPaymentConductor;
+import com.tcvcog.tcvce.session.SessionPersonConductor;
+import com.tcvcog.tcvce.session.SessionPropertyConductor;
+import com.tcvcog.tcvce.session.SessionUserConductor;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.DateTimeUtil;
 
@@ -82,10 +92,11 @@ import javax.sql.DataSource;
  * Collection of convenience methods for accessing application-level objects
  * that beans of various scopes use, most notably Coordinators and Integrators
  * 
- * @author Xander Darsow
+ * @author Ellen Bascomb of Apartment 31Y
  */
 
 public class        BackingBeanUtils 
+        extends     DateTimeUtil
         implements  Serializable{
     
 //    @ManagedProperty(value="sessionBean")
@@ -279,6 +290,172 @@ public class        BackingBeanUtils
         }
         return false;
     }
+    
+    /**
+     * Executes a value expression to retrieve a reference to this session's
+     * requested conductor object. Conductors manage non-business rule, session-applicable
+     * business object operations, such as refreshing of session-level BOBs
+     * 
+     * @return the requested conductor
+     */
+    public SessionConductor getSessionConductor(){
+        FacesContext context = getFacesContext();
+        return context.getApplication()
+                .evaluateExpressionGet(
+                        context, 
+                        "#{sessionConductor}", 
+                        SessionConductor.class);
+    }
+    
+    
+    
+    /**
+     * Executes a value expression to retrieve a reference to this session's
+     * requested conductor object. Conductors manage non-business rule, session-applicable
+     * business object operations, such as refreshing of session-level BOBs
+     * 
+     * @return the requested conductor
+     */
+    public SessionCECaseConductor getSessionCECaseConductor(){
+        FacesContext context = getFacesContext();
+        return context.getApplication()
+                .evaluateExpressionGet(
+                        context, 
+                        "#{sessionCECaseConductor}", 
+                        SessionCECaseConductor.class);
+    }
+    
+    
+    /**
+     * Executes a value expression to retrieve a reference to this session's
+     * requested conductor object. Conductors manage non-business rule, session-applicable
+     * business object operations, such as refreshing of session-level BOBs
+     * 
+     * @return the requested conductor
+     */
+    public SessionCodeConductor getSessionCodeConductor(){
+        FacesContext context = getFacesContext();
+        return context.getApplication()
+                .evaluateExpressionGet(
+                        context, 
+                        "#{sessionCodeConductor}", 
+                        SessionCodeConductor.class);
+    }
+    
+    /**
+     * Executes a value expression to retrieve a reference to this session's
+     * requested conductor object. Conductors manage non-business rule, session-applicable
+     * business object operations, such as refreshing of session-level BOBs
+     * 
+     * @return the requested conductor
+     */
+    public SessionEventConductor getSessionEventConductor(){
+        FacesContext context = getFacesContext();
+        return context.getApplication()
+                .evaluateExpressionGet(
+                        context, 
+                        "#{sessionEventConductor}", 
+                        SessionEventConductor.class);
+    }
+    
+    /**
+     * Executes a value expression to retrieve a reference to this session's
+     * requested conductor object. Conductors manage non-business rule, session-applicable
+     * business object operations, such as refreshing of session-level BOBs
+     * 
+     * @return the requested conductor
+     */
+    public SessionMuniConductor getSessionMuniConductor(){
+        FacesContext context = getFacesContext();
+        return context.getApplication()
+                .evaluateExpressionGet(
+                        context, 
+                        "#{sessionMuniConductor}", 
+                        SessionMuniConductor.class);
+    }
+    
+    /**
+     * Executes a value expression to retrieve a reference to this session's
+     * requested conductor object. Conductors manage non-business rule, session-applicable
+     * business object operations, such as refreshing of session-level BOBs
+     * 
+     * @return the requested conductor
+     */
+    public SessionOccConductor getSessionOccConductor(){
+        FacesContext context = getFacesContext();
+        return context.getApplication()
+                .evaluateExpressionGet(
+                        context, 
+                        "#{sessionOccConductor}", 
+                        SessionOccConductor.class);
+    }
+    
+    /**
+     * Executes a value expression to retrieve a reference to this session's
+     * requested conductor object. Conductors manage non-business rule, session-applicable
+     * business object operations, such as refreshing of session-level BOBs
+     * 
+     * @return the requested conductor
+     */
+    public SessionPaymentConductor getSessionPaymentConductor(){
+        FacesContext context = getFacesContext();
+        return context.getApplication()
+                .evaluateExpressionGet(
+                        context, 
+                        "#{sessionPaymentConductor}", 
+                        SessionPaymentConductor.class);
+    }
+    
+    /**
+     * Executes a value expression to retrieve a reference to this session's
+     * requested conductor object. Conductors manage non-business rule, session-applicable
+     * business object operations, such as refreshing of session-level BOBs
+     * 
+     * @return the requested conductor
+     */
+    public SessionPersonConductor getSessionPersonConductor(){
+        FacesContext context = getFacesContext();
+        return context.getApplication()
+                .evaluateExpressionGet(
+                        context, 
+                        "#{sessionPersonConductor}", 
+                        SessionPersonConductor.class);
+    }
+    
+    /**
+     * Executes a value expression to retrieve a reference to this session's
+     * requested conductor object. Conductors manage non-business rule, session-applicable
+     * business object operations, such as refreshing of session-level BOBs
+     * 
+     * @return the requested conductor
+     */
+    public SessionPropertyConductor getSessionPropertyConductor(){
+        FacesContext context = getFacesContext();
+        return context.getApplication()
+                .evaluateExpressionGet(
+                        context, 
+                        "#{sessionPropertyConductor}", 
+                        SessionPropertyConductor.class);
+    }
+    
+    /**
+     * Executes a value expression to retrieve a reference to this session's
+     * requested conductor object. Conductors manage non-business rule, session-applicable
+     * business object operations, such as refreshing of session-level BOBs
+     * 
+     * @return the requested conductor
+     */
+    public SessionUserConductor getSessionUserConductor(){
+        FacesContext context = getFacesContext();
+        return context.getApplication()
+                .evaluateExpressionGet(
+                        context, 
+                        "#{sessionUserConductor}", 
+                        SessionUserConductor.class);
+    }
+    
+    
+    
     
     public CodeCoordinator getCodeCoordinator() {
         FacesContext context = getFacesContext();
@@ -505,18 +682,10 @@ public class        BackingBeanUtils
     }
 
     
-    public String getPrettyDate(LocalDateTime d) {
-        return DateTimeUtil.getPrettyDate(d);
-    }
-    
     public String getPrettyLocalDateOnlyNoTime(LocalDate d){
         return DateTimeUtil.getPrettyLocalDateNoTime(d);
     }
     
-    
-    public String getPrettyDateNoTime(LocalDateTime d){
-        return DateTimeUtil.getPrettyDateNoTime(d);
-    }
     
   
    
