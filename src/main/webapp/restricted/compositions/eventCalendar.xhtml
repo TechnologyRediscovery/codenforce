@@ -13,12 +13,14 @@
 
 
 
-        <p:panel id="cal-panel"
-                 header="Event Calendar"
-                 collapsed="false"
-                 closable="true"
-                 rendered="true" >
+    <p:panel id="cal-panel"
+             widgetVar="cal-panel-var"
+             header="Event Calendar"
+             toggleable="true"
+             collapsed="false"
+             rendered="true" >
 
+        <h:form id="event-cal-form">
             <div class="p-grid"
                  id="cal-grid">
 
@@ -30,31 +32,55 @@
                         <div class="evcal-dayheader">
                             <h:outputText value="#{day.dayPrettyPrefix}" />
                             <h:outputText value="#{sessionEventConductor.getPrettyLocalDateOnlyNoTime(day.day)} " />
+                        </div>
                             <ui:repeat id="evcal-evlist-day-minus1"
                                        value="#{day.evList}"
                                        var="ev">
                                 <div class="evcal-evrow">
                                     <div class="evcal-evicon-container">
-
+                                        <i class="material-icons">
+                                            <h:outputText value="#{ev.domain.materialIcon}"/>
+                                        </i>
+                                    </div>
+                                    <div class="evcal-evicon-container">
+                                        <i class="material-icons">
+                                            <h:outputText value="#{ev.category.icon.materialIcon}"/>
+                                        </i>
                                     </div>
                                     <div class="evcal-evtime-container">
                                         <h:outputText value="#{sessionEventConductor.getPrettyTimeOnly(ev.timeStart)}" />
-                                        <h:outputText value="(" />
-                                        <h:outputText value="#{ev.duration}" />
-                                        <h:outputText value="(" />
                                     </div>
                                     <div class="evcal-evcat-container">
-
-                                        <h:outputText value="#{ev.category.eventCategoryTitle}" />
-
+                                        <div class="restrict-main-contents-io-link link-button">
+                                            <p:commandLink id="evcal-event-open-button"
+                                                           styleClass="noFill button-size-small"
+                                                           value="#{ev.category.eventCategoryTitle}"
+                                                           oncomplete="PF('event-profile-dialog-var').show()"
+                                                           update="event-profile-dialog event-profile-form"
+                                                           actionListener="#{eventBB.onViewEvent(ev)}">
+                                            </p:commandLink>
+                                        </div>
                                     </div>
-
                                 </div>
                                 <p:spacer height="2px" />
                             </ui:repeat>
-                        </div>
                     </div>
                 </ui:repeat>
+
             </div>
-        </p:panel>
+        </h:form>
+        <p:spacer height="5px" />
+        <div class="restrict-main-contents-io-link">
+
+            <h:form id="eventcal-refresh-form">
+
+                <p:commandLink  id="eventcal-refresh-cl"
+                                value="refresh calendar"
+                                actionListener="#{sessionEventConductor.refreshCalendar}"
+                                ajax="true"
+                                update="cal-panel
+                                calendar-growl-form"/>
+            </h:form>
+        </div>
+    </p:panel>
 </ui:composition>

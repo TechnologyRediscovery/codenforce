@@ -27,31 +27,44 @@ public enum DomainEnum {
     CODE_ENFORCEMENT        (   "Code enforcement case(s)", 
                                 "cecase_caseid",
                                 "CE",
-                                "fee"),
+                                "fee",
+                                "gavel"),
     OCCUPANCY               (   "Permit File(s)", 
                                 "occperiod_periodid",
                                 "PERMIT",
-                                "fine"),
+                                "fine",
+                                "home"),
     PARCEL                  (   "Parcels", 
                                 "parcel_parcelid",
                                 "PARCEL",
-                                "none"),
+                                "none",
+                                "home_work"),
+    /**
+     * Used to indicate an agnostic OR completely inclusive System domain.
+     * When set as the domain of an SearchParamsEvents, such a value will
+     * trigger the splitting of th8at Params into one for each supported
+     * non-universal domain in this enum, which as of JULY of 2022 included only CE 
+     * and OCC But not PARCEL
+     */
     UNIVERSAL               (   "All event subdomains", 
                                 "cecase_caseid",
                                 "UNI",
-                                "charge");                         // this field should never
+                                "charge",
+                                "language");                         // this field should never
                                                                 // be used since the Search Coor
     private final String title;                                 // is interpreting UNIVERSAL to run
     private final String dbField;                               // the other two independently
                                                                 // and combine the results\
     private final String abbrev;
     private final String chargeTypeName;
+    private final String materialIcon;
     
-    private DomainEnum(String t, String db, String ab, String ctn){
+    private DomainEnum(String t, String db, String ab, String ctn, String matIcon){
         title = t;
         dbField = db;
         abbrev = ab;
         chargeTypeName = ctn;
+        materialIcon = matIcon;
     }
 
     /**
@@ -80,6 +93,13 @@ public enum DomainEnum {
      */
     public String getChargeTypeName() {
         return chargeTypeName;
+    }
+
+    /**
+     * @return the materialIcon
+     */
+    public String getMaterialIcon() {
+        return materialIcon;
     }
 
 

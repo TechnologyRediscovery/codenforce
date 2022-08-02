@@ -40,6 +40,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 /**
@@ -172,41 +174,21 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * @throws SearchException 
      */
      public QueryEvent runQuery(QueryEvent q, UserAuthorized ua) throws SearchException{
+         EventIntegrator ei = getEventIntegrator();
          EventCoordinator ec = getEventCoordinator();
          if(q == null) return null;
         
         prepareQueryForRun(q);
-
-        List<SearchParamsEvent> paramsList = q.getParamsList();
-        List<EventCnF> evTempList = new ArrayList<>();
-        
-        for(SearchParamsEvent sp: paramsList){
-            evTempList.clear();
-            // audit the params and get the result list back
-            if(sp.getEventDomain_val() == DomainEnum.UNIVERSAL){
-                // query for Code Enf
-                sp.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
-                
-                runQuery_event_IntegratorCall(sp, evTempList);
-                
-                // now add Occ events as well
-                sp.setEventDomain_val(DomainEnum.OCCUPANCY);
-                runQuery_event_IntegratorCall(sp, evTempList);
-            } else {
-                runQuery_event_IntegratorCall(sp, evTempList);
-            }
+      
+        for(SearchParamsEvent sp: q.getParamsList()){
              try {
-                 // add each batch of OccPeriod objects from the SearchParam run to our
-                 // ongoing list
-                 q.addToResults(ec.assembleEventCnFPropUnitCasePeriodHeavyList(evTempList, ua));
-             } catch (EventException | IntegrationException | BObStatusException | BlobException ex) {
+                 q.addToResults(ec.assembleEventCnFPropUnitCasePeriodHeavyList(ec.getEventList(ei.searchForEvents(sp)), ua));
+             } catch (IntegrationException | BObStatusException | BlobException | EventException ex) {
                  System.out.println(ex);
-             }
+             } 
             q.appendToQueryLog(sp);
-        } // close parameter for
-        
+        }
         postRunConfigureQuery(q);
-        
         return q;
      }
      
@@ -217,9 +199,23 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
       * @param q
       * @param ua 
       */
-     private void runQuery_event_spliceParamsForUniversalDomain(QueryEvent q, UserAuthorized ua){
-         
-     
+     private List<SearchParamsEvent> runQuery_event_spliceParamsForUniversalDomain(QueryEvent q, SearchParamsEvent params) throws SearchException{
+         List<SearchParamsEvent> additionalParams = new ArrayList<>();
+         if(q != null && params != null && params.isEventDomain_ctl() && params.getEventDomain_val() != null){
+             if(params.getEventDomain_val() == DomainEnum.UNIVERSAL){
+                 System.out.println("SearchCoordinator.runQuery_event_spliceParamsForUniversalDomain | found UNIVERSAL Domain; splicing");
+                 SearchParamsEvent spe = new SearchParamsEvent(params);
+                 spe.setEventDomain_val(DomainEnum.CODE_ENFORCEMENT);
+                 additionalParams.add(params);
+                 spe = new SearchParamsEvent(params);
+                 spe.setEventDomain_val(DomainEnum.OCCUPANCY);
+                 additionalParams.add(params);
+             }
+         } else {
+             throw new SearchException("Cannot build additional event params for events with null additional params, query, or params");
+        }
+        System.out.println("SearchCoordinator.runQuery_event_spliceParamsForUniversalDomain | found UNIVERSAL Domain | addit params size : " + additionalParams.size());
+         return additionalParams;
      }
      
      /**
@@ -228,14 +224,21 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
       * @param evList
       * @throws SearchException 
       */
-     private void runQuery_event_IntegratorCall(SearchParamsEvent params, List<EventCnF> evList) throws SearchException{
-        EventCoordinator ec = getEventCoordinator();
-        
-        EventIntegrator ei = getEventIntegrator();
-        if(evList == null){
-            return;
+     private List<EventCnF> runQuery_event_fetchFromDB(SearchParamsEvent params, List<EventCnF> evList) throws SearchException{
+        if(params == null || evList == null){
+            throw new SearchException("Cannot fetch events from DB wtih null params or evList");
+            
         } 
+        EventCoordinator ec = getEventCoordinator();
+        EventIntegrator ei = getEventIntegrator();
         try {
+            // Integration level search method cannot cope with UNIVERSAL DOMAIN
+            // the caller to this method must splice the UNIVERSAL into subdomains before
+            // calling me
+//            if(params.isEventDomain_ctl() && params.getEventDomain_val() != null && params.getEventDomain_val() == DomainEnum.UNIVERSAL){
+//                return evList;
+//            }
+            System.out.println("SearchCoordinator.runQuery_event_fetchFromDB | non-universal params | params sql: " + params.getFilterName());
             for(Integer i: ei.searchForEvents(params)){
                 evList.add(ec.getEvent(i));
             }
@@ -243,6 +246,8 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             System.out.println(ex);
             throw new SearchException("Integration or CaseLifecycle exception in query run;");
         }
+        
+        return evList;
          
      }
      
@@ -978,6 +983,9 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                  break;
             case CUSTOM:
                 paramsList.add(genParams_event_custom(params, cred));
+                break;
+            case CALENDAR:
+                paramsList.add(genParams_event_calendar(params, cred));
                 break;
             default:
          }
@@ -2007,6 +2015,19 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setDate_field(SearchParamsEventDateFieldsEnum.TIME_START);
         params.setDate_end_val(LocalDateTime.now());
         params.setDate_start_val(LocalDateTime.now().minusDays(DAYS_IN_WEEK));
+        params.setLimitResultCount_ctl(false);
+        params.setEventDomain_ctl(true);
+        params.setEventDomain_val(DomainEnum.UNIVERSAL);
+        
+        // all other event controls are off by default
+        
+        return params;
+        
+    }
+    
+    public SearchParamsEvent genParams_event_calendar(SearchParamsEvent params, Credential cred ){
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsEventDateFieldsEnum.TIME_START);
         params.setLimitResultCount_ctl(false);
         params.setEventDomain_ctl(true);
         params.setEventDomain_val(DomainEnum.UNIVERSAL);

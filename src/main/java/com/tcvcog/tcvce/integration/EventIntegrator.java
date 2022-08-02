@@ -24,6 +24,7 @@ import com.tcvcog.tcvce.coordinators.SearchCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.domain.SearchException;
 import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.EventCnF;
@@ -57,7 +58,7 @@ import java.util.logging.Logger;
  */
 public class EventIntegrator extends BackingBeanUtils implements Serializable {
 
-    final String ACTIVE_FIELD = "event.active";
+    final String ACTIVE_FIELD = "event.deactivatedts";
     /**
      * Creates a new instance of EventIntegrator
      */
@@ -548,7 +549,10 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      */
     public List<Integer> searchForEvents(SearchParamsEvent params) 
             throws IntegrationException, BObStatusException {
-        
+        if(params == null){
+            throw new IntegrationException("cannot search for events with null SearchParamsEvent");
+            
+        }        
         SearchCoordinator sc = getSearchCoordinator();
         List<Integer> evidlst = new ArrayList<>();
         ResultSet rs = null;
@@ -556,9 +560,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
 
         // we need an EventDomain for the BOBID, too, so set it arbitrarily if it's null
-        if(params.getEventDomain_val() == null){
+        if(params.isEventDomain_ctl() && params.getEventDomain_val() == null){
             params.setEventDomain_val(DomainEnum.UNIVERSAL);
-            params.appendToParamLog("DOMAIN CONTROL: no object specified - Code Enforcement chosen as default; | ");
+            params.appendToParamLog("DOMAIN CONTROL: no object specified - UNIVERSAL chosen as default; | ");
         }
         
         params.appendSQL("SELECT DISTINCT eventid \n");
@@ -566,17 +570,17 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         params.appendSQL("LEFT OUTER JOIN public.eventhuman ON (eventhuman.event_eventid = event.eventid) \n");
         // to get to property and hence municipality, we must traverse different key pathways
         // through the database for CE versus Occ. This is all backflippy crazy shit because
-        // of the decision decision to maintain only one event tablef or both Occ events and CE events.
-        if(params.getEventDomain_val().equals(DomainEnum.CODE_ENFORCEMENT)){
+        // of the decision decision to maintain only one event table for both Occ events and CE events.
+//        if(params.getEventDomain_val().equals(DomainEnum.CODE_ENFORCEMENT)){
             params.appendSQL("LEFT OUTER JOIN public.cecase ON (cecase.caseid = event.cecase_caseid) \n");
+            params.appendSQL("LEFT OUTER JOIN public.occperiod ON (occperiod.periodid = event.occperiod_periodid) \n");
+            params.appendSQL("LEFT OUTER JOIN public.parcelunit ON (parcelunit.unitid= occperiod.parcelunit_unitid) \n");
             params.appendSQL("LEFT OUTER JOIN public.parcel ON (cecase.parcel_parcelkey = parcel.parcelkey)  \n");
             
-        } else {
+//        } else {
             // with only two enum values now, we either have Code enf or occ
-            params.appendSQL("LEFT OUTER JOIN public.occperiod ON (occperiod.periodid = event.occperiod_periodid) \n");
-            params.appendSQL("LEFT OUTER JOIN public.parcelunit ON (parcelunit_unitid= occperiod.parcelunit_unitid) \n");
-            params.appendSQL("LEFT OUTER JOIN public.parcel ON (parcel.parcelkey = parcelunit.parcel_parcelkey) \n");
-        }
+//            params.appendSQL("LEFT OUTER JOIN public.parcel ON (parcel.parcelkey = parcelunit.parcel_parcelkey) \n");
+//        }
         params.appendSQL("WHERE eventid IS NOT NULL \n");
         
         // as long as this isn't an ID only search, do the normal SQL building process
@@ -619,10 +623,17 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
            // **     3.EVENT DOMAIN        **
            // *******************************
             if(params.isEventDomain_ctl()){
-                params.appendSQL("AND ");
-                params.appendSQL(params.getEventDomain_val().getDbField()); //Code enf or Occ
-                params.appendSQL(" ");
-                params.appendSQL("IS NOT NULL ");
+                switch(params.getEventDomain_val()){
+                    case UNIVERSAL:
+                        break;
+                    case PARCEL:
+                        throw new IntegrationException("Searching events by parcel key is not yet supported, sorry!");
+                    default:
+                        params.appendSQL("AND ");
+                        params.appendSQL(params.getEventDomain_val().getDbField()); //Code enf or Occ
+                        params.appendSQL(" ");
+                        params.appendSQL("IS NOT NULL ");
+                }
             }
             
            // *******************************

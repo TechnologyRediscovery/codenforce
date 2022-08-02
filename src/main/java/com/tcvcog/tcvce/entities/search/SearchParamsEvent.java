@@ -67,6 +67,32 @@ public class        SearchParamsEvent
        
    }
    
+   public SearchParamsEvent(SearchParamsEvent params){
+       super(params);
+       this.eventCat_ctl = params.eventCat_ctl;
+        this.eventCat_val = params.eventCat_val;
+        this.eventType_ctl = params.eventType_ctl;
+        this.eventType_val = params.eventType_val;
+        this.eventDomain_ctl = params.eventDomain_ctl;
+        this.eventDomain_val = params.eventDomain_val;
+        this.eventDomainPK_ctl = params.eventDomainPK_ctl;
+        this.eventDomainPK_val = params.eventDomainPK_val;
+        this.person_ctl = params.person_ctl;
+        this.person_val = params.person_val;
+        this.rolefloor_enact_ctl = params.rolefloor_enact_ctl;
+        this.roleFloor_enact_val = params.roleFloor_enact_val;
+        this.rolefloor_view_ctl = params.rolefloor_view_ctl;
+        this.roleFloor_view_val = params.roleFloor_view_val;
+        this.rolefloor_update_ctl = params.rolefloor_update_ctl;
+        this.roleFloor_update_val = params.roleFloor_update_val;
+        this.property_ctl = params.property_ctl;
+        this.property_val = params.property_val;
+        this.notify_ctl = params.notify_ctl;
+        this.notify_val = params.notify_val;
+       
+       
+   }
+   
      public SearchParamsEventDateFieldsEnum[] getDateFieldList(){
        SearchParamsEventDateFieldsEnum[] fields = SearchParamsEventDateFieldsEnum.values();
        return fields;
@@ -78,7 +104,7 @@ public class        SearchParamsEvent
    }
    
    
-   public DomainEnum[] getEventDomainList(){
+   public DomainEnum[] getEventDomainListComplete(){
        DomainEnum[] domains = DomainEnum.values();
        return domains;
    }

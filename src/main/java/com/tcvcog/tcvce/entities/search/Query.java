@@ -172,6 +172,8 @@ public abstract class   Query<E extends BOb>
 
   
     /**
+     * Provides the query log
+     * 
      * @return the resultsMessage
      */
     public String getQueryLog() {
@@ -182,7 +184,8 @@ public abstract class   Query<E extends BOb>
         return resultsMessage.toString();
     }
 
-    /**
+    /**'
+     * Appends the given string to the search log
      * @param msg
      */
     public void appendToQueryLog(String msg) {
@@ -194,6 +197,11 @@ public abstract class   Query<E extends BOb>
         }
     }
     
+    /**
+     * Pulls out the RAW SQL of a search param and appends it to the 
+     * query log
+     * @param sp 
+     */
     public void appendToQueryLog(SearchParams sp){
         if(sp != null){
             resultsMessage.append(Constants.FMT_SEARCH_HEAD_FILTERLOG);

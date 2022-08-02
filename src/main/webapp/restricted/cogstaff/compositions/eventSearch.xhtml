@@ -467,7 +467,7 @@
                                           noSelectionOption="true" 
                                           itemDisabled="true"/>
                             <f:selectItems id="event-search-filter-domain-items" 
-                                           value="#{eventSearchBB.searchParamsSelected.eventDomainList}" 
+                                           value="#{eventSearchBB.searchParamsSelected.eventDomainListComplete}" 
                                            var="ed" itemValue="#{ed}" itemLabel="#{ed.title}" />
                             <f:converter converterId="eventDomainConverter" />
                         </p:selectOneMenu>

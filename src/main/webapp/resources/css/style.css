@@ -394,8 +394,15 @@ div.headerLink a:before, a:visited{
 
 .evcal-dayheader{
     font-weight: bold;
+    text-decoration: underline;
 }
 
+.evcal-evrow{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding:5px;
+}
 
 
 

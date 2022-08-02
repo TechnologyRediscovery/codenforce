@@ -69,13 +69,19 @@ public  enum            QueryEventEnum
                                         "Custom", 
                                         RoleType.MuniReader,
                                         true,
-                                        true);
+                                        true),
+    
+    CALENDAR(                           "Calendar - day", 
+                                        "Daily Calendar", 
+                                        RoleType.MuniReader,
+                                        true,
+                                        false);
     
     private final String title;
     private final String desc;
     private final RoleType requiredRoleMin;
     private final boolean log;
-    private boolean showAllControls;
+    private final boolean showAllControls;
     
     private QueryEventEnum(String t, String l, RoleType minRoleType, boolean lg, boolean showall){
         this.desc = l;

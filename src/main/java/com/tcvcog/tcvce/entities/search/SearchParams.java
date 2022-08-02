@@ -86,11 +86,58 @@ public  class           SearchParams
     private StringBuilder log;
     
    public SearchParams(){
+       initLists();
+   }
+   
+   /**
+    * Basically clones a given SearchParams
+    * @param params 
+    */
+   public SearchParams(SearchParams params){
+       initLists();
+       this.filterName = params.filterName;
+        this.filterDescription = params.filterDescription;
+        this.sql = params.sql;
+        this.muni_rtMin = params.muni_rtMin;
+        this.muni_ctl = params.muni_ctl;
+        this.muni_val = params.muni_val;
+        this.date_rtMin = params.date_rtMin;
+        this.date_startEnd_ctl = params.date_startEnd_ctl;
+        this.date_field = params.date_field;
+        this.date_start_val = params.date_start_val;
+        this.date_end_val = params.date_end_val;
+        this.date_relativeDates_ctl = params.date_relativeDates_ctl;
+        this.date_relativeDates_start_val = params.date_relativeDates_start_val;
+        this.date_realtiveDates_end_val = params.date_realtiveDates_end_val;
+        this.dateRuleList = params.dateRuleList;
+        this.user_rtMin = params.user_rtMin;
+        this.user_ctl = params.user_ctl;
+        this.user_field = params.user_field;
+        this.user_val = params.user_val;
+        this.bobID_rtMin = params.bobID_rtMin;
+        this.bobID_ctl = params.bobID_ctl;
+        this.bobID_val = params.bobID_val;
+        this.limitResultCount_rtMin = params.limitResultCount_rtMin;
+        this.limitResultCount_ctl = params.limitResultCount_ctl;
+        this.limitResultCount_val = params.limitResultCount_val;
+        this.active_rtMin = params.active_rtMin;
+        this.active_ctl = params.active_ctl;
+        this.active_val = params.active_val;
+        this.log = params.log;
+       
+       
+   }
+   
+
+   /**
+    * Injects empty StringBuilder and list objects
+    */
+   private void initLists(){
        sql = new StringBuilder();
        log = new StringBuilder();
        dateRuleList = new ArrayList<>();
-   }
-   
+        
+    }
    
     @Override
    public String toString(){

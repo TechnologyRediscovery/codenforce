@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.event.ActionEvent;
 
 /**
  * The premier session-scoped, object family specific bean
@@ -101,13 +103,29 @@ public class SessionEventConductor extends BackingBeanUtils{
     }
     
     /**
+     * Listener for user requests to run calendar event query again
+     * @param ev 
+     */
+    public void refreshCalendar(ActionEvent ev){
+        try {
+            initEventCalendar6Day();
+              getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                        "Calendar refreshed!", ""));
+        } catch (SearchException ex) {
+            System.out.println(ex);
+              getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                        "Could not load calendar: " + ex.getMessage(), ""));
+        }
+    }
+    
+    /**
      * Conducts a day-by-day event query for yesterday, today, and 4 future days
      * and injects the resulting composite object into this bean's member
      * 
      */
     private void initEventCalendar6Day() throws SearchException{
         SearchCoordinator sc = getSearchCoordinator();
-
+ 
         List<EventCalendarDay> dayList = new ArrayList<>();
         Map<Integer, String> prefixMap = new HashMap<>();
 
@@ -139,7 +157,7 @@ public class SessionEventConductor extends BackingBeanUtils{
                 day.setDayPrettyPrefix("");
             }
                         
-            QueryEvent evq = sc.initQuery(QueryEventEnum.MUNI_7DAY_ACTIVITY, getSessionBean().getSessUser().getKeyCard());
+            QueryEvent evq = sc.initQuery(QueryEventEnum.CALENDAR, getSessionBean().getSessUser().getKeyCard());
             evq.getPrimaryParams().setDate_start_val(day.getLdtLowerBound());
             evq.getPrimaryParams().setDate_end_val(day.getLdtUpperBound());
            

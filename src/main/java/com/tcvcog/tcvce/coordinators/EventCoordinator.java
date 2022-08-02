@@ -496,7 +496,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         long lduration = 0;
         if(ev.getTimeStart() != null && ev.getTimeEnd() != null){
             if(ev.getTimeEnd().isAfter(ev.getTimeStart())){
-                long sec = ev.getTimeEnd().toEpochSecond(ZoneOffset.UTC) - ev.getTimeEnd().toEpochSecond(ZoneOffset.UTC);
+                long sec = ev.getTimeEnd().toEpochSecond(ZoneOffset.UTC) - ev.getTimeStart().toEpochSecond(ZoneOffset.UTC);
                 lduration = (long) ((double) sec / 60.0);
             }
         }
