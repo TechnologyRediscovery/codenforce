@@ -84,9 +84,9 @@ ALTER TABLE public.municipality ADD COLUMN defaultheaderimageheightpx INTEGER DE
 ALTER TYPE eventtype ADD VALUE 'OccupancyOrigination';
 ALTER TYPE eventtype ADD VALUE 'OccupancyClosing';
 ALTER TYPE eventtype ADD VALUE 'Inspection';
---******************************* REMOTE CURSOR HERE  ******************************* 
 
 ALTER TABLE public.event ADD COLUMN parcel_parcelkey INTEGER CONSTRAINT event_parcelkey_fk REFERENCES parcel (parcelkey);
+--******************************* REMOTE CURSOR HERE  ******************************* 
 --******************************* LOCAL CURSOR HERE  ******************************* 
 
 

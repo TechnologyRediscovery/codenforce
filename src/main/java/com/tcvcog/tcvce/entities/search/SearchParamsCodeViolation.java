@@ -60,6 +60,18 @@ public class        SearchParamsCodeViolation
     private boolean noticeMailed_ctl;
     private boolean noticeMailed_val;
     
+    // CV param set 8
+    private boolean transferred_ctl;
+    private boolean transferred_val;
+    
+    // CV param set 9
+    private boolean compliance_ctl;
+    private boolean compliance_val;
+    
+    // CV param set 10
+    private boolean nullified_ctl;
+    private boolean nullified_val;
+    
     
    public SearchParamsCodeViolation(){
        
@@ -271,6 +283,90 @@ public class        SearchParamsCodeViolation
      */
     public void setNoticeMailed_val(boolean noticeMailed_val) {
         this.noticeMailed_val = noticeMailed_val;
+    }
+
+    /**
+     * @return the transferred_ctl
+     */
+    public boolean isTransferred_ctl() {
+        return transferred_ctl;
+    }
+
+    /**
+     * @return the transferred_val
+     */
+    public boolean isTransferred_val() {
+        return transferred_val;
+    }
+
+    /**
+     * @return the compliance_ctl
+     */
+    public boolean isCompliance_ctl() {
+        return compliance_ctl;
+    }
+
+    /**
+     * @return the compliance_val
+     */
+    public boolean isCompliance_val() {
+        return compliance_val;
+    }
+
+    /**
+     * @return the nullified_ctl
+     */
+    public boolean isNullified_ctl() {
+        return nullified_ctl;
+    }
+
+    /**
+     * @return the nullified_val
+     */
+    public boolean isNullified_val() {
+        return nullified_val;
+    }
+
+    /**
+     * @param transferred_ctl the transferred_ctl to set
+     */
+    public void setTransferred_ctl(boolean transferred_ctl) {
+        this.transferred_ctl = transferred_ctl;
+    }
+
+    /**
+     * @param transferred_val the transferred_val to set
+     */
+    public void setTransferred_val(boolean transferred_val) {
+        this.transferred_val = transferred_val;
+    }
+
+    /**
+     * @param compliance_ctl the compliance_ctl to set
+     */
+    public void setCompliance_ctl(boolean compliance_ctl) {
+        this.compliance_ctl = compliance_ctl;
+    }
+
+    /**
+     * @param compliance_val the compliance_val to set
+     */
+    public void setCompliance_val(boolean compliance_val) {
+        this.compliance_val = compliance_val;
+    }
+
+    /**
+     * @param nullified_ctl the nullified_ctl to set
+     */
+    public void setNullified_ctl(boolean nullified_ctl) {
+        this.nullified_ctl = nullified_ctl;
+    }
+
+    /**
+     * @param nullified_val the nullified_val to set
+     */
+    public void setNullified_val(boolean nullified_val) {
+        this.nullified_val = nullified_val;
     }
    
   

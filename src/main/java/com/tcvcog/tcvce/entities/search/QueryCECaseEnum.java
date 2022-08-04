@@ -29,7 +29,28 @@ public  enum QueryCECaseEnum
                             RoleType.MuniReader, 
                             true),
     
-    OPEN_ASOFENDDATE(     "Cases that were open as of a given date", 
+    /**
+     * As one of the fanciest queries in all of CnF, I build a multi-param
+     * Query that will count cases open as of the end date of a period (like a reporting
+     * period) but not that were opened during that period
+     */
+    OPEN_ASOFENDDATE(     "Cases that were open as of the end of a given date range", 
+                            "Excludes cases opened during that date range but includes "
+                                    + "those that were open at the start of the range", 
+                            RoleType.MuniReader, 
+                            true),
+    
+    /**
+     * Designed to be used to count total open cases as of the start of a period
+     * and will therefore NOT address a period of opening cases in that period which
+     *  would be an exceptional case and is addressed by the OPEN_ASOFENDDATE 
+     * value in this enumeration.
+     * 
+     * Intended use requires setting the start and end date range to the same date
+     * 
+     * 
+     */
+    OPEN_ASOFGIVENDATE(     "Cases that were open as of a given date", 
                             "Only casese that were open at the end date", 
                             RoleType.MuniReader, 
                             true),

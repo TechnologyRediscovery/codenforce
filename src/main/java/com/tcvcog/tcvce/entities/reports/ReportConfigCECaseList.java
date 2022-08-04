@@ -37,6 +37,8 @@ public class ReportConfigCECaseList
     private boolean includeEventSummaryByCase;
     private boolean includeCECaseStatusPie;
     private boolean includeStreetLevelSummary;
+    private boolean includeCitationPieChart;
+    private boolean includeClosurePieChart;
     
     private boolean includeExtendedPropertyDetails;
     
@@ -46,9 +48,10 @@ public class ReportConfigCECaseList
     
     private List<CECaseDataHeavy> caseListCustomQueryExport;
     
+    private List<CECaseDataHeavy> caseListOpenAsOfDateStart;
     private List<CECaseDataHeavy> caseListOpenedInDateRange;
-    private List<CECaseDataHeavy> caseListOpenAsOfDateEnd;
     private List<CECaseDataHeavy> caseListClosedInDateRange;
+    private List<CECaseDataHeavy> caseListOpenAsOfDateEnd;
     
     protected List<Citation> citationList;
     
@@ -60,6 +63,13 @@ public class ReportConfigCECaseList
     private List<CodeViolationPropCECaseHeavy> violationsLoggedComplianceDateRange;
     private List<CodeViolationPropCECaseHeavy> violationsCitedDateRange;
     private List<CodeViolationPropCECaseHeavy> violationsLoggedDateRange;
+    private List<CodeViolationPropCECaseHeavy> violationsAccumulatedCompliance;
+    private List<CodeViolationPropCECaseHeavy> violationsWithinStipCompWindow;
+    private List<CodeViolationPropCECaseHeavy> violationsOutsideCompWindowNOTCited;
+    private List<CodeViolationPropCECaseHeavy> violationsNoComplianceButCited;
+    
+    
+    
     private HorizontalBarChartModel barViolationsReport;
     
     private PieChartModel pieViol;
@@ -604,6 +614,104 @@ public class ReportConfigCECaseList
      */
     public void setViolationsLoggedDateRange(List<CodeViolationPropCECaseHeavy> violationsLoggedDateRange) {
         this.violationsLoggedDateRange = violationsLoggedDateRange;
+    }
+
+    /**
+     * @return the violationsWithinStipCompWindow
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsWithinStipCompWindow() {
+        return violationsWithinStipCompWindow;
+    }
+
+    /**
+     * @param violationsWithinStipCompWindow the violationsWithinStipCompWindow to set
+     */
+    public void setViolationsWithinStipCompWindow(List<CodeViolationPropCECaseHeavy> violationsWithinStipCompWindow) {
+        this.violationsWithinStipCompWindow = violationsWithinStipCompWindow;
+    }
+
+    /**
+     * @return the includeCitationPieChart
+     */
+    public boolean isIncludeCitationPieChart() {
+        return includeCitationPieChart;
+    }
+
+    /**
+     * @param includeCitationPieChart the includeCitationPieChart to set
+     */
+    public void setIncludeCitationPieChart(boolean includeCitationPieChart) {
+        this.includeCitationPieChart = includeCitationPieChart;
+    }
+
+    /**
+     * @return the violationsOutsideCompWindowNOTCited
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsOutsideCompWindowNOTCited() {
+        return violationsOutsideCompWindowNOTCited;
+    }
+
+    /**
+     * @param violationsOutsideCompWindowNOTCited the violationsOutsideCompWindowNOTCited to set
+     */
+    public void setViolationsOutsideCompWindowNOTCited(List<CodeViolationPropCECaseHeavy> violationsOutsideCompWindowNOTCited) {
+        this.violationsOutsideCompWindowNOTCited = violationsOutsideCompWindowNOTCited;
+    }
+
+    /**
+     * @return the violationsNoComplianceButCited
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsNoComplianceButCited() {
+        return violationsNoComplianceButCited;
+    }
+
+    /**
+     * @param violationsNoComplianceButCited the violationsNoComplianceButCited to set
+     */
+    public void setViolationsNoComplianceButCited(List<CodeViolationPropCECaseHeavy> violationsNoComplianceButCited) {
+        this.violationsNoComplianceButCited = violationsNoComplianceButCited;
+    }
+
+    /**
+     * @return the caseListOpenAsOfDateStart
+     */
+    public List<CECaseDataHeavy> getCaseListOpenAsOfDateStart() {
+        return caseListOpenAsOfDateStart;
+    }
+
+    /**
+     * @param caseListOpenAsOfDateStart the caseListOpenAsOfDateStart to set
+     */
+    public void setCaseListOpenAsOfDateStart(List<CECaseDataHeavy> caseListOpenAsOfDateStart) {
+        this.caseListOpenAsOfDateStart = caseListOpenAsOfDateStart;
+    }
+
+    /**
+     * @return the violationsAccumulatedCompliance
+     */
+    public List<CodeViolationPropCECaseHeavy> getViolationsAccumulatedCompliance() {
+        return violationsAccumulatedCompliance;
+    }
+
+    /**
+     * @param violationsAccumulatedCompliance the violationsAccumulatedCompliance to set
+     */
+    public void setViolationsAccumulatedCompliance(List<CodeViolationPropCECaseHeavy> violationsAccumulatedCompliance) {
+        this.violationsAccumulatedCompliance = violationsAccumulatedCompliance;
+    }
+
+    /**
+     * @return the includeClosurePieChart
+     */
+    public boolean isIncludeClosurePieChart() {
+        return includeClosurePieChart;
+    }
+
+    /**
+     * @param includeClosurePieChart the includeClosurePieChart to set
+     */
+    public void setIncludeClosurePieChart(boolean includeClosurePieChart) {
+        this.includeClosurePieChart = includeClosurePieChart;
     }
     
     

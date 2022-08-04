@@ -100,7 +100,7 @@ public class ReportingBB extends BackingBeanUtils implements Serializable{
         } else {
             currentReport = reportCECaseList;
         }
-        System.out.println("ReportingBB.intiBean");
+        System.out.println("ReportingBB.initBean");
         
         
     }

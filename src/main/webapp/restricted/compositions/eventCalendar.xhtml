@@ -50,16 +50,26 @@
                                     <div class="evcal-evtime-container">
                                         <h:outputText value="#{sessionEventConductor.getPrettyTimeOnly(ev.timeStart)}" />
                                     </div>
-                                    <div class="evcal-evcat-container">
-                                        <div class="restrict-main-contents-io-link link-button">
+                                    <div class="evcal-evcat-container"
+                                         style="font-size: 0.8em;">
+                                        <div class="restrict-main-contents-io-link link-button"
+                                             style="padding-bottom: 0px;">
                                             <p:commandLink id="evcal-event-open-button"
                                                            styleClass="noFill button-size-small"
+                                                           style="padding-bottom: 0px;"
                                                            value="#{ev.category.eventCategoryTitle}"
                                                            oncomplete="PF('event-profile-dialog-var').show()"
                                                            update="event-profile-dialog event-profile-form"
                                                            actionListener="#{eventBB.onViewEvent(ev)}">
                                             </p:commandLink>
                                         </div>
+                                        <br />
+                                         <p:commandLink id="evcal-holder-cl"
+                                                        action="#{eventSearchBB.onViewEventHolder(ev)}"
+                                                        style="font-weight: bold; color:blue;">
+                                             <h:outputText value="#{ev.cecase.caseID eq 0 ? 'Permit File ID:':'Case ID:'}"/>
+                                             <h:outputText value="#{ev.cecase.caseID eq 0 ? ev.occPeriodID : ev.ceCaseID  }"/>
+                                         </p:commandLink>
                                     </div>
                                 </div>
                                 <p:spacer height="2px" />

@@ -1059,12 +1059,18 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case OPENED_INDATERANGE:
                 paramsList.add(genParams_CECase_openedInDateRange(params, cred));
                 break;
+            case OPEN_ASOFGIVENDATE:
+                System.out.println("SearchCoordinator.initQuery(CECase): oened_ASOFGIVENDATE");
+                paramsList.add(genParams_ceCase_openAsOfSOR_butClosedAsOfNow(params, cred));
+                params = genParams_ceCase_initParams(cred);
+                paramsList.add(genParams_ceCase_openBeforeSOR_stillNotClosed(params, cred));
+                
+                break;
             case OPEN_ASOFENDDATE:
                 System.out.println("SearchCoordinator.initQuery(CECase): oened_ASOFENDDATE");
                 paramsList.add(genParams_ceCase_openAsOfEOR_butClosedBeforeToday(params, cred));
                 params = genParams_ceCase_initParams(cred);
                 paramsList.add(genParams_ceCase_openBeforeSOR_notClosed(params, cred));
-                
                 break;
             case CLOSED_CASES:
                 paramsList.add(genParams_CECase_closedInDateRange(params, cred));
@@ -1090,6 +1096,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
                 break;
             case MUNI_ALL:
                 paramsList.add(genParams_ceCase_muniAllActive(params, cred));
+                break;
             default:
          }
          
@@ -1115,6 +1122,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case MUNI_ALL:
                  paramsList.add(genParams_cv_muniall(params, cred));
                 break;
+                
             case CITED_PAST30:
                  paramsList.add(genParams_cv_cited30(params, cred));
                 
@@ -1122,6 +1130,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case CITED_PAST7:
                 paramsList.add(genParams_cv_cited7(params, cred));
                 break;
+                
             case COMP_PAST30:
                 paramsList.add(genParams_cv_comp30(params, cred));
                 
@@ -1171,8 +1180,19 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
             case LOGGED_IN_DATE_RANGE:
                 paramsList.add(genParams_cv_loggedInDateRange(params, cred));
                 break;
-            default:
                 
+            case VIOLATIONS_INSIDE_COMPLIANCE_WINDOW:
+                paramsList.add(genParams_cv_withinComplianceWindow(params, cred));
+                break;
+                
+            case COMPLIANCE_DUE_EXPIRED_NOTCITED:
+                paramsList.add(genParams_cv_expiredCompWindow(params, cred));
+                break;
+                
+            case NOCOMP_CITED_ANYTIME:
+                paramsList.add(genParams_cv_activeCited(params, cred));
+                break;
+            default:
                 
          }
          
@@ -2369,6 +2389,12 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         return params;
     }
     
+    /**
+     * Builds a very fancy parameter with a pair of date rules. 
+     * @param params
+     * @param cred
+     * @return 
+     */
     public SearchParamsCECase genParams_ceCase_openAsOfEOR_butClosedBeforeToday(SearchParamsCECase params, Credential cred){
         params.setFilterName("Finds cases that were open on a given report end date, perhaps closed before now()");
         
@@ -2401,7 +2427,57 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         drClose.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
         
         // CLIENT METHOD TODO:
-        // client sets this second list element to end of report
+        // client sets this second list element to start of report
+        drClose.setDate_start_val(null);
+        drClose.setDate_end_val(LocalDateTime.now());
+        params.getDateRuleList().add(drClose);
+        
+        // don't touch this, let dates do it
+        params.setCaseOpen_ctl(false);
+        params.setCaseOpen_val(false);
+        
+        return params;
+    }
+    
+    /**
+     * Builds a very fancy parameter with a pair of date rules. 
+     * @param params
+     * @param cred
+     * @return 
+     */
+    public SearchParamsCECase genParams_ceCase_openAsOfSOR_butClosedAsOfNow(SearchParamsCECase params, Credential cred){
+        params.setFilterName("Finds cases that were open on a given report START date, perhaps closed before now()");
+        
+        // STANDARD SWITCHES
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        params.setPersonInfoCase_ctl(true);
+        params.setPersonInfoCase_val(false);
+        
+        params.setPropInfoCase_ctl(true);
+        params.setPropInfoCase_val(false);
+        
+        // SPECIFIC TO THIS QUERY
+        params.setDate_startEnd_ctl(true);
+        params.setDateRuleList(new ArrayList<>());
+        
+        SearchParamsDateRule drOpen = genParams_getDateRule();
+        
+        drOpen.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
+        drOpen.setDate_start_val(LocalDateTime.of(1970, 1, 1, 0, 0));
+        
+        // CLIENT METHOD TODO:
+        // set first list element to end of report
+        drOpen.setDate_end_val(null);
+        
+        params.getDateRuleList().add(drOpen);
+        
+        SearchParamsDateRule drClose = genParams_getDateRule();
+        drClose.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
+        
+        // CLIENT METHOD TODO:
+        // client sets this second list element to start of report
         drClose.setDate_start_val(null);
         drClose.setDate_end_val(LocalDateTime.now());
         params.getDateRuleList().add(drClose);
@@ -2424,6 +2500,58 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      */
     public SearchParamsCECase genParams_ceCase_openBeforeSOR_notClosed(SearchParamsCECase params, Credential cred){
         params.setFilterName("Finds cases that were opened from EPOCH to SOR and have null closed date");
+        
+        // STANDARD SWITCHES
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        params.setPersonInfoCase_ctl(true);
+        params.setPersonInfoCase_val(false);
+        
+        params.setPropInfoCase_ctl(true);
+        params.setPropInfoCase_val(false);
+        
+        // SPECIFIC TO THIS QUERY
+        params.setDate_startEnd_ctl(true);
+        params.setDateRuleList(new ArrayList<>());
+        
+        SearchParamsDateRule drOpen = genParams_getDateRule();
+        
+        drOpen.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
+        drOpen.setDate_start_val(LocalDateTime.of(1970, 1, 1, 0, 0));
+        
+        // set first list element START OF REPORTING PERIOD
+        // CLIENT METHOD TODO: SET ME
+        drOpen.setDate_end_val(null);
+        
+        params.getDateRuleList().add(drOpen);
+        
+        SearchParamsDateRule notClosed = genParams_getDateRule();
+        notClosed.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
+        
+        // NO CLOSING DATE
+        notClosed.setDate_null_ctl(true);
+        notClosed.setDate_null_val(true);
+        params.getDateRuleList().add(notClosed);
+        
+        // don't touch this, let dates do it
+        params.setCaseOpen_ctl(false);
+        params.setCaseOpen_val(false);
+        
+        return params;
+    }
+    
+    /**
+     * Parameter config to grab cases that were opened
+     * between epoch and START of report, and still open
+     * Used in conjunction with those opened before END of report
+     * and closed between END of report and now
+     * @param params
+     * @param cred
+     * @return 
+     */
+    public SearchParamsCECase genParams_ceCase_openBeforeSOR_stillNotClosed(SearchParamsCECase params, Credential cred){
+        params.setFilterName("Finds cases that were opened from EPOCH to end date and have null closed date");
         
         // STANDARD SWITCHES
         params.setActive_ctl(true);
@@ -2518,6 +2646,68 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
     }
     
     /**
+     * Makes me a searchparams object that asks for violations which would have 
+     * been in their compliance timeframe as of the END date of a given 
+     * report; User of these params must set that end date.
+     * 
+     * @param params
+     * @param cred
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCodeViolation genParams_cv_withinComplianceWindow(SearchParamsCodeViolation params, Credential cred){
+        params.setFilterName("Violations which would be in their compliance window given start and end date");
+        
+        
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        // Violations which have NOT been marked with complaince or transfer or null
+        params.setTransferred_ctl(true);
+        params.setTransferred_val(false);
+        
+        params.setCompliance_ctl(true);
+        params.setCompliance_val(false);
+        
+        params.setNullified_ctl(true);
+        params.setNullified_val(false);
+        
+        params.setCited_ctl(true);
+        params.setCited_val(false);
+        
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.STIPULATED_COMPLIANCE);
+        
+        return params;
+    }
+    
+    public SearchParamsCodeViolation genParams_cv_expiredCompWindow(SearchParamsCodeViolation params, Credential cred){
+        params.setFilterName("Violations which as of the end date of the report, have expired timeframe but NO citation associated");
+        
+        
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        // Violations which have NOT been marked with complaince or transfer or null
+        params.setTransferred_ctl(true);
+        params.setTransferred_val(false);
+        
+        params.setCompliance_ctl(true);
+        params.setCompliance_val(false);
+        
+        params.setNullified_ctl(true);
+        params.setNullified_val(false);
+        
+        params.setCited_ctl(true);
+        params.setCited_val(false);
+        
+        params.setDate_startEnd_ctl(true);
+        params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.STIPULATED_COMPLIANCE);
+        
+        return params;
+        
+    }
+    /**
      * Returns a SearchParams subclass for retrieving code violations
      * that meet the desired criteria
      * @param params
@@ -2570,6 +2760,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         params.setDate_startEnd_ctl(true);
         params.setDate_relativeDates_ctl(true);
+        
         params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.CITATIONDOR);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         params.setDate_relativeDates_start_val(PASTPERIOD_MONTH);
@@ -2590,7 +2781,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
      * into the Integrator for case list retrieval
      */
     public SearchParamsCodeViolation genParams_cv_cited7(SearchParamsCodeViolation params, Credential cred){
-        params.setFilterName("cited in past 30 days");
+        params.setFilterName("cited in past 7 days");
         
         params.setDate_startEnd_ctl(true);
         params.setDate_relativeDates_ctl(true);
@@ -2603,6 +2794,49 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         
         return params;
     }
+    
+    
+    
+    
+    /**
+     * Returns a SearchParams subclass for retrieving code violations
+     * that meet the desired criteria
+     * 
+     * 
+     * @param params
+     * @param cred
+     * @return a SearchParams subclass with mem vars ready to send
+     * into the Integrator for case list retrieval
+     */
+    public SearchParamsCodeViolation genParams_cv_activeCited(SearchParamsCodeViolation params, Credential cred){
+        params.setFilterName("Violations without compliance but included in a citation");
+        
+        params.setDate_startEnd_ctl(true);
+        params.setDate_relativeDates_ctl(false);
+        
+        params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.CITATIONDOR);
+        
+        params.setCited_ctl(true);
+        params.setCited_val(true);
+        
+        params.setActive_ctl(true);
+        params.setActive_val(true);
+        
+        // Violations which have NOT been marked with complaince or transfer or null
+        params.setTransferred_ctl(true);
+        params.setTransferred_val(false);
+        
+        params.setCompliance_ctl(true);
+        params.setCompliance_val(false);
+        
+        params.setNullified_ctl(true);
+        params.setNullified_val(false);
+        
+   
+        return params;
+    }
+    
+    
     
     
     /**
@@ -2802,7 +3036,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setFilterName("Stipulated compliance date within the upcoming 30 days");
 
         params.setDate_startEnd_ctl(true);
-        params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.STIP);
+        params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.STIPULATED_COMPLIANCE);
         params.setDate_relativeDates_ctl(true);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         params.setDate_relativeDates_start_val(PASTPERIOD_MONTH);
@@ -2822,7 +3056,7 @@ public class SearchCoordinator extends BackingBeanUtils implements Serializable{
         params.setFilterName("Stipulated compliance date within the upcoming 7 days");
 
         params.setDate_startEnd_ctl(true);
-        params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.STIP);
+        params.setDate_field(SearchParamsCodeViolationDateFieldsEnum.STIPULATED_COMPLIANCE);
         params.setDate_relativeDates_ctl(true);
         params.setDate_realtiveDates_end_val(PASTPERIOD_TODAY);
         params.setDate_relativeDates_start_val(PASTPERIOD_WEEK);

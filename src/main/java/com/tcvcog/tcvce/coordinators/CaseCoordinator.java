@@ -83,6 +83,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public final static int DEFAULT_EXTENSIONDAYS = 14;
     final static String ADDRESSLESS_PROPERTY_STREET_NAME = "Not attached to a street";
 
+    final static int ARBITRARILY_LONG_TIME_YEARS = 113; // arbitrary magic number of years into the future (thanks WWALK)
+    
     public final static RoleType MIN_RANK_TO_ISSUE_CITATION = RoleType.EnforcementOfficial;
 
     /**
@@ -1544,6 +1546,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         listRpt.setIncludeFullOwnerContactInfo(false);
         listRpt.setIncludeViolationList(true);
         listRpt.setIncludeEventSummaryByCase(false);
+        listRpt.setIncludeCitationPieChart(false);
         return listRpt;
 
     }
@@ -1561,54 +1564,114 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if (rpt == null || ua == null) {
             return null;
         }
-
-        QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_INDATERANGE, ua.getKeyCard());
-        SearchParamsCECase spcse = query_opened.getPrimaryParams();
-        spcse.setDate_startEnd_ctl(true);
-        spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
-        spcse.setDate_start_val(rpt.getDate_start_val());
-        spcse.setDate_end_val(rpt.getDate_end_val());
-
-        rpt.setCaseListOpenedInDateRange(cecase_assembleCECaseDataHeavyList(sc.runQuery(query_opened, ua).getBOBResultList(), ua));
-        if (rpt.getCaseListOpenedInDateRange() != null) {
-            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenedInDateRange().size());
-        }
-
-        QueryCECase query_active_asof = sc.initQuery(QueryCECaseEnum.OPEN_ASOFENDDATE, ua.getKeyCard());
-
-        if (query_active_asof.getParamsList() != null && query_active_asof.getParamsList().size() == 2) {
-
+        SearchParamsCECase spcse;
+          
+        // Phase 1: Cases open as of report START date 
+        // Akin to "beginning inventory"
+        QueryCECase queryOpenAsOfSOR = sc.initQuery(QueryCECaseEnum.OPEN_ASOFGIVENDATE, ua.getKeyCard());
+        // query audit setup
+        if (queryOpenAsOfSOR.getParamsList() != null && queryOpenAsOfSOR.getParamsList().size() == 2) {
             // setup params
-            spcse = query_active_asof.getPrimaryParams();
+            spcse = queryOpenAsOfSOR.getPrimaryParams();
 
-            // client field injection: cases open as of EOR but closed between EOR+1 and now()
+            // client field injection of END date value: cases open as of START 
             if (spcse.getDateRuleList() != null && spcse.getDateRuleList().size() == 2) {
-                spcse.getDateRuleList().get(0).setDate_end_val(rpt.getDate_end_val());
-                spcse.getDateRuleList().get(1).setDate_start_val(rpt.getDate_end_val().plusDays(1));
-                System.out.println("CaseCoordinator.report_buildCECaseListReport " + spcse.getDateRuleList());
+                // COORDINATOR injects date field SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD
+                // Corodinator sets date start val to JAN 1 1970
+                spcse.getDateRuleList().get(0).setDate_end_val(rpt.getDate_start_val());
+                spcse.getDateRuleList().get(1).setDate_start_val(rpt.getDate_start_val().plusDays(1));
+                // search coord injected now() as the end date
             }
 
-            // client field injection: cases open as of EOR and not closed, even today
-            if (query_active_asof.getParamsList() != null && !query_active_asof.getParamsList().isEmpty()) {
-                SearchParamsCECase sponc = query_active_asof.getParamsList().get(1);
+            // client field injection: cases open as of EOR and not closed, even up to today
+            if (queryOpenAsOfSOR.getParamsList() != null && !queryOpenAsOfSOR.getParamsList().isEmpty()) {
+                SearchParamsCECase sponc = queryOpenAsOfSOR.getParamsList().get(1);
                 sponc.getDateRuleList().get(0).setDate_end_val(rpt.getDate_start_val());
-                System.out.println("CaseCoordinator.report_buildCECaseListReport " + sponc.getDateRuleList());
             }
         }
 
-        List<CECase> cseList = sc.runQuery(query_active_asof, ua).getBOBResultList();
-        System.out.println("Query: " + query_active_asof.getQueryLog());
+        List<CECase> casesOpenAsOfSOR = sc.runQuery(queryOpenAsOfSOR, ua).getBOBResultList();
+        System.out.println("Query: " + queryOpenAsOfSOR.getQueryLog());
 
-        if (cseList != null && !cseList.isEmpty()) {
-            System.out.println("CaseCoordinator.assembleCECaseListReport: OPEN AS OF CASE LIST");
-            for (CECase cse : cseList) {
+        if (casesOpenAsOfSOR != null && !casesOpenAsOfSOR.isEmpty()) {
+            System.out.println("CaseCoordinator.assembleCECaseListReport: OPEN AS OF START OR REPORT");
+            for (CECase cse : casesOpenAsOfSOR) {
                 System.out.print("CID: " + cse.getCaseID());
                 System.out.println("| name: " + cse.getCaseName());
             }
         }
 
-        rpt.setCaseListOpenAsOfDateEnd(cecase_assembleCECaseDataHeavyList(cseList, ua));
+        rpt.setCaseListOpenAsOfDateStart(cecase_assembleCECaseDataHeavyList(casesOpenAsOfSOR, ua));
+        
+        // Phase 2: Cases opened during reporting period
+        QueryCECase query_opened = sc.initQuery(QueryCECaseEnum.OPENED_INDATERANGE, ua.getKeyCard());
+        spcse = query_opened.getPrimaryParams();
+        spcse.setDate_startEnd_ctl(true);
+        spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.ORIGINATION_DOFRECORD);
+        spcse.setDate_start_val(rpt.getDate_start_val());
+        spcse.setDate_end_val(rpt.getDate_end_val());
+        rpt.setCaseListOpenedInDateRange(cecase_assembleCECaseDataHeavyList(sc.runQuery(query_opened, ua).getBOBResultList(), ua));
 
+        if (rpt.getCaseListOpenedInDateRange() != null) {
+            System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenedInDateRange().size());
+        }
+        
+        // Phase 3: Cases closed during reporting period
+        QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_CASES, ua.getKeyCard());
+        spcse = query_closed.getPrimaryParams();
+        spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
+        spcse.setDate_startEnd_ctl(true);
+        spcse.setDate_start_val(rpt.getDate_start_val());
+        spcse.setDate_end_val(rpt.getDate_end_val());
+        rpt.setCaseListClosedInDateRange(cecase_assembleCECaseDataHeavyList(sc.runQuery(query_closed, ua).getBOBResultList(), ua));
+        if (rpt.getCaseListClosedInDateRange() != null) {
+            System.out.println("CaseCoordinator.report_buildCECaseListReport: Current List size " + rpt.getCaseListClosedInDateRange().size());
+        }
+
+        // Phase 4: Cases open as of end of reporting period
+        // AKIN to "Ending Inventory"
+        QueryCECase queryOpenedAsOfEndDate = sc.initQuery(QueryCECaseEnum.OPEN_ASOFENDDATE, ua.getKeyCard());
+
+        if (queryOpenedAsOfEndDate.getParamsList() != null && queryOpenedAsOfEndDate.getParamsList().size() == 2) {
+
+            // setup params
+            spcse = queryOpenedAsOfEndDate.getPrimaryParams();
+
+            // client field injection: cases open as of EOR but closed between EOR+1 and now()
+            // meaning they were still open as of EOR
+            if (spcse.getDateRuleList() != null && spcse.getDateRuleList().size() == 2) {
+                spcse.getDateRuleList().get(0).setDate_end_val(rpt.getDate_end_val());
+                // we have to make this adjustment since we still need to think of a case as open
+                // if it has since closed and therefore has a NOT NULL closing date
+                // The costs of getting a computer to think it's not now()
+                spcse.getDateRuleList().get(1).setDate_start_val(rpt.getDate_end_val().plusDays(1));
+                System.out.println("CaseCoordinator.report_buildCECaseListReport " + spcse.getDateRuleList());
+            }
+
+            // client field injection: cases open as of EOR and not closed, even today
+            if (queryOpenedAsOfEndDate.getParamsList() != null && !queryOpenedAsOfEndDate.getParamsList().isEmpty()) {
+                SearchParamsCECase sponc = queryOpenedAsOfEndDate.getParamsList().get(1);
+                sponc.getDateRuleList().get(0).setDate_end_val(rpt.getDate_end_val());
+                System.out.println("CaseCoordinator.report_buildCECaseListReport " + sponc.getDateRuleList());
+            }
+        }
+
+        List<CECase> casesOpenAsOfEOR = sc.runQuery(queryOpenedAsOfEndDate, ua).getBOBResultList();
+        System.out.println("Query: " + queryOpenedAsOfEndDate.getQueryLog());
+
+        if (casesOpenAsOfEOR != null && !casesOpenAsOfEOR.isEmpty()) {
+            System.out.println("CaseCoordinator.assembleCECaseListReport: OPEN AS OF END OF REPORT CASE LIST");
+            for (CECase cse : casesOpenAsOfEOR) {
+                System.out.print("CID: " + cse.getCaseID());
+                System.out.println("| name: " + cse.getCaseName());
+            }
+        }
+
+        rpt.setCaseListOpenAsOfDateEnd(cecase_assembleCECaseDataHeavyList(casesOpenAsOfEOR, ua));
+        
+      
+        
+      // AVERAGE CASE AGE  
         if (rpt.getCaseListOpenAsOfDateEnd() != null && !rpt.getCaseListOpenAsOfDateEnd().isEmpty()) {
             System.out.println("CaseCoordinator.report_buildCECaseListReport: Opened List size " + rpt.getCaseListOpenAsOfDateEnd().size());
             // compute average case age for opened as of date list
@@ -1621,16 +1684,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             rpt.setAverageAgeOfCasesOpenAsOfReportEndDate(df.format(avg));
         }
 
-        QueryCECase query_closed = sc.initQuery(QueryCECaseEnum.CLOSED_CASES, ua.getKeyCard());
-        spcse = query_closed.getPrimaryParams();
-        spcse.setDate_field(SearchParamsCECaseDateFieldsEnum.CLOSE);
-        spcse.setDate_startEnd_ctl(true);
-        spcse.setDate_start_val(rpt.getDate_start_val());
-        spcse.setDate_end_val(rpt.getDate_end_val());
-        rpt.setCaseListClosedInDateRange(cecase_assembleCECaseDataHeavyList(sc.runQuery(query_closed, ua).getBOBResultList(), ua));
-        if (rpt.getCaseListClosedInDateRange() != null) {
-            System.out.println("CaseCoordinator.report_buildCECaseListReport: Current List size " + rpt.getCaseListClosedInDateRange().size());
-        }
+      
 
         // BUILD BY STREET
         rpt = report_ceCaseList_organizeByStreet(rpt);
@@ -1644,32 +1698,70 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         rpt.setEventList(sc.runQuery(query_ev, ua).getBOBResultList());
 
         // VIOLATIONS
-//        QueryCodeViolation qcodeVDORInPeriod = sc.initQuery(QueryCodeViolationEnum.LOGGED_IN_DATE_RANGE, ua.getKeyCard());
-//        SearchParamsCodeViolation params = qcodeVDORInPeriod.getPrimaryParams();
-//        params.setDate_relativeDates_ctl(false);
-//        params.setDate_start_val(rpt.getDate_start_val());
-//        params.setDate_end_val(rpt.getDate_end_val());
-//        rpt.setViolationsLoggedDateRange(sc.runQuery(qcodeVDORInPeriod).getResults());
-//        System.out.println("CaseCoordinator.report_buildCECaseListReport: Violation DOR in range query log" + qcodeVDORInPeriod.getQueryLog());
-//        
-//        
-//        qcv = sc.initQuery(QueryCodeViolationEnum.COMP_PAST30, ua.getKeyCard());
-//        params = qcv.getPrimaryParams();
-//        params.setDate_relativeDates_ctl(false);
-//        params.setDate_start_val(rpt.getDate_start_val());
-//        params.setDate_end_val(rpt.getDate_end_val());
-//        rpt.setViolationsLoggedComplianceDateRange(sc.runQuery(qcv).getResults());
-//        
-//        qcv = sc.initQuery(QueryCodeViolationEnum.CITED_PAST30, ua.getKeyCard());
-//        params = qcv.getPrimaryParams();
-//        params.setDate_relativeDates_ctl(false);
-//        params.setDate_start_val(rpt.getDate_start_val());
-//        params.setDate_end_val(rpt.getDate_end_val());
-//        rpt.setViolationsCitedDateRange(sc.runQuery(qcv).getResults());
+        
+        
+        QueryCodeViolation qcodeVDORInPeriod = sc.initQuery(QueryCodeViolationEnum.LOGGED_IN_DATE_RANGE, ua.getKeyCard());
+        SearchParamsCodeViolation params = qcodeVDORInPeriod.getPrimaryParams();
+        params.setDate_relativeDates_ctl(false);
+        params.setDate_start_val(rpt.getDate_start_val());
+        params.setDate_end_val(rpt.getDate_end_val());
+        rpt.setViolationsLoggedDateRange(sc.runQuery(qcodeVDORInPeriod).getResults());
+        
+        System.out.println("CaseCoordinator.report_buildCECaseListReport: Violation DOR in range query log" + qcodeVDORInPeriod.getQueryLog());
+        
+        
+        QueryCodeViolation qcv = sc.initQuery(QueryCodeViolationEnum.COMP_PAST30, ua.getKeyCard());
+        params = qcv.getPrimaryParams();
+        params.setDate_relativeDates_ctl(false);
+        params.setDate_start_val(rpt.getDate_start_val().minusYears(ARBITRARILY_LONG_TIME_YEARS));
+        params.setDate_end_val(rpt.getDate_end_val());
+        rpt.setViolationsAccumulatedCompliance(sc.runQuery(qcv).getResults());
+        
+        qcv = sc.initQuery(QueryCodeViolationEnum.COMP_PAST30, ua.getKeyCard());
+        params = qcv.getPrimaryParams();
+        params.setDate_relativeDates_ctl(false);
+        params.setDate_start_val(rpt.getDate_start_val());
+        params.setDate_end_val(rpt.getDate_end_val());
+        rpt.setViolationsLoggedComplianceDateRange(sc.runQuery(qcv).getResults());
+        
+        
+        qcv = sc.initQuery(QueryCodeViolationEnum.VIOLATIONS_INSIDE_COMPLIANCE_WINDOW, ua.getKeyCard());
+        params = qcv.getPrimaryParams();
+        params.setDate_relativeDates_ctl(false);
+        // a violation that's in the compliance window as of END of report, 
+        // will only be grabbed by asking if the the stip comp date is AFTER
+        // the end of the report, and into the future some arbitrary number of days
+        // That's why we're injecting the END date of the report as the START
+        // date of our violation stip comp date query
+        params.setDate_start_val(rpt.getDate_end_val());
+        params.setDate_end_val(rpt.getDate_end_val().plusYears(ARBITRARILY_LONG_TIME_YEARS)); // arbitrary magic number of years into the future (thanks WWALK)
+        rpt.setViolationsWithinStipCompWindow(sc.runQuery(qcv).getResults());
+        
+        qcv = sc.initQuery(QueryCodeViolationEnum.COMPLIANCE_DUE_EXPIRED_NOTCITED, ua.getKeyCard());
+        params = qcv.getPrimaryParams();
+        params.setDate_relativeDates_ctl(false);
+        // since the violation is still active, we'll get expired ones
+        // by capturing only the ones whose stip comp date is anytime in the past up to the report end date 
+        params.setDate_start_val(rpt.getDate_end_val().minusYears(ARBITRARILY_LONG_TIME_YEARS));
+        params.setDate_end_val(rpt.getDate_end_val()); 
+        rpt.setViolationsOutsideCompWindowNOTCited(sc.runQuery(qcv).getResults());
+        
+        qcv = sc.initQuery(QueryCodeViolationEnum.CITED_PAST30, ua.getKeyCard());
+        params = qcv.getPrimaryParams();
+        params.setDate_relativeDates_ctl(false);
+        
+        
+        // this is an accumulated figure whose only bound is the repot end date
+        params.setDate_start_val(rpt.getDate_end_val().minusYears(ARBITRARILY_LONG_TIME_YEARS));
+        params.setDate_end_val(rpt.getDate_end_val());
+        rpt.setViolationsNoComplianceButCited(sc.runQuery(qcv).getResults());
 //        
 //        initBarViolationsPastMonth(rpt);
 //        initPieEnforcement(rpt);
-        initPieViols(rpt);
+        
+        // deprecated as of AUG 2022 to use discrete stats
+        // initPieViols(rpt);
+        
         initPieCitation(rpt);
         initPieClosure(rpt);
 
@@ -1784,6 +1876,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * Builds a violation pie chart
      *
+     * @deprecated  in favor of discrete statistics since this pie 
+     * was asserted to be misleading to report readers
      * @param rpt
      */
     private void initPieViols(ReportConfigCECaseList rpt) {

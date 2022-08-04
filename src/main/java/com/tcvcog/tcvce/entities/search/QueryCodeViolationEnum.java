@@ -33,15 +33,15 @@ public  enum QueryCodeViolationEnum
                             true),
     
     
-    // IMPLEMENT ME
-    COMPLIANCE_DUE_WIHTIN   ("Currently within compliance date",
+    // IMPLEMENT ME, okay fine
+    VIOLATIONS_INSIDE_COMPLIANCE_WINDOW   ("Currently within compliance window",
                             "",
                             RoleType.MuniStaff,
                             true),
     
     
-    // IMPLEMENT ME
-    COMPLIANCE_DUE_EXPIRED  ("Expired compliance timeframe",
+    // IMPLEMENT ME, okay fine
+    COMPLIANCE_DUE_EXPIRED_NOTCITED  ("Expired compliance timeframe but not cited",
                             "",
                             RoleType.MuniStaff,
                             true),
@@ -74,6 +74,11 @@ public  enum QueryCodeViolationEnum
                             true),
     
     CITED_PAST7            ("Cited in the past 7 days",
+                            "",
+                            RoleType.MuniStaff,
+                            true),
+    
+    NOCOMP_CITED_ANYTIME   ("Violation without compliance (or nullification or deactivation or transfer) but citation",
                             "",
                             RoleType.MuniStaff,
                             true),

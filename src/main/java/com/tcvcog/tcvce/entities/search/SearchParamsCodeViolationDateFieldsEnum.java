@@ -35,7 +35,7 @@ public  enum SearchParamsCodeViolationDateFieldsEnum
     CASE_ATTACHMENTDOR              ("Date of logging in case", 
                                 "codeviolation.dateofrecord"), 
     
-    STIP                          ("Stipulated compliance date",
+    STIPULATED_COMPLIANCE       ("Stipulated compliance date",
                                 "codeviolation.stipulatedcompliancedate"), 
     
     COMPLIANCETS                  ("Compliance DB timestamp",

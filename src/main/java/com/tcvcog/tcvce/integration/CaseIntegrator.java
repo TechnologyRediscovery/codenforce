@@ -312,28 +312,27 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        
-      
-params.appendSQL("SELECT DISTINCT codeviolation.violationid, cecase.caseid, cecase.casename, property.propertyid, property.address, municipality.municode, municipality.muniname ");
-params.appendSQL("FROM public.codeviolation  ");
-params.appendSQL("INNER JOIN public.cecase ON (cecase.caseid = codeviolation.cecase_caseid) ");
-params.appendSQL("INNER JOIN public.parcel ON (cecase.parcel_parcelkey = parcel.parcelkey) ");
-params.appendSQL("INNER JOIN public.municipality ON (parcel.muni_municode = municipality.municode) ");
-params.appendSQL("LEFT OUTER JOIN  ");
-params.appendSQL("(	SELECT codeviolation_violationid, citation.citationid, citation.dateofrecord ");
-params.appendSQL("FROM public.citationviolation  ");
-params.appendSQL("INNER JOIN public.citation ON (citationviolation.citation_citationid = citation.citationid) ");
-params.appendSQL("INNER JOIN public.citationstatus on (citationstatus.statusid = citation.status_statusid) ");
-params.appendSQL("WHERE citationstatus.editsforbidden = TRUE	 ");
-params.appendSQL(") AS citv ON (codeviolation.violationid = citv.codeviolation_violationid) ");
-params.appendSQL("LEFT OUTER JOIN  ");
-params.appendSQL("( ");
-params.appendSQL("SELECT codeviolation_violationid, sentdate ");
-params.appendSQL("FROM noticeofviolationcodeviolation ");
-params.appendSQL("INNER JOIN public.noticeofviolation ON (noticeofviolationcodeviolation.noticeofviolation_noticeid = noticeofviolation.noticeid) ");
-params.appendSQL("WHERE noticeofviolation.sentdate IS NOT NULL ");
-params.appendSQL(") AS novcv ON (codeviolation.violationid = novcv.codeviolation_violationid) ");
-params.appendSQL("WHERE violationid IS NOT NULL ");
+
+        params.appendSQL("SELECT DISTINCT codeviolation.violationid, cecase.caseid, cecase.casename, parcel.parcelkey, municipality.municode, municipality.muniname ");
+        params.appendSQL("FROM public.codeviolation  ");
+        params.appendSQL("INNER JOIN public.cecase ON (cecase.caseid = codeviolation.cecase_caseid) ");
+        params.appendSQL("INNER JOIN public.parcel ON (cecase.parcel_parcelkey = parcel.parcelkey) ");
+        params.appendSQL("INNER JOIN public.municipality ON (parcel.muni_municode = municipality.municode) ");
+        params.appendSQL("LEFT OUTER JOIN  ");
+        params.appendSQL("(	SELECT codeviolation_violationid, citation.citationid, citation.dateofrecord ");
+        params.appendSQL("FROM public.citationviolation  ");
+        params.appendSQL("INNER JOIN public.citation ON (citationviolation.citation_citationid = citation.citationid) ");
+        params.appendSQL("INNER JOIN public.citationstatus on (citationstatus.statusid = citation.status_statusid) ");
+        params.appendSQL("WHERE citationstatus.editsforbidden = TRUE	 ");
+        params.appendSQL(") AS citv ON (codeviolation.violationid = citv.codeviolation_violationid) ");
+        params.appendSQL("LEFT OUTER JOIN  ");
+        params.appendSQL("( ");
+        params.appendSQL("SELECT codeviolation_violationid, sentdate ");
+        params.appendSQL("FROM noticeofviolationcodeviolation ");
+        params.appendSQL("INNER JOIN public.noticeofviolation ON (noticeofviolationcodeviolation.noticeofviolation_noticeid = noticeofviolation.noticeid) ");
+        params.appendSQL("WHERE noticeofviolation.sentdate IS NOT NULL ");
+        params.appendSQL(") AS novcv ON (codeviolation.violationid = novcv.codeviolation_violationid) ");
+        params.appendSQL("WHERE violationid IS NOT NULL ");
         
         // *******************************
         // **         BOb ID            **
@@ -422,7 +421,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             }
              
             // *******************************
-            // **     7.BOb SOURCE          **
+            // **     7.notice mailed       **
             // *******************************
              if (params.isNoticeMailed_ctl()) {
                 if(params.isNoticeMailed_val()){
@@ -431,6 +430,44 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                     params.appendSQL("AND novcv.sentdate IS NULL ");
                 }
             }
+             
+            // *******************************
+            // **     8. transfer           **
+            // *******************************
+             if (params.isTransferred_ctl()) {
+                if(params.isTransferred_val()){
+                    params.appendSQL("AND codeviolation.transferredts IS NOT NULL ");
+                } else {
+                    params.appendSQL("AND codeviolation.transferredts IS NULL ");
+                }
+            }
+             
+             
+             
+            // *******************************
+            // **     9. compliance         **
+            // *******************************
+             if (params.isCompliance_ctl()) {
+                if(params.isCompliance_val()){
+                    params.appendSQL("AND codeviolation.compliancetimestamp IS NOT NULL ");
+                } else {
+                    params.appendSQL("AND codeviolation.compliancetimestamp IS NULL ");
+                }
+            }
+             
+             
+            // *******************************
+            // **     10. nullified         **
+            // *******************************
+             if (params.isNullified_ctl()) {
+                if(params.isNullified_val()){
+                    params.appendSQL("AND codeviolation.nullifiedts IS NOT NULL ");
+                } else {
+                    params.appendSQL("AND codeviolation.nullifiedts IS NULL ");
+                }
+            }
+             
+             
            
             
             
@@ -465,14 +502,6 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
                 if (params.isCecase_ctl()) {
                     stmt.setInt(++paramCounter, params.getCecase_val().getCaseID());
                 }
-                // violation set 3
-//                 if (params.isCited_ctl()) {
-//                    stmt.setBoolean(++paramCounter, params.isCited_val());
-//                }
-                // violation set 4
-//                if(params.isLegacyImport_ctl()){
-//                    stmt.setBoolean(++paramCounter, params.isLegacyImport_val());
-//                }
                 
                 // violation set 5
                 if(params.isSeverity_ctl()){
@@ -500,8 +529,7 @@ params.appendSQL("WHERE violationid IS NOT NULL ");
             while (rs.next() && counter < maxResults) {
                 CodeViolationPropCECaseHeavy cvpch = new CodeViolationPropCECaseHeavy(cc.violation_getCodeViolation(rs.getInt("violationid")));
                 cvpch.setCeCaseName(rs.getString("casename"));
-                cvpch.setPropertyAddress(rs.getString("address"));
-                cvpch.setPropertyID(rs.getInt("propertyid"));
+                cvpch.setPropertyID(rs.getInt("parcelkey"));
                 cvpch.setMuniCode(rs.getInt("municode"));
                 cvpch.setMuniName(rs.getString("muniname"));
                 
