@@ -64,3 +64,6 @@ All developer documentation is written in markdown and exists on the mater branc
 ## accessing the documentation
 The documentation root is at 
 https://technologyrediscovery.github.io/codenforce/
+# Table of Contents
+
+[Code Enforcement Case Profile](case/casescreen.md)
