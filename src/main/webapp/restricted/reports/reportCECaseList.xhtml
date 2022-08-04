@@ -17,9 +17,19 @@
 
                     <h:form id="case-list-report-form">
 
+                        <div class="report-trailblaze-headerbox">
+                            <div class="report-trailblaze-headerbox-title">
+                                <h:outputText value="Report Summary from #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_start_val)} to #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}" />
+
+                            </div>
+                            <div class="report-trailblaze-headerbox-tail">
+                                <h:outputText value=" "/>
+                            </div>
+                        </div>
+
                         <div class="ui-g data_container_nested_restrict_report">
 
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report"   >
 
                                 <!--NESTED DATA LABEL INLINE -->
                                 <div class="restrict-data-field-label-inline" >
@@ -32,36 +42,7 @@
                                     <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenAsOfDateStart.size()}" />
                                 </div>
                             </div>
-
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
-
-                                <!--NESTED DATA LABEL INLINE -->
-                                <div class="restrict-data-field-label-inline" >
-                                    <h:outputLabel value="Total cases open as of end of reporting period: "/>
-                                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}:" />
-                                </div>
-                                <!--NESTED DATA VALUE INLINE -->
-                                <div class="restrict-data-field-value-inline"
-                                     style="color:black;">
-                                    <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenAsOfDateEnd.size()}" />
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="report-trailblaze-headerbox">
-                            <div class="report-trailblaze-headerbox-title">
-                                <h:outputText value="Report Summary from #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_start_val)} to #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}" />
-
-                            </div>
-                            <div class="report-trailblaze-headerbox-tail">
-                                <h:outputText value=" "/>
-                            </div>
-                        </div>
-
-
-                        <div class="ui-g data_container_nested_restrict_report">
-                            <!--NESTED DATA FIELD -->
+                            
                             <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
 
                                 <!--NESTED DATA LABEL INLINE -->
@@ -86,6 +67,20 @@
                                 <div class="restrict-data-field-value-inline"
                                      style="color:black;" >
                                     <h:outputText value="#{reportingBB.reportCECaseList.caseListClosedInDateRange.size()}" />
+                                </div>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                <!--NESTED DATA LABEL INLINE -->
+                                <div class="restrict-data-field-label-inline" >
+                                    <h:outputLabel value="Total cases open as of end of reporting period: "/>
+                                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}:" />
+                                </div>
+                                <!--NESTED DATA VALUE INLINE -->
+                                <div class="restrict-data-field-value-inline"
+                                     style="color:black;">
+                                    <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenAsOfDateEnd.size()}" />
                                 </div>
                             </div>
 
@@ -234,7 +229,7 @@
 
 
                             <f:subview id="rptcecaselist-pie-citation-subview"
-                                       rendered="#{reportingBB.reportCECaseList.includeCitationPieChart}">
+                                       rendered="#{reportingBB.reportCECaseList.includeSectionCitations_pieChart}">
                                 <div class="report-tb-kpi-container">
                                     <div class="ui-g">
                                         <div class="ui-g-6 ui-md-6 ui-lg-6" >
@@ -290,7 +285,7 @@
                             </f:subview>
 
                             <f:subview id="rptcecaselist-pie-caseclosure"
-                                       rendered="#{reportingBB.reportCECaseList.includeClosurePieChart}">
+                                       rendered="#{reportingBB.reportCECaseList.includeSectionReportSummary_closurePieChart}">
                                 <div class="report-tb-kpi-container printing-page-break-before">
                                     <div class="ui-g">
                                         <div class="ui-g-6 ui-md-6 ui-lg-6" >
@@ -342,7 +337,7 @@
                         </div>
 
                         <f:subview id="report-streetsummary-header"
-                                   rendered="#{reportingBB.reportCECaseList.includeStreetLevelSummary}">
+                                   rendered="#{reportingBB.reportCECaseList.includeSectionStreetLevelSummary}">
                             <div class="report-trailblaze-headerbox">
                                 <div class="report-trailblaze-headerbox-title">
                                     <h:outputText value="Code Enforcement by Street: Summary" />
@@ -359,7 +354,7 @@
                                      value="#{reportingBB.reportCECaseList.streetContainerList}"
                                      var="streetcont"
                                      draggableColumns="true"
-                                     rendered="#{reportingBB.reportCECaseList.includeStreetLevelSummary}"
+                                     rendered="#{reportingBB.reportCECaseList.includeSectionStreetLevelSummary}"
                                      tableStyleClass="primeDataTable">
 
                             <p:column width="25%">

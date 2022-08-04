@@ -1541,12 +1541,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      */
     public ReportConfigCECaseList report_getDefaultReportConfigCECaseList() {
         ReportConfigCECaseList listRpt = new ReportConfigCECaseList();
-        listRpt.setIncludeListSummaryFigures(true);
-        listRpt.setIncludeCaseNames(false);
-        listRpt.setIncludeFullOwnerContactInfo(false);
-        listRpt.setIncludeViolationList(true);
-        listRpt.setIncludeEventSummaryByCase(false);
-        listRpt.setIncludeCitationPieChart(false);
+        
+        
+        listRpt.setIncludeSectionCaseByCaseDetail_caseNames(false);
+        listRpt.setIncludeSectionCaseByCaseDetail_fullOwnerContactInfo(false);
+        listRpt.setIncludeSectionCaseByCaseDetail_violationList(true);
+        listRpt.setIncludeSectionCaseByCaseDetail_eventSummary(false);
+        listRpt.setIncludeSectionCitations_pieChart(false);
+        
         return listRpt;
 
     }

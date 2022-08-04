@@ -11,6 +11,7 @@ import com.tcvcog.tcvce.entities.Citation;
 import com.tcvcog.tcvce.entities.CodeViolationPropCECaseHeavy;
 import com.tcvcog.tcvce.entities.EventCnFPropUnitCasePeriodHeavy;
 import com.tcvcog.tcvce.entities.CodeViolationStatusEnum;
+import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.search.Query;
 import com.tcvcog.tcvce.entities.search.QueryBacked;
 import java.io.Serializable;
@@ -29,18 +30,62 @@ public class ReportConfigCECaseList
         extends Report 
         implements Serializable, QueryBacked{
     
-    private boolean includeListSummaryFigures;
+    // ******************************
+    // Section: Report Summary Switches
+    // *******************************
+    private boolean includeSectionReportSummary;
     
-    private boolean includeCaseNames;
-    private boolean includeFullOwnerContactInfo;
-    private boolean includeViolationList;
-    private boolean includeEventSummaryByCase;
-    private boolean includeCECaseStatusPie;
-    private boolean includeStreetLevelSummary;
-    private boolean includeCitationPieChart;
-    private boolean includeClosurePieChart;
+    private boolean includeSectionReportSummary_openAsOfSOR;
+    private boolean includeSectionReportSummary_openAsOfEOR;
+    private boolean includeSectionReportSummary_casesOpened;
+    private boolean includeSectionReportSummary_casesClosed;
+    private boolean includeSectionReportSummary_newViolations;
+    private boolean includeSectionReportSummary_compViol;
+    private boolean includeSectionReportSummary_eventsLogged;
+    private boolean includeSectionReportSummary_eventsTotalTime;
     
-    private boolean includeExtendedPropertyDetails;
+    private boolean includeSectionReportSummary_closurePieChart;
+    private boolean includeSectionReportSummary_ceCaseStatusPie; // do not use
+    
+    // *****************************************
+    // Section: Code Violations Switches
+    // *****************************************
+    private boolean includeSectionCodeViolationStatus;
+    private boolean includeSectionCodeViolationStatus_compliance;
+    private boolean includeSectionCodeViolationStatus_withinWindow;
+    private boolean includeSectionCodeViolationStatus_expiredWindow;
+    private boolean includeSectionCodeViolationStatus_cited;
+    
+    
+    // *****************************************
+    // Section: Citations Switches
+    // *****************************************
+    private boolean includeSectionCitations;
+    private boolean includeSectionCitations_citationsAnyStage;
+    
+    private boolean includeSectionCitations_pieChart;
+    
+    // *****************************************
+    // Section: Street summary
+    // *****************************************
+    private boolean includeSectionStreetLevelSummary;
+    
+    
+    // *****************************************
+    // Section: Case Details 
+    // *****************************************
+    
+    private boolean includeSectionCaseByCaseDetail;
+    
+    private boolean includeSectionCaseByCaseDetail_fullOwnerContactInfo;
+    private boolean includeSectionCaseByCaseDetail_caseNames;
+    private boolean includeSectionCaseByCaseDetail_violationList;
+    private boolean includeSectionCaseByCaseDetail_extendedPropertyDetails;
+    private boolean includeSectionCaseByCaseDetail_eventSummary;
+    private RoleType includeSectionCaseByCaseDetail_eventListViewerRank;
+    
+    
+    
     
     private List<ReportCECaseListStreetCECaseContainer> streetContainerList;
     private Map<String, ReportCECaseListStreetCECaseContainer> streetSCC;
@@ -91,12 +136,21 @@ public class ReportConfigCECaseList
     private double averageAgeOfCasesClosed;
     private String averageAgeOfCasesOpenAsOfReportEndDate;
     
+    
+    /**
+     * No arg constructor
+     */
     public ReportConfigCECaseList(){
         violationsCitedDateRange = new ArrayList<>();
         violationsLoggedComplianceDateRange = new ArrayList<>();
         violationsCitedDateRange = new ArrayList<>();
     }
     
+    
+    /**
+     * Builds a list of street containers using the streetSCC
+     * member. Call setStreetSCC(...) before this method
+     */
     public void assembleStreetList(){
         if(streetSCC != null && !streetSCC.isEmpty()){
             streetContainerList = new ArrayList<>();
@@ -142,88 +196,75 @@ public class ReportConfigCECaseList
         return cl;
     }
 
+
     /**
-     * @return the includeListSummaryFigures
+     * @return the includeSectionCaseByCaseDetail_caseNames
      */
-    public boolean isIncludeListSummaryFigures() {
-        return includeListSummaryFigures;
+    public boolean isIncludeSectionCaseByCaseDetail_caseNames() {
+        return includeSectionCaseByCaseDetail_caseNames;
     }
 
     /**
-     * @return the includeCaseNames
+     * @return the includeSectionCaseByCaseDetail_fullOwnerContactInfo
      */
-    public boolean isIncludeCaseNames() {
-        return includeCaseNames;
+    public boolean isIncludeSectionCaseByCaseDetail_fullOwnerContactInfo() {
+        return includeSectionCaseByCaseDetail_fullOwnerContactInfo;
     }
 
     /**
-     * @return the includeFullOwnerContactInfo
+     * @return the includeSectionCaseByCaseDetail_violationList
      */
-    public boolean isIncludeFullOwnerContactInfo() {
-        return includeFullOwnerContactInfo;
+    public boolean isIncludeSectionCaseByCaseDetail_violationList() {
+        return includeSectionCaseByCaseDetail_violationList;
     }
 
     /**
-     * @return the includeViolationList
+     * @return the includeSectionCaseByCaseDetail_eventSummary
      */
-    public boolean isIncludeViolationList() {
-        return includeViolationList;
+    public boolean isIncludeSectionCaseByCaseDetail_eventSummary() {
+        return includeSectionCaseByCaseDetail_eventSummary;
     }
 
     /**
-     * @return the includeEventSummaryByCase
+     * @param includeSectionCaseByCaseDetail_caseNames the includeSectionCaseByCaseDetail_caseNames to set
      */
-    public boolean isIncludeEventSummaryByCase() {
-        return includeEventSummaryByCase;
+    public void setIncludeSectionCaseByCaseDetail_caseNames(boolean includeSectionCaseByCaseDetail_caseNames) {
+        this.includeSectionCaseByCaseDetail_caseNames = includeSectionCaseByCaseDetail_caseNames;
     }
 
     /**
-     * @param includeListSummaryFigures the includeListSummaryFigures to set
+     * @param includeSectionCaseByCaseDetail_fullOwnerContactInfo the includeSectionCaseByCaseDetail_fullOwnerContactInfo to set
      */
-    public void setIncludeListSummaryFigures(boolean includeListSummaryFigures) {
-        this.includeListSummaryFigures = includeListSummaryFigures;
+    public void setIncludeSectionCaseByCaseDetail_fullOwnerContactInfo(boolean includeSectionCaseByCaseDetail_fullOwnerContactInfo) {
+        this.includeSectionCaseByCaseDetail_fullOwnerContactInfo = includeSectionCaseByCaseDetail_fullOwnerContactInfo;
     }
 
     /**
-     * @param includeCaseNames the includeCaseNames to set
+     * @param includeSectionCaseByCaseDetail_violationList the includeSectionCaseByCaseDetail_violationList to set
      */
-    public void setIncludeCaseNames(boolean includeCaseNames) {
-        this.includeCaseNames = includeCaseNames;
+    public void setIncludeSectionCaseByCaseDetail_violationList(boolean includeSectionCaseByCaseDetail_violationList) {
+        this.includeSectionCaseByCaseDetail_violationList = includeSectionCaseByCaseDetail_violationList;
     }
 
     /**
-     * @param includeFullOwnerContactInfo the includeFullOwnerContactInfo to set
+     * @param includeSectionCaseByCaseDetail_eventSummary the includeSectionCaseByCaseDetail_eventSummary to set
      */
-    public void setIncludeFullOwnerContactInfo(boolean includeFullOwnerContactInfo) {
-        this.includeFullOwnerContactInfo = includeFullOwnerContactInfo;
+    public void setIncludeSectionCaseByCaseDetail_eventSummary(boolean includeSectionCaseByCaseDetail_eventSummary) {
+        this.includeSectionCaseByCaseDetail_eventSummary = includeSectionCaseByCaseDetail_eventSummary;
     }
 
     /**
-     * @param includeViolationList the includeViolationList to set
+     * @return the includeSectionCaseByCaseDetail_extendedPropertyDetails
      */
-    public void setIncludeViolationList(boolean includeViolationList) {
-        this.includeViolationList = includeViolationList;
+    public boolean isIncludeSectionCaseByCaseDetail_extendedPropertyDetails() {
+        return includeSectionCaseByCaseDetail_extendedPropertyDetails;
     }
 
     /**
-     * @param includeEventSummaryByCase the includeEventSummaryByCase to set
+     * @param includeSectionCaseByCaseDetail_extendedPropertyDetails the includeSectionCaseByCaseDetail_extendedPropertyDetails to set
      */
-    public void setIncludeEventSummaryByCase(boolean includeEventSummaryByCase) {
-        this.includeEventSummaryByCase = includeEventSummaryByCase;
-    }
-
-    /**
-     * @return the includeExtendedPropertyDetails
-     */
-    public boolean isIncludeExtendedPropertyDetails() {
-        return includeExtendedPropertyDetails;
-    }
-
-    /**
-     * @param includeExtendedPropertyDetails the includeExtendedPropertyDetails to set
-     */
-    public void setIncludeExtendedPropertyDetails(boolean includeExtendedPropertyDetails) {
-        this.includeExtendedPropertyDetails = includeExtendedPropertyDetails;
+    public void setIncludeSectionCaseByCaseDetail_extendedPropertyDetails(boolean includeSectionCaseByCaseDetail_extendedPropertyDetails) {
+        this.includeSectionCaseByCaseDetail_extendedPropertyDetails = includeSectionCaseByCaseDetail_extendedPropertyDetails;
     }
 
     @Override
@@ -573,31 +614,31 @@ public class ReportConfigCECaseList
     }
 
     /**
-     * @return the includeCECaseStatusPie
+     * @return the includeSectionReportSummary_ceCaseStatusPie
      */
-    public boolean isIncludeCECaseStatusPie() {
-        return includeCECaseStatusPie;
+    public boolean isIncludeSectionReportSummary_ceCaseStatusPie() {
+        return includeSectionReportSummary_ceCaseStatusPie;
     }
 
     /**
-     * @param includeCECaseStatusPie the includeCECaseStatusPie to set
+     * @param includeSectionReportSummary_ceCaseStatusPie the includeSectionReportSummary_ceCaseStatusPie to set
      */
-    public void setIncludeCECaseStatusPie(boolean includeCECaseStatusPie) {
-        this.includeCECaseStatusPie = includeCECaseStatusPie;
+    public void setIncludeSectionReportSummary_ceCaseStatusPie(boolean includeSectionReportSummary_ceCaseStatusPie) {
+        this.includeSectionReportSummary_ceCaseStatusPie = includeSectionReportSummary_ceCaseStatusPie;
     }
 
     /**
-     * @return the includeStreetLevelSummary
+     * @return the includeSectionStreetLevelSummary
      */
-    public boolean isIncludeStreetLevelSummary() {
-        return includeStreetLevelSummary;
+    public boolean isIncludeSectionStreetLevelSummary() {
+        return includeSectionStreetLevelSummary;
     }
 
     /**
-     * @param includeStreetLevelSummary the includeStreetLevelSummary to set
+     * @param includeSectionStreetLevelSummary the includeSectionStreetLevelSummary to set
      */
-    public void setIncludeStreetLevelSummary(boolean includeStreetLevelSummary) {
-        this.includeStreetLevelSummary = includeStreetLevelSummary;
+    public void setIncludeSectionStreetLevelSummary(boolean includeSectionStreetLevelSummary) {
+        this.includeSectionStreetLevelSummary = includeSectionStreetLevelSummary;
     }
 
    
@@ -631,17 +672,17 @@ public class ReportConfigCECaseList
     }
 
     /**
-     * @return the includeCitationPieChart
+     * @return the includeSectionCitations_pieChart
      */
-    public boolean isIncludeCitationPieChart() {
-        return includeCitationPieChart;
+    public boolean isIncludeSectionCitations_pieChart() {
+        return includeSectionCitations_pieChart;
     }
 
     /**
-     * @param includeCitationPieChart the includeCitationPieChart to set
+     * @param includeSectionCitations_pieChart the includeSectionCitations_pieChart to set
      */
-    public void setIncludeCitationPieChart(boolean includeCitationPieChart) {
-        this.includeCitationPieChart = includeCitationPieChart;
+    public void setIncludeSectionCitations_pieChart(boolean includeSectionCitations_pieChart) {
+        this.includeSectionCitations_pieChart = includeSectionCitations_pieChart;
     }
 
     /**
@@ -701,17 +742,269 @@ public class ReportConfigCECaseList
     }
 
     /**
-     * @return the includeClosurePieChart
+     * @return the includeSectionReportSummary_closurePieChart
      */
-    public boolean isIncludeClosurePieChart() {
-        return includeClosurePieChart;
+    public boolean isIncludeSectionReportSummary_closurePieChart() {
+        return includeSectionReportSummary_closurePieChart;
     }
 
     /**
-     * @param includeClosurePieChart the includeClosurePieChart to set
+     * @param includeSectionReportSummary_closurePieChart the includeSectionReportSummary_closurePieChart to set
      */
-    public void setIncludeClosurePieChart(boolean includeClosurePieChart) {
-        this.includeClosurePieChart = includeClosurePieChart;
+    public void setIncludeSectionReportSummary_closurePieChart(boolean includeSectionReportSummary_closurePieChart) {
+        this.includeSectionReportSummary_closurePieChart = includeSectionReportSummary_closurePieChart;
+    }
+
+    /**
+     * @return the includeSectionReportSummary
+     */
+    public boolean isIncludeSectionReportSummary() {
+        return includeSectionReportSummary;
+    }
+
+    /**
+     * @return the includeSectionReportSummary_openAsOfSOR
+     */
+    public boolean isIncludeSectionReportSummary_openAsOfSOR() {
+        return includeSectionReportSummary_openAsOfSOR;
+    }
+
+    /**
+     * @return the includeSectionReportSummary_openAsOfEOR
+     */
+    public boolean isIncludeSectionReportSummary_openAsOfEOR() {
+        return includeSectionReportSummary_openAsOfEOR;
+    }
+
+    /**
+     * @return the includeSectionReportSummary_casesOpened
+     */
+    public boolean isIncludeSectionReportSummary_casesOpened() {
+        return includeSectionReportSummary_casesOpened;
+    }
+
+    /**
+     * @return the includeSectionReportSummary_casesClosed
+     */
+    public boolean isIncludeSectionReportSummary_casesClosed() {
+        return includeSectionReportSummary_casesClosed;
+    }
+
+    /**
+     * @return the includeSectionReportSummary_newViolations
+     */
+    public boolean isIncludeSectionReportSummary_newViolations() {
+        return includeSectionReportSummary_newViolations;
+    }
+
+    /**
+     * @return the includeSectionReportSummary_eventsLogged
+     */
+    public boolean isIncludeSectionReportSummary_eventsLogged() {
+        return includeSectionReportSummary_eventsLogged;
+    }
+
+    /**
+     * @return the includeSectionReportSummary_eventsTotalTime
+     */
+    public boolean isIncludeSectionReportSummary_eventsTotalTime() {
+        return includeSectionReportSummary_eventsTotalTime;
+    }
+
+    /**
+     * @return the includeSectionCodeViolationStatus
+     */
+    public boolean isIncludeSectionCodeViolationStatus() {
+        return includeSectionCodeViolationStatus;
+    }
+
+    /**
+     * @return the includeSectionCodeViolationStatus_compliance
+     */
+    public boolean isIncludeSectionCodeViolationStatus_compliance() {
+        return includeSectionCodeViolationStatus_compliance;
+    }
+
+    /**
+     * @return the includeSectionCodeViolationStatus_withinWindow
+     */
+    public boolean isIncludeSectionCodeViolationStatus_withinWindow() {
+        return includeSectionCodeViolationStatus_withinWindow;
+    }
+
+    /**
+     * @return the includeSectionCodeViolationStatus_expiredWindow
+     */
+    public boolean isIncludeSectionCodeViolationStatus_expiredWindow() {
+        return includeSectionCodeViolationStatus_expiredWindow;
+    }
+
+    /**
+     * @return the includeSectionCodeViolationStatus_cited
+     */
+    public boolean isIncludeSectionCodeViolationStatus_cited() {
+        return includeSectionCodeViolationStatus_cited;
+    }
+
+    /**
+     * @return the includeSectionCitations
+     */
+    public boolean isIncludeSectionCitations() {
+        return includeSectionCitations;
+    }
+
+    /**
+     * @return the includeSectionCitations_citationsAnyStage
+     */
+    public boolean isIncludeSectionCitations_citationsAnyStage() {
+        return includeSectionCitations_citationsAnyStage;
+    }
+
+    /**
+     * @return the includeSectionCaseByCaseDetail
+     */
+    public boolean isIncludeSectionCaseByCaseDetail() {
+        return includeSectionCaseByCaseDetail;
+    }
+
+    /**
+     * @param includeSectionReportSummary the includeSectionReportSummary to set
+     */
+    public void setIncludeSectionReportSummary(boolean includeSectionReportSummary) {
+        this.includeSectionReportSummary = includeSectionReportSummary;
+    }
+
+    /**
+     * @param includeSectionReportSummary_openAsOfSOR the includeSectionReportSummary_openAsOfSOR to set
+     */
+    public void setIncludeSectionReportSummary_openAsOfSOR(boolean includeSectionReportSummary_openAsOfSOR) {
+        this.includeSectionReportSummary_openAsOfSOR = includeSectionReportSummary_openAsOfSOR;
+    }
+
+    /**
+     * @param includeSectionReportSummary_openAsOfEOR the includeSectionReportSummary_openAsOfEOR to set
+     */
+    public void setIncludeSectionReportSummary_openAsOfEOR(boolean includeSectionReportSummary_openAsOfEOR) {
+        this.includeSectionReportSummary_openAsOfEOR = includeSectionReportSummary_openAsOfEOR;
+    }
+
+    /**
+     * @param includeSectionReportSummary_casesOpened the includeSectionReportSummary_casesOpened to set
+     */
+    public void setIncludeSectionReportSummary_casesOpened(boolean includeSectionReportSummary_casesOpened) {
+        this.includeSectionReportSummary_casesOpened = includeSectionReportSummary_casesOpened;
+    }
+
+    /**
+     * @param includeSectionReportSummary_casesClosed the includeSectionReportSummary_casesClosed to set
+     */
+    public void setIncludeSectionReportSummary_casesClosed(boolean includeSectionReportSummary_casesClosed) {
+        this.includeSectionReportSummary_casesClosed = includeSectionReportSummary_casesClosed;
+    }
+
+    /**
+     * @param includeSectionReportSummary_newViolations the includeSectionReportSummary_newViolations to set
+     */
+    public void setIncludeSectionReportSummary_newViolations(boolean includeSectionReportSummary_newViolations) {
+        this.includeSectionReportSummary_newViolations = includeSectionReportSummary_newViolations;
+    }
+
+    /**
+     * @param includeSectionReportSummary_eventsLogged the includeSectionReportSummary_eventsLogged to set
+     */
+    public void setIncludeSectionReportSummary_eventsLogged(boolean includeSectionReportSummary_eventsLogged) {
+        this.includeSectionReportSummary_eventsLogged = includeSectionReportSummary_eventsLogged;
+    }
+
+    /**
+     * @param includeSectionReportSummary_eventsTotalTime the includeSectionReportSummary_eventsTotalTime to set
+     */
+    public void setIncludeSectionReportSummary_eventsTotalTime(boolean includeSectionReportSummary_eventsTotalTime) {
+        this.includeSectionReportSummary_eventsTotalTime = includeSectionReportSummary_eventsTotalTime;
+    }
+
+    /**
+     * @param includeSectionCodeViolationStatus the includeSectionCodeViolationStatus to set
+     */
+    public void setIncludeSectionCodeViolationStatus(boolean includeSectionCodeViolationStatus) {
+        this.includeSectionCodeViolationStatus = includeSectionCodeViolationStatus;
+    }
+
+    /**
+     * @param includeSectionCodeViolationStatus_compliance the includeSectionCodeViolationStatus_compliance to set
+     */
+    public void setIncludeSectionCodeViolationStatus_compliance(boolean includeSectionCodeViolationStatus_compliance) {
+        this.includeSectionCodeViolationStatus_compliance = includeSectionCodeViolationStatus_compliance;
+    }
+
+    /**
+     * @param includeSectionCodeViolationStatus_withinWindow the includeSectionCodeViolationStatus_withinWindow to set
+     */
+    public void setIncludeSectionCodeViolationStatus_withinWindow(boolean includeSectionCodeViolationStatus_withinWindow) {
+        this.includeSectionCodeViolationStatus_withinWindow = includeSectionCodeViolationStatus_withinWindow;
+    }
+
+    /**
+     * @param includeSectionCodeViolationStatus_expiredWindow the includeSectionCodeViolationStatus_expiredWindow to set
+     */
+    public void setIncludeSectionCodeViolationStatus_expiredWindow(boolean includeSectionCodeViolationStatus_expiredWindow) {
+        this.includeSectionCodeViolationStatus_expiredWindow = includeSectionCodeViolationStatus_expiredWindow;
+    }
+
+    /**
+     * @param includeSectionCodeViolationStatus_cited the includeSectionCodeViolationStatus_cited to set
+     */
+    public void setIncludeSectionCodeViolationStatus_cited(boolean includeSectionCodeViolationStatus_cited) {
+        this.includeSectionCodeViolationStatus_cited = includeSectionCodeViolationStatus_cited;
+    }
+
+    /**
+     * @param includeSectionCitations the includeSectionCitations to set
+     */
+    public void setIncludeSectionCitations(boolean includeSectionCitations) {
+        this.includeSectionCitations = includeSectionCitations;
+    }
+
+    /**
+     * @param includeSectionCitations_citationsAnyStage the includeSectionCitations_citationsAnyStage to set
+     */
+    public void setIncludeSectionCitations_citationsAnyStage(boolean includeSectionCitations_citationsAnyStage) {
+        this.includeSectionCitations_citationsAnyStage = includeSectionCitations_citationsAnyStage;
+    }
+
+    /**
+     * @param includeSectionCaseByCaseDetail the includeSectionCaseByCaseDetail to set
+     */
+    public void setIncludeSectionCaseByCaseDetail(boolean includeSectionCaseByCaseDetail) {
+        this.includeSectionCaseByCaseDetail = includeSectionCaseByCaseDetail;
+    }
+
+    /**
+     * @return the includeSectionReportSummary_compViol
+     */
+    public boolean isIncludeSectionReportSummary_compViol() {
+        return includeSectionReportSummary_compViol;
+    }
+
+    /**
+     * @param includeSectionReportSummary_compViol the includeSectionReportSummary_compViol to set
+     */
+    public void setIncludeSectionReportSummary_compViol(boolean includeSectionReportSummary_compViol) {
+        this.includeSectionReportSummary_compViol = includeSectionReportSummary_compViol;
+    }
+
+    /**
+     * @return the includeSectionCaseByCaseDetail_eventListViewerRank
+     */
+    public RoleType getIncludeSectionCaseByCaseDetail_eventListViewerRank() {
+        return includeSectionCaseByCaseDetail_eventListViewerRank;
+    }
+
+    /**
+     * @param includeSectionCaseByCaseDetail_eventListViewerRank the includeSectionCaseByCaseDetail_eventListViewerRank to set
+     */
+    public void setIncludeSectionCaseByCaseDetail_eventListViewerRank(RoleType includeSectionCaseByCaseDetail_eventListViewerRank) {
+        this.includeSectionCaseByCaseDetail_eventListViewerRank = includeSectionCaseByCaseDetail_eventListViewerRank;
     }
     
     
