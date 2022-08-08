@@ -34,6 +34,7 @@ public class ReportCECaseListStreetCECaseContainer
     private List<CECaseDataHeavy> caseOpenedList;
     private List<CECaseDataHeavy> caseContinuingList;
     private List<CECaseDataHeavy> caseClosedList;
+    private List<CECaseDataHeavy> combinedCaseList;
     
     protected boolean caseOpenedListDisplay;
     protected boolean caseContinuingListDisplay;
@@ -43,7 +44,41 @@ public class ReportCECaseListStreetCECaseContainer
         caseOpenedList = new ArrayList<>();
         caseContinuingList = new ArrayList<>();
         caseClosedList = new ArrayList<>();
+        combinedCaseList = new ArrayList<>();
     }
+    
+    /**
+     * Antipattern getter: aggregates internal lists
+     * @return the combinedCaseList
+     */
+    public List<CECaseDataHeavy> getCombinedCaseList() {
+        if(combinedCaseList != null){
+            if(caseOpenedList != null){
+                combinedCaseList.addAll(caseOpenedList);
+            }
+            if(caseContinuingList != null){
+                combinedCaseList.addAll(caseContinuingList);
+            }
+            if(caseClosedList != null){
+                combinedCaseList.addAll(caseClosedList);
+            }
+        }
+        return combinedCaseList;
+    }
+
+    
+    
+    
+    
+    /** 
+     
+     * @param combinedCaseList the combinedCaseList to set
+     */
+    public void setCombinedCaseList(List<CECaseDataHeavy> combinedCaseList) {
+        this.combinedCaseList = combinedCaseList;
+    }
+    
+   
     
     /**
      * @return the streetName
@@ -153,8 +188,9 @@ public class ReportCECaseListStreetCECaseContainer
     public void setCaseClosedListDisplay(boolean caseClosedListDisplay) {
         this.caseClosedListDisplay = caseClosedListDisplay;
     }
+
     
-   
+
     
     
 }

@@ -82,6 +82,7 @@ public class ReportConfigCECaseList
     private boolean includeSectionCaseByCaseDetail_violationList;
     private boolean includeSectionCaseByCaseDetail_extendedPropertyDetails;
     private boolean includeSectionCaseByCaseDetail_eventSummary;
+    private boolean includeSectionCaseByCaseDetail_eventDescription;
     private RoleType includeSectionCaseByCaseDetail_eventListViewerRank;
     
     
@@ -1005,6 +1006,20 @@ public class ReportConfigCECaseList
      */
     public void setIncludeSectionCaseByCaseDetail_eventListViewerRank(RoleType includeSectionCaseByCaseDetail_eventListViewerRank) {
         this.includeSectionCaseByCaseDetail_eventListViewerRank = includeSectionCaseByCaseDetail_eventListViewerRank;
+    }
+
+    /**
+     * @return the includeSectionCaseByCaseDetail_eventDescription
+     */
+    public boolean isIncludeSectionCaseByCaseDetail_eventDescription() {
+        return includeSectionCaseByCaseDetail_eventDescription;
+    }
+
+    /**
+     * @param includeSectionCaseByCaseDetail_eventDescription the includeSectionCaseByCaseDetail_eventDescription to set
+     */
+    public void setIncludeSectionCaseByCaseDetail_eventDescription(boolean includeSectionCaseByCaseDetail_eventDescription) {
+        this.includeSectionCaseByCaseDetail_eventDescription = includeSectionCaseByCaseDetail_eventDescription;
     }
     
     

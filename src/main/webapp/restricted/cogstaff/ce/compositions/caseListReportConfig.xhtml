@@ -116,13 +116,13 @@
                                 </p:selectBooleanCheckbox>
                             </div>
 
-                            <f:subview id="report-caselist-reportsummary-metrics-subview"
+                            <p:outputPanel id="report-caselist-reportsummary-metrics-subview"
                                        rendered="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary}">
 
                                 <div class="p-col-2">
                                     <h:outputText value=" " />
                                 </div>
-                                <div class="p-col-8">
+                                <div class="p-col-6">
                                     <h:outputLabel class="bold" 
                                                    value="Total cases open as of start of reporting period" 
                                                    for="report-caselist-reportsummary-casesopenasof-chkbox" />
@@ -244,7 +244,7 @@
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary_closurePieChart}" 
                                                              disabled="false"/>
                                 </div>
-                            </f:subview>
+                            </p:outputPanel>
 
 
                             <div class="p-col-10">
@@ -260,7 +260,7 @@
                                 </p:selectBooleanCheckbox>
                             </div>
 
-                            <f:subview id="report-caselist-violations-metrics-subview"
+                            <p:outputPanel id="report-caselist-violations-metrics-subview"
                                        rendered="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCodeViolationStatus}">
 
                                 <div class="p-col-2">
@@ -319,7 +319,7 @@
                                                              disabled="false"/>
                                 </div>
 
-                            </f:subview>
+                            </p:outputPanel>
 
                             <div class="p-col-10">
                                 <h:outputLabel class="bold" 
@@ -334,7 +334,7 @@
                                 </p:selectBooleanCheckbox>
                             </div>
 
-                            <f:subview id="report-caselist-citations-metrics-subview"
+                            <p:outputPanel id="report-caselist-citations-metrics-subview"
                                        rendered="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCitations}">
 
                                 <div class="p-col-2">
@@ -366,7 +366,7 @@
                                                              disabled="false"/>
                                 </div>
 
-                            </f:subview>
+                            </p:outputPanel>
 
                             <div class="p-col-10">
                                 <h:outputLabel class="bold" 
@@ -376,7 +376,7 @@
                             <div class="p-col-2">
                                 <p:selectBooleanCheckbox id="report-caselist-streetsummary-chkbox" 
                                                          value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionStreetLevelSummary}" 
-                                                         disabled="true"/>
+                                                         disabled="false"/>
                             </div>
 
                             <div class="p-col-10">
@@ -387,10 +387,10 @@
                             <div class="p-col-2">
                                 <p:selectBooleanCheckbox id="report-caselist-casedetails-chkbox" 
                                                          value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail}" 
-                                                         disabled="true"/>
+                                                         disabled="false"/>
                             </div>
 
-                            <f:subview id="report-caselist-casedetails-metrics-subview"
+                            <p:outputPanel id="report-caselist-casedetails-metrics-subview"
                                        rendered="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail}">
 
                                 <div class="p-col-2">
@@ -426,7 +426,7 @@
                                 <div class="p-col-2">
                                     <p:selectBooleanCheckbox id="report-caselist-propertyinfo" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail_extendedPropertyDetails}" 
-                                                             disabled="true" />
+                                                             disabled="false" />
                                 </div>
 
                                 <div class="p-col-2">
@@ -439,13 +439,13 @@
                                 <div class="p-col-2">
                                     <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail_eventSummary}" 
-                                                             disabled="true" >
+                                                             disabled="false" >
                                         <p:ajax update="report-caselist-casedetails-eventviewerrole-subview" />
                                     </p:selectBooleanCheckbox>
                                 </div>
 
 
-                                <f:subview id="report-caselist-casedetails-eventviewerrole-subview"
+                                <p:outputPanel id="report-caselist-casedetails-eventviewerrole-subview"
                                            rendered="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail}">
 
                                     <div class="p-col-2">
@@ -468,9 +468,23 @@
                                                            itemLabel="#{rt.label}, (RNK: #{rt.rank})"/>
                                         </p:selectOneMenu>
                                     </div>
-                                </f:subview>
 
-                            </f:subview>
+                                    <div class="p-col-2">
+                                        <h:outputText value=" " />
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputLabel class="bold" 
+                                                       value="Event descriptions" 
+                                                       for="report-caselist-casedetail-descr-sbcb" />
+                                    </div>
+                                    <div class="p-col-2">
+                                        <p:selectBooleanCheckbox id="report-casedetail-eventdescr-sbcb" 
+                                                                 value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail_eventDescription}" 
+                                                                 disabled="false" />
+                                    </div>
+                                </p:outputPanel>
+
+                            </p:outputPanel>
                         </div>
                     </p:panel>
                 </div>

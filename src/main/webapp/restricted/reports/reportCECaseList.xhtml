@@ -16,190 +16,294 @@
                 <div class="printer-friendly-report">
 
                     <h:form id="case-list-report-form">
+                        <f:subview id="sec-summary-subview"
+                                   rendered="#{reportingBB.reportCECaseList.includeSectionReportSummary}">
 
-                        <div class="report-trailblaze-headerbox">
-                            <div class="report-trailblaze-headerbox-title">
-                                <h:outputText value="Report Summary from #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_start_val)} to #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}" />
+                            <div class="report-trailblaze-headerbox">
+                                <div class="report-trailblaze-headerbox-title">
+                                    <h:outputText value="Report Summary from #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_start_val)} to #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}" />
 
-                            </div>
-                            <div class="report-trailblaze-headerbox-tail">
-                                <h:outputText value=" "/>
-                            </div>
-                        </div>
-
-                        <div class="ui-g data_container_nested_restrict_report">
-
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report"   >
-
-                                <!--NESTED DATA LABEL INLINE -->
-                                <div class="restrict-data-field-label-inline" >
-                                    <h:outputLabel value="Total cases open as of start of reporting period: "/>
-                                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_start_val)}:" />
                                 </div>
-                                <!--NESTED DATA VALUE INLINE -->
-                                <div class="restrict-data-field-value-inline"
-                                     style="color:black;">
-                                    <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenAsOfDateStart.size()}" />
-                                </div>
-                            </div>
-                            
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
-
-                                <!--NESTED DATA LABEL INLINE -->
-                                <div class="restrict-data-field-label-inline" >
-                                    <h:outputLabel value="Cases opened: "/>
-                                </div>
-                                <!--NESTED DATA VALUE INLINE -->
-                                <div class="restrict-data-field-value-inline"
-                                     style="color:black;">
-                                    <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenedInDateRange.size()}" />
+                                <div class="report-trailblaze-headerbox-tail">
+                                    <h:outputText value=" "/>
                                 </div>
                             </div>
 
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+                            <div class="ui-g data_container_nested_restrict_report">
 
-                                <!--NESTED DATA LABEL INLINE -->
-                                <div class="restrict-data-field-label-inline" 
-                                     >
-                                    <h:outputLabel value="Cases closed: "/>
-                                </div>
-                                <!--NESTED DATA VALUE INLINE -->
-                                <div class="restrict-data-field-value-inline"
-                                     style="color:black;" >
-                                    <h:outputText value="#{reportingBB.reportCECaseList.caseListClosedInDateRange.size()}" />
-                                </div>
-                            </div>
+                                <f:subview id="metric-summary-opensor"
+                                           rendered="#{reportingBB.reportCECaseList.includeSectionReportSummary_openAsOfSOR}">
 
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report"   >
 
-                                <!--NESTED DATA LABEL INLINE -->
-                                <div class="restrict-data-field-label-inline" >
-                                    <h:outputLabel value="Total cases open as of end of reporting period: "/>
-                                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}:" />
-                                </div>
-                                <!--NESTED DATA VALUE INLINE -->
-                                <div class="restrict-data-field-value-inline"
-                                     style="color:black;">
-                                    <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenAsOfDateEnd.size()}" />
-                                </div>
-                            </div>
-
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
-
-                                <!--NESTED DATA LABEL INLINE -->
-                                <div class="restrict-data-field-label-inline" 
-                                     >
-                                    <h:outputLabel value="New violations: "/>
-                                </div>
-                                <!--NESTED DATA VALUE INLINE -->
-                                <div class="restrict-data-field-value-inline"
-                                     style="color:black;" >
-                                    <h:outputText value="#{reportingBB.reportCECaseList.violationsLoggedDateRange.size()}" />
-
-                                </div>
-                            </div>
-
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
-
-                                <!--NESTED DATA LABEL INLINE -->
-                                <div class="restrict-data-field-label-inline" 
-                                     >
-                                    <h:outputLabel value="Violations that have come into compliance: "/>
-                                </div>
-                                <!--NESTED DATA VALUE INLINE -->
-                                <div class="restrict-data-field-value-inline"
-                                     style="color:black;" >
-                                    <h:outputText value="#{reportingBB.reportCECaseList.violationsLoggedComplianceDateRange.size()}" />
-                                </div>
-                            </div>
-
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
-
-                                <!--NESTED DATA LABEL INLINE -->
-                                <div class="restrict-data-field-label-inline" 
-                                     >
-                                    <h:outputLabel value="Number of events logged: "/>
-                                </div>
-                                <!--NESTED DATA VALUE INLINE -->
-                                <div class="restrict-data-field-value-inline"
-                                     style="color:black;" >
-                                    <h:outputText value="#{reportingBB.reportCECaseList.eventList.size()}" />
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="report-trailblaze-headerbox">
-                            <div class="report-trailblaze-headerbox-title">
-                                <h:outputText value="Code Violation Status as of #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)} " />
-                            </div>
-                            <div class="report-trailblaze-headerbox-tail">
-                                <h:outputText value=" "/>
-                            </div>
-                        </div>
-
-
-
-                        <div class="report-tb-kpis">
-                            <div class="report-tb-kpi-container">
-                                <div class="ui-g">
-
-                                    <div class="ui-g-12 ui-md-12 ui-lg-12" >
-                                        <h:outputText value="The following categories pull from all violations entered into the system before #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)} " />
+                                        <!--NESTED DATA LABEL INLINE -->
+                                        <div class="restrict-data-field-label-inline" >
+                                            <h:outputLabel value="Total cases open as of start of reporting period: "/>
+                                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_start_val)}:" />
+                                        </div>
+                                        <!--NESTED DATA VALUE INLINE -->
+                                        <div class="restrict-data-field-value-inline"
+                                             style="color:black;">
+                                            <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenAsOfDateStart.size()}" />
+                                        </div>
                                     </div>
+                                </f:subview>
+
+                                <f:subview id="metric-summary-opened"
+                                           rendered="#{reportingBB.reportCECaseList.includeSectionReportSummary_casesOpened}">
 
                                     <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
 
                                         <!--NESTED DATA LABEL INLINE -->
                                         <div class="restrict-data-field-label-inline" >
-                                            <h:outputLabel value="Compliance achieved: "/>
+                                            <h:outputLabel value="Cases opened: "/>
+                                        </div>
+                                        <!--NESTED DATA VALUE INLINE -->
+                                        <div class="restrict-data-field-value-inline"
+                                             style="color:black;">
+                                            <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenedInDateRange.size()}" />
+                                        </div>
+                                    </div>
+                                </f:subview>
+
+                                <f:subview id="metric-summary-closed"
+                                           rendered="#{reportingBB.reportCECaseList.includeSectionReportSummary_casesClosed}">
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                        <!--NESTED DATA LABEL INLINE -->
+                                        <div class="restrict-data-field-label-inline" 
+                                             >
+                                            <h:outputLabel value="Cases closed: "/>
                                         </div>
                                         <!--NESTED DATA VALUE INLINE -->
                                         <div class="restrict-data-field-value-inline"
                                              style="color:black;" >
-                                            <h:outputText value="#{reportingBB.reportCECaseList.violationsAccumulatedCompliance.size()}" />
+                                            <h:outputText value="#{reportingBB.reportCECaseList.caseListClosedInDateRange.size()}" />
                                         </div>
                                     </div>
+                                </f:subview>
+
+                                <f:subview id="metric-summary-openasofeor"
+                                           rendered="#{reportingBB.reportCECaseList.includeSectionReportSummary_openAsOfEOR}">
 
                                     <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
 
                                         <!--NESTED DATA LABEL INLINE -->
                                         <div class="restrict-data-field-label-inline" >
-                                            <h:outputLabel value="Within compliance window: "/>
+                                            <h:outputLabel value="Total cases open as of end of reporting period: "/>
+                                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)}:" />
                                         </div>
                                         <!--NESTED DATA VALUE INLINE -->
                                         <div class="restrict-data-field-value-inline"
-                                             style="color:black;" >
-                                            <h:outputText value="#{reportingBB.reportCECaseList.violationsWithinStipCompWindow.size()}" />
+                                             style="color:black;">
+                                            <h:outputText value="#{reportingBB.reportCECaseList.caseListOpenAsOfDateEnd.size()}" />
                                         </div>
                                     </div>
+                                </f:subview>
+
+                                <f:subview id="metric-summary-newviols"
+                                           rendered="#{reportingBB.reportCECaseList.includeSectionReportSummary_newViolations}">
+
                                     <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
 
                                         <!--NESTED DATA LABEL INLINE -->
-                                        <div class="restrict-data-field-label-inline" >
-                                            <h:outputLabel value="Requiring ongoing action (but not cited): "/>
+                                        <div class="restrict-data-field-label-inline" 
+                                             >
+                                            <h:outputLabel value="New violations: "/>
                                         </div>
                                         <!--NESTED DATA VALUE INLINE -->
                                         <div class="restrict-data-field-value-inline"
                                              style="color:black;" >
-                                            <h:outputText value="#{reportingBB.reportCECaseList.violationsOutsideCompWindowNOTCited.size()}" />
+                                            <h:outputText value="#{reportingBB.reportCECaseList.violationsLoggedDateRange.size()}" />
+
                                         </div>
                                     </div>
+                                </f:subview>
+
+                                <f:subview id="metric-summary-compviol"
+                                           rendered="#{reportingBB.reportCECaseList.includeSectionReportSummary_compViol}">
+
                                     <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
 
                                         <!--NESTED DATA LABEL INLINE -->
-                                        <div class="restrict-data-field-label-inline" >
-                                            <h:outputLabel value="Violations cited: "/>
+                                        <div class="restrict-data-field-label-inline" 
+                                             >
+                                            <h:outputLabel value="Violations that have come into compliance: "/>
                                         </div>
                                         <!--NESTED DATA VALUE INLINE -->
                                         <div class="restrict-data-field-value-inline"
                                              style="color:black;" >
-                                            <h:outputText value="#{reportingBB.reportCECaseList.violationsNoComplianceButCited.size()}" />
+                                            <h:outputText value="#{reportingBB.reportCECaseList.violationsLoggedComplianceDateRange.size()}" />
                                         </div>
                                     </div>
+                                </f:subview>
 
+                                <f:subview id="metric-summary-evslogged"
+                                           rendered="#{reportingBB.reportCECaseList.includeSectionReportSummary_eventsLogged}">
+
+                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                        <!--NESTED DATA LABEL INLINE -->
+                                        <div class="restrict-data-field-label-inline" 
+                                             >
+                                            <h:outputLabel value="Number of events logged: "/>
+                                        </div>
+                                        <!--NESTED DATA VALUE INLINE -->
+                                        <div class="restrict-data-field-value-inline"
+                                             style="color:black;" >
+                                            <h:outputText value="#{reportingBB.reportCECaseList.eventList.size()}" />
+                                        </div>
+                                    </div>
+                                </f:subview>
+                            </div>
+
+                            <f:subview id="rptcecaselist-pie-caseclosure"
+                                       rendered="#{reportingBB.reportCECaseList.includeSectionReportSummary_closurePieChart}">
+                                <div class="report-tb-kpi-container printing-page-break-before">
+                                    <div class="ui-g">
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6" >
+                                            <div class="report-kpi-aggregate-container">
+                                                <div class="report-tb-kpi-icon">
+                                                    <div class="inline-icon report-icon">
+                                                        <i class="material-icons">
+                                                            <h:outputText value="door_back"/>
+                                                        </i>
+                                                    </div>
+                                                    <div class="report-tb-kpi-title">
+                                                        <h:outputText value="Closed Cases" />
+                                                    </div>
+                                                    <div class="report-tb-kpi-value">
+                                                        <h:outputText value="Total closed count: #{reportingBB.reportCECaseList.caseListClosedInDateRange.size()}" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="report-legend-container">
+                                                    <ui:repeat value="#{reportingBB.reportCECaseList.pieClosureLegend}" 
+                                                               var="liclose">
+                                                        <div class="report-legend-item">
+                                                            <div class="report-legend-colorbox"
+                                                                 style="background-color: #{liclose.colorRGBString}; color:#{liclose.colorRGBString}">
+                                                                <h:outputText value="color"/>
+                                                            </div>
+                                                            <div class="report-legend-title">
+                                                                <h:outputText value="#{liclose.title}: " />
+                                                            </div>
+                                                            <div class="report-legend-count">
+                                                                <h:outputText value="#{liclose.value}" />
+                                                            </div>
+                                                        </div>
+                                                    </ui:repeat>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="ui-g-6 ui-md-6 ui-lg-6" >
+                                            <div class="report-pie-container">
+                                                <p:pieChart id="pie-closure"
+                                                            model="#{reportingBB.reportCECaseList.pieClosure}" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </f:subview>
+                        </f:subview>
+                        <f:subview id="sec-codeviolations-subview"
+                                   rendered="#{reportingBB.reportCECaseList.includeSectionCodeViolationStatus}">
+
+                            <div class="report-trailblaze-headerbox">
+                                <div class="report-trailblaze-headerbox-title">
+                                    <h:outputText value="Code Violation Status as of #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)} " />
+                                </div>
+                                <div class="report-trailblaze-headerbox-tail">
+                                    <h:outputText value=" "/>
                                 </div>
                             </div>
+                            <div class="report-tb-kpis">
+                                <div class="report-tb-kpi-container">
+                                    <div class="ui-g">
+
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12" >
+                                            <h:outputText value="The following categories pull from all violations entered into the system before #{reportingBB.getPrettyDateNoTime(reportingBB.reportCECaseList.date_end_val)} " />
+                                        </div>
+
+
+                                        <f:subview id="metric-aggcompliance-subview"
+                                                   rendered="#{reportingBB.reportCECaseList.includeSectionCodeViolationStatus_compliance}">
+
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Compliance achieved: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline"
+                                                     style="color:black;" >
+                                                    <h:outputText value="#{reportingBB.reportCECaseList.violationsAccumulatedCompliance.size()}" />
+                                                </div>
+                                            </div>
+                                        </f:subview>
+
+
+                                        <f:subview id="sec-withincompwindow-subview"
+                                                   rendered="#{reportingBB.reportCECaseList.includeSectionCodeViolationStatus_withinWindow}">
+
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Within compliance window: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline"
+                                                     style="color:black;" >
+                                                    <h:outputText value="#{reportingBB.reportCECaseList.violationsWithinStipCompWindow.size()}" />
+                                                </div>
+                                            </div>
+                                        </f:subview>
+
+                                        <f:subview id="sec-outsidewindow-subview"
+                                                   rendered="#{reportingBB.reportCECaseList.includeSectionCodeViolationStatus_expiredWindow}">
+
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Requiring ongoing action (but not cited): "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline"
+                                                     style="color:black;" >
+                                                    <h:outputText value="#{reportingBB.reportCECaseList.violationsOutsideCompWindowNOTCited.size()}" />
+                                                </div>
+                                            </div>
+                                        </f:subview>
+
+                                        <f:subview id="sec-codeviolationscited-subview"
+                                                   rendered="#{reportingBB.reportCECaseList.includeSectionCodeViolationStatus_cited}">
+
+                                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Violations cited: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline"
+                                                     style="color:black;" >
+                                                    <h:outputText value="#{reportingBB.reportCECaseList.violationsNoComplianceButCited.size()}" />
+                                                </div>
+                                            </div>
+                                        </f:subview>
+                                    </div>
+                                </div>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="sec-citaions-subview"
+                                   rendered="#{reportingBB.reportCECaseList.includeSectionCitations}">
 
                             <div class="report-trailblaze-headerbox">
                                 <div class="report-trailblaze-headerbox-title">
@@ -212,18 +316,23 @@
                             <div class="report-tb-kpi-container">
                                 <div class="ui-g">
 
-                                    <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
 
-                                        <!--NESTED DATA LABEL INLINE -->
-                                        <div class="restrict-data-field-label-inline" >
-                                            <h:outputLabel value="Citations (at any stage) on active cases within the reporting period: "/>
+                                    <f:subview id="sec-citaions-citcount-subview"
+                                               rendered="#{reportingBB.reportCECaseList.includeSectionCitations_citationsAnyStage}">
+
+                                        <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
+
+                                            <!--NESTED DATA LABEL INLINE -->
+                                            <div class="restrict-data-field-label-inline" >
+                                                <h:outputLabel value="Citations (at any stage) on active cases within the reporting period: "/>
+                                            </div>
+                                            <!--NESTED DATA VALUE INLINE -->
+                                            <div class="restrict-data-field-value-inline"
+                                                 style="color:black;" >
+                                                <h:outputText value="#{reportingBB.reportCECaseList.citationList.size()}" />
+                                            </div>
                                         </div>
-                                        <!--NESTED DATA VALUE INLINE -->
-                                        <div class="restrict-data-field-value-inline"
-                                             style="color:black;" >
-                                            <h:outputText value="#{reportingBB.reportCECaseList.citationList.size()}" />
-                                        </div>
-                                    </div>
+                                    </f:subview>
                                 </div>
                             </div>
 
@@ -283,60 +392,9 @@
                                     </div>
                                 </div>
                             </f:subview>
+                        </f:subview>
 
-                            <f:subview id="rptcecaselist-pie-caseclosure"
-                                       rendered="#{reportingBB.reportCECaseList.includeSectionReportSummary_closurePieChart}">
-                                <div class="report-tb-kpi-container printing-page-break-before">
-                                    <div class="ui-g">
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6" >
-                                            <div class="report-kpi-aggregate-container">
-                                                <div class="report-tb-kpi-icon">
-                                                    <div class="inline-icon report-icon">
-                                                        <i class="material-icons">
-                                                            <h:outputText value="door_back"/>
-                                                        </i>
-                                                    </div>
-                                                    <div class="report-tb-kpi-title">
-                                                        <h:outputText value="Closed Cases" />
-                                                    </div>
-                                                    <div class="report-tb-kpi-value">
-                                                        <h:outputText value="Total closed count: #{reportingBB.reportCECaseList.caseListClosedInDateRange.size()}" />
-                                                    </div>
-                                                </div>
-
-                                                <div class="report-legend-container">
-                                                    <ui:repeat value="#{reportingBB.reportCECaseList.pieClosureLegend}" 
-                                                               var="liclose">
-                                                        <div class="report-legend-item">
-                                                            <div class="report-legend-colorbox"
-                                                                 style="background-color: #{liclose.colorRGBString}; color:#{liclose.colorRGBString}">
-                                                                <h:outputText value="color"/>
-                                                            </div>
-                                                            <div class="report-legend-title">
-                                                                <h:outputText value="#{liclose.title}: " />
-                                                            </div>
-                                                            <div class="report-legend-count">
-                                                                <h:outputText value="#{liclose.value}" />
-                                                            </div>
-                                                        </div>
-                                                    </ui:repeat>
-
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6" >
-                                            <div class="report-pie-container">
-                                                <p:pieChart id="pie-closure"
-                                                            model="#{reportingBB.reportCECaseList.pieClosure}" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </f:subview>
-                        </div>
-
-                        <f:subview id="report-streetsummary-header"
+                        <f:subview id="report-streetsummary-subview"
                                    rendered="#{reportingBB.reportCECaseList.includeSectionStreetLevelSummary}">
                             <div class="report-trailblaze-headerbox">
                                 <div class="report-trailblaze-headerbox-title">
@@ -346,543 +404,780 @@
                                     <h:outputText value=" text"/>
                                 </div>
                             </div>
+
+                            <p:spacer height="10px" />
+
+                            <p:dataTable id="street-summary-table"
+                                         value="#{reportingBB.reportCECaseList.streetContainerList}"
+                                         var="streetcont"
+                                         draggableColumns="true"
+                                         rendered="#{reportingBB.reportCECaseList.includeSectionStreetLevelSummary}"
+                                         tableStyleClass="primeDataTable">
+
+                                <p:column width="25%">
+                                    <f:facet name="header">
+                                        <h:outputText value="Street name" />
+                                    </f:facet>
+                                    <h:outputText value="#{streetcont.streetName}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="New Cases this period" />
+                                    </f:facet>
+                                    <h:outputText value="#{streetcont.caseOpenedList.size()}"/>
+                                </p:column>
+
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Continuing cases" />
+                                    </f:facet>
+                                    <h:outputText value="#{streetcont.caseContinuingList.size()}"/>
+                                </p:column>
+
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Closed cases" />
+                                    </f:facet>
+                                    <h:outputText value="#{streetcont.caseClosedList.size()}"/>
+                                </p:column>
+
+                            </p:dataTable>
+
                         </f:subview>
 
-                        <p:spacer height="10px" />
 
-                        <p:dataTable id="street-summary-table"
-                                     value="#{reportingBB.reportCECaseList.streetContainerList}"
-                                     var="streetcont"
-                                     draggableColumns="true"
-                                     rendered="#{reportingBB.reportCECaseList.includeSectionStreetLevelSummary}"
-                                     tableStyleClass="primeDataTable">
+                        <f:subview id="report-casedetails-subview"
+                                   rendered="#{reportingBB.reportCECaseList.includeSectionCaseByCaseDetail}">
 
-                            <p:column width="25%">
-                                <f:facet name="header">
-                                    <h:outputText value="Street name" />
-                                </f:facet>
-                                <h:outputText value="#{streetcont.streetName}"/>
-                            </p:column>
+                            <div class="report-tb-streetlist printing-page-break-before">
 
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="New Cases this period" />
-                                </f:facet>
-                                <h:outputText value="#{streetcont.caseOpenedList.size()}"/>
-                            </p:column>
-
-
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="Continuing cases" />
-                                </f:facet>
-                                <h:outputText value="#{streetcont.caseContinuingList.size()}"/>
-                            </p:column>
-
-
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="Closed cases" />
-                                </f:facet>
-                                <h:outputText value="#{streetcont.caseClosedList.size()}"/>
-                            </p:column>
-
-                        </p:dataTable>
-
-                        <p:spacer height="5px" />
-
-                        <div class="printing-page-break-after">
-
-                        </div>
-
-
-
-                        <div class="report-trailblaze-headerbox">
-                            <div class="report-trailblaze-headerbox-title">
-                                <h:outputText value="Code Enforcement by Street: Detail" />
-                            </div>
-                            <div class="report-trailblaze-headerbox-tail">
-                                <h:outputText value=" text"/>
-                            </div>
-                        </div>
-
-                        <div class="report-tb-streetlist printing-page-break-after">
-
-                            <ui:repeat id="cases-by-street-uirpt"
-                                       value="#{reportingBB.reportCECaseList.streetContainerList}"
-                                       var="csc">
-
-                                <h2>
-                                    <h:outputText value="#{csc.streetName}" />
-                                </h2>
-                                <div class="report-street-summary">
-                                    <h:outputText value="New cases: #{csc.caseOpenedList.size()} | Continuing cases: #{csc.caseContinuingList.size()} | Closed cases: #{csc.caseClosedList.size()}" />
+                                <div class="report-trailblaze-headerbox">
+                                    <div class="report-trailblaze-headerbox-title">
+                                        <h:outputText value="Code Enforcement by Street: Detail" />
+                                    </div>
+                                    <div class="report-trailblaze-headerbox-tail">
+                                        <h:outputText value=" text"/>
+                                    </div>
                                 </div>
 
-                                <p:dataScroller
-                                    id="caselist-report-cases-open-datascroller"
-                                    value="#{csc.caseOpenedList}"
-                                    var="cse">
 
-                                    <h3 style="font-size: 1.5em;">
-                                        <h:outputText id="header-id-ot" value="Opened: #{cse.property.address.addressPretty1Line}"/>
-                                    </h3>
+                                <ui:repeat id="cases-by-street-uirpt"
+                                           value="#{reportingBB.reportCECaseList.streetContainerList}"
+                                           var="csc">
 
-                                    <!-- NESTED DATA CONTAINER -->
-                                    <div class="ui-g data_container_nested_restrict_report">
-
-                                        <!--NESTED DATA FIELD -->
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Status: "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-o-status-it" 
-                                                              value="#{cse.statusBundle.phase.label} (Case ID: #{cse.caseID})"/>
-                                            </div>
-                                        </div>
-                                        <!--NESTED DATA FIELD -->
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Manager: "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-manager-it" 
-                                                              value="#{cse.caseManager.human.name} "/>  
-                                            </div>
-
-                                        </div>
-                                        <!--NESTED DATA FIELD -->
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Opened: "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-o-odate-it" 
-                                                              value="#{reportingBB.getPrettyDateNoTime(cse.originationDate)}"/>
-                                            </div>
-                                        </div>
-
-                                        <!--NESTED DATA FIELD -->
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Closed: "
-                                                               rendered="#{!empty cse.closingDate}"/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-cdate-it" 
-                                                              value="#{reportingBB.getPrettyDateNoTime(cse.closingDate)}"
-                                                              rendered="#{!empty cse.closingDate}"/>
-                                            </div>
-                                        </div>
-
-
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputText value="(#{cse.violationList.size()}) " />
-                                                <h:outputLabel value="Violations: "/>
-
-                                            </div>
-
-
-
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <p:dataScroller id="violations-scroller"
-                                                                value="#{cse.violationList}"
-                                                                var="viol"
-                                                                style="font-family: sans-serif;">
-
-                                                    <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
-                                                                  style="font-weight: bold;"/>
-
-
-                                                    <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
-                                                                  style="font-weight: bold;"/>
-
-                                                    <h:outputText    id="violation-scroller-chapter-ot"
-                                                                     value="#{viol.violatedEnfElement.headerString}"
-                                                                     escape="false"/>
-
-
-                                                </p:dataScroller>
-
-                                            </div>
-                                        </div>
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="(#{cse.noticeList.size()}) Notices: : "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <p:dataScroller id="case-nov-scroller"
-                                                                value="#{cse.noticeList}"
-                                                                var="nov"
-                                                                style="font-family: sans-serif;">
-
-                                                    <h:outputText value="Mailed on: " 
-                                                                  rendered="#{!(empty nov.sentTS)}"/>
-                                                    <h:outputText value="#{nov.sentTSPretty}"
-                                                                  rendered="#{!(empty nov.sentTS)}"/>
-
-                                                </p:dataScroller>
-                                            </div>
-                                        </div>
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputText value="#{cse.citationList.size()} " />
-                                                <h:outputLabel value="Citations: "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <p:dataScroller id="case-citations-scroller"
-                                                                value="#{cse.citationList}"
-                                                                var="cit"
-                                                                style="font-family: sans-serif;">
-                                                    <div style="text-decoration: underline;">
-                                                        <h:outputText value="ID: #{cit.citationNo}" />
-                                                    </div>
-                                                    <p:spacer height="3px" />
-                                                    <ui:repeat id="citation-status-uir"
-                                                               value="#{cit.statusLog}"
-                                                               var="logentry">
-                                                        <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
-                                                        <p:spacer height="3px" />
-                                                    </ui:repeat>
-                                                </p:dataScroller>
-                                            </div>
-                                        </div>
+                                    <h2>
+                                        <h:outputText value="#{csc.streetName}" />
+                                    </h2>
+                                    <div class="report-street-summary">
+                                        <h:outputText value="New cases: #{csc.caseOpenedList.size()} | Continuing cases: #{csc.caseContinuingList.size()} | Closed cases: #{csc.caseClosedList.size()}" />
                                     </div>
 
-                                    <p:spacer height="10px" />
-                                </p:dataScroller>
 
 
+                                    <p:dataScroller
+                                        id="caselist-report-cases-combined-datascroller"
+                                        value="#{csc.combinedCaseList}"
+                                        var="cse">
 
-                                <p:dataScroller
-                                    id="caselist-report-cases-continuing-datascroller"
-                                    value="#{csc.caseContinuingList}"
-                                    var="cse">
+                                        <h3 style="font-size: 1.5em;">
+                                            <h:outputText id="header-id-ot" value="Address: #{cse.property.address.addressPretty1Line}"/>
+                                        </h3>
 
-                                    <h3 style="font-size: 1.5em;">
-                                        <h:outputText id="header-id-ot" value="Continuing: #{cse.property.address.addressPretty1Line}"/>
-                                    </h3>
+                                        <!-- NESTED DATA CONTAINER -->
+                                        <div class="ui-g data_container_nested_restrict_report">
 
-                                    <!-- NESTED DATA CONTAINER -->
-                                    <div class="ui-g data_container_nested_restrict_report">
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
 
-                                        <!--NESTED DATA FIELD -->
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Status: "/>
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Status: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-o-status-it" 
+                                                                  value="#{cse.statusBundle.phase.label} (Case ID: #{cse.caseID})"/>
+                                                </div>
                                             </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-o-status-it" 
-                                                              value="#{cse.statusBundle.phase.label} (Case ID: #{cse.caseID})"/>
-                                            </div>
-                                        </div>
-                                        <!--NESTED DATA FIELD -->
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Manager: "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-manager-it" 
-                                                              value="#{cse.caseManager.human.name} "/>  
-                                            </div>
-                                        </div>
-                                        <!--NESTED DATA FIELD -->
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Opened: "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-o-odate-it" 
-                                                              value="#{reportingBB.getPrettyDateNoTime(cse.originationDate)}"/>
-                                            </div>
-                                        </div>
-
-                                        <!--NESTED DATA FIELD -->
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Closed: "
-                                                               rendered="#{!empty cse.closingDate}"/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-cdate-it" 
-                                                              value="#{reportingBB.getPrettyDateNoTime(cse.closingDate)}"
-                                                              rendered="#{!empty cse.closingDate}"/>
-                                            </div>
-                                        </div>
-
-
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputText value="(#{cse.violationList.size()}) " />
-                                                <h:outputLabel value="Violations: "/>
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Manager: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-manager-it" 
+                                                                  value="#{cse.caseManager.human.name} "/>  
+                                                </div>
 
                                             </div>
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
 
-
-
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <p:dataScroller id="violations-scroller"
-                                                                value="#{cse.violationList}"
-                                                                var="viol"
-                                                                style="font-family: sans-serif;">
-
-                                                    <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
-                                                                  style="font-weight: bold;"/>
-
-
-                                                    <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
-                                                                  style="font-weight: bold;"/>
-
-                                                    <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
-                                                                  style="font-weight: bold;"/>
-
-                                                    <h:outputText    id="violation-scroller-chapter-ot"
-                                                                     value="#{viol.violatedEnfElement.headerString}"
-                                                                     escape="false"/>
-
-
-                                                </p:dataScroller>
-
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Opened: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-o-odate-it" 
+                                                                  value="#{reportingBB.getPrettyDateNoTime(cse.originationDate)}"/>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
 
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="(#{cse.noticeList.size()}) Notices: : "/>
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Closed: "
+                                                                   rendered="#{!empty cse.closingDate}"/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-cdate-it" 
+                                                                  value="#{reportingBB.getPrettyDateNoTime(cse.closingDate)}"
+                                                                  rendered="#{!empty cse.closingDate}"/>
+                                                </div>
                                             </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <p:dataScroller id="case-nov-scroller"
-                                                                value="#{cse.noticeList}"
-                                                                var="nov"
-                                                                style="font-family: sans-serif;">
 
-                                                    <h:outputText value="Mailed on: " 
-                                                                  rendered="#{!(empty nov.sentTS)}"/>
-                                                    <h:outputText value="#{nov.sentTSPretty}"
-                                                                  rendered="#{!(empty nov.sentTS)}"/>
+                                            <f:subview id="report-casedetails-casename-subview"
+                                                       rendered="#{reportingBB.reportCECaseList.includeSectionCaseByCaseDetail_caseNames}">
 
-                                                </p:dataScroller>
-                                            </div>
-                                        </div>
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+                                                <!--NESTED DATA FIELD -->
+                                                <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field-report" >
 
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputText value="#{cse.citationList.size()} " />
-                                                <h:outputLabel value="Citations: "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <p:dataScroller id="case-citations-scroller"
-                                                                value="#{cse.citationList}"
-                                                                var="cit"
-                                                                style="font-family: sans-serif;">
-                                                    <div style="text-decoration: underline;">
-                                                        <h:outputText value="ID: #{cit.citationNo}" />
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <h:outputLabel value="Case name: "
+                                                                       />
                                                     </div>
-                                                    <p:spacer height="3px" />
-                                                    <ui:repeat id="citation-status-uir"
-                                                               value="#{cit.statusLog}"
-                                                               var="logentry">
-                                                        <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
-                                                        <p:spacer height="3px" />
-                                                    </ui:repeat>
-                                                </p:dataScroller>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <p:spacer height="10px" />
-                                </p:dataScroller>
-
-                                <p:dataScroller
-                                    id="caselist-report-cases-closed-datascroller"
-                                    value="#{csc.caseClosedList}"
-                                    var="cse">
-
-                                    <h3 style="font-size: 1.5em;">
-                                        <h:outputText id="header-id-ot" value="Closed: #{cse.property.address.addressPretty1Line}"/>
-                                    </h3>
-
-                                    <!-- NESTED DATA CONTAINER -->
-                                    <div class="ui-g data_container_nested_restrict_report">
-
-                                        <!--NESTED DATA FIELD -->
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Status: "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-o-status-it" 
-                                                              value="#{cse.statusBundle.phase.label}  (Case ID: #{cse.caseID})"/>
-                                            </div>
-                                        </div>
-
-
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Manager: "/>
-                                            </div>
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-manager-it" 
-                                                              value="#{cse.caseManager.human.name}"/>  
-                                            </div>
-
-                                        </div>
-
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Opened: "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-o-odate-it" 
-                                                              value="#{reportingBB.getPrettyDateNoTime(cse.originationDate)}"/>
-                                            </div>
-                                        </div>
-
-                                        <!--NESTED DATA FIELD -->
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="Closed: "
-                                                               rendered="#{!empty cse.closingDate}"/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <h:outputText id="selcase-cdate-it" 
-                                                              value="#{reportingBB.getPrettyDateNoTime(cse.closingDate)}"
-                                                              rendered="#{!empty cse.closingDate}"/>
-                                            </div>
-                                        </div>
-
-
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputText value="(#{cse.violationList.size()}) " />
-                                                <h:outputLabel value="Violations: "/>
-
-                                            </div>
-
-
-
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <p:dataScroller id="violations-scroller"
-                                                                value="#{cse.violationList}"
-                                                                var="viol"
-                                                                style="font-family: sans-serif;">
-
-                                                    <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
-                                                                  style="font-weight: bold;"/>
-
-
-                                                    <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
-                                                                  style="font-weight: bold;"/>
-
-                                                    <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
-                                                                  style="font-weight: bold;"/>
-
-                                                    <h:outputText    id="violation-scroller-chapter-ot"
-                                                                     value="#{viol.violatedEnfElement.headerString}"
-                                                                     escape="false"/>
-
-                                                </p:dataScroller>
-
-                                            </div>
-                                        </div>
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputLabel value="(#{cse.noticeList.size()}) Notices: : "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <p:dataScroller id="case-nov-scroller"
-                                                                value="#{cse.noticeList}"
-                                                                var="nov"
-                                                                style="font-family: sans-serif;">
-
-                                                    <h:outputText value="Mailed on: " 
-                                                                  rendered="#{!(empty nov.sentTS)}"/>
-                                                    <h:outputText value="#{nov.sentTSPretty}"
-                                                                  rendered="#{!(empty nov.sentTS)}"/>
-
-                                                </p:dataScroller>
-                                            </div>
-                                        </div>
-                                        <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
-
-                                            <!--NESTED DATA LABEL INLINE -->
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputText value="#{cse.citationList.size()}: " />
-                                                <h:outputLabel value="Citations: "/>
-                                            </div>
-                                            <!--NESTED DATA VALUE INLINE -->
-                                            <div class="restrict-data-field-value-inline" >
-                                                <p:dataScroller id="case-citations-scroller"
-                                                                value="#{cse.citationList}"
-                                                                var="cit"
-                                                                style="font-family: sans-serif;">
-                                                    <div style="text-decoration: underline;">
-                                                        <h:outputText value="ID: #{cit.citationNo}" />
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
+                                                        <h:outputText id="selcase-name-it" 
+                                                                      value="#{cse.caseName}"
+                                                                      />
                                                     </div>
-                                                    <p:spacer height="3px" />
-                                                    <ui:repeat id="citation-status-uir"
-                                                               value="#{cit.statusLog}"
-                                                               var="logentry">
-                                                        <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
+                                                </div>
+                                            </f:subview>
+
+                                            <f:subview id="report-casedetails-viollist-subview"
+                                                       rendered="#{reportingBB.reportCECaseList.includeSectionCaseByCaseDetail_violationList}">
+
+
+                                                <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <h:outputText value="(#{cse.violationList.size()}) " />
+                                                        <h:outputLabel value="Violations: "/>
+
+                                                    </div>
+
+
+
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
+                                                        <p:dataScroller id="violations-scroller"
+                                                                        value="#{cse.violationList}"
+                                                                        var="viol"
+                                                                        style="font-family: sans-serif;">
+
+                                                            <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
+                                                                          style="font-weight: bold;"/>
+
+
+                                                            <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
+                                                                          style="font-weight: bold;"/>
+
+                                                            <h:outputText    id="violation-scroller-chapter-ot"
+                                                                             value="#{viol.violatedEnfElement.headerString}"
+                                                                             escape="false"/>
+
+
+                                                        </p:dataScroller>
+
+                                                    </div>
+                                                </div>
+                                            </f:subview>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="(#{cse.noticeList.size()}) Notices: : "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="case-nov-scroller"
+                                                                    value="#{cse.noticeList}"
+                                                                    var="nov"
+                                                                    style="font-family: sans-serif;">
+
+                                                        <h:outputText value="Mailed on: " 
+                                                                      rendered="#{!(empty nov.sentTS)}"/>
+                                                        <h:outputText value="#{nov.sentTSPretty}"
+                                                                      rendered="#{!(empty nov.sentTS)}"/>
+
+                                                    </p:dataScroller>
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputText value="#{cse.citationList.size()} " />
+                                                    <h:outputLabel value="Citations: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="case-citations-scroller"
+                                                                    value="#{cse.citationList}"
+                                                                    var="cit"
+                                                                    style="font-family: sans-serif;">
+                                                        <div style="text-decoration: underline;">
+                                                            <h:outputText value="ID: #{cit.citationNo}" />
+                                                        </div>
                                                         <p:spacer height="3px" />
-                                                    </ui:repeat>
-                                                </p:dataScroller>
+                                                        <ui:repeat id="citation-status-uir"
+                                                                   value="#{cit.statusLog}"
+                                                                   var="logentry">
+                                                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
+                                                            <p:spacer height="3px" />
+                                                        </ui:repeat>
+                                                    </p:dataScroller>
+                                                </div>
+                                            </div>
+
+                                            <f:subview id="report-casedetails-evlist-subview"
+                                                       rendered="#{reportingBB.reportCECaseList.includeSectionCaseByCaseDetail_eventSummary}">
+
+                                                <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                    <!--NESTED DATA LABEL INLINE -->
+                                                    <div class="restrict-data-field-label-inline" >
+                                                        <h:outputText value="#{cse.eventList.size()} " />
+                                                        <h:outputLabel value="Events:"/>
+                                                    </div>
+                                                    <!--NESTED DATA VALUE INLINE -->
+                                                    <div class="restrict-data-field-value-inline" >
+                                                        <p:dataScroller id="case-citations-scroller"
+                                                                        value="#{cse.eventList}"
+                                                                        var="ev"
+                                                                        style="font-family: sans-serif;">
+                                                            <h:outputText value="#{missionControlBB.getPrettyDate(ev.timeStart)}" 
+                                                                          style="font-weight: bold;"/>
+                                                            <h:outputText value=": "
+                                                                          style="font-weight: bold;"/>
+
+                                                            <h:outputText value="#{ev.category.eventCategoryTitle}" />
+                                                            <f:subview id="report-casedetails-evdescr-subview"
+                                                                       rendered="#{reportingBB.reportCECaseList.includeSectionCaseByCaseDetail_eventDescription}">
+                                                                <h:outputText value="Description : "
+                                                                              style="font-weight: bold;"/>
+
+                                                                <h:outputText value="#{ev.description}" />
+                                                            </f:subview>
+
+                                                        </p:dataScroller>
+                                                    </div>
+                                                </div>
+                                            </f:subview>
+                                        </div>
+
+                                        <p:spacer height="10px" />
+                                    </p:dataScroller>
+
+
+                                    <p:dataScroller
+                                        id="caselist-report-cases-open-datascroller"
+                                        value="#{csc.caseOpenedList}"
+                                        rendered="false"
+                                        var="cse">
+
+                                        <h3 style="font-size: 1.5em;">
+                                            <h:outputText id="header-id-ot" value="Opened: #{cse.property.address.addressPretty1Line}"/>
+                                        </h3>
+
+                                        <!-- NESTED DATA CONTAINER -->
+                                        <div class="ui-g data_container_nested_restrict_report">
+
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Status: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-o-status-it" 
+                                                                  value="#{cse.statusBundle.phase.label} (Case ID: #{cse.caseID})"/>
+                                                </div>
+                                            </div>
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Manager: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-manager-it" 
+                                                                  value="#{cse.caseManager.human.name} "/>  
+                                                </div>
+
+                                            </div>
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Opened: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-o-odate-it" 
+                                                                  value="#{reportingBB.getPrettyDateNoTime(cse.originationDate)}"/>
+                                                </div>
+                                            </div>
+
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Closed: "
+                                                                   rendered="#{!empty cse.closingDate}"/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-cdate-it" 
+                                                                  value="#{reportingBB.getPrettyDateNoTime(cse.closingDate)}"
+                                                                  rendered="#{!empty cse.closingDate}"/>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputText value="(#{cse.violationList.size()}) " />
+                                                    <h:outputLabel value="Violations: "/>
+
+                                                </div>
+
+
+
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="violations-scroller"
+                                                                    value="#{cse.violationList}"
+                                                                    var="viol"
+                                                                    style="font-family: sans-serif;">
+
+                                                        <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
+                                                                      style="font-weight: bold;"/>
+
+
+                                                        <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
+                                                                      style="font-weight: bold;"/>
+
+                                                        <h:outputText    id="violation-scroller-chapter-ot"
+                                                                         value="#{viol.violatedEnfElement.headerString}"
+                                                                         escape="false"/>
+
+
+                                                    </p:dataScroller>
+
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="(#{cse.noticeList.size()}) Notices: : "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="case-nov-scroller"
+                                                                    value="#{cse.noticeList}"
+                                                                    var="nov"
+                                                                    style="font-family: sans-serif;">
+
+                                                        <h:outputText value="Mailed on: " 
+                                                                      rendered="#{!(empty nov.sentTS)}"/>
+                                                        <h:outputText value="#{nov.sentTSPretty}"
+                                                                      rendered="#{!(empty nov.sentTS)}"/>
+
+                                                    </p:dataScroller>
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputText value="#{cse.citationList.size()} " />
+                                                    <h:outputLabel value="Citations: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="case-citations-scroller"
+                                                                    value="#{cse.citationList}"
+                                                                    var="cit"
+                                                                    style="font-family: sans-serif;">
+                                                        <div style="text-decoration: underline;">
+                                                            <h:outputText value="ID: #{cit.citationNo}" />
+                                                        </div>
+                                                        <p:spacer height="3px" />
+                                                        <ui:repeat id="citation-status-uir"
+                                                                   value="#{cit.statusLog}"
+                                                                   var="logentry">
+                                                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
+                                                            <p:spacer height="3px" />
+                                                        </ui:repeat>
+                                                    </p:dataScroller>
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputText value="#{cse.eventList.size()} " />
+                                                    <h:outputLabel value="Events:"/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="case-citations-scroller"
+                                                                    value="#{cse.eventList}"
+                                                                    var="ev"
+                                                                    style="font-family: sans-serif;">
+                                                        <h:outputText value="#{missionControlBB.getPrettyDate(ev.timeStart)}" 
+                                                                      style="font-weight: bold;"/>
+                                                        <h:outputText value=": "
+                                                                      style="font-weight: bold;"/>
+
+                                                        <h:outputText value="#{ev.category.eventCategoryTitle}" />
+                                                    </p:dataScroller>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <p:spacer height="10px" />
-                                </p:dataScroller>
-                            </ui:repeat>
-                        </div>
+
+                                        <p:spacer height="10px" />
+                                    </p:dataScroller>
+
+
+
+                                    <p:dataScroller
+                                        id="caselist-report-cases-continuing-datascroller"
+                                        value="#{csc.caseContinuingList}"
+                                        var="cse"
+                                        rendered="false">
+
+                                        <h3 style="font-size: 1.5em;">
+                                            <h:outputText id="header-id-ot" value="Continuing: #{cse.property.address.addressPretty1Line}"/>
+                                        </h3>
+
+                                        <!-- NESTED DATA CONTAINER -->
+                                        <div class="ui-g data_container_nested_restrict_report">
+
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Status: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-o-status-it" 
+                                                                  value="#{cse.statusBundle.phase.label} (Case ID: #{cse.caseID})"/>
+                                                </div>
+                                            </div>
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Manager: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-manager-it" 
+                                                                  value="#{cse.caseManager.human.name} "/>  
+                                                </div>
+                                            </div>
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Opened: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-o-odate-it" 
+                                                                  value="#{reportingBB.getPrettyDateNoTime(cse.originationDate)}"/>
+                                                </div>
+                                            </div>
+
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Closed: "
+                                                                   rendered="#{!empty cse.closingDate}"/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-cdate-it" 
+                                                                  value="#{reportingBB.getPrettyDateNoTime(cse.closingDate)}"
+                                                                  rendered="#{!empty cse.closingDate}"/>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputText value="(#{cse.violationList.size()}) " />
+                                                    <h:outputLabel value="Violations: "/>
+
+                                                </div>
+
+
+
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="violations-scroller"
+                                                                    value="#{cse.violationList}"
+                                                                    var="viol"
+                                                                    style="font-family: sans-serif;">
+
+                                                        <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
+                                                                      style="font-weight: bold;"/>
+
+
+                                                        <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
+                                                                      style="font-weight: bold;"/>
+
+                                                        <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
+                                                                      style="font-weight: bold;"/>
+
+                                                        <h:outputText    id="violation-scroller-chapter-ot"
+                                                                         value="#{viol.violatedEnfElement.headerString}"
+                                                                         escape="false"/>
+
+
+                                                    </p:dataScroller>
+
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="(#{cse.noticeList.size()}) Notices: : "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="case-nov-scroller"
+                                                                    value="#{cse.noticeList}"
+                                                                    var="nov"
+                                                                    style="font-family: sans-serif;">
+
+                                                        <h:outputText value="Mailed on: " 
+                                                                      rendered="#{!(empty nov.sentTS)}"/>
+                                                        <h:outputText value="#{nov.sentTSPretty}"
+                                                                      rendered="#{!(empty nov.sentTS)}"/>
+
+                                                    </p:dataScroller>
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputText value="#{cse.citationList.size()} " />
+                                                    <h:outputLabel value="Citations: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="case-citations-scroller"
+                                                                    value="#{cse.citationList}"
+                                                                    var="cit"
+                                                                    style="font-family: sans-serif;">
+                                                        <div style="text-decoration: underline;">
+                                                            <h:outputText value="ID: #{cit.citationNo}" />
+                                                        </div>
+                                                        <p:spacer height="3px" />
+                                                        <ui:repeat id="citation-status-uir"
+                                                                   value="#{cit.statusLog}"
+                                                                   var="logentry">
+                                                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
+                                                            <p:spacer height="3px" />
+                                                        </ui:repeat>
+                                                    </p:dataScroller>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <p:spacer height="10px" />
+                                    </p:dataScroller>
+
+                                    <p:dataScroller
+                                        id="caselist-report-cases-closed-datascroller"
+                                        value="#{csc.caseClosedList}"
+                                        var="cse"
+                                        rendered="false">
+
+                                        <h3 style="font-size: 1.5em;">
+                                            <h:outputText id="header-id-ot" value="Closed: #{cse.property.address.addressPretty1Line}"/>
+                                        </h3>
+
+                                        <!-- NESTED DATA CONTAINER -->
+                                        <div class="ui-g data_container_nested_restrict_report">
+
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Status: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-o-status-it" 
+                                                                  value="#{cse.statusBundle.phase.label}  (Case ID: #{cse.caseID})"/>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Manager: "/>
+                                                </div>
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-manager-it" 
+                                                                  value="#{cse.caseManager.human.name}"/>  
+                                                </div>
+
+                                            </div>
+
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Opened: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-o-odate-it" 
+                                                                  value="#{reportingBB.getPrettyDateNoTime(cse.originationDate)}"/>
+                                                </div>
+                                            </div>
+
+                                            <!--NESTED DATA FIELD -->
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="Closed: "
+                                                                   rendered="#{!empty cse.closingDate}"/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <h:outputText id="selcase-cdate-it" 
+                                                                  value="#{reportingBB.getPrettyDateNoTime(cse.closingDate)}"
+                                                                  rendered="#{!empty cse.closingDate}"/>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputText value="(#{cse.violationList.size()}) " />
+                                                    <h:outputLabel value="Violations: "/>
+
+                                                </div>
+
+
+
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="violations-scroller"
+                                                                    value="#{cse.violationList}"
+                                                                    var="viol"
+                                                                    style="font-family: sans-serif;">
+
+                                                        <h:outputText value="#{!(empty viol.status) ? viol.status.label : ''}"
+                                                                      style="font-weight: bold;"/>
+
+
+                                                        <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
+                                                                      style="font-weight: bold;"/>
+
+                                                        <h:outputText value="#{!(empty viol.status) ? ': ' : ''}"
+                                                                      style="font-weight: bold;"/>
+
+                                                        <h:outputText    id="violation-scroller-chapter-ot"
+                                                                         value="#{viol.violatedEnfElement.headerString}"
+                                                                         escape="false"/>
+
+                                                    </p:dataScroller>
+
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputLabel value="(#{cse.noticeList.size()}) Notices: : "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="case-nov-scroller"
+                                                                    value="#{cse.noticeList}"
+                                                                    var="nov"
+                                                                    style="font-family: sans-serif;">
+
+                                                        <h:outputText value="Mailed on: " 
+                                                                      rendered="#{!(empty nov.sentTS)}"/>
+                                                        <h:outputText value="#{nov.sentTSPretty}"
+                                                                      rendered="#{!(empty nov.sentTS)}"/>
+
+                                                    </p:dataScroller>
+                                                </div>
+                                            </div>
+                                            <div class="ui-g-6 ui-md-6 ui-lg-6 restrict-data-field-report" >
+
+                                                <!--NESTED DATA LABEL INLINE -->
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputText value="#{cse.citationList.size()}: " />
+                                                    <h:outputLabel value="Citations: "/>
+                                                </div>
+                                                <!--NESTED DATA VALUE INLINE -->
+                                                <div class="restrict-data-field-value-inline" >
+                                                    <p:dataScroller id="case-citations-scroller"
+                                                                    value="#{cse.citationList}"
+                                                                    var="cit"
+                                                                    style="font-family: sans-serif;">
+                                                        <div style="text-decoration: underline;">
+                                                            <h:outputText value="ID: #{cit.citationNo}" />
+                                                        </div>
+                                                        <p:spacer height="3px" />
+                                                        <ui:repeat id="citation-status-uir"
+                                                                   value="#{cit.statusLog}"
+                                                                   var="logentry">
+                                                            <h:outputText value="#{reportingBB.getPrettyDateNoTime(logentry.dateOfRecord)}: #{logentry.status.statusTitle}"/>
+                                                            <p:spacer height="3px" />
+                                                        </ui:repeat>
+                                                    </p:dataScroller>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p:spacer height="10px" />
+                                    </p:dataScroller>
+                                </ui:repeat>
+                            </div>
                     </h:form>
                 </div>
             </ui:define>
