@@ -2,7 +2,7 @@
 
 The CE Case screen enables you to update and track all aspects of a specific code enforcement case. 
 
-To navigate to the specific panel you want to update, you can scroll down or use the hyperlinks at the top of the page.
+To navigate to the specific panel you want to update, scroll down or use the hyperlinks at the top of the page.
 
 ![screenshot](img/overview.png)
 
