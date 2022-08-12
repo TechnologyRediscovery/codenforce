@@ -113,11 +113,11 @@ You can confirm which code element(s) were linked to each space in your checklis
 
 ![screenshot](img/inspection_11.png)
 
-10. Once you are done selecting files, click the blue 'Upload' button (red circle). 
+10. Once you are done selecting files, click the blue 'Upload' button. 
 
 ![screenshot](img/inspection_12.png)
 
-If your upload is successful, the blue 'Upload' button will dissapear and confirmation will temporarily appear for each file that was uploaded (red arrow). 
+If your upload is successful, the blue 'Upload' button will dissapear and confirmation will temporarily appear for each file that was uploaded. 
 
 ![screenshot](img/inspection_13.png)
 
@@ -125,7 +125,7 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 
 ![screenshot](img/inspection_14.png)
 
-12. If the inspection contained any violations, a pop-up window will appear to prompt you to indicate the severity. Choose the appropiate severyity from the drop-down menu (red circle), then select 'Save violation details' (red arrow).  
+12. If the inspection contained any violations, a pop-up window will appear to prompt you to indicate the severity. Choose the appropiate severyity from the drop-down menu, then select 'Save violation details'.  
 
 ![screenshot](img/inspection_15.png)
 
@@ -135,7 +135,7 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 
 ![screenshot](img/inspection_16.png)
 
-14. Select the correct determination/result of the inspection from the drop-down menu by clicking the down arrow (red circle). Then select the 'Finalize and lock inspection ID' blue button (red arrow). After this button has been selected, you will no longer be able to make any changes to the inspection.
+14. Select the correct determination/result of the inspection from the drop-down menu by clicking the down arrow. Then select the 'Finalize and lock inspection ID' blue button. After this button has been selected, you will no longer be able to make any changes to the inspection.
 
 ![screenshot](img/inspection_17.png)
 
