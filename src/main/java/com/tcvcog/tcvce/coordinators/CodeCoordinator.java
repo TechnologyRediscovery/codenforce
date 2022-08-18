@@ -424,8 +424,6 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         
         ci.deactivateCodeElement(ele);
         
-        
-        
     }
     
     

@@ -90,5 +90,10 @@ ALTER TABLE public.event ADD COLUMN parcel_parcelkey INTEGER CONSTRAINT event_pa
 --******************************* LOCAL CURSOR HERE  ******************************* 
 
 
+
+
+
+
+
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
     VALUES (42, 'database/patches/dbpatch_beta42.sql', NULL, 'ecd', '');

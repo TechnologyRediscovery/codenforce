@@ -1497,7 +1497,7 @@
                     <div class="p-col-12">
                         <p:commandButton   id="inspection-finalize-commit-cb"
                                            value="Finalzie and lock inspection ID:#{fieldInspectionBB.currentInspection.inspectionID} with selected determination"
-                                           rendered="#{(systemServicesBB.bbSessionUser.userID eq ins.inspector.userID) or systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                           rendered="true"
                                            icon="fa fa-check-square "
                                            disabled="#{!empty fieldInspectionBB.currentInspection.determinationTS}"
                                            actionListener="#{fieldInspectionBB.onCertifyInspectionCommitButtonChange}"
@@ -1518,7 +1518,7 @@
                                               disabled="#{empty fieldInspectionBB.currentInspection.determinationTS}"
                                               ajax="true"
                                               oncomplete="PF('inspection-finalize-dialog-var').hide();"
-                                              rendered="#{!empty fieldInspectionBB.currentInspection.determinationTS}"
+                                              rendered="true"
                                               value="Remove finalization of inspection ID #{fieldInspectionBB.currentInspection.inspectionID}" 
                                               update="  @form:@parent:inspectiontools-growl-form
                                               @form:@parent:inspection-actions-form

@@ -113,17 +113,12 @@ public class ReportConfigCECaseList
     private List<CodeViolationPropCECaseHeavy> violationsWithinStipCompWindow;
     private List<CodeViolationPropCECaseHeavy> violationsOutsideCompWindowNOTCited;
     private List<CodeViolationPropCECaseHeavy> violationsNoComplianceButCited;
-    
-    
-    
     private HorizontalBarChartModel barViolationsReport;
     
     private PieChartModel pieViol;
     protected List<LegendItem> pieViolLegend;
     private Map<CodeViolationStatusEnum, Integer> pieViolStatMap;
     private int pieViolCompCount;
-    
-    
     
     private PieChartModel pieEnforcement;
     protected List<LegendItem> pieEnforcementLegend;
