@@ -4,13 +4,11 @@
 
 ![screenshot](img/checklist_1.png)
 
-
 2. Select the '+ New checklist' button on the inspection checlist builder page. 
 
 ![screenshot](img/checklist_2.png)
 
 A pop-up window will appear in the middle of the page. 
-
 
 3. Fill in the municipality, title, description, and governing code for the new checklist that you want to create. Then, select "Save Changes". 
 
@@ -65,21 +63,11 @@ You can confirm which code element(s) were linked to each space in your checklis
 ![screenshot](img/checklist_8.png)
 
 
-## Create A New Case
-
-1. From the property page, select the 'Create New Code Enforcement Case' button on the right-hand side. 
-
-![screenshot](img/inspection_1.png)
-
-2.  Fill in the case name, the date and time that the case was opened, the case manager, origination category, and optional notes. Select the 'Open Code Enforcement Case' button.
-
-![screenshot](img/inspection_2.png)
-
 ## Conduct An Inspection
 
-1. From the code enforcement case page, select the '+ New inspection' button under the 'Field Inspection' banner. 
+1. From the permit file page, select the '+ New inspection' button under the 'Inspections' banner. 
 
-![screenshot](img/inspection_3.png)
+![screenshot](img/updatedinspection.png)
 
 2. Choose the inspection checklist that you want to use and select the 'Create' button.
 
@@ -129,13 +117,39 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 
 ![screenshot](img/inspection_15.png)
 
+
 ## Finalize an Inspection
 
-13. After saving an inspection checklist, you can finalize the inspection by selecting the blue 'finalize inspection' button. 
+1. After saving an inspection checklist, you can finalize the inspection by selecting the blue 'finalize inspection' button. 
 
 ![screenshot](img/inspection_16.png)
 
-14. Select the correct determination/result of the inspection from the drop-down menu by clicking the down arrow. Then select the 'Finalize and lock inspection ID' blue button. After this button has been selected, you will no longer be able to make any changes to the inspection.
+2. Select the correct determination/result of the inspection from the drop-down menu by clicking the down arrow. Then select the 'Finalize and lock inspection ID' blue button. After this button has been selected, you will no longer be able to make any changes to the inspection.
 
 ![screenshot](img/inspection_17.png)
+
+
+## Generate a Field Inspection Report
+
+1. Select the blue 'Build Inspection Report' button (red arrow).
+
+![screenshot](img/inspection_18.png)
+
+2. Select which elements of the inspection you want to be included in the report from the drop-down menu (red circle) and check any relevant boxes.  Once you are finished, click the 'Click to generate inspection report in new tabe' blue text at the top of the pop-up window. The report will appear in a new tab in a print-friendly format. 
+
+![screenshot](img/inspection_19.png)
+
+
+## Transfer Violations to a New or Existing Case
+
+1. After an inspection has been finalized, you can transfer the violations that were found to a new or existing case so that you do not need to re-enter them. To do this, select 'Transfer Violated Elements' in the Inspection Toolbox.
+
+![screenshot](img/violtransfer.png)
+
+2. Choose whether you would like to open a new case, or add the violations to an existing case.
+
+![screenshot](img/violtransfer.png)
+
+3. Review the violations and enter case details to complete the transfer.
+
 
