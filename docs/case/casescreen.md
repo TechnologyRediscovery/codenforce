@@ -9,10 +9,11 @@ To navigate to the specific panel you want to update, scroll down or use the hyp
 From this page, you can:
 
 - Add, View, and Edit Violations
-- Prepare and Print Notices of Violation
+- Conduct Field Inspections
+- Prepare and Print Notices of Violation and Other Letters
+- Manage Letter Types 
 - Log, Edit and View Events
 - Upload Photos and Documents
-- Manage Fees and Payments
 - Manage Citations
 - Add Notes
 
@@ -32,15 +33,83 @@ From this page, you can:
 ![screenshot](img/recordviolation.png)
 
 
+## Conduct a Field Inspection
+
+1. From the code enforcement case page, select the '+ New inspection' button under the 'Field Inspection' banner. 
+
+![screenshot](img/inspection_3copy.png)
+
+2. Choose the inspection checklist that you want to use and select the 'Create' button.
+
+![screenshot](img/inspection_4copy.png)
+
+3. Enter the inspector, date, and time of the inspection, and any notes, in the 'Inspection Profile' pop-up window.  Select the 'Save Changes' button.  
+
+![screenshot](img/inspection_5copy.png)
+
+4. Select the 'Inspect new space' button.  
+
+![screenshot](img/inspection_6copy.png)
+
+5. Select the space(s) and click 'Continue'.
+
+![screenshot](img/inspection_7copy.png)
+
+6. You can choose to add a location descriptor. To start the inspection, select the 'Inspect spance now!' button.
+
+![screenshot](img/inspection_8copy.png)
+
+7. All of the code elements within the inspection list will default to 'Not Inspected'. If you would like, you can batch apply the 'Passed' or 'Violated' status to all of the code elements in the list by selecting the status from the drop-down menu in the top left-hand side of the pop-up window and select the 'Batch apply to all ords' link.
+
+![screenshot](img/inspection_9copy.png)
+
+8. Code elements in the inspection list are divided into subcategories. Select the arrow next to a subcategory (red circle) to display the associated code elements.  To add a photo, select the 'Add a photo' link (red arrow). 
+
+![screenshot](img/inspection_10copy.png)
+
+9. After selecting the 'Add a photo' link in step 8, a pop-up window will appear. To add a photo that is saved on the device, select the '+ Choose' button. 
+
+![screenshot](img/inspection_11copy.png)
+
+10. Once you are done selecting files, click the blue 'Upload' button. 
+
+![screenshot](img/inspection_12copy.png)
+
+If your upload is successful, the blue 'Upload' button will dissapear and confirmation will temporarily appear for each file that was uploaded. 
+
+![screenshot](img/inspection_13copy.png)
+
+11. To complete the inspection checklist, select 'Save and confirm' at the top of the window. 
+
+![screenshot](img/inspection_14copy.png)
+
+12. If the inspection contained any violations, a pop-up window will appear to prompt you to indicate the severity. Choose the appropiate severyity from the drop-down menu, then select 'Save violation details'.  
+
+![screenshot](img/inspection_15copy.png)
+
+
+## Add Inspected Violations to Case
+
+1. After an inspection has been finalized, you can transfer the violations that were found to your case so that you do not need to re-enter them. To do this, select 'Transfer Violated Elements' in the Inspection Toolbox.
+
+![screenshot](img/violtransfercopy.png)
+
+2. Select that you would like to add violations to an existing case.
+
+![screenshot](img/violtransfer2copy.png)
+
+3. Review the violations and enter case details to complete the transfer.
+
+
 ## Prepare a Notice of Violation
 
-1. From the dashboard, select the property case that the NOV is being built from. Select 'View'.
+1. From the case screen, select 'New Letter'.
 
-![screenshot](img/nov1.png)
+![screenshot](img/newletter.png)
 
-2. Select 'New Notice of Violation'.
+2. Select "Notice of Violation" in the drop down menu.
 
-![screenshot](img/nov2.png)
+![screenshot](img/novletter.png)
 
 3. Choose a Notice of Violation Template. This template has the prefilled text body to create the NOV. Select 'Create Draft'.
 
@@ -78,7 +147,7 @@ From this page, you can:
 
 ![screenshot](img/nov7.png)
 
-13. Select 'Record Mailing' (located next to the 'Finalize and Lock' selection).
+13. Select 'Record Mailing' (located next to the 'Finalize and Lock' selection). This will also automatically generate a Follow Up Event for the Default follow up window, as configured in the Letter Type settings.
 
 ![screenshot](img/nov8.png)
 
@@ -87,7 +156,7 @@ To Remove the NOV, Reset the mailing status, or Mark the notice as returned, sel
 ![screenshot](img/nov10.png)
 
 
-## Adding a new person when creating an NOV
+## Add a new person when creating an NOV
 
 1. Select 'Choose addressee' after you begin a new draft.
 
@@ -114,7 +183,7 @@ To Remove the NOV, Reset the mailing status, or Mark the notice as returned, sel
 7. Close the pop up box and re-select 'Choose addressee'. The person you selected will now be available to add to the NOV.
 
 
-## Linking a new address when creating an NOV
+## Link a new address when creating an NOV
 
 If the address that you want to mail the NOV to is not currently linked to the case's property, you can add that link from the 'Choose Addressee' screen when you create the NOV. 
 
@@ -133,6 +202,23 @@ If the address that you want to mail the NOV to is not currently linked to the c
 4. Select the building number where your address is located, or add it to the system by selecting 'New address on'. Existing links to parcels and persons will also display in the upper right hand corner. Close the pop up box.
 
 ![screenshot](img/selectforlinking.png)
+
+
+## Manage Letter Types 
+
+Letter Types allow you to set up follow up events for correspondence you send to property owners. To set up a new Letter Type, select "manage Letter Types" from the Letters panel, then select Create new Letter Type. After you complete those steps, the following pop up will display:
+
+![screenshot](img/editlettertype.png)
+
+Some of the most important fields to note on this pop up are:
+
+-The Default follow-up window refers to how many days will pass before you are prompted with a follow up event.
+-The event categories allow you to choose which events will display after a letter is sent, when follow up is due, and if a letter is returned to sender.
+-The Inject Violations checkbox will automatically populate the letter will all violations attached to the case. You will have the ability to remove individual violations after you create the letter.
+
+To update the settings for an existing Letter Type, select 'view' next to that Letter Type for your municipality.
+
+![screenshot](img/viewlettertype.png)
 
 
 ## Log an Event

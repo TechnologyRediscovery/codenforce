@@ -148,7 +148,7 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 
 2. Choose whether you would like to open a new case, or add the violations to an existing case.
 
-![screenshot](img/violtransfer.png)
+![screenshot](img/violtransfer2.png)
 
 3. Review the violations and enter case details to complete the transfer.
 
