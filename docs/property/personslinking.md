@@ -4,7 +4,7 @@
 
 ![screenshot](img/manageproppers.png)
 
-2. Search to see if the person you would like to connect has already been entered into the database. Type the first or last name into the text block and select 'execute selected query'.
+2. Search to see if the person you would like to connect has already been entered into the database. Type the first or last name into the text block, and select 'execute selected query'.
 
 ![screenshot](img/search.png)
 
