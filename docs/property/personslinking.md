@@ -14,11 +14,11 @@
 
 4. If the person you searched for has been entered in the database, they will display in the Working Persons list. Once you have found them on the list, select 'queue for linking'.
 
-![screenshot](img/workingpers.png)
+![screenshot](img/workingpers2.png)
 
 5. Select the person's role (how they are related to the property or case) and then click 'Link these persons to Parcel' or 'Link these persons to Code Enf Case'.
 
-![screenshot](img/selectedpers.png)
+![screenshot](img/selectedpers2.png)
 
 
 ## Link Multiple People to a Property or Case at Once
