@@ -4074,11 +4074,12 @@ rptList.setIncludeSectionCaseByCaseDetail_eventSummary(true);
                 if(cse.getClosingDate() != null){
                     continue;
                 }
-                if(currentCase != null){
-                    if(currentCase.getCaseID() == cse.getCaseID()){
-                        continue;
-                    }
-                }
+                // removed to add all cases
+//                if(currentCase != null){
+//                    if(currentCase.getCaseID() == cse.getCaseID()){
+//                        continue;
+//                    }
+//                }
                 cl.add(cse);
             }
         }

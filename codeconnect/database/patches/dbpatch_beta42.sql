@@ -86,13 +86,74 @@ ALTER TYPE eventtype ADD VALUE 'OccupancyClosing';
 ALTER TYPE eventtype ADD VALUE 'Inspection';
 
 ALTER TABLE public.event ADD COLUMN parcel_parcelkey INTEGER CONSTRAINT event_parcelkey_fk REFERENCES parcel (parcelkey);
+
+
+ALTER TABLE public.event ADD COLUMN human_humanid INTEGER 
+    CONSTRAINT event_humanid_fk REFERENCES human (humanid);
+
+CREATE SEQUENCE public.occinspectiondispatch_dispatchid_seq
+  INCREMENT 1
+  MINVALUE 100
+  MAXVALUE 9223372036854775807
+  START 100
+  CACHE 1;
+ALTER TABLE public.occinspectiondispatch_dispatchid_seq
+  OWNER TO sylvia;
+
+
+CREATE TABLE IF NOT EXISTS public.occinspectiondispatch
+(
+    dispatchid integer NOT NULL DEFAULT nextval('occinspectiondispatch_dispatchid_seq'::regclass),
+    createdby_userid integer NOT NULL,
+    creationts timestamp with time zone NOT NULL,
+    dispatchnotes text COLLATE pg_catalog."default",
+    inspection_inspectionid integer NOT NULL,
+    retrievalts timestamp with time zone,
+    retrievedby_userid integer,
+    synchronizationts timestamp with time zone,
+    synchronizationnotes text COLLATE pg_catalog."default",
+    municipality_municode integer NOT NULL,
+    municipalityname text COLLATE pg_catalog."default",
+    CONSTRAINT occinspectiondispatch_pkey PRIMARY KEY (dispatchid),
+    CONSTRAINT occinspectiondispatch_createdby_userid_fk FOREIGN KEY (createdby_userid)
+        REFERENCES public.login (userid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT occinspectiondispatch_municode_fk FOREIGN KEY (municipality_municode)
+        REFERENCES public.municipality (municode) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT occinspectiondispatch_occinspectionid_fk FOREIGN KEY (inspection_inspectionid)
+        REFERENCES public.occinspection (inspectionid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT occinspectiondispatch_retrievedby_userid_fk FOREIGN KEY (retrievedby_userid)
+        REFERENCES public.login (userid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.occinspectiondispatch
+    OWNER to sylvia;
+
+ALTER TABLE public.occinspectiondispatch ADD COLUMN deactivatedts TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occinspectiondispatch ADD COLUMN deactivatedby_userid INTEGER CONSTRAINT occinspectiondispatch_deacbyuserid_fk 
+    REFERENCES login (userid);
+
+
+ALTER TABLE public.occinspectiondispatch ADD COLUMN lastupdatedts  TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.occinspectiondispatch ADD COLUMN lastupdatedby_userid    INTEGER CONSTRAINT occinspectiondispatch_lastupdatdby_userid_fk 
+    REFERENCES login (userid);
+
+ALTER TABLE public.occinspectiondispatch DROP COLUMN municipality_municode;
+ALTER TABLE public.occinspectiondispatch DROP COLUMN municipalityname;
+
 --******************************* REMOTE CURSOR HERE  ******************************* 
 --******************************* LOCAL CURSOR HERE  ******************************* 
-
-
-
-
-
 
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)

@@ -73,11 +73,13 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     
     private boolean formMigrateFailedItemsOnFinalization;
     
-    
     private int occPeriodIDFortransferFormField;
     
     private ReportConfigOccInspection reportConfigFIN;
     private List<ViewOptionsOccChecklistItemsEnum> ordinanceViewOptionsList;
+    
+    private boolean editModeDispatch;
+    private OccInspectionDispatch currentDispatch;
        
 
     @PostConstruct
@@ -173,6 +175,48 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
                         .getRequestParameterMap()
                         .get("initiating-inspection-list-component-id");
         System.out.println("FieldInspectionBB.extractComponentForReloadFromRequest | Component = " + inspectionListComponentForUpdate);
+    }
+    
+    /**
+     * Listener for user clicks of the dispatch edit or revoke button on 
+     * the inspection profile screen
+     * @param ev 
+     */
+    public void onToggleDispatchEditMode(ActionEvent ev){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        if(currentInspection != null){
+            if(editModeDispatch){
+                if(currentDispatch != null){
+                    try {
+                        if(currentDispatch.getDispatchID() == 0){
+                            oic.insertOccInspectionDispatch(currentInspection, currentDispatch, getSessionBean().getSessUser());
+                        } else {
+                            oic.updateOccInspectionDispatch(currentDispatch, getSessionBean().getSessUser());
+                        }
+                    } catch (IntegrationException | BObStatusException ex) {
+                        System.out.println(ex);
+                          getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                    "Fatal error: inserting or updating dispatch; ", ""));
+                    } 
+                }
+            } else {    
+                if(currentInspection.getDispatch() == null){
+                    currentDispatch = oic.getOccInspectionDispatchSkeleton(currentInspection, getSessionBean().getSessUser());
+                }
+            }
+            editModeDispatch = !editModeDispatch;
+        }
+    }
+    
+    
+    /**
+     * Listener for user requests to cancel edits of the dispatch
+     * @param ev 
+     */
+    public void onDispatchEditModeAbort(ActionEvent ev){
+        editModeDispatch = false;
+        
     }
 
     /**
@@ -1123,6 +1167,34 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      */
     public void setOrdinanceViewOptionsList(List<ViewOptionsOccChecklistItemsEnum> ordinanceViewOptionsList) {
         this.ordinanceViewOptionsList = ordinanceViewOptionsList;
+    }
+
+    /**
+     * @return the editModeDispatch
+     */
+    public boolean isEditModeDispatch() {
+        return editModeDispatch;
+    }
+
+    /**
+     * @param editModeDispatch the editModeDispatch to set
+     */
+    public void setEditModeDispatch(boolean editModeDispatch) {
+        this.editModeDispatch = editModeDispatch;
+    }
+
+    /**
+     * @return the currentDispatch
+     */
+    public OccInspectionDispatch getCurrentDispatch() {
+        return currentDispatch;
+    }
+
+    /**
+     * @param currentDispatch the currentDispatch to set
+     */
+    public void setCurrentDispatch(OccInspectionDispatch currentDispatch) {
+        this.currentDispatch = currentDispatch;
     }
 
     

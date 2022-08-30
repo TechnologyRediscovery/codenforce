@@ -48,8 +48,12 @@
                                          icon="fa fa-stop"
                                          actionListener="#{fieldInspectionBB.abortEditsOccInspectionMetadata}"
                                          oncomplete="PF('inspection-profile-dialog-var').show()"
-                                         update="@form
-                                         @form:@parent:inspectiontools-growl-form"/>
+                                         update="   @form
+                                                    @form:@parent:inspectiontools-growl-form
+                                                    inspection-actions-form
+                                                    inspection-advancedtools-form
+                                                    inspection-actions-form
+                                                    inspection-inspectedspaces-form"/>
                     </div>
 
 
@@ -374,6 +378,7 @@
                         </div>
                     </p:panel>
                 </h:form>
+                
                 <p:panel id="inspection-advancedtools-panel"
                          toggleable="true"
                          collapsed="true"
@@ -507,7 +512,30 @@
                                                  value="#{!empty fieldInspectionBB.currentInspection.determination ? 'edit determination':'finalize inspection'}">
                                 </p:commandButton>
                             </div>
+                            
                         </div>
+                    </h:form>
+                </p:panel>
+
+                <p:panel id="inspection-dispatch-panel"
+                         toggleable="true"
+                         collapsed="false"
+                         header="Dispatch">
+                    <h:form id="inspection-dispatch-form">
+                        
+                        <p:commandButton id="dispatch-init-button"
+                                                 actionListener="#{fieldInspectionBB.onCertifyInspectionInitButtonChange}"
+                                                 ajax="true"
+                                                 icon="fa fa-check"
+                                                 oncomplete="PF('inspection-finalize-dialog-var').show()"
+                                                 disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
+                                                 update="  inspection-finalize-form
+                                                 inspection-finalize-dialog"
+                                                 value="#{!empty fieldInspectionBB.currentInspection.determination ? 'edit determination':'finalize inspection'}">
+                                </p:commandButton>
+                        
+                        
                     </h:form>
                 </p:panel>
 
@@ -976,7 +1004,7 @@
     <!-- Barely realized form that should show stats for one OccInspectedSpace(?) and all of its ordinances -->
 
     <p:dialog id="inspections-entryscreen"
-              height="600" width="1000"
+              height="800" width="1300"
               widgetVar="inspections-entryscreen-var"
               header="Inspect ordiances in #{fieldInspectionBB.currentInspectedSpace.type.spaceTypeTitle} (ID: #{fieldInspectionBB.currentInspectedSpace.inspectedSpaceID})"
               dynamic="true"

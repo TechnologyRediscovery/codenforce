@@ -441,9 +441,10 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @return
      * @throws BObStatusException 
      */
-    private FieldInspection configureOccInspection(FieldInspection inspection) throws BObStatusException {
+    private FieldInspection configureOccInspection(FieldInspection inspection) throws BObStatusException, IntegrationException {
         boolean allSpacesPassed = true;
         BlobCoordinator bc = getBlobCoordinator();
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
         if (inspection == null) {
             throw new BObStatusException("Cannot configure a null inspection");
         }
@@ -463,6 +464,9 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                 allSpacesPassed = false;
             }
         }
+        
+        // check for dispatches and load if necessary
+        inspection.setDispatch(oii.getOccInspectionDispatch(oii.getOccInspectionDispatchByInspection(inspection)));
 
         inspection.setReadyForPassedCertification(allSpacesPassed);
         if (!inspection.getInspectedSpaceList().isEmpty()) {
@@ -473,6 +477,94 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         
 
         return inspection;
+    }
+    
+    /**
+     * Generator for dispatch objects less an ID which makes them skeletons
+     * @param fin
+     * @param ua
+     * @return 
+     */
+    public OccInspectionDispatch getOccInspectionDispatchSkeleton(FieldInspection fin, UserAuthorized ua){
+        OccInspectionDispatch oid = new OccInspectionDispatch();
+        if(fin != null){
+            oid.setInspectionID(fin.getInspectionID());
+        }
+        return oid;
+        
+        
+    }
+    
+    
+    /**
+     * Logic intermediary for dispatch insertion
+     * @param fin which is being dispatched
+     * @param oid
+     * @param ua doing the actual dispatching
+     * @return
+     * @throws IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public int insertOccInspectionDispatch(FieldInspection fin, OccInspectionDispatch oid, UserAuthorized ua) throws IntegrationException, BObStatusException{
+        if(oid == null || fin == null){
+            throw new IntegrationException("Cannot insert null inspection dispatch and cannot do so with null FIN");
+        }
+        
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        
+        if(fin.getDispatch() != null){
+            throw new BObStatusException("The given field inspection contains a dispatch already!");
+        }
+        
+        oid.setInspectionID(fin.getInspectionID());
+        
+        oid.setCreatedBy(ua);
+        oid.setLastUpdatedBy(ua);
+        
+        return oii.insertOccInspectionDispatch(oid);
+    }
+    
+    /**
+     * Updates a record in the occinspectiondispatch table
+     * @param oid
+     * @param ua 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public void updateOccInspectionDispatch(OccInspectionDispatch oid, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(oid == null || ua == null){
+            throw new BObStatusException("Cannot update dispatch with null dispatch or user");            
+        }
+        
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+         
+        oid.setLastUpdatedBy(ua);
+        oii.updateOccInspectionDispatch(oid);
+        
+        
+    }
+    
+    
+    /**
+     * Logic block to set deactivation TS and user on a dispatch
+     * @param oid to deactivate
+     * @param ua doing the deactivation
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public void deactivateOccInspectionDispatch(OccInspectionDispatch oid, UserAuthorized ua) throws BObStatusException, IntegrationException{
+        if(oid == null || ua == null){
+            throw new BObStatusException("Cannot deactivate dispatch with null dispatch or user");            
+        }
+        
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+        oid.setDeactivatedBy(ua);
+        oid.setDeactivatedTS(LocalDateTime.now());
+        oid.setLastUpdatedBy(ua);
+        
+        oii.updateOccInspectionDispatch(oid);
+        
+        
     }
 
     /**

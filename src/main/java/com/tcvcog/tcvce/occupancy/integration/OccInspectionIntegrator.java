@@ -1355,7 +1355,277 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         
         return newInspectionID;
     }
+    
+    /**
+     * Looks for any dispatches by inspection
+     * @param fin
+     * @return the ID of at maximum one dipsatch; 0 for no dispatches
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+    public int getOccInspectionDispatchByInspection(FieldInspection fin) throws IntegrationException{
+        if(fin == null){
+            throw new IntegrationException("Cannot fetch dispatches by null field inspection");
+        }
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT dispatchid FROM occinspectiondispatch WHERE inspection_inspectionid=? AND deactivatedts IS NULL;");
+        int did = 0;
 
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, fin.getInspectionID());
+
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                did = rs.getInt("dispatchid");
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable find dispatches by inspection", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+        return did;
+    }
+    
+    /**
+     * Extracts a dispatch from the DB by ID
+     * @param dispatchID
+     * @return the fully-baked inspection dispatch
+     */
+    public OccInspectionDispatch getOccInspectionDispatch(int dispatchID) throws IntegrationException, BObStatusException{
+        if(dispatchID == 0){
+            return null;
+        }
+        
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT dispatchid, createdby_userid, creationts, dispatchnotes, "
+                + "inspection_inspectionid, retrievalts, retrievedby_userid, synchronizationts, synchronizationnotes, "
+                + "municipality_municode, municipalityname, deactivatedts, deactivatedby_userid, lastupdatedts, lastupdatedby_userid\n" 
+                + "	FROM public.occinspectiondispatch WHERE dispatchid=?;");
+        OccInspectionDispatch dispatch = null;
+
+        try {
+            stmt = con.prepareStatement(sb.toString());
+            stmt.setInt(1, dispatchID);
+
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                dispatch = generateOccInspectionDispatch(rs);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("unable to generate dispatch", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        } // close finally
+
+        return dispatch;
+        
+    }
+    
+    /**
+     * Internal generator for dispatches
+     * @param rs
+     * @return 
+     */
+    private OccInspectionDispatch generateOccInspectionDispatch(ResultSet rs) throws SQLException, IntegrationException, BObStatusException{
+        if(rs == null){
+            return null;
+        }
+        
+        UserCoordinator uc = getUserCoordinator();
+        SystemIntegrator si = getSystemIntegrator();
+        
+        OccInspectionDispatch dispatch = new OccInspectionDispatch();
+        dispatch.setInspectionID(rs.getInt("dispatchid"));
+        dispatch.setDispatchNotes(rs.getString("dispatchnotes"));
+        dispatch.setInspectionID(rs.getInt("inspection_inspectionid"));
+        if(rs.getTimestamp("retrievalts") != null){
+            dispatch.setRetrievalTS(rs.getTimestamp("retrievalts").toLocalDateTime());
+        }
+        if(rs.getInt("retrievedby_userid") != 0){
+            dispatch.setRetrievedBy(uc.user_getUser(rs.getInt("retrievedby_userid")));   
+        }
+        if(rs.getTimestamp("synchronizationts") != null){
+            dispatch.setSynchronizationTS(rs.getTimestamp("synchronizationts").toLocalDateTime());
+        }
+        dispatch.setSynchronizationNotes(rs.getString("synchronizationnotes"));
+        si.populateTrackedFields(dispatch, rs, false);
+        return dispatch;
+        
+    }
+
+    
+    /**
+     * Writes a given dispatch to the DB
+     * @param oid
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     */
+    public int insertOccInspectionDispatch(OccInspectionDispatch oid) throws IntegrationException{
+        if(oid == null){
+            throw new IntegrationException("Cannot insert a null dispatch");
+        }
+        
+        String query = "INSERT INTO public.occinspectiondispatch(\n" +
+                        "	dispatchid, createdby_userid, creationts, dispatchnotes, \n" +
+                        "	inspection_inspectionid, retrievalts, retrievedby_userid, \n" +
+                        "	synchronizationts, synchronizationnotes, municipality_municode, \n" +
+                        "	municipalityname, deactivatedts, deactivatedby_userid, \n" +
+                        "	lastupdatedts, lastupdatedby_userid)\n" +
+                        "      VALUES (DEFAULT, ?, now(), ?, "
+                                    + "?, ?, ?, "
+                                    + "?, ?, NULL, "
+                                    + "NULL, NULL, NULL, "
+                                    + "now(), ?);";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        int freshDispatchID = 0;
+        try {
+            stmt = con.prepareStatement(query);
+      
+            if(oid.getCreatedBy() != null){
+                stmt.setInt(1, oid.getCreatedBy().getCreatedByUserId());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+            stmt.setString(2, oid.getDispatchNotes());
+
+            stmt.setInt(3, oid.getInspectionID());
+            if(oid.getRetrievalTS() != null){
+                stmt.setTimestamp(4, java.sql.Timestamp.valueOf(oid.getRetrievalTS()));
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+            if(oid.getRetrievedBy()!= null){
+                stmt.setInt(5, oid.getRetrievedBy().getUserID());
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+
+            if(oid.getSynchronizationTS() != null){
+                stmt.setTimestamp(6, java.sql.Timestamp.valueOf(oid.getSynchronizationTS()));
+            } else {
+                stmt.setNull(6, java.sql.Types.NULL);
+            }
+            stmt.setString(7, oid.getSynchronizationNotes());
+            if(oid.getLastUpdatedBy() != null){
+                stmt.setInt(8, oid.getLastUpdatedByUserID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            
+            stmt.execute();
+            
+            String retrievalQuery = "SELECT currval('occinspectiondispatch_dispatchid_seq');";
+            stmt = con.prepareStatement(retrievalQuery);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                freshDispatchID = rs.getInt(1);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot insert OccInspectionDispatch", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        
+        return freshDispatchID;
+        
+    }
+    
+    /**
+     * Updates a record of the occinspectiondispatch table
+     * @param oid
+     * @throws IntegrationException 
+     */
+    public void updateOccInspectionDispatch(OccInspectionDispatch oid) throws IntegrationException{
+        if(oid == null){
+            throw new IntegrationException("Cannot update a null dispatch");
+        }
+        
+        String query = "UPDATE public.occinspectiondispatch\n" +
+                        "	SET dispatchnotes=?, inspection_inspectionid=?, \n" +
+                        "	retrievalts=?, retrievedby_userid=?, synchronizationts=?, \n" +
+                        "	synchronizationnotes=?, municipality_municode=NULL, municipalityname=NULL, \n" +
+                        "	deactivatedts=?, deactivatedby_userid=?, lastupdatedts=now(), \n" +
+                        "	lastupdatedby_userid=?\n" +
+                        "	WHERE dispatchid=?;";
+        Connection con = getPostgresCon();
+        ResultSet rs = null;
+        PreparedStatement stmt = null;
+        try {
+            stmt = con.prepareStatement(query);
+      
+            stmt.setString(1, oid.getDispatchNotes());
+
+            stmt.setInt(2, oid.getInspectionID());
+            if(oid.getRetrievalTS() != null){
+                stmt.setTimestamp(3, java.sql.Timestamp.valueOf(oid.getRetrievalTS()));
+            } else {
+                stmt.setNull(3, java.sql.Types.NULL);
+            }
+            if(oid.getRetrievedBy()!= null){
+                stmt.setInt(4, oid.getRetrievedBy().getUserID());
+            } else {
+                stmt.setNull(4, java.sql.Types.NULL);
+            }
+
+            if(oid.getSynchronizationTS() != null){
+                stmt.setTimestamp(5, java.sql.Timestamp.valueOf(oid.getSynchronizationTS()));
+            } else {
+                stmt.setNull(5, java.sql.Types.NULL);
+            }
+            stmt.setString(6, oid.getSynchronizationNotes());
+
+            if(oid.getDeactivatedTS() != null){
+                stmt.setTimestamp(7, java.sql.Timestamp.valueOf(oid.getDeactivatedTS()));
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            if(oid.getDeactivatedBy() != null){
+                stmt.setInt(8, oid.getDeactivatedByUserID());
+            } else {
+                stmt.setNull(8, java.sql.Types.NULL);
+            }
+            
+            if(oid.getLastUpdatedBy() != null){
+                stmt.setInt(9, oid.getLastUpdatedByUserID());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            stmt.setInt(10, oid.getDispatchID());
+            
+            stmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            System.out.println(ex.toString());
+            throw new IntegrationException("Cannot update OccInspectionDispatch", ex);
+        } finally {
+            if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+            if (stmt != null) { try { stmt.close(); } catch (SQLException e) { /* ignored */} }
+            if (rs != null) { try { rs.close(); } catch (SQLException ex) { /* ignored */ } }
+        }
+        
+        
+    }
   
     /**
      * See if a determination has been used in the DB and if not, it can be deleted

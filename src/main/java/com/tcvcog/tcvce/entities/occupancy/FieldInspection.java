@@ -71,6 +71,9 @@ public  class       FieldInspection
 
     private LocalDateTime timeStart;
     private LocalDateTime timeEnd;
+    
+    // DISPATCH
+    private OccInspectionDispatch dispatch;
 
     /** ID for the OccPeriod that this FieldInspection is for **/
     private DomainEnum domainEnum;
@@ -733,5 +736,19 @@ public  class       FieldInspection
      */
     public void setDomainEnum(DomainEnum domainEnum) {
         this.domainEnum = domainEnum;
+    }
+
+    /**
+     * @return the dispatch
+     */
+    public OccInspectionDispatch getDispatch() {
+        return dispatch;
+    }
+
+    /**
+     * @param dispatch the dispatch to set
+     */
+    public void setDispatch(OccInspectionDispatch dispatch) {
+        this.dispatch = dispatch;
     }
 }
