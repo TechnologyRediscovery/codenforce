@@ -495,6 +495,19 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         
     }
     
+    /**
+     * Basic getter for dispatches
+     * @param did
+     * @return 
+     * @throws com.tcvcog.tcvce.domain.IntegrationException 
+     * @throws com.tcvcog.tcvce.domain.BObStatusException 
+     */
+    public OccInspectionDispatch getOccInspectionDispatch(int did) throws IntegrationException, BObStatusException{
+        OccInspectionIntegrator oic = getOccInspectionIntegrator();
+        return oic.getOccInspectionDispatch(did);
+        
+    }
+    
     
     /**
      * Logic intermediary for dispatch insertion
@@ -512,8 +525,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         
-        if(fin.getDispatch() != null){
-            throw new BObStatusException("The given field inspection contains a dispatch already!");
+        if(fin.getDispatch() != null && fin.getDispatch().getDispatchID() != 0){
+            throw new BObStatusException("The given field inspection contains a dispatch with an ID already!");
         }
         
         oid.setInspectionID(fin.getInspectionID());

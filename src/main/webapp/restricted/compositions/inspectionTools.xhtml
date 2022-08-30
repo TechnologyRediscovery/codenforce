@@ -24,9 +24,15 @@
             <!-- Inspection metadata-->
             <div class="p-col-6">
                 <h:form id="inspection-profile-form">
+                    
+                    <h:outputText id="dispatch-notice-ot"
+                                  style="color: darkgreen; font-weight: bold;"
+                                value="This inspection has been dispatched to handheld computer field application"
+                                rendered="#{!empty inspection.dispatch and (empty inspection.dispatch.synchronizationTS and (empty inspection.dispatch.deactivatedTS))}" />
+
                     <p:commandButton id="inspections-inspectiondetails-editbutton"
                                      value="#{fieldInspectionBB.editModeInspectionMetadata ? 'Save Changes' : 'Edit'}"
-                                     disabled="#{!empty fieldInspectionBB.currentInspection.deactivatedBy}"
+                                     disabled="#{!fieldInspectionBB.currentInspection.browserUserEditingAllowed}"
                                      rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                      icon="fa #{fieldInspectionBB.editModeInspectionMetadata ? 'fa-check' : 'fa-pencil'}"
                                      actionListener="#{fieldInspectionBB.onToggleEditModeInspectionMetadata}"
@@ -49,11 +55,11 @@
                                          actionListener="#{fieldInspectionBB.abortEditsOccInspectionMetadata}"
                                          oncomplete="PF('inspection-profile-dialog-var').show()"
                                          update="   @form
-                                                    @form:@parent:inspectiontools-growl-form
-                                                    inspection-actions-form
-                                                    inspection-advancedtools-form
-                                                    inspection-actions-form
-                                                    inspection-inspectedspaces-form"/>
+                                         @form:@parent:inspectiontools-growl-form
+                                         inspection-actions-form
+                                         inspection-advancedtools-form
+                                         inspection-actions-form
+                                         inspection-inspectedspaces-form"/>
                     </div>
 
 
@@ -378,7 +384,7 @@
                         </div>
                     </p:panel>
                 </h:form>
-                
+
                 <p:panel id="inspection-advancedtools-panel"
                          toggleable="true"
                          collapsed="true"
@@ -397,6 +403,7 @@
 
                         <p:commandButton id="inspection-occperiodxfer-button"
                                          action="#{fieldInspectionBB.onOccPeriodXferButtonClick}"
+                                         disabled="#{!fieldInspectionBB.currentInspection.browserUserEditingAllowed}"
                                          ajax="false"
                                          value="Transfer this inspection!" />
 
@@ -406,6 +413,7 @@
                                           actionListener="#{fieldInspectionBB.onDeactivateInspectionButtonClick}"
                                           ajax="true"
                                           value="Deactivate inspection ID #{fieldInspectionBB.currentInspection.inspectionID}"
+                                          disabled="#{!fieldInspectionBB.currentInspection.browserUserEditingAllowed}"
                                           update="#{fieldInspectionBB.inspectionListComponentForUpdate}
                                           inspectiontools-growl-form"
                                           oncomplete="PF('inspection-profile-dialog-var').hide();"
@@ -435,7 +443,7 @@
                                                   icon="fa fa-upload"
                                                   oncomplete="PF('blob-upload-dialog-var').show()"
                                                   rendered="true"
-                                                  disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                  disabled="#{fieldInspectionBB.editModeInspectionMetadata or !fieldInspectionBB.currentInspection.browserUserEditingAllowed}"
                                                   update="@form:@parent:@parent:blob-upload-dialog
                                                   inspectiontools-growl-form"
                                                   />
@@ -449,7 +457,7 @@
                                                   ajax="true"
                                                   icon="fa fa-file-image-o"
                                                   oncomplete="PF('blobs-gallery-dialog-var').show()"
-                                                  disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                  disabled="#{fieldInspectionBB.editModeInspectionMetadata or !fieldInspectionBB.currentInspection.browserUserEditingAllowed}"
                                                   rendered="true"
                                                   update="@form:@parent:@parent:blobs-gallery-dialog
                                                   inspectiontools-growl-form"
@@ -462,7 +470,7 @@
                                                   value="Build Inspection report"
                                                   actionListener="#{fieldInspectionBB.onFieldInspectionReportInitLinkClick}"
                                                   ajax="true"
-                                                  disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                  disabled="#{fieldInspectionBB.editModeInspectionMetadata or !fieldInspectionBB.currentInspection.browserUserEditingAllowed}"
                                                   rendered="true"
                                                   icon="fa fa-print"
                                                   oncomplete="PF('inspection-reportconfig-dialog-var').show()"
@@ -488,7 +496,7 @@
                                 <p:commandButton    id="insp-extractviolations-button"
                                                     value="Transfer Violated Elements #{empty fieldInspectionBB.currentInspection.determination ? '[Finalize inspection to enable migration]' : ''}"
                                                     ajax="true"
-                                                    disabled="#{empty fieldInspectionBB.currentInspection.determination}"
+                                                    disabled="#{(empty fieldInspectionBB.currentInspection.determination) or !fieldInspectionBB.currentInspection.browserUserEditingAllowed}"
                                                     actionListener="#{migrationBB.onMigrationInitButtonChange}"
                                                     oncomplete="PF('faileditems-migrate-choosepath-dialog-var').show()"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
@@ -505,14 +513,14 @@
                                                  ajax="true"
                                                  icon="fa fa-check"
                                                  oncomplete="PF('inspection-finalize-dialog-var').show()"
-                                                 disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
+                                                 disabled="#{fieldInspectionBB.editModeInspectionMetadata or !fieldInspectionBB.currentInspection.browserUserEditingAllowed}"
                                                  rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
                                                  update="  inspection-finalize-form
                                                  inspection-finalize-dialog"
                                                  value="#{!empty fieldInspectionBB.currentInspection.determination ? 'edit determination':'finalize inspection'}">
                                 </p:commandButton>
                             </div>
-                            
+
                         </div>
                     </h:form>
                 </p:panel>
@@ -522,22 +530,205 @@
                          collapsed="false"
                          header="Dispatch">
                     <h:form id="inspection-dispatch-form">
-                        
-                        <p:commandButton id="dispatch-init-button"
-                                                 actionListener="#{fieldInspectionBB.onCertifyInspectionInitButtonChange}"
-                                                 ajax="true"
-                                                 icon="fa fa-check"
-                                                 oncomplete="PF('inspection-finalize-dialog-var').show()"
-                                                 disabled="#{fieldInspectionBB.editModeInspectionMetadata}"
-                                                 rendered="#{systemServicesBB.bbSessionUser.keyCard.hasEnfOfficialPermissions}"
-                                                 update="  inspection-finalize-form
-                                                 inspection-finalize-dialog"
-                                                 value="#{!empty fieldInspectionBB.currentInspection.determination ? 'edit determination':'finalize inspection'}">
-                                </p:commandButton>
-                        
-                        
+
+                        <p:commandButton    id="dispatch-toggle-button"
+                                            actionListener="#{fieldInspectionBB.onToggleDispatchEditMode}"
+                                            ajax="true"
+                                            disabled="#{!fieldInspectionBB.currentInspection.browserUserEditingAllowed}"
+                                            rendered="#{!fieldInspectionBB.editModeDispatch}"
+                                            update="inspection-dispatch-form
+                                            inspectiontools-growl-form"
+                                            value="#{!empty fieldInspectionBB.currentDispatch ? 'Edit dispatch notes':'Dispatch inspection to handheld computer field application'}">
+                        </p:commandButton>
+
+                        <p:commandButton    id="dispatch-save-button"
+                                            actionListener="#{fieldInspectionBB.onToggleDispatchEditMode}"
+                                            ajax="true"
+                                            disabled="false"
+                                            rendered="#{fieldInspectionBB.editModeDispatch}"
+                                            update="inspection-dispatch-form
+                                                inspection-profile-form
+                                                inspectiontools-growl-form
+                                                inspection-actions-form
+                                                inspection-advancedtools-form
+                                                inspection-actions-form
+                                                inspection-inspectedspaces-form"
+                                            value="Save dispatch">
+                        </p:commandButton>
+
+                        <div class="gray_button">
+                            <p:commandButton    id="dispatch-abort-button"
+                                                actionListener="#{fieldInspectionBB.onDispatchEditModeAbort}"
+                                                ajax="true"
+                                                disabled="false"
+                                                rendered="#{fieldInspectionBB.editModeDispatch}"
+                                                update="inspection-dispatch-form
+                                                inspectiontools-growl-form"
+                                                value="Abort dispatch edits">
+                            </p:commandButton>
+                        </div>
+
+                        <p:spacer height="3px" />
+                        <div class="p-grid">
+                            <div class="p-col-4 restrict-data-field-label-inline">
+                                Dispatch status
+                            </div>
+
+                            <div class="p-col-8 restrict-data-field-value-inline">
+                                <h:outputText rendered="#{empty fieldInspectionBB.currentDispatch and !fieldInspectionBB.editModeDispatch}" 
+                                              value="Inspection not dispatched to mobile application"/>
+                                <h:outputText   id="dispatch-status-otwid"
+                                                rendered="#{!empty fieldInspectionBB.currentDispatch and !fieldInspectionBB.editModeDispatch}" 
+                                                value="Dispatched to mobile application (ID:#{fieldInspectionBB.currentDispatch.dispatchID})"/>
+                            </div>
+
+                            <f:subview  id="dispatchfields"
+                                        rendered="#{!empty fieldInspectionBB.currentDispatch}">
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    Dispatch notes
+                                </div>
+
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <h:outputText value="#{fieldInspectionBB.currentDispatch.dispatchNotes}"
+                                                  rendered="#{!fieldInspectionBB.editModeDispatch}" />
+                                    <p:inputTextarea value="#{fieldInspectionBB.currentDispatch.dispatchNotes}"
+                                                     rendered="#{fieldInspectionBB.editModeDispatch}"
+                                                     rows="5"
+                                                     cols="35" />
+                                </div>
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    Retrieval
+                                      <p:commandButton id="retrieval-help-button"
+                                                            icon="fa fa-question-circle-o"
+                                                            styleClass="button-help"
+                                                            type="button" />
+
+                                           <p:overlayPanel for="retrieval-help-button"
+                                                           style="width:350px;" 
+                                                           dismissable="true"
+                                                           showCloseIcon="true">
+                                               <h3>Dispatch retrieval</h3>
+                                               <p>After an inspection is dispatched to the handheld computer application, the field user must login on the handheld device
+                                               and pull down any dispatched inspections. Once this transfer occurs, the date and time are reported in this field. The inspection
+                                               remains locked to browser users until the inspection is synchronized from the handheld device back to the server OR the browser
+                                               user decides to revoke the dispatch (used only in exceptional circumstances).</p>
+                                               
+                                               
+                                           </p:overlayPanel>
+                                </div>
+
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <h:outputText value="(pending mobile user retrieval)"
+                                                  styleClass="italic"
+                                                  rendered="#{empty fieldInspectionBB.currentDispatch.retrievalTS}" />
+                                    <h:outputText value="Retrieved by user: #{fieldInspectionBB.currentDispatch.retrievedBy.human.name}"
+                                                  rendered="#{!empty fieldInspectionBB.currentDispatch.retrievedBy}" />
+                                    <p:spacer height="3px" />
+                                    <h:outputText value="on #{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentDispatch.retrievalTS)}"
+                                                  rendered="#{!empty fieldInspectionBB.currentDispatch.retrievalTS}" />
+
+                                </div>
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    Synchronization
+                                    
+                                        <p:commandButton id="sync-help-button"
+                                                            icon="fa fa-question-circle-o"
+                                                            styleClass="button-help"
+                                                            type="button" />
+
+                                           <p:overlayPanel for="sync-help-button"
+                                                           style="width:350px;" 
+                                                           dismissable="true"
+                                                           showCloseIcon="true">
+                                               <h3>Dispatch synchronization</h3>
+                                               <p>Once an inspection is completed using the handheld computer application, the results are sent back to the codeNForce server
+                                               and the inspection is then unlocked for further editing using the browser-based tools. This field will show the date this occurs.</p>
+                                               
+                                               
+                                           </p:overlayPanel>
+
+                                </div>
+
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <h:outputText value="(pending mobile user synchronization)"
+                                                  styleClass="italic"
+                                                  rendered="#{empty fieldInspectionBB.currentDispatch.synchronizationTS}" />
+                                    <h:outputText value="On #{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentDispatch.synchronizationTS)}"
+                                                  rendered="#{!empty fieldInspectionBB.currentDispatch.synchronizationTS}" />
+                                    <p:spacer height="3px" />
+                                    <h:outputText value="With notes: #{fieldInspectionBB.currentDispatch.synchronizationNotes}"
+                                                  rendered="#{!empty fieldInspectionBB.currentDispatch.synchronizationTS}" />
+
+                                </div>
+                                <div class="p-col-4 restrict-data-field-label-inline">
+                                    Revocation
+                                </div>
+
+                                <div class="p-col-8 restrict-data-field-value-inline">
+                                    <p:commandLink     id="dispatch-deac-init-cl"
+                                                       ajax="true"
+                                                       style="color:blue; font-weight: bold;"
+                                                       rendered="true"
+                                                       disabled="#{(!empty fieldInspectionBB.currentDispatch.synchronizationTS) or (!empty fieldInspectionBB.currentDispatch.deactivatedTS)}"
+                                                       oncomplete="PF('dispatch-deac-dialog-var').show();"
+                                                       update="dispatch-deac-dialog
+                                                       dispatch-deac-form"
+                                                       value="#{!empty fieldInspectionBB.currentDispatch.synchronizationTS ? '(a synchronized dispatch cannot be revoked)':'revoke dispatch'}">
+                                    </p:commandLink>
+
+                                  
+
+                                    <p:spacer height="3px" />
+                                    <h:outputText value="Revoked on #{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.dispatch.deactivatedTS)}"
+                                                  rendered="#{!empty fieldInspectionBB.currentInspection.dispatch.deactivatedTS}" />
+                                    <p:spacer height="3px" />
+                                    <h:outputText value="by user ID: #{fieldInspectionBB.currentInspection.dispatch.deactivatedBy.human.name}"
+                                                  rendered="#{!empty fieldInspectionBB.currentInspection.dispatch.deactivatedBy}" />
+
+                                </div>
+                            </f:subview>
+                        </div>
                     </h:form>
                 </p:panel>
+
+                <p:dialog id="dispatch-deac-dialog"
+                          widgetVar="dispatch-deac-dialog-var"
+                          header="Revoke dispatch ID:#{fieldInspectionBB.currentDispatch.dispatchID}"
+                          closable="true"
+                          closeOnEscape="true"
+                          dynamic="true"
+                          height="300"
+                          width="400"
+                          resizable="true"
+                          responsive="true">
+
+                    <h:form id="dispatch-deac-form">
+                        <h:outputText style="color:darkred; font-weight: bold;"
+                                      value="Official warming: Deactivating a dispatch that has been retrieved--but not synchronized--will wreak havoc in the mobile applicaiton" 
+                                      rendered="#{!empty fieldInspectionBB.currentDispatch.retrievalTS}"/>
+
+                        <p:spacer height="3px" />
+
+                        <p:commandButton    id="dispatch-deac-button"
+                                            actionListener="#{fieldInspectionBB.onDispatchRevoke}"
+                                            ajax="true"
+                                            disabled="false"
+                                            rendered="true"
+                                            update="inspection-dispatch-form
+                                                    inspection-profile-form
+                                                    inspectiontools-growl-form
+                                                    inspectiontools-growl-form
+                                                    inspection-actions-form
+                                                    inspection-advancedtools-form
+                                                    inspection-actions-form
+                                                    inspection-inspectedspaces-form"
+                                              oncomplete="PF('dispatch-deac-dialog-var').hide();"
+                                            value="Revoke dispatch (ID:#{fieldInspectionBB.currentDispatch.dispatchID})">
+                        </p:commandButton>
+
+
+                    </h:form>
+                </p:dialog>
 
                 <p:panel id="inspection-spaces-panel"
                          toggleable="true"
@@ -552,7 +743,7 @@
                                             actionListener="#{fieldInspectionBB.onAddSpaceInitLinkClick}"
                                             oncomplete="PF('inspections-selecttype-var').show()"
                                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                            disabled="#{fieldInspectionBB.editModeInspectionMetadata or !empty fieldInspectionBB.currentInspection.determinationTS}"
+                                            disabled="#{fieldInspectionBB.editModeInspectionMetadata or !empty fieldInspectionBB.currentInspection.determinationTS or !fieldInspectionBB.currentInspection.browserUserEditingAllowed}"
                                             icon="fa fa-plus"
                                             update="inspections-selecttype-form"
                                             />

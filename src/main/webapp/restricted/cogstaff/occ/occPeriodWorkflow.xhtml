@@ -98,8 +98,12 @@
                                                     <p:spacer height="3px" />
                                                     <h:outputText value="#{inspection.inspector.username} (ID:#{inspection.inspector.userID})" />
                                                 </p:column>
-                                                <p:column headerText="Determination"
+                                                <p:column headerText="Status / Determination"
                                                           style="width:30%;">
+                                                      <h:outputText id="dispatch-ot"
+                                                                  value="dispatched to handheld computer field application"
+                                                                  rendered="#{!empty inspection.dispatch and (empty inspection.dispatch.synchronizationTS and (empty inspection.dispatch.deactivatedTS))}" />
+                                                      <p:spacer height="3px" />
                                                     <h:outputText value="#{empty inspection.determination ? '(in process)':inspection.determination.title}" />
                                                     <h:outputText value="#{inspection.determination.qualifiesAsPassed ? ' (QUALIFIES AS PASS)':' (NOT pass)'}" 
                                                                   rendered="#{!empty inspection.determination}"/>

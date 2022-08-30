@@ -1407,9 +1407,9 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         ResultSet rs = null;
         PreparedStatement stmt = null;
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT dispatchid, createdby_userid, creationts, dispatchnotes, "
+        sb.append("SELECT dispatchid, createdby_userid, createdts, dispatchnotes, "
                 + "inspection_inspectionid, retrievalts, retrievedby_userid, synchronizationts, synchronizationnotes, "
-                + "municipality_municode, municipalityname, deactivatedts, deactivatedby_userid, lastupdatedts, lastupdatedby_userid\n" 
+                + "deactivatedts, deactivatedby_userid, lastupdatedts, lastupdatedby_userid\n" 
                 + "	FROM public.occinspectiondispatch WHERE dispatchid=?;");
         OccInspectionDispatch dispatch = null;
 
@@ -1448,7 +1448,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         SystemIntegrator si = getSystemIntegrator();
         
         OccInspectionDispatch dispatch = new OccInspectionDispatch();
-        dispatch.setInspectionID(rs.getInt("dispatchid"));
+        dispatch.setDispatchID(rs.getInt("dispatchid"));
         dispatch.setDispatchNotes(rs.getString("dispatchnotes"));
         dispatch.setInspectionID(rs.getInt("inspection_inspectionid"));
         if(rs.getTimestamp("retrievalts") != null){
@@ -1479,15 +1479,13 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         }
         
         String query = "INSERT INTO public.occinspectiondispatch(\n" +
-                        "	dispatchid, createdby_userid, creationts, dispatchnotes, \n" +
+                        "	dispatchid, createdby_userid, createdts, dispatchnotes, \n" +
                         "	inspection_inspectionid, retrievalts, retrievedby_userid, \n" +
-                        "	synchronizationts, synchronizationnotes, municipality_municode, \n" +
-                        "	municipalityname, deactivatedts, deactivatedby_userid, \n" +
+                        "	synchronizationts, synchronizationnotes, deactivatedts, deactivatedby_userid, \n" +
                         "	lastupdatedts, lastupdatedby_userid)\n" +
                         "      VALUES (DEFAULT, ?, now(), ?, "
                                     + "?, ?, ?, "
-                                    + "?, ?, NULL, "
-                                    + "NULL, NULL, NULL, "
+                                    + "?, ?, NULL, NULL, "
                                     + "now(), ?);";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -1563,7 +1561,7 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         String query = "UPDATE public.occinspectiondispatch\n" +
                         "	SET dispatchnotes=?, inspection_inspectionid=?, \n" +
                         "	retrievalts=?, retrievedby_userid=?, synchronizationts=?, \n" +
-                        "	synchronizationnotes=?, municipality_municode=NULL, municipalityname=NULL, \n" +
+                        "	synchronizationnotes=?, \n" +
                         "	deactivatedts=?, deactivatedby_userid=?, lastupdatedts=now(), \n" +
                         "	lastupdatedby_userid=?\n" +
                         "	WHERE dispatchid=?;";

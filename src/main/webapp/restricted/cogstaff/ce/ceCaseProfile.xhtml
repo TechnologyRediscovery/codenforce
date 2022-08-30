@@ -811,8 +811,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     <ui:include src="/restricted/compositions/inspectionTools.xhtml"/>
 
-
-
                                     <p:panel id="inspections-panel"
                                              toggleable="true"
                                              widgetVar="inspections-panel-var"
@@ -849,9 +847,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                           style="width:25%;">
                                                     <h:outputText value="#{inspection.inspector.human.name}" />
                                                 </p:column>
-                                                <p:column headerText="Determination"
+                                                <p:column headerText="Status / Determination"
                                                           style="width:30%;">
+                                                    <h:outputText id="dispatch-ot"
+                                                                  value="dispatched to handheld computer field application"
+                                                                  rendered="#{!empty inspection.dispatch and (empty inspection.dispatch.synchronizationTS and (empty inspection.dispatch.deactivatedTS))}" />
+                                                    <p:spacer height="3px" />
                                                     <h:outputText value="#{empty inspection.determination ? '(in process)':inspection.determination.title}" />
+                                                    <h:outputText value="#{inspection.determination.qualifiesAsPassed ? ' (QUALIFIES AS PASS)':' (NOT pass)'}" 
+                                                                  rendered="#{!empty inspection.determination}"/>
                                                 </p:column>
                                                 <p:column headerText="Actions"
                                                           style="width:25%;">

@@ -118,6 +118,7 @@ public  class       FieldInspection
     private String generalComments;
 
     private OccInspectionCause cause;
+    private String editingLockMessage;
     
     private List<OccInspectionRequirementAssigned> requirementList;
 
@@ -132,6 +133,23 @@ public  class       FieldInspection
         viewSetting = ViewOptionsOccChecklistItemsEnum.ALL_ITEMS;
     }
     
+    /**
+     * Logic container for determining if the browser users can edit the inspection, 
+     * and this is based on the status of the dispatch object, if any, and the inspections
+     * finalization status
+     * @return if the browser UI should allow users to edit inspection fields
+     */
+    public boolean isBrowserUserEditingAllowed(){
+        if(deactivatedTS != null){
+            return false;
+        }
+        if(dispatch != null){
+            if(dispatch.getSynchronizationTS() == null && dispatch.getDeactivatedTS() == null){
+                return false;
+            }
+        }
+        return true;
+    }
     
     /** 
      * Special getter for subsets of elements
@@ -750,5 +768,19 @@ public  class       FieldInspection
      */
     public void setDispatch(OccInspectionDispatch dispatch) {
         this.dispatch = dispatch;
+    }
+
+    /**
+     * @return the editingLockMessage
+     */
+    public String getEditingLockMessage() {
+        return editingLockMessage;
+    }
+
+    /**
+     * @param editingLockMessage the editingLockMessage to set
+     */
+    public void setEditingLockMessage(String editingLockMessage) {
+        this.editingLockMessage = editingLockMessage;
     }
 }

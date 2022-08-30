@@ -138,6 +138,9 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     public void onViewEditInspectionLinkClick(IFace_inspectable holder, FieldInspection fi){
         currentInspectable = holder;
         currentInspection = fi;
+        if(currentInspection != null){
+            currentDispatch = currentInspection.getDispatch();
+        }
         try {
             refreshCurrentInspectionAndRestoreSelectedSpace();
         } catch (IntegrationException | BObStatusException | BlobException ex) {
@@ -189,10 +192,20 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
                 if(currentDispatch != null){
                     try {
                         if(currentDispatch.getDispatchID() == 0){
-                            oic.insertOccInspectionDispatch(currentInspection, currentDispatch, getSessionBean().getSessUser());
+                            int freshid = oic.insertOccInspectionDispatch(currentInspection, currentDispatch, getSessionBean().getSessUser());
+                            System.out.println("FieldInspectionBB.onToggleDispatchEditMode: freshID: " + freshid);
+                            currentDispatch.setDispatchID(freshid);
+                            getFacesContext().addMessage(null,
+                                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                           "Dispatch inserted! ID number assigned: " + freshid, ""));
                         } else {
+                            // we've got an existing dispatch to update
                             oic.updateOccInspectionDispatch(currentDispatch, getSessionBean().getSessUser());
+                            getFacesContext().addMessage(null,
+                                   new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                           "Dispatch updated!", ""));
                         }
+                        reloadDispatch();
                     } catch (IntegrationException | BObStatusException ex) {
                         System.out.println(ex);
                           getFacesContext().addMessage(null,
@@ -200,12 +213,32 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
                                     "Fatal error: inserting or updating dispatch; ", ""));
                     } 
                 }
+                // we need a dispatch skeleton
             } else {    
-                if(currentInspection.getDispatch() == null){
+                if(currentDispatch == null){
                     currentDispatch = oic.getOccInspectionDispatchSkeleton(currentInspection, getSessionBean().getSessUser());
+//                    currentInspection.setDispatch(currentDispatch);
+                    System.out.println("FieldInspectionBB.onToggleDispatchEditMode: created skeleton" );
                 }
             }
             editModeDispatch = !editModeDispatch;
+        }
+    }
+    
+    private void reloadDispatch(){
+        if(currentDispatch != null && currentDispatch.getDispatchID() != 0){
+            OccInspectionCoordinator oic = getOccInspectionCoordinator();
+            try {
+                currentDispatch = oic.getOccInspectionDispatch(currentDispatch.getDispatchID());
+                currentInspection.setDispatch(currentDispatch);
+                System.out.println("FieldInspectionBB.reloadDispatch ID " + currentDispatch.getDispatchID() + ", and injected into inspection!");
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+                getFacesContext().addMessage(null,
+                  new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                          "Fatal error: inserting or updating dispatch; ", ""));
+            } 
+            
         }
     }
     
@@ -216,6 +249,31 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      */
     public void onDispatchEditModeAbort(ActionEvent ev){
         editModeDispatch = false;
+          getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_INFO,
+                         "Dispatch edit aborted!", ""));
+
+        
+    }
+    
+    /**
+     * Listener for user requests to cancel edits of the dispatch
+     * @param ev 
+     */
+    public void onDispatchRevoke(ActionEvent ev){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        try {
+            oic.deactivateOccInspectionDispatch(currentDispatch, getSessionBean().getSessUser());
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Unable to revoke dispatch", ""));
+        } 
+         getFacesContext().addMessage(null,
+                 new FacesMessage(FacesMessage.SEVERITY_INFO,
+                         "Dispatch has been revoked!", ""));
+
         
     }
 
