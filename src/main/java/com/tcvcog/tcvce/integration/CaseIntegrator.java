@@ -322,15 +322,17 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         params.appendSQL("(	SELECT codeviolation_violationid, citation.citationid, citation.dateofrecord ");
         params.appendSQL("FROM public.citationviolation  ");
         params.appendSQL("INNER JOIN public.citation ON (citationviolation.citation_citationid = citation.citationid) ");
-        params.appendSQL("INNER JOIN public.citationstatus on (citationstatus.statusid = citation.status_statusid) ");
-        params.appendSQL("WHERE citationstatus.editsforbidden = TRUE	 ");
+        // commented out to fix Alex's bug: zero cited violations on his report
+//        params.appendSQL("INNER JOIN public.citationstatus on (citationstatus.statusid = citation.status_statusid) ");
+//        params.appendSQL("WHERE citationstatus.editsforbidden = TRUE	 ");
+        params.appendSQL("WHERE citation.deactivatedts IS NULL AND citationviolation.deactivatedts IS NULL ");
         params.appendSQL(") AS citv ON (codeviolation.violationid = citv.codeviolation_violationid) ");
         params.appendSQL("LEFT OUTER JOIN  ");
         params.appendSQL("( ");
         params.appendSQL("SELECT codeviolation_violationid, sentdate ");
         params.appendSQL("FROM noticeofviolationcodeviolation ");
         params.appendSQL("INNER JOIN public.noticeofviolation ON (noticeofviolationcodeviolation.noticeofviolation_noticeid = noticeofviolation.noticeid) ");
-        params.appendSQL("WHERE noticeofviolation.sentdate IS NOT NULL ");
+        params.appendSQL("WHERE noticeofviolation.sentdate IS NOT NULL AND noticeofviolation.active = TRUE");
         params.appendSQL(") AS novcv ON (codeviolation.violationid = novcv.codeviolation_violationid) ");
         params.appendSQL("WHERE violationid IS NOT NULL ");
         

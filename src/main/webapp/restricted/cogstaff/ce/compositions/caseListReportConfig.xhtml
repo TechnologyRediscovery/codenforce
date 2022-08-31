@@ -103,12 +103,12 @@
                     <p:panel id="caselist-config-sections"
                              header="Section and metric display options">
                         <div class="p-grid">
-                            <div class="p-col-10">
+                            <div class="p-col-8">
                                 <h:outputLabel class="bold" 
                                                value="Include report summary?" 
                                                for="report-caselist-reportsummary-chkbox" />
                             </div>
-                            <div class="p-col-2">
+                            <div class="p-col-4">
                                 <p:selectBooleanCheckbox id="report-caselist-reportsummary-chkbox" 
                                                          value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary}" 
                                                          disabled="false">
@@ -119,127 +119,102 @@
                             <p:outputPanel id="report-caselist-reportsummary-metrics-subview"
                                        rendered="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary}">
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
-                                <div class="p-col-6">
+                                <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Total cases open as of start of reporting period" 
                                                    for="report-caselist-reportsummary-casesopenasof-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-reportsummary-casesopenasof-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary_openAsOfSOR}" 
                                                              disabled="false"/>
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
+                                
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Cases opened" 
                                                    for="report-caselist-reportsummary-opened-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-reportsummary-opened-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary_casesOpened}" 
                                                              disabled="false"/>
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
+                                
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Cases closed" 
                                                    for="report-caselist-reportsummary-closed-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-reportsummary-closed-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary_casesClosed}" 
                                                              disabled="false"/>
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Total cases open as of end of reporting period" 
                                                    for="report-caselist-reportsummary-eor-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-reportsummary-eor-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary_openAsOfEOR}" 
                                                              disabled="false"/>
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="New Violations" 
                                                    for="report-caselist-reportsummary-newviols-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-reportsummary-newviols-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary_newViolations}" 
                                                              disabled="false"/>
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Violaions that have come into compliance" 
                                                    for="report-caselist-reportsummary-vcomp-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-reportsummary-vcomp-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary_compViol}" 
                                                              disabled="false"/>
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Events logged" 
                                                    for="report-caselist-reportsummary-evs-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-reportsummary-evs-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary_eventsLogged}" 
                                                              disabled="false"/>
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Aggregated event duration" 
                                                    for="report-caselist-reportsummary-aggevdur-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-reportsummary-aggevdur-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary_eventsTotalTime}" 
                                                              disabled="false"/>
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Reason for case closure breakdown and pie chart" 
                                                    for="report-caselist-reportsummary-caseclosepie-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-reportsummary-caseclosepie-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionReportSummary_closurePieChart}" 
                                                              disabled="false"/>
@@ -247,12 +222,12 @@
                             </p:outputPanel>
 
 
-                            <div class="p-col-10">
+                            <div class="p-col-8">
                                 <h:outputLabel class="bold" 
                                                value="Include section: Code Violation Status?" 
                                                for="report-caselist-section-violations-chkbox" />
                             </div>
-                            <div class="p-col-2">
+                            <div class="p-col-4">
                                 <p:selectBooleanCheckbox id="report-caselist-section-violations-chkbox" 
                                                          value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCodeViolationStatus}" 
                                                          disabled="false">
@@ -263,57 +238,45 @@
                             <p:outputPanel id="report-caselist-violations-metrics-subview"
                                        rendered="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCodeViolationStatus}">
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Accumulated code violation compliance count" 
                                                    for="report-caselist-violations-metric-acccomp-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-violations-metric-acccomp-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCodeViolationStatus_compliance}" 
                                                              disabled="false"/>
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Within compliance window" 
                                                    for="report-caselist-violations-metric-compwindow-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-violations-metric-compwindow-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCodeViolationStatus_withinWindow}" 
                                                              disabled="false"/>
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Outside compliance window (aka: Requiring ongoing action)" 
                                                    for="report-caselist-violations-metric-expwindow-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-violations-metric-expwindow-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCodeViolationStatus_expiredWindow}" 
                                                              disabled="false"/>
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Violations cited" 
                                                    for="report-caselist-violations-metric-vcited-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-violations-metric-vcited-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCodeViolationStatus_cited}" 
                                                              disabled="false"/>
@@ -321,12 +284,12 @@
 
                             </p:outputPanel>
 
-                            <div class="p-col-10">
+                            <div class="p-col-8">
                                 <h:outputLabel class="bold" 
                                                value="Include section: Citations?" 
                                                for="report-caselist-section-citations-chkbox" />
                             </div>
-                            <div class="p-col-2">
+                            <div class="p-col-4">
                                 <p:selectBooleanCheckbox id="report-caselist-section-citations-chkbox" 
                                                          value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCitations}" 
                                                          disabled="false">
@@ -337,30 +300,24 @@
                             <p:outputPanel id="report-caselist-citations-metrics-subview"
                                        rendered="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCitations}">
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Citations at any stage on active cases in reporting period" 
                                                    for="report-caselist-citations-metric-citsanystage-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-citations-metric-citsanystage-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCitations_citationsAnyStage}" 
                                                              disabled="false"/>
                                 </div>
 
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" 
                                                    value="Citations stage breakdown and pie chart" 
                                                    for="report-caselist-citations-metric-citpie-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-citations-metric-citpie-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCitations_pieChart}" 
                                                              disabled="false"/>
@@ -368,23 +325,23 @@
 
                             </p:outputPanel>
 
-                            <div class="p-col-10">
+                            <div class="p-col-8">
                                 <h:outputLabel class="bold" 
                                                value="Include section: street level summary table?" 
                                                for="report-caselist-streetsummary-chkbox" />
                             </div>
-                            <div class="p-col-2">
+                            <div class="p-col-4">
                                 <p:selectBooleanCheckbox id="report-caselist-streetsummary-chkbox" 
                                                          value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionStreetLevelSummary}" 
                                                          disabled="false"/>
                             </div>
 
-                            <div class="p-col-10">
+                            <div class="p-col-8">
                                 <h:outputLabel class="bold" 
                                                value="Include section: Case details?" 
                                                for="report-caselist-casedetails-chkbox" />
                             </div>
-                            <div class="p-col-2">
+                            <div class="p-col-4">
                                 <p:selectBooleanCheckbox id="report-caselist-casedetails-chkbox" 
                                                          value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail}" 
                                                          disabled="false"/>
@@ -393,50 +350,38 @@
                             <p:outputPanel id="report-caselist-casedetails-metrics-subview"
                                        rendered="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail}">
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" value="Case names" 
                                                    for="report-caselist-casename-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-casename-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail_caseNames}" />
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" value="Violation list " 
                                                    for="report-caselist-viols-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-viols-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail_violationList}" />
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" value="Extended property info " for="report-caselist-propertyinfo" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-propertyinfo" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail_extendedPropertyDetails}" 
                                                              disabled="false" />
                                 </div>
 
-                                <div class="p-col-2">
-                                    <h:outputText value=" " />
-                                </div>
                                 <div class="p-col-8">
                                     <h:outputLabel class="bold" value="Event history" 
                                                    for="report-caselist-eventhist-chkbox" />
                                 </div>
-                                <div class="p-col-2">
+                                <div class="p-col-4">
                                     <p:selectBooleanCheckbox id="report-caselist-eventhist-chkbox" 
                                                              value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail_eventSummary}" 
                                                              disabled="false" >
@@ -448,10 +393,7 @@
                                 <p:outputPanel id="report-caselist-casedetails-eventviewerrole-subview"
                                            rendered="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail}">
 
-                                    <div class="p-col-2">
-                                        <h:outputText value=" " />
-                                    </div>
-                                    <div class="p-col-4">
+                                    <div class="p-col-6">
                                         <h:outputLabel class="bold" 
                                                        value="Filter event list assuming a reader's rank of" 
                                                        for="report-caselist-casedetail-eventreaderreank-som" />
@@ -469,15 +411,12 @@
                                         </p:selectOneMenu>
                                     </div>
 
-                                    <div class="p-col-2">
-                                        <h:outputText value=" " />
-                                    </div>
                                     <div class="p-col-8">
                                         <h:outputLabel class="bold" 
                                                        value="Event descriptions" 
                                                        for="report-caselist-casedetail-descr-sbcb" />
                                     </div>
-                                    <div class="p-col-2">
+                                    <div class="p-col-4">
                                         <p:selectBooleanCheckbox id="report-casedetail-eventdescr-sbcb" 
                                                                  value="#{ceCaseSearchAndReportBB.reportCECaseList.includeSectionCaseByCaseDetail_eventDescription}" 
                                                                  disabled="false" />

@@ -1542,31 +1542,31 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     public ReportConfigCECaseList report_getDefaultReportConfigCECaseList() {
         ReportConfigCECaseList rptList = new ReportConfigCECaseList();
        rptList.setIncludeSectionReportSummary(true);
-rptList.setIncludeSectionReportSummary_openAsOfSOR(true);
-rptList.setIncludeSectionReportSummary_openAsOfEOR(true);
-rptList.setIncludeSectionReportSummary_casesOpened(true);
-rptList.setIncludeSectionReportSummary_casesClosed(true);
-rptList.setIncludeSectionReportSummary_newViolations(true);
-rptList.setIncludeSectionReportSummary_compViol(true);
-rptList.setIncludeSectionReportSummary_eventsLogged(true);
-rptList.setIncludeSectionReportSummary_eventsTotalTime(true);
-rptList.setIncludeSectionReportSummary_closurePieChart(true);
-rptList.setIncludeSectionReportSummary_ceCaseStatusPie(true);
-rptList.setIncludeSectionCodeViolationStatus(true);
-rptList.setIncludeSectionCodeViolationStatus_compliance(true);
-rptList.setIncludeSectionCodeViolationStatus_withinWindow(true);
-rptList.setIncludeSectionCodeViolationStatus_expiredWindow(true);
-rptList.setIncludeSectionCodeViolationStatus_cited(true);
-rptList.setIncludeSectionCitations(true);
-rptList.setIncludeSectionCitations_citationsAnyStage(true);
-rptList.setIncludeSectionCitations_pieChart(true);
-rptList.setIncludeSectionStreetLevelSummary(true);
-rptList.setIncludeSectionCaseByCaseDetail(true);
-rptList.setIncludeSectionCaseByCaseDetail_fullOwnerContactInfo(true);
-rptList.setIncludeSectionCaseByCaseDetail_caseNames(true);
-rptList.setIncludeSectionCaseByCaseDetail_violationList(true);
-rptList.setIncludeSectionCaseByCaseDetail_extendedPropertyDetails(true);
-rptList.setIncludeSectionCaseByCaseDetail_eventSummary(true);
+        rptList.setIncludeSectionReportSummary_openAsOfSOR(true);
+        rptList.setIncludeSectionReportSummary_openAsOfEOR(true);
+        rptList.setIncludeSectionReportSummary_casesOpened(true);
+        rptList.setIncludeSectionReportSummary_casesClosed(true);
+        rptList.setIncludeSectionReportSummary_newViolations(true);
+        rptList.setIncludeSectionReportSummary_compViol(true);
+        rptList.setIncludeSectionReportSummary_eventsLogged(true);
+        rptList.setIncludeSectionReportSummary_eventsTotalTime(true);
+        rptList.setIncludeSectionReportSummary_closurePieChart(true);
+        rptList.setIncludeSectionReportSummary_ceCaseStatusPie(true);
+        rptList.setIncludeSectionCodeViolationStatus(true);
+        rptList.setIncludeSectionCodeViolationStatus_compliance(true);
+        rptList.setIncludeSectionCodeViolationStatus_withinWindow(true);
+        rptList.setIncludeSectionCodeViolationStatus_expiredWindow(true);
+        rptList.setIncludeSectionCodeViolationStatus_cited(true);
+        rptList.setIncludeSectionCitations(true);
+        rptList.setIncludeSectionCitations_citationsAnyStage(true);
+        rptList.setIncludeSectionCitations_pieChart(true);
+        rptList.setIncludeSectionStreetLevelSummary(true);
+        rptList.setIncludeSectionCaseByCaseDetail(true);
+        rptList.setIncludeSectionCaseByCaseDetail_fullOwnerContactInfo(true);
+        rptList.setIncludeSectionCaseByCaseDetail_caseNames(true);
+        rptList.setIncludeSectionCaseByCaseDetail_violationList(true);
+        rptList.setIncludeSectionCaseByCaseDetail_extendedPropertyDetails(true);
+        rptList.setIncludeSectionCaseByCaseDetail_eventSummary(true);
 
         
         return rptList;
@@ -1768,7 +1768,7 @@ rptList.setIncludeSectionCaseByCaseDetail_eventSummary(true);
         params.setDate_end_val(rpt.getDate_end_val()); 
         rpt.setViolationsOutsideCompWindowNOTCited(sc.runQuery(qcv).getResults());
         
-        qcv = sc.initQuery(QueryCodeViolationEnum.CITED_PAST30, ua.getKeyCard());
+        qcv = sc.initQuery(QueryCodeViolationEnum.NOCOMP_CITED_ANYTIME, ua.getKeyCard());
         params = qcv.getPrimaryParams();
         params.setDate_relativeDates_ctl(false);
         
