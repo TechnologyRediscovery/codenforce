@@ -22,8 +22,8 @@ import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.util.Constants;
-import javax.annotation.PostConstruct;
-import javax.faces.context.ExternalContext;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.context.ExternalContext;
 
 /**
  *

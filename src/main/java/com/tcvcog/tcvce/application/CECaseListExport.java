@@ -16,7 +16,7 @@
  */
 package com.tcvcog.tcvce.application;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  *

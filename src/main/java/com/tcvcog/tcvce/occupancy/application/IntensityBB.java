@@ -24,9 +24,9 @@ import com.tcvcog.tcvce.entities.IntensitySchema;
 import com.tcvcog.tcvce.integration.SystemIntegrator;
 import java.io.Serializable;
 import java.util.ArrayList;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.event.ActionEvent;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.event.ActionEvent;
 
 /**
  *

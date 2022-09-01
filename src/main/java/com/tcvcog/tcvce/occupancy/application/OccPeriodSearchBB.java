@@ -20,8 +20,8 @@ import com.tcvcog.tcvce.entities.search.QueryOccPeriod;
 import com.tcvcog.tcvce.entities.search.SearchParamsOccPeriod;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
 
 /**
  * Tools for finding an occupancy period in the database

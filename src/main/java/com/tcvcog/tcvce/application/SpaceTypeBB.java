@@ -16,8 +16,8 @@
  */
 package com.tcvcog.tcvce.application;
 
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
+import jakarta.faces.bean.ManagedBean;
+import jakarta.faces.bean.ViewScoped;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 
@@ -27,7 +27,7 @@ import java.io.Serializable;
 //imported when adding  and @ViewScoped
 
 import java.util.*;
-import javax.faces.application.FacesMessage;
+import jakarta.faces.application.FacesMessage;
 
 /**
  *

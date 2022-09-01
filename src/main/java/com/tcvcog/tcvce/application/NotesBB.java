@@ -29,8 +29,8 @@ import com.tcvcog.tcvce.entities.IFace_noteHolder;
 import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 

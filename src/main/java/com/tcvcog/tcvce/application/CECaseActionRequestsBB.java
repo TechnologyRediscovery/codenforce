@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.session.SessionBean;
 import com.tcvcog.tcvce.entities.CECaseDataHeavy;
 import java.io.Serializable;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  *

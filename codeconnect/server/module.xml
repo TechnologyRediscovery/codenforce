@@ -4,7 +4,7 @@
 		<resource-root path="postgresql-42.2.5.jar"/>  
 	</resources>  
 	<dependencies>  
-		<module name="javax.api"/>  
-		<module name="javax.transaction.api"/>  
+		<module name="jakarta.api"/>  
+		<module name="jakarta.transaction.api"/>  
 	</dependencies>  
 </module> 

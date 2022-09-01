@@ -155,6 +155,7 @@ ALTER TABLE public.occinspectiondispatch DROP COLUMN municipalityname;
 --******************************* REMOTE CURSOR HERE  ******************************* 
 --******************************* LOCAL CURSOR HERE  ******************************* 
 
+ALTER TABLE public.occinspectiondispatch RENAME COLUMN creationts to createdts;
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
     VALUES (42, 'database/patches/dbpatch_beta42.sql', NULL, 'ecd', '');

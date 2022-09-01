@@ -17,7 +17,7 @@
 package com.tcvcog.tcvce.application;
 
 import java.util.ArrayList;
-import javax.faces.component.html.HtmlDataTable;
+import jakarta.faces.component.html.HtmlDataTable;
 import com.tcvcog.tcvce.entities.*;
 import com.tcvcog.tcvce.integration.CEActionRequestIntegrator;
 import java.io.Serializable;

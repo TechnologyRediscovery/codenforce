@@ -31,10 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.ActionEvent;
 
 /**
  * The official backing bean for address management
@@ -437,6 +437,110 @@ public  class   AddressBB
         currentMailingAddress = pc.getMailingAddressSkeleton();
         if(currentStreet != null){
             currentStreet.setCityStateZip(currentCityStateZip);
+            currentMailingAddress.setStreet(currentStreet);
+        }
+        editModeCurrentAddress = true;
+        
+    }
+    
+    /**
+     * Listener for user requests to abort any mailing address operation
+     * @param ev 
+     */
+    public void onMailingAddressAbortOperationButtonChange(ActionEvent ev){
+        editModeCurrentAddress = false;
+    }
+    
+    /**
+     * Listener for user requests to start the address deactivation process
+     * @param ev 
+     */
+    public void onMailingAddressDeactivateInitLinkClick(ActionEvent ev){
+        
+    }
+    
+    /**
+     * 
+     * Listener for user requests to commit the deactivation operation
+     * @param ev 
+     */
+    public void onMailingAddressDeactivateConfirmButtonChange(ActionEvent ev){
+        PropertyCoordinator pc = getPropertyCoordinator();
+        try {
+            pc.deactivateMailingAddress(currentMailingAddress, getSessionBean().getSessUser());
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Address deactivation successful! ",""));
+        } catch (BObStatusException | IntegrationException ex) {
+            System.out.println("ex");
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Could deactivate address: " + ex.getMessage(),""));
+        } 
+    }
+    
+    /**
+     * Listener for user requests to start the note process on a 
+     * mailing address
+     * @param ev
+     */
+    public void onMailingAddressNoteInitButtonChange(ActionEvent ev){
+        formNotesAddress = "";
+    }
+    
+    /**
+     * user requests to commit a note to a mailin address
+     * @param ev
+     */
+    public void onMailingAddressNoteCommitButtonChage(ActionEvent ev){
+        SystemCoordinator sc = getSystemCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(currentMailingAddress != null){
+            MessageBuilderParams mbp = new MessageBuilderParams(currentMailingAddress.getNotes(), null, null, formNotesAddress, getSessionBean().getSessUser(), null);
+            currentMailingAddress.setNotes(sc.appendNoteBlock(mbp));
+            try {
+                sc.writeNotes(currentMailingAddress, getSessionBean().getSessUser());
+                currentMailingAddress = pc.getMailingAddress(currentMailingAddress.getAddressID());
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Note write successful! Woot woot!",""));
+                
+            } catch (IntegrationException | BObStatusException ex) {
+                System.out.println(ex);
+                 getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Fatal note error: " + ex.getMessage(),""));
+            } 
+            formNotesAddress = "";
+        }
+    }
+    
+    /**
+     * Listener for user requests to start the note 
+     * process on a street
+     * @param ev
+     */
+    public void onMailingStreetNoteInitButtonChange(ActionEvent ev){
+        formNotesStreet = "";
+    }
+    
+    /**
+     * Listener for user Requests to commit notes to the 
+     * currentStreet
+     * @param ev
+     */
+    public void onMailingStreetNoteCommitButtonChage(ActionEvent ev){
+        SystemCoordinator sc = getSystemCoordinator();
+        PropertyCoordinator pc = getPropertyCoordinator();
+        if(currentStreet != null){
+            MessageBuilderParams mbp = new MessageBuilderParams(currentStreet.getNotes(), null, null, formNotesStreet, getSessionBean().getSessUser(), null);
+            currentStreet.setNotes(sc.appendNoteBlock(mbp));
+            try {
+                sc.writeNotes(currentStreet, getSessionBean().getSessUser());
+                currentStreet = pc.getMailingStreet(currentStreet.getStreetID());
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+              ip);
             currentMailingAddress.setStreet(currentStreet);
         }
         editModeCurrentAddress = true;

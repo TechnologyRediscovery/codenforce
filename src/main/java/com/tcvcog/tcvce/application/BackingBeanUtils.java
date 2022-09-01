@@ -20,8 +20,8 @@ import com.tcvcog.tcvce.session.SessionBean;
 import com.tcvcog.tcvce.coordinators.*;
 
 import java.io.Serializable;
-import javax.faces.context.FacesContext;
-import javax.faces.application.Application;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.application.Application;
 import java.sql.Connection;
 
 import com.tcvcog.tcvce.entities.Municipality;
@@ -79,13 +79,13 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
-import javax.el.ValueExpression;
-import javax.faces.context.ExternalContext;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
+import jakarta.el.ValueExpression;
+import jakarta.faces.context.ExternalContext;
+import jakarta.naming.Context;
+import jakarta.naming.InitialContext;
+import jakarta.naming.NamingException;
+import jakarta.servlet.http.HttpSession;
+import jakarta.sql.DataSource;
 
 
 /**
