@@ -81,11 +81,11 @@ import java.util.List;
 import java.util.ResourceBundle;
 import jakarta.el.ValueExpression;
 import jakarta.faces.context.ExternalContext;
-import jakarta.naming.Context;
-import jakarta.naming.InitialContext;
-import jakarta.naming.NamingException;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import jakarta.servlet.http.HttpSession;
-import jakarta.sql.DataSource;
+import javax.sql.DataSource;
 
 
 /**

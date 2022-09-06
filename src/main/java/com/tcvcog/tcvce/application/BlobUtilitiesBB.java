@@ -24,6 +24,8 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
 
+
+
 /**
  * Master Bean for our shared blob tools made possible by the
  * IFace_BlobHolder. This is a view scoped bean that backs
@@ -177,15 +179,20 @@ public class    BlobUtilitiesBB
         }
     }
     
+    public void uploadListener(FileUploadEvent fleUpEv){
+        
+        
+    }
+    
     
     /**
      * Listener for user requests to upload a file and attach to case
      * I ask the coordinator for the current Blob_Holder and interrogate it
      * for information about where to store its blobs in the DB
      *
-     * @param ev
+     * @param pfUpEv
      */
-    public void onBlobUploadCommitButtonChange(FileUploadEvent ev) {
+    public void onBlobUploadCommitButtonChange(FileUploadEvent pfUpEv) {
         // as the session for our blob holder
         // client UIs must set this up for me to know who to connect 
         // the blob to
@@ -193,38 +200,40 @@ public class    BlobUtilitiesBB
         currentBlobHolder = getSessionBean().getSessBlobHolder();
         System.out.println("BlobToolsUniversalBB.onBlobUploadCommitButtonChange | Beginning storage cycle!");
         extractAndStoreBlobListComponentToUpdate();
-        if (currentBlobHolder != null && currentBlobHolder.getBlobLinkEnum() != null && ev != null && ev.getFile() != null) {
+        if (currentBlobHolder != null && currentBlobHolder.getBlobLinkEnum() != null){
+            if(pfUpEv != null ) {
 
-            try {
-                BlobCoordinator blobc = getBlobCoordinator();
+                try {
+                    BlobCoordinator blobc = getBlobCoordinator();
 
-                Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
-                blob.setBytes(ev.getFile().getContent());
-                blob.setFilename(ev.getFile().getFileName());
-                blob.setMuni(getSessionBean().getSessMuni());
-                   
-                Blob freshBlob = blobc.insertBlobAndInsertMetadataAndLinkToParent(
-                                                blob, 
-                                                currentBlobHolder, 
-                                                getSessionBean().getSessUser(), 
-                                                getSessionBean().getSessMuni());
-                
-                if (freshBlob != null) {
-                    System.out.println("BlobUtilitiesBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getPhotoDocID());
-                
+                    Blob blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());
+                    blob.setFilename(pfUpEv.getFile().getFileName());
+                    blob.setBytes(pfUpEv.getFile().getContent());
+                    blob.setMuni(getSessionBean().getSessMuni());
+
+                    Blob freshBlob = blobc.insertBlobAndInsertMetadataAndLinkToParent(
+                                                    blob, 
+                                                    currentBlobHolder, 
+                                                    getSessionBean().getSessUser(), 
+                                                    getSessionBean().getSessMuni());
+
+                    if (freshBlob != null) {
+                        System.out.println("BlobUtilitiesBB.onBlobUploadCommitButtonChange | fresh blob ID: " + freshBlob.getPhotoDocID());
+
+                        getFacesContext().addMessage(null,
+                            new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                    "Upload success! File " + blob.getFilename() + " Is stored with PhotoDoc ID: " + freshBlob.getPhotoDocID(), ""));
+                    }
+                    refreshCurrentBlobHolder();
+                    sendUpdatedBlobListToSessionForSenderRefresh();
+
+                } catch (IntegrationException | IOException | BlobException | BlobTypeException | BObStatusException ex) {
+                    System.out.println("BlobUtilitiesBB.onBlobUploadCommitButtonChange | upload failed! " + ex);
+                    System.out.println(ex);
                     getFacesContext().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO,
-                                "Upload success! File " + ev.getFile().getFileName() + " Is stored with PhotoDoc ID: " + freshBlob.getPhotoDocID(), ""));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                                "Fatal error on upload of file: [cannot list filename]", ""));
                 }
-                refreshCurrentBlobHolder();
-                sendUpdatedBlobListToSessionForSenderRefresh();
-
-            } catch (IntegrationException | IOException | BlobException | BlobTypeException | BObStatusException ex) {
-                System.out.println("BlobUtilitiesBB.onBlobUploadCommitButtonChange | upload failed! " + ex);
-                System.out.println(ex);
-                getFacesContext().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Fatal error on upload of file: " + ev.getFile().getFileName() , ""));
             }
         }
     }
