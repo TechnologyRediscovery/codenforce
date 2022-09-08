@@ -55,6 +55,11 @@
             <version>2.6</version>
         </dependency>
 
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.1</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
@@ -86,7 +91,6 @@
                     <outputDirectory>${project.build.directory}/war/</outputDirectory>
                 </configuration>
             </plugin>
-            
             <plugin>
                 <groupId>fish.payara.maven.plugins</groupId>
                 <artifactId>payara-micro-maven-plugin</artifactId>
@@ -98,24 +102,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-<!--                    <startClass>my.custom.start.class.Main</startClass>
-                    <deployArtifacts>
-                        <artifactItem>
-                            <groupId>org.mycompany</groupId>
-                            <artifactId>my-project</artifactId>
-                            <version>1.0</version>
-                            <type>ear</type>
-                        </artifactItem>
-                    </deployArtifacts>
-                    <customJars>
-                        <artifactItem>
-                            <groupId>org.primefaces</groupId>
-                            <artifactId>primefaces</artifactId>
-                            <version>6.0</version>
-                        </artifactItem>
-                    </customJars>-->
-                </configuration>
             </plugin>
         </plugins>
     </build>
