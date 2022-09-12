@@ -5,7 +5,7 @@
 
     <groupId>com.tcvcog.codeenforcement</groupId>
     <artifactId>tcvce</artifactId>
-    <version>0.9</version>
+    <version>0.870</version>
     <packaging>war</packaging>
 
     <name>tcvce</name>
@@ -95,7 +95,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.3</version>
+                <version>3.3.2</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <outputDirectory>${project.build.directory}/war/</outputDirectory>
@@ -136,4 +136,5 @@
             <name>Repository for library PrimeFaces-maven-lib</name>
         </repository>
     </repositories>
+    <description>Pre-Jakarta codeNforce</description>
 </project>

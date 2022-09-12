@@ -59,7 +59,7 @@
                             <h:outputText id="ord-created" 
                                           value="#{codeElementBB.getPrettyDateNoTime(sessionBean.sessEnforcableCodeElement.createdTS)}"/>
                             <h:outputText value="#{!(empty sessionBean.sessEnforcableCodeElement.createdBy) ? ' by ' : ''}"/>
-                            <h:outputText value="#{!(empty sessionBean.sessEnforcableCodeElement.createdBy) ? sessionBean.sessEnforcableCodeElement.createdBy.phumanlastName : ''}"/>
+                            <h:outputText value="#{!(empty sessionBean.sessEnforcableCodeElement.createdBy) ? sessionBean.sessEnforcableCodeElement.createdBy.human.name : ''}"/>
                         </div>
                     </div>
                     <div class="ui-g-12 ui-md-6 ui-lg-12 restrict-data-field" >
@@ -72,7 +72,7 @@
                             <h:outputText id="ord-updated" 
                                           value="#{codeElementBB.getPrettyDateNoTime(sessionBean.sessEnforcableCodeElement.lastUpdatedTS)}"/>
                             <h:outputText value="#{!(empty sessionBean.sessEnforcableCodeElement.lastupdatedBy) ? ' by ' : ''}"/>
-                            <h:outputText value="#{!(empty sessionBean.sessEnforcableCodeElement.lastupdatedBy) ? sessionBean.sessEnforcableCodeElement.lastupdatedBy.perhumanstName : ''}"/>
+                            <h:outputText value="#{!(empty sessionBean.sessEnforcableCodeElement.lastupdatedBy) ? sessionBean.sessEnforcableCodeElement.lastupdatedBy.human.name : ''}"/>
                         </div>
                     </div>
 

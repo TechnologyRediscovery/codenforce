@@ -759,7 +759,7 @@
                                                 </div>
                                                 <div class="restrict-data-field-value-inline" >
                                                     <h:outputText id="ece-createdby" 
-                                                                  value="#{!(empty cse.eceCreatedBy) ? cse.createdBy.human.lastName: ''}"/>
+                                                                  value="#{!(empty cse.eceCreatedBy) ? cse.createdBy.human.name: ''}"/>
                                                     <h:outputText id="ece-creationts" 
                                                                   value="#{codeSetBB.getPrettyDate(cse.eceCreatedTS)}"/>
                                                 </div>
@@ -772,7 +772,7 @@
                                                 </div>
                                                 <div class="restrict-data-field-value-inline" >
                                                     <h:outputText id="ece-lastupdatedby" 
-                                                                  value="#{!(empty cse.lastupdatedBy) ? cse.lastupdatedBy.phumanlastName: ''}"/>
+                                                                  value="#{!(empty cse.lastupdatedBy) ? cse.lastupdatedBy.human.name: ''}"/>
                                                     <h:outputText id="ece-lastupdatedts" 
                                                                   value="#{codeSetBB.getPrettyDate(cse.lastUpdatedTS)}"/>
                                                 </div>
