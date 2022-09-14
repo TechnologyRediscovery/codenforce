@@ -214,8 +214,8 @@ public class        BackingBeanUtils
         Context initContext = null;
         try {
             initContext = new InitialContext();
-            Context envCtx = (Context) initContext.lookup("java:");
-//            Context envCtx = (Context) initContext.lookup("java:comp/env");
+            // updated for Wildfly PREVIEW 26.1.0
+            Context envCtx = (Context) initContext.lookup("java:jboss/");
             dataSource = (DataSource) envCtx.lookup(jndi_name);
             connx = dataSource.getConnection();
         } catch (NamingException | SQLException ex) {

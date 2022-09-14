@@ -91,6 +91,7 @@
     <error-page>
         <location>/public/error.xhtml</location>
     </error-page>
+    
     <!--security cases-->
     <security-role>
         <role-name>cogstaff</role-name>

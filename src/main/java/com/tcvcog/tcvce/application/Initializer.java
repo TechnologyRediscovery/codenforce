@@ -43,8 +43,8 @@ import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
 /**
- *
- * @author cedba
+ * Sets up session beans in the session namespace
+ * @author Ellen Bascomb of Apartment 31Y
  */
 @WebListener
 public class Initializer implements ServletContextListener{
@@ -191,6 +191,7 @@ public class Initializer implements ServletContextListener{
     
     @Override
     public void contextDestroyed(ServletContextEvent event){
+        System.out.println("Initializer.contextDestroyed | nothing to be done yet");
         
     }
     
