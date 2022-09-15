@@ -48,8 +48,6 @@
                              icon="fa fa-plus"
                              update="permit-add-choosetype-form
                              @form"/>
-
-            
             
             <p:commandLink  id="permits-manage-blocks-cl" 
                             ajax="true"
@@ -62,8 +60,6 @@
 
             <p:spacer height="5px"/>
             
-            
-
             <p:dataTable id="occperiod-permits-datatable"
                          var="permit"
                          rowKey="#{permit.permitID}"
@@ -71,7 +67,6 @@
                          tableStyleClass="primeDataTable"
                          draggableColumns="true"
                          resizableColumns="true">
-
 
                 <p:column width="15%">
                     <f:facet name="header">
@@ -185,7 +180,6 @@
         </h:form>
     </p:panel>
 
-
     <p:dialog id="permit-add-choosetype-dialog"
               widgetVar="permit-add-choosetype-dialog-var"
               header="Choose permit type"
@@ -233,10 +227,7 @@
                 </div>
             </div>
         </h:form>
-
     </p:dialog>
-
-
 
     <!--p:dialog|permit-nullify-confirm-dialog-->
     <p:dialog id="permit-nullify-confirm-dialog"
@@ -1025,7 +1016,7 @@
                             <p:spacer height="2px" />
 
                             <h:outputText value="#{hl.linkedObjectRole.title}" />
-                            <h:outputText value="#{hl.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME}" />
+                            <h:outputText value=" #{hl.linkedObjectRole.schema.TARGET_OBJECT_FRIENDLY_NAME}" />
                             <h:outputText value=" (ID:#{hl.parentObjectID})" />
 
 

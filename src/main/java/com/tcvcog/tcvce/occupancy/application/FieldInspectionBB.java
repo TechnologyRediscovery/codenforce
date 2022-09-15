@@ -947,6 +947,9 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
         formFollowUpInspectionTo = currentInspection;
         
     }
+    
+    
+    
 
         
     // *****************************************

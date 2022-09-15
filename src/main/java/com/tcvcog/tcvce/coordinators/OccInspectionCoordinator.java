@@ -40,6 +40,7 @@ import com.tcvcog.tcvce.occupancy.integration.OccChecklistIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
+import com.tcvcog.tcvce.occupancy.application.FieldInspectionReinspectionConfig;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -95,8 +96,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @param tem
      * @param inspectable
      * @param user   The current user who will become the Inspector
-     * @return An FieldInspection object with the ID given in the DB and a
- configured Template inside
+     * @return  An FieldInspection object with the ID given in the DB and a
+                configured Template inside
      * @throws InspectionException
      * @throws IntegrationException
      * @throws com.tcvcog.tcvce.domain.BObStatusException
@@ -173,7 +174,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         }
     }
     
-    public void inspectionActino_updateSpaceElement(OccInspectedSpaceElement oise, FieldInspection fin) 
+    public void inspectionAction_updateSpaceElement(OccInspectedSpaceElement oise, FieldInspection fin) 
             throws IntegrationException, BObStatusException{
         OccInspectionIntegrator oii = getOccInspectionIntegrator();
         if(oise == null || fin == null){
@@ -227,7 +228,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         // actually this is stamped by now() in db
 //        inspectedSpace.setAddedToChecklistTS(LocalDateTime.now());
 
-        // Wrap each CodeElement in an InspectedCodeElement blanket to keep it warm :)
+        // Wrap each CodeElement in an InspectedCodeElement blanket to keep it warm
         List<OccInspectedSpaceElement> inspectedElements;
         inspectedElements = tpe.getCodeElementList().stream().map(element -> {
             OccInspectedSpaceElement inspectedElement = new OccInspectedSpaceElement(element);
@@ -928,6 +929,99 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         }
 
         return oise;
+    }
+    
+    /**
+     * // TODO: FINISH ME!!!!
+     * // TODO: FINISH ME!!!!
+     * // TODO: FINISH ME!!!!
+     * // TODO: FINISH ME!!!!
+     * // TODO: FINISH ME!!!!
+     * // TODO: FINISH ME!!!!
+     * // TODO: FINISH ME!!!!
+     * // TODO: FINISH ME!!!!
+     * // TODO: FINISH ME!!!!
+     * // TODO: FINISH ME!!!!
+     * // TODO: FINISH ME!!!!
+     * // TODO: FINISH ME!!!!
+     * 
+     * Logic controller for creating a new field inspection as a re-inspection of a 
+     * previous field inspection. By default, the created re-inspection will be configured
+     * with the same checklist as the source inspection. Failed items will migrate 
+     * to the re-inspection, with notes appended to each documenting where they came from
+     * @param reSettings that must be not null and have an inspection for source and a requesting user
+     * @return the fresh inspection that's a reinspection of the inputted inspection object
+     * @throws BObStatusException for null inputs, or non-finalized FIN
+     */
+    public FieldInspectionReinspectionConfig inspectionAction_setupReinspection(FieldInspectionReinspectionConfig reSettings) 
+            throws BObStatusException, IntegrationException{
+       
+        
+        if(reSettings.getSourceInspection() == null || reSettings.getRequestingUser() == null|| reSettings.getInspectable() == null){
+            throw new BObStatusException("Cannot configure reinspection with null inspection or user or occ period/case");
+        }
+        
+        if(reSettings.getSourceInspection().getDetermination() == null){
+            throw new BObStatusException("Field inspection must be finalized before a reinspection will be created");
+        }
+        
+        FieldInspection reinspection = getOccInspectionSkeleton();
+        
+        // Transfer basic attributes to the fresh reinspection object
+        
+        // only one of these should be non-zero
+        reinspection.setOccPeriodID(reSettings.getSourceInspection().getOccPeriodID());
+        reinspection.setCecaseID(reSettings.getSourceInspection().getCecaseID());
+        
+        reinspection.setChecklistTemplate(reSettings.getSourceInspection().getChecklistTemplate());
+        reinspection.setChecklistTemplateID(reSettings.getSourceInspection().getChecklistTemplateID());
+        
+        reinspection.setInspector(reSettings.getSourceInspection().getInspector());
+        
+        reSettings = configureReinspectionSpaces(reSettings);
+        // TODO: FINISH ME!!!!
+        
+        
+        return reSettings;
+        
+    }
+
+    /**
+     * Internal organ for setting up a reinspection's settings
+     * @param reSettings
+     * @return the settings object
+     */
+    private FieldInspectionReinspectionConfig configureReinspectionSpaces(FieldInspectionReinspectionConfig reSettings) throws BObStatusException, IntegrationException{
+        
+        if(reSettings.getSourceInspection() == null 
+                || reSettings.getRequestingUser() == null
+                || reSettings.getInspectable() == null 
+                || reSettings.getReInspection() == null
+                || reSettings.getReInspection().getChecklistTemplate() == null){
+            throw new BObStatusException("Cannot configure reinspection with null inspection or user or occ period/case");
+        }
+        
+        // Now setup inspected space elements
+        
+        List<OccInspectedSpace> inSpaceList = reSettings.getSourceInspection().getInspectedSpaceList();
+        if(inSpaceList != null && !inSpaceList.isEmpty()){
+            for(OccInspectedSpace inspc: inSpaceList){
+                List<OccInspectedSpaceElement> elementListFail = inspc.getElementListFail();
+                // If we have at least 1 failed item in the space from the first inspection, 
+                // build that space again in the reinspection
+                if(elementListFail != null && !elementListFail.isEmpty()){
+                    OccInspectedSpace reinsois = inspectionAction_commenceInspectionOfSpaceTypeChecklistified(
+                                                    reSettings.getReInspection(), 
+                                                    reSettings.getReinspector(), 
+                                                    inspc.getType(), 
+                                                    OccInspectionStatusEnum.NOTINSPECTED, 
+                                                    inspc.getLocation());
+                    
+                    // TODO: FINISH ME!!!!
+                }
+            }
+        }        
+        return reSettings;                
     }
     
    

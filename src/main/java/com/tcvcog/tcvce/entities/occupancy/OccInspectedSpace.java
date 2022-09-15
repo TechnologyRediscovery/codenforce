@@ -33,7 +33,9 @@ import java.util.*;
  * @author ellen bascomb of apt 31y, Technology Rediscovery LLC 
  */
 public class OccInspectedSpace
-        implements Serializable, Cloneable, Comparable<OccInspectedSpace> {
+        implements  Serializable, 
+                    Cloneable, 
+                    Comparable<OccInspectedSpace> {
 
     private int inspectedSpaceID;
     
