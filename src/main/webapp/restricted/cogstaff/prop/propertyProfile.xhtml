@@ -237,11 +237,11 @@
                                 <p:panel id="property-adresses-panel"
                                          toggleable="true"
                                          collapsed="false"
-                                         header="Addresses links">
+                                         header="Addresses Links">
                                     <h:form id="property-profile-addresses-form">
 
                                         <p:commandButton        id="prop-addresses-add-cb"
-                                                                value="Link a new address to property" 
+                                                                value="Link New Address" 
                                                                 ajax="true"
                                                                 icon="fa fa-link"
                                                                 actionListener="#{addressBB.onLinkPersonPropToAddressInitButtonChange(propertyProfileBB.currentProperty)}"
@@ -321,7 +321,7 @@
                                             <p:commandButton    id="parcel-info-edit-abort-button"
                                                                 ajax="true"
                                                                 rendered="#{propertyProfileBB.currentParcelInfoEditMode}"
-                                                                value="Abort edit"
+                                                                value="Cancel Edit"
                                                                 actionListener="#{propertyProfileBB.onParcelInfoEditModeOperationAbortButtonChange}"
                                                                 style="margin-left: 5px;"
                                                                 update="property-messages-global
@@ -993,7 +993,7 @@
                                         <div class="ui-g data-container">
                                             <p:commandButton   id="propinfo-notes-add-button"
                                                                rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
-                                                               value="Add new note"  
+                                                               value="Add New Note"  
                                                                icon="fa fa-sticky-note-o"
                                                                actionListener="#{propertyProfileBB.onParcelNoteAppendInit}"
                                                                disabled="false"
@@ -1033,7 +1033,7 @@
                                                            actionListener="#{personBB.onSelectAndLinkPersonsInit(propertyProfileBB.currentProperty)}"
                                                            oncomplete="PF('human-search-dialog-var').show()"
                                                            rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
-                                                           value="Manage property-person links"
+                                                           value="Manage Links"
                                                            update=" human-search-dialog
                                                            property-messages-global
                                                            search-query-form
@@ -1252,7 +1252,7 @@
                                                             oncomplete="PF('blob-upload-dialog-var').show()"
                                                             update="blob-upload-dialog
                                                             blob-uploadconnect-tabview"
-                                                            value="Upload photo or document"
+                                                            value="Upload"
                                                             icon="fa fa-upload"
                                                             >
                                             <f:param name="blob-list-component-to-update" value="prop-blobs-form" />

@@ -15,20 +15,19 @@
             <ui:define name="content">
                 <f:view id="missionControlView">
                     <div class="mainContainer">
+
                         <h:form id="messages-global-form">
+
                             <p:growl id="messages-global-growl"
                                      redisplay="false"
                                      />
                         </h:form>
 
                         <div class="ui-g data_container_nested_restrict">
-                            <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                                <ui:include src="/restricted/compositions/eventCalendar.xhtml"/>
-                                
-                            </div>
-                            
+
                             <!--NESTED DATA FIELD VERTICAL-->
                             <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
+
 
                                 <p:panel    id="dash-event-search-panel"
                                             toggleable="true"
@@ -42,10 +41,83 @@
                                     <ui:include src="cogstaff/compositions/eventSearch.xhtml" />
                                 </p:panel>
 
+
                                 <ui:include src="cogstaff/occ/compositions/occPeriodListSearch.xhtml"/>
                                 <ui:include src="cogstaff/occ/compositions/occPermitListSearch.xhtml"/>
 
-                             
+
+                                <p:panel  id="event-future-list-panel"
+                                          toggleable="true"
+                                          widgetVar="event-future-list-panel-var"
+                                          collapsed="false"
+                                          style="width:100%;"
+                                          header="Upcoming Events">
+                                    <h:form id="event-future-list-form">
+                                        <p:dataTable
+                                            id="events-future-table"
+                                            var="ef"
+                                            rowKey="#{ef.eventID}"
+                                            value="#{sessionBean.queryEventFuture7Days.BOBResultList}"
+                                            tableStyleClass="primeDataTable"
+                                            resizableColumns="true"
+                                            widgetVar="events-table-var"
+                                            >
+                                            <!--<p:ajax event="rowSelect" update="selectedRowLabel"/>-->
+
+                                            <p:column width="4%">
+                                                <i class="material-icons"><h:outputText value="#{ef.category.icon.materialIcon}"/></i>
+                                                <p:spacer height="2px" />
+                                                <h:outputText value="#{ef.domain.abbrev}"/>
+                                                <p:spacer height="2px" />
+                                                <h:outputText value="#{ef.eventID}"/>
+                                            </p:column>
+
+
+                                            <p:column width="20%" sortBy="#{ef.category.eventType.label}"
+                                                      >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Description" />
+                                                </f:facet>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{ef.category.eventType.label}: #{ef.category.eventCategoryTitle}"
+                                                                  style="font-weight: bold;"/>
+                                                    <p:spacer height="5px" />
+                                                    <h:outputText value="#{ef.property.addressString} (#{ef.property.muni.muniName}): Case ID: #{ef.cecase.caseID}"/>
+                                                </div>
+                                            </p:column>
+
+                                            <p:column width="9%" sortBy="#{ef.timeStart}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Date" />
+                                                </f:facet>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="#{missionControlBB.getPrettyDate(ef.timeStart)}"/>
+                                                    <p:spacer height="2px" />
+                                                    <h:outputText value="#{ef.duration} mins"/>
+                                                </div>
+                                            </p:column>
+
+                                            <p:column width="4%" exportable="false">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Action" />
+                                                </f:facet>
+
+                                                <div class="restrict-main-contents-io-link">
+
+                                                    <p:commandLink id="violation-ord-details-cl" 
+                                                                   ajax="false"
+                                                                   action="#{missionControlBB.onViewEventButtonChange(e)}"
+                                                                   value="view" 
+                                                                   style="color:blue;"
+                                                                   type="button" />
+                                                </div>
+
+
+                                            </p:column>
+
+                                        </p:dataTable>
+                                    </h:form>
+                                </p:panel>
                             </div>
 
                             <div class="ui-g-12 ui-md-6 ui-lg-6 restrict-data-field">
@@ -69,7 +141,7 @@
                                     <h:form id="cecase-search-form">
 
                                         <h:outputLabel styleClass="bold" 
-                                                       value="Select a query:" 
+                                                       value="Search By:" 
                                                        for="cecase-query-desc-ot" />
 
                                         <p:selectOneMenu id="cecase-query-som" 
@@ -100,7 +172,7 @@
                                                            disabled="#{ceCaseSearchAndReportBB.querySelected.queryExecuted}"
                                                            icon="fa fa-flash" 
                                                            styleClass="button"
-                                                           value="run query" 
+                                                           value="Run Search" 
                                                            update="@form
                                                            cecase-search-results-form
                                                            cecase-search-log-form"/>
@@ -110,7 +182,7 @@
                                                            actionListener="#{ceCaseSearchAndReportBB.resetQuery}"
                                                            icon="fa fa-eraser" 
                                                            styleClass="button inline-button"
-                                                           value="clear query" 
+                                                           value="Clear Search" 
                                                            disabled="#{!ceCaseSearchAndReportBB.querySelected.queryExecuted}"
                                                            update=" cecase-search-log-form
                                                            @form"/>
@@ -133,7 +205,7 @@
                                                            actionListener="#{ceCaseSearchAndReportBB.clearCECaseList}"
                                                            icon="fa fa-eraser" 
                                                            styleClass="button"
-                                                           value="clear results list" 
+                                                           value="Clear Results" 
                                                            update="messages-global-form
                                                            cecase-search-results-form"/>
 
@@ -143,7 +215,7 @@
                                                            actionListener="#{ceCaseSearchAndReportBB.loadCECaseHistory}"
                                                            icon="fa fa-clock-o" 
                                                            styleClass="button"
-                                                           value="load case history" 
+                                                           value="Load Case History" 
                                                            update="messages-global-form
                                                            cecase-search-results-form"/>
 
@@ -154,7 +226,7 @@
                                                            value="Export CSV" 
                                                            >
                                             <p:dataExporter type="csv" 
-                                                             target="cecase-search-results-table"
+                                                            target="cecase-search-results-table"
                                                             fileName="caseExport" />
                                         </p:commandButton>
 
@@ -183,7 +255,6 @@
                                                 </f:facet>
                                                 <p:rowToggler />
                                             </p:column>
-                                            
                                             <p:column width="15%" 
                                                       sortBy="#{cse.priority.label}"
                                                       styleClass="#{!empty cse.priority ? cse.priority.rowStyleClass:''}">
@@ -195,15 +266,14 @@
                                                 </i>
                                                 <p:spacer height="3px" />
                                                 <h:outputText value="#{cse.priority.label}" style="font-size:0.7em;" />
+
                                             </p:column>
-                                            
                                             <p:column width="15%" sortBy="#{cse.caseManager.human.name}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Manager" />
                                                 </f:facet>
                                                 <h:outputText value="#{cse.caseManager.human.name}"/>
                                             </p:column>
-                                            
                                             <p:column width="20%" sortBy="#{cse.originationDate}">
                                                 <f:facet name="header">
                                                     <h:outputText value="Opened" />
@@ -213,7 +283,6 @@
                                                 <h:outputText value="Age: #{cse.caseAge} days"
                                                               style="font-style: italic"/>
                                             </p:column>
-                                            
                                             <p:column width="35%" 
                                                       sortBy="#{cse.property.address.buildingNo}"
                                                       filterBy="#{cse.property.address.buildingNo}">
@@ -413,7 +482,7 @@
                                             >
 
                                     <h:form id="violation-update-stipdates-batch-form">
-                                        <h4>Current Compliance dates</h4>
+                                        <h4>Current Compliance Dates</h4>
                                         <p>
                                             <h:outputText value="#{ceCaseBB.getPrettyDate(ceCaseBB.currentViolation.stipulatedComplianceDate)}"/>
                                         </p>
@@ -637,7 +706,7 @@
                                           widgetVar="cecase-search-log-panel-var"
                                           collapsed="true"
                                           style="width:100%;"
-                                          header="CECase Query log">
+                                          header="CECase Search Log">
 
                                     <h:form id="cecase-search-log-form">
                                         <div class='search-query-desc'>
@@ -654,7 +723,7 @@
                                          collapsed="false"
                                          closable="true"
                                          toggleable="true"
-                                         header="#{sessionBean.sessCEARList.size()} CE Action Requests Awaitng Review"
+                                         header="#{sessionBean.sessCEARList.size()} CE Action Requests Awaiting Review"
                                          rendered="true"
                                          footer=""
                                          toggleableHeader="true"
@@ -671,7 +740,7 @@
                                                          tableStyleClass="primeDataTable"
                                                          >
 
-                                                <p:column headerText="Date Submitted000"
+                                                <p:column headerText="Date Submitted"
                                                           styleClass="centeredColumnContent">
 
                                                     <h:outputText value="#{missionControlBB.getPrettyDateNoTime(r.submittedTimeStamp)}"/>
@@ -727,7 +796,7 @@
                                          collapsed="false"
                                          closable="true"
                                          toggleable="true"
-                                         header="Switch session municipality"
+                                         header="Switch Session Municipality"
                                          rendered="true"
                                          footer=""
                                          toggleableHeader="true"
@@ -736,7 +805,7 @@
 
                                         <p:commandButton    id="dash-switchmuni-button-switch"
                                                             disabled="false"
-                                                            value="Change session credential" 
+                                                            value="Change Session Credential" 
                                                             styleClass="button" 
                                                             action="#{missionControlBB.reauthenticate}" 
                                                             icon="fa fa-exchange" />
@@ -747,7 +816,7 @@
                                          collapsed="false"
                                          closable="true"
                                          toggleable="true"
-                                         header="Switch user"
+                                         header="Switch User"
                                          rendered="true"
                                          footer=""
                                          toggleableHeader="true"

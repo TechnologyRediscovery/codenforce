@@ -15,20 +15,20 @@
 
                     <div class="mainContainer">
 
-                       <div class="title-container">
-                            
+                        <div class="title-container">
+
                             <h1>Code Books</h1>
-                            
-                            
+
+
                             <h:form id="cecase-help-form">
                                 <div class="restrict-main-contents-help-link">
                                     <a href="https://technologyrediscovery.github.io/codenforce/code/codebooks"
                                        target="_blank">
-                                       help
+                                        help
                                     </a>
                                 </div>
                             </h:form>
-                           
+
                         </div>
 
                         <h:form id="form-messages-global">
@@ -131,7 +131,7 @@
                                                                     style="#{codeSet.codeSetID == codeSetBB.currentCodeSet.codeSetID ? 'background-color: #dee461; color:black; border:none;':''}"
                                                                     action="#{codeSetBB.onViewCodeSetButtonChange(codeSet)}"
                                                                     ajax="true"
-                                                                    title="View orinances in this source"
+                                                                    title="View ordinances in this source"
                                                                     update="form-messages-global
                                                                     :sets-list-form
                                                                     sets-ece-list-panel
@@ -257,7 +257,7 @@
                                                       styleClass="italic" />
 
                                         <h:outputText id="sets-ece-list-size-label-ot"
-                                                      value="#{!(empty codeSetBB.currentCodeSet.enfCodeElementList) ? ' ordiances contained in this code book' : 'empty code book'}"
+                                                      value="#{!(empty codeSetBB.currentCodeSet.enfCodeElementList) ? ' ordinances contained in this code book' : 'empty code book'}"
                                                       styleClass="italic" />
 
                                         <p:dataTable
@@ -422,8 +422,8 @@
                                                                 </h:outputLabel>
                                                             </div>
                                                             <div class="restrict-data-field-value-inline" >
-                                                               <h:outputText id="ece-lastupdatedby" 
-                                                                             value="#{!(empty cse.lastupdatedBy) ? cse.lastupdatedBy.phumanlastName: ''}"/>
+                                                                <h:outputText id="ece-lastupdatedby" 
+                                                                              value="#{!(empty cse.lastupdatedBy) ? cse.lastupdatedBy.phumanlastName: ''}"/>
                                                                 <h:outputText id="ece-lastupdatedts" 
                                                                               value="#{codeSetBB.getPrettyDate(cse.lastUpdatedTS)}"/>
                                                             </div>
@@ -439,7 +439,7 @@
                                                                  columnClasses="gridTd, gridTd"
                                                                  >
                                                         <h:panelGroup>
-                                                            <h:outputLabel styleClass="bold" value="Munimum Penalty"/>
+                                                            <h:outputLabel styleClass="bold" value="Minimum Penalty"/>
                                                             <p:spacer height="15px"/>
                                                             <div class="rowExpansion">
                                                                 <h:outputText escape="false" value="$#{cse.minPenalty}"/>
@@ -682,108 +682,139 @@
                                >
 
                         <h:form id="sets-ece-update-form">
+                            <div class="p-grid">
+                                <div class="p-col-3">
 
-                            <h:panelGrid columns="4" cellpadding="10"  footerClass="gridFooter"
-                                         columnClasses="gridTd, gridTd, gridTd, gridTd">
-
-                                <h:panelGroup>
                                     <p:outputLabel for="formMaxPenalty">
                                         <h:outputText value="Maximum Penalty in $"/>
                                     </p:outputLabel>
-                                </h:panelGroup>
-                                <h:panelGroup>
+                                </div>
+
+
+                                <div class="p-col-3">
                                     <p:inputText id="formMaxPenalty" value="#{codeSetBB.currentEnforcableCodeElement.maxPenalty}" 
                                                  style="width: 50%;" tabindex="3" required="true" styleClass="inputText"/>
                                     <h:message for="formMaxPenalty" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
 
-                                <h:panelGroup>
+                                </div>
+
+                                <div class="p-col-3">
                                     <p:outputLabel for="formMinPenaltyField">
                                         <h:outputText value="Minimum Penalty in $"/>
                                     </p:outputLabel>
-                                </h:panelGroup>
-                                <h:panelGroup>
+                                </div>
+
+                                <div class="p-col-3">
                                     <p:inputText id="formMinPenaltyField" value="#{codeSetBB.currentEnforcableCodeElement.minPenalty}" 
                                                  style="width: 100%;" tabindex="4" required="true" styleClass="inputText"/>
                                     <h:message for="formMinPenaltyField" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
+                                </div>
 
-                                <h:panelGroup>
+                                <div class="p-col-3">
                                     <p:outputLabel for="formNormPenaltyField">
                                         <h:outputText value="Default/Normal Penalty in $"/>
                                     </p:outputLabel>
-                                </h:panelGroup>
+                                </div>
 
-                                <h:panelGroup>
+
+                                <div class="p-col-3">
                                     <p:inputText id="formNormPenaltyField" value="#{codeSetBB.currentEnforcableCodeElement.normPenalty}" 
                                                  style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
                                     <h:message for="formNormPenaltyField" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
 
-                                <h:panelGroup>
+                                </div>
+                                <div class="p-col-3">
                                     <p:outputLabel for="formPenaltyNotesField">
                                         <h:outputText value="Penalty notes"/>
                                     </p:outputLabel>
-                                </h:panelGroup>
+                                </div>
 
-                                <h:panelGroup>
+                                <div class="p-col-3">
                                     <p:inputText id="formPenaltyNotesField" value="#{codeSetBB.currentEnforcableCodeElement.penaltyNotes}" 
                                                  style="width: 100%;" tabindex="6" required="false" styleClass="inputText"/>
                                     <h:message for="formPenaltyNotesField" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
 
-                                <h:panelGroup>
+                                </div>
+                                <div class="p-col-3">
                                     <p:outputLabel for="formNormDaysToComplyField">
                                         <h:outputText value="Default days to comply"/>
                                     </p:outputLabel>
-                                </h:panelGroup>
-                                <h:panelGroup>
+                                </div>
+
+                                <div class="p-col-3">
                                     <p:inputText id="formNormDaysToComplyField" value="#{codeSetBB.currentEnforcableCodeElement.normDaysToComply}" 
                                                  style="width: 50%;" tabindex="7" required="true" styleClass="inputText"/>
                                     <h:message for="formNormDaysToComplyField" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
+                                </div>
 
-                                <h:panelGroup>
+                                <div class="p-col-3">
                                     <p:outputLabel for="formNormDaysToComplyNotesField">
                                         <h:outputText value="Notes on days to comply"/>
                                     </p:outputLabel>
-                                </h:panelGroup>
-                                <h:panelGroup>
+                                </div>
+
+                                <div class="p-col-3">
                                     <p:inputText id="formNormDaysToComplyNotesField" value="#{codeSetBB.currentEnforcableCodeElement.daysToComplyNotes}" 
                                                  style="width: 100%;" tabindex="8" required="false" styleClass="inputText"/>
                                     <h:message for="formNormDaysToComplyNotesField" showDetail="false" showSummary="true" 
                                                warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                </h:panelGroup>
+                                </div>
 
 
-                                <f:facet name="footer">
-                                    <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Default violation findings:" for="ece-update-defviolfindings"/>
-                                    </h:panelGroup>
+                                <div class="p-col-3">
+                                    <h:outputLabel styleClass="bold" value="Default violation findings:" for="ece-update-defviolfindings"/>
+                                </div>
 
+                                <div class="p-col-3">
                                     <p:inputTextarea id="ece-update-defviolfindings"
                                                      value="#{codeSetBB.currentEnforcableCodeElement.defaultViolationDescription}" />
-                                    <h:panelGroup>
-                                        <h:outputLabel styleClass="bold" value="Municipality-Specific Notes:" for="formMuniSpecificNotesEditor"/>
-                                    </h:panelGroup>
+                                </div>
 
-                                    <h:panelGroup>
-                                        <p:textEditor   id="formMuniSpecificNotesEditor"  
-                                                        value="#{codeSetBB.currentEnforcableCodeElement.muniSpecificNotes}" 
-                                                    required="false"
-                                                    secure="false"
-                                                    height="200"/>
-                                        <h:message for="formMuniSpecificNotesEditor" showDetail="false" showSummary="true" 
-                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
-                                    </h:panelGroup>
-                                </f:facet>
+                                <div class="p-col-3">
+                                    <h:outputLabel styleClass="bold" value="Municipality-Specific Notes:" for="formMuniSpecificNotesEditor"/>
+                                </div>
 
-                            </h:panelGrid>
+
+                                <div class="p-col-3">
+                                    <p:inputTextarea   
+                                        id="formMuniSpecificNotesEditor"  
+                                        value="#{codeSetBB.currentEnforcableCodeElement.muniSpecificNotes}" 
+                                        required="false"
+                                        rows = "2"
+                                        cols = "15"/>
+                                    <h:message for="formMuniSpecificNotesEditor" showDetail="false" showSummary="true" 
+                                               warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                </div>
+
+                                <div class="p-col-3 restrict-main-contents-io-title" >
+                                    <p:outputLabel  for="violation-severity-som">
+                                        <h:outputText value="Violation severity default" />
+                                    </p:outputLabel>
+                                </div>
+                                
+                                <div class="p-col-3 restrict-main-contents-io-content">
+                                    <p:selectOneMenu id="violation-severity-som"
+                                                     value="#{codeSetBB.currentEnforcableCodeElement.defaultViolationSeverity}"
+                                                     style="width: 100%;"
+                                                     required="true"
+                                                     requiredMessage="A violation severity must be selected when adding a violation."
+                                                     >
+                                        <f:converter converterId="intensityClassConverter"/>
+
+                                        <f:selectItem itemLabel="select a severity" noSelectionOption="true" />
+
+                                        <f:selectItems id="violation-severity-selitems"
+                                                       value="#{codeSetBB.enforcableCodeElementSeverityList}"
+                                                       var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
+                                    </p:selectOneMenu>
+                                </div>
+
+                            </div>
                             <p:spacer height="15px"/>
                             <p:commandButton 
                                 id="sets-ece-udpate-commit-cb"
@@ -800,7 +831,6 @@
                                                 immediate="true"
                                                 oncomplete="PF('sets-ece-update-dialog-var').hide();"
                                                 />
-
                         </h:form>
                     </p:dialog> 
 
@@ -839,7 +869,7 @@
                                 actionListener="#{codeSetBB.retrieveCodeElementsFromSelectedSource}"
                                 ajax="true" 
                                 icon="fa fa-list"
-                                update=":sets-addelements-form"/>
+                                update=":sets-addelements-form:code-element-table"/>
 
                         </h:form>
 
@@ -850,7 +880,7 @@
                                 Un-select a row by holding down control while clicking (using a mouse for this is handy).</p>
 
                             <p:dataTable
-                                id="codeElementTable"
+                                id="code-element-table"
                                 var="ord"
                                 value="#{codeSetBB.codeElementList}"
                                 selectionMode="multiple"
@@ -1006,10 +1036,144 @@
 
                                 />
                             <p:spacer height="5px"/>
-                            <h:outputText value="Note: Ordinances will be added with default enforcability data which you should edit from the main screen" />
+                            <p:panel 
+                                id="default-panel" 
+                                header="Default enforceability values for selected ordinances"
+                                >
 
+                                <div class="p-grid">
+                                    <div class="p-col-3">
+
+                                        <p:outputLabel for="form-max-penalty-default">
+                                            <h:outputText value="Maximum Penalty in $"/>
+                                        </p:outputLabel>
+                                    </div>
+
+
+                                    <div class="p-col-3">
+                                        <p:inputText id="form-max-penalty-default" value="#{codeSetBB.enforcableCodeElementDefaultValues.maxPenalty}" 
+                                                     style="width: 50%;" tabindex="3" required="true" styleClass="inputText"/>
+                                        <h:message for="formMaxPenalty" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </div>
+
+                                    <div class="p-col-3">
+                                        <p:outputLabel for="form-min-penalty-field-default">
+                                            <h:outputText value="Minimum Penalty in $"/>
+                                        </p:outputLabel>
+                                    </div>
+
+                                    <div class="p-col-3">
+                                        <p:inputText id="form-min-penalty-field-default" value="#{codeSetBB.enforcableCodeElementDefaultValues.minPenalty}" 
+                                                     style="width: 100%;" tabindex="4" required="true" styleClass="inputText"/>
+                                        <h:message for="formMinPenaltyField" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </div>
+
+                                    <div class="p-col-3">
+                                        <p:outputLabel for="form-norm-penalty-field-default">
+                                            <h:outputText value="Default/Normal Penalty in $"/>
+                                        </p:outputLabel>
+                                    </div>
+
+
+                                    <div class="p-col-3">
+                                        <p:inputText id="form-norm-penalty-field-default" value="#{codeSetBB.enforcableCodeElementDefaultValues.normPenalty}" 
+                                                     style="width: 50%;" tabindex="5" required="true" styleClass="inputText"/>
+                                        <h:message for="formNormPenaltyField" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </div>
+                                    <div class="p-col-3">
+                                        <p:outputLabel for="form-penalty-notes-field-default">
+                                            <h:outputText value="Penalty notes"/>
+                                        </p:outputLabel>
+                                    </div>
+
+                                    <div class="p-col-3">
+                                        <p:inputText id="form-penalty-notes-field-default" value="#{codeSetBB.enforcableCodeElementDefaultValues.penaltyNotes}" 
+                                                     style="width: 100%;" tabindex="6" required="false" styleClass="inputText"/>
+                                        <h:message for="form-penalty-notes-field-default" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+
+                                    </div>
+                                    <div class="p-col-3">
+                                        <p:outputLabel for="form-norm-days-to-comply-field-default">
+                                            <h:outputText value="Default days to comply"/>
+                                        </p:outputLabel>
+                                    </div>
+
+                                    <div class="p-col-3">
+                                        <p:inputText id="form-norm-days-to-comply-field-default" value="#{codeSetBB.enforcableCodeElementDefaultValues.normDaysToComply}" 
+                                                     style="width: 50%;" tabindex="7" required="true" styleClass="inputText"/>
+                                        <h:message for="form-norm-days-to-comply-field" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </div>
+
+                                    <div class="p-col-3">
+                                        <p:outputLabel for="form-norm-days-to-comply-notes-field-default">
+                                            <h:outputText value="Notes on days to comply"/>
+                                        </p:outputLabel>
+                                    </div>
+
+                                    <div class="p-col-3">
+                                        <p:inputText id="form-norm-days-to-comply-notes-field-default" value="#{codeSetBB.enforcableCodeElementDefaultValues.daysToComplyNotes}" 
+                                                     style="width: 100%;" tabindex="8" required="false" styleClass="inputText"/>
+                                        <h:message for="form-norm-days-to-comply-notes-field" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </div>
+
+
+                                    <div class="p-col-3">
+                                        <h:outputLabel styleClass="bold" value="Default violation findings:" for="ece-update-defviolfindings"/>
+                                    </div>
+
+                                    <div class="p-col-3">
+                                        <p:inputTextarea id="ece-update-defviolfindings-default"
+                                                         value="#{codeSetBB.enforcableCodeElementDefaultValues.defaultViolationDescription}" />
+                                    </div>
+
+                                    <div class="p-col-3">
+                                        <h:outputLabel styleClass="bold" value="Municipality-Specific Notes:" for="formMuniSpecificNotesEditor"/>
+                                    </div>
+
+
+                                    <div class="p-col-3">
+                                        <p:inputTextarea   
+                                            id="form-muni-specific-notes-editor-default"  
+                                            value="#{codeSetBB.enforcableCodeElementDefaultValues.muniSpecificNotes}" 
+                                            required="false"
+                                            rows = "2"
+                                            cols = "15"/>
+                                        <h:message for="form-muni-specific-notes-editor-default" showDetail="false" showSummary="true" 
+                                                   warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
+                                    </div>
+
+                                    <div class="p-col-3 restrict-main-contents-io-title" >
+                                        <p:outputLabel  for="violation-severity-som">
+                                            <h:outputText value="Violation severity default" />
+                                        </p:outputLabel>
+                                    </div>
+                                    <div class="p-col-3 restrict-main-contents-io-content">
+                                        <p:selectOneMenu id="violation-severity-som"
+                                                         value="#{codeSetBB.enforcableCodeElementDefaultValues.defaultViolationSeverity}"
+                                                         style="width: 100%;"
+                                                         required="true"
+                                                         requiredMessage="A violation severity must be selected when adding a violation."
+                                                         >
+                                            <f:converter converterId="intensityClassConverter"/>
+
+                                            <f:selectItem itemLabel="select a severity" noSelectionOption="true" />
+
+                                            <f:selectItems id="violation-severity-selitems"
+                                                           value="#{codeSetBB.enforcableCodeElementSeverityList}"
+                                                           var="ic" itemValue="#{ic}" itemLabel="#{ic.numericRating}: #{ic.title}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>                             
+                            </p:panel>
                         </h:form>
-
                     </p:dialog>
 
                     <p:dialog id="set-nuke-dialog"

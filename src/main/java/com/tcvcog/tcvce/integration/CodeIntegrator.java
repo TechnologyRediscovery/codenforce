@@ -1051,11 +1051,11 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         String query = "INSERT INTO public.codesetelement(\n" +
                     "codesetelementid, codeset_codesetid, codelement_elementid, elementmaxpenalty, \n" +
                     "elementminpenalty, elementnormpenalty, penaltynotes, normdaystocomply, \n" +
-                    "daystocomplynotes, munispecificnotes, defaultviolationdescription,"
+                    "daystocomplynotes, munispecificnotes, defaultseverityclass_classid, fee_feeid, defaultviolationdescription,"
                     + "createdts, createdby_userid, lastupdatedts, lastupdatedby_userid)\n" +
                     " VALUES (DEFAULT, ?, ?, ?, \n" +
                     "?, ?, ?, ?, \n" +
-                    "?, ?, ?,"
+                    "?, ?, ?, ?, ?, \n"
                     + "now(), ?, now(), ?);";
         ResultSet rs = null;
         int freshECEID = 0;
@@ -1074,18 +1074,35 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             
             stmt.setString(8, ece.getDaysToComplyNotes());
             stmt.setString(9, ece.getMuniSpecificNotes());
-            stmt.setString(10, ece.getDefaultViolationDescription());
+            if(ece.getDefaultViolationSeverity() != null){
+                stmt.setInt(10, ece.getDefaultViolationSeverity().getClassID());
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
+            }
+            
+            
+            //DEPRECATED 08.23.22 by wwalk for later usage
+//            if(ece.getFeeList() != null){
+//                stmt.setInt(11, ece.getFeeList()):
+//            } else {
+//                stmt.setNull(11, java.sql.Types.NULL);
+//            }
+
+            //wwalk, 08.23.22: feeList entry currently set to NULL
+            stmt.setInt(11, java.sql.Types.NULL);
+            
+            stmt.setString(12, ece.getDefaultViolationDescription());
             
             if(ece.getEceCreatedBy() != null){
-                stmt.setInt(11, ece.getEceCreatedBy().getUserID());
+                stmt.setInt(13, ece.getEceCreatedBy().getUserID());
             } else {
-                stmt.setNull(11, java.sql.Types.NULL);
+                stmt.setNull(13, java.sql.Types.NULL);
             }
 
             if(ece.getEceLastupdatedBy() != null){
-                stmt.setInt(12, ece.getEceLastupdatedBy().getUserID());
+                stmt.setInt(14, ece.getEceLastupdatedBy().getUserID());
             } else {
-                stmt.setNull(12, java.sql.Types.NULL);
+                stmt.setNull(14, java.sql.Types.NULL);
             }
             
             

@@ -424,6 +424,8 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         
         ci.deactivateCodeElement(ele);
         
+        
+        
     }
     
     
@@ -604,15 +606,35 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
      * @throws BObStatusException
      * @throws IntegrationException 
      */
-    public int insertEnforcableCodeElement(EnforcableCodeElement ece, CodeSet cs, UserAuthorized ua) throws BObStatusException, IntegrationException{
+    public int insertEnforcableCodeElement(EnforcableCodeElement ece, 
+            CodeSet cs, 
+            UserAuthorized ua,
+            EnforcableCodeElement dece) 
+            throws BObStatusException, IntegrationException{
         CodeIntegrator ci = getCodeIntegrator();
         if(ece == null || ua == null || cs == null){
             throw new BObStatusException("Cannot insert ECE with null ECE or User");
         }
+        ece.setCodeSetID(cs.getCodeSetID());
+        //Take skeleton enforceable values and inject them into defaults before adding to database
+        ece.setMaxPenalty(dece.getMaxPenalty());
+        ece.setMinPenalty(dece.getMinPenalty());
+        ece.setNormPenalty(dece.getNormPenalty());
+        ece.setPenaltyNotes(dece.getPenaltyNotes());
+        ece.setNormDaysToComply(dece.getNormDaysToComply());
+        ece.setDaysToComplyNotes(dece.getDaysToComplyNotes());
+        ece.setMuniSpecificNotes(dece.getMuniSpecificNotes());
+        ece.setDefaultViolationSeverity(dece.getDefaultViolationSeverity());
+        ece.setFeeList(dece.getFeeList());
+        ece.setDefaultViolationDescription(dece.getDefaultViolationDescription());
+        
+       
+        
+        
+       
         
         ece.setEceCreatedBy(ua);
         ece.setEceLastupdatedBy(ua);
-        ece.setCodeSetID(cs.getCodeSetID());
         return ci.insertEnforcableCodeElementToCodeSet(ece);
         
     }
@@ -866,5 +888,9 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         CodeIntegrator ci = getCodeIntegrator();
         ci.deleteCodeElementGuideEntry(cege);
         
+    }
+
+    public void insertEnforcableCodeElement(EnforcableCodeElement ece, CodeSet currentCodeSet, UserAuthorized sessUser) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

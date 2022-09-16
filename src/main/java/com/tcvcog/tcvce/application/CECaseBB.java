@@ -289,7 +289,7 @@ public class CECaseBB
             } catch (BObStatusException | IntegrationException ex) {
                 System.out.println(ex);
                 getFacesContext().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-                        "Fatal error udating case manager. Please log a ticket.", ""));
+                        "Fatal error updating case manager. Please log a ticket.", ""));
             } 
         }
         editModeCurrentCaseManager = !editModeCurrentCaseManager;
