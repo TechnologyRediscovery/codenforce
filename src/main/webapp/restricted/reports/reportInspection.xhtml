@@ -37,6 +37,8 @@
                                     <h:outputText value=" | " />
                                     <h:outputText id="creator-ot" value="Created by: #{reportingBB.reportConfigFieldInspection.creator.human.name}" />
                                     <h:outputText value=" " />
+                                    <!-- Deprecated by wwalk 9.2.22 to eliminate created by name redundancy -->
+                                    <!--<h:outputText value="#{reportingBB.reportConfigFieldInspection.creator.human.name}" />-->
                                     <h:outputText value=" | " />
                                     <h:outputText id="report-ts-ot" value="#{reportingBB.reportConfigFieldInspection.generationTimestampPretty}" />
                                 </div>
@@ -51,11 +53,11 @@
                 <f:view id="report-inspection-view">
                     <h:form id="report-inspection-form">
 
-                        <h1 style="clear:both;">Field inspection report</h1>
+                        <h1 style="clear:both;">Field Inspection Report</h1>
 
                             <div class="p-grid nested-grid">
                                 <div class="p-col-6">
-                                    <h2>Property details</h2>
+                                    <h2>Property Details</h2>
                                     <h:outputText styleClass="occperiod-address" 
                                                   value="#{reportingBB.reportConfigFieldInspection.inspectedProperty.address.addressPretty2LineEscapeFalse}"
                                                   escape="false"/>
@@ -168,7 +170,7 @@
                                     <f:subview id="fir-unit-subview"
                                                rendered="#{!empty reportingBB.reportConfigFieldInspection.inspectedUnit}" >
 
-                                        <h2>Unit details</h2>
+                                        <h2>Unit Details</h2>
                                         <div class="p-grid">
                                             <div class="p-col-4">
                                                 <div class="restrict-data-field-label-inline" >
@@ -379,7 +381,7 @@
                             </div>
                         </f:subview>
 
-                        <h2>Inspection results</h2>
+                        <h2>Inspection Results</h2>
 
                         <p:dataScroller
                             id="scroller-inspectedspacelist"

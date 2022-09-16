@@ -132,7 +132,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                         <h:form id="cecase-profile-form-0">
                                             <p:commandButton id="cecase-edit-button"  
-                                                             value="#{ceCaseBB.editModeCurrentCase ? 'Save changes' : 'Edit case details'}"
+                                                             value="#{ceCaseBB.editModeCurrentCase ? 'Save changes' : 'Edit Case Details'}"
                                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                              icon="fa #{ceCaseBB.editModeCurrentCase ? 'fa-check' : 'fa-pencil'}"
                                                              actionListener="#{ceCaseBB.onToggleCECaseEditButtonChange}"
@@ -692,7 +692,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                actionListener="#{ceCaseBB.prepareReportCECase}"
                                                                icon="fa fa-print"
                                                                oncomplete="PF('report-case-profile-diaglog-var').show()"
-                                                               value="Print case profile "
+                                                               value="Print Case Profile "
                                                                update="report-case-profile-form"/>
                                         </h:form>
 
@@ -811,6 +811,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
                                     <ui:include src="/restricted/compositions/inspectionTools.xhtml"/>
 
+
+
                                     <p:panel id="inspections-panel"
                                              toggleable="true"
                                              widgetVar="inspections-panel-var"
@@ -820,7 +822,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
                                             <p:commandButton id="inspections-newbutton"
-                                                             value="New inspection"
+                                                             value="New Inspection"
                                                              disabled="#{!empty ceCaseBB.currentCase.closingDate}"
                                                              rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                              icon="fa fa-plus"
@@ -847,15 +849,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                           style="width:25%;">
                                                     <h:outputText value="#{inspection.inspector.human.name}" />
                                                 </p:column>
-                                                <p:column headerText="Status / Determination"
+                                                <p:column headerText="Determination"
                                                           style="width:30%;">
-                                                    <h:outputText id="dispatch-ot"
-                                                                  value="dispatched to handheld computer field application"
-                                                                  rendered="#{!empty inspection.dispatch and (empty inspection.dispatch.synchronizationTS and (empty inspection.dispatch.deactivatedTS))}" />
-                                                    <p:spacer height="3px" />
                                                     <h:outputText value="#{empty inspection.determination ? '(in process)':inspection.determination.title}" />
-                                                    <h:outputText value="#{inspection.determination.qualifiesAsPassed ? ' (QUALIFIES AS PASS)':' (NOT pass)'}" 
-                                                                  rendered="#{!empty inspection.determination}"/>
                                                 </p:column>
                                                 <p:column headerText="Actions"
                                                           style="width:25%;">
@@ -887,13 +883,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:panel id="events-panel"
                                              toggleable="true"
                                              collapsed="false"
-                                             header="Events (#{eventListRequestScopedBB.managedEventList.size()}) on #{!empty sessionEventConductor.sessEventsPageEventDomainRequest ? sessionEventCondcutor.sessEventsPageEventDomainRequest.title : ''} (ID:#{!empty eventListRequestScopedBB.currentEvHolder ? eventListRequestScopedBB.currentEvHolder.BObID : ''})">
+                                             header="Events (#{eventListRequestScopedBB.managedEventList.size()}) on #{!empty sessionBean.sessEventsPageEventDomainRequest ? sessionBean.sessEventsPageEventDomainRequest.title : ''} (ID:#{!empty eventListRequestScopedBB.currentEvHolder ? eventListRequestScopedBB.currentEvHolder.BObID : ''})">
 
                                         <h:form id="events-form">
 
                                             <p:commandButton id="events-add-button"
                                                              styleClass="noFill button-size-small"
-                                                             value="Add event"
+                                                             value="Add Event"
                                                              icon="fa fa-plus"
                                                              actionListener="#{eventBB.onEventAddInit(ceCaseBB.currentCase)}"
                                                              oncomplete="PF('event-add-dialog-var').show()"

@@ -56,7 +56,7 @@
                            disabled="#{occPeriodSearchBB.occPeriodQuerySelected.queryExecuted}"
                            icon="fa fa-flash" 
                            styleClass="button"
-                           value="run query" 
+                           value="Run Search" 
                            update="@form
                            occperiod-search-results-form
                            occperiod-search-log-form"/>
@@ -66,7 +66,7 @@
                            actionListener="#{occPeriodSearchBB.resetQuery}"
                            icon="fa fa-eraser" 
                            styleClass="button inline-button"
-                           value="clear query" 
+                           value="Clear Search" 
                            disabled="#{!occPeriodSearchBB.occPeriodQuerySelected.queryExecuted}"
                            update=" occperiod-search-log-form
                            @form"/>
@@ -89,7 +89,7 @@
                                actionListener="#{occPeriodSearchBB.clearOccPeriodList}"
                                icon="fa fa-eraser" 
                                styleClass="button"
-                               value="clear results list" 
+                               value="Clear Results List" 
                                update=" occperiod-messages-form
                                         occperiod-search-results-form"/>
 
@@ -99,7 +99,7 @@
                                actionListener="#{occPeriodSearchBB.loadOccPeriodHistory}"
                                icon="fa fa-clock-o" 
                                styleClass="button"
-                               value="load file history" 
+                               value="Load File History" 
                                update=" occperiod-messages-form
                                         @form"/>
             <p:spacer height="5px" />
@@ -212,7 +212,7 @@
               widgetVar="occperiod-search-log-panel-var"
               collapsed="true"
               style="width:100%;"
-              header="CECase Query log">
+              header="CECase Search Log">
 
         <h:form id="occperiod-search-log-form">
             <div class="search-query-desc">

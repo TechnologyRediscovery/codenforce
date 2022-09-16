@@ -28,6 +28,34 @@ import java.util.List;
 public class EnforcableCodeElement 
         extends CodeElement 
         implements Serializable, Cloneable {
+   
+    // code set elements and enforcable code elments are equivalent
+    // TODO: unify these names
+    protected int codeSetElementID;
+    protected int codeSetID;
+    
+    
+    protected double maxPenalty;
+    protected double minPenalty;
+    protected double normPenalty;
+    protected String penaltyNotes;
+    protected int normDaysToComply;
+    protected String daysToComplyNotes;
+    protected String muniSpecificNotes;
+    protected List<Fee> feeList;
+    protected String defaultViolationDescription;
+    protected IntensityClass defaultViolationSeverity;
+    
+    protected List<String> injectedValues;
+    
+    
+     /** Humanization Object standard fields **/
+    protected LocalDateTime eceCreatedTS;
+    protected User eceCreatedBy;
+    protected LocalDateTime eceLastUpdatedTS;
+    protected User eceLastupdatedBy;
+    protected LocalDateTime eceDeactivatedTS;
+    protected User eceDeactivatedBy;
 
     public EnforcableCodeElement() {
 
@@ -48,6 +76,7 @@ public class EnforcableCodeElement
             this.muniSpecificNotes = ece.muniSpecificNotes;
             this.feeList = ece.feeList;
             this.defaultViolationDescription = ece.defaultViolationDescription;
+            this.defaultViolationSeverity = ece.defaultViolationSeverity;
             this.injectedValues = ece.injectedValues;
             this.eceCreatedTS = ece.eceCreatedTS;
             this.eceCreatedBy = ece.eceCreatedBy;
@@ -55,6 +84,8 @@ public class EnforcableCodeElement
             this.eceLastupdatedBy = ece.eceLastupdatedBy;
             this.eceDeactivatedTS = ece.eceDeactivatedTS;
             this.eceDeactivatedBy = ece.eceDeactivatedBy;
+            
+            
         }
         
     }
@@ -65,32 +96,6 @@ public class EnforcableCodeElement
         
     }
 
-    // code set elements and enforcable code elments are equivalent
-    // TODO: unify these names
-    protected int codeSetElementID;
-    protected int codeSetID;
-    
-    
-    protected double maxPenalty;
-    protected double minPenalty;
-    protected double normPenalty;
-    protected String penaltyNotes;
-    protected int normDaysToComply;
-    protected String daysToComplyNotes;
-    protected String muniSpecificNotes;
-    protected List<Fee> feeList;
-    protected String defaultViolationDescription;
-    
-    protected List<String> injectedValues;
-    
-    
-     /** Humanization Object standard fields **/
-    protected LocalDateTime eceCreatedTS;
-    protected User eceCreatedBy;
-    protected LocalDateTime eceLastUpdatedTS;
-    protected User eceLastupdatedBy;
-    protected LocalDateTime eceDeactivatedTS;
-    protected User eceDeactivatedBy;
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -349,6 +354,20 @@ public class EnforcableCodeElement
      */
     public void setCodeSetID(int codeSetID) {
         this.codeSetID = codeSetID;
+    }
+
+    /**
+     * @return the defaultViolationSeverity
+     */
+    public IntensityClass getDefaultViolationSeverity() {
+        return defaultViolationSeverity;
+    }
+
+    /**
+     * @param defaultViolationSeverity the defaultViolationSeverity to set
+     */
+    public void setDefaultViolationSeverity(IntensityClass defaultViolationSeverity) {
+        this.defaultViolationSeverity = defaultViolationSeverity;
     }
 
 }

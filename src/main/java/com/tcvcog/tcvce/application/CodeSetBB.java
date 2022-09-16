@@ -18,14 +18,17 @@ Council of Governments, PA
 package com.tcvcog.tcvce.application;
 
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;
+import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.CodeSet;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.EnforcableCodeElement;
+import com.tcvcog.tcvce.entities.IntensityClass;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +59,8 @@ public class CodeSetBB
     
     private List<EnforcableCodeElement> enforcableCodeElementListFiltered;
     private EnforcableCodeElement currentEnforcableCodeElement;
+    private EnforcableCodeElement enforcableCodeElementDefaultValues;
+    private List<IntensityClass> enforcableCodeElementSeverityList;
     
     private Map<Municipality, CodeSet> muniSetMap;
     
@@ -64,6 +69,8 @@ public class CodeSetBB
 
     private List<CodeElement> codeElementList;
     private List<CodeElement> selectedElementsToAddToSet;
+    
+   
     
     
     /**
@@ -75,6 +82,7 @@ public class CodeSetBB
     @PostConstruct
     public void initBean(){
         CodeCoordinator cc = getCodeCoordinator();
+        SystemCoordinator sysCor = getSystemCoordinator();
         try {
             codeSetList = cc.getCodeSetListComplete();
             codeSourceList = cc.getCodeSourceList();
@@ -82,7 +90,15 @@ public class CodeSetBB
             muniSetMap = cc.getMuniCodeSetDefaultMap();
             codeElementList = new ArrayList<>();
             selectedElementsToAddToSet = new ArrayList<>();
+            enforcableCodeElementSeverityList = sysCor.getIntensitySchemaWithClasses(getResourceBundle(Constants.DB_FIXED_VALUE_BUNDLE)
+                    .getString("intensityschema_violationseverity"))
+                    .getClassList();
             
+            if(enforcableCodeElementSeverityList != null && !enforcableCodeElementSeverityList.isEmpty()){
+                System.out.println("CodeSetBB: " + enforcableCodeElementSeverityList.size());
+            } else {
+                System.out.println("Error: Error getting Severity List");
+            }
             
 
             // if we have a set in the session, make it current on page load
@@ -272,12 +288,14 @@ public class CodeSetBB
     /**
      * Listener for user requests to start the addition process of ECEs to the 
      * current CodeSet
+     * Inject a skeleton ECE for storing default values
      * @param ev
      */
     public void onAddCodeElementsToCodeSetInitButtonChange(ActionEvent ev) {
-        
-       // nothing to do here yet
+        CodeCoordinator cc = getCodeCoordinator();
+        enforcableCodeElementDefaultValues = cc.getEnforcableCodeElementSkeleton(null);
        
+    
     }
      
     
@@ -318,7 +336,7 @@ public class CodeSetBB
             for(CodeElement ele: selectedElementsToAddToSet){
                 ece = cc.getEnforcableCodeElementSkeleton(ele);
                 try {
-                    cc.insertEnforcableCodeElement(ece, currentCodeSet, getSessionBean().getSessUser());
+                    cc.insertEnforcableCodeElement(ece, currentCodeSet, getSessionBean().getSessUser(), enforcableCodeElementDefaultValues);
                 } catch (IntegrationException | BObStatusException ex) {
                     getFacesContext().addMessage(null,
                             new FacesMessage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), ""));
@@ -364,7 +382,7 @@ public class CodeSetBB
             cc.updateEnforcableCodeElement(currentEnforcableCodeElement, getSessionBean().getSessUser());
             getFacesContext().addMessage(null,
               new FacesMessage(FacesMessage.SEVERITY_INFO,
-                  "Successfully updated enforcability info on enforcable ordinance ID: " + currentEnforcableCodeElement.getCodeSetElementID(), ""));
+                  "Successfully updated enforceability info on enforceable ordinance ID: " + currentEnforcableCodeElement.getCodeSetElementID(), ""));
             return "codeSetManage";
             
         } catch (BObStatusException | IntegrationException ex) {
@@ -588,6 +606,34 @@ public class CodeSetBB
      */
     public void setEnforcableCodeElementListFiltered(List<EnforcableCodeElement> enforcableCodeElementListFiltered) {
         this.enforcableCodeElementListFiltered = enforcableCodeElementListFiltered;
+    }
+
+    /**
+     * @return the enforcableCodeElementDefaultValues
+     */
+    public EnforcableCodeElement getEnforcableCodeElementDefaultValues() {
+        return enforcableCodeElementDefaultValues;
+    }
+
+    /**
+     * @param enforcableCodeElementDefaultValues the enforcableCodeElementDefaultValues to set
+     */
+    public void setEnforcableCodeElementDefaultValues(EnforcableCodeElement enforcableCodeElementDefaultValues) {
+        this.enforcableCodeElementDefaultValues = enforcableCodeElementDefaultValues;
+    }
+
+    /**
+     * @return the enforcableCodeElementSeverityList
+     */
+    public List<IntensityClass> getEnforcableCodeElementSeverityList() {
+        return enforcableCodeElementSeverityList;
+    }
+
+    /**
+     * @param enforcableCodeElementSeverityList the enforcableCodeElementSeverityList to set
+     */
+    public void setEnforcableCodeElementSeverityList(List<IntensityClass> enforcableCodeElementSeverityList) {
+        this.enforcableCodeElementSeverityList = enforcableCodeElementSeverityList;
     }
 
 }

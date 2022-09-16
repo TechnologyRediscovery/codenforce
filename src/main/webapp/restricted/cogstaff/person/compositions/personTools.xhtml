@@ -582,7 +582,7 @@
                         <p:commandButton    id="person-profile-info-edit-abort-button"
                                             ajax="true"
                                             rendered="#{personBB.currentPersonHumanFieldsEditMode}"
-                                            value="Abort edit"
+                                            value="Cancel Edit"
                                             style="background-color: darkgray;"
                                             actionListener="#{personBB.onHumanOperationAbortButtonChange}"
                                             update="@form:@parent:persontools-growl-form
@@ -896,7 +896,7 @@
                 <p:panel id="person-profile-phones-panel"
                          toggleable="true"
                          collapsed="false"
-                         header="Phone numbers">
+                         header="Phone Numbers">
 
                     <h:form id="person-profile-phones-form">
 
@@ -907,7 +907,7 @@
                                              disabled="#{personBB.currentPersonHumanFieldsEditMode}"
                                              oncomplete="PF('phone-dialog-var').show()"
                                              rendered="true"
-                                             value="Add phone number" 
+                                             value="Add Phone Number" 
                                              update="@form:@parent:phone-info-form
                                              phone-dialog"/>
 
@@ -981,7 +981,7 @@
                 <p:panel id="person-emails-panel"
                          toggleable="true"
                          collapsed="false"
-                         header="Email addresses">
+                         header="Email Addresses">
 
 
                     <h:form id="person-profile-emails-form">
@@ -994,7 +994,7 @@
                                               oncomplete="PF('email-dialog-var').show()"
                                               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniReaderPermissions}"
                                               update="@form:@parent:email-info-form"
-                                              value="Add email address" />
+                                              value="Add Email Address" />
 
                         <p:spacer height="5px"/>
 
@@ -1238,7 +1238,7 @@
                 <p:commandButton    id="humanlink-edit-abort-button"
                                     ajax="true"
                                     rendered="#{personBB.currentContactPhoneEditMode}"
-                                    value="Abort edit"
+                                    value="Cancel Edit"
                                     actionListener="#{personBB.onPhoneOperationAbortButtonChange}"
                                     oncomplete="PF('humanlink-viewedit-dialog-var').show()"
                                     update="@form
@@ -1642,7 +1642,7 @@
                     <p:commandButton    id="phone-edit-abort-button"
                                         ajax="true"
                                         rendered="#{personBB.currentContactPhoneEditMode}"
-                                        value="Abort edit"
+                                        value="Cancel Edit"
                                         actionListener="#{personBB.onPhoneOperationAbortButtonChange}"
                                         oncomplete="PF('phone-dialog-var').show()"
                                         update="@form
@@ -1827,7 +1827,7 @@
                 closeOnEscape="true"
                 dynamic="true"
                 modal="true"
-                header="#{personBB.currentContactEmail.emailID eq 0 ? 'Create new email address' : 'View/Edit email address'}"
+                header="#{personBB.currentContactEmail.emailID eq 0 ? 'Create new email address' : 'View/Edit Email Address'}"
                 rendered="true"
                 >
 
@@ -1854,7 +1854,7 @@
                     <p:commandButton    id="email-edit-abort-button"
                                         ajax="true"
                                         rendered="#{personBB.currentContactEmailEditMode}"
-                                        value="Abort edit"
+                                        value="Cancel Edit"
                                         actionListener="#{personBB.onEmailOperationAbortButtonChange}"
                                         oncomplete="PF('person-profile-dialog-var').show()"
                                         update="email-info-form
