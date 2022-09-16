@@ -19,6 +19,7 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import java.io.Serializable;
 import com.tcvcog.tcvce.entities.Credential;
@@ -1021,9 +1022,18 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         if(usr == null){
             throw new BObStatusException("Cannot configure a null user");
         }
-        
+        BlobCoordinator bc = getBlobCoordinator();
         PersonCoordinator pc = getPersonCoordinator();
         usr.setHuman(pc.getHuman(usr.getHumanID()));
+        try {
+            usr.setBlobList(bc.getBlobLightList(usr));
+            if(usr.getSignatureBlobID() != 0){
+                usr.setSignatureBlob(bc.getBlobLight(usr.getSignatureBlobID()));
+            }
+        } catch (BlobException ex) {
+            throw new BObStatusException(ex.getMessage());
+        }
+        
         return usr;
     }
     

@@ -12,198 +12,270 @@
     <h:body>
         <ui:composition template="./../report_template_permit.xhtml">
             <ui:define name="print-content">
-                
-                   <h:form id="permit-draft-form">
-            
-            <div class="p-grid">
-                <div class="p-col-12 centeredColumnContent">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.statictitle}" 
-                                  styleClass="occpermit-title"
-                                  />
-                    <p:spacer height="3px" />
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticmuniaddress}"
-                                  escape="false"
-                                  styleClass="occpermit-titlesub"/>
-                </div>
-                <div class="p-col-4 restrict-data-field-label-inline">
-                    <h:outputText value="Property:" />
-                </div>
-                <div class="p-col-8 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticpropertyinfo}" 
-                                  escape="false"/>
-                </div>
-                <div class="p-col-5">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticownerseller}" 
-                                  escape="false"/>
 
-                </div>
-                <div class="p-col-2">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticcolumnlink}" />
-                </div>
-                <div class="p-col-5">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticbuyertenant}"
-                                  escape="false" />
-                </div>
-                <div class="p-col-2">
-                    <h:outputText value="Proposed use:" />
+                <h:form id="permit-draft-form">
 
-                </div>
-                <div class="p-col-2">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticproposeduse}" />
+                    <div class="p-grid">
+                        <div class="p-col-12 centeredColumnContent">
+                            <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.statictitle}" 
+                                          styleClass="occpermit-title"
+                                          />
+                            <p:spacer height="3px" />
+                            <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticmuniaddress}"
+                                          escape="false"
+                                          styleClass="occpermit-titlesub"/>
+                        </div>
+                        <div class="p-col-4 restrict-data-field-label-inline">
+                            <h:outputText value="Property:" />
+                        </div>
+                        <div class="p-col-8 restrict-data-field-value-inline">
+                            <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticpropertyinfo}" 
+                                          escape="false"/>
+                        </div>
+                        <div class="p-col-4 restrict-data-field-label-inline">
+                            <h:outputText value="Permit Number:" />
+                        </div>
+                        <div class="p-col-8 restrict-data-field-value-inline">
+                            <h:outputText value="#{occPeriodBB.currentOccPermit.referenceNo}" 
+                                          rendered="#{!empty occPeriodBB.currentOccPermit.referenceNo}"/>
 
-                </div>
-                <div class="p-col-2">
-                    <h:outputText value="Use code:" />
+                        </div>
+                        <div class="p-col-5">
+                            <h:outputText value="Property Owner(s)/Seller(s):"
+                                          styleClass="bold" />
+                            <p:spacer height="2px" />
+                            <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticownerseller}" 
+                                          escape="false"/>
 
-                </div>
-                <div class="p-col-2">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticusecode}" />
+                        </div>
+                        <div class="p-col-2">
+                            <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticcolumnlink}" />
+                        </div>
+                        <div class="p-col-5">
+                            <h:outputText value="Property buyer(s)/tenant(s)"
+                                          styleClass="bold" />
+                            <p:spacer height="2px" />
+                            <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticbuyertenant}"
+                                          escape="false" />
+                        </div>
 
-                </div>
-                <div class="p-col-2">
-                    <h:outputText value="Property class:" />
+                        <f:subview id="permit-sv-propuse"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticproposeduse}">
 
-                </div>
-                <div class="p-col-2">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticpropclass}" />
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Proposed use:" />
+                            </div>
+                            <div class="p-col-3">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticproposeduse}" />
 
-                </div>
-                <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="Date of Application:" />
-                </div>
-                <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(BB.reportConfigOccPermit.permit.staticdateofapplication)}" />
-                </div>
-                <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="Initial Inspection:" />
-                </div>
-                <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportConfigOccPermit.permit.staticinitialinspection)}" />
-                </div>
-                <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="Reinspection Date:" />
-                </div>
-                <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportConfigOccPermit.permit.staticreinspectiondate)}" />
-                </div>
-                <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="Final inspection:" />
-                </div>
-                <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportConfigOccPermit.permit.staticfinalinspection)}" />
-                </div>
-                <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="Date of Issuance:" />
-                </div>
-                <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.getPrettyDateNoTime(reportingBB.reportConfigOccPermit.permit.staticdateofissue)}" />
-                </div>
-                
-                <f:subview  id="permit-expiry-subview"
-                            rendered="#{reportingBB.reportConfigOccPermit.permit.permitType.expires}">
-                    <div class="p-col-3 restrict-data-field-label-inline">
-                         <h:outputText value="#{empty reportingBB.reportConfigOccPermit.permit.staticdateofexpiry ? ' ' : 'Date of Expiry:'}" />
-                     </div>
-                     <div class="p-col-3 restrict-data-field-value-inline">
-                         <h:outputText value="#{empty reportingBB.reportConfigOccPermit.permit.staticdateofexpiry ? ' ' : reportingBB.getPrettyDateNoTime(reportingBB.reportConfigOccPermit.permit.staticdateofexpiry)}" />
-                     </div>
-                </f:subview>
-                <f:subview  id="permit-expiry-subview-placeholder"
-                            rendered="#{!reportingBB.reportConfigOccPermit.permit.permitType.expires}">
-                    <div class="p-col-3 restrict-data-field-label-inline">
-                         <h:outputText value=" " />
-                     </div>
-                     <div class="p-col-3 restrict-data-field-value-inline">
-                         <h:outputText value=" " />
-                     </div>
-                </f:subview>
+                            </div>
+                        </f:subview>
 
-                
-                
-                <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="Code Enforcement Officer:" />
-                </div>
-                <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticofficername}" />
-                </div>
-                <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="Issued Under:" />
-                </div>
-                <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticissuedundercodesourceid}" 
-                                  escape="false"/>
-                </div>
-                
-                <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="Special conditions and stipulations:" />
-                </div>
-                <div class="p-col-9 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticstipulations}"
-                                  escape="false"/>
-                </div>
-                <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="Comments:" />
-                </div>
-                <div class="p-col-3 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticcomments}" 
-                                  escape="false"/>
-                </div>
+                        <f:subview id="permit-sv-usecode"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticusecode}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Use code:" />
+                            </div>
+                            <div class="p-col-3">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticusecode}" />
+                            </div>
+                        </f:subview>
 
-                <div class="p-col-3 restrict-data-field-label-inline">
-                    <h:outputText value="Construction type:" />
-                </div>
-                <div class="p-col-9 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticconstructiontype}" />
-                </div>
+                        <f:subview id="permit-sv-propclass"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticpropclass}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Property class:" />
+                            </div>
+                            <div class="p-col-3">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticpropclass}" />
+                            </div>
+                        </f:subview>
 
-                <div class="p-col-6 restrict-data-field-label-inline">
-                    <h:outputText value="Property Manager(s)" />
-                </div>
-                <div class="p-col-6 restrict-data-field-label-inline">
-                    <h:outputText value="Property Tenant(s):" />
-                </div>
-                <div class="p-col-6 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticmanager}"
-                                  escape="false"/>
-                </div>
-                <div class="p-col-6 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.statictenants}"
-                                  escape="false"/>
-                </div>
+                        <f:subview id="permit-sv-date-application"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticdateofapplication}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Date of Application:" />
+                            </div>
+                            <div class="p-col-3 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticdateofapplication)}" />
+                            </div>
+                        </f:subview>
 
-                <div class="p-col-4 restrict-data-field-label-inline">
-                    <h:outputText value="Lease Term:" />
-                </div>
-                <div class="p-col-8 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticleaseterm}" />
-                </div>
+                        <f:subview id="permit-sv-date-ins-initial"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticinitialinspection}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Initial Inspection:" />
+                            </div>
+                            <div class="p-col-3 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticinitialinspection)}" />
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-date-ins-reins"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticreinspectiondate}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Reinspection Date:" />
+                            </div>
+                            <div class="p-col-3 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticreinspectiondate)}" />
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-date-ins-final"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticfinalinspection}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Final inspection:" />
+                            </div>
+                            <div class="p-col-3 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticfinalinspection)}" />
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-date-issuance"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticdateofissue}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Date of Issuance:" />
+                            </div>
+                            <div class="p-col-3 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticdateofissue)}" />
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-date-expiry"
+                                   rendered="#{(!empty occPeriodBB.currentOccPermit.staticdateofexpiry) and (occPeriodBB.currentOccPermit.permitType.expires)}">
+
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Date of Expiry:" />
+                            </div>
+                            <div class="p-col-3 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticdateofexpiry)}" />
+                            </div>
+                        </f:subview>
 
 
-                <div class="p-col-4 restrict-data-field-label-inline">
-                    <h:outputText value="Lease:" />
-                </div>
-                <div class="p-col-8 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticleasestatus}" />
-                </div>
+                        <f:subview id="permit-sv-officer"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticofficername}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Code Enforcement Officer:" />
+                            </div>
+                            <div class="p-col-3 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticofficername}" />
+                            </div>
+                        </f:subview>
 
+                        <f:subview id="permit-sv-issuedunder"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticissuedundercodesourceid}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Issued Under:" />
+                            </div>
+                            <div class="p-col-3 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticissuedundercodesourceid}"
+                                              escape="false"/>
+                            </div>
+                        </f:subview>
 
-                <div class="p-col-4 restrict-data-field-label-inline">
-                    <h:outputText value="Payment:" />
-                </div>
-                <div class="p-col-8 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticpaymentstatus}" />
-                </div>
+                        <div class="p-col-12">
+                            <h:outputText value=" " />
+                        </div>
 
-                <div class="p-col-4 restrict-data-field-label-inline">
-                    <h:outputText value="Notices: " />
-                </div>
-                <div class="p-col-8 restrict-data-field-value-inline">
-                    <h:outputText value="#{reportingBB.reportConfigOccPermit.permit.staticnotice}"
-                                  escape="false" />
-                </div>
-            </div>
-        </h:form>
-                
+                        <f:subview id="permit-sv-conditions"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticstipulations}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Special conditions and stipulations:" />
+                            </div>
+                            <div class="p-col-9 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticstipulations}"
+                                              escape="false"/>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-comments"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticcomments}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Comments:" />
+                            </div>
+                            <div class="p-col-3 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticcomments}" 
+                                              escape="false"/>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-notices"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticnotice}">
+                            <div class="p-col-4 restrict-data-field-label-inline">
+                                <h:outputText value="Notices: " />
+                            </div>
+                            <div class="p-col-8 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticnotice}"
+                                              escape="false" />
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-consttype"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticconstructiontype}">
+                            <div class="p-col-3 restrict-data-field-label-inline">
+                                <h:outputText value="Construction type:" />
+                            </div>
+                            <div class="p-col-9 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticconstructiontype}" />
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-managers"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticmanager}">
+
+                            <div class="p-col-6 restrict-data-field-label-inline">
+                                <h:outputText value="Property Manager(s)" />
+                            </div>
+                            <div class="p-col-6 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticmanager}"
+                                              escape="false"/>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-tenenats"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.statictenants}">
+
+                            <div class="p-col-6 restrict-data-field-label-inline">
+                                <h:outputText value="Property Tenant(s):" />
+                            </div>
+                            <div class="p-col-6 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.statictenants}"
+                                              escape="false"/>
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-leaseterm"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticleaseterm}">
+                            <div class="p-col-4 restrict-data-field-label-inline">
+                                <h:outputText value="Lease Term:" />
+                            </div>
+                            <div class="p-col-8 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticleaseterm}" />
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-leasestatus"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticleasestatus}">
+                            <div class="p-col-4 restrict-data-field-label-inline">
+                                <h:outputText value="Lease:" />
+                            </div>
+                            <div class="p-col-8 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticleasestatus}" />
+                            </div>
+                        </f:subview>
+
+                        <f:subview id="permit-sv-payment"
+                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticpaymentstatus}">
+                            <div class="p-col-4 restrict-data-field-label-inline">
+                                <h:outputText value="Payment:" />
+                            </div>
+                            <div class="p-col-8 restrict-data-field-value-inline">
+                                <h:outputText value="#{occPeriodBB.currentOccPermit.staticpaymentstatus}" />
+                            </div>
+                        </f:subview>
+                    </div>
+                </h:form>
             </ui:define>
         </ui:composition>
     </h:body>

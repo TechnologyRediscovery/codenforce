@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -26,7 +27,8 @@ import java.util.Objects;
  * See UserAuthorized for the credentialed subclass.
  * @author cedba
  */
-public class User implements Serializable{
+public class User 
+        implements Serializable, IFace_BlobHolder{
 
     protected int userID;
     protected RoleType roleType;
@@ -48,6 +50,12 @@ public class User implements Serializable{
     protected int deactivatedByUserID;
     
     protected int homeMuniID;
+    
+    // BLOB
+    final BlobLinkEnum USER_BLOBENUM = BlobLinkEnum.USER;
+    protected List<BlobLight> blobList;
+    protected int signatureBlobID;
+    protected BlobLight signatureBlob;
     
     
     
@@ -82,6 +90,9 @@ public class User implements Serializable{
             this.deactivatedByUserID = u.deactivatedByUserID;
             
             this.homeMuniID = u.homeMuniID;
+            this.blobList = u.blobList;
+            this.signatureBlobID = u.signatureBlobID;
+            this.signatureBlob = u.signatureBlob;
           
         }
     }
@@ -360,6 +371,64 @@ public class User implements Serializable{
      */
     public void setHumanID(int humanID) {
         this.humanID = humanID;
+    }
+
+    @Override
+    public void setBlobList(List<BlobLight> bl) {
+        blobList = bl;
+    }
+
+    @Override
+    public List<BlobLight> getBlobList() {
+        return blobList;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobLinkEnum() {
+        return USER_BLOBENUM;
+    }
+
+    @Override
+    public int getParentObjectID() {
+        return userID;
+    }
+
+    @Override
+    public BlobLinkEnum getBlobUpstreamPoolEnum() {
+        return null;
+    }
+
+    @Override
+    public int getBlobUpstreamPoolEnumPoolFeederID() {
+        return 0;
+    }
+
+    /**
+     * @return the signatureBlob
+     */
+    public BlobLight getSignatureBlob() {
+        return signatureBlob;
+    }
+
+    /**
+     * @param signatureBlob the signatureBlob to set
+     */
+    public void setSignatureBlob(BlobLight signatureBlob) {
+        this.signatureBlob = signatureBlob;
+    }
+
+    /**
+     * @return the signatureBlobID
+     */
+    public int getSignatureBlobID() {
+        return signatureBlobID;
+    }
+
+    /**
+     * @param signatureBlobID the signatureBlobID to set
+     */
+    public void setSignatureBlobID(int signatureBlobID) {
+        this.signatureBlobID = signatureBlobID;
     }
 
   

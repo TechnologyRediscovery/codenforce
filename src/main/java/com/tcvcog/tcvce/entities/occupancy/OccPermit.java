@@ -41,85 +41,7 @@ public class OccPermit extends TrackedEntity
     final static String PERMIT_PK = "permitid";
     
     
-    public OccPermit(){
-        dynamicPopulationLog = new String();
-        finalizationAuditLog = new String();
-    }
-    
-    /**
-     * Constructor of an OccPermit object given an
-     * OccPermit object
-     * @param permit
-     */
-    public OccPermit(OccPermit permit){
-        
-          dynamicPopulationLog = new String();
-        finalizationAuditLog = new String();
-        
-        
-        this.permitID = permit.permitID;
-        this.referenceNo = permit.referenceNo;
-        this.periodID = permit.periodID;
-        this.permitType = permit.permitType;
-        this.permitAdditionalText = permit.permitAdditionalText;
-        this.notes = permit.notes;
-        this.finalizedts = permit.finalizedts;
-        this.finalizedBy = permit.finalizedBy;
-        this.nullifiedTS = permit.nullifiedTS;
-        this.nullifiedBy = permit.nullifiedBy;
-        this.dynamicPopulationLog = permit.dynamicPopulationLog;
-        this.finalizationAuditLog = permit.finalizationAuditLog;
-        this.dynamicPopulationReadyForFinalizationTS = permit.dynamicPopulationReadyForFinalizationTS;
-        this.finalizationAuditPassTS = permit.finalizationAuditPassTS;
-        this.parcelInfo = permit.parcelInfo;
-        this.issuingOfficer = permit.issuingOfficer;
-        this.text_comments = permit.text_comments;
-        this.dynamicDateOfApplication = permit.dynamicDateOfApplication;
-        this.dynamicsDateOfApplicationAppRef = permit.dynamicsDateOfApplicationAppRef;
-        this.dynamicInitialInspection = permit.dynamicInitialInspection;
-        this.dynamicInitialInspectionFINRef = permit.dynamicInitialInspectionFINRef;
-        this.dynamicreinspectiondate = permit.dynamicreinspectiondate;
-        this.dynamicReInspectionFINRef = permit.dynamicReInspectionFINRef;
-        this.dynamicfinalinspection = permit.dynamicfinalinspection;
-        this.dynamicFinalInspectionFINRef = permit.dynamicFinalInspectionFINRef;
-        this.dynamicdateofissue = permit.dynamicdateofissue;
-        this.dynamicDateExpiry = permit.dynamicDateExpiry;
-        this.staticdateofapplication = permit.staticdateofapplication;
-        this.staticinitialinspection = permit.staticinitialinspection;
-        this.staticreinspectiondate = permit.staticreinspectiondate;
-        this.staticfinalinspection = permit.staticfinalinspection;
-        this.staticdateofissue = permit.staticdateofissue;
-        this.staticdateofexpiry = permit.staticdateofexpiry;
-        this.statictitle = permit.statictitle;
-        this.staticmuniaddress = permit.staticmuniaddress;
-        this.staticpropertyinfo = permit.staticpropertyinfo;
-        this.staticownerseller = permit.staticownerseller;
-        this.staticcolumnlink = permit.staticcolumnlink;
-        this.staticbuyertenant = permit.staticbuyertenant;
-        this.staticproposeduse = permit.staticproposeduse;
-        this.staticusecode = permit.staticusecode;
-        this.staticconstructiontype = permit.staticconstructiontype;
-        this.staticpropclass   = permit.staticpropclass;   
-        this.staticofficername = permit.staticofficername; 
-        this.staticissuedundercodesourceid   = permit.staticissuedundercodesourceid;   
-        this.staticstipulations = permit.staticstipulations;
-        this.staticcomments = permit.staticcomments;
-        this.staticmanager = permit.staticmanager;
-        this.statictenants = permit.statictenants;
-        this.staticleaseterm = permit.staticleaseterm;
-        this.staticleasestatus = permit.staticleasestatus;
-        this.staticpaymentstatus = permit.staticpaymentstatus;
-        this.staticnotice = permit.staticnotice;
-        this.ownerSellerLinkList = permit.ownerSellerLinkList;
-        this.buyerTenantLinkList = permit.buyerTenantLinkList;
-        this.managerLinkList = permit.managerLinkList;
-        this.tenantLinkList = permit.tenantLinkList;
-        this.issuingCodeSourceList = permit.issuingCodeSourceList;
-        this.textBlocks_stipulations = permit.textBlocks_stipulations;
-        this.textBlocks_notice = permit.textBlocks_notice;
-        this.textBlocks_comments = permit.textBlocks_comments;
-        
-    }
+  
     
     
     private int permitID;
@@ -148,11 +70,8 @@ public class OccPermit extends TrackedEntity
     private String dynamicPopulationLog;
     private String finalizationAuditLog;
     
-  
-    
     private LocalDateTime dynamicPopulationReadyForFinalizationTS;
     private LocalDateTime finalizationAuditPassTS;
-    
     
     private List<HumanLink> ownerSellerLinkList;
     private List<HumanLink> buyerTenantLinkList;
@@ -161,14 +80,13 @@ public class OccPermit extends TrackedEntity
     
     private ParcelInfo parcelInfo;
     private User issuingOfficer;
+    private Person issuingOfficerPerson;
     private List<CodeSource> issuingCodeSourceList;
     
     private List<TextBlock> textBlocks_stipulations;
     private List<TextBlock> textBlocks_notice;
     // both combined for the comments static field
     private List<TextBlock> textBlocks_comments;
-    
-    
     
     private String text_comments;
     
@@ -224,7 +142,87 @@ public class OccPermit extends TrackedEntity
     private String staticleasestatus;
     private String staticpaymentstatus;
     private String staticnotice;
-
+    
+  public OccPermit(){
+        dynamicPopulationLog = new String();
+        finalizationAuditLog = new String();
+    }
+    
+    /**
+     * Constructor of an OccPermit object given an
+     * OccPermit object
+     * @param permit
+     */
+    public OccPermit(OccPermit permit){
+        
+          dynamicPopulationLog = new String();
+        finalizationAuditLog = new String();
+        
+        
+        this.permitID = permit.permitID;
+        this.referenceNo = permit.referenceNo;
+        this.periodID = permit.periodID;
+        this.permitType = permit.permitType;
+        this.permitAdditionalText = permit.permitAdditionalText;
+        this.notes = permit.notes;
+        this.finalizedts = permit.finalizedts;
+        this.finalizedBy = permit.finalizedBy;
+        this.nullifiedTS = permit.nullifiedTS;
+        this.nullifiedBy = permit.nullifiedBy;
+        this.dynamicPopulationLog = permit.dynamicPopulationLog;
+        this.finalizationAuditLog = permit.finalizationAuditLog;
+        this.dynamicPopulationReadyForFinalizationTS = permit.dynamicPopulationReadyForFinalizationTS;
+        this.finalizationAuditPassTS = permit.finalizationAuditPassTS;
+        this.parcelInfo = permit.parcelInfo;
+        this.issuingOfficer = permit.issuingOfficer;
+        this.issuingOfficerPerson = permit.issuingOfficerPerson;
+        this.text_comments = permit.text_comments;
+        this.dynamicDateOfApplication = permit.dynamicDateOfApplication;
+        this.dynamicsDateOfApplicationAppRef = permit.dynamicsDateOfApplicationAppRef;
+        this.dynamicInitialInspection = permit.dynamicInitialInspection;
+        this.dynamicInitialInspectionFINRef = permit.dynamicInitialInspectionFINRef;
+        this.dynamicreinspectiondate = permit.dynamicreinspectiondate;
+        this.dynamicReInspectionFINRef = permit.dynamicReInspectionFINRef;
+        this.dynamicfinalinspection = permit.dynamicfinalinspection;
+        this.dynamicFinalInspectionFINRef = permit.dynamicFinalInspectionFINRef;
+        this.dynamicdateofissue = permit.dynamicdateofissue;
+        this.dynamicDateExpiry = permit.dynamicDateExpiry;
+        this.staticdateofapplication = permit.staticdateofapplication;
+        this.staticinitialinspection = permit.staticinitialinspection;
+        this.staticreinspectiondate = permit.staticreinspectiondate;
+        this.staticfinalinspection = permit.staticfinalinspection;
+        this.staticdateofissue = permit.staticdateofissue;
+        this.staticdateofexpiry = permit.staticdateofexpiry;
+        this.statictitle = permit.statictitle;
+        this.staticmuniaddress = permit.staticmuniaddress;
+        this.staticpropertyinfo = permit.staticpropertyinfo;
+        this.staticownerseller = permit.staticownerseller;
+        this.staticcolumnlink = permit.staticcolumnlink;
+        this.staticbuyertenant = permit.staticbuyertenant;
+        this.staticproposeduse = permit.staticproposeduse;
+        this.staticusecode = permit.staticusecode;
+        this.staticconstructiontype = permit.staticconstructiontype;
+        this.staticpropclass   = permit.staticpropclass;   
+        this.staticofficername = permit.staticofficername; 
+        this.staticissuedundercodesourceid   = permit.staticissuedundercodesourceid;   
+        this.staticstipulations = permit.staticstipulations;
+        this.staticcomments = permit.staticcomments;
+        this.staticmanager = permit.staticmanager;
+        this.statictenants = permit.statictenants;
+        this.staticleaseterm = permit.staticleaseterm;
+        this.staticleasestatus = permit.staticleasestatus;
+        this.staticpaymentstatus = permit.staticpaymentstatus;
+        this.staticnotice = permit.staticnotice;
+        this.ownerSellerLinkList = permit.ownerSellerLinkList;
+        this.buyerTenantLinkList = permit.buyerTenantLinkList;
+        this.managerLinkList = permit.managerLinkList;
+        this.tenantLinkList = permit.tenantLinkList;
+        this.issuingCodeSourceList = permit.issuingCodeSourceList;
+        this.textBlocks_stipulations = permit.textBlocks_stipulations;
+        this.textBlocks_notice = permit.textBlocks_notice;
+        this.textBlocks_comments = permit.textBlocks_comments;
+        
+    }
       /**
      * Tacks whatever String is passed in and appends it to the config log
      * @param s 
@@ -1145,6 +1143,20 @@ public class OccPermit extends TrackedEntity
      */
     public void setPermitType(OccPermitType permitType) {
         this.permitType = permitType;
+    }
+
+    /**
+     * @return the issuingOfficerPerson
+     */
+    public Person getIssuingOfficerPerson() {
+        return issuingOfficerPerson;
+    }
+
+    /**
+     * @param issuingOfficerPerson the issuingOfficerPerson to set
+     */
+    public void setIssuingOfficerPerson(Person issuingOfficerPerson) {
+        this.issuingOfficerPerson = issuingOfficerPerson;
     }
 
   

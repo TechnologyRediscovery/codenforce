@@ -1074,7 +1074,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         PropertyUnitWithProp puwp = pc.getPropertyUnitWithProp(period.getPropertyUnitID());
         sb = new StringBuilder();
         if(puwp != null){
-            if(!puwp.getUnitNumber().equals(pc.DEFAULTUNITNUMBER)){
+            if((!puwp.getUnitNumber().equals(pc.DEFAULTUNITNUMBER)) || (!puwp.getUnitNumber().contentEquals("DEFAULT"))){
                 sb.append("Unit: ");
                 sb.append(puwp.getUnitNumber());
                 sb.append(Constants.FMT_HTML_BREAK);
@@ -1139,7 +1139,15 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         permit.setStaticissuedundercodesourceid(sb.toString());
         
         // issuing officer
-        permit.setStaticofficername(permit.getIssuingOfficer().getHuman().getName());
+        sb = new StringBuilder();
+        sb.append(permit.getIssuingOfficer().getHuman().getName());
+        sb.append(Constants.FMT_HTML_BREAK);
+        sb.append(permit.getIssuingOfficer().getHuman().getJobTitle());
+        sb.append(Constants.FMT_HTML_BREAK);
+        sb.append(permit.getIssuingOfficerPerson().getPrimaryPhone());
+        sb.append(Constants.FMT_HTML_BREAK);
+        sb.append(permit.getIssuingOfficerPerson().getPrimaryEmail());
+        permit.setStaticofficername(sb.toString());
         
        // now deal with person links
        if(permit.getOwnerSellerLinkList() != null && !permit.getOwnerSellerLinkList().isEmpty()){
@@ -1156,7 +1164,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
                 sb.append(buildPersonContactString(hl));
            }
            permit.setStaticbuyertenant(sb.toString());
-           
        }
         
        if(permit.getManagerLinkList() != null && !permit.getManagerLinkList().isEmpty()){
@@ -1189,9 +1196,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
        }
        permit.setStaticcomments(sb.toString());
        
-        permit.setLastUpdatedBy(ua);
+       permit.setLastUpdatedBy(ua);
         
-        oi.updateOccPermitStaticFields(permit);
+       oi.updateOccPermitStaticFields(permit);
     }
     
     /**

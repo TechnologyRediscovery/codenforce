@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * Interface for any object that has attached blob IDs
- * @author Nathan Dietz & Ellen Bascomb
+ * @author Nathan Dietz & Ellen Bascomb (Apartment 31Y)
  */
 public interface IFace_BlobHolder {
     

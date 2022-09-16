@@ -78,7 +78,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query =  " SELECT userid, username, password, notes, pswdlastupdated, \n" +
                         "       forcepasswordreset, createdby_userid, createdts, nologinvirtualonly, \n" +
                         "       deactivatedts, deactivatedby_userid, lastupdatedts, userrole, \n" +
-                        "       homemuni, humanlink_humanid, lastupdatedby_userid, forcepasswordresetby_userid\n" +
+                        "       homemuni, humanlink_humanid, lastupdatedby_userid, forcepasswordresetby_userid, signature_photodocid\n" +
                         "  FROM public.login WHERE userid = ?;";   
         
         PreparedStatement stmt = null;
@@ -182,6 +182,8 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 user.setHomeMuniID(rs.getInt("homemuni"));
             }
             user.setHumanID(rs.getInt("humanlink_humanid"));
+            
+            user.setSignatureBlobID(rs.getInt("signature_photodocid"));
          return user;
     }
     
@@ -924,7 +926,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         System.out.println("UserIntegrator.updateUser");
         String query =  "UPDATE public.login\n" +
                         "   SET notes=?, humanlink_humanid=?, \n" +
-                        "    nologinvirtualonly=?, deactivatedts=?, deactivatedby_userid=?, lastupdatedts=now(), homemuni=? \n" +
+                        "    nologinvirtualonly=?, deactivatedts=?, deactivatedby_userid=?, lastupdatedts=now(), homemuni=?, signature_photodocid=? \n" +
                         " WHERE userid=?;";
         
         PreparedStatement stmt = null;
@@ -970,7 +972,13 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(6, java.sql.Types.NULL);
             }
             
-            stmt.setInt(7, usr.getUserID());
+            if(usr.getSignatureBlob() != null){
+                stmt.setInt(7, usr.getSignatureBlob().getPhotoDocID());
+            } else {
+                stmt.setNull(7, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(8, usr.getUserID());
             
             stmt.executeUpdate();
             
