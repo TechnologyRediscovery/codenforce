@@ -795,7 +795,9 @@
                                                oncomplete="PF('violation-remove-dialog-var').show()"
                                                value="Deactivate violation"
                                                style="color:blue; font-weight: bold;"
-                                               type="button" />
+                                               type="button" 
+                                               update="@form:@parent:violation-remove-dialog
+                                               @form:@parent:violation-remove-form"/>
 
                                 <p:commandLink    id="violation-reactivate-init-cb"
                                                   ajax="true"

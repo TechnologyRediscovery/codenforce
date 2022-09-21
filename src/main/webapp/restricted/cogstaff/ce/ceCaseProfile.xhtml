@@ -887,9 +887,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                     <p:panel id="events-panel"
                                              toggleable="true"
                                              collapsed="false"
-                                             header="Events (#{eventListRequestScopedBB.managedEventList.size()}) on #{!empty sessionEventConductor.sessEventsPageEventDomainRequest ? sessionEventCondcutor.sessEventsPageEventDomainRequest.title : ''} (ID:#{!empty eventListRequestScopedBB.currentEvHolder ? eventListRequestScopedBB.currentEvHolder.BObID : ''})">
+                                             header="Events attached to CE Case (ID:#{eventBB.currentEventHolder.BObID})">
 
-                                        <h:form id="events-form">
+                                        <h:form id="cecase-events-form">
 
                                             <p:commandButton id="events-add-button"
                                                              styleClass="noFill button-size-small"
@@ -900,25 +900,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                              update="event-add-dialog"
                                                              >
                                                 
-                                                <f:param name="event-list-component-to-update" value="events-form:events-table" />
+                                                <f:param name="event-list-component-to-update" value="cecase-events-form:cecase-events-table" />
                                                 
                                             </p:commandButton>
 
                                             <p:spacer height="5px"/>
 
-                                            <h:outputText value="include deactivated events?  " />
-                                            <p:selectBooleanCheckbox id="events-viewdeac-sbcb"
-                                                                     value="#{sessionBean.sessFlagIncludeDeactivatedEvents}" >
-                                                <p:ajax listener="#{eventListRequestScopedBB.configureManagedEventList}" 
-                                                        update="events-table
-                                                        events-panel"/>
-                                            </p:selectBooleanCheckbox>
-                                                                     
-                                            <p:spacer height="5px"/>
 
-                                            <p:dataTable id="events-table"
+                                            <p:dataTable id="cecase-events-table"
                                                          var="genevent"
-                                                         value="#{eventListRequestScopedBB.managedEventList}"
+                                                         value="#{eventBB.managedEventList}"
                                                          tableStyleClass="primeDataTable"
                                                          rowKey="#{genevent.eventID}"
                                                          reflow="false">
@@ -968,7 +959,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                                 event-profile-form"
                                                                        >
                                                             <p:ajax listener="#{eventBB.onViewEvent(genevent)}" />
-                                                            <f:param name="event-list-component-to-update" value="events-form:events-table" />
+                                                            <f:param name="event-list-component-to-update" value="cecase-events-form:cecase-events-table" />
                                                         </p:commandLink>
                                                     </div>
                                                     <p:spacer height="3px" />

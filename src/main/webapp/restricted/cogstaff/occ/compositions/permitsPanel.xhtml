@@ -3,17 +3,17 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns="http://www.w3.org/1999/xhtml">
-    
+
     <ui:include src="/restricted/cogstaff/compositions/textBlockTools.xhtml" />
-    
+
     <!--growl-->
     <h:form id="permits-growl-form">
         <p:growl id="permits-growl" />
     </h:form>
 
-   
-    
-      <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+
+
+    <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
 
     <p:dialog widgetVar="statusDialog" 
               modal="true"
@@ -48,7 +48,7 @@
                              icon="fa fa-plus"
                              update="permit-add-choosetype-form
                              @form"/>
-            
+
             <p:commandLink  id="permits-manage-blocks-cl" 
                             ajax="true"
                             actionListener="#{textBlockBB.onManageBlocksInit}"
@@ -59,7 +59,7 @@
                             rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"/>
 
             <p:spacer height="5px"/>
-            
+
             <p:dataTable id="occperiod-permits-datatable"
                          var="permit"
                          rowKey="#{permit.permitID}"
@@ -194,7 +194,7 @@
                              value="Initialize permit of selected type" 
                              icon="fa fa-plus"
                              oncomplete="   PF('permit-add-choosetype-dialog-var').hide();
-                                            PF('occperiod-createpermit-occpermit-var').show();"
+                             PF('occperiod-createpermit-occpermit-var').show();"
                              update="occperiod-createpermit-occpermit-form"/>
 
             <p:spacer height="3px" />
@@ -973,8 +973,8 @@
               header="Connect persons to Occ Permit"
               rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}">
 
-        
-        
+
+
 
         <div class="p-grid">
             <div class="p-col-12">
@@ -1238,7 +1238,7 @@
 
 
             <div class="p-grid">
-                
+
                 <div class="p-col-12 centeredColumnContent">
                     <h:outputText value="#{occPeriodBB.currentOccPermit.statictitle}" 
                                   style="font-weight: bold; font-size:1.4em;"/>
@@ -1247,7 +1247,7 @@
                                   escape="false"
                                   rendered="#{!empty occPeriodBB.currentOccPermit.staticmuniaddress}"/>
                 </div>
-                
+
                 <div class="p-col-4 restrict-data-field-label-inline">
                     <h:outputText value="Property:" />
                 </div>
@@ -1263,7 +1263,7 @@
                                   rendered="#{!empty occPeriodBB.currentOccPermit.referenceNo}"/>
                     <h:outputText value="[reference # assigned at finalization]" 
                                   rendered="#{empty occPeriodBB.currentOccPermit.referenceNo}"/>
-                    
+
                 </div>
                 <div class="p-col-5">
                     <h:outputText value="Property Owner/Seller(s):"
@@ -1272,7 +1272,7 @@
                     <h:outputText value="#{occPeriodBB.currentOccPermit.staticownerseller}" 
                                   escape="false"/>
                 </div>
-                
+
                 <div class="p-col-2">
                     <p:spacer height="15px" />
                     <h:outputText value="#{occPeriodBB.currentOccPermit.staticcolumnlink}" />
@@ -1284,7 +1284,7 @@
                     <h:outputText value="#{occPeriodBB.currentOccPermit.staticbuyertenant}"
                                   escape="false" />
                 </div>
-                
+
                 <f:subview id="permit-sv-propuse"
                            rendered="#{!empty occPeriodBB.currentOccPermit.staticproposeduse}">
 
@@ -1306,7 +1306,7 @@
                         <h:outputText value="#{occPeriodBB.currentOccPermit.staticusecode}" />
                     </div>
                 </f:subview>
-                
+
                 <f:subview id="permit-sv-propclass"
                            rendered="#{!empty occPeriodBB.currentOccPermit.staticpropclass}">
                     <div class="p-col-3 restrict-data-field-label-inline">
@@ -1316,7 +1316,7 @@
                         <h:outputText value="#{occPeriodBB.currentOccPermit.staticpropclass}" />
                     </div>
                 </f:subview>
-                
+
                 <f:subview id="permit-sv-date-application"
                            rendered="#{!empty occPeriodBB.currentOccPermit.staticdateofapplication}">
                     <div class="p-col-3 restrict-data-field-label-inline">
@@ -1326,7 +1326,7 @@
                         <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticdateofapplication)}" />
                     </div>
                 </f:subview>
-                
+
                 <f:subview id="permit-sv-date-ins-initial"
                            rendered="#{!empty occPeriodBB.currentOccPermit.staticinitialinspection}">
                     <div class="p-col-3 restrict-data-field-label-inline">
@@ -1336,7 +1336,7 @@
                         <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticinitialinspection)}" />
                     </div>
                 </f:subview>
-                
+
                 <f:subview id="permit-sv-date-ins-reins"
                            rendered="#{!empty occPeriodBB.currentOccPermit.staticreinspectiondate}">
                     <div class="p-col-3 restrict-data-field-label-inline">
@@ -1346,7 +1346,7 @@
                         <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticreinspectiondate)}" />
                     </div>
                 </f:subview>
-                
+
                 <f:subview id="permit-sv-date-ins-final"
                            rendered="#{!empty occPeriodBB.currentOccPermit.staticfinalinspection}">
                     <div class="p-col-3 restrict-data-field-label-inline">
@@ -1356,7 +1356,7 @@
                         <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticfinalinspection)}" />
                     </div>
                 </f:subview>
-                
+
                 <f:subview id="permit-sv-date-issuance"
                            rendered="#{!empty occPeriodBB.currentOccPermit.staticdateofissue}">
                     <div class="p-col-3 restrict-data-field-label-inline">
@@ -1366,7 +1366,7 @@
                         <h:outputText value="#{occPeriodBB.getPrettyDateNoTime(occPeriodBB.currentOccPermit.staticdateofissue)}" />
                     </div>
                 </f:subview>
-                
+
                 <f:subview id="permit-sv-date-expiry"
                            rendered="#{(!empty occPeriodBB.currentOccPermit.staticdateofexpiry) and (occPeriodBB.currentOccPermit.permitType.expires)}">
 
@@ -1379,8 +1379,8 @@
                 </f:subview>
 
 
-             
-                
+
+
                 <f:subview id="permit-sv-issuedunder"
                            rendered="#{!empty occPeriodBB.currentOccPermit.staticissuedundercodesourceid}">
                     <div class="p-col-3 restrict-data-field-label-inline">
@@ -1391,7 +1391,7 @@
                                       escape="false"/>
                     </div>
                 </f:subview>
-                
+
                 <div class="p-col-12">
                     <h:outputText value=" " />
                 </div>
@@ -1406,7 +1406,7 @@
                                       escape="false"/>
                     </div>
                 </f:subview>
-                
+
                 <f:subview id="permit-sv-comments"
                            rendered="#{!empty occPeriodBB.currentOccPermit.staticcomments}">
                     <div class="p-col-3 restrict-data-field-label-inline">
@@ -1450,7 +1450,7 @@
                                       escape="false"/>
                     </div>
                 </f:subview>
-                
+
                 <f:subview id="permit-sv-tenenats"
                            rendered="#{!empty occPeriodBB.currentOccPermit.statictenants}">
 
@@ -1462,7 +1462,7 @@
                                       escape="false"/>
                     </div>
                 </f:subview>
-                           
+
                 <f:subview id="permit-sv-leaseterm"
                            rendered="#{!empty occPeriodBB.currentOccPermit.staticleaseterm}">
                     <div class="p-col-4 restrict-data-field-label-inline">
@@ -1492,27 +1492,31 @@
                         <h:outputText value="#{occPeriodBB.currentOccPermit.staticpaymentstatus}" />
                     </div>
                 </f:subview>
-                
+
                 <div class="p-col-12">
                     <h:outputText value=" " />
                 </div>
-                
-                   <f:subview id="permit-sv-officer"
+
+                <f:subview id="permit-sv-officer"
                            rendered="#{!empty occPeriodBB.currentOccPermit.staticofficername}">
                     <div class="p-col-4 restrict-data-field-label-inline">
-                        <h:outputText value="Issing Code Enforcement Officer:" />
+                        <h:outputText value="Issuing official:" />
                     </div>
                     <div class="p-col-8 restrict-data-field-value-inline">
-                        
-                        
-                        <h:outputText value="#{occPeriodBB.currentOccPermit.staticofficername}"
+
+                        <p:graphicImage value="#{blobsterBB.image}"
+                                        alt=" " 
+                                        styleClass="signature"
+                                        cache="false"
+                                       rendered="#{reportingBB.reportConfigOccPermit.permit.staticOfficerSignaturePhotoDocID ne 0}">
+                            <f:param name="blobid" value="#{occPeriodBB.currentOccPermit.staticOfficerSignaturePhotoDocID}"/>
+                        </p:graphicImage>
+                        <p:spacer height="3px" />
+                        <h:outputText value="#{occPeriodBB.currentOccPermit.staticofficername}" 
                                       escape="false"/>
                     </div>
                 </f:subview>
-                
-                
             </div>
-            
         </h:form>
     </p:dialog>
 </ui:composition>

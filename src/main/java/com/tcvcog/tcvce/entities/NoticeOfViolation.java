@@ -85,6 +85,7 @@ public  class NoticeOfViolation
     private String fixedNotifyingOfficerTitle;
     private String fixedNotifyingOfficerPhone;
     private String fixedNotifyingOfficerEmail;
+    private int fixedNotifyingOfficerSignaturePhotoDocID;
     
     private int headerImageID;
     
@@ -796,6 +797,20 @@ public  class NoticeOfViolation
     @Override
     public List<EventCnFEmitted> getEmittedEvents() {
         return emittedEventList;
+    }
+
+    /**
+     * @return the fixedNotifyingOfficerSignaturePhotoDocID
+     */
+    public int getFixedNotifyingOfficerSignaturePhotoDocID() {
+        return fixedNotifyingOfficerSignaturePhotoDocID;
+    }
+
+    /**
+     * @param fixedNotifyingOfficerSignaturePhotoDocID the fixedNotifyingOfficerSignaturePhotoDocID to set
+     */
+    public void setFixedNotifyingOfficerSignaturePhotoDocID(int fixedNotifyingOfficerSignaturePhotoDocID) {
+        this.fixedNotifyingOfficerSignaturePhotoDocID = fixedNotifyingOfficerSignaturePhotoDocID;
     }
 
    

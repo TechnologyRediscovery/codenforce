@@ -152,7 +152,6 @@ ALTER TABLE public.occinspectiondispatch ADD COLUMN lastupdatedby_userid    INTE
 ALTER TABLE public.occinspectiondispatch DROP COLUMN municipality_municode;
 ALTER TABLE public.occinspectiondispatch DROP COLUMN municipalityname;
 
---******************************* REMOTE CURSOR HERE  ******************************* 
 
 
 CREATE TABLE IF NOT EXISTS public.loginphotodocs
@@ -164,9 +163,18 @@ CREATE TABLE IF NOT EXISTS public.loginphotodocs
 
 ALTER TABLE public.login ADD COLUMN signature_photodocid INTEGER REFERENCES public.photodoc (photodocid);
 
-ALTER TABLE public.occpermit ADD COLUMN staticsignature_photodocid INTEGER CONSTRAINT occpermit_sig_photodocid_fk REFERENCES public.photodoc (photodocid);
 
+ALTER TABLE public.occpermit ADD COLUMN staticsignature_photodocid INTEGER CONSTRAINT occpermit_sig_photodocid_fk REFERENCES public.photodoc (photodocid);
+ALTER TABLE public.noticeofviolation ADD COLUMN fixedissuingofficersig_photodocid INTEGER CONSTRAINT nov_sig_photodocid_fk REFERENCES public.photodoc (photodocid);
+--******************************* REMOTE CURSOR HERE  ******************************* 
 --******************************* LOCAL CURSOR HERE  ******************************* 
+
+
+
+
+
+
+
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
     VALUES (42, 'database/patches/dbpatch_beta42.sql', NULL, 'ecd', '');

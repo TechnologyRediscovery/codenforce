@@ -198,10 +198,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
         OccupancyIntegrator oi = getOccupancyIntegrator();
         BlobCoordinator bc = getBlobCoordinator();
-        PaymentIntegrator pai = getPaymentIntegrator();
         WorkflowCoordinator chc = getWorkflowCoordinator();
-        SearchCoordinator sc = getSearchCoordinator();
-        EventCoordinator ec = getEventCoordinator();
         OccInspectionCoordinator oic = getOccInspectionCoordinator();
         PropertyCoordinator pc = getPropertyCoordinator();
         PersonCoordinator persc = getPersonCoordinator();
@@ -211,7 +208,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         // this is the Java version of table joins in SQL; we're doing them interatively
         // in our integrators for each BOB
         try {
-            per = oi.getOccPeriod(per.getPeriodID());
+            per = getOccPeriod(per.getPeriodID(), ua);
             opdh.setPropUnitProp(pc.getPropertyUnitWithProp(opdh.getPropertyUnitID()));
             // APPLICATION LIST
             opdh.setApplicationList(oi.getOccPermitApplicationList(opdh));
@@ -221,16 +218,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
 
             opdh.setHumanLinkList(persc.getHumanLinkList(opdh));
 
-            // EVENT LIST
-
-            QueryEvent qe = sc.initQuery(QueryEventEnum.OCCPERIOD, ua.getKeyCard());
-            if (!qe.getParamsList().isEmpty()) {
-                qe.getParamsList().get(0).setEventDomainPK_val(per.getPeriodID());
-            }
-            qe = sc.runQuery(qe, ua);
-            
-            opdh.setEventList(ec.downcastEventCnFPropertyUnitHeavy(qe.getBOBResultList()));
-
+           
             // PROPOSAL LIST
             // Potentially turn off proposal process? if its broken or erroring?
             opdh.setProposalList(chc.getProposalList(opdh, ua.getKeyCard()));
@@ -348,6 +336,9 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             throws EventException, AuthorizationException, IntegrationException, BObStatusException, ViolationException {
 
         SystemIntegrator si = getSystemIntegrator();
+        EventCoordinator ec = getEventCoordinator();
+        
+        period.setEventList(ec.getEventList(period));
         
         period.setPinner(ua);
         period.setPinned(si.getPinnedStatus(period));
@@ -1046,13 +1037,18 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
      * fixed String/Date values to the OccPermit's static fields and then writing those
      * changes to the DB
      * @param period
-     * @param permit
-     * @param ua
-     * @param mdh
+     * @param permit must contain the issuing officer
+     * @param ua the user currently requesting the permit creation; NOT the issuing officer
+     * @param mdh the current muni
      * @throws BObStatusException
      * @throws IntegrationException 
      */
-    public void occPermitPopulateStaticFieldsFromDynamicFields(OccPeriodDataHeavy period, OccPermit permit, UserAuthorized ua, MunicipalityDataHeavy mdh) throws BObStatusException, IntegrationException{
+    public void occPermitPopulateStaticFieldsFromDynamicFields( OccPeriodDataHeavy period, 
+                                                                OccPermit permit, 
+                                                                UserAuthorized ua, 
+                                                                MunicipalityDataHeavy mdh) 
+                                                throws BObStatusException, IntegrationException{
+                                                
         if(permit == null || ua == null || period == null || mdh == null){
             throw new BObStatusException("Cannot insert occ permit with null permit or user or period or munidh");
         }
@@ -1067,7 +1063,6 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         permit.setStatictitle(permit.getPermitType().getPermitTitle());
         permit.setStaticcolumnlink(OCCPERMIT_DEFAULT_COL_SEP);
         
-        
         StringBuilder sb;
         
          // now do property and unit static fields
@@ -1081,9 +1076,11 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
             }
             sb.append(puwp.getProperty().getAddress().getAddressPretty2LineEscapeFalse());
             sb.append(Constants.FMT_HTML_BREAK);
+            sb.append("County parcel ID: ");
             sb.append(puwp.getProperty().getCountyParcelID());
             permit.setStaticpropertyinfo(sb.toString());
         }
+        
         // muni addresss
 //        System.out.println("OccupancyCoordinator.setStaticFields: Setting muni address: " + mdh.getMuniPropertyDH().getAddress().getAddressPretty2LineEscapeFalse());
         sb = new StringBuilder();
@@ -1138,16 +1135,30 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         }
         permit.setStaticissuedundercodesourceid(sb.toString());
         
-        // issuing officer
+        if(permit.getIssuingOfficerPerson() == null){
+            PersonCoordinator persc = getPersonCoordinator();
+            permit.setIssuingOfficerPerson(persc.getPerson(permit.getIssuingOfficer().getHuman()));
+        }
+        
+        // build issuing officer
         sb = new StringBuilder();
         sb.append(permit.getIssuingOfficer().getHuman().getName());
         sb.append(Constants.FMT_HTML_BREAK);
-        sb.append(permit.getIssuingOfficer().getHuman().getJobTitle());
-        sb.append(Constants.FMT_HTML_BREAK);
-        sb.append(permit.getIssuingOfficerPerson().getPrimaryPhone());
-        sb.append(Constants.FMT_HTML_BREAK);
-        sb.append(permit.getIssuingOfficerPerson().getPrimaryEmail());
+        if(permit.getIssuingOfficer().getHuman().getJobTitle() != null){
+            sb.append(permit.getIssuingOfficer().getHuman().getJobTitle());
+            sb.append(Constants.FMT_HTML_BREAK);
+        }
+        if(permit.getIssuingOfficerPerson().getPrimaryPhone() != null){
+            sb.append(permit.getIssuingOfficerPerson().getPrimaryPhone().getPhoneNumber());
+            sb.append(Constants.FMT_HTML_BREAK);
+        }
+        if(permit.getIssuingOfficerPerson().getPrimaryEmail() != null){
+            sb.append(permit.getIssuingOfficerPerson().getPrimaryEmail().getEmailaddress());
+        }
         permit.setStaticofficername(sb.toString());
+        
+        // issuing officer signature
+        permit.setStaticOfficerSignaturePhotoDocID(permit.getIssuingOfficer().getSignatureBlobID());
         
        // now deal with person links
        if(permit.getOwnerSellerLinkList() != null && !permit.getOwnerSellerLinkList().isEmpty()){
@@ -1466,10 +1477,15 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
     public void editOccPeriod(OccPeriod period, UserAuthorized ua) throws IntegrationException, BObStatusException {
         OccupancyIntegrator oi = getOccupancyIntegrator();
 
-        if (period.getAuthorizedTS() != null) {
-            throw new BObStatusException("Cannot change period type or manager on an authorized period; the period must first be unauthorized");
+        // disable authorization
+//        if (period.getAuthorizedTS() != null) {
+//            throw new BObStatusException("Cannot change period type or manager on an authorized period; the period must first be unauthorized");
+//        }
+        if(period.getStartDate()!= null && period.getEndDate() != null && period.getStartDate().isAfter(period.getEndDate())){
+            throw new BObStatusException("An permit file's start date must be before its end date");
         }
-
+        period.setLastUpdatedBy(ua);
+        
         oi.updateOccPeriod(period);
     }
 

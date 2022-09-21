@@ -46,8 +46,6 @@ public class SessionEventConductor extends BackingBeanUtils{
     private List<EventCnF> sessEventListForRefreshUptake;
     private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
     private EventCnF sessEvent;
-    private ActivatableRouteEnum sessEventRoute;
-    private ActivatableRouteEnum sessEventListRoute;
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                   V Event                                      <<< */
     /* >>> -------------------------------------------------------------- <<< */
@@ -57,13 +55,12 @@ public class SessionEventConductor extends BackingBeanUtils{
      * if the relevant event list is extracted from the proper session business
      * objects
      */
-    private PageModeEnum sessEventsPagePageModeRequest;
     private DomainEnum sessEventsPageEventDomainRequest;
     private QueryEvent queryEventFuture7Days;
     /* >>> QUERY EVENT <<< */
     private QueryEvent queryEvent;
     private List<QueryEvent> queryEventList;
-
+                
     
     
     /**
@@ -179,15 +176,7 @@ public class SessionEventConductor extends BackingBeanUtils{
         this.sessEventList = sessEventList;
     }
 
-    /**
-     *
-     *
-     * @param sessEventsPagePageModeRequest the sessEventsPagePageModeRequest to set
-     */
-    public void setSessEventsPagePageModeRequest(PageModeEnum sessEventsPagePageModeRequest) {
-        this.sessEventsPagePageModeRequest = sessEventsPagePageModeRequest;
-    }
-
+  
     /**
      *
      *
@@ -224,15 +213,7 @@ public class SessionEventConductor extends BackingBeanUtils{
         return sessEventList;
     }
 
-    /**
-     *
-     *
-     * @return the sessEventsPagePageModeRequest
-     */
-    public PageModeEnum getSessEventsPagePageModeRequest() {
-        return sessEventsPagePageModeRequest;
-    }
-
+   
 
     /**
      *

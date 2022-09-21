@@ -28,7 +28,7 @@ import java.util.Objects;
  * @author cedba
  */
 public class User 
-        implements Serializable, IFace_BlobHolder{
+        implements Serializable{
 
     protected int userID;
     protected RoleType roleType;
@@ -50,12 +50,9 @@ public class User
     protected int deactivatedByUserID;
     
     protected int homeMuniID;
-    
-    // BLOB
-    final BlobLinkEnum USER_BLOBENUM = BlobLinkEnum.USER;
-    protected List<BlobLight> blobList;
     protected int signatureBlobID;
-    protected BlobLight signatureBlob;
+    
+    
     
     
     
@@ -90,9 +87,7 @@ public class User
             this.deactivatedByUserID = u.deactivatedByUserID;
             
             this.homeMuniID = u.homeMuniID;
-            this.blobList = u.blobList;
             this.signatureBlobID = u.signatureBlobID;
-            this.signatureBlob = u.signatureBlob;
           
         }
     }
@@ -373,50 +368,6 @@ public class User
         this.humanID = humanID;
     }
 
-    @Override
-    public void setBlobList(List<BlobLight> bl) {
-        blobList = bl;
-    }
-
-    @Override
-    public List<BlobLight> getBlobList() {
-        return blobList;
-    }
-
-    @Override
-    public BlobLinkEnum getBlobLinkEnum() {
-        return USER_BLOBENUM;
-    }
-
-    @Override
-    public int getParentObjectID() {
-        return userID;
-    }
-
-    @Override
-    public BlobLinkEnum getBlobUpstreamPoolEnum() {
-        return null;
-    }
-
-    @Override
-    public int getBlobUpstreamPoolEnumPoolFeederID() {
-        return 0;
-    }
-
-    /**
-     * @return the signatureBlob
-     */
-    public BlobLight getSignatureBlob() {
-        return signatureBlob;
-    }
-
-    /**
-     * @param signatureBlob the signatureBlob to set
-     */
-    public void setSignatureBlob(BlobLight signatureBlob) {
-        this.signatureBlob = signatureBlob;
-    }
-
     /**
      * @return the signatureBlobID
      */
@@ -431,6 +382,7 @@ public class User
         this.signatureBlobID = signatureBlobID;
     }
 
+   
   
 
 }

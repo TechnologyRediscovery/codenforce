@@ -43,6 +43,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import org.primefaces.model.charts.ChartData;
@@ -2317,7 +2319,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     }
     
     /**
-     * Translates colmn counts to grid squares for CSS display (divides 12 by col count)
+     * Translates column counts to grid squares for CSS display (divides 12 by col count)
      */
     private int report_ceCase_setGridSquaresFromColCount(int colCount){
         switch(colCount){
@@ -2671,6 +2673,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             nov.setFixedNotifyingOfficerTitle(nov.getNotifyingOfficerPerson().getJobTitle());
             nov.setFixedNotifyingOfficerPhone(nov.getNotifyingOfficerPerson().getPhoneList().get(0).getPhoneNumber());
             nov.setFixedNotifyingOfficerEmail(nov.getNotifyingOfficerPerson().getEmailList().get(0).getEmailaddress());
+            nov.setFixedNotifyingOfficerSignaturePhotoDocID(nov.getNotifyingOfficer().getSignatureBlobID());
 
             ci.novLockAndQueueForMailing(nov);
 
@@ -3855,9 +3858,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
     /**
      * Standard coordinator method which calls the integration method after
-     * checking business rules. ALSO coordinates creating a corresponding
-     * proposal to match the stipulated compliance date on the violation that's
-     * added.
+     * checking business rules. ASLO attaches blobs if present
      *
      * @param cv
      * @param cse
@@ -3878,6 +3879,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
 
         CaseIntegrator ci = getCaseIntegrator();
         PaymentCoordinator pc = getPaymentCoordinator();
+        BlobCoordinator blobc = getBlobCoordinator();
+        
         int insertedViolationID;
 
         violation_verifyCodeViolationAttributes(cse, cv);
@@ -3887,8 +3890,20 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
         if (cv.getCreatedBy() == null) {
             cv.setCreatedBy(ua);
         }
+        
         insertedViolationID = ci.insertCodeViolation(cv);
         pc.insertAutoAssignedFees(cse, cv);
+        // deal with blobs
+        if(cv.getBlobList() != null && !cv.getBlobList().isEmpty()){
+            System.out.println("CaseCoordinator.violation_attachViolationToCase | linking blob to violation on viol insert! size: " + cv.getBlobList().size());
+            // ordinarily a violation wouldn't have blobs on it from a fresh case attachment
+            // but it might from an inspection!
+            cv.setViolationID(insertedViolationID);
+            blobc.linkBlobHolderToBlobList(cv, cv.getBlobList() );
+        } else {
+            System.out.println("CaseCoordinator.violation_attachViolationToCase | Found null or empty blob list on violation attachment" );
+        }
+        
         return insertedViolationID;
     }
 
@@ -3901,9 +3916,18 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      */
     public CodeViolation violation_getCodeViolation(int vid)
             throws IntegrationException, BObStatusException {
+        
         CaseIntegrator ci = getCaseIntegrator();
         CodeViolation cv = ci.getCodeViolation(vid);
-        return violation_configureCodeViolation(cv);
+        
+        try {
+            cv = violation_configureCodeViolation(cv);
+        } catch (BlobException ex) {
+            System.out.println(ex);
+            throw new BObStatusException("Could not retrieve blobs on Violations");
+        }
+        
+        return cv;
     }
 
     /**
@@ -3940,13 +3964,14 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @return the CodeViolation with correct icon and status
      * @throws com.tcvcog.tcvce.domain.IntegrationException
      */
-    private CodeViolation violation_configureCodeViolation(CodeViolation cv) throws IntegrationException {
+    private CodeViolation violation_configureCodeViolation(CodeViolation cv) throws IntegrationException, BObStatusException, BlobException {
         SystemIntegrator si = getSystemIntegrator();
         CaseIntegrator ci = getCaseIntegrator();
         CourtEntityIntegrator cei = getCourtEntityIntegrator();
+        BlobCoordinator bc = getBlobCoordinator();
 
-        // TODO: NADGIT photo stuff
-//        cv.setBlobList(ci.loadViolationPhotoList(cv));
+        
+        cv.setBlobList(bc.getBlobLightList(cv));
         cv.setCitationIDList(cei.getCitationIDsByViolation(cv.getViolationID()));
         cv.setNoticeIDList(ci.novGetNOVIDList(cv));
 
@@ -4053,6 +4078,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
                 cv.setCreatedBy(oise.getLastInspectedBy());
                 cv.setLastUpdatedUser(oise.getLastInspectedBy());
                 cv.setPenalty(oise.getNormPenalty());
+                cv.setBlobList(oise.getBlobList());
                 cvl.add(cv); // method will make new violation
             }
         }
@@ -4311,8 +4337,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             }
             targetViol.setPenalty(cv.getPenalty());
 
+            // deal with blobs
             if (cvms.isLinkInspectedElementPhotoDocsToViolation()) {
-                targetViol.setBlobList(cv.getBlobList());
+                if(cv.getBlobList() != null && !cv.getBlobList().isEmpty()){
+                    System.out.println("CaseCoordinator.violation_migration_assembleFreshViolations | incoming code violation blob list size: " + cv.getBlobList().size());
+                    targetViol.setBlobList(cv.getBlobList());
+                    
+                } else {
+                    System.out.println("CaseCoordinator.violation_migration_assembleFreshViolations | null or empty incoming cv blob list");
+                }
             }
             targetViol.setSeverityIntensity(cv.getSeverityIntensity());
             targetViol.setActive(true);
@@ -4363,6 +4396,7 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
     /**
      * Internal organ for building a nice, descriptive note on the violations
      * being migrated so we know where they came from
+     * TODO: Get me working!
      *
      * @param cv yet to be inserted that needs the note
      * @param cvms with all the goodies
@@ -4396,7 +4430,10 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             }
         }
         String ln = "Violation Note: " + vnote;
-        cvms.appendToMigrationLog(ln);
+        // BROKEN as of 21 SEP 2022
+        // Placeholder injection
+//        cvms.appendToMigrationLog(ln);
+        cvms.appendToMigrationLog("This violation was migrated from a field inspection on this case, a different case, a permit file!");
 
         return vnote;
     }

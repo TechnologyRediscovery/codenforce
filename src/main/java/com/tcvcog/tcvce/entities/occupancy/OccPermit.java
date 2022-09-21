@@ -18,6 +18,7 @@ Council of Governments, PA
 package com.tcvcog.tcvce.entities.occupancy;
 
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
+import com.tcvcog.tcvce.entities.BlobLight;
 import com.tcvcog.tcvce.entities.CodeSource;
 import com.tcvcog.tcvce.entities.HumanLink;
 import com.tcvcog.tcvce.entities.ParcelInfo;
@@ -131,6 +132,7 @@ public class OccPermit extends TrackedEntity
     
     private String staticpropclass;     // from parcelinfo
     private String staticofficername; // from dynamic field on permit
+    private int staticOfficerSignaturePhotoDocID;
     private String staticissuedundercodesourceid;   // from chosen code source
     private String staticstipulations;
     
@@ -204,6 +206,8 @@ public class OccPermit extends TrackedEntity
         this.staticconstructiontype = permit.staticconstructiontype;
         this.staticpropclass   = permit.staticpropclass;   
         this.staticofficername = permit.staticofficername; 
+        this.staticOfficerSignaturePhotoDocID = permit.staticOfficerSignaturePhotoDocID;
+        
         this.staticissuedundercodesourceid   = permit.staticissuedundercodesourceid;   
         this.staticstipulations = permit.staticstipulations;
         this.staticcomments = permit.staticcomments;
@@ -1158,6 +1162,23 @@ public class OccPermit extends TrackedEntity
     public void setIssuingOfficerPerson(Person issuingOfficerPerson) {
         this.issuingOfficerPerson = issuingOfficerPerson;
     }
+
+
+    /**
+     * @return the staticOfficerSignaturePhotoDocID
+     */
+    public int getStaticOfficerSignaturePhotoDocID() {
+        return staticOfficerSignaturePhotoDocID;
+    }
+
+    /**
+     * @param staticOfficerSignaturePhotoDocID the staticOfficerSignaturePhotoDocID to set
+     */
+    public void setStaticOfficerSignaturePhotoDocID(int staticOfficerSignaturePhotoDocID) {
+        this.staticOfficerSignaturePhotoDocID = staticOfficerSignaturePhotoDocID;
+    }
+
+    
 
   
     

@@ -1510,6 +1510,9 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
      */
     public CodeViolation getCodeViolation(int violationID) 
             throws IntegrationException, BObStatusException {
+        if(violationID == 0){
+            throw new IntegrationException("CaseIntegrator.getCodeViolation | Cannot getCodeViolation with id = 0");
+        }
         String query = "SELECT violationid, codesetelement_elementid, cecase_caseid, dateofrecord, \n" +
                         "       entrytimestamp, stipulatedcompliancedate, actualcompliancedate, \n" +
                         "       penalty, description, notes, legacyimport, compliancetimestamp, \n" +
@@ -1555,7 +1558,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             
         }
         
-        String query = "SELECT violationid FROM codeviolation WHERE cecase_caseid = ?";
+        String query = "SELECT violationid FROM codeviolation WHERE cecase_caseid = ? AND active = TRUE;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
         PreparedStatement stmt = null;
@@ -1971,7 +1974,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                         "       fixedrecipientxferts=now(), fixedrecipientname=?, fixedrecipientbldgno=?, \n" + // 5-6
                         "       fixedrecipientstreet=?, fixedrecipientcity=?, fixedrecipientstate=?, \n" +  // 7-9
                         "       fixedrecipientzip=?,  fixednotifyingofficername=?, fixednotifyingofficertitle=?, \n" +
-                        "       fixednotifyingofficerphone=?, fixednotifyingofficeremail=?" + // 10
+                        "       fixednotifyingofficerphone=?, fixednotifyingofficeremail=?, fixedissuingofficersig_photodocid=? " + // 10
                         "   WHERE noticeid=?;"; //11
         // note that original time stamp is not altered on an update
 
@@ -1999,7 +2002,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             stmt.setString(13, nov.getFixedNotifyingOfficerPhone());
             stmt.setString(14, nov.getFixedNotifyingOfficerEmail());
             
-            stmt.setInt(15, nov.getNoticeID());
+            stmt.setInt(15, nov.getFixedNotifyingOfficerSignaturePhotoDocID());
+            stmt.setInt(16, nov.getNoticeID());
 
             stmt.execute();
         } catch (SQLException ex) {
@@ -2286,7 +2290,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
                         "       fixedrecipientxferts, fixedrecipientname, fixedrecipientbldgno, \n" +
                         "       fixedrecipientstreet, fixedrecipientcity, fixedrecipientstate, \n" +
                         "       fixedrecipientzip, fixednotifyingofficername, fixednotifyingofficertitle, \n" +
-                        "       fixednotifyingofficerphone, fixednotifyingofficeremail, letter_typeid \n" +
+                        "       fixednotifyingofficerphone, fixednotifyingofficeremail, letter_typeid, fixedissuingofficersig_photodocid \n" +
                         "  FROM public.noticeofviolation WHERE noticeid = ?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -2815,6 +2819,8 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             notice.setNovType(cc.nov_getNOVType(rs.getInt("letter_typeid")));
         }
 
+        notice.setFixedNotifyingOfficerSignaturePhotoDocID(rs.getInt("fixedissuingofficersig_photodocid"));
+        
         return notice;
 
     }
@@ -2836,6 +2842,7 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
         PreparedStatement stmt = null;
         CodeViolationDisplayable viol;
         List<CodeViolationDisplayable> codeViolationList = new ArrayList<>();
+        CaseCoordinator cc = getCaseCoordinator();
 
         try {
             stmt = con.prepareStatement(query);
@@ -2843,11 +2850,11 @@ public class CaseIntegrator extends BackingBeanUtils implements Serializable{
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                  viol = new CodeViolationDisplayable(getCodeViolation(rs.getInt("codeviolation_violationid")));
+                viol = new CodeViolationDisplayable(cc.violation_getCodeViolation(rs.getInt("codeviolation_violationid")));
                 viol.setIncludeOrdinanceText(rs.getBoolean("includeordtext"));
                 viol.setIncludeHumanFriendlyText(rs.getBoolean("includehumanfriendlyordtext"));
-                 viol.setIncludeViolationPhotos(rs.getBoolean("includeviolationphoto"));
-                 codeViolationList.add(viol);
+                viol.setIncludeViolationPhotos(rs.getBoolean("includeviolationphoto"));
+                codeViolationList.add(viol);
             }
 
         } catch (SQLException ex) {

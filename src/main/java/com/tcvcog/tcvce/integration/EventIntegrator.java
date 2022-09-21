@@ -36,6 +36,8 @@ import com.tcvcog.tcvce.entities.EventType;
 import com.tcvcog.tcvce.entities.IFace_EventHolder;
 import com.tcvcog.tcvce.entities.Iface_eventEmitter;
 import com.tcvcog.tcvce.entities.NoticeOfViolation;
+import com.tcvcog.tcvce.entities.Parcel;
+import com.tcvcog.tcvce.entities.PropertyDataHeavy;
 import com.tcvcog.tcvce.entities.RoleType;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.search.SearchParamsEvent;
@@ -84,7 +86,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         String query = "SELECT eventid, category_catid, cecase_caseid, createdts, eventdescription, \n" +
                         "       createdby_userid, active, notes, occperiod_periodid, timestart, \n" +
                         "       timeend, lastupdatedby_userid, lastupdatedts, deactivatedts, \n" +
-                        "       deactivatedby_userid \n" +
+                        "       deactivatedby_userid, parcel_parcelkey  \n" +
                         "  FROM public.event WHERE eventid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -142,6 +144,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             // these values will be used by the configure method to set the domain
             ev.setCeCaseID(rs.getInt("cecase_caseid"));
             ev.setOccPeriodID(rs.getInt("occperiod_periodid"));
+            ev.setParcelKey(rs.getInt("parcel_parcelkey"));
             
             if (rs.getTimestamp("timestart") != null) {
                 LocalDateTime dt = rs.getTimestamp("timestart").toInstant()
@@ -216,7 +219,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      */
      public List<Integer> getEventList(IFace_EventHolder evHolder) throws IntegrationException{
         
-     StringBuilder queryStub = new StringBuilder("SELECT eventid FROM public.event WHERE ");
+     StringBuilder queryStub = new StringBuilder("SELECT eventid FROM public.event WHERE eventid IS NOT NULL AND deactivatedts IS NULL AND ");
             
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -231,6 +234,8 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             queryStub.append("occperiod_periodid=?;");
         } else if(evHolder instanceof CECase){
             queryStub.append("cecase_caseid=?;");
+        } else if(evHolder instanceof PropertyDataHeavy){
+            queryStub.append("parcel_parcelkey=?;");
         }
 
         try {
@@ -243,6 +248,9 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
             } else if(evHolder instanceof CECase){
                 CECase cec = (CECase) evHolder;
                 stmt.setInt(1, cec.getCaseID());
+            } else if(evHolder instanceof PropertyDataHeavy){
+                PropertyDataHeavy pdh = (PropertyDataHeavy) evHolder;
+                stmt.setInt(1, pdh.getParcelKey());
             }
             
             rs = stmt.executeQuery();
@@ -276,17 +284,15 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
      */
     public int insertEvent(EventCnF event) throws IntegrationException, BObStatusException {
         if(event == null) return 0;
-        PersonIntegrator pi = getPersonIntegrator();
-        EventCoordinator ec = getEventCoordinator();
         int insertedEventID = 0;
 
         String query = "INSERT INTO public.event(\n" +
                         "            eventid, category_catid, cecase_caseid, createdts, eventdescription, \n" +
                         "            createdby_userid, notes, occperiod_periodid, timestart, \n" +
-                        "            timeend, lastupdatedby_userid, lastupdatedts)\n" +
+                        "            timeend, lastupdatedby_userid, lastupdatedts, parcel_parcelkey)\n" +
                         "    VALUES (DEFAULT, ?, ?, now(), ?, \n" +
                         "            ?, ?, ?, ?, \n" +
-                        "            ?, ?, now());"; 
+                        "            ?, ?, now(), ?);"; 
         Connection con = getPostgresCon();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -341,6 +347,12 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setInt(9, event.getLastUpdatedBy().getUserID());
             } else {
                 stmt.setNull(9, java.sql.Types.NULL);
+            }
+            
+            if(event.getDomain() == DomainEnum.PARCEL && event.getParcelKey() != 0){
+                stmt.setInt(10, event.getParcelKey());
+            } else {
+                stmt.setNull(10, java.sql.Types.NULL);
             }
             
             stmt.execute();
@@ -427,7 +439,7 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
         sb.append("   SET cecase_caseid=?, eventdescription=?, \n" +
                     "       occperiod_periodid=?, \n" +
                     "       timestart=?, timeend=?, lastupdatedby_userid=?, lastupdatedts=now(), \n" +
-                    "       deactivatedts=?, deactivatedby_userid=? \n" );
+                    "       deactivatedts=?, deactivatedby_userid=?, parcel_parcelkey=? \n" );
         sb.append(" WHERE eventid=?;");
 
         // TO DO: finish clearing view confirmation
@@ -485,7 +497,13 @@ public class EventIntegrator extends BackingBeanUtils implements Serializable {
                 stmt.setNull(8, java.sql.Types.NULL);
             }
             
-            stmt.setInt(9, event.getEventID());
+            if(event.getDomain() == DomainEnum.PARCEL && event.getParcelKey() != 0){
+                stmt.setInt(9, event.getParcelKey());
+            } else {
+                stmt.setNull(9, java.sql.Types.NULL);
+            }
+            
+            stmt.setInt(10, event.getEventID());
             
             stmt.executeUpdate();
 

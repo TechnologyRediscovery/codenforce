@@ -267,16 +267,8 @@
                                                                  usercfg-messages-form
                                                                  userconfig-usertable" 
                                                                  rendered="#{userConfigBB.humanLinkEditMode}"/>
-
-
-
                                             </h:form>
-
-
-
                                         </div>
-
-
 
                                         <div class="p-col-4 restrict-data-field-label-inline" >
                                             <h:outputText  value="Virtual User" />
@@ -294,7 +286,7 @@
                                                                 alt="no preview available" 
                                                                 style="width: 100%; margin-right: 10px;" 
                                                                 cache="false"
-                                                                rendered="#{!userConfigBB.signatureEditMode}">
+                                                                rendered="#{!userConfigBB.signatureEditMode and !empty userConfigBB.currentUserAuthorizedForConfig.signatureBlob}">
                                                     <f:param name="blobid" value="#{userConfigBB.currentUserAuthorizedForConfig.signatureBlob.photoDocID}"/>
                                                 </p:graphicImage>
                                                 <p:spacer height="2px" />
@@ -305,17 +297,36 @@
                                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
                                                                     update="@form"
                                                                     value="#{userConfigBB.signatureEditMode ? 'cancel signature update':'update signature photo'}" >
-
                                                 </p:commandLink>
-
-
-
-
-
+                                                <p:spacer height="2px" />
+                                                <p:dataTable id="signature-candidate-table"
+                                                             value="#{userConfigBB.currentUserAuthorizedForConfig.blobList}"
+                                                             var="sigblob"
+                                                             rendered="#{userConfigBB.signatureEditMode}">
+                                                
+                                                    <p:column headerText="Photodoc ID">
+                                                        <h:outputText value="#{sigblob.photoDocID}" />
+                                                          <p:graphicImage value="#{blobsterBB.image}"
+                                                                        alt="no preview available" 
+                                                                        style="width: 100px; margin-right: 10px;" 
+                                                                        cache="false"
+                                                                        rendered="true">
+                                                            <f:param name="blobid" value="#{sigblob.photoDocID}"/>
+                                                        </p:graphicImage>
+                                                        
+                                                        
+                                                    </p:column>
+                                                    <p:column>
+                                                        <p:commandLink id="select-signature-blob-cl"
+                                                                       style="color:blue; font-weight: bold;"
+                                                                       actionListener="#{userConfigBB.onChangeSignatureBlobCommit(sigblob)}" 
+                                                                       value="select for signature"
+                                                                       update="@form
+                                                                                usercfg-messages-form" />
+                                                    </p:column>
+                                                </p:dataTable>
                                             </h:form>
                                         </div>
-
-
 
                                         <div class="p-col-4 restrict-data-field-label-inline" >
                                             <h:outputText value="Home Municipality" />
@@ -356,16 +367,12 @@
                                     </div>
                                 </p:panel>
 
-
-
-
                                 <p:panel    id="usercfg-umap-panel"
                                             toggleable="true"
                                             widgetVar="usercfg-umap-panel-var"
                                             collapsed="false"
                                             rendered="true"
                                             header="User-Municipality Authorization Periods (UMAPs)">
-
 
                                     <h:form id="user-authorizations-dialog-periodtable-form">
 
@@ -380,7 +387,6 @@
                                                          usercfg-messages-form" />
 
                                         <p:spacer height="5px" />
-
 
                                         <p:dataTable
                                             id="userconfig-muniauthperiods-table"
@@ -416,7 +422,6 @@
                                                 <h:outputText value="#{muPeriod.userMuniAuthPeriodID}"/>
                                                 <h:outputText value=")" class="objectid-close"/>
                                             </p:column>
-
 
                                             <p:column>
                                                 <f:facet name="header">
@@ -497,7 +502,6 @@
                                                         <h:outputText value="User ID: #{muPeriod.createdByUserID}" />
                                                     </div>
 
-
                                                     <div class="p-col-4 restrict-data-field-label-inline">
                                                         <h:outputLabel value="Created TS:" />
                                                     </div>
@@ -508,10 +512,8 @@
                                                     <div class="p-col-12">
                                                         <h4>Log entries associated with this authorization period</h4>
 
-
                                                         <p:scrollPanel id="userconfig-authperiod-logentry-scrollpanel"
                                                                        style="height: 200px;">
-
                                                             <p:dataTable
                                                                 id="userconfig-muniauthperiods-logentry-table"
                                                                 var="muEntry"
@@ -575,7 +577,6 @@
                                          >
 
                                     <h:form id="user-blobs-form">
-
                                         <p:commandButton    id="user-blob-add-button"
                                                             ajax="true"
                                                             styleClass="noFill button-size-small"
@@ -589,13 +590,12 @@
                                             <f:param name="blob-list-component-to-update" value="user-blobs-form" />
                                         </p:commandButton>
 
-
                                         <p:spacer height="5px" />
 
                                         <p:dataTable
                                             id="user-blobs-table"
                                             var="blob"
-                                            value="#{userConfigBB.currentUserAuthorizedForConfig.blobList}"
+                                            value="#{userConfigBB.managedUserBlobList}"
                                             rowKey="#{blob.bytesID}"
                                             tableStyleClass="primeDataTable"
                                             resizableColumns="true"
@@ -633,7 +633,6 @@
                                                     <h:outputText value="created: #{propertyProfileBB.getPrettyDateNoTime(blob.createdTS)}"/>
                                                 </div>
                                             </p:column>
-
 
                                             <p:column>
                                                 <f:facet name="header">

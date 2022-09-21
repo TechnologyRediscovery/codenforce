@@ -118,8 +118,10 @@ public class PropertyProfileBB
             System.out.println("PropertyProfileBB.initBean() | Current Property: " + currentProperty.getParcelKey());
         } else {
             System.out.println("PropertyProfileBB.initBean() | Current Property null ");
-            
         }
+        
+        // setup event domain
+           getSessionEventConductor().setSessEventsPageEventDomainRequest(DomainEnum.PARCEL);
         reloadCurrentPropertyDataHeavy();
          try {
              setPutList(pi.getPropertyUseTypeList());
@@ -435,7 +437,7 @@ public class PropertyProfileBB
         SystemCoordinator sc = getSystemCoordinator();
         try {
 //            currentProperty.setAbandonedDateStart(pc.configureDateTime(currentProperty.getAbandonedDateStart().to));
-            pc.updatePropertyDataHeavyBroadviewPhoto(currentProperty, getSessionBean().getSessUser());
+            pc.updateParcel(currentProperty, getSessionBean().getSessUser());
             reloadCurrentPropertyDataHeavy();
             sc.logObjectView(getSessionBean().getSessUser(), currentProperty);
             getFacesContext().addMessage(null,

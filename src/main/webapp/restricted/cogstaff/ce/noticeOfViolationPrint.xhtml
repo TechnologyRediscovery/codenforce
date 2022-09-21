@@ -147,26 +147,35 @@
                                       value="#{noticeOfViolationBB.currentNotice.noticeTextAfterViolations}" />
                     </div>
 
-                    <div class="signature">
+                    <div class="nov-sigblock">
+                        <p:graphicImage value="#{blobsterBB.image}"
+                                                alt=" " 
+                                                styleClass="signature"
+                                                cache="false"
+                                                rendered="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerSignaturePhotoDocID ne 0}">
+                            <f:param name="blobid" value="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerSignaturePhotoDocID}"/>
+                        </p:graphicImage>
+                        <p:spacer height="2px" />
+                        
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficerPerson.name}"
                                       rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}" />
                         
-                        <br />
+                        <p:spacer height="2px" />
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficerPerson.jobTitle}"
                                       rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}" />
-                        <br />
+                        <p:spacer height="2px" />
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficerPerson.primaryPhone.phoneNumber}"
                                       rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}" />
-                        <br />
+                        <p:spacer height="2px" />
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.notifyingOfficerPerson.primaryEmail.emailaddress}"
                                       rendered="#{empty noticeOfViolationBB.currentNotice.lockedAndqueuedTS}" />
                         
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerName}" />
-                        <br />
+                        <p:spacer height="2px" />
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerTitle}" />
-                        <br />
+                        <p:spacer height="2px" />
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerPhone}" />
-                        <br />
+                        <p:spacer height="2px" />
                         <h:outputText value="#{noticeOfViolationBB.currentNotice.fixedNotifyingOfficerEmail}" />
                     </div>
 

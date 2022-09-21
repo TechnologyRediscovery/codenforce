@@ -136,6 +136,7 @@ public class UserConfigBB extends BackingBeanUtils{
             System.out.println(ex);
         }
     }
+  
     
     /**
      * gets a new set of users from DB
@@ -645,14 +646,13 @@ public class UserConfigBB extends BackingBeanUtils{
      */
     public void onChangeSignatureBlobCommit(BlobLight bl){
         UserCoordinator uc = getUserCoordinator();
-        currentUserAuthorizedForConfig.setSignatureBlob(bl);
         
         try {
-            uc.user_updateUser(currentUserAuthorizedForConfig);
+            uc.user_updateUserAuthorizedSignatureBlob(currentUserAuthorizedForConfig, bl);
             getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_INFO,
                                "Signature for user: updated success!", ""));
-        } catch (IntegrationException | AuthorizationException | BObStatusException ex) {
+        } catch (IntegrationException | BObStatusException ex) {
             getFacesContext().addMessage(null,
                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
                                "Could not update signature for user", ""));
@@ -664,7 +664,22 @@ public class UserConfigBB extends BackingBeanUtils{
     }
 
 
-    
+    /**
+     * Special getter for user blobs
+     * @return 
+     */
+    public List<BlobLight> getManagedUserBlobList(){
+        List<BlobLight> blist = getSessionBean().getSessBlobLightListForRefreshUptake();
+        if(currentUserAuthorizedForConfig != null){
+            if(blist != null){
+                currentUserAuthorizedForConfig.setBlobList(blist);
+                getSessionBean().setSessBlobLightListForRefreshUptake(null);
+            }
+            return currentUserAuthorizedForConfig.getBlobList();
+        }
+        return null;
+        
+    }
   
     
     
