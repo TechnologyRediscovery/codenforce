@@ -131,7 +131,7 @@
                                                                  styleClass="multiButtonLineButton"
                                                                  actionListener="#{userConfigBB.onConfigureUserLinkClick(user)}"
                                                                  update="
-                                                                 userconfig-usertable
+                                                                 @form:@parent:usercfg-search-results-form:userconfig-usertable
                                                                  usercfg-panel-info
                                                                  usercfg-umap-panel
                                                                  usercfg-panel-notes
@@ -265,7 +265,7 @@
                                                                  actionListener="#{userConfigBB.onUpdateUserPersonLinkCommitButtonChange}"
                                                                  update="@form
                                                                  usercfg-messages-form
-                                                                 userconfig-usertable" 
+                                                                 @form:@parent:usercfg-search-results-form:userconfig-usertable" 
                                                                  rendered="#{userConfigBB.humanLinkEditMode}"/>
                                             </h:form>
                                         </div>
@@ -938,7 +938,7 @@
                                                     value="Permanently Deactivate User: #{userConfigBB.currentUserAuthorizedForConfig.username}"
                                                     oncomplete="PF('usercfg-userdeactivate-confirm-dialog-var').hide();"
                                                     update="userconfig-usertable
-                                                    usercfg-panel-info"/>
+                                                            usercfg-panel-info"/>
 
 
                             </h:form>

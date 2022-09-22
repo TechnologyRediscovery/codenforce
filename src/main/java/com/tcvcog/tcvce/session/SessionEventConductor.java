@@ -60,18 +60,13 @@ public class SessionEventConductor extends BackingBeanUtils{
     /* >>> QUERY EVENT <<< */
     private QueryEvent queryEvent;
     private List<QueryEvent> queryEventList;
-                
-    
     
     /**
      * Creates a new instance of SessionEvents
      */
     public SessionEventConductor() {
         
-        
     }
-    
-    
     
     @PostConstruct
     public void initBean()  {
@@ -128,6 +123,7 @@ public class SessionEventConductor extends BackingBeanUtils{
 
         prefixMap.put(-1, "Yesterday: ");
         prefixMap.put(0, "Today: ");
+        prefixMap.put(1, "Tomorrow: : ");
 
         for(int dayCount = -1; dayCount <=4; dayCount++){
             EventCalendarDay day = new EventCalendarDay();
@@ -157,6 +153,7 @@ public class SessionEventConductor extends BackingBeanUtils{
             QueryEvent evq = sc.initQuery(QueryEventEnum.CALENDAR, getSessionBean().getSessUser().getKeyCard());
             evq.getPrimaryParams().setDate_start_val(day.getLdtLowerBound());
             evq.getPrimaryParams().setDate_end_val(day.getLdtUpperBound());
+            evq.getPrimaryParams().setMuni_val(getSessionBean().getSessMuni());
            
             day.setEvList(sc.runQuery(evq, getSessionBean().getSessUser()).getBOBResultList());
             dayList.add(day);

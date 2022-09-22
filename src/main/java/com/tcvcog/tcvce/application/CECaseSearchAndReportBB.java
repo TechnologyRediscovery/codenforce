@@ -131,17 +131,18 @@ public class CECaseSearchAndReportBB
         int listSize = 0;
 
         if (!isAppendResultsToList()) {
-            getCaseList().clear();
+            caseList.clear();
         }
         querySelected.setRequestingUser(getSessionBean().getSessUser());
         try {
-            getCaseList().addAll(sc.runQuery(querySelected, getSessionBean().getSessUser()).getResults());
+            getSessionBean().setSessCECaseList(sc.runQuery(querySelected, getSessionBean().getSessUser()).getResults());
+            caseList.addAll(getSessionBean().getSessCECaseList());
             if (getCaseList() != null) {
                 listSize = getCaseList().size();
             }
             getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Your query completed with " + listSize + " results", ""));
+                            "Your query completed with " + listSize + " results; These are now your session cases!", ""));
         } catch (SearchException ex) {
             System.out.println(ex);
             getFacesContext().addMessage(null,
