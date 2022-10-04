@@ -38,10 +38,9 @@ import java.util.Objects;
  * to be inspected) during an occupancy inspection
  * @author ellen bascomb of apt 31y
  */
-public class OccInspectedSpaceElement
+ public class OccInspectedSpaceElement
         extends OccSpaceElement
         implements Serializable, 
-                    Comparable<OccInspectedSpaceElement>, 
                     IFace_BlobHolder,
                     IFace_keyIdentified,
                     IFace_transferrable{
@@ -337,18 +336,7 @@ public class OccInspectedSpaceElement
         this.migrateToCaseOnFail = migrateToCaseOnFail;
     }
 
-    /**
-     * Sorts by ordinance chapter
-     * @param o
-     * @return 
-     */
-    @Override
-    public int compareTo(OccInspectedSpaceElement o) {
-        if(ordSecTitle == null || o == null || o.ordSecTitle == null){
-            return 0;
-        }
-        return ordSecTitle.compareTo(o.ordSecTitle);
-    }
+   
 
     /**
      * Not boring! These are getters and setter wrappers for the status parameter that take and give raw enums

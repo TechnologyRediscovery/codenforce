@@ -24,11 +24,11 @@
             <!-- Inspection metadata-->
             <div class="p-col-6">
                 <h:form id="inspection-profile-form">
-                    
+
                     <h:outputText id="dispatch-notice-ot"
                                   style="color: darkgreen; font-weight: bold;"
-                                value="This inspection has been dispatched to handheld computer field application"
-                                rendered="#{!empty inspection.dispatch and (empty inspection.dispatch.synchronizationTS and (empty inspection.dispatch.deactivatedTS))}" />
+                                  value="This inspection has been dispatched to handheld computer field application"
+                                  rendered="#{!empty inspection.dispatch and (empty inspection.dispatch.synchronizationTS and (empty inspection.dispatch.deactivatedTS))}" />
 
                     <p:commandButton id="inspections-inspectiondetails-editbutton"
                                      value="#{fieldInspectionBB.editModeInspectionMetadata ? 'Save Changes' : 'Edit'}"
@@ -61,8 +61,6 @@
                                          inspection-actions-form
                                          inspection-inspectedspaces-form"/>
                     </div>
-
-
 
                     <p:spacer height="5px"/>
 
@@ -174,11 +172,11 @@
                              collapsed="false"
                              header="Inspection">
                         <div class="p-grid">
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 Effective Date
                             </div>
 
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.effectiveDateOfRecord)}"/>
 
@@ -197,10 +195,10 @@
                                                 required="false" />
                             </div>
 
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 Cause
                             </div>
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.cause.title}"
                                               title="#{fieldInspectionBB.currentInspection.cause.description}"
@@ -218,10 +216,10 @@
 
                             </div>
 
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 Checklist
                             </div>
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
 
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.checklistTemplate.title}"/>
@@ -239,11 +237,11 @@
                                               value="Warning: changing templates after an inspection has begun is a recipe for disaster!"/>
                             </div>
 
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 Start time
                             </div>
 
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.timeStart)}"/>
 
@@ -262,11 +260,11 @@
                                                 required="false" />
                             </div>
 
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 End time
                             </div>
 
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText   rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                                 value="#{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.timeEnd)}"/>
                                 <p:datePicker 	 id="inspection-time-end-datepicker"
@@ -284,13 +282,13 @@
                                                 required="false" />
                             </div>
 
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 Determination
                                 <p:spacer height="3px" />
 
                             </div>
 
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText value="#{!empty fieldInspectionBB.currentInspection.determination 
                                                        ? fieldInspectionBB.currentInspection.determination.title 
                                                        : ''}" />
@@ -299,10 +297,10 @@
 
                             <p:divider/>
 
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 Max occupants allowed
                             </div>
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.maxOccupantsAllowed}"/>
 
@@ -310,10 +308,10 @@
                                              value="#{fieldInspectionBB.currentInspection.maxOccupantsAllowed}"
                                              required="false"/>
                             </div>
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 Number of bedrooms
                             </div>
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.numBedrooms}"/>
                                 <p:inputText rendered="#{fieldInspectionBB.editModeInspectionMetadata}"  
@@ -321,10 +319,10 @@
                                              required="false"/>
                             </div>
 
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 Number of bathrooms
                             </div>
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                               value="#{fieldInspectionBB.currentInspection.numBathrooms}"/>
                                 <p:inputText rendered="#{fieldInspectionBB.editModeInspectionMetadata}"  
@@ -339,12 +337,13 @@
                              collapsed="false"
                              header="Notes">
                         <div class="p-grid">
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 Pre-inspection notes
                             </div>
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText   rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
-                                                value="#{fieldInspectionBB.currentInspection.notesPreInspection}"/>
+                                                value="#{fieldInspectionBB.currentInspection.notesPreInspection}"
+                                                escape="false"/>
 
                                 <p:inputTextarea    rendered="#{fieldInspectionBB.editModeInspectionMetadata}" 
                                                     value="#{fieldInspectionBB.currentInspection.notesPreInspection}"
@@ -353,11 +352,11 @@
                                                     required="false"/>
                             </div>
 
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 Remarks
                             </div>
 
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText   rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                                 value="#{fieldInspectionBB.currentInspection.remarks}"/>
 
@@ -368,10 +367,10 @@
                                                     required="false"/>
                             </div>
 
-                            <div class="p-col-4">
+                            <div class="p-col-4 restrict-data-field-label-inline">
                                 General Comments
                             </div>
-                            <div class="p-col-8">
+                            <div class="p-col-8 restrict-data-field-value-inline">
                                 <h:outputText   rendered="#{!fieldInspectionBB.editModeInspectionMetadata}" 
                                                 value="#{fieldInspectionBB.currentInspection.generalComments}"/>
 
@@ -482,12 +481,13 @@
                                 <p:commandButton    id="insp-followup-button"
                                                     value="Setup Re-inspection"
                                                     ajax="true"
-                                                    disabled="true"
-                                                    actionListener="#{fieldInspectionBB.onSetupReinspectionButtonClick}"
+                                                    disabled="#{empty fieldInspectionBB.currentInspection.determinationTS or fieldInspectionBB.editModeInspectionMetadata or !fieldInspectionBB.currentInspection.browserUserEditingAllowed}"
+                                                    actionListener="#{fieldInspectionBB.onReinspectionInit}"
                                                     oncomplete="PF('inspection-followup-dialog-var').show()"
                                                     rendered="#{systemServicesBB.bbSessionUser.keyCard.hasMuniStaffPermissions}"
                                                     icon="fa fa-repeat"
-                                                    update="inspection-followup-form"
+                                                    update="@form:@parent:inspection-followup-form
+                                                    inspection-followup-dialog"
                                                     />
 
                             </div>
@@ -545,12 +545,12 @@
                                             disabled="false"
                                             rendered="#{fieldInspectionBB.editModeDispatch}"
                                             update="inspection-dispatch-form
-                                                inspection-profile-form
-                                                inspectiontools-growl-form
-                                                inspection-actions-form
-                                                inspection-advancedtools-form
-                                                inspection-actions-form
-                                                inspection-inspectedspaces-form"
+                                            inspection-profile-form
+                                            inspectiontools-growl-form
+                                            inspection-actions-form
+                                            inspection-advancedtools-form
+                                            inspection-actions-form
+                                            inspection-inspectedspaces-form"
                                             value="Save dispatch">
                         </p:commandButton>
 
@@ -596,23 +596,23 @@
                                 </div>
                                 <div class="p-col-4 restrict-data-field-label-inline">
                                     Retrieval
-                                      <p:commandButton id="retrieval-help-button"
-                                                            icon="fa fa-question-circle-o"
-                                                            styleClass="button-help"
-                                                            type="button" />
+                                    <p:commandButton id="retrieval-help-button"
+                                                     icon="fa fa-question-circle-o"
+                                                     styleClass="button-help"
+                                                     type="button" />
 
-                                           <p:overlayPanel for="retrieval-help-button"
-                                                           style="width:350px;" 
-                                                           dismissable="true"
-                                                           showCloseIcon="true">
-                                               <h3>Dispatch retrieval</h3>
-                                               <p>After an inspection is dispatched to the handheld computer application, the field user must login on the handheld device
-                                               and pull down any dispatched inspections. Once this transfer occurs, the date and time are reported in this field. The inspection
-                                               remains locked to browser users until the inspection is synchronized from the handheld device back to the server OR the browser
-                                               user decides to revoke the dispatch (used only in exceptional circumstances).</p>
-                                               
-                                               
-                                           </p:overlayPanel>
+                                    <p:overlayPanel for="retrieval-help-button"
+                                                    style="width:350px;" 
+                                                    dismissable="true"
+                                                    showCloseIcon="true">
+                                        <h3>Dispatch retrieval</h3>
+                                        <p>After an inspection is dispatched to the handheld computer application, the field user must login on the handheld device
+                                            and pull down any dispatched inspections. Once this transfer occurs, the date and time are reported in this field. The inspection
+                                            remains locked to browser users until the inspection is synchronized from the handheld device back to the server OR the browser
+                                            user decides to revoke the dispatch (used only in exceptional circumstances).</p>
+
+
+                                    </p:overlayPanel>
                                 </div>
 
                                 <div class="p-col-8 restrict-data-field-value-inline">
@@ -628,22 +628,22 @@
                                 </div>
                                 <div class="p-col-4 restrict-data-field-label-inline">
                                     Synchronization
-                                    
-                                        <p:commandButton id="sync-help-button"
-                                                            icon="fa fa-question-circle-o"
-                                                            styleClass="button-help"
-                                                            type="button" />
 
-                                           <p:overlayPanel for="sync-help-button"
-                                                           style="width:350px;" 
-                                                           dismissable="true"
-                                                           showCloseIcon="true">
-                                               <h3>Dispatch synchronization</h3>
-                                               <p>Once an inspection is completed using the handheld computer application, the results are sent back to the codeNForce server
-                                               and the inspection is then unlocked for further editing using the browser-based tools. This field will show the date this occurs.</p>
-                                               
-                                               
-                                           </p:overlayPanel>
+                                    <p:commandButton id="sync-help-button"
+                                                     icon="fa fa-question-circle-o"
+                                                     styleClass="button-help"
+                                                     type="button" />
+
+                                    <p:overlayPanel for="sync-help-button"
+                                                    style="width:350px;" 
+                                                    dismissable="true"
+                                                    showCloseIcon="true">
+                                        <h3>Dispatch synchronization</h3>
+                                        <p>Once an inspection is completed using the handheld computer application, the results are sent back to the codeNForce server
+                                            and the inspection is then unlocked for further editing using the browser-based tools. This field will show the date this occurs.</p>
+
+
+                                    </p:overlayPanel>
 
                                 </div>
 
@@ -674,7 +674,7 @@
                                                        value="#{!empty fieldInspectionBB.currentDispatch.synchronizationTS ? '(a synchronized dispatch cannot be revoked)':'revoke dispatch'}">
                                     </p:commandLink>
 
-                                  
+
 
                                     <p:spacer height="3px" />
                                     <h:outputText value="Revoked on #{fieldInspectionBB.getPrettyDate(fieldInspectionBB.currentInspection.dispatch.deactivatedTS)}"
@@ -713,14 +713,14 @@
                                             disabled="false"
                                             rendered="true"
                                             update="inspection-dispatch-form
-                                                    inspection-profile-form
-                                                    inspectiontools-growl-form
-                                                    inspectiontools-growl-form
-                                                    inspection-actions-form
-                                                    inspection-advancedtools-form
-                                                    inspection-actions-form
-                                                    inspection-inspectedspaces-form"
-                                              oncomplete="PF('dispatch-deac-dialog-var').hide();"
+                                            inspection-profile-form
+                                            inspectiontools-growl-form
+                                            inspectiontools-growl-form
+                                            inspection-actions-form
+                                            inspection-advancedtools-form
+                                            inspection-actions-form
+                                            inspection-inspectedspaces-form"
+                                            oncomplete="PF('dispatch-deac-dialog-var').hide();"
                                             value="Revoke dispatch (ID:#{fieldInspectionBB.currentDispatch.dispatchID})">
                         </p:commandButton>
 
@@ -1404,7 +1404,7 @@
                                                         rendered="true"
                                                         update="@form:@parent:@parent:blob-upload-dialog
                                                         "
-                                                        value="Add Photos"
+                                                        value="add Photos"
                                                         actionListener="#{fieldInspectionBB.onManageBlobsOnInspectedElement(spaceElement)}">
                                             <f:param name="blob-list-component-to-update"
                                                      value="inspections-entryscreen-form" />
@@ -1419,7 +1419,7 @@
                                                         rendered="true"
                                                         update="@form:@parent:@parent:blobs-gallery-dialog
                                                         "
-                                                        value="View photos"
+                                                        value="view photos (#{spaceElement.blobList.size()})"
                                                         actionListener="#{fieldInspectionBB.onManageBlobsOnInspectedElement(spaceElement)}">
 
                                         </p:commandLink>
@@ -1688,7 +1688,7 @@
                      header="Determination">
                 <div class="p-grid">
 
-                    <div class="p-col-4">
+                    <div class="p-col-4 restrict-data-field-label-inline">
                         <h:outputText value="Determination" />
                     </div>
                     <div class="p-col-8" >
@@ -1754,13 +1754,13 @@
 
     <p:dialog id="inspection-followup-dialog"
               widgetVar="inspection-followup-dialog-var"
-              header="Setup re-inspection of inspection ID: #{fieldInspectionBB.formFollowUpInspectionTo.inspectionID}"
+              header="Setup re-inspection of inspection ID: #{fieldInspectionBB.currentInspection.inspectionID}"
               closable="true"
               closeOnEscape="true"
               dynamic="true"
               modal="true"
               height="600"
-              width="600"
+              width="800"
               resizable="true"
               responsive="true">
 
@@ -1768,20 +1768,169 @@
 
             <div class="p-grid">
 
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     <h:outputText value="Follow-up to" />
                 </div>
-                <div class="p-col-8">
-                    <h:outputText value="Inspection ID: #{fieldInspectionBB.formFollowUpInspectionTo.inspectionID}" />
-                    <h:outputText value="Start Time: #{!empty fieldInspectionBB.formFollowUpInspectionTo.timeStart 
-                                                       ? fieldInspectionBB.getPrettyDate(fieldInspectionBB.formFollowupInspectionTo.timeStart) 
+                <div class="p-col-8 restrict-data-field-value-inline">
+                    <h:outputText value="Inspection ID: #{fieldInspectionBB.reinspectionConfig.sourceInspection.inspectionID}" />
+                    <h:outputText value="Start Time: #{!empty fieldInspectionBB.reinspectionConfig.sourceInspection.timeStart 
+                                                       ? fieldInspectionBB.getPrettyDate(fieldInspectionBB.reinspectionConfig.sourceInspection.timeStart) 
                                                        : ''}" />
+                </div>
+
+                <div class="p-col-4 restrict-data-field-label-inline">
+                    <h:outputText value="Date of follow-up inspection:" />
+                </div>
+                <div class="p-col-8 restrict-data-field-value-inline">
+                    <p:datePicker 	 id="reinspection-dor-datepicker"
+                                    rendered="true"
+                                    value="#{fieldInspectionBB.reinspectionConfig.reinspectionDate}" 
+                                    style="width: 100%;"
+                                    pattern="MM/dd/yyyy HH:mm"
+                                    disabled="false"
+                                    showButtonBar="true"
+                                    hideOnDateTimeSelect="true"
+                                    showOnFocus="false"
+                                    showIcon="true"
+                                    mask="true"
+                                    timeInput="true" 
+                                    required="false" />
 
                 </div>
+
+                <div class="p-col-4 restrict-data-field-label-inline">
+                    <h:outputText value="Designated reinspector:" />
+                </div>
+                <div class="p-col-8 restrict-data-field-value-inline">
+                    <p:selectOneMenu rendered="true"
+                                     value="#{fieldInspectionBB.reinspectionConfig.reinspector}"
+                                     filter="true"
+                                     filterMatchMode="contains"
+                                     required="false"
+                                     converter="userConverter">
+                        <f:selectItems value="#{systemServicesBB.bbSessionMuni.swornOfficerList}" 
+                                       var="user"
+                                       itemLabel="#{user.human.name} (#{user.username})"
+                                       itemValue="#{user}"/>
+                    </p:selectOneMenu>
+                </div>
+                <div class="p-col-4 restrict-data-field-label-inline">
+                    <h:outputText value="Attach reinspection to same parent object:" />
+                </div>
+                <div class="p-col-8 restrict-data-field-value-inline">
+                    <p:selectBooleanCheckbox value="#{fieldInspectionBB.reinspectionConfig.maintainSameParentObject}" 
+                                             disabled="true"/>
+
+
+                </div>
+            </div>
+
+            <p:panel id="reins-settings-spacesordinances"
+                     header="Space and ordinance reinspection settings"
+                     toggleable="true"
+                     collapsed="false">
+
+                <div class="p-grid">
+                    <div class="p-col-8 restrict-data-field-label-inline">
+                        <h:outputText value="Reinspect spaces without any inspected ordinances:" />
+                    </div>
+                    <div class="p-col-4 restrict-data-field-value-inline">
+                        <p:selectBooleanCheckbox value="#{fieldInspectionBB.reinspectionConfig.migrateInspectedSpacesWithoutAnyInspectedItems}" />
+                    </div>
+
+                    <div class="p-col-8 restrict-data-field-label-inline">
+                        <h:outputText value="Reinspect spaces without failed items:" />
+                    </div>
+                    <div class="p-col-4 restrict-data-field-value-inline">
+                        <p:selectBooleanCheckbox value="#{fieldInspectionBB.reinspectionConfig.migrateInspectedSpacesWithoutAnyFailedItems}" />
+                    </div>
+
+                    <div class="p-col-8 restrict-data-field-label-inline">
+                        <h:outputText value="Reinspect only failed items:" />
+                    </div>
+                    <div class="p-col-4 restrict-data-field-value-inline">
+                        <p:selectBooleanCheckbox value="#{fieldInspectionBB.reinspectionConfig.migrateOnlyFailedElements}" />
+                    </div>
+
+                    <div class="p-col-8 restrict-data-field-label-inline">
+                        <h:outputText value="Reinspect uninspected ordinances:" />
+                    </div>
+                    <div class="p-col-4 restrict-data-field-value-inline">
+                        <p:selectBooleanCheckbox value="#{fieldInspectionBB.reinspectionConfig.migrateUninspectedElements}" />
+                    </div>
+
+                    <div class="p-col-8 restrict-data-field-label-inline">
+                        <h:outputText value="Duplicate ordinance findings:" />
+                    </div>
+                    <div class="p-col-4 restrict-data-field-value-inline">
+                        <p:selectBooleanCheckbox value="#{fieldInspectionBB.reinspectionConfig.migrateInspectionFindings}" />
+                    </div>
+
+                    <div class="p-col-8 restrict-data-field-label-inline">
+                        <h:outputText value="Do not wrap findings in metadata:" />
+                    </div>
+                    <div class="p-col-4 restrict-data-field-value-inline">
+                        <p:selectBooleanCheckbox value="#{fieldInspectionBB.reinspectionConfig.literalFindingsCloneNoWrapper}" />
+                    </div>
+                </div>                
+            </p:panel>
+            <p:panel id="reins-settings-blobs"
+                     header="Space and ordinance reinspection settings"
+                     toggleable="true"
+                     collapsed="false">
+
+                <div class="p-grid">
+                    <div class="p-col-8 restrict-data-field-label-inline">
+                        <h:outputText value="Relink photos on original inspection:" />
+                    </div>
+                    <div class="p-col-4 restrict-data-field-value-inline">
+                        <p:selectBooleanCheckbox value="#{fieldInspectionBB.reinspectionConfig.migrateBlobsOnSourceInspection}" 
+                                                 disabled="true"/>
+                    </div>
+
+                    <div class="p-col-8 restrict-data-field-label-inline">
+                        <h:outputText value="Relink photos on failed items:" />
+                    </div>
+                    <div class="p-col-4 restrict-data-field-value-inline">
+                        <p:selectBooleanCheckbox value="#{fieldInspectionBB.reinspectionConfig.migrateBlobsOnFailedItems}" 
+                                                 disabled="true"/>
+                    </div>
+
+                    <div class="p-col-8 restrict-data-field-label-inline">
+                        <h:outputText value="Relink photos passed items:" />
+                    </div>
+                    <div class="p-col-4 restrict-data-field-value-inline">
+                        <p:selectBooleanCheckbox value="#{fieldInspectionBB.reinspectionConfig.migrateBlobsOnPassedItems}" 
+                                                 disabled="true"/>
+                    </div>
+
+                   
+                    
+                </div>
+            </p:panel>
+            <p:spacer height="3px" />
+            <div class="p-grid">
                 <div class="p-col-4">
-                    <h:outputText value="Reinspection Options:" />
+                    <p:commandButton id="reinspection-commit-cb"
+                                     value="Generate follow-up inspection" 
+                                     icon="fa fa-check"
+                                     oncomplete="PF('inspection-followup-dialog-var').hide();"
+                                     actionListener="#{fieldInspectionBB.onReinspectionCommit}"
+                                     update="#{fieldInspectionBB.inspectionListComponentForUpdate}
+                                     inspectiontools-growl-form">
+                    </p:commandButton>
                 </div>
                 <div class="p-col-8">
+                    <div class="gray_button">
+
+                        <p:commandButton id="reinspection-abort-cb"
+                                         value="Cancel" 
+                                         icon="fa fa-stop"
+                                         oncomplete="PF('inspection-followup-dialog-var').hide();"
+                                         actionListener="#{fieldInspectionBB.onReinspectionOperationAbort}">
+                        </p:commandButton>
+
+                    </div>  
                 </div>
             </div>
         </h:form>
@@ -1818,7 +1967,7 @@
                 <div class="p-col-12">
                     <h2>Inspection details options</h2>
                 </div>
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Include containing Object info <br />(Permit File or CECase):
                 </div>
                 <div class="p-col-2">
@@ -1826,7 +1975,7 @@
                                              rendered="false"/>
                 </div>
 
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Include bed/bath count <br />and occupant limits:
                 </div>
                 <div class="p-col-2">
@@ -1838,10 +1987,10 @@
                 <div class="p-col-12">
                     <h2>Ordinance display options</h2>
                 </div>
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Ordinances to display:
                 </div>
-                <div class="p-col-8">
+                <div class="p-col-8 restrict-data-field-value-inline">
 
 
                     <p:selectOneMenu rendered="true"
@@ -1855,21 +2004,21 @@
                     </p:selectOneMenu>
 
                 </div>
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Include ordinance text:
                 </div>
                 <div class="p-col-2">
                     <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includeFullOrdText}" />
                 </div>
 
-                <div class="p-col-4">
-                    Include inspection findings:
+                <div class="p-col-4 restrict-data-field-label-inline">
+                    Include original inspection findings:
                 </div>
                 <div class="p-col-2">
                     <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includeOrdinanceFindings}" />
                 </div>
 
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Include ordinance timestamps:
                 </div>
                 <div class="p-col-2">
@@ -1884,48 +2033,48 @@
                     <h2>Photo options: Include...</h2>
                 </div>
 
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Photos on violated Ords:
                 </div>
                 <div class="p-col-2">
                     <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includePhotos_fail}" />
                 </div>
 
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Photos on passed Ords:
                 </div>
                 <div class="p-col-2">
                     <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includePhotos_pass}" />
                 </div>
 
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Overall photos:
                 </div>
                 <div class="p-col-2">
                     <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includeOverallInspectionPhotos}" />
                 </div>
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Photo IDs:
                 </div>
                 <div class="p-col-2">
                     <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includePhotoIDs}" />
                 </div>
 
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Photo Titles:
                 </div>
                 <div class="p-col-2">
                     <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includePhotoTitles}" />
                 </div>
 
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Photo original filenames:
                 </div>
                 <div class="p-col-2">
                     <p:selectBooleanCheckbox value="#{fieldInspectionBB.reportConfigFIN.includePhotoOriginalFileNames}" />
                 </div>
 
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Photo descriptions:
                 </div>
                 <div class="p-col-2">
@@ -1946,7 +2095,7 @@
 
 
 
-                <div class="p-col-4">
+                <div class="p-col-4 restrict-data-field-label-inline">
                     Inspector signature:
                 </div>
                 <div class="p-col-2">

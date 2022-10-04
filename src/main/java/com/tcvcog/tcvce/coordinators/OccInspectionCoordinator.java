@@ -40,7 +40,7 @@ import com.tcvcog.tcvce.occupancy.integration.OccChecklistIntegrator;
 import com.tcvcog.tcvce.occupancy.integration.OccInspectionIntegrator;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
-import com.tcvcog.tcvce.occupancy.application.FieldInspectionReinspectionConfig;
+import com.tcvcog.tcvce.occupancy.application.FieldInspectionReInspectionConfig;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -194,7 +194,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @param user          The current user--not necessarily the official inspector of the
                       FieldInspection.
      * @param tpe          The space type which will have a list of SpaceElements inside it
-     * @param initialStatus The initial status of the created OccInspectedSpace
+     * @param initialStatus The initial status of the created OccInspectedSpace. If this 
      * @param locDesc       A populated location descriptor for the new OccInspectedSpace. Can be an
      *                      existing location or a new one.
      *
@@ -268,6 +268,99 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     }
     
     /**
+     * Creates a "customized clone" of an OccInspectedSpace for use during the 
+     * reinspection process
+     * 
+     * @param reInConfig
+     * @param ois
+     * @return the freshly Cloned OccInspectedSpace
+     * @throws IntegrationException 
+     */
+     
+    public OccInspectedSpace inspectionAction_reInspectOccInspectedSpace (  FieldInspectionReInspectionConfig reInConfig, 
+                                                                            OccInspectedSpace ois) 
+                    throws IntegrationException {
+
+        OccInspectionIntegrator oii = getOccInspectionIntegrator();
+
+        // Create new inspected space and populate fields
+        OccInspectedSpace reInspectedSpace = new OccInspectedSpace(ois);
+        reInspectedSpace.setAddedToChecklistBy(reInConfig.getReinspector());
+        reInspectedSpace.setAddedToChecklistTS(reInConfig.getReinspectionDate());
+  
+        // With a fully built inspected space, we can record our start of inspection in the DB
+        reInspectedSpace = oii.recordCommencementOfSpaceInspection(reInspectedSpace, reInConfig.getReInspection());
+
+        // Move over the memebers in our oises carefully, clearing the ID so we get a new one for our new OIS
+        
+        List<OccInspectedSpaceElement> idLessOISECloneList = new ArrayList();
+        
+        if(reInspectedSpace.getInspectedElementList() != null && !reInspectedSpace.getInspectedElementList().isEmpty()){
+            for(OccInspectedSpaceElement oise: reInspectedSpace.getInspectedElementList()){
+                oise.setInspectedSpaceElementID(0);
+                
+                switch(oise.getStatusEnum()){
+                    case NOTINSPECTED:
+                        if(reInConfig.isMigrateUninspectedElements()){
+                            idLessOISECloneList.add(oise);
+                        }
+                        break;
+                    case PASS:
+                        if(!reInConfig.isMigrateOnlyFailedElements()){
+                            oise.setLastInspectedBy(reInConfig.getReinspector());
+                            oise.setLastInspectedTS(reInConfig.getReinspectionDate());
+                            oise.setComplianceGrantedBy(reInConfig.getReinspector());
+                            oise.setComplianceGrantedTS(reInConfig.getReinspectionDate());
+                            idLessOISECloneList.add(oise);
+                        }
+                        break;
+                    case VIOLATION:
+                        oise.setLastInspectedBy(reInConfig.getReinspector());
+                        oise.setLastInspectedTS(reInConfig.getReinspectionDate());
+                        idLessOISECloneList.add(oise);
+                        break;
+                }
+            }
+        }
+        
+        // Build findings
+        if(!idLessOISECloneList.isEmpty()){
+            for(OccInspectedSpaceElement oise: idLessOISECloneList){
+                if(reInConfig.isMigrateInspectionFindings()){
+                    if(!reInConfig.isLiteralFindingsCloneNoWrapper()){
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Original findings from inspection ID ");
+                        sb.append(reInConfig.getSourceInspection().getInspectionID());
+                        sb.append(" on ");
+                        sb.append(reInConfig.getSourceInspection().getEffectiveDateOfRecord());
+                        sb.append(" by ");
+                        sb.append(reInConfig.getSourceInspection().getInspector().getHuman().getName());
+                        sb.append(": '");
+                        sb.append(oise.getInspectionNotes());
+                        sb.append("'.");
+                        oise.setInspectionNotes(sb.toString());
+                    } else {
+                        // keep notes the way they were on the original
+                    }
+                } else {
+                    // wipe notes
+                    oise.setInspectionNotes(null);
+                }
+            }
+        }
+        
+        reInspectedSpace.setInspectedElementList(idLessOISECloneList);
+
+        // now use our convenience method to initiate Inspection of the space's individual elements
+        oii.recordInspectionOfSpaceElements(reInspectedSpace, reInConfig.getReInspection());
+
+        // check sequence by retrieving new inspected space and displaying info
+//        inspectedSpace = oii.getInspectedSpace(inspectedSpace.getInspectedSpaceID());
+
+        return reInspectedSpace;
+    }
+    
+    /**
      * Sets the certified fields on an inspection and injects a determination;
      * Implements logic to ensure proper privileges and throws exceptions
      * with useful messages inside
@@ -329,6 +422,8 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * 
      * @param oi with changed fields. This method injects lastupdatedby stuff
      * @param ua the user doing the updates
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
      */
     public void updateOccInspection(FieldInspection oi, UserAuthorized ua) throws IntegrationException, BObStatusException{
       OccInspectionIntegrator oii = getOccInspectionIntegrator();
@@ -476,7 +571,6 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
 //            Collections.reverse(inspection.getInspectedSpaceList());
         }
         
-
         return inspection;
     }
     
@@ -492,8 +586,6 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             oid.setInspectionID(fin.getInspectionID());
         }
         return oid;
-        
-        
     }
     
     /**
@@ -655,7 +747,9 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     
     /**
      * Builds a single generation tree of elements for display in an accordion
-     * panel whose "folds" each has a list of logically grouped elements
+     * panel whose "folds" each has a list of logically grouped elements; 
+     * grouped by the code guide category that lives on the ordinance in its
+     * unbooked code source state
      * 
      * @param ois containing all the CodeElements in its belly
      * @return the same ois but with a nice List of OccInsElementGroup objects!
@@ -667,7 +761,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             
             if(!ois.getInspectedElementList().isEmpty()){
                 // Disable for debugging
-//                Collections.sort(ois.getInspectedElementList());
+                Collections.sort(ois.getInspectedElementList());
                 for(OccInspectedSpaceElement oise: ois.getInspectedElementList()){
                     String cat = null;
                     if(oise.getGuideEntry() != null){
@@ -780,7 +874,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @param ua the user doing the inspecting; must have CEO or better permissions
      * @param oi the inspection in which the element lives
      * @param useDefFindOnFail if true is passed in, the default findings will be appended to any findings
-     * @return 
+     * @return a reference to the same oise as was passed in, after the DB writes have gone through
      * @throws AuthorizationException
      * @throws BObStatusException
      * @throws IntegrationException 
@@ -808,7 +902,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
                 inspectionAction_configureElementForCompliance(oise, ua, oi);
                 break;
         }
-        // write changes to db // test without writing
+        // write changes to db
         oii.updateInspectedSpaceElement(oise);
         return oise;
 
@@ -857,7 +951,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     
 
     /**
-     * Sets members on an OccInspectedSpaceElement and writes to DB
+     * Sets members on an OccInspectedSpaceElement 
      * @param oise
      * @param u
      * @param oi
@@ -875,7 +969,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
     }
 
     /**
-     * Removes status of space inspection in DB
+     * Sets compliance and last inspected ts to NULL
      * @param oise
      * @param u
      * @param oi
@@ -931,32 +1025,62 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         return oise;
     }
     
+    
+   
+    
+    /** 
+     * ************************************************************
+     * ********************* REINSPECTIONS!! **********************
+     * ************************************************************
+     */
+    
+     /**
+      * Factory for FieldInspectionReInspectionConfig objects
+ Sets sensible defaults
+      * 
+      * @param source the field inspection we'd like to reinspect
+      * @return with only the source inspection set; all ready for 
+      * additional params
+      */
+     public FieldInspectionReInspectionConfig getFieldInspectionReinspectionSettingsSkeleton(FieldInspection source){
+         FieldInspectionReInspectionConfig reinconfig = new FieldInspectionReInspectionConfig();
+         reinconfig.setSourceInspection(source);
+         
+         reinconfig.setMaintainSameParentObject(true);
+         
+         reinconfig.setMigrateInspectionFindings(true);
+         reinconfig.setLiteralFindingsCloneNoWrapper(false);
+         
+         reinconfig.setMigrateInspectedSpacesWithoutAnyInspectedItems(false);
+         reinconfig.setMigrateInspectedSpacesWithoutAnyFailedItems(false);
+         
+         reinconfig.setMigrateBlobsOnFailedItems(false);
+         reinconfig.setMigrateUninspectedElements(false);
+         
+         reinconfig.setMigrateBlobsOnSourceInspection(false);
+         reinconfig.setMigrateBlobsOnFailedItems(false);
+         reinconfig.setMigrateBlobsOnPassedItems(false);
+         
+         return reinconfig;
+     }
+    
     /**
-     * // TODO: FINISH ME!!!!
-     * // TODO: FINISH ME!!!!
-     * // TODO: FINISH ME!!!!
-     * // TODO: FINISH ME!!!!
-     * // TODO: FINISH ME!!!!
-     * // TODO: FINISH ME!!!!
-     * // TODO: FINISH ME!!!!
-     * // TODO: FINISH ME!!!!
-     * // TODO: FINISH ME!!!!
-     * // TODO: FINISH ME!!!!
-     * // TODO: FINISH ME!!!!
-     * // TODO: FINISH ME!!!!
      * 
      * Logic controller for creating a new field inspection as a re-inspection of a 
      * previous field inspection. By default, the created re-inspection will be configured
      * with the same checklist as the source inspection. Failed items will migrate 
      * to the re-inspection, with notes appended to each documenting where they came from
+     * 
      * @param reSettings that must be not null and have an inspection for source and a requesting user
      * @return the fresh inspection that's a reinspection of the inputted inspection object
      * @throws BObStatusException for null inputs, or non-finalized FIN
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     * @throws com.tcvcog.tcvce.domain.InspectionException
+     * @throws com.tcvcog.tcvce.domain.BlobException
      */
-    public FieldInspectionReinspectionConfig inspectionAction_setupReinspection(FieldInspectionReinspectionConfig reSettings) 
-            throws BObStatusException, IntegrationException{
+    public FieldInspectionReInspectionConfig inspectionAction_setupReinspection(FieldInspectionReInspectionConfig reSettings) 
+            throws BObStatusException, IntegrationException, InspectionException, BlobException{
        
-        
         if(reSettings.getSourceInspection() == null || reSettings.getRequestingUser() == null|| reSettings.getInspectable() == null){
             throw new BObStatusException("Cannot configure reinspection with null inspection or user or occ period/case");
         }
@@ -969,18 +1093,26 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
         
         // Transfer basic attributes to the fresh reinspection object
         
+        reSettings.appendToReinspectionLog("Reinspection of inspection ID: " + reSettings.getSourceInspection().getInspectionID(), true);
+        reSettings.appendToReinspectionLog("Original inspector: " + reSettings.getSourceInspection().getInspector().getUsername(), true);
+        reSettings.appendToReinspectionLog("Original occperiodID: " + reSettings.getSourceInspection().getOccPeriodID(), true);
+        reSettings.appendToReinspectionLog("Original cecaseID: " + reSettings.getSourceInspection().getCecaseID(), true);
+        
         // only one of these should be non-zero
         reinspection.setOccPeriodID(reSettings.getSourceInspection().getOccPeriodID());
         reinspection.setCecaseID(reSettings.getSourceInspection().getCecaseID());
         
         reinspection.setChecklistTemplate(reSettings.getSourceInspection().getChecklistTemplate());
         reinspection.setChecklistTemplateID(reSettings.getSourceInspection().getChecklistTemplateID());
-        
+        reinspection.setFollowUpToInspectionID(reSettings.getSourceInspection().getInspectionID());
         reinspection.setInspector(reSettings.getSourceInspection().getInspector());
         
-        reSettings = configureReinspectionSpaces(reSettings);
-        // TODO: FINISH ME!!!!
+        reSettings.setReInspection(inspectionAction_commenceOccupancyInspection(reinspection,reSettings.getSourceInspection().getChecklistTemplate() , reSettings.getInspectable(), reSettings.getReinspector()));
         
+        reSettings = configureReinspectionSpaces(reSettings);
+        
+        reSettings.getReInspection().setNotesPreInspection(reSettings.getLog());
+        updateOccInspection(reSettings.getReInspection(), reSettings.getRequestingUser());
         
         return reSettings;
         
@@ -991,7 +1123,7 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
      * @param reSettings
      * @return the settings object
      */
-    private FieldInspectionReinspectionConfig configureReinspectionSpaces(FieldInspectionReinspectionConfig reSettings) throws BObStatusException, IntegrationException{
+    private FieldInspectionReInspectionConfig configureReinspectionSpaces(FieldInspectionReInspectionConfig reSettings) throws BObStatusException, IntegrationException{
         
         if(reSettings.getSourceInspection() == null 
                 || reSettings.getRequestingUser() == null
@@ -1001,23 +1133,40 @@ public class OccInspectionCoordinator extends BackingBeanUtils implements Serial
             throw new BObStatusException("Cannot configure reinspection with null inspection or user or occ period/case");
         }
         
+        
         // Now setup inspected space elements
         
         List<OccInspectedSpace> inSpaceList = reSettings.getSourceInspection().getInspectedSpaceList();
         if(inSpaceList != null && !inSpaceList.isEmpty()){
+            // visit each space individually
             for(OccInspectedSpace inspc: inSpaceList){
-                List<OccInspectedSpaceElement> elementListFail = inspc.getElementListFail();
-                // If we have at least 1 failed item in the space from the first inspection, 
-                // build that space again in the reinspection
-                if(elementListFail != null && !elementListFail.isEmpty()){
-                    OccInspectedSpace reinsois = inspectionAction_commenceInspectionOfSpaceTypeChecklistified(
-                                                    reSettings.getReInspection(), 
-                                                    reSettings.getReinspector(), 
-                                                    inspc.getType(), 
-                                                    OccInspectionStatusEnum.NOTINSPECTED, 
-                                                    inspc.getLocation());
-                    
-                    // TODO: FINISH ME!!!!
+                OccInspectableStatus oisStatus = inspc.getStatus();
+                
+                reSettings.appendToReinspectionLog("Checking inspected space ID: " + inspc.getInspectedSpaceID(), true);
+                
+                if(oisStatus == null){
+                    throw new BObStatusException("Inspected space ID " + inspc.getInspectedSpaceID() + " has a null status: aborting reinspection logic");
+                }
+                boolean reinspectspace = true;
+                switch(oisStatus.getStatusEnum()){
+                    case NOTINSPECTED:
+                        // we'll never move over spaces that had zero marked elements
+                        if(!reSettings.isMigrateInspectedSpacesWithoutAnyInspectedItems()){
+                            reinspectspace = false;
+                        }
+                        break;
+                    case PASS:
+                        // check what the reinspector wants
+                        if(!reSettings.isMigrateInspectedSpacesWithoutAnyFailedItems()){
+                            reinspectspace = false;
+                        }
+                        break;
+                    case VIOLATION:
+                        // always reinspect 
+                        break;
+                }
+                if(reinspectspace){
+                    inspectionAction_reInspectOccInspectedSpace(reSettings, inspc);
                 }
             }
         }        

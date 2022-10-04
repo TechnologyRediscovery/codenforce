@@ -20,11 +20,12 @@ package com.tcvcog.tcvce.entities;
 import java.time.LocalDateTime;
 
 /**
- *
+ * The root class of the Code Element family!
  * @author ellen bascomb of apt 31y
  */
 public class CodeElement
-        extends BOb {
+        extends BOb
+        implements Comparable<Object>{
     
     protected int elementID;
 
@@ -96,6 +97,60 @@ public class CodeElement
         }
     }
 
+    /**
+     * Compares based on chapter no, then sec no, then subsec no, then subsub sec no
+     * @param o
+     * @return 
+     */
+    @Override
+    public int compareTo(Object o) {
+        if(o == null){
+            throw new NullPointerException("Cannot compare myself to a null");
+        }
+        if(!(o instanceof CodeElement)){
+            throw new ClassCastException("Cannot cast given object to CodeElement");
+        }
+        CodeElement inel = (CodeElement) o;
+        
+        int compChapterNo = 0;
+        
+        if(this.ordchapterNo < inel.ordchapterNo){
+            compChapterNo = -1;
+        } else if(this.ordchapterNo > inel.ordchapterNo){
+            compChapterNo = 1;
+        }
+        
+        // Same chapter, so now we have to use sec number
+        if(compChapterNo != 0){
+            return compChapterNo;
+        } else {
+            if(ordSecNum != null && inel.ordSecNum != null){
+                int compSecNo = this.ordSecNum.compareTo(inel.ordSecNum);
+                if(compSecNo != 0){
+                    return compSecNo;
+                } else{
+                    if(ordSubSecNum != null && inel.ordSubSecNum != null){
+                        int compSubSecNo = this.ordSubSecNum.compareTo((inel.ordSubSecNum));
+                        if(compSubSecNo != 0){
+                            return compSubSecNo;
+                        } else{
+                            if(ordSubSubSecNum != null && inel.ordSubSubSecNum != null){
+                                return this.ordSubSubSecNum.compareTo(inel.ordSubSubSecNum);
+                            } else {
+                                return compSubSecNo;
+                            }
+                        }
+                    } else {
+                        return compSecNo;
+                    }
+                }
+            } else {
+                return compChapterNo;
+            }
+        }
+    }
+
+    
     
      /**
      * @return the headerString
@@ -462,6 +517,7 @@ public class CodeElement
         this.legacyID = legacyID;
     }
 
+    
 
     
 }

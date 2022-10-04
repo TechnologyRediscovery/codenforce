@@ -853,6 +853,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                                                                   value="dispatched to handheld computer field application"
                                                                   rendered="#{!empty inspection.dispatch and (empty inspection.dispatch.synchronizationTS and (empty inspection.dispatch.deactivatedTS))}" />
                                                     <p:spacer height="3px" />
+                                                    <h:outputText id="followup-to-ot"
+                                                                  value="Follow-up to inspection ID #{inspection.followUpToInspectionID}"
+                                                                  rendered="#{inspection.followUpToInspectionID ne 0}" />
+                                                    <p:spacer height="3px" />
                                                     <h:outputText value="#{empty inspection.determination ? '(in process)':inspection.determination.title}" />
                                                     <h:outputText value="#{inspection.determination.qualifiesAsPassed ? ' (QUALIFIES AS PASS)':' (NOT pass)'}" 
                                                                   rendered="#{!empty inspection.determination}"/>

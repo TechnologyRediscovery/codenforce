@@ -16,10 +16,13 @@
  */
 package com.tcvcog.tcvce.occupancy.application;
 
+import com.tcvcog.tcvce.entities.CECase;
 import com.tcvcog.tcvce.entities.IFace_inspectable;
 import com.tcvcog.tcvce.entities.User;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.entities.occupancy.FieldInspection;
+import com.tcvcog.tcvce.entities.occupancy.OccPeriod;
+import com.tcvcog.tcvce.util.Constants;
 import java.time.LocalDateTime;
 
 /**
@@ -28,7 +31,7 @@ import java.time.LocalDateTime;
  * 
  * @author Ellen Bascomb of Apartment 31Y
  */
-public class FieldInspectionReinspectionConfig {
+public class FieldInspectionReInspectionConfig {
     
     private FieldInspection sourceInspection;
     private IFace_inspectable inspectable;
@@ -39,13 +42,55 @@ public class FieldInspectionReinspectionConfig {
     private UserAuthorized requestingUser;
 
     // Reinspection settings switches
+    protected boolean maintainSameParentObject;
+    protected CECase changeTargetToCECase;
+    protected OccPeriod changeTargetToOccPeriod;
+    
+    protected boolean migrateInspectionFindings;    
+    protected boolean literalFindingsCloneNoWrapper;    
+    
+    private boolean migrateInspectedSpacesWithoutAnyInspectedItems;
     private boolean migrateInspectedSpacesWithoutAnyFailedItems;
-    private boolean migrateOnlyFailedItems;
-    private boolean collapseFailedItemsIntoSpecialSpace;
+    
+    private boolean migrateOnlyFailedElements;
+    private boolean migrateUninspectedElements;
     
     private boolean migrateBlobsOnSourceInspection;
     private boolean migrateBlobsOnFailedItems;
     private boolean migrateBlobsOnPassedItems;
+    
+    
+    
+    private StringBuilder log;
+    
+    
+    /**
+     * Tacks the given string onto the train
+     * and then an html break
+     * @param str 
+     * @param newline whether or not to append an html br
+     */
+    public void appendToReinspectionLog(String str, boolean newline){
+        if(log == null){
+            log = new StringBuilder();
+        }
+        log.append(str);
+        if(newline){
+            log.append(Constants.FMT_HTML_BREAK);
+        }
+    }
+    
+    /**
+     * Asks the String train for itself
+     * @return 
+     */
+    public String getLog(){
+        if(log != null){
+            return log.toString();
+        } else {
+            return "EMTPY LOG;";
+        }
+    }
     
     /**
      * @return the sourceInspection
@@ -174,17 +219,17 @@ public class FieldInspectionReinspectionConfig {
     }
 
     /**
-     * @return the migrateOnlyFailedItems
+     * @return the migrateOnlyFailedElements
      */
-    public boolean isMigrateOnlyFailedItems() {
-        return migrateOnlyFailedItems;
+    public boolean isMigrateOnlyFailedElements() {
+        return migrateOnlyFailedElements;
     }
 
     /**
-     * @param migrateOnlyFailedItems the migrateOnlyFailedItems to set
+     * @param migrateOnlyFailedElements the migrateOnlyFailedElements to set
      */
-    public void setMigrateOnlyFailedItems(boolean migrateOnlyFailedItems) {
-        this.migrateOnlyFailedItems = migrateOnlyFailedItems;
+    public void setMigrateOnlyFailedElements(boolean migrateOnlyFailedElements) {
+        this.migrateOnlyFailedElements = migrateOnlyFailedElements;
     }
 
     /**
@@ -202,17 +247,105 @@ public class FieldInspectionReinspectionConfig {
     }
 
     /**
-     * @return the collapseFailedItemsIntoSpecialSpace
+     * @return the migrateUninspectedElements
      */
-    public boolean isCollapseFailedItemsIntoSpecialSpace() {
-        return collapseFailedItemsIntoSpecialSpace;
+    public boolean isMigrateUninspectedElements() {
+        return migrateUninspectedElements;
     }
 
     /**
-     * @param collapseFailedItemsIntoSpecialSpace the collapseFailedItemsIntoSpecialSpace to set
+     * @param migrateUninspectedElements the migrateUninspectedElements to set
      */
-    public void setCollapseFailedItemsIntoSpecialSpace(boolean collapseFailedItemsIntoSpecialSpace) {
-        this.collapseFailedItemsIntoSpecialSpace = collapseFailedItemsIntoSpecialSpace;
+    public void setMigrateUninspectedElements(boolean migrateUninspectedElements) {
+        this.migrateUninspectedElements = migrateUninspectedElements;
     }
+
+    /**
+     * @return the migrateInspectedSpacesWithoutAnyInspectedItems
+     */
+    public boolean isMigrateInspectedSpacesWithoutAnyInspectedItems() {
+        return migrateInspectedSpacesWithoutAnyInspectedItems;
+    }
+
+    /**
+     * @param migrateInspectedSpacesWithoutAnyInspectedItems the migrateInspectedSpacesWithoutAnyInspectedItems to set
+     */
+    public void setMigrateInspectedSpacesWithoutAnyInspectedItems(boolean migrateInspectedSpacesWithoutAnyInspectedItems) {
+        this.migrateInspectedSpacesWithoutAnyInspectedItems = migrateInspectedSpacesWithoutAnyInspectedItems;
+    }
+
+    /**
+     * @return the maintainSameParentObject
+     */
+    public boolean isMaintainSameParentObject() {
+        return maintainSameParentObject;
+    }
+
+    /**
+     * @return the changeTargetToCECase
+     */
+    public CECase getChangeTargetToCECase() {
+        return changeTargetToCECase;
+    }
+
+    /**
+     * @return the changeTargetToOccPeriod
+     */
+    public OccPeriod getChangeTargetToOccPeriod() {
+        return changeTargetToOccPeriod;
+    }
+
+    /**
+     * @return the migrateInspectionFindings
+     */
+    public boolean isMigrateInspectionFindings() {
+        return migrateInspectionFindings;
+    }
+
+    /**
+     * @return the literalFindingsCloneNoWrapper
+     */
+    public boolean isLiteralFindingsCloneNoWrapper() {
+        return literalFindingsCloneNoWrapper;
+    }
+
+  
+
+    /**
+     * @param maintainSameParentObject the maintainSameParentObject to set
+     */
+    public void setMaintainSameParentObject(boolean maintainSameParentObject) {
+        this.maintainSameParentObject = maintainSameParentObject;
+    }
+
+    /**
+     * @param changeTargetToCECase the changeTargetToCECase to set
+     */
+    public void setChangeTargetToCECase(CECase changeTargetToCECase) {
+        this.changeTargetToCECase = changeTargetToCECase;
+    }
+
+    /**
+     * @param changeTargetToOccPeriod the changeTargetToOccPeriod to set
+     */
+    public void setChangeTargetToOccPeriod(OccPeriod changeTargetToOccPeriod) {
+        this.changeTargetToOccPeriod = changeTargetToOccPeriod;
+    }
+
+    /**
+     * @param migrateInspectionFindings the migrateInspectionFindings to set
+     */
+    public void setMigrateInspectionFindings(boolean migrateInspectionFindings) {
+        this.migrateInspectionFindings = migrateInspectionFindings;
+    }
+
+    /**
+     * @param literalFindingsCloneNoWrapper the literalFindingsCloneNoWrapper to set
+     */
+    public void setLiteralFindingsCloneNoWrapper(boolean literalFindingsCloneNoWrapper) {
+        this.literalFindingsCloneNoWrapper = literalFindingsCloneNoWrapper;
+    }
+
+    
     
 }

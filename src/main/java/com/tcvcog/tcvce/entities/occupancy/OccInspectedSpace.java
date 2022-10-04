@@ -70,6 +70,9 @@ public class OccInspectedSpace
         this.inspectedElementListVisible = space.getInspectedElementListVisible();
         this.viewSetting = space.getViewSetting();
 
+        this.inspectedElementGroupList = space.getInspectedElementGroupList();
+        this.elementStatusMap = space.getElementStatusMap();
+        
         this.location = space.getLocation();
 
         this.addedToChecklistBy = space.getAddedToChecklistBy();

@@ -69,7 +69,8 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     private boolean useDefaultFindingsOnCurrentOISE;
 
     private boolean editModeInspectionMetadata;
-    private FieldInspection formFollowUpInspectionTo;
+    
+    protected FieldInspectionReInspectionConfig reinspectionConfig;
     
     private boolean formMigrateFailedItemsOnFinalization;
     
@@ -941,13 +942,44 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
     
     /**
      * Listener for user requests to start a follow-up inspection
+     * @param ev     
+     */
+    public void onReinspectionInit(ActionEvent ev){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        reinspectionConfig = oic.getFieldInspectionReinspectionSettingsSkeleton(currentInspection);
+        reinspectionConfig.setInspectable(currentInspectable);
+    }
+    
+    /**
+     * Listener for users all done with the reinspection config
      * @param ev 
      */
-    public void onSetupReinspectionButtonClick(ActionEvent ev){
-        formFollowUpInspectionTo = currentInspection;
+    public void onReinspectionCommit(ActionEvent ev){
+        OccInspectionCoordinator oic = getOccInspectionCoordinator();
+        try {
+            reinspectionConfig.setRequestingUser(getSessionBean().getSessUser());
+            reinspectionConfig = oic.inspectionAction_setupReinspection(reinspectionConfig);
+            refreshInspectionListAndTriggerManagedListReload();
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Reinspection setup complete!", ""));
+        } catch (BObStatusException | IntegrationException | BlobException | InspectionException ex) {
+            System.out.println(ex);
+            getFacesContext().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_FATAL,
+                        ex.getMessage(), ""));
+        } 
         
     }
     
+    /**
+     * User requests to abort the reinspection process
+     * @param ev 
+     */
+    public void onReinspectionOperationAbort(ActionEvent ev){
+        reinspectionConfig = null;
+        
+    }
     
     
 
@@ -1188,19 +1220,7 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
         this.inspectionListComponentForUpdate = inspectionListComponentForUpdate;
     }
 
-    /**
-     * @return the formFollowUpInspectionTo
-     */
-    public FieldInspection getFormFollowUpInspectionTo() {
-        return formFollowUpInspectionTo;
-    }
-
-    /**
-     * @param formFollowUpInspectionTo the formFollowUpInspectionTo to set
-     */
-    public void setFormFollowUpInspectionTo(FieldInspection formFollowUpInspectionTo) {
-        this.formFollowUpInspectionTo = formFollowUpInspectionTo;
-    }
+   
 
     /**
      * @return the formMigrateFailedItemsOnFinalization
@@ -1256,6 +1276,20 @@ public class FieldInspectionBB extends BackingBeanUtils implements Serializable 
      */
     public void setCurrentDispatch(OccInspectionDispatch currentDispatch) {
         this.currentDispatch = currentDispatch;
+    }
+
+    /**
+     * @return the reinspectionConfig
+     */
+    public FieldInspectionReInspectionConfig getReinspectionConfig() {
+        return reinspectionConfig;
+    }
+
+    /**
+     * @param reinspectionConfig the reinspectionConfig to set
+     */
+    public void setReinspectionConfig(FieldInspectionReInspectionConfig reinspectionConfig) {
+        this.reinspectionConfig = reinspectionConfig;
     }
 
     
