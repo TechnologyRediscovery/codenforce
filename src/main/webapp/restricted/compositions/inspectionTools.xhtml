@@ -1202,7 +1202,7 @@
               closable="false"
               closeOnEscape="false">
 
-        <div class="p-d-flex p-jc-between">
+        <div class="p-grid">
 
             <div>
                 <h:form id="inspections-entryscreen-controls-form">
@@ -1261,8 +1261,9 @@
                                    icon="ui-icon-alert" />
                     </p:commandLink>
 
-                    <p>Filter elements (See mobile specs) </p>
-                    <p:inputText id="ordsearch" />
+                    <p>Filter elements (coming soon!) </p>
+                    <p:inputText id="ordsearch"
+                                 disabled="true"/>
                 </h:form>
 
 
@@ -1815,7 +1816,7 @@
                     </p:selectOneMenu>
                 </div>
                 <div class="p-col-4 restrict-data-field-label-inline">
-                    <h:outputText value="Attach reinspection to same parent object:" />
+                    <h:outputText value="Attach reinspection to same permit file or case:" />
                 </div>
                 <div class="p-col-8 restrict-data-field-value-inline">
                     <p:selectBooleanCheckbox value="#{fieldInspectionBB.reinspectionConfig.maintainSameParentObject}" 
@@ -1826,9 +1827,9 @@
             </div>
 
             <p:panel id="reins-settings-spacesordinances"
-                     header="Space and ordinance reinspection settings"
+                     header="Space and ordinance reinspection settings (coming soon!)"
                      toggleable="true"
-                     collapsed="false">
+                     collapsed="true">
 
                 <div class="p-grid">
                     <div class="p-col-8 restrict-data-field-label-inline">

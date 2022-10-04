@@ -17,6 +17,7 @@ Council of Governments, PA
  */
 package com.tcvcog.tcvce.entities;
 
+import com.tcvcog.tcvce.util.Constants;
 import java.time.LocalDateTime;
 
 /**
@@ -96,7 +97,8 @@ public class CodeElement
             this.deactivatedBy = codeElement.getDeactivatedBy();
         }
     }
-
+    
+   
     /**
      * Compares based on chapter no, then sec no, then subsec no, then subsub sec no
      * @param o

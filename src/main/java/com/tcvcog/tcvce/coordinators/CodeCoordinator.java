@@ -29,6 +29,7 @@ import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.UserAuthorized;
 import com.tcvcog.tcvce.integration.CodeIntegrator;
 import com.tcvcog.tcvce.integration.MunicipalityIntegrator;
+import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -349,6 +350,36 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         }
            
         return isPureIRCFormat;
+    }
+    
+    /**
+     * Concatenates all ordinance citation members (ch, sec, sub sec no and title)
+     * along with the ord's technical text for searching
+     * @param ele
+     * @return the complete string, including any HTML that's in the technical text
+     */
+    public String buildSearchableString(CodeElement ele){
+        StringBuilder sb = new StringBuilder();
+        sb.append(ele.getOrdchapterNo());
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(ele.getOrdchapterTitle());
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(ele.getOrdSecNum());
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(ele.getOrdSecTitle());
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(ele.getOrdSubSecNum());
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(ele.getOrdSubSecTitle());
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(ele.getOrdSubSubSecNum());
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(ele.getOrdTechnicalText());
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(ele.getOrdHumanFriendlyText());
+        
+        
+        return sb.toString();
     }
     
     
