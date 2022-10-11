@@ -31,6 +31,7 @@ public class NoticeOfViolationType {
     
     private boolean courtDocument;
     private boolean injectViolations;
+    private boolean includeStipCompDate;
     
     private LocalDateTime deactivatedTS;
 
@@ -231,6 +232,20 @@ public class NoticeOfViolationType {
      */
     public void setPrintStyle(PrintStyle printStyle) {
         this.printStyle = printStyle;
+    }
+
+    /**
+     * @return the includeStipCompDate
+     */
+    public boolean isIncludeStipCompDate() {
+        return includeStipCompDate;
+    }
+
+    /**
+     * @param includeStipCompDate the includeStipCompDate to set
+     */
+    public void setIncludeStipCompDate(boolean includeStipCompDate) {
+        this.includeStipCompDate = includeStipCompDate;
     }
     
 }

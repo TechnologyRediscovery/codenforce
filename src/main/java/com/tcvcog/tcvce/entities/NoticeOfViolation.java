@@ -107,6 +107,7 @@ public  class NoticeOfViolation
    
     private PrintStyle style;
     private boolean useSignatureImage;
+    private boolean includeStipulatedCompDate;
     private boolean includeViolationPhotoAttachment;
     
     private int followupEventDaysRequest;
@@ -811,6 +812,20 @@ public  class NoticeOfViolation
      */
     public void setFixedNotifyingOfficerSignaturePhotoDocID(int fixedNotifyingOfficerSignaturePhotoDocID) {
         this.fixedNotifyingOfficerSignaturePhotoDocID = fixedNotifyingOfficerSignaturePhotoDocID;
+    }
+
+    /**
+     * @return the includeStipulatedCompDate
+     */
+    public boolean isIncludeStipulatedCompDate() {
+        return includeStipulatedCompDate;
+    }
+
+    /**
+     * @param includeStipulatedCompDate the includeStipulatedCompDate to set
+     */
+    public void setIncludeStipulatedCompDate(boolean includeStipulatedCompDate) {
+        this.includeStipulatedCompDate = includeStipulatedCompDate;
     }
 
    

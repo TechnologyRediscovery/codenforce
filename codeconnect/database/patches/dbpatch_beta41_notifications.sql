@@ -64,12 +64,8 @@ UPDATE public.event SET deactivatedts = now() WHERE active=FALSE;
 
 
 ALTER TABLE public.citationstatus ADD COLUMN terminalstatus BOOLEAN DEFAULT FALSE;
--- LOCAL CURSOR
 
-
-
-
-
+-- 
 
 
 

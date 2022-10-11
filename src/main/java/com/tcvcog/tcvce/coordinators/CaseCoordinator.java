@@ -2757,8 +2757,15 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      * @throws IntegrationException
      */
     public int nov_InsertNotice(NoticeOfViolation nov, CECaseDataHeavy cse, User usr) throws IntegrationException, BObStatusException {
+        if(nov == null || cse == null || usr == null){
+            throw new BObStatusException("cannot insert notice with null notice, notice type, case, or user ");
+        }
+        if(nov.getNovType() == null){
+            throw new BObStatusException("cannot insert notice with null notice type");
+        }
         CaseIntegrator ci = getCaseIntegrator();
         nov.setCreationBy(usr);
+        
         System.out.println("CaseCoordinator.novInsertNotice");
         return ci.novInsert(cse, nov);
     }
@@ -2925,9 +2932,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
      */
     public NoticeOfViolation nov_assembleNOVFromTemplate(NoticeOfViolation nov, TextBlock temp, CECase cse) throws BObStatusException {
 
-        CaseIntegrator ci = getCaseIntegrator();
-        if (nov == null || temp == null || cse == null) {
-            throw new BObStatusException("Cannot build a notice with null NOV, template or case");
+        if (nov == null || nov.getNovType() == null || temp == null || cse == null) {
+            throw new BObStatusException("Cannot assemble a notice from template with null NOV, template or case");
         }
 
         String template = temp.getTextBlockText();
@@ -2941,6 +2947,8 @@ public class CaseCoordinator extends BackingBeanUtils implements Serializable {
             nov.setNoticeTextBeforeViolations(template);
         }
 
+        nov.setIncludeStipulatedCompDate(nov.getNovType().isIncludeStipCompDate());
+        
         return nov;
     }
 

@@ -392,6 +392,18 @@
                 </div>
             </div>
 
+            <h2>Display Settings</h2>
+            
+            <div class="p-grid">
+                <div class="p-col-12">
+                    <h:outputText value="Letter includes violation stipulated compliance dates:" 
+                                  styleClass="bold" />
+                    
+                    <h:outputText   value="#{noticeOfViolationBB.currentNotice.includeStipulatedCompDate ? 'Yes':'No'}" 
+                                    rendered="true" />
+                </div>
+            </div>
+            
             <h2>Letter Tools</h2>
 
             <div class="ui-g data_container_nested_restrict">
@@ -574,7 +586,7 @@
                     </p:selectBooleanCheckbox>
                 </div>
                 <div class="p-col-6">
-                    <h:outputText value="Include all block categories"
+                    <h:outputText value="Include all template text block categories"
                                   style="margin-right:8px;"/>
                     <p:selectBooleanCheckbox value="#{noticeOfViolationBB.showTextBlocksAllCategories}">
                          <p:ajax update="nov-templateblocks-add-table"
@@ -692,7 +704,9 @@
                                        showButtonBar="true"
                                        mask="true"
                                        timeInput="true" 
-                                       required="true" />
+                                       required="true" >
+                        <p:ajax />
+                    </p:datePicker>
 
 
                     <h:message for="noticeDateOfRecord" showDetail="true" showSummary="true" 
@@ -821,7 +835,22 @@
         <h2>Code violations</h2>
 
         <h:form id="nov-violation-configuration-form">
+             <div class="p-grid">
+                
+                <div class="p-col-4 restrict-data-field-label-inline">
+                    <h:outputText value="Include stipulated compliance dates in letter? " />
+                </div>
+                <div class="p-col-8 restrict-data-field-value-inline">
+                    
+                    <p:selectBooleanCheckbox value="#{noticeOfViolationBB.currentNotice.includeStipulatedCompDate}"
+                                              >
+                        <p:ajax update="violation-table"/>
+                    </p:selectBooleanCheckbox>
 
+                </div>
+
+            </div>
+            
 
             <p:dataTable
                 id="violation-table"
@@ -862,7 +891,8 @@
                     <f:facet name="header">
                         <h:outputText value="Stip Comp Date" />
                     </f:facet>
-                    <h:outputText value="#{noticeOfViolationBB.getPrettyDateNoTime(v.stipulatedComplianceDate)}"/>
+                    <h:outputText value="#{noticeOfViolationBB.getPrettyDateNoTime(v.stipulatedComplianceDate)}"
+                                  rendered="#{noticeOfViolationBB.currentNotice.includeStipulatedCompDate}"/>
                 </p:column>
 
                 <p:column width="5%">
@@ -981,6 +1011,9 @@
 
             </script>
 
+            <p:spacer height="3px" />
+           
+            
         </h:form>
 
         <h:form id="nov-preview-textafter-form">
@@ -1640,6 +1673,17 @@
                         <h:outputText value="#{noticeOfViolationBB.currentNOVType.injectViolations? 'Yes':'No'}" 
                                       rendered="#{!noticeOfViolationBB.editModeNOVType}" />
                         <p:selectBooleanCheckbox value="#{noticeOfViolationBB.currentNOVType.injectViolations}"
+                                                 rendered="#{noticeOfViolationBB.editModeNOVType}"  />
+
+                    </div>
+
+                    <div class="p-col-4 restrict-data-field-label-inline">
+                        <h:outputText value="Default to include stipulated compliance dates: " />
+                    </div>
+                    <div class="p-col-8 restrict-data-field-value-inline">
+                        <h:outputText value="#{noticeOfViolationBB.currentNOVType.includeStipCompDate ? 'Yes':'No'}" 
+                                      rendered="#{!noticeOfViolationBB.editModeNOVType}" />
+                        <p:selectBooleanCheckbox value="#{noticeOfViolationBB.currentNOVType.includeStipCompDate}"
                                                  rendered="#{noticeOfViolationBB.editModeNOVType}"  />
 
                     </div>

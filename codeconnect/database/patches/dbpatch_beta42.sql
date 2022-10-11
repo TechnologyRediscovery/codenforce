@@ -166,13 +166,17 @@ ALTER TABLE public.login ADD COLUMN signature_photodocid INTEGER REFERENCES publ
 
 ALTER TABLE public.occpermit ADD COLUMN staticsignature_photodocid INTEGER CONSTRAINT occpermit_sig_photodocid_fk REFERENCES public.photodoc (photodocid);
 ALTER TABLE public.noticeofviolation ADD COLUMN fixedissuingofficersig_photodocid INTEGER CONSTRAINT nov_sig_photodocid_fk REFERENCES public.photodoc (photodocid);
+
+
+ALTER TABLE public.noticeofviolation ADD COLUMN includestipcompdate BOOLEAN DEFAULT TRUE;
+ALTER TABLE public.noticeofviolationtype ADD COLUMN includestipcompdate BOOLEAN DEFAULT TRUE;
+
+
+ALTER TABLE public.noticeofviolation ALTER COLUMN includestipcompdate SET DEFAULT false;
+ALTER TABLE public.noticeofviolationtype ALTER COLUMN includestipcompdate SET DEFAULT false;
+
 --******************************* REMOTE CURSOR HERE  ******************************* 
 --******************************* LOCAL CURSOR HERE  ******************************* 
-
-
-
-
-
 
 
 
