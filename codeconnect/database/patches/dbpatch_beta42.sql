@@ -157,4 +157,4 @@ ALTER TABLE public.occinspectiondispatch DROP COLUMN municipalityname;
 
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)
-    VALUES (42, 'database/patches/dbpatch_beta42.sql', NULL, 'ecd', '');
+    VALUES (42, 'database/patches/dbpatch_beta42.sql', '10-13-2022', 'ecd', 'associated with release v0.875');
