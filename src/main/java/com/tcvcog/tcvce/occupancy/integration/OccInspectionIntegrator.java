@@ -430,7 +430,9 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
 
     /**
      * Creates a record in the occinspectedspace table which connects a space type 
-     * with an inspeection and records who added it and when
+     * with an inspeection and records who added it and when. NOTE that I don't
+     * write individual element data; use my siblings for that instead
+     * 
      * @param spc
      * @param inspection
      * @return
@@ -508,24 +510,24 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
      *
      * @param inspection the current FieldInspection
      * @param inspSpace an OccInspectedSpace that was NOT retrieved from the DB
-     * @return the number of newly inserted spaces (mostly for info value only)
+     * @return the number of newly inserted space elements (mostly for info value only)
  passed as the second input parameter having been written to DB and added
  to the FieldInspection's internal List of inspected elements.
      * @throws IntegrationException
      */
     public int recordInspectionOfSpaceElements(OccInspectedSpace inspSpace, FieldInspection inspection) throws IntegrationException {
-        int spaceInserts = 0;
+        int spaceElementInserts = 0;
         Iterator<OccInspectedSpaceElement> inspectedElementListIterator = inspSpace.getInspectedElementList().iterator();
         while (inspectedElementListIterator.hasNext()) {
             OccInspectedSpaceElement oie = inspectedElementListIterator.next();
             if (oie.getInspectedSpaceElementID() != 0) {
                 updateInspectedSpaceElement(oie);
             } else {
-                spaceInserts++;
+                spaceElementInserts++;
                 insertInspectedSpaceElement(oie, inspSpace);
             }
         }
-        return spaceInserts;
+        return spaceElementInserts;
     }
     
     /**

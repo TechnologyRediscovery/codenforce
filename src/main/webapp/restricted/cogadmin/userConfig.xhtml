@@ -131,7 +131,7 @@
                                                                  styleClass="multiButtonLineButton"
                                                                  actionListener="#{userConfigBB.onConfigureUserLinkClick(user)}"
                                                                  update="
-                                                                 userconfig-usertable
+                                                                 @form:@parent:usercfg-search-results-form:userconfig-usertable
                                                                  usercfg-panel-info
                                                                  usercfg-umap-panel
                                                                  usercfg-panel-notes
@@ -162,170 +162,210 @@
                                          >
 
 
-                                        <div class="p-grid">
-                                            <div class="p-col-4 restrict-data-field-label-inline" >
-                                                <h:outputText  value="Username"/>
-                                            </div>
-                                            <div class="p-col-8 restrict-data-field-value-inline" >
-                                                <h:outputText value="#{userConfigBB.currentUserAuthorizedForConfig.username}" />
-                                            </div>
+                                    <div class="p-grid">
+                                        <div class="p-col-4 restrict-data-field-label-inline" >
+                                            <h:outputText  value="Username"/>
+                                        </div>
+                                        <div class="p-col-8 restrict-data-field-value-inline" >
+                                            <h:outputText value="#{userConfigBB.currentUserAuthorizedForConfig.username}" />
+                                        </div>
 
-                                            <div class="p-col-4 restrict-data-field-label-inline" >
-                                                <h:outputText  value="Record"/>
-                                            </div>
-                                            <div class="p-col-8 restrict-data-field-value-inline" >
-                                                <h:outputText value="Created: #{userConfigBB.getPrettyDate(userConfigBB.currentUserAuthorizedForConfig.createdTS)}" />
+                                        <div class="p-col-4 restrict-data-field-label-inline" >
+                                            <h:outputText  value="Record"/>
+                                        </div>
+                                        <div class="p-col-8 restrict-data-field-value-inline" >
+                                            <h:outputText value="Created: #{userConfigBB.getPrettyDate(userConfigBB.currentUserAuthorizedForConfig.createdTS)}" />
+                                            <p:spacer height="3px" />
+                                            <h:outputText value="By userid: #{userConfigBB.currentUserAuthorizedForConfig.createdByUserId}" />
+                                            <p:spacer height="3px" />
+                                            <h:outputText value="Last Updated: #{userConfigBB.getPrettyDate(userConfigBB.currentUserAuthorizedForConfig.lastUpdatedTS)} " />
+                                        </div>
+
+                                        <div class="p-col-4 restrict-data-field-label-inline" >
+                                            <h:outputText  value="Password" />
+                                        </div>
+                                        <div class="p-col-8 restrict-data-field-value-inline" >
+                                            <h:form id="usercfg-passwordtools-form">
+
+
+                                                <h:outputText value="Last Updated: #{!(empty userConfigBB.currentUserAuthorizedForConfig.pswdLastUpdated) ? userConfigBB.getPrettyDate(userConfigBB.currentUserAuthorizedForConfig.pswdLastUpdated): ''}" />
                                                 <p:spacer height="3px" />
-                                                <h:outputText value="By userid: #{userConfigBB.currentUserAuthorizedForConfig.createdByUserId}" />
+                                                <p:commandLink   id="userconfig-newpass-cl"
+                                                                 ajax="true"
+                                                                 actionListener="#{userConfigBB.onRestUserPasswordInit}"
+                                                                 oncomplete="PF('usercfg-newpassword-dialog-var').show()"
+                                                                 update="usercfg-newpassword-dialog"
+                                                                 style="color:blue; font-weight: bold;"
+                                                                 value="Generate and Assign New Temp Password" 
+                                                                 tabindex="3"/>
+
                                                 <p:spacer height="3px" />
-                                                <h:outputText value="Last Updated: #{userConfigBB.getPrettyDate(userConfigBB.currentUserAuthorizedForConfig.lastUpdatedTS)} " />
-                                            </div>
+                                                <p:commandLink   id="userconfig-forcereset-cl"
+                                                                 ajax="true"
+                                                                 actionListener="#{userConfigBB.onForceResetUserPassword}"
+                                                                 oncomplete="PF('usercfg-newpassword-dialog-var').show()"
+                                                                 update="usercfg-newpassword-dialog"
+                                                                 disabled="true"
+                                                                 style="color:blue; font-weight: bold;"
+                                                                 value="Force User To Choose New Password on Next Login" 
+                                                                 tabindex="4"/>
+                                            </h:form>
 
-                                            <div class="p-col-4 restrict-data-field-label-inline" >
-                                                <h:outputText  value="Password" />
-                                            </div>
-                                            <div class="p-col-8 restrict-data-field-value-inline" >
-                                                <h:form id="usercfg-passwordtools-form">
-                                                    
+                                        </div>
 
-                                                    <h:outputText value="Last Updated: #{!(empty userConfigBB.currentUserAuthorizedForConfig.pswdLastUpdated) ? userConfigBB.getPrettyDate(userConfigBB.currentUserAuthorizedForConfig.pswdLastUpdated): ''}" />
-                                                    <p:spacer height="3px" />
-                                                        <p:commandLink   id="userconfig-newpass-cl"
-                                                                        ajax="true"
-                                                                        actionListener="#{userConfigBB.onRestUserPasswordInit}"
-                                                                        oncomplete="PF('usercfg-newpassword-dialog-var').show()"
-                                                                        update="usercfg-newpassword-dialog"
-                                                                        style="color:blue; font-weight: bold;"
-                                                                        value="Generate and Assign New Temp Password" 
-                                                                        tabindex="3"/>
+                                        <div class="p-col-4 restrict-data-field-label-inline" >
+                                            <h:outputText  value="Linked Person" />
+                                        </div>
+                                        <div class="p-col-8 restrict-data-field-value-inline" >
 
-                                                        <p:spacer height="3px" />
-                                                        <p:commandLink   id="userconfig-forcereset-cl"
-                                                                            ajax="true"
-                                                                            actionListener="#{userConfigBB.onForceResetUserPassword}"
-                                                                            oncomplete="PF('usercfg-newpassword-dialog-var').show()"
-                                                                            update="usercfg-newpassword-dialog"
-                                                                            disabled="true"
-                                                                            style="color:blue; font-weight: bold;"
-                                                                            value="Force User To Choose New Password on Next Login" 
-                                                                            tabindex="4"/>
-                                                    </h:form>
 
-                                            </div>
+                                            <h:form id="usercfg-personlink-form">
 
-                                            <div class="p-col-4 restrict-data-field-label-inline" >
-                                                <h:outputText  value="Linked Person" />
-                                            </div>
-                                            <div class="p-col-8 restrict-data-field-value-inline" >
-                                                
-                                                
-                                                <h:form id="usercfg-personlink-form">
-                                                    
                                                 <h:outputText id="userinfo-personlink2"
                                                               value="#{!empty userConfigBB.currentUserAuthorizedForConfig 
                                                                        ? userConfigBB.currentUserAuthorizedForConfig.human.name 
                                                                        : '[none!]'}" 
                                                               rendered="#{!userConfigBB.humanLinkEditMode}"/>
-                                                
-                                                 <p:spacer height="3px" />
-                                                
-                                                 <p:commandLink   id="userconfig-updatepersonlinkinit-cl"
-                                                                    ajax="true"
-                                                                    actionListener="#{userConfigBB.onUpdateUserPersonLinkInitLinkClick}"
-                                                                    update="@form"
-                                                                    style="color:blue; font-weight: bold;"
-                                                                    value="update person link to session person" 
-                                                                    tabindex="5"
-                                                                    rendered="#{!userConfigBB.humanLinkEditMode}"/>
-                                                 
-                                                 <p:spacer height="3px" />
-                                                 <h:outputText value="User #{userConfigBB.currentUserAuthorizedForConfig.username}'s person link will now become: " 
-                                                               rendered="#{userConfigBB.humanLinkEditMode}"/>
-                                                 <h:outputText value="#{userConfigBB.humanForLinking.name} (ID:#{userConfigBB.humanForLinking.humanID})"
-                                                               rendered="#{!empty userConfigBB.humanForLinking and userConfigBB.humanLinkEditMode}" />
-                                                 <p:spacer height="3px" 
-                                                           rendered="#{userConfigBB.humanLinkEditMode}"/>
-                                                
-                                                 <div class="gray_button">
-                                                     
-                                                    <p:commandButton ajax="true"
-                                                             id="usersconfig-updatepersonlink-cancel-cb" 
-                                                             value="Cancel" 
-                                                             icon="fa fa-stop"
-                                                             actionListener="#{userConfigBB.onUpdateUserPersonAbortButtonCange}"
-                                                             update="@form
-                                                             usercfg-messages-form" 
-                                                             rendered="#{userConfigBB.humanLinkEditMode}"/>
-                                                 </div>
-                                                 <p:spacer height="3px" />
-                                                <p:commandButton ajax="true"
-                                                         id="usersconfig-updatepersonlink-commit-cb" 
-                                                         value="Save link" 
-                                                         icon="fa fa-save"
-                                                         actionListener="#{userConfigBB.onUpdateUserPersonLinkCommitButtonChange}"
-                                                         update="@form
-                                                         usercfg-messages-form
-                                                         userconfig-usertable" 
-                                                         rendered="#{userConfigBB.humanLinkEditMode}"/>
-                                                
-                                                
-                                                
-                                                </h:form>
-                                                
-                                                
-                                                
-                                            </div>
 
-                                            <div class="p-col-4 restrict-data-field-label-inline" >
-                                                <h:outputText   value="Active" />
-                                            </div>
-                                            <div class="p-col-8 restrict-data-field-value-inline" >
-                                                <h:form id="usercfg-deac-init-form">
-
-                                                    <h:outputText value="#{empty userConfigBB.currentUserAuthorizedForConfig.deactivatedTS ? 'Active user': 'Deactivated'}" />
-                                                    
-                                                    <p:spacer height="3px" 
-                                                              rendered="#{!(empty userConfigBB.currentUserAuthorizedForConfig.deactivatedTS)}"/>
-                                                    
-                                                    <h:outputText value="Deactivated as of #{userConfigBB.getPrettyDate(userConfigBB.currentUserAuthorizedForConfig.deactivatedTS)}"
-                                                                  rendered="#{!(empty userConfigBB.currentUserAuthorizedForConfig.deactivatedTS)}" />
-                                                    <p:spacer height="3px"  />
-
-                                                     <p:commandLink   id="userconfig-updatepersonlinkinit-cl"
-                                                                        ajax="true"
-                                                                        actionListener="#{userConfigBB.onUserDeactivateInitButtonChange}"
-                                                                        update="usercfg-userdeactivate-confirm-dialog
-                                                                        usercfg-userdeactivate-confirm-form"
-                                                                        oncomplete="PF('usercfg-userdeactivate-confirm-dialog-var').show();"
-                                                                        disabled="false"
-                                                                        style="color:blue; font-weight: bold;"
-                                                                        value="deactivate user" 
-                                                                        tabindex="5"/>
-                                                </h:form>
-
-                                            </div>
-
-                                            <div class="p-col-4 restrict-data-field-label-inline" >
-                                                <h:outputText  value="Virtual User" />
-                                            </div>
-                                            <div class="p-col-8 restrict-data-field-value-inline" >
-                                                <h:outputText value="#{userConfigBB.currentUserAuthorizedForConfig.noLoginVirtualUser ? 'Virtual only; no login' : 'Regular user'}" />
-                                            </div>
-
-                                            <div class="p-col-4 restrict-data-field-label-inline" >
-                                                <h:outputText value="Home Municipality" />
-                                            </div>
-                                            <div class="p-col-8 restrict-data-field-value-inline" >
-                                                <h:outputText value="#{userConfigBB.currentUserAuthorizedForConfig.homeMuni.muniName}" />
                                                 <p:spacer height="3px" />
-                                                <h:outputText value="#{userConfigBB.currentUserAuthorizedForConfig.homeMuni.muniCode}" />
-                                            </div>
 
+                                                <p:commandLink   id="userconfig-updatepersonlinkinit-cl"
+                                                                 ajax="true"
+                                                                 actionListener="#{userConfigBB.onUpdateUserPersonLinkInitLinkClick}"
+                                                                 update="@form"
+                                                                 style="color:blue; font-weight: bold;"
+                                                                 value="update person link to session person" 
+                                                                 tabindex="5"
+                                                                 rendered="#{!userConfigBB.humanLinkEditMode}"/>
+
+                                                <p:spacer height="3px" />
+                                                <h:outputText value="User #{userConfigBB.currentUserAuthorizedForConfig.username}'s person link will now become: " 
+                                                              rendered="#{userConfigBB.humanLinkEditMode}"/>
+                                                <h:outputText value="#{userConfigBB.humanForLinking.name} (ID:#{userConfigBB.humanForLinking.humanID})"
+                                                              rendered="#{!empty userConfigBB.humanForLinking and userConfigBB.humanLinkEditMode}" />
+                                                <p:spacer height="3px" 
+                                                          rendered="#{userConfigBB.humanLinkEditMode}"/>
+
+                                                <div class="gray_button">
+
+                                                    <p:commandButton ajax="true"
+                                                                     id="usersconfig-updatepersonlink-cancel-cb" 
+                                                                     value="Cancel" 
+                                                                     icon="fa fa-stop"
+                                                                     actionListener="#{userConfigBB.onUpdateUserPersonAbortButtonCange}"
+                                                                     update="@form
+                                                                     usercfg-messages-form" 
+                                                                     rendered="#{userConfigBB.humanLinkEditMode}"/>
+                                                </div>
+                                                <p:spacer height="3px" />
+                                                <p:commandButton ajax="true"
+                                                                 id="usersconfig-updatepersonlink-commit-cb" 
+                                                                 value="Save link" 
+                                                                 icon="fa fa-save"
+                                                                 actionListener="#{userConfigBB.onUpdateUserPersonLinkCommitButtonChange}"
+                                                                 update="@form
+                                                                 usercfg-messages-form
+                                                                 @form:@parent:usercfg-search-results-form:userconfig-usertable" 
+                                                                 rendered="#{userConfigBB.humanLinkEditMode}"/>
+                                            </h:form>
                                         </div>
+
+                                        <div class="p-col-4 restrict-data-field-label-inline" >
+                                            <h:outputText  value="Virtual User" />
+                                        </div>
+                                        <div class="p-col-8 restrict-data-field-value-inline" >
+                                            <h:outputText value="#{userConfigBB.currentUserAuthorizedForConfig.noLoginVirtualUser ? 'Virtual only; no login' : 'Regular user'}" />
+                                        </div>
+
+                                        <div class="p-col-4 restrict-data-field-label-inline" >
+                                            <h:outputText  value="Signature" />
+                                        </div>
+                                        <div class="p-col-8 restrict-data-field-value-inline" >
+                                            <h:form id="user-signature-form">
+                                                <p:graphicImage value="#{blobsterBB.image}"
+                                                                alt="no preview available" 
+                                                                style="width: 100%; margin-right: 10px;" 
+                                                                cache="false"
+                                                                rendered="#{!userConfigBB.signatureEditMode and !empty userConfigBB.currentUserAuthorizedForConfig.signatureBlob}">
+                                                    <f:param name="blobid" value="#{userConfigBB.currentUserAuthorizedForConfig.signatureBlob.photoDocID}"/>
+                                                </p:graphicImage>
+                                                <p:spacer height="2px" />
+                                                <p:commandLink      id="user-signature-change-cl"
+                                                                    ajax="true"
+                                                                    actionListener="#{userConfigBB.onChangeSignatureBlobLinkClick}"
+                                                                    style="color:blue; font-weight: bold;"
+                                                                    rendered="#{systemServicesBB.bbSessionUser.keyCard.hasSysAdminPermissions}"
+                                                                    update="@form"
+                                                                    value="#{userConfigBB.signatureEditMode ? 'cancel signature update':'update signature photo'}" >
+                                                </p:commandLink>
+                                                <p:spacer height="2px" />
+                                                <p:dataTable id="signature-candidate-table"
+                                                             value="#{userConfigBB.currentUserAuthorizedForConfig.blobList}"
+                                                             var="sigblob"
+                                                             rendered="#{userConfigBB.signatureEditMode}">
+                                                
+                                                    <p:column headerText="Photodoc ID">
+                                                        <h:outputText value="#{sigblob.photoDocID}" />
+                                                          <p:graphicImage value="#{blobsterBB.image}"
+                                                                        alt="no preview available" 
+                                                                        style="width: 100px; margin-right: 10px;" 
+                                                                        cache="false"
+                                                                        rendered="true">
+                                                            <f:param name="blobid" value="#{sigblob.photoDocID}"/>
+                                                        </p:graphicImage>
+                                                        
+                                                        
+                                                    </p:column>
+                                                    <p:column>
+                                                        <p:commandLink id="select-signature-blob-cl"
+                                                                       style="color:blue; font-weight: bold;"
+                                                                       actionListener="#{userConfigBB.onChangeSignatureBlobCommit(sigblob)}" 
+                                                                       value="select for signature"
+                                                                       update="@form
+                                                                                usercfg-messages-form" />
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </h:form>
+                                        </div>
+
+                                        <div class="p-col-4 restrict-data-field-label-inline" >
+                                            <h:outputText value="Home Municipality" />
+                                        </div>
+                                        <div class="p-col-8 restrict-data-field-value-inline" >
+                                            <h:outputText value="#{userConfigBB.currentUserAuthorizedForConfig.homeMuni.muniName}" />
+                                            <p:spacer height="3px" />
+                                            <h:outputText value="#{userConfigBB.currentUserAuthorizedForConfig.homeMuni.muniCode}" />
+                                        </div>
+
+                                        <div class="p-col-4 restrict-data-field-label-inline" >
+                                            <h:outputText   value="Active" />
+                                        </div>
+                                        <div class="p-col-8 restrict-data-field-value-inline" >
+                                            <h:form id="usercfg-deac-init-form">
+
+                                                <h:outputText value="#{empty userConfigBB.currentUserAuthorizedForConfig.deactivatedTS ? 'Active user': 'Deactivated'}" />
+
+                                                <p:spacer height="3px" 
+                                                          rendered="#{!(empty userConfigBB.currentUserAuthorizedForConfig.deactivatedTS)}"/>
+
+                                                <h:outputText value="Deactivated as of #{userConfigBB.getPrettyDate(userConfigBB.currentUserAuthorizedForConfig.deactivatedTS)}"
+                                                              rendered="#{!(empty userConfigBB.currentUserAuthorizedForConfig.deactivatedTS)}" />
+                                                <p:spacer height="3px"  />
+
+                                                <p:commandLink   id="userconfig-updatepersonlinkinit-cl"
+                                                                 ajax="true"
+                                                                 actionListener="#{userConfigBB.onUserDeactivateInitButtonChange}"
+                                                                 update="usercfg-userdeactivate-confirm-dialog
+                                                                 usercfg-userdeactivate-confirm-form"
+                                                                 oncomplete="PF('usercfg-userdeactivate-confirm-dialog-var').show();"
+                                                                 disabled="false"
+                                                                 style="color:blue; font-weight: bold;"
+                                                                 value="deactivate user" 
+                                                                 tabindex="5"/>
+                                            </h:form>
+                                        </div>
+                                    </div>
                                 </p:panel>
-
-
-
 
                                 <p:panel    id="usercfg-umap-panel"
                                             toggleable="true"
@@ -333,7 +373,6 @@
                                             collapsed="false"
                                             rendered="true"
                                             header="User-Municipality Authorization Periods (UMAPs)">
-
 
                                     <h:form id="user-authorizations-dialog-periodtable-form">
 
@@ -348,7 +387,6 @@
                                                          usercfg-messages-form" />
 
                                         <p:spacer height="5px" />
-
 
                                         <p:dataTable
                                             id="userconfig-muniauthperiods-table"
@@ -384,7 +422,6 @@
                                                 <h:outputText value="#{muPeriod.userMuniAuthPeriodID}"/>
                                                 <h:outputText value=")" class="objectid-close"/>
                                             </p:column>
-
 
                                             <p:column>
                                                 <f:facet name="header">
@@ -465,7 +502,6 @@
                                                         <h:outputText value="User ID: #{muPeriod.createdByUserID}" />
                                                     </div>
 
-
                                                     <div class="p-col-4 restrict-data-field-label-inline">
                                                         <h:outputLabel value="Created TS:" />
                                                     </div>
@@ -476,10 +512,8 @@
                                                     <div class="p-col-12">
                                                         <h4>Log entries associated with this authorization period</h4>
 
-
                                                         <p:scrollPanel id="userconfig-authperiod-logentry-scrollpanel"
                                                                        style="height: 200px;">
-
                                                             <p:dataTable
                                                                 id="userconfig-muniauthperiods-logentry-table"
                                                                 var="muEntry"
@@ -520,7 +554,6 @@
                                     </h:form>
                                 </p:panel>
 
-
                                 <p:panel    id="usercfg-pswd-panel"
                                             toggleable="true"
                                             widgetVar="usercfg-pswd-panel-var"
@@ -529,14 +562,130 @@
                                             header="Password Manager">
 
                                     <div class="newpasswd-cont">
-
-
                                         <h:form id="userconfig-form-updatepassword">
-
                                             <h:outputText value="Password management tools:" />
-                                            
                                         </h:form>
                                     </div>
+                                </p:panel>
+
+                                <ui:include src="/restricted/compositions/blobTools.xhtml" />
+                                <p:panel id="user-blobs-panel"
+                                         toggleable="true"
+                                         collapsed="false"
+                                         header="Files and Photos"
+                                         rendered="true"
+                                         >
+
+                                    <h:form id="user-blobs-form">
+                                        <p:commandButton    id="user-blob-add-button"
+                                                            ajax="true"
+                                                            styleClass="noFill button-size-small"
+                                                            actionListener="#{blobUtilitiesBB.onUploadBlobInitButtonChange(userConfigBB.currentUserAuthorizedForConfig)}"
+                                                            oncomplete="PF('blob-upload-dialog-var').show()"
+                                                            update="blob-upload-dialog
+                                                            blob-uploadconnect-tabview"
+                                                            value="Upload photo or document"
+                                                            icon="fa fa-upload"
+                                                            >
+                                            <f:param name="blob-list-component-to-update" value="user-blobs-form" />
+                                        </p:commandButton>
+
+                                        <p:spacer height="5px" />
+
+                                        <p:dataTable
+                                            id="user-blobs-table"
+                                            var="blob"
+                                            value="#{userConfigBB.managedUserBlobList}"
+                                            rowKey="#{blob.bytesID}"
+                                            tableStyleClass="primeDataTable"
+                                            resizableColumns="true"
+                                            draggableRows="false" tabindex="6">
+
+                                            <p:column width="15%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="File Type"/>
+                                                </f:facet>
+                                                <h:outputText value="#{blob.type.title}"/>
+                                                <!-- type icon here -->
+                                            </p:column>
+
+                                            <p:column width="15%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="IDs"/>
+                                                </f:facet>
+                                                <h:outputText value="linkID: #{blob.photoDocID}"/>
+                                                <br/>
+                                                <h:outputText value="bytesID: #{blob.bytesID}"/>
+
+                                            </p:column>
+
+                                            <p:column width="45%">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Info"/>
+                                                </f:facet>
+                                                <div class="rowExpansion">
+                                                    <h:outputText value="title: #{blob.title}"/>
+                                                    <br/>
+                                                    <h:outputText value="descr: #{blob.description}"/>
+                                                    <br/>
+                                                    <h:outputText value="filename: #{blob.filename}"/>
+                                                    <br/>
+                                                    <h:outputText value="created: #{propertyProfileBB.getPrettyDateNoTime(blob.createdTS)}"/>
+                                                </div>
+                                            </p:column>
+
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Actions"/>
+                                                </f:facet>
+                                                <p:commandButton 
+                                                    value="Download" 
+                                                    ajax="false"
+                                                    icon="fa fa-arrow-down" 
+                                                    styleClass="ui-button-outlined">
+                                                    <p:fileDownload value="#{blobRetrieveBB.retrieveBlob(blob)}"
+                                                                    />
+                                                </p:commandButton>
+                                                <br/>
+                                                <div class="restrict-main-contents-io-link link-button">
+
+                                                    <p:commandLink      id="blob-update-button"
+                                                                        ajax="true"
+                                                                        styleClass="noFill button-size-small"
+                                                                        action="#{blobUtilitiesBB.onViewBlobLinkClick(blob, userConfigBB.currentUserAuthorizedForConfig)}"
+                                                                        value="view"
+                                                                        oncomplete="PF('blobs-viewblob-dialog-var').show()"
+                                                                        update="blobs-viewblob-dialog
+                                                                        blob-viewblob-form"
+                                                                        />
+                                                    <p:spacer height="3px" />
+                                                    <p:commandLink      id="blob-edit-button"
+                                                                        ajax="true"
+                                                                        styleClass="noFill button-size-small"
+                                                                        action="#{blobUtilitiesBB.onBlobEditMetaDataInitLinkClick(blob, userConfigBB.currentUserAuthorizedForConfig)}"
+                                                                        value="edit"
+                                                                        oncomplete="PF('blobs-vieweditmetadata-dialog-var').show()"
+                                                                        update="blob-vieweditmetadata-dialog
+                                                                        blob-veweditmetadata-form"
+                                                                        >
+                                                        <f:param name="blob-list-component-to-update" value="user-blobs-form" />
+                                                    </p:commandLink>
+                                                    <p:spacer height="3px" />
+                                                    <p:commandLink      id="blob-remove-button"
+                                                                        ajax="true"
+                                                                        styleClass="noFill button-size-small"
+                                                                        action="#{blobUtilitiesBB.onDeactivateBlobInitLinkClick(blob, userConfigBB.currentUserAuthorizedForConfig)}"
+                                                                        oncomplete="PF('blobs-deactivate-dialog-var').show();"
+                                                                        value="remove"
+                                                                        update="blob-deactivate-dialog
+                                                                        blob-deactivate-form"
+                                                                        >
+                                                        <f:param name="blob-list-component-to-update" value="user-blobs-form" />
+                                                    </p:commandLink>
+                                                </div>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </h:form>
                                 </p:panel>
 
                                 <p:panel id="usercfg-panel-notes"
@@ -547,7 +696,7 @@
                                          >
 
                                     <h:form id="usercfg-notes-form">
-                                     
+
 
                                         <div class="ui-g data-container">
                                             <p:commandButton   id="usercfg-notes-add-button"
@@ -663,9 +812,9 @@
                                     <div class="p-col-8 restrict-data-field-value-inline" >
 
                                         <h:outputText   value="The new user will be mapped to your session person: #{userConfigBB.currentUserAuthorizedForConfig.human.name} (ID:#{userConfigBB.currentUserAuthorizedForConfig.human.humanID})" 
-                                                            />
+                                                        />
 
-                                           
+
                                     </div>
 
                                     <div class="p-col-4 gray_button" >
@@ -677,7 +826,7 @@
                                                             update="usercfg-messages-form"
                                                             oncomplete="PF('userconfig-user-add-dialog-var').hide();"
                                                             />
-                                        
+
                                     </div>
                                     <div class="p-col-8">
                                         <p:commandButton    id="usercfg-add-addnew-commit-button-1"
@@ -688,10 +837,10 @@
                                                             rendered="#{userConfigBB.currentUserAuthorizedForConfig.userID == 0}"
                                                             oncomplete="PF('userconfig-user-add-dialog-var').hide();"
                                                             update="usercfg-messages-form
-                                                                            usercfg-search-results-form
-                                                                            usercfg-panel-info
-                                                                            usercfg-umap-panel
-                                                                            usercfg-panel-notes"
+                                                            usercfg-search-results-form
+                                                            usercfg-panel-info
+                                                            usercfg-umap-panel
+                                                            usercfg-panel-notes"
                                                             />
                                     </div>
                                 </div>
@@ -699,25 +848,25 @@
                         </p:dialog>
 
                         <p:dialog    id="usercfg-newpassword-dialog"
-                                            height="600" width="600"
-                                            widgetVar="usercfg-newpassword-dialog-var"
-                                            closable="true"
-                                            dynamic="true"
-                                            draggable="true"
-                                            closeOnEscape="true"
-                                            resizable="true"
-                                            responsive="true"
-                                            header="New Temporary Password for User: #{userConfigBB.currentUserAuthorizedForConfig.username}">
+                                     height="600" width="600"
+                                     widgetVar="usercfg-newpassword-dialog-var"
+                                     closable="true"
+                                     dynamic="true"
+                                     draggable="true"
+                                     closeOnEscape="true"
+                                     resizable="true"
+                                     responsive="true"
+                                     header="New Temporary Password for User: #{userConfigBB.currentUserAuthorizedForConfig.username}">
 
                             <h:form id="usercfg-newpassword-form">
-                                
+
                                 <p:commandButton id="usercfg-newpassword-reset-cb"
-                                                    ajax="true" 
+                                                 ajax="true" 
                                                  value="Generate Random Password" 
                                                  update="@form"
                                                  actionListener="#{userConfigBB.onResetUserPassword}"
                                                  tabindex="1"/>
-                                
+
                                 <p:spacer height="3px" />
 
                                 <f:subview  id="usercfg-newpassword-subview"
@@ -771,7 +920,7 @@
                                 <p:spacer height="5px" />
 
                                 <div class="gray_button">
-                                    
+
                                     <p:commandButton    ajax="true"
                                                         value="Abort Operation" 
                                                         icon="fa fa-stop"
@@ -796,7 +945,7 @@
 
                         </p:confirmDialog>
 
-                      
+
                         <p:dialog 
                             id="userconfig-umap-add-dialog"
                             widgetVar="userconfig-umap-add-dialog-var" 
@@ -829,7 +978,7 @@
                                                        timeInput="true" 
                                                        required="true" />
                                     </div>
-                                    
+
                                     <div class="p-col-4 restrict-data-field-label-inline" >
                                         <h:outputLabel value="Access Termination Date*" 
                                                        for="aup-cal-stopdate"
@@ -856,7 +1005,7 @@
                                         <h:message for="aup-cal-stopdate" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </div>
-                                    
+
                                     <div class="p-col-4 restrict-data-field-label-inline" >
 
                                         <p:outputLabel  for="aup-roletype-som" 
@@ -876,7 +1025,7 @@
                                         <h:message for="aup-roletype-som" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </div>
-                                    
+
                                     <div class="p-col-4 restrict-data-field-label-inline" >
 
                                         <p:outputLabel  for="aup-muni-som" 
@@ -896,7 +1045,7 @@
                                         <h:message for="aup-muni-som" showDetail="false" showSummary="true" 
                                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError" />
                                     </div>
-                                    
+
                                     <div class="p-col-4 restrict-data-field-label-inline" >
 
                                         <p:outputLabel  for="umap-add-assrank-it" 
@@ -913,7 +1062,7 @@
                                                      required="true" 
                                                      styleClass="inputText"/>
                                     </div>
-                                    
+
                                     <div class="p-col-4 restrict-data-field-label-inline" >
 
                                         <p:outputLabel for="userconfig-addauthperiod-notes-it"
@@ -929,9 +1078,9 @@
                                                      required="false" 
                                                      />
                                     </div>
-                                    
+
                                     <div class="p-col-12 restrict-data-field-label-inline" >
-                                        
+
 
                                         <p:commandButton    id="userconfig-button-commituap"
                                                             ajax="true" 

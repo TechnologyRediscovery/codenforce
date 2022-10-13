@@ -60,12 +60,13 @@ public class EventBB extends BackingBeanUtils implements Serializable {
 
     private long skeletonDuration;
     private EventType skeletonType;
+    
+    private boolean includeDeactivatedEvent;
 
     public EventBB() {}
 
     @PostConstruct
     public void initBean() {
-        SessionBean sb = getSessionBean();
         EventCoordinator ec = getEventCoordinator();
 
         // Find event holder and setup event list
@@ -90,6 +91,9 @@ public class EventBB extends BackingBeanUtils implements Serializable {
                 break;
             case OCCUPANCY:
                 currentEventHolder = sb.getSessOccPeriod();
+                break;
+            case PARCEL:
+                currentEventHolder = sb.getSessProperty();
                 break;
             case UNIVERSAL:
                 System.out.println("eventBB reached universal case in updateEventHolder()--do something about this maybe?");
@@ -134,7 +138,29 @@ public class EventBB extends BackingBeanUtils implements Serializable {
             }
         
         }
+    
     }
+    
+    /**
+     * Special getter for event lists
+     * @return 
+     */
+    public List<EventCnF> getManagedEventList(){
+        List<EventCnF> evlist = getSessionEventConductor().getSessEventListForRefreshUptake();
+        
+        
+        if(currentEventHolder != null){
+            if(evlist != null){
+                currentEventHolder.setEventList(evlist);
+                System.out.println("EventBB.getManagedEventList | fresh event list found on sessionbean of size: " + evlist.size());
+                getSessionEventConductor().setSessEventListForRefreshUptake(null);
+            } 
+            
+            return currentEventHolder.getEventList();
+        }
+        return null;
+    }
+    
     
     
     /**
@@ -172,6 +198,22 @@ public class EventBB extends BackingBeanUtils implements Serializable {
         System.out.println("eventBB.onManageEventPersonButtonChange");
         
     }
+    
+//      /**
+//     * Checks boolean flag on cecase profile page's event list for including deactivated events
+//     */
+//    public void configureManagedEventList(){
+//        List<EventCnF> weededEvList = new ArrayList<>();
+//        if(managedEventList != null && !managedEventList.isEmpty()){
+//            for(EventCnF ev: managedEventList){
+//                boolean include = false;
+//                if(ev.getDeactivatedTS() == null) include = true;
+//                if(isIncludeDeactivatedEvents() && ev.getDeactivatedTS() != null) include = true;
+//                if(include) weededEvList.add(ev);
+//            }
+//            managedEventList = weededEvList;
+//        }
+//    }
     
     
     /**
@@ -639,5 +681,19 @@ public class EventBB extends BackingBeanUtils implements Serializable {
      */
     public void setEventListComponentForRefreshTrigger(String eventListComponentForRefreshTrigger) {
         this.eventListComponentForRefreshTrigger = eventListComponentForRefreshTrigger;
+    }
+
+    /**
+     * @return the includeDeactivatedEvent
+     */
+    public boolean isIncludeDeactivatedEvent() {
+        return includeDeactivatedEvent;
+    }
+
+    /**
+     * @param includeDeactivatedEvent the includeDeactivatedEvent to set
+     */
+    public void setIncludeDeactivatedEvent(boolean includeDeactivatedEvent) {
+        this.includeDeactivatedEvent = includeDeactivatedEvent;
     }
 }

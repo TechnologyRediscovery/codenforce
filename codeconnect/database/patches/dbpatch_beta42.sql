@@ -152,8 +152,32 @@ ALTER TABLE public.occinspectiondispatch ADD COLUMN lastupdatedby_userid    INTE
 ALTER TABLE public.occinspectiondispatch DROP COLUMN municipality_municode;
 ALTER TABLE public.occinspectiondispatch DROP COLUMN municipalityname;
 
+
+
+CREATE TABLE IF NOT EXISTS public.loginphotodocs
+(
+    user_userid     INTEGER NOT NULL CONSTRAINT loginphotodoc_userid_fk REFERENCES public.login (userid),
+    photodoc_id     INTEGER NOT NULL CONSTRAINT loginphotodoc_photodoc_fk REFERENCES public.photodoc (photodocid),
+    CONSTRAINT loginphotodoc PRIMARY KEY (user_userid, photodoc_id)
+);
+
+ALTER TABLE public.login ADD COLUMN signature_photodocid INTEGER REFERENCES public.photodoc (photodocid);
+
+
+ALTER TABLE public.occpermit ADD COLUMN staticsignature_photodocid INTEGER CONSTRAINT occpermit_sig_photodocid_fk REFERENCES public.photodoc (photodocid);
+ALTER TABLE public.noticeofviolation ADD COLUMN fixedissuingofficersig_photodocid INTEGER CONSTRAINT nov_sig_photodocid_fk REFERENCES public.photodoc (photodocid);
+
+
+ALTER TABLE public.noticeofviolation ADD COLUMN includestipcompdate BOOLEAN DEFAULT TRUE;
+ALTER TABLE public.noticeofviolationtype ADD COLUMN includestipcompdate BOOLEAN DEFAULT TRUE;
+
+
+ALTER TABLE public.noticeofviolation ALTER COLUMN includestipcompdate SET DEFAULT false;
+ALTER TABLE public.noticeofviolationtype ALTER COLUMN includestipcompdate SET DEFAULT false;
+
 --******************************* REMOTE CURSOR HERE  ******************************* 
 --******************************* LOCAL CURSOR HERE  ******************************* 
+
 
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)

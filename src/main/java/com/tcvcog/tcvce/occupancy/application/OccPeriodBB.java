@@ -121,6 +121,9 @@ public class OccPeriodBB
         OccupancyCoordinator oc = getOccupancyCoordinator();
         SessionBean sb = getSessionBean();
         PropertyCoordinator pc = getPropertyCoordinator();
+        // setup event view
+        getSessionEventConductor().setSessEventsPageEventDomainRequest(DomainEnum.OCCUPANCY);
+        
         getSessionBean().setSessHumanListRefreshedList(null);
         currentOccPeriod = sb.getSessOccPeriod();
         if(currentOccPeriod != null){
@@ -215,7 +218,7 @@ public class OccPeriodBB
                         "Error! Unable to certify field", ""));
         }
 
-        saveOccPeriodChanges();
+        saveOccPeriodChanges(null);
     }
 
 
@@ -255,8 +258,9 @@ public class OccPeriodBB
      * This method attempts to update the database entry for the currentOccPeriod.
      * It will fail in certain conditions, in which case the currentOccPeriod is returned to
      * a backup made before any current unsaved changes.
+     * @param ev
      */
-    public void saveOccPeriodChanges() {
+    public void saveOccPeriodChanges(ActionEvent ev) {
         OccupancyCoordinator oc = getOccupancyCoordinator();
 
         try {
@@ -487,12 +491,8 @@ public class OccPeriodBB
              getFacesContext().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             ex.getMessage(), ""));
-            
         }
-        
-        
     }
-    
    
     /**
      * Listener for user requests to view the config fields on an occ permit
@@ -501,10 +501,7 @@ public class OccPeriodBB
     public void onOccpermitViewConfigLinkClick(OccPermit permit){
         currentOccPermit = permit;
         configureCurrentOccPermitForOfficerReview();
-        
     }
-    
- 
     
     /**
      * Sends the current occ period and permit with all the goodies injected to the 
@@ -631,10 +628,7 @@ public class OccPeriodBB
                 
             } 
         }
-        
-        
     }
-    
     
     /**
      * Redirects user to page to print occ permit
@@ -647,7 +641,6 @@ public class OccPeriodBB
         currentOccPermitConfig = oc.getOccPermitReportConfigDefault(currentOccPermit, currentOccPeriod, currentPropertyUnit, getSessionBean().getSessUser());
         getSessionBean().setReportConfigOccPermit(currentOccPermitConfig);
         return "occPermit";
-        
     }
 
      /**

@@ -136,15 +136,15 @@
                                             <h:form id="parcel-id-form">
                                                 <div class="p-grid">
                                                     <div class="p-col-12">
-                                                            <p:commandButton    id="parcel-id-edit-abort-button"
-                                                                                ajax="true"
-                                                                                style="margin-left: 5px;"
-                                                                                rendered="#{propertyProfileBB.currentPropertyEditMode}"
-                                                                                value="Abort edit"
-                                                                                actionListener="#{propertyProfileBB.onPropertyEditModeOperationAbortButtonChange}"
-                                                                                update="property-messages-global
-                                                                                @form"
-                                                                                icon="fa fa-stop" />
+                                                        <p:commandButton    id="parcel-id-edit-abort-button"
+                                                                            ajax="true"
+                                                                            style="margin-left: 5px;"
+                                                                            rendered="#{propertyProfileBB.currentPropertyEditMode}"
+                                                                            value="Abort edit"
+                                                                            actionListener="#{propertyProfileBB.onPropertyEditModeOperationAbortButtonChange}"
+                                                                            update="property-messages-global
+                                                                            @form"
+                                                                            icon="fa fa-stop" />
                                                         <p:commandButton id="parcel-id-edit-button"
                                                                          value="#{propertyProfileBB.currentPropertyEditMode ? 'Save changes' : 'Edit'}"
                                                                          rendered="true"
@@ -154,8 +154,6 @@
                                                                          update="@form
                                                                          property-messages-global"
                                                                          />
-                                                                       
-
                                                     </div>
 
                                                     <div class="p-col-6 data_field_label">
@@ -481,27 +479,27 @@
                                             <div class="p-col-12" >
                                                 <p:separator />
                                             </div>
-                                            
+
                                             <div class="p-col-4" >
                                                 <h:outputText value="&nbsp;"
                                                               escape="false" />
                                             </div>
-                                            
-                                            
+
+
                                             <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Start date" />
                                             </div>
                                             <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputLabel value="Stop date" />
                                             </div>
-                                            
+
                                             <div class="p-col-12 restrict-data-field-label-inline" >
                                                 <p:separator />
                                                 <h3>
                                                     Property Status Designations
                                                 </h3>
                                             </div>
-                                            
+
                                             <div class="p-col-4 restrict-data-field-label-inline" >
                                                 <h:outputLabel value="Unfitness of Occupancy"/>
                                             </div>
@@ -589,8 +587,8 @@
 
 
                                             </div>
-                                            
-                                               <div class="p-col-4">
+
+                                            <div class="p-col-4">
                                                 <h:outputText id="propinfo-ot-vacantstop-1"
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.vacantDateStop) 
                                                                        ? propertyProfileBB.getPrettyLocalDateOnlyNoTime(propertyProfileBB.currentProperty.parcelInfo.vacantDateStop) 
@@ -616,8 +614,8 @@
 
 
                                             </div>
-                                    
-                                            
+
+
 
                                             <div class="p-col-4 restrict-data-field-label-inline" >
                                                 <h:outputLabel value="Abandonment"/>
@@ -648,7 +646,7 @@
                                                     <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
 
-                                            
+
 
                                             </div>
 
@@ -677,16 +675,16 @@
 
                                             </div>
 
-                                         
-                                            
-                                            
+
+
+
                                             <div class="p-col-12 restrict-data-field-label-inline" >
                                                 <p:separator />
                                                 <h3>
                                                     TCLB Designations
                                                 </h3>
                                             </div>
-                                            
+
                                             <div class="p-col-4 restrict-data-field-label-inline" >
                                                 <h:outputLabel value="LB Prospect"/>
                                             </div>
@@ -715,8 +713,8 @@
                                                     <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
                                             </div>
-                                            
-                                            
+
+
                                             <div class="p-col-4">
                                                 <h:outputText id="lb-prospect-stop-ot"
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landbankProspectStop) 
@@ -741,7 +739,7 @@
                                                     <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
                                             </div>
-                                            
+
                                             <div class="p-col-4 restrict-data-field-label-inline" >
                                                 <h:outputLabel value="LB Candidate "/>
                                             </div>
@@ -823,8 +821,8 @@
                                                     <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
                                             </div>
-                                            
-                                      
+
+
                                             <div class="p-col-4">
                                                 <h:outputText id="lb-pursuing-stop-ot"
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landbankPursuingStop) 
@@ -879,12 +877,12 @@
                                                     <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
                                             </div>
-                                    
 
-                                            
-                                            
 
-                                            
+
+
+
+
                                             <div class="p-col-4">
                                                 <h:outputText id="lb-owned-stop-ot"
                                                               value="#{!(empty propertyProfileBB.currentProperty.parcelInfo.landbankOwnedStop) 
@@ -909,15 +907,15 @@
                                                     <f:convertDateTime pattern="MM/dd/yyyy" type="localDate"/>
                                                 </p:datePicker>
                                             </div>
-                                            
-                                            
+
+
                                             <div class="p-col-12 restrict-data-field-label-inline" >
                                                 <p:separator />
                                                 <h3>
                                                     TCLB Notes
                                                 </h3>
                                             </div>
-                                            
+
                                             <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputText value="LB Prospect Notes" />
                                             </div>
@@ -925,13 +923,13 @@
                                                 <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.landbankProspectNotes}"
                                                               escape="false"
                                                               rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
-                                                
+
                                                 <p:inputTextarea    value="#{propertyProfileBB.currentProperty.parcelInfo.landbankProspectNotes}"
                                                                     cols="20"
                                                                     rows="5"
                                                                     rendered="#{propertyProfileBB.currentParcelInfoEditMode}"/>
                                             </div>
-                                            
+
                                             <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputText value="LB Candidate Notes" />
                                             </div>
@@ -939,13 +937,13 @@
                                                 <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.landbankAcqCandidateNotes}"
                                                               escape="false"
                                                               rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
-                                                
+
                                                 <p:inputTextarea    value="#{propertyProfileBB.currentProperty.parcelInfo.landbankAcqCandidateNotes}"
                                                                     cols="20"
                                                                     rows="5"
                                                                     rendered="#{propertyProfileBB.currentParcelInfoEditMode}"/>
                                             </div>
-                                            
+
                                             <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputText value="LB Pursuing Notes" />
                                             </div>
@@ -953,13 +951,13 @@
                                                 <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.landbankPursuingNotes}"
                                                               escape="false"
                                                               rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
-                                                
+
                                                 <p:inputTextarea    value="#{propertyProfileBB.currentProperty.parcelInfo.landbankPursuingNotes}"
                                                                     cols="20"
                                                                     rows="5"
                                                                     rendered="#{propertyProfileBB.currentParcelInfoEditMode}"/>
                                             </div>
-                                            
+
                                             <div class="p-col-4 restrict-data-field-label-inline">
                                                 <h:outputText value="LB Owned Notes" />
                                             </div>
@@ -967,13 +965,13 @@
                                                 <h:outputText value="#{propertyProfileBB.currentProperty.parcelInfo.landbankOwnedNotes}"
                                                               escape="false"
                                                               rendered="#{!propertyProfileBB.currentParcelInfoEditMode}"/>
-                                                
+
                                                 <p:inputTextarea    value="#{propertyProfileBB.currentProperty.parcelInfo.landbankOwnedNotes}"
                                                                     cols="20"
                                                                     rows="5"
                                                                     rendered="#{propertyProfileBB.currentParcelInfoEditMode}"/>
                                             </div>
-                                            
+
                                         </div>
                                     </h:form>
                                 </p:panel>
@@ -1000,19 +998,19 @@
                                                                oncomplete="PF('propinfo-notes-dialog-var').show()"
                                                                update="propinfo-note-create-form" />
                                         </div>
-                                            <p:spacer height="5px" />
-                                            <div    id="propinf-ot-notes-div"
-                                                    class="data_field"
-                                                    style="clear:both;">
-                                                <h:outputLabel  styleClass="data_field_label"
-                                                                for="propinfo-ot-notes"
-                                                                value="Notes"/>
+                                        <p:spacer height="5px" />
+                                        <div    id="propinf-ot-notes-div"
+                                                class="data_field"
+                                                style="clear:both;">
+                                            <h:outputLabel  styleClass="data_field_label"
+                                                            for="propinfo-ot-notes"
+                                                            value="Notes"/>
 
-                                                <h:outputText   id="propinfo-ot-notes"
-                                                                styleClass="data_field_value"
-                                                                value="#{propertyProfileBB.currentProperty.notes}"
-                                                                escape="false"/>
-                                            </div>
+                                            <h:outputText   id="propinfo-ot-notes"
+                                                            styleClass="data_field_value"
+                                                            value="#{propertyProfileBB.currentProperty.notes}"
+                                                            escape="false"/>
+                                        </div>
 
                                     </h:form>
                                 </p:panel>
@@ -1357,71 +1355,88 @@
                                         </p:dataTable>
                                     </h:form>
                                 </p:panel>
+                                <ui:include src="../compositions/eventTools.xhtml"/>
 
-                                <p:panel    id="prop-events-panel"
-                                            toggleable="true"
-                                            widgetVar="prop-events-panel-var"
-                                            collapsed="false"
-                                            header="Events"
-                                            rendered="false">
+                                <p:panel id="prop-events-panel"
+                                         toggleable="true"
+                                         collapsed="false"
+                                         header="Events attached to permit file (ID: #{eventBB.currentEventHolder.BObID})">
 
-                                    <h:form id="prop-events-panel-form">
+                                    <h:form id="prop-events-form">
 
+                                        <p:commandButton id="events-add-button"
+                                                         styleClass="noFill button-size-small"
+                                                         value="Add event"
+                                                         icon="fa fa-plus"
+                                                         actionListener="#{eventBB.onEventAddInit(propertyProfileBB.currentProperty) }"
+                                                         oncomplete="PF('event-add-dialog-var').show()"
+                                                         update="event-add-dialog">
+                                            <f:param name="event-list-component-to-update" value="prop-events-form:prop-events-table" />
+                                        </p:commandButton>
 
-                                        <p:selectOneMenu style="width: 300px;" 
-                                                         id="prop-viewoptionsevents-solb" 
-                                                         value="#{propertyProfileBB.eventViewOptionSelected}" 
-                                                         tabindex="10">
+                                        <p:spacer height="5px"/>
 
-                                            <p:ajax update="prop-events-datatable"                                                           
-                                                    immediate="true"/>
-
-                                            <f:selectItems  id="prop-events-selitems" 
-                                                            value="#{propertyProfileBB.eventViewOptions}" 
-                                                            var="evo" 
-                                                            itemValue="#{evo}" 
-                                                            itemLabel="#{evo.label}"/>
-                                        </p:selectOneMenu>
-
-                                        <p:spacer height="5px" />
-
-                                        <p:dataTable id="prop-events-datatable"
-                                                     var="event"
-                                                     value="#{propertyProfileBB.currentProperty.completeEventList}"
+                                        <p:dataTable id="prop-events-table"
+                                                     var="genevent"
+                                                     value="#{eventBB.managedEventList}"
                                                      tableStyleClass="primeDataTable"
-                                                     rowKey="#{event.eventID}"
-                                                     >
+                                                     rowKey="#{genevent.eventID}"
+                                                     reflow="false">
 
-                                            <p:column headerText="ID"
+                                            <p:column headerText="Date"
+                                                      width="20%"
+                                                      sortBy="#{genevent.timeStart}"
                                                       styleClass="centeredColumnContent">
-
-                                                <h:outputText value="#{event.eventID}"/>
-
+                                                <h:outputText value="#{empty genevent.timeStart ? eventBB.getPrettyDate(genevent.createdTS) : eventBB.getPrettyDate(genevent.timeStart) }"/>
                                             </p:column>
 
                                             <p:column headerText="Category"
+                                                      width="20%"
+                                                      sortBy="#{genevent.category.eventCategoryTitle}"
                                                       styleClass="centeredColumnContent">
-                                                <h:outputText value="#{event.category.eventCategoryTitle}" />
 
+                                                <div class="#{genevent.category.icon.styleClass}">
+                                                    <i class="material-icons status-display-icon-i"><h:outputText value="#{genevent.category.icon.materialIcon}"/></i>
+                                                </div>
 
+                                                <h:outputText value="#{genevent.category.eventType.label}:"/>
+
+                                                <p:spacer height="1px" />
+
+                                                <h:outputText value="#{genevent.category.eventCategoryTitle}"/>
                                             </p:column>
 
                                             <p:column headerText="Description"
-                                                      styleClass="centeredColumnContent">
+                                                      width="50%"
+                                                      styleClass="centeredColumnContent wrapText">
 
-                                                <h:outputText value="#{event.description}"/>
+                                                <h:outputText value="#{genevent.description}"/>
 
                                             </p:column>
-                                            <p:column headerText="Options"
-                                                      styleClass="centeredColumnContent">
 
-                                                <p:commandButton    id="prop-events-open-button"
-                                                                    ajax="false"
-                                                                    styleClass="noFill button-size-small"
-                                                                    action="#{propertyProfileBB.onViewEventButtonChange(event)}"
-                                                                    value="View Event"
-                                                                    icon="fa fa-folder-open-o"
-                                                                    />
+                                            <p:column headerText="Actions"
+                                                      width="10%"
+                                                      styleClass="centeredColumnContent">
+                                                <div class="restrict-main-contents-io-link link-button">
+                                                    <p:commandLink id="event-open-button"
+                                                                   styleClass="noFill button-size-small"
+                                                                   value="view/edit"
+                                                                   type="button"
+                                                                   ajax="true"
+                                                                   oncomplete="PF('event-profile-dialog-var').show()"
+                                                                   update="event-profile-dialog
+                                                                   event-profile-form"
+                                                                   >
+                                                        <p:ajax listener="#{eventBB.onViewEvent(genevent)}" />
+                                                        <f:param name="event-list-component-to-update" value="prop-events-form:prop-events-table" />
+                                                    </p:commandLink>
+                                                </div>
+                                                <p:spacer height="3px" />
+                                                <h:outputText value="(ID:#{genevent.eventID})"/>
+                                                <p:spacer height="3px" />
+                                                <h:outputText value="#{empty genevent.deactivatedTS ? 'Active' : 'Deactivated'}"
+                                                              styleClass="italic"/>
+
                                             </p:column>
                                         </p:dataTable>
                                     </h:form>

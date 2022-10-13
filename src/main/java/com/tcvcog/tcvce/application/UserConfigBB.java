@@ -31,6 +31,8 @@ import com.tcvcog.tcvce.util.MessageBuilderParams;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
@@ -70,9 +72,11 @@ public class UserConfigBB extends BackingBeanUtils{
     private Human humanForLinking;
     
     private List<Human> userPersonList;
-    protected int personIDToLink;
-    protected boolean personLinkUseID;
+    private int personIDToLink;
+    private boolean personLinkUseID;
     private Person selectedUserPerson;
+    
+    private boolean signatureEditMode;
     
       /**
      * Creates a new instance of userConfig
@@ -132,6 +136,7 @@ public class UserConfigBB extends BackingBeanUtils{
             System.out.println(ex);
         }
     }
+  
     
     /**
      * gets a new set of users from DB
@@ -624,9 +629,57 @@ public class UserConfigBB extends BackingBeanUtils{
         }
     }
     
-
-
+    /**
+     * Listener for user requests to update user signature blob
+     * @param ev 
+     */
+    public void onChangeSignatureBlobLinkClick(ActionEvent ev){
+        signatureEditMode = !signatureEditMode;
+        
+        
+    }
     
+    /**
+     * Listener for user requests to update their signature blob 
+     * from the list of uploaded blobs
+     * @param bl 
+     */
+    public void onChangeSignatureBlobCommit(BlobLight bl){
+        UserCoordinator uc = getUserCoordinator();
+        
+        try {
+            uc.user_updateUserAuthorizedSignatureBlob(currentUserAuthorizedForConfig, bl);
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO,
+                               "Signature for user: updated success!", ""));
+        } catch (IntegrationException | BObStatusException ex) {
+            getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                               "Could not update signature for user", ""));
+            System.out.println(ex);
+        } 
+        
+        signatureEditMode = false;
+        
+    }
+
+
+    /**
+     * Special getter for user blobs
+     * @return 
+     */
+    public List<BlobLight> getManagedUserBlobList(){
+        List<BlobLight> blist = getSessionBean().getSessBlobLightListForRefreshUptake();
+        if(currentUserAuthorizedForConfig != null){
+            if(blist != null){
+                currentUserAuthorizedForConfig.setBlobList(blist);
+                getSessionBean().setSessBlobLightListForRefreshUptake(null);
+            }
+            return currentUserAuthorizedForConfig.getBlobList();
+        }
+        return null;
+        
+    }
   
     
     
@@ -961,5 +1014,20 @@ public class UserConfigBB extends BackingBeanUtils{
         this.humanForLinking = humanForLinking;
     }
 
+    /**
+     * @return the signatureEditMode
+     */
+    public boolean isSignatureEditMode() {
+        return signatureEditMode;
+    }
+
+    /**
+     * @param signatureEditMode the signatureEditMode to set
+     */
+    public void setSignatureEditMode(boolean signatureEditMode) {
+        this.signatureEditMode = signatureEditMode;
+    }
+
+   
    
 }

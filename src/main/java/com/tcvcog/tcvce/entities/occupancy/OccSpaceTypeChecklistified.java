@@ -8,8 +8,8 @@ package com.tcvcog.tcvce.entities.occupancy;
 import java.util.List;
 
 /**
- *
- * @author sylvia
+ * Wrapper around an OccSpaceType to contain the checklist related metadata
+ * @author Ellen Bascomb of Apartment 31Y
  */
 public class OccSpaceTypeChecklistified
         extends OccSpaceType{

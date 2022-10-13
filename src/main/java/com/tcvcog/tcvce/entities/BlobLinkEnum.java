@@ -62,11 +62,17 @@ public enum BlobLinkEnum {
                             "codeviolation_violationid",
                             "photodoc_photodocid"),
     
-    CITATION   (   "Citation",
+    CITATION   (            "Citation",
                             "citation",
                             "citationphotodoc",
                             "citation_citationid",
-                            "photodoc_photodocid");
+                            "photodoc_photodocid"),
+    
+    USER        (           "User",
+                            "login",
+                            "loginphotodocs",
+                            "user_userid",
+                            "photodoc_id");
     
     private final String objectParentTitle;
     private final String objectParentTableName;

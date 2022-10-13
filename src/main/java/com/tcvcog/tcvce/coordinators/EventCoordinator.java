@@ -340,10 +340,18 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         // *************************
         // Check Connections to the mother BOb
         // *************************
-        if (erg instanceof OccPeriod && ev.getOccPeriodID() == 0) {
+        if (erg.getBObID() == 0){
+            throw new EventException("EventCoordinator.addEvent | FATAL ERROR: Received an object without its primary key mapped to getBobID()");
+        }
+        // make sure we don't have a cross-domain conflict
+        if (erg instanceof OccPeriod && ev.getCeCaseID() == 0 && ev.getParcelKey() == 0) {
             ev.setOccPeriodID(erg.getBObID());
-        } else if (erg instanceof CECase && ev.getCeCaseID() == 0) {
+        } else if (erg instanceof CECase && ev.getOccPeriodID() == 0 && ev.getParcelKey() == 0) {
             ev.setCeCaseID(erg.getBObID());
+        } else if (erg instanceof PropertyDataHeavy && ev.getCeCaseID() == 0 && ev.getOccPeriodID() == 0){
+            ev.setParcelKey(erg.getBObID());
+        } else {
+            throw new EventException("EventCoordinator.addEvent | FATAL ERROR: Improperly injected event with mother's PK");
         }
         
         configureEventTimes(ev, ua);
@@ -503,11 +511,14 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         ev.setDuration(lduration);
         
         // Declare this event as either in the CE or Occ domain with 
-        // our hacky little enum thingy
+        // our hacky little enum thingy 
+        // ELLEN BASCOMB of APT 31Y SEP22: Not so hacky, actually
           if(ev.getCeCaseID() != 0){
                 ev.setDomain(DomainEnum.CODE_ENFORCEMENT);
             } else if(ev.getOccPeriodID() != 0){
                 ev.setDomain(DomainEnum.OCCUPANCY);
+            }  else if(ev.getParcelKey() != 0){
+                ev.setDomain(DomainEnum.PARCEL);
             } else {
                 throw new EventException("EventCnF must have either an occupancy period ID, or CECase ID");
             }
@@ -695,6 +706,7 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
         
         CECase cse = null;
         OccPeriod op = null;
+        PropertyDataHeavy pdh = null;
         
         // the moment of event instantiation!!!!
         EventCnF e = new EventCnF();
@@ -724,6 +736,10 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                 e.setOccPeriodID(op.getPeriodID());
                 e.setDomain(DomainEnum.OCCUPANCY);
                 System.out.println("EventCoordinator.initEvent | Event is getting occ period set to " + e.getOccPeriodID());
+            } else if (erg instanceof PropertyDataHeavy){
+                pdh = (PropertyDataHeavy) erg;
+                e.setParcelKey(pdh.getParcelKey());
+                e.setDomain(DomainEnum.PARCEL);
             }
         }
         if(ec != null){
@@ -913,6 +929,11 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
                     typeList.addAll(determinePermittedEventTypesForOcc((OccPeriodDataHeavy) erg, ua));
                 }
                 break;
+            case PARCEL:
+                if(erg instanceof PropertyDataHeavy){
+                    typeList.addAll(determinePermittedEventTypesForParcel((PropertyDataHeavy) erg, ua));
+                }
+                break;
             case UNIVERSAL:
                 typeList.add(EventType.Custom);
                 typeList.add(EventType.Meeting);
@@ -957,6 +978,28 @@ public class EventCoordinator extends BackingBeanUtils implements Serializable{
      * @return 
      */
     private List<EventType> determinePermittedEventTypesForOcc(OccPeriod period, UserAuthorized u) {
+        List<EventType> typeList = new ArrayList<>();
+        RoleType role = u.getRole();
+        if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
+            typeList.add(EventType.Action);
+            typeList.add(EventType.Timeline);
+            typeList.add(EventType.Occupancy);
+        }
+        if (role != RoleType.MuniReader) {
+            typeList.add(EventType.Communication);
+            typeList.add(EventType.Meeting);
+            typeList.add(EventType.Custom);
+        }
+        return typeList;
+    }
+    
+    /**
+     * Business rule logic container for choosing permitted eventTypes
+     * @param period
+     * @param u
+     * @return 
+     */
+    private List<EventType> determinePermittedEventTypesForParcel(PropertyDataHeavy pdh, UserAuthorized u) {
         List<EventType> typeList = new ArrayList<>();
         RoleType role = u.getRole();
         if (role == RoleType.EnforcementOfficial || u.getRole() == RoleType.Developer) {
