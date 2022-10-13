@@ -699,6 +699,12 @@ div.printer-friendly-report .ui-widget-content{
     text-align: right;
 }
 
+.signature{
+    border-bottom: thin solid black;
+    width: 180px; 
+    margin-right: 10px;
+}
+
 
 /* *********** end Printing and reports******** */
 

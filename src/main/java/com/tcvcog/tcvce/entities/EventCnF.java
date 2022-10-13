@@ -60,6 +60,7 @@ public  class       EventCnF
     protected DomainEnum domain;
     protected int ceCaseID;
     protected int occPeriodID;
+    protected int parcelKey;
     
     protected LocalDateTime timeStart;
     protected LocalDateTime timeEnd;
@@ -424,6 +425,20 @@ public  class       EventCnF
      */
     public void setDuration(long duration) {
         this.duration = duration;
+    }
+
+    /**
+     * @return the parcelKey
+     */
+    public int getParcelKey() {
+        return parcelKey;
+    }
+
+    /**
+     * @param parcelKey the parcelKey to set
+     */
+    public void setParcelKey(int parcelKey) {
+        this.parcelKey = parcelKey;
     }
 
     

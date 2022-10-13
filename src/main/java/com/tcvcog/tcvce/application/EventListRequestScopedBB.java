@@ -69,22 +69,7 @@ public class EventListRequestScopedBB extends BackingBeanUtils{
         }
         setIncludeDeactivatedEvents(getSessionBean().isSessFlagIncludeDeactivatedEvents());
         
-//        List<EventCnF> evlist = getSessionBean().getSessEventListForRefreshUptake();
-        
-        
-//        if(getCurrentCase() != null){
-//            if(evlist != null){
-//                setManagedEventList(evlist);
-//                System.out.println("EventListRequestScopedBB.getManagedEventList | fresh event list found on sessionbean of size: " + evlist.size());
-//                getSessionBean().setSessEventListForRefreshUptake(null);
-//            } else {
-//                setManagedEventList(getCurrentCase().getEventList());
-//            }
-//            
-//            if(managedEventList == null){
-//                // something's wrong and we just need a list
-//                setManagedEventList(new ArrayList<>());
-//            }
+//        
             System.out.println("EventListRequestScopedBB.getManagedEventList | size BEFORE weeding: " + managedEventList.size() );
             configureManagedEventList();
 //        }

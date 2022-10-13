@@ -471,7 +471,6 @@ public class PersonCoordinator extends BackingBeanUtils implements Serializable{
         generateEmailListPretty(p);
         
         return p;
-        
     }
     
     /**

@@ -497,8 +497,9 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
      */
     public PropertyDataHeavy assemblePropertyDataHeavy(Property prop, UserAuthorized ua) throws IntegrationException, BObStatusException, SearchException, BlobException {
 
-        SearchCoordinator sc = getSearchCoordinator();
         CaseCoordinator cc = getCaseCoordinator();
+        EventCoordinator ec = getEventCoordinator();
+        SearchCoordinator sc = getSearchCoordinator();
         PropertyIntegrator pi = getPropertyIntegrator();
         PropertyDataHeavy pdh = null;
         BlobCoordinator bc = getBlobCoordinator();
@@ -556,6 +557,10 @@ public class PropertyCoordinator extends BackingBeanUtils implements Serializabl
                    // PARCEL INFO NOW LIVES on the parcel itself and uses the parcelinfo table
                    
 //                   pdh.setExtDataList(fetchExternalDataRecords(pi.getPropertyExternalDataRecordIDs(pdh.getParcelKey())));
+                    
+                    // events
+                    pdh.setEventList(ec.getEventList(pdh));
+
 
                } catch (EventException | AuthorizationException | BObStatusException | BlobException | IntegrationException | SearchException ex) {
                    System.out.println(ex);

@@ -18,12 +18,14 @@ Council of Governments, PA
 package com.tcvcog.tcvce.integration;
 
 import com.tcvcog.tcvce.application.BackingBeanUtils;
+import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.MunicipalityCoordinator;
 import com.tcvcog.tcvce.coordinators.PersonCoordinator;
 import com.tcvcog.tcvce.coordinators.SystemCoordinator;
 import com.tcvcog.tcvce.coordinators.UserCoordinator;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
 import com.tcvcog.tcvce.entities.Municipality;
 import com.tcvcog.tcvce.entities.Person;
@@ -78,7 +80,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         String query =  " SELECT userid, username, password, notes, pswdlastupdated, \n" +
                         "       forcepasswordreset, createdby_userid, createdts, nologinvirtualonly, \n" +
                         "       deactivatedts, deactivatedby_userid, lastupdatedts, userrole, \n" +
-                        "       homemuni, humanlink_humanid, lastupdatedby_userid, forcepasswordresetby_userid\n" +
+                        "       homemuni, humanlink_humanid, lastupdatedby_userid, forcepasswordresetby_userid, signature_photodocid\n" +
                         "  FROM public.login WHERE userid = ?;";   
         
         PreparedStatement stmt = null;
@@ -182,6 +184,9 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
                 user.setHomeMuniID(rs.getInt("homemuni"));
             }
             user.setHumanID(rs.getInt("humanlink_humanid"));
+            user.setSignatureBlobID(rs.getInt("signature_photodocid"));
+            
+            
          return user;
     }
     
@@ -204,7 +209,7 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         Connection con = getPostgresCon();
         ResultSet rs = null;
         // broken query
-        String query =  " SELECT userid, pswdlastupdated, forcepasswordreset, forcepasswordresetby_userid, createdby_userid, createdts " +
+        String query =  " SELECT userid, pswdlastupdated, forcepasswordreset, forcepasswordresetby_userid, createdby_userid, createdts, signature_photodocid " +
                         " FROM public.login WHERE userid = ?;";
         
         UserAuthorized ua = null;
@@ -253,6 +258,19 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
             if(rs.getTimestamp("createdts") != null){
                 ua.setCreatedTS(rs.getTimestamp("createdts").toLocalDateTime());
             }
+            ua.setSignatureBlobID(rs.getInt("signature_photodocid"));
+            
+            BlobCoordinator bc = getBlobCoordinator();
+        try {
+            ua.setBlobList(bc.getBlobLightList(ua));
+            if(ua.getSignatureBlobID() != 0){
+                ua.setSignatureBlob(bc.getBlobLight(ua.getSignatureBlobID()));
+            }
+            
+        } catch (BlobException | BObStatusException | IntegrationException ex) {
+            throw new SQLException(ex.getMessage());
+        }
+        
         return ua;
     }
     
@@ -978,6 +996,44 @@ public class UserIntegrator extends BackingBeanUtils implements Serializable {
         } catch (SQLException ex) {
             System.out.println(ex);
             throw new IntegrationException("UserIntegrator.updateUser:Error updating User", ex);
+        } finally{
+             if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
+             if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }
+        } // close finally
+    }
+    
+    
+    /**
+     * Updates fields on login table record; most login fields are managed by independent
+     * methods for security thoroughness
+     * @param ua
+     * @throws IntegrationException 
+     */
+    public void updateUserSignatureBlob(UserAuthorized ua) throws IntegrationException{
+        Connection con = getPostgresCon();
+        System.out.println("UserIntegrator.updateUser");
+        String query =  "UPDATE public.login\n" +
+                        "   SET signature_photodocid=? \n" +
+                        " WHERE userid=?;";
+        
+        PreparedStatement stmt = null;
+        	
+        try {
+            
+            stmt = con.prepareStatement(query);
+            if(ua.getSignatureBlob() != null){
+                stmt.setInt(1, ua.getSignatureBlob().getPhotoDocID());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
+                        
+            stmt.setInt(2, ua.getUserID());
+            
+            stmt.executeUpdate();
+            
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            throw new IntegrationException("UserIntegrator.updateUser:Error updating User signature", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

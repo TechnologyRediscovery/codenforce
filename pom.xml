@@ -5,7 +5,7 @@
 
     <groupId>com.tcvcog.codeenforcement</groupId>
     <artifactId>tcvce</artifactId>
-    <version>0.870</version>
+    <version>0.871</version>
     <packaging>war</packaging>
 
     <name>tcvce</name>

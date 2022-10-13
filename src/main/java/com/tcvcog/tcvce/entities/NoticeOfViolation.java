@@ -85,6 +85,7 @@ public  class NoticeOfViolation
     private String fixedNotifyingOfficerTitle;
     private String fixedNotifyingOfficerPhone;
     private String fixedNotifyingOfficerEmail;
+    private int fixedNotifyingOfficerSignaturePhotoDocID;
     
     private int headerImageID;
     
@@ -106,6 +107,7 @@ public  class NoticeOfViolation
    
     private PrintStyle style;
     private boolean useSignatureImage;
+    private boolean includeStipulatedCompDate;
     private boolean includeViolationPhotoAttachment;
     
     private int followupEventDaysRequest;
@@ -796,6 +798,34 @@ public  class NoticeOfViolation
     @Override
     public List<EventCnFEmitted> getEmittedEvents() {
         return emittedEventList;
+    }
+
+    /**
+     * @return the fixedNotifyingOfficerSignaturePhotoDocID
+     */
+    public int getFixedNotifyingOfficerSignaturePhotoDocID() {
+        return fixedNotifyingOfficerSignaturePhotoDocID;
+    }
+
+    /**
+     * @param fixedNotifyingOfficerSignaturePhotoDocID the fixedNotifyingOfficerSignaturePhotoDocID to set
+     */
+    public void setFixedNotifyingOfficerSignaturePhotoDocID(int fixedNotifyingOfficerSignaturePhotoDocID) {
+        this.fixedNotifyingOfficerSignaturePhotoDocID = fixedNotifyingOfficerSignaturePhotoDocID;
+    }
+
+    /**
+     * @return the includeStipulatedCompDate
+     */
+    public boolean isIncludeStipulatedCompDate() {
+        return includeStipulatedCompDate;
+    }
+
+    /**
+     * @param includeStipulatedCompDate the includeStipulatedCompDate to set
+     */
+    public void setIncludeStipulatedCompDate(boolean includeStipulatedCompDate) {
+        this.includeStipulatedCompDate = includeStipulatedCompDate;
     }
 
    

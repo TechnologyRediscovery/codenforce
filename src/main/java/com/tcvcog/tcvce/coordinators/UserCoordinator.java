@@ -19,7 +19,9 @@ package com.tcvcog.tcvce.coordinators;
 import com.tcvcog.tcvce.application.BackingBeanUtils;
 import com.tcvcog.tcvce.domain.AuthorizationException;
 import com.tcvcog.tcvce.domain.BObStatusException;
+import com.tcvcog.tcvce.domain.BlobException;
 import com.tcvcog.tcvce.domain.IntegrationException;
+import com.tcvcog.tcvce.entities.BlobLight;
 import java.io.Serializable;
 import com.tcvcog.tcvce.entities.Credential;
 import com.tcvcog.tcvce.entities.Municipality;
@@ -319,7 +321,7 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         List<Municipality> tempMuniList;
         Map<Municipality, List<UserMuniAuthPeriod>> tempMap = new HashMap<>();
 
-            if(umapMapRaw != null && !umapMapRaw.isEmpty()){
+            if(umapMapRaw != null && !umapMapRaw.isEmpty()){ 
                 Set<Municipality> muniSet = umapMapRaw.keySet();
                 if(!muniSet.isEmpty()){
                     tempMuniList = new ArrayList(muniSet);
@@ -667,9 +669,26 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
             }
         } else {
             throw new AuthorizationException("Cannot create new user from Null or without username");
-            
         }
         return newUserID;
+    }
+    
+    /**
+     * Updates only the user's signature blob
+     * 
+     * @param ua for updating
+     * @param bl to inject into the user
+     * @throws com.tcvcog.tcvce.domain.BObStatusException
+     * @throws com.tcvcog.tcvce.domain.IntegrationException
+     */
+     public void user_updateUserAuthorizedSignatureBlob(UserAuthorized ua, BlobLight bl) throws BObStatusException, IntegrationException{
+        if(ua == null || bl == null){
+            throw new BObStatusException("Cannot update a user's sig blob with null user or blob");
+        }
+        UserIntegrator ui = getUserIntegrator();
+        ua.setSignatureBlob(bl);
+        ui.updateUserSignatureBlob(ua);
+        
     }
     
     /**
@@ -1021,9 +1040,9 @@ public class UserCoordinator extends BackingBeanUtils implements Serializable {
         if(usr == null){
             throw new BObStatusException("Cannot configure a null user");
         }
-        
         PersonCoordinator pc = getPersonCoordinator();
         usr.setHuman(pc.getHuman(usr.getHumanID()));
+        
         return usr;
     }
     

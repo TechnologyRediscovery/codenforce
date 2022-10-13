@@ -46,8 +46,6 @@ public class SessionEventConductor extends BackingBeanUtils{
     private List<EventCnF> sessEventListForRefreshUptake;
     private List<EventCnFPropUnitCasePeriodHeavy> sessEventList;
     private EventCnF sessEvent;
-    private ActivatableRouteEnum sessEventRoute;
-    private ActivatableRouteEnum sessEventListRoute;
     /* >>> -------------------------------------------------------------- <<< */
     /* >>>                   V Event                                      <<< */
     /* >>> -------------------------------------------------------------- <<< */
@@ -57,24 +55,18 @@ public class SessionEventConductor extends BackingBeanUtils{
      * if the relevant event list is extracted from the proper session business
      * objects
      */
-    private PageModeEnum sessEventsPagePageModeRequest;
     private DomainEnum sessEventsPageEventDomainRequest;
     private QueryEvent queryEventFuture7Days;
     /* >>> QUERY EVENT <<< */
     private QueryEvent queryEvent;
     private List<QueryEvent> queryEventList;
-
-    
     
     /**
      * Creates a new instance of SessionEvents
      */
     public SessionEventConductor() {
         
-        
     }
-    
-    
     
     @PostConstruct
     public void initBean()  {
@@ -131,6 +123,7 @@ public class SessionEventConductor extends BackingBeanUtils{
 
         prefixMap.put(-1, "Yesterday: ");
         prefixMap.put(0, "Today: ");
+        prefixMap.put(1, "Tomorrow: : ");
 
         for(int dayCount = -1; dayCount <=4; dayCount++){
             EventCalendarDay day = new EventCalendarDay();
@@ -160,6 +153,7 @@ public class SessionEventConductor extends BackingBeanUtils{
             QueryEvent evq = sc.initQuery(QueryEventEnum.CALENDAR, getSessionBean().getSessUser().getKeyCard());
             evq.getPrimaryParams().setDate_start_val(day.getLdtLowerBound());
             evq.getPrimaryParams().setDate_end_val(day.getLdtUpperBound());
+            evq.getPrimaryParams().setMuni_val(getSessionBean().getSessMuni());
            
             day.setEvList(sc.runQuery(evq, getSessionBean().getSessUser()).getBOBResultList());
             dayList.add(day);
@@ -179,15 +173,7 @@ public class SessionEventConductor extends BackingBeanUtils{
         this.sessEventList = sessEventList;
     }
 
-    /**
-     *
-     *
-     * @param sessEventsPagePageModeRequest the sessEventsPagePageModeRequest to set
-     */
-    public void setSessEventsPagePageModeRequest(PageModeEnum sessEventsPagePageModeRequest) {
-        this.sessEventsPagePageModeRequest = sessEventsPagePageModeRequest;
-    }
-
+  
     /**
      *
      *
@@ -224,15 +210,7 @@ public class SessionEventConductor extends BackingBeanUtils{
         return sessEventList;
     }
 
-    /**
-     *
-     *
-     * @return the sessEventsPagePageModeRequest
-     */
-    public PageModeEnum getSessEventsPagePageModeRequest() {
-        return sessEventsPagePageModeRequest;
-    }
-
+   
 
     /**
      *

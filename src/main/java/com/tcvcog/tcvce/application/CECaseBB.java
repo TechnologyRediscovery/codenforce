@@ -127,6 +127,9 @@ public class CECaseBB
         UserCoordinator uc = getUserCoordinator();
         SystemCoordinator sysCor = getSystemCoordinator();
         
+        // signal event domain
+        getSessionEventConductor().setSessEventsPageEventDomainRequest(DomainEnum.CODE_ENFORCEMENT);
+        
         try {
             configureCurrentCase(getSessionBean().getSessCECase());
             

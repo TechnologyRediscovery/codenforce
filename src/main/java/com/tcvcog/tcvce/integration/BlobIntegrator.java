@@ -638,7 +638,7 @@ public class BlobIntegrator extends BackingBeanUtils implements Serializable{
             stmt.execute();
             
         } catch (SQLException ex) {
-            //System.out.println(ex);
+            System.out.println(ex);
             throw new IntegrationException("BlobIntegrator.linkBlobHolderToBlobMetadata | Error linking metadata to parent ", ex);
         } finally{
              if (stmt != null){ try { stmt.close(); } catch (SQLException ex) {/* ignored */ } }

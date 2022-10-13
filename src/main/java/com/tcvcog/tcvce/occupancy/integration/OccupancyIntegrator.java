@@ -572,7 +572,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                         "       staticstipulations, staticcomments, staticmanager, statictenants, \n" +
                         "       staticleaseterm, staticleasestatus, staticpaymentstatus, staticnotice, \n" +
                         "       createdts, createdby_userid, lastupdatedts, lastupdatedby_userid, \n" +
-                        "       deactivatedts, deactivatedby_userid, staticconstructiontype, nullifiedts, nullifiedby_userid, staticdateexpiry, permittype_typeid  \n" +
+                        "       deactivatedts, deactivatedby_userid, staticconstructiontype, nullifiedts, " +
+                        "       nullifiedby_userid, staticdateexpiry, permittype_typeid, staticsignature_photodocid  \n" +
                         "  FROM public.occpermit WHERE permitid=?;";
         Connection con = getPostgresCon();
         ResultSet rs = null;
@@ -671,6 +672,8 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
         if(rs.getInt("nullifiedby_userid") != 0){
             permit.setNullifiedBy(uc.user_getUser(rs.getInt("nullifiedby_userid")));
         }
+        
+        permit.setStaticOfficerSignaturePhotoDocID(rs.getInt("staticsignature_photodocid"));
         
         si.populateTrackedFields(permit, rs, true);
         
@@ -960,7 +963,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                         "       staticstipulations=?, staticcomments=?, staticmanager=?, statictenants=?, \n" +
                         "       staticleaseterm=?, staticleasestatus=?, staticpaymentstatus=?, \n" +
                         "       staticnotice=?, lastupdatedts=now(), \n" +
-                        "       lastupdatedby_userid=?, staticconstructiontype=?, staticdateexpiry=?  " +
+                        "       lastupdatedby_userid=?, staticconstructiontype=?, staticdateexpiry=?, staticsignature_photodocid=?  " +
                         " WHERE permitid = ?;";
 
         Connection con = getPostgresCon();
@@ -1033,7 +1036,12 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             } else {
                 stmt.setNull(28, java.sql.Types.NULL);
             }
-            stmt.setInt(29, permit.getPermitID());
+            if(permit.getStaticOfficerSignaturePhotoDocID() != 0){
+                stmt.setInt(29, permit.getStaticOfficerSignaturePhotoDocID());
+            } else {
+                stmt.setNull(29, java.sql.Types.NULL);
+            }
+            stmt.setInt(30, permit.getPermitID());
             
 
             stmt.executeUpdate();
@@ -1425,7 +1433,7 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
                 + "       startdatecertifiedby_userid=?, startdatecertifiedts=?, enddate=?, \n"
                 + "       enddatecertifiedby_userid=?, enddatecterifiedts=?, manager_userid=?, \n"
                 + "       authorizationts=?, authorizedby_userid=?, overrideperiodtypeconfig=?, \n"
-                + "       notes=?, createdby_userid=?, lastupdatedby_userid=?, lastupdatedts=now() \n"
+                + "       notes=?, lastupdatedby_userid=?, lastupdatedts=now() \n"
                 + " WHERE periodid=?;";
         ResultSet rs = null;
         Connection con = null;
@@ -1436,7 +1444,11 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
             stmt = con.prepareStatement(query);
 
             // PARAMS LINE 1
-            stmt.setInt(1, period.getSource().getSourceid());
+            if(period.getSource() != null){
+                stmt.setInt(1, period.getSource().getSourceid());
+            } else {
+                stmt.setNull(1, java.sql.Types.NULL);
+            }
             stmt.setInt(2, period.getPropertyUnitID());
             // timestamp set to now()
 
@@ -1495,23 +1507,20 @@ public class OccupancyIntegrator extends BackingBeanUtils implements Serializabl
 
             // PARAMS LINE 5
             stmt.setString(13, period.getNotes());
-            if (period.getCreatedBy() != null) {
-                stmt.setInt(14, period.getCreatedBy().getUserID());
+           
+
+            if(period.getLastUpdatedBy() != null){
+                stmt.setInt(14, period.getLastUpdatedBy().getUserID());
             } else {
                 stmt.setNull(14, java.sql.Types.NULL);
             }
 
-            if(period.getLastUpdatedBy() != null){
-                stmt.setInt(15, period.getLastUpdatedBy().getUserID());
-            } else {
-                stmt.setNull(15, java.sql.Types.NULL);
-            }
-
-            stmt.setInt(16, period.getPeriodID());
+            stmt.setInt(15, period.getPeriodID());
 
             stmt.executeUpdate();
 
         } catch (SQLException ex) {
+            System.out.println(ex);
             throw new IntegrationException("Integration error: Unable to update occ period. This is a fatal error that should be reported.", ex);
         } finally {
              if (con != null) { try { con.close(); } catch (SQLException e) { /* ignored */} }

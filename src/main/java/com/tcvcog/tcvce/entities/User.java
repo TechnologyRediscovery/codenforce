@@ -18,6 +18,7 @@ package com.tcvcog.tcvce.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -26,7 +27,8 @@ import java.util.Objects;
  * See UserAuthorized for the credentialed subclass.
  * @author cedba
  */
-public class User implements Serializable{
+public class User 
+        implements Serializable{
 
     protected int userID;
     protected RoleType roleType;
@@ -48,6 +50,9 @@ public class User implements Serializable{
     protected int deactivatedByUserID;
     
     protected int homeMuniID;
+    protected int signatureBlobID;
+    
+    
     
     
     
@@ -82,6 +87,7 @@ public class User implements Serializable{
             this.deactivatedByUserID = u.deactivatedByUserID;
             
             this.homeMuniID = u.homeMuniID;
+            this.signatureBlobID = u.signatureBlobID;
           
         }
     }
@@ -362,6 +368,21 @@ public class User implements Serializable{
         this.humanID = humanID;
     }
 
+    /**
+     * @return the signatureBlobID
+     */
+    public int getSignatureBlobID() {
+        return signatureBlobID;
+    }
+
+    /**
+     * @param signatureBlobID the signatureBlobID to set
+     */
+    public void setSignatureBlobID(int signatureBlobID) {
+        this.signatureBlobID = signatureBlobID;
+    }
+
+   
   
 
 }
