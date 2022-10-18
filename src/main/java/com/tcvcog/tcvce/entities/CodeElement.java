@@ -44,6 +44,7 @@ public class CodeElement
     protected String ordSubSecTitle;
     
     protected String ordSubSubSecNum;
+    protected String ordSubSubSecTitle;
     
     protected String ordTechnicalText;
     
@@ -81,6 +82,7 @@ public class CodeElement
             this.ordSubSecNum = codeElement.getOrdSubSecNum();
             this.ordSubSecTitle = codeElement.getOrdSubSecTitle();
             this.ordSubSubSecNum = codeElement.getOrdSubSubSecNum();
+            this.ordSubSubSecTitle = codeElement.getOrdSubSubSecTitle();
             this.ordTechnicalText = codeElement.getOrdTechnicalText();
             this.ordHumanFriendlyText = codeElement.getOrdHumanFriendlyText();
             this.active = codeElement.isActive();
@@ -517,6 +519,20 @@ public class CodeElement
      */
     public void setLegacyID(int legacyID) {
         this.legacyID = legacyID;
+    }
+
+    /**
+     * @return the ordSubSubSecTitle
+     */
+    public String getOrdSubSubSecTitle() {
+        return ordSubSubSecTitle;
+    }
+
+    /**
+     * @param ordSubSubSecTitle the ordSubSubSecTitle to set
+     */
+    public void setOrdSubSubSecTitle(String ordSubSubSecTitle) {
+        this.ordSubSubSecTitle = ordSubSubSecTitle;
     }
 
     

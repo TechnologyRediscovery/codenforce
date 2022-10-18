@@ -324,7 +324,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         String query = "SELECT elementid, codesource_sourceid, ordchapterno, ordchaptertitle, \n" +
                         "       ordsecnum, ordsectitle, ordsubsecnum, ordsubsectitle, ordtechnicaltext, \n" +
                         "       ordhumanfriendlytext, resourceurl, guideentryid, notes, legacyid, \n" +
-                        "       ordsubsubsecnum, useinjectedvalues, lastupdatedts, \n" +
+                        "       ordsubsubsecnum, subsubsectitle, useinjectedvalues, lastupdatedts, \n" +
                         "       createdby_userid, lastupdatedby_userid, deactivatedts, deactivatedby_userid, \n" +
                         "       createdts\n" +
                         "  FROM public.codeelement WHERE elementid=?;";
@@ -392,6 +392,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
         e.setOrdSubSecNum(rs.getString("ordsubsecnum"));
 
         e.setOrdSubSubSecNum(rs.getString("ordsubsubsecnum"));
+        e.setOrdSubSubSecTitle(rs.getString("subsubsectitle"));
 
         e.setOrdTechnicalText(rs.getString("ordtechnicaltext"));
 
@@ -481,13 +482,13 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
                         "            elementid, codesource_sourceid, ordchapterno, ordchaptertitle, \n" +
                         "            ordsecnum, ordsectitle, ordsubsecnum, ordsubsectitle, ordtechnicaltext, \n" +
                         "            ordhumanfriendlytext, resourceurl, guideentryid, notes, legacyid, \n" +
-                        "            ordsubsubsecnum, useinjectedvalues, lastupdatedts, \n" +
+                        "            ordsubsubsecnum, subsubsectitle, useinjectedvalues, lastupdatedts, \n" +
                         "            createdby_userid, lastupdatedby_userid, \n" +
                         "            createdts)\n" +
                         "    VALUES (DEFAULT, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, ?, \n" +
-                        "            ?, ?, now(), \n" +
+                        "            ?, ?, ?, now(), \n" +
                         "            ?, ?, \n" +
                         "            now());";
 
@@ -525,18 +526,19 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setInt(13, element.getLegacyID());
             
             stmt.setString(14, element.getOrdSubSubSecNum());
-            stmt.setBoolean(15, element.isUsingInjectedValues());
+            stmt.setString(15, element.getOrdSubSubSecTitle());
+            stmt.setBoolean(16, element.isUsingInjectedValues());
             
             if(element.getCreatedBy() != null){
-                stmt.setInt(16, element.getCreatedBy().getUserID());
+                stmt.setInt(17, element.getCreatedBy().getUserID());
             } else{
-                stmt.setNull(16, java.sql.Types.NULL);
+                stmt.setNull(17, java.sql.Types.NULL);
             }
             
             if(element.getLastupdatedBy() != null){
-                stmt.setInt(17, element.getLastupdatedBy().getUserID());
+                stmt.setInt(18, element.getLastupdatedBy().getUserID());
             } else{
-                stmt.setNull(17, java.sql.Types.NULL);
+                stmt.setNull(18, java.sql.Types.NULL);
             }
             
             stmt.execute();
@@ -571,7 +573,7 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
                             "   SET codesource_sourceid=?, ordchapterno=?, ordchaptertitle=?, \n" +
                             "       ordsecnum=?, ordsectitle=?, ordsubsecnum=?, ordsubsectitle=?, \n" +
                             "       ordtechnicaltext=?, ordhumanfriendlytext=?, resourceurl=?, guideentryid=?, \n" +
-                            "       notes=?, legacyid=?, ordsubsubsecnum=?, useinjectedvalues=?, \n" +
+                            "       notes=?, legacyid=?, ordsubsubsecnum=?, subsubsectitle=?, useinjectedvalues=?, \n" +
                             "       lastupdatedts=now(), lastupdatedby_userid=? \n" +
                             " WHERE elementid=?;";
 
@@ -610,15 +612,16 @@ public class CodeIntegrator extends BackingBeanUtils implements Serializable {
             stmt.setString(12, element.getNotes());
             stmt.setInt(13, element.getLegacyID());
             stmt.setString(14, element.getOrdSubSubSecNum());
-            stmt.setBoolean(15, element.isUsingInjectedValues());
+            stmt.setString(15, element.getOrdSubSubSecTitle());
+            stmt.setBoolean(16, element.isUsingInjectedValues());
                         
             if(element.getLastupdatedBy() != null){
-                stmt.setInt(16, element.getLastupdatedBy().getUserID());
+                stmt.setInt(17, element.getLastupdatedBy().getUserID());
             } else{
-                stmt.setNull(16, java.sql.Types.NULL);
+                stmt.setNull(17, java.sql.Types.NULL);
             }
             
-            stmt.setInt(17, element.getElementID());
+            stmt.setInt(18, element.getElementID());
             
             
             stmt.executeUpdate();
