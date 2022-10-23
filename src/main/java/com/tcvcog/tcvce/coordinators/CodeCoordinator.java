@@ -202,7 +202,7 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
     
     /**
      * Implements logic to create a title for a code element; Designed to be injected
-     * into the code elements ordiance
+     * into the code elements ordinance
      * 
      * TODO: Finish my guts
      * @param ce
@@ -289,11 +289,19 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
                     sb.append(FMT_SPACE);
                     sb.append(ce.getOrdSecTitle());
                 }
+                //and sub section 
                 if(ce.getOrdSubSecTitle() != null && !ce.getOrdSubSecTitle().equals("''")){
                     sb.append(FMT_SPACE);
                     sb.append(FMT_DASH);
                     sb.append(FMT_SPACE);
                     sb.append(ce.getOrdSubSecTitle());
+                }
+                if(ce.getOrdSubSubSecTitle() != null){
+                    sb.append(FMT_SPACE);
+                    sb.append(FMT_DASH);
+                    sb.append(FMT_SPACE);
+                    sb.append(ce.getOrdSubSubSecTitle());
+                    
                 }
             } // end outer if check on standard IRC 
 //            System.out.println("CodeCoordinator.buildOrdinanceHeaderString | eleID:  " + ce.getElementID() );
@@ -373,6 +381,8 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         sb.append(ele.getOrdSubSecTitle());
         sb.append(Constants.FMT_SPACE_LITERAL);
         sb.append(ele.getOrdSubSubSecNum());
+        sb.append(Constants.FMT_SPACE_LITERAL);
+        sb.append(ele.getOrdSubSubSecTitle());
         sb.append(Constants.FMT_SPACE_LITERAL);
         sb.append(ele.getOrdTechnicalText());
         sb.append(Constants.FMT_SPACE_LITERAL);

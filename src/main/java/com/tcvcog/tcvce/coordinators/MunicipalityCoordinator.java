@@ -100,12 +100,25 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
 
     }
 
+    /**
+     * Retrieves a single municipality from the database
+     * @param muniCode
+     * @return
+     * @throws IntegrationException 
+     */
     public Municipality getMuni(int muniCode) throws IntegrationException {
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         return mi.getMuni(muniCode);
 
     }
 
+    /**
+     * A hacky way to get a default occ period
+     * @param ua
+     * @return
+     * @throws IntegrationException
+     * @throws AuthorizationException 
+     */
     public OccPeriod selectDefaultMuniOccPeriod(UserAuthorized ua) throws IntegrationException, AuthorizationException {
         OccupancyCoordinator oc = getOccupancyCoordinator();
         MunicipalityDataHeavy mdh = null;
@@ -122,6 +135,11 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
         return null;
     }
     
+    /**
+     * Selects an event rule goverend object
+     * @param mdh
+     * @return 
+     */
     public IFace_EventRuleGoverned determineERG(MunicipalityDataHeavy mdh){
         // first, choose a property info case if we have one
         List<CECasePropertyUnitHeavy> cecaseList = new ArrayList<>();
@@ -175,7 +193,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
     }
     
     /**
-     * 
+     * Updates fields on the Municipality object
      * @param muni
      * @param user 
      * @throws com.tcvcog.tcvce.domain.IntegrationException 
@@ -186,7 +204,7 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
         mi.updateMuniDataHeavy(muni);
     }
     /**
-     * 
+     * Writes a new municipality to the system
      * @param muni
      * @param user 
      */
@@ -212,11 +230,11 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
     }
     
     /**
-     * 
+     * Extracts all municipality profiles from DB
      * @return
      * @throws IntegrationException 
      */
-    public ArrayList<MuniProfile> getMuniProfilesList() throws IntegrationException{
+    public List<MuniProfile> getMuniProfilesList() throws IntegrationException{
         MunicipalityIntegrator mi = getMunicipalityIntegrator();
         try {
             return mi.getMuniProfileList();
@@ -225,6 +243,40 @@ public class MunicipalityCoordinator extends BackingBeanUtils implements Seriali
         }
     }
     
+    /**
+     * Writes a new muni profile to the DB
+     * @param profile
+     * @param ua
+     * @return the PK of the fresh profile
+     */
+    public int insertMuniProfile(MuniProfile profile, UserAuthorized ua){
+        MunicipalityIntegrator mi = getMunicipalityIntegrator();
+        
+        return 0;
+    }
+    
+    /**
+     * Updates a given municipality profile object
+     * @param profile
+     * @param ua 
+     */
+    public void updateMuniProfile(MuniProfile profile, UserAuthorized ua){
+        
+        
+    }
+    
+    /**
+     * Deactivates a given muni profile; Logic will check that no municipality is
+     * currently linked to (i.e. using) the profile which under request for deac
+     * 
+     * @param profile
+     * @param ua 
+     */
+    public void deactivateMuniProfile(MuniProfile profile, UserAuthorized ua){
+       
+        
+        
+    }
     
 
 }

@@ -363,6 +363,11 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         
     }
     
+    /**
+     * Generates a mapping of municode to muni name
+     * @return the mapping
+     * @throws IntegrationException 
+     */
     public Map<Integer, String> getMunicipalityMap() throws IntegrationException{
         Map<Integer, String> muniMap = null;
             
@@ -395,6 +400,12 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
     }
     
     
+    /**
+     * Generates a mapping of municipality name to municode; Remember that the municipality is the only
+     * object in CNF in which the primary key is assigned externally, in this case by Allegheny County
+     * @return
+     * @throws IntegrationException 
+     */
     public HashMap<String, Integer> generateCompleteMuniNameIDMap() throws IntegrationException{
         HashMap<String, Integer> muniMap = new HashMap<>();
        
@@ -470,8 +481,13 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         return muniList;
     }
     
-    //xiaohong add
-    public ArrayList<MuniProfile> getMuniProfileList() throws IntegrationException, BObStatusException {
+    /**
+     * Builds a complete list of all municipality profiles
+     * @return
+     * @throws IntegrationException
+     * @throws BObStatusException 
+     */
+    public List<MuniProfile> getMuniProfileList() throws IntegrationException, BObStatusException {
 
         String query = "SELECT profileid FROM public.muniprofile;";
 
@@ -521,7 +537,10 @@ public class MunicipalityIntegrator extends BackingBeanUtils implements Serializ
         return muniProfileList;
     }
     
-    //xiaohong add
+    /**
+     * Writes a municipality to the DB
+     * @param muni 
+     */
     public void insertMuniDataHeavy(MunicipalityDataHeavy muni) {
 
         String query = "INSERT INTO public.municipality(\n"
