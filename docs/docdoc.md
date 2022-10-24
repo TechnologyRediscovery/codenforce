@@ -9,3 +9,7 @@
 8. Authenticate with prompts
 9. Navigate to github.com in browser, select documentation branch, and verify that the files have made it up
 10. Make a note that the files are ready to be linked in live system (make tracker in github)
+
+ssh -f cogadmin@198.199.84.209 -L 50000:localhost:8000 -N
+ps aux | grep ssh   *to kill
+kill (PROCESS ID)   *use the left number

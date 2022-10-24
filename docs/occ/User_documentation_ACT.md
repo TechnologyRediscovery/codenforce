@@ -63,6 +63,7 @@ You can confirm which code element(s) were linked to each space in your checklis
 ![screenshot](img/checklist_8.png)
 
 
+
 ## Conduct An Inspection
 
 1. From the permit file page, select the '+ New inspection' button under the 'Inspections' banner. 
@@ -135,7 +136,7 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 
 ![screenshot](img/inspection_18.png)
 
-2. Select which elements of the inspection you want to be included in the report from the drop-down menu (red circle) and check any relevant boxes.  Once you are finished, click the 'Click to generate inspection report in new tabe' blue text at the top of the pop-up window. The report will appear in a new tab in a print-friendly format. 
+2. Select which elements of the inspection you want to be included in the report from the drop-down menu (red circle) and check any relevant boxes.  Once you are finished, click the 'Click to generate inspection report in new tabe' blue text at the top of the pop-up window. The report will appear in a new tab in a print-friendly format. (Note: It is recommended to remove Headers and Footers on your print settings and adjust the scale as needed.)
 
 ![screenshot](img/inspection_19.png)
 
