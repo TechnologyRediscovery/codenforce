@@ -643,6 +643,7 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
      * @param ece to insert
      * @param cs to which the ECE should be linked
      * @param ua doing the insertion
+     * @param dece containing default values for insertion
      * @return ID of the fresh object in DB
      * @throws BObStatusException
      * @throws IntegrationException 
@@ -668,11 +669,6 @@ public class CodeCoordinator extends BackingBeanUtils implements Serializable {
         ece.setDefaultViolationSeverity(dece.getDefaultViolationSeverity());
         ece.setFeeList(dece.getFeeList());
         ece.setDefaultViolationDescription(dece.getDefaultViolationDescription());
-        
-       
-        
-        
-       
         
         ece.setEceCreatedBy(ua);
         ece.setEceLastupdatedBy(ua);
