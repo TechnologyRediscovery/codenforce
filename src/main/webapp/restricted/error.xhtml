@@ -15,39 +15,51 @@
                 <div class="mainContainer">
                     <f:view id="erroPageView">
                         <h:messages globalOnly="true" showDetail="true" showSummary="true"
-                                        warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
+                                    warnClass="msgWarn" infoClass="msgInfo" fatalClass="msgFatal" errorClass="msgError">
                         </h:messages>
-                            
-                            <h1>Oops, we've got an error!</h1>
-                            <h:form id="errorPageForm">
-                                <h:outputText value="Application root: #{request.contextPath}/restricted/"/>
-                                <h:outputText value="#{systemServicesBB.logSub}"/>
-                                
-                                
-                                <p>No fear, the Back button is...up there! Please click Back (or alt + left arrow) and try another pathway.</p>
-                                
-                                <h2>Reporting errors</h2>
-                                <p>You are encouraged to log all errors you find troublesome through our trusty error reporting form:</p>
-                                
-                                     <p:commandLink ajax="false" value="Bug reporting form" action="improvementSuggestion"
-                                                    styleClass="sblink" style="font-weight:bold"/>
-                                     
-                                <h2>Troubleshooting</h2>
-                                    
-                                <p>A common source of page load errors may be not having an appropriate business object activated 
-                                    when trying to view its details (i.e. trying to view a Property's profile 
-                                    without having searched for and selected an active property.</p>
 
-                                    <p>Check the entries in your system status bar above for details on which Property, Case, Municipality, etc., are active 
-                                during your session.</p>
-                                <h2>Talk to a human!</h2>
-                                    <p>In the event the error you are receiving is debilitating to your work, 
-                                        please call system administrator Eric Darsow at 412.923.9907 (c).</p>
-                                    <p>Messages are checked periodically throughout a workday.</p>
-                                    <p>Email is not a reliable way to work through errors: please use our reporting form or the telephone.</p>
-                                
-                                
-                            </h:form>
+                        <h1>Oops, we've got an error!</h1>
+                        <h:form id="errorPageForm">
+                            <h:outputText value="Application root: #{request.contextPath}/restricted/"/>
+                            <h:outputText value="#{systemServicesBB.logSub}"/>
+                            <div class="ui-g">
+                                <div class="ui-g-12 ui-md-6 ui-lg-4">
+                                    <div class=" data_field_card">
+                                        <div class="data_field_card_title">
+                                            Reporting errors
+                                        </div>
+
+                                        <p>You are encouraged to log all errors you find troublesome through our google drive ticket tracker. </p>
+
+                                    </div>
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4 ">
+                                    <div class="data_field_card">
+                                        <div class="data_field_card_title">
+                                            Troubleshooting
+                                        </div>
+
+                                        <p>A common source of page load errors may be not having an appropriate business object activated 
+                                            when trying to view its details (i.e. trying to view a Property's profile 
+                                            without having searched for and selected an active property.</p>
+
+                                        <p>Check the entries in your system status bar above for details on which Property, Case, Municipality, etc., are active 
+                                            during your session.</p>
+                                    </div>
+
+                                </div>
+                                <div class="ui-g-12 ui-md-6 ui-lg-4">
+                                    <div class="data_field_card">
+                                        <div class="data_field_card_title">
+                                            Talk to a human!
+                                        </div>
+                                        <p>In the event the error you are receiving is debilitating to your work, 
+                                            please call Natalie at the Turtle Creek Valley Council of Governments via 412.858.5115.</p>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </h:form>
                     </f:view>
                 </div>
             </ui:define>

@@ -75,6 +75,19 @@ public class LoginBB extends BackingBeanUtils {
 //           return "testInit";
            
     }
+     
+     /**
+      * Used during debugging of new Elytron redirect service;
+      * Not really a security risk since any page behind /restricted/* will
+      * trigger FORM auth
+      * @return eventCatCOnfig nav string
+      */
+     public String testLoginService(){
+         System.out.println("LoginBB.testLoginService");
+         System.out.println("Forward to EventManage");
+         return "eventCatConfig";
+         
+     }
 
     /**
      * @return the publicUA
