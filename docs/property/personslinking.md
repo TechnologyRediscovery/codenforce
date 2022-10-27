@@ -1,6 +1,6 @@
 ## Link a Person to a Property or Case
 
-<div style="padding:52.19% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/716185487?h=1c6fdf8389&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Updating Property-Persons Links"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+[![Linking](https://i.imgur.com/XXvvyXW.png)](https://vimeo.com/716185487 "Updating Property-Persons Links")
 
 1. From the property page, select 'Manage property-persons links'. Or, from the case page, select 'Manage CE Case to person links'.
 
@@ -32,7 +32,7 @@ To link multiple people to a property or case in one batch, complete the steps i
 
 ## Link a Person to a Mailing Address
 
-<div style="padding:52.19% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/716185588?h=4605c1992d&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Linking a Person to a Mailing Address"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+[![Mailing Link](https://i.imgur.com/VcnpuPS.png)](https://vimeo.com/716185588 "Linking a Person to a Mailing Address")
 
 1. If the perosn you want to link is currently displayed in the top navigation bar, select 'view/edit' and skip to step #4. 
 
@@ -76,4 +76,4 @@ If the person you want to link is not currently displayed in the top navigation 
 
 ## Mark a Property as Abandoned
 
-<div style="padding:62.5% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/752602521?h=4891cd3ca6&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Marking a Property Abandoned"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+[![Abandoned](https://i.imgur.com/kZN9QrN.png)](https://vimeo.com/752602521 "Marking a Property as Abandoned")

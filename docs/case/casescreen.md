@@ -88,6 +88,28 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 ![screenshot](img/inspection_15copy.png)
 
 
+## Finalize an Inspection
+
+1. After saving an inspection checklist, you can finalize the inspection by selecting the blue 'finalize inspection' button. 
+
+![screenshot](img/inspection_16copy.png)
+
+2. Select the correct determination/result of the inspection from the drop-down menu by clicking the down arrow. Then select the 'Finalize and lock inspection ID' blue button. After this button has been selected, you will no longer be able to make any changes to the inspection.
+
+![screenshot](img/inspection_17copy.png)
+
+
+## Generate a Field Inspection Report
+
+1. Select the blue 'Build Inspection Report' button (red arrow).
+
+![screenshot](img/inspection_18copy.png)
+
+2. Select which elements of the inspection you want to be included in the report from the drop-down menu (red circle) and check any relevant boxes.  Once you are finished, click the 'Click to generate inspection report in new tabe' blue text at the top of the pop-up window. The report will appear in a new tab in a print-friendly format. (Note: It is recommended to remove Headers and Footers on your print settings and adjust the scale as needed.)
+
+![screenshot](img/inspection_19copy.png)
+
+
 ## Add Inspected Violations to Case
 
 1. After an inspection has been finalized, you can transfer the violations that were found to your case so that you do not need to re-enter them. To do this, select 'Transfer Violated Elements' in the Inspection Toolbox.
@@ -101,9 +123,14 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 3. Review the violations and enter case details to complete the transfer.
 
 
+## Generate a Field Inspection Report
+
+
+
+
 ## Prepare a Notice of Violation
 
-<div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/737989140?h=bf22d22502&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Preparing a Notice of Violation"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+[![NOV](https://i.imgur.com/an8X8oO.png)](https://vimeo.com/737989140 "Preparing a Notice of Violation")
 
 1. From the case screen, select 'New Letter'.
 
