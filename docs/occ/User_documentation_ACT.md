@@ -5,7 +5,7 @@ From this page, you can conduct an occupancy inspection, generate an occupancy p
 
 ## Conduct An Inspection
 
-[![Inspection](https://i.imgur.com/oIS540d.png)](https://vimeo.com/765013026 "Conducting an Inspection")
+[![Inspection](https://i.imgur.com/50wR1c9.png)](https://vimeo.com/765013026 "Conducting an Inspection")
 
 1. From the permit file page, select the '+ New inspection' button under the 'Inspections' banner. 
 
