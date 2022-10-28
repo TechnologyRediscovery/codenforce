@@ -17,4 +17,4 @@ To run a second search, first click Clear Results to reset the results list.
 
 Each case is assigned a color based on the compliance deadline attached to the case's violations. The earliest compliance deadline in the case is used to determine the color.
 
-[![DashboardColors](https://i.imgur.com/S6P2zva.png)]
+![DashboardColors](https://i.imgur.com/S6P2zva.png)
