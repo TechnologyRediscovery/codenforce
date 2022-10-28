@@ -5,7 +5,7 @@ From this page, you can conduct an occupancy inspection, generate an occupancy p
 
 ## Conduct An Inspection
 
-[![Inspection](https://i.imgur.com/oIS540d.png)](https://vimeo.com/714177493 "Conducting an Occupancy Inspection")
+[![Inspection](https://i.imgur.com/oIS540d.png)](https://vimeo.com/765013026 "Conducting an Inspection")
 
 1. From the permit file page, select the '+ New inspection' button under the 'Inspections' banner. 
 
@@ -60,6 +60,15 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 ![screenshot](img/inspection_15.png)
 
 
+## Inspection Toolbox
+
+The Inspection Toolbox contains options to:
+
+- [Finalize your inspection](#Finalize-an-Inspection)
+- [Build a printable inspection report](#Generate-a-Field-Inspection-Report)
+- [Transfer inspected violations to a new or existing case](#Add-Inspected-Violations-to-Case)
+
+
 ## Finalize an Inspection
 
 1. After saving an inspection checklist, you can finalize the inspection by selecting the blue 'finalize inspection' button. 
@@ -73,6 +82,8 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 
 ## Generate a Field Inspection Report
 
+[![FIR](https://i.imgur.com/NwHYnDR.png)](https://vimeo.com/765016058 "Creating a Field Inspection Report")
+
 1. Select the blue 'Build Inspection Report' button (red arrow).
 
 ![screenshot](img/inspection_18.png)
@@ -83,6 +94,8 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 
 
 ## Transfer Violations to a New or Existing Case
+
+[![Migrate](https://i.imgur.com/L1kDbGK.png)](https://vimeo.com/765068975 "Transferring Violations to a Case")
 
 1. After an inspection has been finalized, you can transfer the violations that were found to a new or existing case so that you do not need to re-enter them. To do this, select 'Transfer Violated Elements' in the Inspection Toolbox.
 

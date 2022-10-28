@@ -9,13 +9,11 @@ To navigate to the specific panel you want to update, scroll down or use the hyp
 From this page, you can:
 
 - [Add, View, and Edit Violations](#Add-a-Violation)
-- Conduct Field Inspections
-- Prepare and Print Notices of Violation and Other Letters
-- Manage Letter Types 
-- Log, Edit and View Events
-- Upload Photos and Documents
-- Manage Citations
-- Add Notes
+- [Conduct Field Inspections](#Conduct-a-Field-Inspection)
+- [Prepare and Print Notices of Violation and Other Letters](#Prepare-a-Notice-of-Violation)
+- [Manage Letter Types](#Manage-Letter-Types) 
+- [Log, Edit and View Events](#Log-an-Event)
+- [Upload Photos and Documents](#Upload-Files-and-Photos)
 
 
 ## Add a Violation
@@ -34,6 +32,8 @@ From this page, you can:
 
 
 ## Conduct a Field Inspection
+
+[![Inspection](https://i.imgur.com/oIS540d.png)](https://vimeo.com/765013026 "Conducting an Inspection")
 
 1. From the code enforcement case page, select the '+ New inspection' button under the 'Field Inspection' banner. 
 
@@ -88,6 +88,15 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 ![screenshot](img/inspection_15copy.png)
 
 
+## Inspection Toolbox
+
+The Inspection Toolbox contains options to:
+
+- [Finalize your inspection](#Finalize-an-Inspection)
+- [Build a printable inspection report](#Generate-a-Field-Inspection-Report)
+- [Transfer inspected violations to a new or existing case](#Add-Inspected-Violations-to-Case)
+
+
 ## Finalize an Inspection
 
 1. After saving an inspection checklist, you can finalize the inspection by selecting the blue 'finalize inspection' button. 
@@ -101,6 +110,8 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 
 ## Generate a Field Inspection Report
 
+[![FIR](https://i.imgur.com/NwHYnDR.png)](https://vimeo.com/765016058 "Creating a Field Inspection Report")
+
 1. Select the blue 'Build Inspection Report' button (red arrow).
 
 ![screenshot](img/inspection_18copy.png)
@@ -112,6 +123,8 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 
 ## Add Inspected Violations to Case
 
+[![Migrate](https://i.imgur.com/L1kDbGK.png)](https://vimeo.com/765068975 "Transferring Violations to a Case")
+
 1. After an inspection has been finalized, you can transfer the violations that were found to your case so that you do not need to re-enter them. To do this, select 'Transfer Violated Elements' in the Inspection Toolbox.
 
 ![screenshot](img/violtransfercopy.png)
@@ -121,11 +134,6 @@ If your upload is successful, the blue 'Upload' button will dissapear and confir
 ![screenshot](img/violtransfer2copy.png)
 
 3. Review the violations and enter case details to complete the transfer.
-
-
-## Generate a Field Inspection Report
-
-
 
 
 ## Prepare a Notice of Violation
