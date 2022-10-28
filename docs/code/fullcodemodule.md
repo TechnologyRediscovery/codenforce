@@ -1,18 +1,15 @@
 # Adding a New Ordinance to CodeNforce
 
-There are two steps to entering a new ordinance in CodeNforce. 
+There are two steps to entering a new ordinance in CodeNforce:
 
-First, [enter your ordinance on the Ordinances page.](#Step-1:-Enter-your-Ordinance-into-CodeNforce)
+- [Step 1: Enter your ordinance on the Ordinances page.](#Enter-your-Ordinance-into-CodeNforce)
 
-![screenshot of side nav](img/ordinancessidenavwrong.png)
+- [Step 2: Add your ordinance to your municipality's Code Book on the Code Book's page.](#Add-an-Ordinance-to-a-Code-Book) 
 
-Next, [add your ordinance to your municipality's Code Book](#Step-2:-Add-an-Ordinance-to-a-Code-Book) on the Code Books page.
+**Once your ordinance is added to the Code Book, please log out of CodeNforce to save all changes. The new changes will not display until you log back in.**
 
-![screenshot of side nav](img/codebookssidenavwrong.png)
 
-Once your ordinance is added to the Code Book, please log out of CodeNforce to save all changes. The new changes will not display until you log back in.
-
-## Step 1: Enter an Ordinance into CodeNforce
+## Enter an Ordinance into CodeNforce
 
 1. Under the Code Source panel, select the Code Source that your ordinance will fall under by clicking the corresponding View icon. 
 
@@ -26,7 +23,8 @@ Once your ordinance is added to the Code Book, please log out of CodeNforce to s
 
 ![screenshot of side nav](img/codebookssidenavwrong.png)
 
-## Step 2: Add an Ordinance to a Code Book
+
+## Add an Ordinance to a Code Book
 
 *Note: This is the second step in the process for adding a new ordinance to the CodeNforce system. If you have not yet entered the details of your ordinance in the Ordinances page, please do that first.*
 
@@ -49,6 +47,7 @@ Once your ordinance is added to the Code Book, please log out of CodeNforce to s
 ![screenshot](img/addelements.png)
 
 5. Please log out of the CodeNforce system to activate these changes.
+
 
 # Create A Checklist 
 
