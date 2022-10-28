@@ -1,6 +1,6 @@
-## Case List Builder
+## Case Search
 
-Case List Builder allows you to run a search for code enforcement cases that meet different criteria. To run your search, select the search criteria you would like to display from the dropdown menu:
+Case Search allows you to run a search for code enforcement cases that meet different criteria. To run your search, select the search criteria you would like to display from the dropdown menu:
 
 ![screenshot of dropdown menu](img/querydropdown.png)
 
