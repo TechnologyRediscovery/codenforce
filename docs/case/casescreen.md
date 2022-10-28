@@ -8,7 +8,7 @@ To navigate to the specific panel you want to update, scroll down or use the hyp
 
 From this page, you can:
 
-- Add, View, and Edit Violations
+- [Add, View, and Edit Violations](Add-a-Violation)
 - Conduct Field Inspections
 - Prepare and Print Notices of Violation and Other Letters
 - Manage Letter Types 
