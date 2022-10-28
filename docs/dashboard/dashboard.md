@@ -12,11 +12,9 @@ The search results will display on the Code Enforcement Case List panel located 
 
 To run a second search, first click Clear Results to reset the results list.
 
-![screenshot of clear query](img/clearquery.png)
-
 
 ## Case Priority Color Scheme
 
 Each case is assigned a color based on the compliance deadline attached to the case's violations. The earliest compliance deadline in the case is used to determine the color.
 
-[Imgur](https://i.imgur.com/S6P2zva.png)
+[![DashboardColors](https://i.imgur.com/S6P2zva.png)]
