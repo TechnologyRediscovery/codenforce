@@ -11,7 +11,7 @@ There are two steps to entering a new ordinance in CodeNforce:
 
 ## Enter an Ordinance into CodeNforce
 
-1. Under the Code Source panel, select the Code Source that your ordinance will fall under by clicking the corresponding View icon. 
+1. Under the Code Source panel, select your Code Source by clicking the corresponding View icon. 
 
 ![screenshot of view icon](img/viewicon.png)
 
