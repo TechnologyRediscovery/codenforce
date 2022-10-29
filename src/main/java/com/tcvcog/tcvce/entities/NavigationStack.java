@@ -19,7 +19,7 @@ package com.tcvcog.tcvce.entities;
 import com.tcvcog.tcvce.domain.NavigationException;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import javax.faces.context.FacesContext;
+import jakarta.faces.context.FacesContext;
 
 /**
  *

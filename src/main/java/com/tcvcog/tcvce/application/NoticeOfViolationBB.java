@@ -27,9 +27,9 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.event.ActionEvent;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.event.ActionEvent;
 
 /**
  * Premier backing bean for Notices of Violation, which are now called 

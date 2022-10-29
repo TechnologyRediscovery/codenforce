@@ -56,10 +56,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.ActionEvent;
 import org.primefaces.event.FileUploadEvent;
 
 /**
@@ -507,45 +507,7 @@ public class CEActionRequestSubmitBB
         getSessionBean().setSessCEAR(currentRequest);
     }
 
-    
-    /**
-     * TODO: must be updated for IFace_BlobHolder
-     * @param ev 
-     */
-    public void handlePhotoUpload(FileUploadEvent ev) {
-        if (ev == null) {
-            System.out.println("CEActionRequestBB.handlePhotoUpload | event: null");
-            return;
-        }
-
-        System.out.println("CEActionRequestSubmitBB.handlePhotoUpload | File: " + ev.getFile().getFileName() + " Type: " + ev.getFile().getContentType());
-
-        BlobCoordinator blobc = getBlobCoordinator();
-        Blob blob = null;
-//        try {
-//            blob = blobc.generateBlobSkeleton(getSessionBean().getSessUser());  //init new blob
-            // TODO: PF migration https://primefaces.github.io/primefaces/10_0_0/#/../migrationguide/8_0
-//            blob.setBytes(ev.getFile().getContents());  // set bytes
-//            blob.setFilename(ev.getFile().getFileName());
-//            blob.setMuni(currentRequest.getMuni());
-//
-//            blob = blobc.storeBlob(blob);
-//        } catch (IntegrationException | IOException | BlobTypeException ex) {
-//            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
-//            getFacesContext().addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                            "Something went wrong while trying to upload your photo, please try again.",
-//                            "If this problem persists, please call your municipal office."));
-//        } catch (BlobException ex) {
-//            System.out.println("CEActionRequestSubmitBB.handleFileUpload | " + ex);
-//            getFacesContext().addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                            ex.getMessage(),
-//                            ""));
-//        }
-
-        currentRequest.getBlobList().add(blob);
-    }
+   
 
     /**
      * This method finalizes the CEAR submission process by saving the request

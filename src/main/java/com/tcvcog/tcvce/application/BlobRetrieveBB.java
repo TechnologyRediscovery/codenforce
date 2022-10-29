@@ -24,8 +24,8 @@ import com.tcvcog.tcvce.integration.BlobIntegrator;
 import java.io.ByteArrayInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.FacesContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 

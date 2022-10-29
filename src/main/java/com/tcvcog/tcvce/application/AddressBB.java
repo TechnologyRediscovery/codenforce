@@ -31,10 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.ActionEvent;
 
 /**
  * The official backing bean for address management
@@ -538,20 +538,18 @@ public  class   AddressBB
             try {
                 sc.writeNotes(currentStreet, getSessionBean().getSessUser());
                 currentStreet = pc.getMailingStreet(currentStreet.getStreetID());
-                getFacesContext().addMessage(null,
-                       new FacesMessage(FacesMessage.SEVERITY_INFO,
-                               "Note write successful! Woot woot!",""));
-            } catch (IntegrationException | BObStatusException ex) {
+            } catch (BObStatusException | IntegrationException ex){
                 System.out.println(ex);
                 getFacesContext().addMessage(null,
-                       new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                               "Fatal note error: " + ex.getMessage(),""));
-            } 
-            formNotesAddress = "";
+                       new FacesMessage(FacesMessage.SEVERITY_ERROR, "FATAL Error on mailing street note commit",""));
+            }
+                getFacesContext().addMessage(null,
+                       new FacesMessage(FacesMessage.SEVERITY_INFO, "Successfully added note to mailing",""));
+            currentMailingAddress.setStreet(currentStreet);
         }
+        editModeCurrentAddress = true;
+        
     }
-    
-    
     
     
     /************************************************************/

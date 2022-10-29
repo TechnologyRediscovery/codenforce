@@ -8,7 +8,7 @@ package com.tcvcog.tcvce.application;
 import com.tcvcog.tcvce.entities.reports.Report;
 import com.tcvcog.tcvce.entities.reports.ReportCEARList;
 import java.io.Serializable;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  *

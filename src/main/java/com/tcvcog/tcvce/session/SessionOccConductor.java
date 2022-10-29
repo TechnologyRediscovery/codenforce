@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.session;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  * Home of Occupancy Period (to users, these are now called Permit Files) 

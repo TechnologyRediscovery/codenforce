@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.session;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  * Home of Money object family specific non-business session facilitation logic 

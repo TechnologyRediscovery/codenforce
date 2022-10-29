@@ -5,7 +5,7 @@
  */
 package com.tcvcog.tcvce.session;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  * The Summer 2022 holder of Session-level methods that previously lived on the

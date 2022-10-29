@@ -10,7 +10,7 @@ https://jdbc.postgresql.org/download.html
 
 The jar should be named:
 
-postgresql-42.2.5.jar
+postgresql-42.5.0.jar (As of SEP-2022)
 
 Then, we need to copy BOTH the jar you just downloaded and the xml into the appropriate modules directory inside wildfly's home. In the author's sample build, a path was built (by adding directories as needed) so that these two files can be stored in:
 

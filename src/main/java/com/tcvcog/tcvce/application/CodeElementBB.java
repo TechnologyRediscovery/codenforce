@@ -24,9 +24,9 @@ import com.tcvcog.tcvce.entities.CodeElement;
 import com.tcvcog.tcvce.entities.CodeSource;
 import java.io.Serializable;
 import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.event.ActionEvent;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.event.ActionEvent;
 
 /**
  * Backing bean for codeElementManage.xhtml

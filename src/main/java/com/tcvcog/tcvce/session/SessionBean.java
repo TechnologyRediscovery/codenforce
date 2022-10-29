@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import com.tcvcog.tcvce.application.interfaces.IFace_ActivatableBOB;
 import com.tcvcog.tcvce.coordinators.BlobCoordinator;
 import com.tcvcog.tcvce.coordinators.CodeCoordinator;

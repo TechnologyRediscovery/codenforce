@@ -34,8 +34,8 @@ import com.tcvcog.tcvce.util.viewoptions.ViewOptionsProposalsEnum;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
 
 /**
  * Backing Bean serving 

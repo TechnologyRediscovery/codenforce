@@ -26,8 +26,8 @@ import com.tcvcog.tcvce.coordinators.OccupancyCoordinator;
 import com.tcvcog.tcvce.domain.BObStatusException;
 import com.tcvcog.tcvce.entities.HumanLink;
 import java.io.Serializable;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
 
 /**
  *

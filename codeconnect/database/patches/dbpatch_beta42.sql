@@ -178,6 +178,7 @@ ALTER TABLE public.noticeofviolationtype ALTER COLUMN includestipcompdate SET DE
 --******************************* REMOTE CURSOR HERE  ******************************* 
 --******************************* LOCAL CURSOR HERE  ******************************* 
 
+ALTER TABLE public.occinspectiondispatch RENAME COLUMN creationts to createdts;
 
 
 INSERT INTO public.dbpatch(patchnum, patchfilename, datepublished, patchauthor, notes)

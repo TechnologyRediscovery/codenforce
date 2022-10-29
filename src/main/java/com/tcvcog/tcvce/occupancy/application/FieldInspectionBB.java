@@ -23,16 +23,16 @@ import com.tcvcog.tcvce.entities.occupancy.*;
 import com.tcvcog.tcvce.entities.reports.ReportConfigOccInspection;
 import com.tcvcog.tcvce.util.Constants;
 import com.tcvcog.tcvce.util.viewoptions.ViewOptionsOccChecklistItemsEnum;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.ActionEvent;
 
 /**
  * The premier backing bean for field inspections workflow.

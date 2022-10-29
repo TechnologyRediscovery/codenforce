@@ -65,15 +65,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.stream.ImageInputStream;
+import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseId;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.primefaces.model.DefaultStreamedContent;
@@ -709,6 +705,8 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
      * A method that removes all metadata from an image blob's bytes and puts
      * them into its Metadata field. Should always be called before saving an
      * image file to the database.
+     * 
+     * Not in use as of upgrade to PF11 and jakarta.*
      *
      * @param input
      * @return The blob that was put into it, stripped of metadata
@@ -742,25 +740,25 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         //The file extension is required because the default getImageReaders()
         //method guesses what file type the bytes are, and sometimes it guesses wrong.
         //Using the getImageReadersByFormatName() ensures we get the right one.
-        Iterator<ImageReader> inReaders = ImageIO.getImageReadersByFormatName(fileExtension);
+//        Iterator<ImageReader> inReaders = ImageIO.getImageReadersByFormatName(fileExtension);
         
-        ImageInputStream iis = ImageIO.createImageInputStream(bis);
+//        ImageInputStream iis = ImageIO.createImageInputStream(bis);
         
-        ImageReader reader = inReaders.next();
+//        ImageReader reader = inReaders.next();
         
-        reader.setInput(iis, false, false);
+//        reader.setInput(iis, false, false);
         
-        IIOMetadata imgMeta = reader.getImageMetadata(0);
+//        IIOMetadata imgMeta = reader.getImageMetadata(0);
         
-        String[] names = imgMeta.getMetadataFormatNames();
+//        String[] names = imgMeta.getMetadataFormatNames();
         
         Metadata blobMeta = new Metadata();
         
         //Go through each different metadata format and put it into the blobMeta map
-        for(int i = 0; i < names.length; i++){
-            Node node = imgMeta.getAsTree(names[i]);
-            blobMeta = extractMetadataFromNode(node, blobMeta);
-        }
+//        for(int i = 0; i < names.length; i++){
+//            Node node = imgMeta.getAsTree(names[i]);
+//            blobMeta = extractMetadataFromNode(node, blobMeta);
+//        }
         
         input.setBlobMetadata(blobMeta);
         
@@ -768,9 +766,9 @@ public class BlobCoordinator extends BackingBeanUtils implements Serializable {
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
-        BufferedImage temp = reader.read(0);
+//        BufferedImage temp = reader.read(0);
         
-        ImageIO.write(temp, fileExtension, baos);
+//        ImageIO.write(temp, fileExtension, baos);
         
         //These bytes should only be the image file itself, without the metadata. But that in the bytes field.
         
