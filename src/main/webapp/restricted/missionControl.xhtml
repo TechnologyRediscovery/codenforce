@@ -27,7 +27,8 @@
 
                         <div class="ui-g data_container_nested_restrict">
                             <div class="ui-g-12 ui-md-12 ui-lg-12 restrict-data-field">
-                                <ui:include src="/restricted/compositions/eventCalendar.xhtml"/>
+                                
+                                    <ui:include src="/restricted/compositions/eventCalendar.xhtml"/>
                                 
                             </div>
                             
@@ -57,6 +58,7 @@
                                           widgetVar="event-future-list-panel-var"
                                           collapsed="false"
                                           style="width:100%;"
+                                          rendered="false"
                                           header="Upcoming Events">
                                     <h:form id="event-future-list-form">
                                         <p:dataTable

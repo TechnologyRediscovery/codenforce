@@ -319,6 +319,12 @@
             <to-view-id>/public/system/documentation/contact.xhtml</to-view-id>
             <redirect />
         </navigation-case>
+        
+        <navigation-case>
+            <from-outcome>privacy</from-outcome>
+            <to-view-id>/public/privacypolicy.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
     </navigation-rule>
         
         
