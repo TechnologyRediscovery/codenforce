@@ -1496,9 +1496,11 @@ public class OccInspectionIntegrator extends BackingBeanUtils implements Seriali
         try {
             stmt = con.prepareStatement(query);
       
-            if(oid.getCreatedBy() != null){
-                stmt.setInt(1, oid.getCreatedBy().getCreatedByUserId());
+            if(oid.getCreatedBy() != null && oid.getCreatedBy().getUserID() != 0){
+                System.out.println("OccInspectionIntegrator.insertOccInspectionDispatch : user " + oid.getCreatedBy().getUserID());
+                stmt.setInt(1, oid.getCreatedBy().getUserID());
             } else {
+                System.out.println("OccInspectionIntegrator.insertOccInspectionDispatch : NULL CR USER ");
                 stmt.setNull(1, java.sql.Types.NULL);
             }
             stmt.setString(2, oid.getDispatchNotes());
