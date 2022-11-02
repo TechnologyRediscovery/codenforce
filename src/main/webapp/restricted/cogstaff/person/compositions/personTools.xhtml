@@ -1092,11 +1092,13 @@
 
                         <p:dataTable    id="person-links-table"
                                         value="#{personBB.currentPersonLinkHeavy.humanLinkList}"
+                                        rendered="#{!empty personBB.currentPersonLinkHeavy.humanLinkList}"
                                         var="hl"
                                         rowKey="#{hl.linkID}"
                                         tableStyleClass="primeDataTable"
                                         draggableRows="true" 
                                         tabindex="6"
+                                        lazy="true"
                                         rowExpandMode="multiple">
                             <p:column width="10%" 
                                       headerText="Exp.">
