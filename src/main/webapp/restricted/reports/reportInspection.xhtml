@@ -16,18 +16,19 @@
                     <div class="flexing-box-topbar">
                         <div class="logoBox">
                             <div class="logo-image-wrapper">
-                                             
-                                
+
+
                                 <p:graphicImage     id="report-headerphoto"
-                                                     value="#{blobsterBB.image}"
-                                                     alt="no preview available" 
-                                                     height="#{reportingBB.headerImageHeightPx}"
-                                                     cache="false"
-                                                     rendered="#{!empty reportingBB.headerImageBlob}">
-                                     <f:param name="blobid" value="#{reportingBB.headerImageBlob.photoDocID}"/>
-                                 </p:graphicImage>
-                    
+                                                    value="#{blobsterBB.image}"
+                                                    alt="no preview available" 
+                                                    height="#{reportingBB.headerImageHeightPx}"
+                                                    cache="false"
+                                                    rendered="#{!empty reportingBB.headerImageBlob}">
+                                    <f:param name="blobid" value="#{reportingBB.headerImageBlob.photoDocID}"/>
+                                </p:graphicImage>
+
                             </div>
+                            <!-- Deprecate by wwalk 10.25.22 to eliminate Field Inspection Report
                             <div class="logo-title-wrapper">
                                 <div class="report-title">
                                     <h:outputText id="report-title-ot"  value="#{reportingBB.reportConfigFieldInspection.title}"/> 
@@ -37,12 +38,11 @@
                                     <h:outputText value=" | " />
                                     <h:outputText id="creator-ot" value="Created by: #{reportingBB.reportConfigFieldInspection.creator.human.name}" />
                                     <h:outputText value=" " />
-                                    <!-- Deprecated by wwalk 9.2.22 to eliminate created by name redundancy -->
-                                    <!--<h:outputText value="#{reportingBB.reportConfigFieldInspection.creator.human.name}" />-->
+                                    <<h:outputText value="#{reportingBB.reportConfigFieldInspection.creator.human.name}" />
                                     <h:outputText value=" | " />
                                     <h:outputText id="report-ts-ot" value="#{reportingBB.reportConfigFieldInspection.generationTimestampPretty}" />
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </f:view>
@@ -55,153 +55,135 @@
 
                         <h1 style="clear:both;">Field Inspection Report</h1>
 
-                            <div class="p-grid nested-grid">
-                                <div class="p-col-6">
-                                    <h2>Property Details</h2>
-                                    <h:outputText styleClass="occperiod-address" 
-                                                  value="#{reportingBB.reportConfigFieldInspection.inspectedProperty.address.addressPretty2LineEscapeFalse}"
-                                                  escape="false"/>
+                        <div class="p-grid nested-grid">
+                            <div class="p-col-6">
+                                <h2>Property Details</h2>
+                                <f:subview id="fir-unit-subview"
+                                           rendered="#{!empty reportingBB.reportConfigFieldInspection.inspectedUnit}" >                                     
+                                    <h:outputText value="Unit: "
+                                                  styleClass="data-text"/>
+                                    <h:outputText value="Single dwelling unit"  
+                                                  rendered="#{reportingBB.reportConfigFieldInspection.inspectedUnit.unitNumber eq 'DEFAULT'}"
+                                                  styleClass="data-text italic" />
+                                    <h:outputText value="#{reportingBB.reportConfigFieldInspection.occPeriod.propUnitProp.unitNumber}"
+                                                  rendered="Unit number: #{reportingBB.reportConfigFieldInspection.inspectedUnit.unitNumber ne 'DEFAULT'}"
+                                                  styleClass="data-text"/>                                         
                                     <p:spacer height="3px" />
+                                </f:subview>
+                                <h:outputText styleClass="occperiod-address" 
+                                              value="#{reportingBB.reportConfigFieldInspection.inspectedProperty.address.addressPretty2LineEscapeFalse}"
+                                              escape="false"/>
+                                <p:spacer height="3px" />
 
-                                    <div class="p-grid">
-                                        <div class="p-col-4">
-                                            <div class="restrict-data-field-label-inline" >                                                
-                                                  <h:outputText value="Parcel ID:" />
-                                            </div>
-                                        </div>
-                                        <div class="p-col-8">
-                                            <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspectedProperty.countyParcelID}" />
-                                        </div>
-                                        <div class="p-col-4">
-                                            <div class="restrict-data-field-label-inline" >     
-                                                <h:outputText value="Total units:" />
-                                            </div>
-                                        </div>
-                                        <div class="p-col-8">
-                                            <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspectedProperty.unitList.size()}" />
-                                        </div>
-                                        <div class="p-col-4">
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputText value="Use type:" />
-                                            </div>
-                                        </div>
-                                        <div class="p-col-8">
-                                            <h:outputText value="#{reportingBB.reportConfigFieldInspection.occPeriod.propUnitProp.property.parcelInfo.useType.name}" />
-                                        </div>
-                                        <div class="p-col-4">
-                                            <div class="restrict-data-field-label-inline" >
-                                                <h:outputText value="Internal ID:" />
-                                            </div>
-                                        </div>
-                                        <div class="p-col-8">
-                                            <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspectedProperty.propertyID}" />
+                                <div class="p-grid">
+                                    <div class="p-col-4">
+                                        <div class="restrict-data-field-label-inline" >                                                
+                                            <h:outputText value="Parcel ID:" />
                                         </div>
                                     </div>
-
-                                    <f:subview id="fir-owner-subview"
-                                               rendered="#{reportingBB.reportConfigFieldInspection.includeOwnerInfo and !(empty reportingBB.reportConfigFieldInspection.propertyOwner)}">
-                                        <h2>Owner</h2>
-                                        <div class="p-grid">
-                                            <div class="p-col-4">
-                                                <div class="restrict-data-field-label-inline" >
-                                                    <h:outputText value="Name: " />
-                                                </div>
-                                            </div>
-                                            <div class="p-col-8">
-                                                <h:outputText value="#{reportingBB.reportConfigFieldInspection.propertyOwner.name}" />
-                                            </div>
-                                            <f:subview id="fir-owner-addresses-subview"
-                                                       rendered="#{reportingBB.reportConfigFieldInspection.includeOwnerAddresses}">
-                                                <div class="p-col-4">
-                                                    <div class="restrict-data-field-label-inline" >
-                                                        <h:outputText value="Addresses: " />
-                                                    </div>
-                                                </div>
-                                                <div class="p-col-8">
-                                                    <ui:repeat id="fir-owner-addresses-uir"
-                                                               value="#{reportingBB.reportConfigFieldInspection.propertyOwner.mailingAddressLinkList}"
-                                                               var="owner-address">
-                                                        <h:outputText value="#{owner-address.addressPretty2LineEscapeFalse}" />
-                                                        <p:spacer height="3px" />
-                                                    </ui:repeat>
-                                                </div>
-                                            </f:subview>
-
-                                            <f:subview id="fir-owner-phones-subview"
-                                                       rendered="#{reportingBB.reportConfigFieldInspection.includeOwnerPhones}">
-                                                <div class="p-col-4">
-                                                    <div class="restrict-data-field-label-inline" >
-                                                        <h:outputText value="Phone numbers:" />
-                                                    </div>
-                                                </div>
-                                                <div class="p-col-8">
-                                                    <ui:repeat id="fir-owner-phones-uir"
-                                                               value="#{reportingBB.reportConfigFieldInspection.propertyOwner.phoneList}"
-                                                               var="owner-phone">
-                                                        <h:outputText value="#{owner-phone.phoneNumber}" />
-                                                        <h:outputText value=" (#{owner-phone.phoneType.title})" />
-                                                        <p:spacer height="3px" />
-                                                    </ui:repeat>
-                                                </div>
-                                            </f:subview>
-
-                                            <f:subview id="fir-owner-emails-subview"
-                                                       rendered="#{reportingBB.reportConfigFieldInspection.includeOwnerEmails}">
-                                                <div class="p-col-4">
-                                                    <div class="restrict-data-field-label-inline" >
-                                                        <h:outputText value="Email addresses:" />
-                                                    </div>
-                                                </div>
-                                                <div class="p-col-8">
-                                                    <ui:repeat id="fir-owner-phones-uir"
-                                                               value="#{reportingBB.reportConfigFieldInspection.propertyOwner.emailList}"
-                                                               var="owner-email">
-                                                        <h:outputText value="#{owner-email.emailaddress}" />
-                                                        <p:spacer height="3px" />
-                                                    </ui:repeat>
-                                                </div>
-                                            </f:subview>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspectedProperty.countyParcelID}" />
+                                    </div>
+                                    <div class="p-col-4">
+                                        <div class="restrict-data-field-label-inline" >     
+                                            <h:outputText value="Total units:" />
                                         </div>
-                                    </f:subview>
-
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspectedProperty.unitList.size()}" />
+                                    </div>
+                                    <!-- Deprecated by wwalk 10.25.22 to remove from Field Inspection Report
+                                    <div class="p-col-4">
+                                        <div class="restrict-data-field-label-inline" >
+                                            <h:outputText value="Use type:" />
+                                        </div>
+                                    </div> 
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{reportingBB.reportConfigFieldInspection.occPeriod.propUnitProp.property.parcelInfo.useType.name}" />
+                                    </div> -->
+                                    <div class="p-col-4">
+                                        <div class="restrict-data-field-label-inline" >
+                                            <h:outputText value="Internal ID:" />
+                                        </div>
+                                    </div>
+                                    <div class="p-col-8">
+                                        <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspectedProperty.propertyID}" />
+                                    </div>
                                 </div>
-                                <div class="p-col-6">
 
-                                    <f:subview id="fir-unit-subview"
-                                               rendered="#{!empty reportingBB.reportConfigFieldInspection.inspectedUnit}" >
-
-                                        <h2>Unit Details</h2>
-                                        <div class="p-grid">
-                                            <div class="p-col-4">
-                                                <div class="restrict-data-field-label-inline" >
-                                                    
-                                                    <h:outputText value="Unit number: "
-                                                                  styleClass="data-text"/>
-                                                </div>
-                                            </div>
-                                            <div class="p-col-8">
-                                                <h:outputText value="Single dwelling unit"  
-                                                              rendered="#{reportingBB.reportConfigFieldInspection.inspectedUnit.unitNumber eq 'DEFAULT'}"
-                                                              styleClass="data-text italic" />
-                                                <h:outputText value="#{reportingBB.reportConfigFieldInspection.occPeriod.propUnitProp.unitNumber}"
-                                                              rendered="Unit number: #{reportingBB.reportConfigFieldInspection.inspectedUnit.unitNumber ne 'DEFAULT'}"
-                                                              styleClass="data-text"/>
-                                            </div>
-                                            <div class="p-col-4">
-                                                <div class="restrict-data-field-label-inline" >
-                                                    <h:outputText value="Internal ID: "
-                                                                  styleClass="data-text"/>
-                                                </div>
-                                            </div>
-                                            <div class="p-col-8">
-                                                <h:outputText value="#{reportingBB.reportConfigFieldInspection.inspectedUnit.unitID}" />
+                                <f:subview id="fir-owner-subview"
+                                           rendered="#{reportingBB.reportConfigFieldInspection.includeOwnerInfo and !(empty reportingBB.reportConfigFieldInspection.propertyOwner)}">
+                                    <h2>Owner</h2>
+                                    <div class="p-grid">
+                                        <div class="p-col-4">
+                                            <div class="restrict-data-field-label-inline" >
+                                                <h:outputText value="Name: " />
                                             </div>
                                         </div>
-                                    </f:subview>
-                                </div>
+                                        <div class="p-col-8">
+                                            <h:outputText value="#{reportingBB.reportConfigFieldInspection.propertyOwner.name}" />
+                                        </div>
+                                        <f:subview id="fir-owner-addresses-subview"
+                                                   rendered="#{reportingBB.reportConfigFieldInspection.includeOwnerAddresses}">
+                                            <div class="p-col-4">
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputText value="Addresses: " />
+                                                </div>
+                                            </div>
+                                            <div class="p-col-8">
+                                                <ui:repeat id="fir-owner-addresses-uir"
+                                                           value="#{reportingBB.reportConfigFieldInspection.propertyOwner.mailingAddressLinkList}"
+                                                           var="owner-address">
+                                                    <h:outputText value="#{owner-address.addressPretty2LineEscapeFalse}" />
+                                                    <p:spacer height="3px" />
+                                                </ui:repeat>
+                                            </div>
+                                        </f:subview>
+
+                                        <f:subview id="fir-owner-phones-subview"
+                                                   rendered="#{reportingBB.reportConfigFieldInspection.includeOwnerPhones}">
+                                            <div class="p-col-4">
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputText value="Phone numbers:" />
+                                                </div>
+                                            </div>
+                                            <div class="p-col-8">
+                                                <ui:repeat id="fir-owner-phones-uir"
+                                                           value="#{reportingBB.reportConfigFieldInspection.propertyOwner.phoneList}"
+                                                           var="owner-phone">
+                                                    <h:outputText value="#{owner-phone.phoneNumber}" />
+                                                    <h:outputText value=" (#{owner-phone.phoneType.title})" />
+                                                    <p:spacer height="3px" />
+                                                </ui:repeat>
+                                            </div>
+                                        </f:subview>
+
+                                        <f:subview id="fir-owner-emails-subview"
+                                                   rendered="#{reportingBB.reportConfigFieldInspection.includeOwnerEmails}">
+                                            <div class="p-col-4">
+                                                <div class="restrict-data-field-label-inline" >
+                                                    <h:outputText value="Email addresses:" />
+                                                </div>
+                                            </div>
+                                            <div class="p-col-8">
+                                                <ui:repeat id="fir-owner-phones-uir"
+                                                           value="#{reportingBB.reportConfigFieldInspection.propertyOwner.emailList}"
+                                                           var="owner-email">
+                                                    <h:outputText value="#{owner-email.emailaddress}" />
+                                                    <p:spacer height="3px" />
+                                                </ui:repeat>
+                                            </div>
+                                        </f:subview>
+                                    </div>
+                                </f:subview>
+
                             </div>
+                            <div class="p-col-6">
 
-                            <p:spacer height="3px" />
+                            </div>
+                        </div>
+
+                        <p:spacer height="3px" />
 
                         <h2>Inspection Details</h2>
 
@@ -231,7 +213,7 @@
                             </div>
                             <div class="p-col-3">
                                 <div class="restrict-data-field-label-inline" >
-                                    <h:outputText value="Effective date:" />
+                                    <h:outputText value="Inspection date:" />
                                 </div>
 
                             </div>
@@ -341,7 +323,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        <!-- Deprecated by wwalk 10.25.22 to remove criteria from Field Inspection Report
                         <f:subview id="fir-bedbathocc-subview"
                                    rendered="#{reportingBB.reportConfigFieldInspection.includeBedBathOccCounts}" >
                             <div class="p-grid">
@@ -379,7 +361,7 @@
                                     <h:outputText value=" " />
                                 </div>
                             </div>
-                        </f:subview>
+                        </f:subview> -->
 
                         <h2>Inspection Results</h2>
 
@@ -438,7 +420,7 @@
                                                     rendered="#{reportingBB.reportConfigFieldInspection.includeFullOrdText}">
                                         <div class="p-col-12">
                                             <div class="restrict-data-field-label-inline" >
-                                            <h:outputText value="Ordinance text" />
+                                                <h:outputText value="Ordinance text" />
                                             </div>
                                             <h:outputText styleClass="italic" value="#{inelement.ordTechnicalText}" escape="false"/>
                                         </div>
@@ -465,7 +447,7 @@
                                             <h:outputText value="#{reportingBB.getPrettyDate(inelement.complianceGrantedTS)}" 
                                                           rendered="#{!empty inelement.complianceGrantedTS}"/>
                                             <h:outputText value="[no compliance]" 
-                                                          
+
                                                           rendered="#{empty inelement.complianceGrantedTS}"/>
                                         </div>
                                     </f:subview>
@@ -483,7 +465,7 @@
                                         <h4>
                                             <h:outputText value=" Photo ID:#{blobord.photoDocID}"
                                                           rendered="#{reportingBB.reportConfigFieldInspection.includePhotoIDs}"/>
-                                            
+
                                             <h:outputText value=": #{blobord.title}"
                                                           rendered="#{reportingBB.reportConfigFieldInspection.includePhotoTitles}"/>
                                         </h4>

@@ -653,6 +653,7 @@ public class CEActionRequestSubmitBB
         SearchCoordinator sc = getSearchCoordinator();
         UserCoordinator uc = getUserCoordinator();
 
+        System.out.println("Search For Properties Single Muni -Called, Success!");
         propList = new ArrayList<>();
 
         QueryProperty qp = null;
@@ -670,6 +671,10 @@ public class CEActionRequestSubmitBB
                 spp.setLimitResultCount_val(20);
 
                 sc.runQuery(qp);
+                
+                System.out.println(qp.getQueryLog());
+                
+                //Ask query for result list, then put it in the table for user to see
 
             } else {
                 getFacesContext().addMessage(null,
