@@ -1422,7 +1422,7 @@ public class OccupancyCoordinator extends BackingBeanUtils implements Serializab
         period.setLastUpdatedBy(ua);
         
 
-        period.setStartDate(LocalDateTime.now().plusDays(DEFAULT_OCC_PERIOD_START_DATE_OFFSET));
+        period.setStartDate(LocalDateTime.now());
         period.setEndDate(null);
         period.setStartDateCertifiedBy(null);
         period.setStartDateCertifiedTS(null);

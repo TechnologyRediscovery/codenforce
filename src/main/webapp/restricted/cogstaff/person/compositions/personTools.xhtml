@@ -1092,6 +1092,8 @@
 
                         <p:dataTable    id="person-links-table"
                                         value="#{personBB.currentPersonLinkHeavy.humanLinkList}"
+                                        rendered="#{!empty personBB.currentPersonLinkHeavy.humanLinkList}"
+                                        lazy="true"
                                         var="hl"
                                         rowKey="#{hl.linkID}"
                                         tableStyleClass="primeDataTable"
