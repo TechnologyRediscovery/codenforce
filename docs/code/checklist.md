@@ -1,26 +1,26 @@
 ## Create A Checklist 
 
-1. Select the 'checklist' link in the 'Code Book' section of the dashboard. 
+(1) Select the 'checklist' link in the 'Code Book' section of the dashboard. 
 
 ![screenshot](img/checklist_1.png)
 
-2. Select the '+ New checklist' button on the inspection checlist builder page. 
+(2) Select the '+ New checklist' button on the inspection checlist builder page. 
 
 ![screenshot](img/checklist_2.png)
 
 A pop-up window will appear in the middle of the page. 
 
-3. Fill in the municipality, title, description, and governing code for the new checklist that you want to create. Then, select "Save Changes". 
+(3) Fill in the municipality, title, description, and governing code for the new checklist that you want to create. Then, select "Save Changes". 
 
 ![screenshot](img/checklist_3.png)
 
 ***The default municipality in this pop-up window may not be the municipality you are currently logged into! Choose the desired municipality from the drop-down menu. The checklist you create will only appear for the municipality chosen in this field!***
 
-4. After saving the basic information for your new checklist in step 3, the "Save Changes" button will dissapear, but the pop-up window will remain. At this point you can either edit the basic information (red arrow), or exit the window (red circle). 
+(4) After saving the basic information for your new checklist in step 3, the "Save Changes" button will dissapear, but the pop-up window will remain. At this point you can either edit the basic information (red arrow), or exit the window (red circle). 
 
 ![screenshot](img/checklist_4.png)
 
-5. The new checklist you created should appear at the bottom of the inspection checklist builder for the municipality you chose in step 3. If not, refresh the webpage.
+(5) The new checklist you created should appear at the bottom of the inspection checklist builder for the municipality you chose in step 3. If not, refresh the webpage.
 
 Select the 'load checklist' link to continue building the checklist. 
 
@@ -30,7 +30,7 @@ After clicking the 'load checklist' link, the title of the new checklist should 
 
 ![screenshot](img/checklist_5_2.png)
 
-6.  Select the '+ Add Space Type' button. 
+(6) Select the '+ Add Space Type' button. 
 
 ![screenshot](img/checklist_6.png)
 
@@ -42,7 +42,7 @@ When you are done, scroll down to the bottom of the list of spaces and click the
 
 ![screenshot](img/checklist_6_3.png)
 
-7.  You should now be able to see all of the spaces you selected and link the associated ordinances that apply to each space. Select the 'link ordances' link in the 'Actions' section of the space.
+(7)  You should now be able to see all of the spaces you selected and link the associated ordinances that apply to each space. Select the 'link ordances' link in the 'Actions' section of the space.
 
 ![screenshot](img/checklist_7.png)
 
@@ -56,7 +56,7 @@ When you are done selecting code elements, select the 'Connect selected ordinanc
 
 ![screenshot](img/checklist_7_4.png)
 
-8. Double checking and editing your new list. 
+(8) Double checking and editing your new list. 
 
 You can confirm which code element(s) were linked to each space in your checklist by selecting the arrow on the left-hand side of the inspection space (red circle). You can also 'remove' a space or mark a required space as 'optional' using the links on the right-hand side of the space (red box). 
 
