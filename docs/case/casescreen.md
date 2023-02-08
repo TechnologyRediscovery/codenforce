@@ -37,8 +37,6 @@ From this page, you can:
 
 (1) Locate the violation and click 'view/edit.' 
 
-![screenshot](img/exdateSmall.png)
-
 (2) Click 'Change Stip. Comp. Date'.
 
 ![screenshot](img/exdate.png)
@@ -348,8 +346,6 @@ If you made a mistake in the type or category, please delete the event and creat
 ## Close the Case
 
 (1) Navigate to the open case.
-
-![screenshot](img/cc.png)
 
 (2) Click 'close case'.
 
