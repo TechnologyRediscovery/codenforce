@@ -14,7 +14,7 @@ From this page, you can:
 - [Manage Letter Types](#Manage-Letter-Types) 
 - [Log, Edit and View Events](#Log-an-Event)
 - [Upload Photos and Documents](#Upload-Files-and-Photos)
-
+- [Close the Case](#Close-the-Case)
 
 ## Add a Violation
 
@@ -29,6 +29,40 @@ From this page, you can:
 (3) Scroll to the bottom of the Record New Code Violation panel to enter a Description of the code violation. Click the 'Record Violation' button.
 
 ![screenshot](img/recordviolation.png)
+
+**Note: If a violation was added in error, you can deactivate the violation by clicking 'Deactivate violation' under Violation Details. This will cause the record of the violation to be removed from the case.** 
+
+
+## Extend Violation Compliance Date
+
+(1) Locate the violation and click 'view/edit.' 
+
+![screenshot](img/exdate.jpeg)
+
+(2) Click 'Change Stip. Comp. Date'.
+
+![screenshot](img/exdate2.jpeg)
+
+(3) Enter a new compliance date and add a note to the Event Log Description explaining why it was changed. Click 'Save new stipulated Compliance date.'
+
+
+## Record Violation Compliance
+
+(1) Navigate to the Code Violations box on the Case screen. Click 'Record compliance.'
+
+![screenshot](img/cdate2.jpeg)
+
+(2) Add a descriptive comment & date of record, click 'Record compliance.'
+
+![screenshot](img/cdate3.jpeg)
+
+The code violation box will display a green compliance achieved date. 
+
+![screenshot](img/cdate4.jpeg)
+
+(3) Repeat the process per violation.
+
+**Note: Even after all violations are marked compliant, the case will still remain open. To [close the case](#close-the-case), click 'close case' in the Code Enforcement Case panel.** 
 
 
 ## Conduct a Field Inspection
@@ -309,6 +343,27 @@ If you made a mistake in the type or category, please delete the event and creat
 (4) Navigate to your uploaded document at the bottom of the Files and Photos panel, and select 'edit' under the Actions column to add a title and description for your document.
 
 ![screenshot](img/edit.png)
+
+
+## Close the Case
+
+(1) Navigate to the open case.
+
+![screenshot](img/cc.jpeg)
+
+(2) Click 'close case'.
+
+![screenshot](img/cc1.jpeg)
+
+(3) Select reason for closure from dropdown box.
+
+![screenshot](img/cc2.jpeg)
+
+(4) Enter date of closure and click 'Close case'.
+
+(5) Confirm case is closed.
+
+![screenshot](img/cc6.jpeg)
 
 
 
