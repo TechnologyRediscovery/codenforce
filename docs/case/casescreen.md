@@ -37,7 +37,7 @@ From this page, you can:
 
 (1) Locate the violation and click 'view/edit.' 
 
-![screenshot](img/exdate.jpeg)
+![screenshot](img/exdateSmall.png)
 
 (2) Click 'Change Stip. Comp. Date'.
 
@@ -50,15 +50,15 @@ From this page, you can:
 
 (1) Navigate to the Code Violations box on the Case screen. Click 'Record compliance.'
 
-![screenshot](img/cdate2.jpeg)
+![screenshot](img/cdate2.png)
 
 (2) Add a descriptive comment & date of record, click 'Record compliance.'
 
-![screenshot](img/cdate3.jpeg)
+![screenshot](img/cdate3.png)
 
 The code violation box will display a green compliance achieved date. 
 
-![screenshot](img/cdate4.jpeg)
+![screenshot](img/cdate4.png)
 
 (3) Repeat the process per violation.
 
@@ -349,21 +349,21 @@ If you made a mistake in the type or category, please delete the event and creat
 
 (1) Navigate to the open case.
 
-![screenshot](img/cc.jpeg)
+![screenshot](img/cc.png)
 
 (2) Click 'close case'.
 
-![screenshot](img/cc1.jpeg)
+![screenshot](img/cc1.png)
 
 (3) Select reason for closure from dropdown box.
 
-![screenshot](img/cc2.jpeg)
+![screenshot](img/cc2.png)
 
 (4) Enter date of closure and click 'Close case'.
 
 (5) Confirm case is closed.
 
-![screenshot](img/cc6.jpeg)
+![screenshot](img/cc6.png)
 
 
 
