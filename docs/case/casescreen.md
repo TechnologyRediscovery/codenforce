@@ -41,7 +41,7 @@ From this page, you can:
 
 (2) Click 'Change Stip. Comp. Date'.
 
-![screenshot](img/exdate2.jpeg)
+![screenshot](img/exdate.png)
 
 (3) Enter a new compliance date and add a note to the Event Log Description explaining why it was changed. Click 'Save new stipulated Compliance date.'
 
