@@ -110,6 +110,6 @@ The Inspection Toolbox contains options to:
 
 ## Generate an Occupancy Permit
 
-[![Permit](https://i.imgur.com/8gsU6Zo.png)](https://vimeo.com/714239708 "Generating an Occupancy Permit")
+[![Permit](https://i.imgur.com/8gsU6Zo.png)](https://vimeo.com/810974149 "Generating an Occupancy Permit")
 
 
