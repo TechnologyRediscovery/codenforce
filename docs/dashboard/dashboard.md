@@ -10,7 +10,9 @@ The search results will display on the Code Enforcement Case List panel located 
 
 ![screenshot of Code Enforcement Case List panel with arrow](img/cecaselistquery.png)
 
-To run a second search, first click Clear Results to reset the results list.
+To run a second search, first click 'reset search'.
+
+![reset](img/resetsearch.png)
 
 
 ## Case Priority Color Scheme
@@ -18,3 +20,30 @@ To run a second search, first click Clear Results to reset the results list.
 Each case is assigned a color based on the compliance deadline attached to the case's violations. The earliest compliance deadline in the case is used to determine the color.
 
 ![DashboardColors](https://i.imgur.com/S6P2zva.png)
+
+
+## Custom Event Search
+
+(1) Scroll down to 'Select a query' in the 'Events' box.
+
+![event query](img/eventquery.png)
+
+(2) Select 'Events by category' in the dropdown menu.
+
+![event query](img/eventsbycat.png)
+
+(3) Select the date range that you would like to use for your search.
+
+![event query](img/startandenddate.png)
+
+(4) Select the event category that you would like to track in your search
+
+![event query](img/eventcat.png)
+
+(5) Scroll up and press 'Search'.
+
+![event query](img/search.png)
+
+To run a second search, first select 'reset query'
+
+![event query](img/resetquery.png)
