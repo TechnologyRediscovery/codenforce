@@ -1,8 +1,8 @@
 # Public action request portal (CEARs)
 
 Contents:
-1. [Public CEAR submission sequence](#Public-page-sequence)
-2. [Internal CEAR management tools](#Internal-CEAR-management-tools)
+1. [Public CEAR submission sequence](#public-page-sequence)
+2. [Internal CEAR management tools](#internal-cear-management-tools)
 
 codeNforce version 1.6.0 and later includes a public-facing series of forms which allows users to submit a code enforcement action request (CEAR). The submission process provides the following features:
 * Requests are attributable to either a specific parcel in the chosen municipality or a location describable in a text box.
