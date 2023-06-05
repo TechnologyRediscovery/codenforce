@@ -65,7 +65,7 @@ The code violation box will display a green compliance achieved date.
 
 ## Conduct a Field Inspection
 
-[![Inspection](https://i.imgur.com/50wR1c9.png)](https://vimeo.com/765013026 "Conducting an Inspection")
+![Inspection](https://i.imgur.com/50wR1c9.png)](https://vimeo.com/765013026 "Conducting an Inspection")
 
 (1) From the code enforcement case page, select the '+ New inspection' button under the 'Field Inspection' banner. 
 

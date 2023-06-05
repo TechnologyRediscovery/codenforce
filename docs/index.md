@@ -1,13 +1,12 @@
-# CodeNForce system documentation
-CodeNForce is a JavaEE-based, open source web database application for managing municpal government code enforcement and occupancy permitting workflows. Built by Technology Rediscovery LLC and students attending the Community College of Allgheny County, CodeNForce's geographic center is the Turtle Creek Valley on the outskirts of Pittsburgh, PA.
+![codeNforce logo](img/Logo-N_public.png)
 
-## About this documentation
-As technical documentation designed for developers, the primary audience for these pages are system administrators and developers who wish to build, edit, or maintain an existing CodeConnect instance. Sub-components of the system each have their own briefing page which links to specific files in the repo as they are explained and indexes how-to pages for various tasks. 
+# Table of Contents
 
-## Building codeNforce
-[You can build codeNforce on most any Linux system with these instructions.](buildingcc/buildsteps.md) As a barely launched prototype, the build process is not always smooth like it might be in a fully packaged docker container. If you're trying to build as an non project team member, you will probably need to be quite handy at the terminal.
+1. [Code enforcement case management](case/casescreen.md)
+2. [Public action request portal](public/cears.md)
 
-## Contents by subsystem
+
+## Developer documentation contents by subsystem
 
 ### N [User](ss_User.md)
 ### I [Municipality](ss_Municipality.md)
@@ -32,7 +31,20 @@ As technical documentation designed for developers, the primary audience for the
 ### XX [External Data](ss_externaldata.md)
 ### XXI [Session](ss_session.md)
 
-## Legacy doc pages
+## [Permissions](permissions.md)
+As a cross-subsystem topic, the permissions strategy draws on features of User Credential objects and MuniProfile objects.
+
+
+# CodeNForce system documentation
+CodeNForce is a JavaEE-based, open source web database application for managing municpal government code enforcement and occupancy permitting workflows. Built by Technology Rediscovery LLC and students attending the Community College of Allgheny County, CodeNForce's geographic center is the Turtle Creek Valley on the outskirts of Pittsburgh, PA.
+
+## About this documentation
+As technical documentation designed for developers, the primary audience for these pages are system administrators and developers who wish to build, edit, or maintain an existing CodeConnect instance. Sub-components of the system each have their own briefing page which links to specific files in the repo as they are explained and indexes how-to pages for various tasks. 
+
+## Building codeNforce
+[You can build codeNforce on most any Linux system with these instructions.](buildingcc/buildsteps.md) As a barely launched prototype, the build process is not always smooth like it might be in a fully packaged docker container. If you're trying to build as an non project team member, you will probably need to be quite handy at the terminal.
+
+## Legacy doc pages (archive)
 
 [Code enforcement phase management and requested events](cecasephases.md)
 
@@ -64,6 +76,4 @@ All developer documentation is written in markdown and exists on the mater branc
 ## accessing the documentation
 The documentation root is at 
 https://technologyrediscovery.github.io/codenforce/
-# Table of Contents
 
-[Code Enforcement Case Profile](case/casescreen.md)
