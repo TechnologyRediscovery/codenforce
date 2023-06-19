@@ -4,6 +4,7 @@
 
 1. [Code enforcement case management](case/casescreen.md)
 2. [Public action request portal](public/cears.md)
+3. [Cross-muni case and property viewing](case/crossmuni.md)
 
 
 ## Developer documentation contents by subsystem

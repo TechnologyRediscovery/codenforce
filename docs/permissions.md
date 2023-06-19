@@ -41,7 +41,9 @@ MuniProfile can specify:
 
 Finalization logic also applies to removing finalization. 
 Code violations permissions are applied during transfer of failed inspection items to a CE case
+Deactivation of field inspections is governed by the permission floor for conducting inspections.
 
+Dispatches are governed by the checkpoint permissionsCheckpointAddUpdateFieldInspectionMetadata
 
 ### Occupancy permits
 Users must have rank of muni staff or better to draft permits. `MuniProfile` can require code officer or manager roles for formal issuance of the permit (and generation of its sequence ID). Issuance check is also applied for permit nullification. The issuance check is also applied during permit finalize override failed audit.
