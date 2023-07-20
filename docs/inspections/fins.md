@@ -5,33 +5,51 @@ Updated on 20-JUL-2023 after dashboard inspections going live.
 Field inspections record the outcome of a code officer's on-the-ground assessment of a property's compliance with checklist items grouped by the space type being inspected. 
 
 Features include:
-* Municipality-specific custom checklists to match the reason and scope of inspections, such as an exterior-only checklist or a sign inspection checklist
-* Photo upload for documentation of individual checklist items
-* Printable inspection reports
-* Integration of violated checklist items into code enforcement cases
-* One-click re-inspections make documentation of a property's progress toward compliance easy
+* Municipality-specific custom checklists to match the reason and scope of inspections, such as an exterior-only checklist, a sign inspection checklist, or a swimming pool checklist
+* Batch photo upload and linking of photos to individual checklist items
+* Printable inspection reports with embedded photos and findings
+* Easy transfer of violated checklist items into code enforcement cases to monitor compliance 
+* One-click re-inspections make for slick documentation of a property's progress toward compliance
 
 ## Inspection process
-Overview of steps
-1. [Locate the permit file or code enforcement case](#step1) to which the inspection should be attached
-1. Initiate either a new inspection or a re-inspection on that permit file or case
+1. [Locate the permit file or code enforcement case](#home) to which the inspection should be attached
+1. [Start a new inspection or a re-inspection](#start) on that permit file or case
 	* If creating a new inspection, choose an inspection checklist
-1. Configure inspection details: inspector, start/end times, comments
-1. From the inspection profile dialog, choose a space type to inspect 
-1. Conduct the actual inspection and take photos as you go
-1. Upload all the inspection photos to the inspection photo pool
-1. Attach photos to individual checklist items
-1. Finalize the inspection
-1. Generate, print, and distribute an [inspection report](#toolbox)
+1. [Configure inspection details](#configure): inspector, start/end times, comments
+1. [Choose a space type](#spacetype) to inspect 
+1. [Conduct the inspection](#conduct), adding additional spaces and taking photos as you go
+1. [Upload all the inspection photos](#upload) to the inspection photo pool
+1. [Attach photos](#attach) to individual checklist items
+1. [Finalize](#finalize) the inspection
+1. [Generate an inspection report](#report)
+1. [Transfer violated items](#transfer) to a code enforcement case (optional)
 
 
-### Find the right place for the inspection {#step1}
+### Find the right place for the inspection {#home}
 1. Search for and view the relevant property for your inspection. From the property profile page locate the appropriate permit file or code enforcement case to which the inspection should be attached. Navigate to the permit file or case profile page. NOTE: Only open code enforcement cases can receive a new inspection. 
     * Alternatively, if you know a permit file or case exists on the property of interest, simply find the relevant record on the dashboard search tools.
-2. 
+ 
+## Start a new inspection or build a re-inspection {#start}
 
-## Conduct a Field Inspection
+
+## Conduct a Field Inspection {#conduct}
 Inspections (and re-inspections) can be initiated on both permit files and code enforcement cases directly from the dashboard or the permit file or case profile pages.
+
+## Configure inspection details {#configure}
+
+## Choosing a space type {#spacetype}
+
+## Upload your inspection photos in a batch {#upload}
+
+## Attach photos from pool to checklist items {#attach}
+
+## Review and finalize {#finalize}
+
+## Generate an inspection report {#report}
+
+## Transfer violated items to a code enforcement case {#transfer}
+
+
 
 ### Starting an inspection from the dashboard
 
