@@ -3,8 +3,9 @@
 # Table of Contents
 
 1. [Code enforcement case management](case/casescreen.md)
-2. [Public action request portal](public/cears.md)
-3. [Cross-muni case and property viewing](case/crossmuni.md)
+1. [Field inspections](inspections/fins.md)
+1. [Public action request portal](public/cears.md)
+1. [Cross-muni case and property viewing](case/crossmuni.md)
 
 
 ## Developer documentation contents by subsystem
