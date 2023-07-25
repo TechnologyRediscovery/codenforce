@@ -34,15 +34,16 @@ Features include:
 ## Start a new inspection or setup a re-inspection {#start}
 If starting an inspection from the dashboard on either a code enforcement case or permit file, click the link in the Actions column called **inspect**. An inspection selection dialog appears. Start a fresh inspection using the button on the left or choose to reinspect a previous inspection using the tools on the right side of the dialog.
 
-If you start a new inspection, you'll firs be prompted to choose an inspection checklist. You can customize or build a new checklist using codeNforce's checklist builder accessed in the top navigation bar's **Code Book** box using the link **checklists**.
+If you start a new inspection, you'll first be prompted to choose an inspection checklist. You can customize or build a new checklist using codeNforce's checklist builder accessed in the top navigation bar's **Code Book** box using the link **checklists**.
 
 ### One-click reinspections
 ![one click reinspections](img/newfins_oneclick.png)
 
-The blue reinspect button will automatically build you a new inspection based on the inspection you've chosen to reinspect using sensible default settings such as only reinspecting spaces with failed items. If you'd prefer to have complete control over all the reinspection settings, use the link called *advanced reinspect* which will produce the reinspection settings dialog and ask for confirmation prior to building a new inspection. 
+The blue **reinspect** button will automatically build you a new inspection based on the inspection you've chosen to reinspect using sensible default settings such as only reinspecting spaces with failed items. If you'd prefer to have complete control over all the reinspection settings, use the link called **advanced reinspect** which will produce the reinspection settings dialog and ask for confirmation prior to building a new inspection. 
 
 ### Identifying reinspections
 As soon as you use the one-click reinspect button or confirm reinspection advanced settings, the familiar inspection info dialog appears. You'll know that your current inspection is a reinspection because the pre-inpsection notes are pre-populated with reinspection info and the inspection type will be listed as *Re-Inspection to inspection ID:???*
+
 ![proof of a reinspection](img/newfins_reinspectnotes.png)
 
 ## Configure inspection {#configure}
@@ -55,7 +56,7 @@ The inspection details panel allows users to specify the inspector, start/end ti
 ![inspection details](img/newfins_details.png)
 
 ## Choosing a space type {#spacetype}
-Once your inspection details are in good shape, users actually conduct pass/violate determinations by choosing a space type to inspect. Start this process with the all-import *Inspect new space* button located at the top of the Inspect space panel.
+Once your inspection details are in good shape, users actually conduct pass/violate determinations by choosing a space type to inspect. Start this process with the all-important **Inspect new space** button located at the top of the Inspect space panel.
 
 ![Inspect a new space](img/newfins_inspect.png)
 
@@ -66,9 +67,9 @@ You can see below that this particular checklist specifies the inspection of fou
 ![choose space type](img/newfins_selectSpace.png)
 
 ### Whole house space type
-You cannot add or remove checklist items from this dialog. Many towns have decided to include a space type called something like "Whole house" or "all ordinances" in each checklist so that inspectors can always access each ordinance during an inspection if their space-specific checklists do not include a required ordinance. 
+You cannot add or remove checklist items from this dialog. Many towns have decided to include a space type called something like "Whole house" or "all ordinances" in each checklist which contains all ordinances in the town's codebook. This allows inspectors to always access uncommonly enforced ordinances during an inspection if their space-specific checklist space types do not include a required ordinance. 
 
-Also note that the checklist backing each inspection is determined at the very beginning of the inspection process and cannot be changed by browser users. 
+Also note that the checklist backing each inspection is determined at the very beginning of the inspection process and cannot be changed by browser users. If you chose an incorrect checklist, deactivate your inspection using the **Transfer and deactivation** panel in the lower left column of the inspection profile. Then make a fresh new inspection with the desired checklist. 
 
 ## Inspect the space checklist {#conduct}
 After choosing a space type to inspect, the all-important **Inspect ordinances** dialog appears in which users  input checklist item outcomes (pass/violate) and include textual descriptions of inspection findings. Click the blue **Save and continue to photos** button in the upper left corner to proceed.
@@ -76,14 +77,14 @@ After choosing a space type to inspect, the all-important **Inspect ordinances**
 ![space inspector](img/newfin_spacedetails.png)
 
 ### Batch update and filtering
-Use the batch ordinance status applicator at the start of your space type inspection then customize individual ordinances with an outcome and findings. 
+Use the batch ordinance status applicator at the start of your space inspection. Once the screen refreshes, then customize individual ordinances with an outcome and findings. 
 
-Users can also find their desired checklist item using the full-text filter tool. Enter the text you wish to use in your filter into the text box, then click **Search**. Only matching ordinances appear in your inspection list. Any changes made to individual ordinances are preserved before, during, and after a filter operation. 
+Users can also find their desired checklist item using the full-text filter tool. Enter the text you wish to use in your filter into the text box, then click **Search**. Only matching ordinances appear in your inspection list. Remove the filter with the **Clear** link. Any changes made to individual ordinances are preserved before, during, and after a filter operation. 
 
 ### Space summary: Review outcomes and findings dialog
 Following the space entry dialog, a review and photo upload dialog appears. This dialog groups all your inspection items based on their outcome: violated items appearing first, followed by passed items, and uninspected items at the bottom. 
 
-Each item's findings and even inspection outcome can be edited individually on this screen. Changes made to any individual item will be saved and this dialog's lists repopulated based on user edits. 
+Each item's findings and even inspection outcome can be edited individually on this screen. Changes made to any individual item will be saved and this dialog's lists repopulated based on user edits. Users cannot add findings or photos to uninspected items since doing so would mean those items were, in fact, inspected.
 
 ![review space](img/newfins_photos.png)
 
