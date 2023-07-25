@@ -26,122 +26,93 @@ Features include:
 
 
 ### Find the right place for the inspection {#home}
-1. Search for and view the relevant property for your inspection. From the property profile page locate the appropriate permit file or code enforcement case to which the inspection should be attached. Navigate to the permit file or case profile page. NOTE: Only open code enforcement cases can receive a new inspection. 
-    * Alternatively, if you know a permit file or case exists on the property of interest, simply find the relevant record on the dashboard search tools.
+1. Search for and view the relevant property for your inspection. 
+2. From the property profile page locate the appropriate permit file or code enforcement case to which the inspection should be attached. Navigate to the permit file or case profile page. 
+	* NOTE: Only open code enforcement cases can receive a new inspection. 
+    * Alternatively, if you know a permit file or case exists on the property of interest, simply find the relevant record on the dashboard lists and proceed to the next step
  
-## Start a new inspection or build a re-inspection {#start}
+## Start a new inspection or setup a re-inspection {#start}
+If starting an inspection from the dashboard on either a code enforcement case or permit file, click the link in the Actions column called **inspect**. An inspection selection dialog appears. Start a fresh inspection using the button on the left or choose to reinspect a previous inspection using the tools on the right side of the dialog.
 
+If you start a new inspection, you'll firs be prompted to choose an inspection checklist. You can customize or build a new checklist using codeNforce's checklist builder accessed in the top navigation bar's **Code Book** box using the link **checklists**.
 
-## Conduct a Field Inspection {#conduct}
-Inspections (and re-inspections) can be initiated on both permit files and code enforcement cases directly from the dashboard or the permit file or case profile pages.
+### One-click reinspections
+![one click reinspections](img/newfins_oneclick.png)
 
-## Configure inspection details {#configure}
+The blue reinspect button will automatically build you a new inspection based on the inspection you've chosen to reinspect using sensible default settings such as only reinspecting spaces with failed items. If you'd prefer to have complete control over all the reinspection settings, use the link called *advanced reinspect* which will produce the reinspection settings dialog and ask for confirmation prior to building a new inspection. 
+
+### Identifying reinspections
+As soon as you use the one-click reinspect button or confirm reinspection advanced settings, the familiar inspection info dialog appears. You'll know that your current inspection is a reinspection because the pre-inpsection notes are pre-populated with reinspection info and the inspection type will be listed as *Re-Inspection to inspection ID:???*
+![proof of a reinspection](img/newfins_reinspectnotes.png)
+
+## Configure inspection {#configure}
+The "home screen" of any field inspection is the inspection profile dialog and contains tools for configuring, conducting, finalizing, and documenting your inspection. 
+
+![inspection profile](img/newfins_profile.png)
+
+The inspection details panel allows users to specify the inspector, start/end times, maximum occupancy limits, and compose overall comments and pre-inspection comments.
+
+![inspection details](img/newfins_details.png)
 
 ## Choosing a space type {#spacetype}
+Once your inspection details are in good shape, users actually conduct pass/violate determinations by choosing a space type to inspect. Start this process with the all-import *Inspect new space* button located at the top of the Inspect space panel.
+
+![Inspect a new space](img/newfins_inspect.png)
+
+Clicking this button will display a space type choice dialog box where the space type names are displayed and the row expansion details which ordinances are included in each space type's checklist.
+
+You can see below that this particular checklist specifies the inspection of four ordinances when inspecting a space called **Exterior property areas**. 
+
+![choose space type](img/newfins_selectSpace.png)
+
+### Whole house space type
+You cannot add or remove checklist items from this dialog. Many towns have decided to include a space type called something like "Whole house" or "all ordinances" in each checklist so that inspectors can always access each ordinance during an inspection if their space-specific checklists do not include a required ordinance. 
+
+Also note that the checklist backing each inspection is determined at the very beginning of the inspection process and cannot be changed by browser users. 
+
+## Inspect the space checklist {#conduct}
+After choosing a space type to inspect, the all-important **Inspect ordinances** dialog appears in which users  input checklist item outcomes (pass/violate) and include textual descriptions of inspection findings. Click the blue **Save and continue to photos** button in the upper left corner to proceed.
+
+![space inspector](img/newfin_spacedetails.png)
+
+### Batch update and filtering
+Use the batch ordinance status applicator at the start of your space type inspection then customize individual ordinances with an outcome and findings. 
+
+Users can also find their desired checklist item using the full-text filter tool. Enter the text you wish to use in your filter into the text box, then click **Search**. Only matching ordinances appear in your inspection list. Any changes made to individual ordinances are preserved before, during, and after a filter operation. 
+
+### Space summary: Review outcomes and findings dialog
+Following the space entry dialog, a review and photo upload dialog appears. This dialog groups all your inspection items based on their outcome: violated items appearing first, followed by passed items, and uninspected items at the bottom. 
+
+Each item's findings and even inspection outcome can be edited individually on this screen. Changes made to any individual item will be saved and this dialog's lists repopulated based on user edits. 
+
+![review space](img/newfins_photos.png)
+
+### Final column for photo tools
+The final column of the space summary tables provides photo selection and review links. See the next section for details.
 
 ## Upload your inspection photos in a batch {#upload}
+When you're ready to assign photos to individual inspection items, first upload them as a batch to the overall inspection using the Photos and documents panel in the lower right column of the inspection profile. 
+
+![photo process](img/newfins_photos1.png)
+
 
 ## Attach photos from pool to checklist items {#attach}
+Then return to each individual space's **photos and findings** dialog and assign photos from the pool to individual checklist items. You can assign the same photo to several inspection items. Removing the assignment is as easy as a lick on the *remove*link.
+
+![photo process](img/newfins_photos2.png)
 
 ## Review and finalize {#finalize}
+After uploading photos, check your ordinance determinations using the row expansion arrows in the leftmost column of the Inspect spaces tables. Adjust any item details using the **photos and findings** link in the *Actions* column
+
+![photo process](img/newfins_review.png)
+
+When all your items are in ship shape, finalize the inspection using the blue **Finalize inspection** command button in the inspection toolbox in the upper right panel of the profile. Choose a determination that fits your use case and confirm. You're now unable to add additional spaces to the inspection. You can remove an inspection's finalization by clicking the same button that has now become **Edit determination**. You must first remove finalization and then re-finalize with your adjusted outcome.
 
 ## Generate an inspection report {#report}
+The final step is to generate a printable inspection report using the blue toolbox button called **Build inspection report**. The report builder's dialog allows for full-control over which data is included in the final report. 
+![photo process](img/newfins_report.png)
 
 ## Transfer violated items to a code enforcement case {#transfer}
-
-
-
-### Starting an inspection from the dashboard
-
-### Starting an inspection from the permit file or case profile pages
-
-(1) From the code enforcement case page, select the '+ New inspection' button under the 'Field Inspection' banner. 
-
-![screenshot](img/inspection_3copy.png)
-
-(2) Choose the inspection checklist that you want to use and select the 'Create' button.
-
-![screenshot](img/inspection_4copy.png)
-
-(3) Enter the inspector, date, and time of the inspection, and any notes, in the 'Inspection Profile' pop-up window.  Select the 'Save Changes' button.  
-
-![screenshot](img/inspection_5copy.png)
-
-(4) Select the 'Inspect new space' button.  
-
-![screenshot](img/inspection_6copy.png)
-
-(5) Select the space(s) and click 'Continue'.
-
-![screenshot](img/inspection_7copy.png)
-
-(6) You can choose to add a location descriptor. To start the inspection, select the 'Inspect spance now!' button.
-
-![screenshot](img/inspection_8copy.png)
-
-(7) All of the code elements within the inspection list will default to 'Not Inspected'. If you would like, you can batch apply the 'Passed' or 'Violated' status to all of the code elements in the list by selecting the status from the drop-down menu in the top left-hand side of the pop-up window and select the 'Batch apply to all ords' link.
-
-![screenshot](img/inspection_9copy.png)
-
-(8) Code elements in the inspection list are divided into subcategories. Select the arrow next to a subcategory (red circle) to display the associated code elements.  To add a photo, select the 'Add a photo' link (red arrow). 
-
-![screenshot](img/inspection_10copy.png)
-
-(9) After selecting the 'Add a photo' link in step 8, a pop-up window will appear. To add a photo that is saved on the device, select the '+ Choose' button. 
-
-![screenshot](img/inspection_11copy.png)
-
-(10) Once you are done selecting files, click the blue 'Upload' button. 
-
-![screenshot](img/inspection_12copy.png)
-
-If your upload is successful, the blue 'Upload' button will dissapear and confirmation will temporarily appear for each file that was uploaded. 
-
-![screenshot](img/inspection_13copy.png)
-
-(11) To complete the inspection checklist, select 'Save and confirm' at the top of the window. 
-
-![screenshot](img/inspection_14copy.png)
-
-(12) If the inspection contained any violations, a pop-up window will appear to prompt you to indicate the severity. Choose the appropiate severyity from the drop-down menu, then select 'Save violation details'.  
-
-![screenshot](img/inspection_15copy.png)
-
-
-## Inspection Toolbox {#toolbox}
-
-The Inspection Toolbox contains options to:
-
-- [Finalize your inspection](#Finalize-an-Inspection)
-- [Build a printable inspection report](#Generate-a-Field-Inspection-Report)
-- [Transfer inspected violations to a new or existing case](#Add-Inspected-Violations-to-Case)
-
-
-## Finalize an Inspection
-
-(1) After saving an inspection checklist, you can finalize the inspection by selecting the blue 'finalize inspection' button. 
-
-![screenshot](img/inspection_16copy.png)
-
-(2) Select the correct determination/result of the inspection from the drop-down menu by clicking the down arrow. Then select the 'Finalize and lock inspection ID' blue button. After this button has been selected, you will no longer be able to make any changes to the inspection.
-
-![screenshot](img/inspection_17copy.png)
-
-
-## Generate a Field Inspection Report
-
-[![FIR](https://i.imgur.com/NwHYnDR.png)](https://vimeo.com/765016058 "Creating a Field Inspection Report")
-
-(1) Select the blue 'Build Inspection Report' button (red arrow).
-
-![screenshot](img/inspection_18copy.png)
-
-(2) Select which elements of the inspection you want to be included in the report from the drop-down menu (red circle) and check any relevant boxes.  Once you are finished, click the 'Click to generate inspection report in new tabe' blue text at the top of the pop-up window. The report will appear in a new tab in a print-friendly format. (Note: It is recommended to remove Headers and Footers on your print settings and adjust the scale as needed.)
-
-![screenshot](img/inspection_19copy.png)
-
-
-## Add Inspected Violations to Case
 
 [![Migrate](https://i.imgur.com/L1kDbGK.png)](https://vimeo.com/765068975 "Transferring Violations to a Case")
 
